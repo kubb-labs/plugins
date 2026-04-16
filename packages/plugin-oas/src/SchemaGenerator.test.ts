@@ -1,8 +1,9 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createMockedPlugin } from '@kubb/core/mocks'
 import { parse, type SchemaObject } from '@kubb/oas'
 import { describe, expect, test } from 'vitest'
-import { createMockedPlugin, mockedPluginDriver } from '#mocks'
+import { mockedPluginDriver } from '#mocks'
 import { type GetSchemaGeneratorOptions, SchemaGenerator } from './SchemaGenerator.ts'
 import { schemaKeywords } from './SchemaMapper.ts'
 

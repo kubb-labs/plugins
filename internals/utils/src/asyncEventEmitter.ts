@@ -1,5 +1,9 @@
 import { EventEmitter as NodeEventEmitter } from 'node:events'
-import { toError } from './errors.ts'
+
+function toError(err: unknown): Error {
+  if (err instanceof Error) return err
+  return new Error(String(err))
+}
 
 /**
  * A function that can be registered as an event listener, synchronous or async.
