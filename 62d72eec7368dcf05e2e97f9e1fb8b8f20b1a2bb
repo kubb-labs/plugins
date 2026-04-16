@@ -1,0 +1,97 @@
+.changeset/plugin-ts-compatibility-presets.md
+  bee15efb48a0fdfc 5,7-8,10
+.changeset/plugin-ts-enum-type-suffix.md
+  bee15efb48a0fdfc 5,14
+.changeset/config.json
+  bee15efb48a0fdfc 10,19
+.changeset/oas-ts-resolve-options.md
+  bee15efb48a0fdfc 6-9
+.changeset/remove-plugin-key-use-name.md
+  bee15efb48a0fdfc 17
+.changeset/plugin-ts-remove-mapper.md
+  bee15efb48a0fdfc 5
+.changeset/plugin-client-v5-migration.md
+  bee15efb48a0fdfc 5,7-9,11
+.changeset/plugin-cypress-v5-upgrade.md
+  bee15efb48a0fdfc 5,7,9-10
+.changeset/plugin-ts-remove-deprecated-options.md
+  bee15efb48a0fdfc 5
+.changeset/plugin-ts-legacy-naming-parity.md
+  bee15efb48a0fdfc 5,9-11,13
+.changeset/plugin-ts-resolvers-transformers.md
+  bee15efb48a0fdfc 5,7-8,10,12
+.changeset/update-function-param-types.md
+  bee15efb48a0fdfc 7
+.changeset/ts-discriminator-string-types.md
+  bee15efb48a0fdfc 5-9
+.changeset/upgrade-typescript-v6.md
+  bee15efb48a0fdfc 13
+.changeset/plugin-mcp-enum-path-params.md
+  bee15efb48a0fdfc 5
+.changeset/plugin-zod-v5-rewrite.md
+  bee15efb48a0fdfc 5,8-12,15-17,19
+.changeset/plugin-redoc-direct-adapter.md
+  bee15efb48a0fdfc 5
+.changeset/plugin-client-params-casing-unused-var.md
+  bee15efb48a0fdfc 5,7
+.changeset/require-node-22.md
+  bee15efb48a0fdfc 18
+packages/plugin-zod/src/printers/printerZodMini.ts
+  bee15efb48a0fdfc 28,45,260
+packages/plugin-zod/src/printers/printerZod.ts
+  bee15efb48a0fdfc 27,45,284
+.changeset/rename-define-to-create.md
+  bee15efb48a0fdfc 18
+packages/plugin-zod/src/printers/printerZod.test.ts
+  bee15efb48a0fdfc 539-540,554
+.changeset/ts-cypress-generator-helpers.md
+  bee15efb48a0fdfc 6
+.changeset/plugin-ts-fix-array-jsdoc.md
+  bee15efb48a0fdfc 5
+packages/plugin-zod/src/printers/printerZodMini.test.ts
+  bee15efb48a0fdfc 515-516,530
+.changeset/plugin-ts-v2-helpers.md
+  bee15efb48a0fdfc 5-12
+.changeset/plugin-ts-legacy-flag.md
+  bee15efb48a0fdfc 5,7
+.changeset/printer-options-api.md
+  bee15efb48a0fdfc 7,9,22,35
+.changeset/rename-plugin-manager-to-plugin-driver.md
+  bee15efb48a0fdfc 17
+.changeset/plugin-ts-fix-grouped-query-params.md
+  bee15efb48a0fdfc 5,7-9,11-13
+.changeset/plugin-ts-fix-keys-to-omit.md
+  bee15efb48a0fdfc 5
+packages/plugin-zod/src/generators/zodGenerator.test.tsx
+  bee15efb48a0fdfc 527
+.changeset/ts-fix-request-body-description.md
+  bee15efb48a0fdfc 5
+.changeset/pre.json
+  bee15efb48a0fdfc 20,23,30,33-35,39,41,43-45,47-53
+.changeset/ts-function-printer-type-handling.md
+  bee15efb48a0fdfc 5
+.changeset/plugin-mcp-v5-migration.md
+  bee15efb48a0fdfc 6,8-11,13
+packages/plugin-ts/src/generators/typeGenerator.test.ts
+  bee15efb48a0fdfc 267,301
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "62d72eec7368dcf05e2e97f9e1fb8b8f20b1a2bb",
+  "prompts": {
+    "bee15efb48a0fdfc": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "44f91da2-1220-4fb1-a728-4fac8965183f",
+        "model": "claude-4.5-opus-high-thinking"
+      },
+      "human_author": "Stijn Van Hulle",
+      "messages": [],
+      "total_additions": 165,
+      "total_deletions": 495,
+      "accepted_lines": 138,
+      "overriden_lines": 0
+    }
+  }
+}
