@@ -1,0 +1,91 @@
+packages/plugin-ts/package.json
+  7912347e5e596721 63-65,70
+pnpm-workspace.yaml
+  7912347e5e596721 8-15
+examples/fetch/package.json
+  7912347e5e596721 21,24
+packages/plugin-swr/package.json
+  7912347e5e596721 88,92,96
+packages/plugin-msw/package.json
+  7912347e5e596721 90-91,95,110
+examples/typescript/package.json
+  7912347e5e596721 23-24,27
+packages/plugin-faker/package.json
+  7912347e5e596721 85-86,89,104
+packages/plugin-zod/package.json
+  7912347e5e596721 66-67,83
+packages/plugin-oas/package.json
+  7912347e5e596721 95-97,101
+examples/faker/package.json
+  7912347e5e596721 31
+examples/generators/package.json
+  7912347e5e596721 21-22,26,28
+tests/e2e/package.json
+  7912347e5e596721 40
+tests/performance/package.json
+  7912347e5e596721 17,23
+packages/plugin-vue-query/package.json
+  7912347e5e596721 87-88,93,97
+examples/vue-query/package.json
+  7912347e5e596721 31
+internals/tanstack-query/package.json
+  7912347e5e596721 51-52,54,57
+README.md
+  7912347e5e596721 2,7,14,18-61,64-65,71-84,90-109,151,153,155,160-162,169-173
+examples/msw/package.json
+  7912347e5e596721 26,33
+examples/solid-query/package.json
+  7912347e5e596721 21,29
+examples/cypress/package.json
+  7912347e5e596721 27
+examples/mcp/package.json
+  7912347e5e596721 27
+examples/react-query/package.json
+  7912347e5e596721 31,34
+examples/swr/package.json
+  7912347e5e596721 21,28
+packages/plugin-svelte-query/package.json
+  7912347e5e596721 86-87,92,96
+packages/plugin-solid-query/package.json
+  7912347e5e596721 86-87,92,96
+examples/svelte-query/package.json
+  7912347e5e596721 21,29
+packages/plugin-mcp/package.json
+  7912347e5e596721 63,67,82
+examples/advanced/package.json
+  7912347e5e596721 56,59
+packages/plugin-cypress/package.json
+  7912347e5e596721 67,69,84
+examples/zod/package.json
+  7912347e5e596721 25
+packages/plugin-redoc/package.json
+  7912347e5e596721 68-69
+packages/plugin-client/package.json
+  7912347e5e596721 108,111,118
+packages/plugin-react-query/package.json
+  7912347e5e596721 85-86,91,95
+examples/client/package.json
+  7912347e5e596721 22-25,29,31
+examples/simple-single/package.json
+  7912347e5e596721 24,33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "b9d5112747209c3c839843d7fe212f4dc454b410",
+  "prompts": {
+    "7912347e5e596721": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8ecfd796-f1cd-4474-9e98-6df3dc0cd14d",
+        "model": "claude-4.5-opus-high-thinking"
+      },
+      "human_author": "Stijn Van Hulle",
+      "messages": [],
+      "total_additions": 199,
+      "total_deletions": 115,
+      "accepted_lines": 192,
+      "overriden_lines": 0
+    }
+  }
+}
