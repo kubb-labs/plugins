@@ -75,9 +75,6 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Build agent
-        run: pnpm turbo run build --filter=@kubb/agent
-
       - name: Test
         run: pnpm run test
 
@@ -178,7 +175,7 @@ jobs:
         run: pnpm run build
 
       - name: Publish preview packages
-        run: pnpx pkg-pr-new publish --pnpm --owner=stijnvanhulle --repo=https://github.com/kubb-labs/kubb.git './packages/*' --template './examples/*'
+        run: pnpx pkg-pr-new publish --pnpm './packages/*' --template './examples/*'
 
   dependency-diff:
     name: Dependency Diff
