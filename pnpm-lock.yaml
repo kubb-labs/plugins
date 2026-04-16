@@ -65,6 +65,12 @@ importers:
       '@changesets/cli':
         specifier: ^2.30.0
         version: 2.30.0(@types/node@22.19.17)
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
+      '@kubb/parser-ts':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
       '@manypkg/cli':
         specifier: ^0.25.1
         version: 0.25.1

@@ -1,9 +1,9 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: just for testing */
 
-import { format } from '@kubb/core/mocks'
 import { print } from '@kubb/parser-ts'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
+import { format } from '#mocks'
 import {
   appendJSDocToNode,
   createArrayDeclaration,

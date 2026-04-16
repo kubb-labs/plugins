@@ -1,11 +1,12 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Config } from '@kubb/core'
+import { createMockedPlugin, createMockedPluginDriver } from '@kubb/core/mocks'
 import type { HttpMethod } from '@kubb/oas'
 import { parse } from '@kubb/oas'
 import { OperationGenerator, renderOperations } from '@kubb/plugin-oas'
 import { describe, test } from 'vitest'
-import { createMockedPlugin, createMockedPluginDriver, matchFiles } from '#mocks'
+import { matchFiles } from '#mocks'
 import type { PluginMsw } from '../types.ts'
 import { handlersGenerator } from './handlersGenerator.tsx'
 

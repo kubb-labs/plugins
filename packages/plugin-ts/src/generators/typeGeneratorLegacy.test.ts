@@ -1,14 +1,8 @@
 import type { Config } from '@kubb/core'
 import { ast } from '@kubb/core'
-import {
-  createMockedAdapter,
-  createMockedPlugin,
-  createMockedPluginDriver,
-  matchFiles,
-  renderGeneratorOperation,
-  renderGeneratorSchema,
-} from '@kubb/core/mocks'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { describe, test } from 'vitest'
+import { matchFiles } from '#mocks'
 import { resolverTsLegacy } from '../resolvers/resolverTsLegacy.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGeneratorLegacy } from './typeGeneratorLegacy.tsx'

@@ -2,10 +2,11 @@
 
 import type { Config } from '@kubb/core'
 import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTsLegacy } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation } from '#mocks'
+import { matchFiles } from '#mocks'
 import { QueryKey } from '../components'
 import { MutationKey } from '../components/MutationKey.tsx'
 import { resolverSwr } from '../resolvers/resolverSwr.ts'
