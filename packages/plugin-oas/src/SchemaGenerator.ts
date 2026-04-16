@@ -1,4 +1,4 @@
-import type { AsyncEventEmitter } from '@internals/utils'
+import type { AsyncEventEmitter } from '@kubb/core'
 import { getUniqueName, pascalCase, stringify } from '@internals/utils'
 
 import type { ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions, ResolveNameParams } from '@kubb/core'

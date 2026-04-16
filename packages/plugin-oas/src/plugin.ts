@@ -1,5 +1,5 @@
 import path from 'node:path'
-import type { AsyncEventEmitter } from '@internals/utils'
+import type { AsyncEventEmitter } from '@kubb/core'
 import { camelCase } from '@internals/utils'
 import { type Config, createPlugin, type KubbHooks, type UserGroup } from '@kubb/core'
 import type { Oas } from '@kubb/oas'
