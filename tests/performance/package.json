@@ -14,13 +14,13 @@
   "type": "module",
   "dependencies": {
     "@internals/utils": "workspace:*",
-    "@kubb/core": "workspace:*",
+    "@kubb/core": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "kubb": "workspace:*"
+    "kubb": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:",

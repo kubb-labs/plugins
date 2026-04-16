@@ -63,8 +63,8 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/core": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*",
+    "@kubb/core": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
     "remeda": "catalog:"
   },
   "devDependencies": {
@@ -80,6 +80,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   }
 }

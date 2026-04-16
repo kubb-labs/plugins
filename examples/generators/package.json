@@ -18,14 +18,14 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/ast": "workspace:*",
-    "@kubb/parser-ts": "workspace:*",
+    "@kubb/ast": "catalog:",
+    "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*",
+    "@kubb/renderer-jsx": "catalog:",
     "axios": "^1.15.0",
-    "kubb": "workspace:*"
+    "kubb": "catalog:"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",

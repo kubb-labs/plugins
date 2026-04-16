@@ -23,14 +23,14 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
-    "@kubb/adapter-oas": "workspace:*",
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-msw": "workspace:*",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@mswjs/http-middleware": "^0.9.2",
-    "kubb": "workspace:*",
+    "kubb": "catalog:",
     "msw": "^2.13.3",
     "react": "^18.3.1"
   },

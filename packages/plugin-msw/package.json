@@ -87,12 +87,12 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/core": "workspace:*",
-    "@kubb/oas": "workspace:*",
+    "@kubb/core": "catalog:",
+    "@kubb/oas": "catalog:",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@internals/utils": "workspace:*"
@@ -107,6 +107,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   }
 }

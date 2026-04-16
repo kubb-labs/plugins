@@ -37,7 +37,7 @@
     "@tanstack/vue-query": "^5.99.0",
     "axios": "^1.15.0",
     "cypress": "~14.2.1",
-    "kubb": "workspace:*",
+    "kubb": "catalog:",
     "msw": "^2.13.3",
     "react": "^18.3.1",
     "solid-js": "^1.9.12",

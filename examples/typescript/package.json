@@ -20,11 +20,11 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "workspace:*",
-    "@kubb/oas": "workspace:*",
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/oas": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "axios": "^1.15.0",
-    "kubb": "workspace:*"
+    "kubb": "catalog:"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

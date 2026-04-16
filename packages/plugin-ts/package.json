@@ -60,14 +60,14 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/core": "workspace:*",
-    "@kubb/parser-ts": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*",
+    "@kubb/core": "catalog:",
+    "@kubb/parser-ts": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
     "remeda": "catalog:",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "engines": {
     "node": ">=22"

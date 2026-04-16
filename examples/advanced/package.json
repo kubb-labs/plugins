@@ -53,10 +53,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@kubb/agent": "workspace:*",
+    "@kubb/agent": "catalog:",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "kubb": "workspace:*",
+    "kubb": "catalog:",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.30.1",

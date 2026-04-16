@@ -28,7 +28,7 @@
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "dayjs": "^1.11.20",
-    "kubb": "workspace:*",
+    "kubb": "catalog:",
     "react": "^18.3.1"
   },
   "devDependencies": {

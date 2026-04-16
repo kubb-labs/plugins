@@ -60,11 +60,11 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/core": "workspace:*",
+    "@kubb/core": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@internals/utils": "workspace:*"
@@ -79,6 +79,6 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   }
 }

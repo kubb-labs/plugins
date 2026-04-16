@@ -105,17 +105,17 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/core": "workspace:*",
+    "@kubb/core": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@internals/utils": "workspace:*",
     "axios": "^1.15.0"
   },
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*",
+    "@kubb/renderer-jsx": "catalog:",
     "axios": "^1.7.2"
   },
   "peerDependenciesMeta": {

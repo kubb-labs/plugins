@@ -65,8 +65,8 @@
     "@internals/utils": "workspace:*"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "workspace:*",
-    "@kubb/core": "workspace:*",
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/core": "catalog:",
     "handlebars": "^4.7.9"
   },
   "engines": {

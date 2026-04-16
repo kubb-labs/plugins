@@ -48,13 +48,13 @@
   },
   "dependencies": {
     "@internals/utils": "workspace:*",
-    "@kubb/core": "workspace:*",
-    "@kubb/oas": "workspace:*",
+    "@kubb/core": "catalog:",
+    "@kubb/oas": "catalog:",
     "@kubb/plugin-oas": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:"

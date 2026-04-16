@@ -18,10 +18,10 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/adapter-oas": "workspace:*",
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "kubb": "workspace:*"
+    "kubb": "catalog:"
   },
   "devDependencies": {
     "react": "^18.3.1",

@@ -22,7 +22,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "axios": "^1.15.0",
-    "kubb": "workspace:*",
+    "kubb": "catalog:",
     "react": "^18.3.1",
     "typescript": "^5.9.3",
     "zod": "^4.3.6"

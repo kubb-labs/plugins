@@ -24,7 +24,7 @@
   "dependencies": {
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "kubb": "workspace:*",
+    "kubb": "catalog:",
     "react": "^18.3.1"
   },
   "devDependencies": {
