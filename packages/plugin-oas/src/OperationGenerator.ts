@@ -55,7 +55,7 @@ export class OperationGenerator<TPluginOptions extends PluginFactoryOptions = Pl
       case 'path':
         return !!operation.path.match(pattern)
       case 'method':
-        return !!method.match(pattern)
+        return typeof pattern === 'string' ? method.toLowerCase() === pattern.toLowerCase() : !!method.match(pattern)
       case 'contentType':
         return !!operation.getContentType().match(pattern)
       default:
