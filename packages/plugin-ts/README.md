@@ -11,13 +11,13 @@
 [![License][license-src]][license-href]
 [![Sponsors][sponsors-src]][sponsors-href]
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main//examples/typescript" target="_blank">View Demo</a>
 <span> · </span>
 <a href="https://kubb.dev/" target="_blank">Documentation</a>
 <span> · </span>
-<a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
+<a href="https://github.com/kubb-labs/plugins/issues/" target="_blank">Report Bug</a>
 <span> · </span>
-<a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Request Feature</a>
+<a href="https://github.com/kubb-labs/plugins/issues/" target="_blank">Request Feature</a>
 </h4>
 </div>
 
@@ -43,13 +43,13 @@ Kubb uses an MIT-licensed open source project with its ongoing development made 
 [npm-version-href]: https://npmjs.com/package/@kubb/plugin-ts
 [npm-downloads-src]: https://img.shields.io/npm/dm/@kubb/plugin-ts?flat&colorA=18181B&colorB=f58517
 [npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-ts
-[license-src]: https://img.shields.io/github/license/kubb-labs/kubb.svg?flat&colorA=18181B&colorB=f58517
-[license-href]: https://github.com/kubb-labs/kubb/blob/main/LICENSE
-[build-src]: https://img.shields.io/github/actions/workflow/status/kubb-labs/kubb/ci.yaml?style=flat&colorA=18181B&colorB=f58517
+[license-src]: https://img.shields.io/github/license/kubb-labs/plugins.svg?flat&colorA=18181B&colorB=f58517
+[license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
+[build-src]: https://img.shields.io/github/actions/workflow/status/kubb-labs/plugins/ci.yaml?style=flat&colorA=18181B&colorB=f58517
 [build-href]: https://www.npmjs.com/package/@kubb/plugin-ts
 [minified-src]: https://img.shields.io/bundlephobia/min/@kubb/plugin-ts?style=flat&colorA=18181B&colorB=f58517
 [minified-href]: https://www.npmjs.com/package/@kubb/plugin-ts
-[coverage-src]: https://img.shields.io/codecov/c/github/kubb-labs/kubb?style=flat&colorA=18181B&colorB=f58517
+[coverage-src]: https://img.shields.io/codecov/c/github/kubb-labs/plugins?style=flat&colorA=18181B&colorB=f58517
 [coverage-href]: https://www.npmjs.com/package/@kubb/plugin-ts
 [sponsors-src]: https://img.shields.io/github/sponsors/stijnvanhulle?style=flat&colorA=18181B&colorB=f58517
 [sponsors-href]: https://github.com/sponsors/stijnvanhulle/
