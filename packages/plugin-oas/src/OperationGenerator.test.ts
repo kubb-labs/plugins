@@ -203,7 +203,7 @@ describe('OperationGenerator exclude', async () => {
         exclude: [
           {
             type: 'method',
-            pattern: 'get',
+            pattern: 'GET',
           },
         ],
         include: undefined,
@@ -343,7 +343,7 @@ describe('OperationGenerator include', async () => {
         include: [
           {
             type: 'method',
-            pattern: 'get',
+            pattern: 'GET',
           },
         ],
         exclude: undefined,
@@ -414,7 +414,7 @@ describe('OperationGenerator include and exclude', async () => {
         exclude: [
           {
             type: 'method',
-            pattern: 'post',
+            pattern: 'POST',
           },
         ],
         driver: undefined as unknown as PluginDriver,

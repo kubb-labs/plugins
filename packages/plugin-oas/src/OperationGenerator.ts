@@ -1,7 +1,5 @@
-import type { AsyncEventEmitter } from '@kubb/core'
 import { pascalCase } from '@internals/utils'
-
-import type { ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions } from '@kubb/core'
+import type { AsyncEventEmitter, ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions } from '@kubb/core'
 import type { contentType, HttpMethod, Oas, OasTypes, Operation, SchemaObject } from '@kubb/oas'
 import type { CoreGenerator } from './generators/createGenerator.ts'
 import type { ReactGenerator } from './generators/createReactGenerator.ts'

@@ -1,6 +1,6 @@
 import type { ast, Output, PluginFactoryOptions, ResolveNameParams, UserGroup } from '@kubb/core'
 
-import type { contentType, HttpMethod, Oas, Operation, SchemaObject } from '@kubb/oas'
+import type { contentType, Oas, Operation, SchemaObject } from '@kubb/oas'
 import type { Generator } from './generators/types.ts'
 
 type GetOasOptions = {
@@ -204,7 +204,7 @@ type ByPath = {
 
 type ByMethod = {
   type: 'method'
-  pattern: HttpMethod | RegExp
+  pattern: ast.HttpMethod | RegExp
 }
 // TODO implement as alternative for ByMethod
 // type ByMethods = {
