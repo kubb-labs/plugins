@@ -1,4 +1,4 @@
-import { ast, definePrinter } from '@kubb/core'
+import { ast } from '@kubb/core'
 import { safePrint } from '@kubb/parser-ts'
 import type ts from 'typescript'
 import { ENUM_TYPES_WITH_KEY_SUFFIX, OPTIONAL_ADDS_QUESTION_TOKEN, OPTIONAL_ADDS_UNDEFINED } from '../constants.ts'
@@ -113,7 +113,7 @@ type PrinterTs = PrinterTsFactory
  * const declaration = printer.print(schemaNode) // ts.TypeAliasDeclaration | ts.InterfaceDeclaration
  * ```
  */
-export const printerTs = definePrinter<PrinterTs>((options) => {
+export const printerTs = ast.definePrinter<PrinterTs>((options) => {
   const addsUndefined = OPTIONAL_ADDS_UNDEFINED.has(options.optionalType)
 
   return {

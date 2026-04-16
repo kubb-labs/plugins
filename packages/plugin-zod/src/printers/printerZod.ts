@@ -1,6 +1,6 @@
 import { stringify } from '@internals/utils'
 
-import { ast, definePrinter } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyModifiers, containsSelfRef, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
 
@@ -58,7 +58,7 @@ export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptio
  * const code = printer.print(stringSchemaNode) // "z.string()"
  * ```
  */
-export const printerZod = definePrinter<PrinterZodFactory>((options) => {
+export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
   return {
     name: 'zod',
     options,
