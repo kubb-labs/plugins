@@ -67,6 +67,9 @@
     "typescript": "5.9.3"
   },
   "peerDependencies": {
+    "@kubb/ast": "5.0.0-alpha.34",
+    "@kubb/core": "5.0.0-alpha.34",
+    "@kubb/parser-ts": "5.0.0-alpha.34",
     "@kubb/renderer-jsx": "5.0.0-alpha.34"
   },
   "engines": {
