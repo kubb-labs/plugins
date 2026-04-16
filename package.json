@@ -54,6 +54,7 @@
     "@kubb/ast": "5.0.0-alpha.36",
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
+    "@kubb/adapter-oas": "catalog:",
     "@manypkg/cli": "^0.25.1",
     "@size-limit/file": "catalog:",
     "@types/node": "catalog:",
