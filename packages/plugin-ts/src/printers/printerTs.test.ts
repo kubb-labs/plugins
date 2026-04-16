@@ -1,8 +1,8 @@
 import { ast } from '@kubb/core'
+import { format } from '@kubb/core/mocks'
 import { print } from '@kubb/parser-ts'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
-import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import { printerTs } from './printerTs.ts'
 

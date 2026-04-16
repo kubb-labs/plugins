@@ -4,7 +4,6 @@
     "rootDir": ".",
     "types": ["bun-types"],
     "paths": {
-      "#mocks": ["./configs/mocks.ts"],
       "@internals/utils": ["./internals/utils/src/index.ts"],
       "@internals/tanstack-query": ["./internals/tanstack-query/src/index.ts"],
       "@kubb/plugin-oas/hooks": ["./packages/plugin-oas/src/hooks/index.ts"],

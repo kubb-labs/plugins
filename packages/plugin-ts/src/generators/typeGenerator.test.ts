@@ -3,8 +3,15 @@ import { camelCase } from '@internals/utils'
 
 import type { Config, Group } from '@kubb/core'
 import { ast } from '@kubb/core'
+import {
+  createMockedAdapter,
+  createMockedPlugin,
+  createMockedPluginDriver,
+  matchFiles,
+  renderGeneratorOperation,
+  renderGeneratorSchema,
+} from '@kubb/core/mocks'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorSchema } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'

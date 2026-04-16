@@ -1,9 +1,9 @@
 import { camelCase, pascalCase } from '@internals/utils'
 import type { PluginDriver } from '@kubb/core'
+import { createMockedPlugin } from '@kubb/core/mocks'
 import type { OasTypes, SchemaObject } from '@kubb/oas'
 import { parse } from '@kubb/oas'
 import { describe, expect, it } from 'vitest'
-import { createMockedPlugin } from '#mocks'
 import { type GetSchemaGeneratorOptions, SchemaGenerator } from '../SchemaGenerator.ts'
 
 // Simple mocked plugin manager for testing

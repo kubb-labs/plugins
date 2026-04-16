@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { Plugin, PluginDriver } from '@kubb/core'
+import { createMockedAdapter } from '@kubb/core/mocks'
 import { parse, parseFromConfig } from '@kubb/oas'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter } from '#mocks'
 import { OperationGenerator } from './OperationGenerator.ts'
 import { KUBB_REQUIRED_REQUEST_BODY_MARKER } from './utils/requestBody.ts'
 
