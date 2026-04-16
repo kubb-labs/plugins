@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { createKubb, AsyncEventEmitter, type KubbHooks, type Config } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
@@ -55,7 +55,7 @@ const configs: Array<{ name: string; config: Config }> = [
           ],
         }),
       ],
-    }as unknown as Config,
+    } as unknown as Config,
   },
   {
     name: 'includeByTag',
@@ -71,7 +71,7 @@ const configs: Array<{ name: string; config: Config }> = [
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
-    }as unknown as Config,
+    } as unknown as Config,
   },
 ]
 

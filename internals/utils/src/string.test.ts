@@ -43,8 +43,6 @@ describe('trimQuotes', () => {
   })
 })
 
-
-
 describe('trimExtName', () => {
   test('strips .ts extension', () => {
     expect(trimExtName('petStore.ts')).toBe('petStore')
