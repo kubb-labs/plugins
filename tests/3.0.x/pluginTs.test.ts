@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
+import { AsyncEventEmitter, createKubb, type KubbHooks, type UserConfig } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-const configs: Array<{ name: string; config: Config }> = [
+const configs: Array<{ name: string; config: UserConfig }> = [
   // ─── group ───────────────────────────────────────────────────────────────
   {
     /**
@@ -34,7 +34,7 @@ const configs: Array<{ name: string; config: Config }> = [
           group: { type: 'tag' },
         }),
       ],
-    } as unknown as Config,
+    },
   },
 
   // ─── exclude / include ───────────────────────────────────────────────────
@@ -55,7 +55,7 @@ const configs: Array<{ name: string; config: Config }> = [
           ],
         }),
       ],
-    } as unknown as Config,
+    },
   },
   {
     name: 'includeByTag',
@@ -71,7 +71,7 @@ const configs: Array<{ name: string; config: Config }> = [
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
-    } as unknown as Config,
+    },
   },
 ]
 
