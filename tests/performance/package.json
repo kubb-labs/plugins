@@ -22,7 +22,8 @@
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "@kubb/plugin-zod": "workspace:*"
+    "@kubb/plugin-zod": "workspace:*",
+    "kubb": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:",

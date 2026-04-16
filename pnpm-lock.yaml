@@ -1136,6 +1136,40 @@ importers:
         specifier: workspace:*
         version: link:../../internals/utils
 
+  tests/3.0.x:
+    dependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
+      '@kubb/parser-ts':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
+      '@kubb/plugin-cypress':
+        specifier: workspace:*
+        version: link:../../packages/plugin-cypress
+      '@kubb/plugin-oas':
+        specifier: workspace:*
+        version: link:../../packages/plugin-oas
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ts
+      '@kubb/plugin-zod':
+        specifier: workspace:*
+        version: link:../../packages/plugin-zod
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.2
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/node@25.6.0)(@vitest/ui@4.1.4)(jiti@2.6.1)(msw@2.13.4(@types/node@25.6.0)(typescript@6.0.2))(yaml@2.8.3)
+
   tests/e2e:
     dependencies:
       '@faker-js/faker':

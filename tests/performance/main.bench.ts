@@ -1,11 +1,12 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { AsyncEventEmitter, createKubb, type UserConfig } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type HookStylePlugin } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginOas } from '@kubb/plugin-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
+import { defineConfig } from 'kubb'
 import { bench, describe } from 'vitest'
 
 /**
@@ -25,7 +26,7 @@ describe('Plugin Generation Performance', () => {
   bench(
     'single plugin generation (plugin-ts)',
     async () => {
-      const config: UserConfig = {
+      const config = defineConfig({
         root: '.',
         input: {
           path: petStorePath,
@@ -44,11 +45,11 @@ describe('Plugin Generation Performance', () => {
             },
             enumType: 'asConst',
           }),
-        ],
-      }
+        ] as HookStylePlugin[],
+      })
 
       const hooks = new AsyncEventEmitter()
-      await createKubb({ config, hooks }).build()
+      await createKubb({ config: config as Config, hooks }).build()
     },
     {
       time: 10000,
@@ -58,7 +59,7 @@ describe('Plugin Generation Performance', () => {
   bench(
     'multiple plugins generation (plugin-ts + plugin-client)',
     async () => {
-      const config: UserConfig = {
+      const config = defineConfig({
         root: '.',
         input: {
           path: petStorePath,
@@ -82,11 +83,11 @@ describe('Plugin Generation Performance', () => {
               path: 'clients',
             },
           }),
-        ],
-      }
+        ] as HookStylePlugin[],
+      })
 
       const hooks = new AsyncEventEmitter()
-      await createKubb({ config, hooks }).build()
+      await createKubb({ config: config as Config, hooks }).build()
     },
     {
       time: 10000,
@@ -96,7 +97,7 @@ describe('Plugin Generation Performance', () => {
   bench(
     'comprehensive plugin suite generation',
     async () => {
-      const config: UserConfig = {
+      const config = defineConfig({
         root: '.',
         input: {
           path: petStorePath,
@@ -133,11 +134,11 @@ describe('Plugin Generation Performance', () => {
               barrelType: false,
             },
           }),
-        ],
-      }
+        ] as HookStylePlugin[],
+      })
 
       const hooks = new AsyncEventEmitter()
-      await createKubb({ config, hooks }).build()
+      await createKubb({ config: config as Config, hooks }).build()
     },
     {
       time: 10000,
