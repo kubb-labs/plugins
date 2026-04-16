@@ -2,7 +2,7 @@
 "@kubb/plugin-ts": major
 ---
 
-Remove deprecated options from `@kubb/plugin-ts`. Use `adapterOas(...)` instead:
+**Breaking:** Remove deprecated options. Use `adapterOas(...)` instead:
 
 | Removed | Replacement |
 |---|---|

@@ -1,6 +1,4 @@
 ---
-"@kubb/core": major
-"@kubb/adapter-oas": major
 "@kubb/plugin-oas": major
 "@kubb/plugin-ts": major
 "@kubb/plugin-client": major
@@ -17,12 +15,10 @@
 "@kubb/plugin-redoc": major
 ---
 
-Rename factory functions from `define*` to `create*`. `defineConfig` is unchanged.
+**Breaking:** Rename factory functions from `define*` to `create*`. `defineConfig` is unchanged.
 
 | Before | After |
 |---|---|
 | `definePlugin` | `createPlugin` |
 | `defineAdapter` | `createAdapter` |
 | `defineGenerator` | `createGenerator` |
-| `defineLogger` | `createLogger` |
-| `defineStorage` | `createStorage` |

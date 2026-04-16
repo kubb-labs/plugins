@@ -12,9 +12,6 @@ catalogs:
     '@kubb/agent':
       specifier: 5.0.0-alpha.35
       version: 5.0.0-alpha.35
-    '@kubb/ast':
-      specifier: 5.0.0-alpha.35
-      version: 5.0.0-alpha.35
     '@kubb/core':
       specifier: 5.0.0-alpha.35
       version: 5.0.0-alpha.35
@@ -219,9 +216,6 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-alpha.35(@kubb/renderer-jsx@5.0.0-alpha.35)
-      '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.35
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-alpha.35(@kubb/renderer-jsx@5.0.0-alpha.35)
@@ -334,9 +328,9 @@ importers:
 
   examples/generators:
     dependencies:
-      '@kubb/ast':
+      '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.35
+        version: 5.0.0-alpha.35(@kubb/renderer-jsx@5.0.0-alpha.35)
       '@kubb/parser-ts':
         specifier: 'catalog:'
         version: 5.0.0-alpha.35(@kubb/renderer-jsx@5.0.0-alpha.35)

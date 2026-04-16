@@ -1,4 +1,3 @@
-import type { PrinterFactoryOptions, PrinterPartial } from '@kubb/core'
 import { ast, definePrinter } from '@kubb/core'
 import { safePrint } from '@kubb/parser-ts'
 import type ts from 'typescript'
@@ -27,7 +26,7 @@ import { buildPropertyJSDocComments } from '../utils.ts'
  * })
  * ```
  */
-export type PrinterTsNodes = PrinterPartial<ts.TypeNode, PrinterTsOptions>
+export type PrinterTsNodes = ast.PrinterPartial<ts.TypeNode, PrinterTsOptions>
 
 export type PrinterTsOptions = {
   /**
@@ -87,7 +86,7 @@ export type PrinterTsOptions = {
 /**
  * TypeScript printer factory options: maps `SchemaNode` → `ts.TypeNode` (raw) or `ts.Node` (full declaration).
  */
-export type PrinterTsFactory = PrinterFactoryOptions<'typescript', PrinterTsOptions, ts.TypeNode, string>
+export type PrinterTsFactory =  ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, ts.TypeNode, string>
 
 type PrinterTs = PrinterTsFactory
 

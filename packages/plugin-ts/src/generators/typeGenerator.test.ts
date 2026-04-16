@@ -264,7 +264,7 @@ describe('typeGenerator — Operation — group', () => {
       resolver: resolverTs,
     })
 
-    const file = driver.fileManager.files.find((f) => f.baseName === expectedBaseName)
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === expectedBaseName)
     expect(file).toBeDefined()
     const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
     const expectedPath = expectedDir ? path.resolve(root, expectedDir, expectedBaseName) : path.resolve(root, expectedBaseName)
@@ -298,7 +298,7 @@ describe('typeGenerator — Operation — group', () => {
       resolver: resolverTs,
     })
 
-    const file = driver.fileManager.files.find((f) => f.baseName === 'GetConfig.ts')
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === 'GetConfig.ts')
     expect(file).toBeDefined()
     const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
     expect(file!.path).toBe(path.resolve(root, 'defaultController', 'GetConfig.ts'))

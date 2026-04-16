@@ -1,5 +1,4 @@
 ---
-"@kubb/core": major
 "@kubb/plugin-oas": major
 "@kubb/plugin-ts": major
 "@kubb/plugin-client": major
@@ -15,4 +14,4 @@
 "@kubb/plugin-mcp": major
 ---
 
-Remove `pluginKey` in favour of `pluginName`. Each plugin can now only be used once, adding duplicate plugins throws an error.
+**Breaking:** Remove `pluginKey` in favour of `pluginName`. Each plugin can now only be used once; duplicate plugins throw an error.

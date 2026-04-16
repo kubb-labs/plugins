@@ -1,4 +1,4 @@
-import { createFile, createSource, createText } from '@kubb/ast'
+import { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 
@@ -12,14 +12,14 @@ export const clientOperationGenerator = defineGenerator<PluginClient>({
     const file = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output })
 
     return [
-      createFile({
+      ast.createFile({
         baseName: file.baseName,
         path: file.path,
         meta: file.meta,
         sources: [
-          createSource({
+          ast.createSource({
             nodes: [
-              createText(`export const ${node.operationId} = {
+              ast.createText(`export const ${node.operationId} = {
   method: '${node.method}',
   url: '${toURL(node.path)}'
 }`),

@@ -1,6 +1,5 @@
 import { stringify } from '@internals/utils'
 
-import type { PrinterFactoryOptions, PrinterPartial } from '@kubb/core'
 import { ast, definePrinter } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyMiniModifiers, containsSelfRef, formatLiteral, lengthChecksMini, numberChecksMini } from '../utils.ts'
@@ -26,7 +25,7 @@ import { applyMiniModifiers, containsSelfRef, formatLiteral, lengthChecksMini, n
  * })
  * ```
  */
-export type PrinterZodMiniNodes = PrinterPartial<string, PrinterZodMiniOptions>
+export type PrinterZodMiniNodes = ast.PrinterPartial<string, PrinterZodMiniOptions>
 
 export type PrinterZodMiniOptions = {
   guidType?: PluginZod['resolvedOptions']['guidType']
@@ -43,7 +42,7 @@ export type PrinterZodMiniOptions = {
   nodes?: PrinterZodMiniNodes
 }
 
-export type PrinterZodMiniFactory = PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
+export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
 /**
  * Zod v4 **Mini** printer built with `definePrinter`.
  *
@@ -258,7 +257,7 @@ export const printerZodMini = definePrinter<PrinterZodMiniFactory>((options) => 
         // Mirror printerTs `nonNullable: true`: when omitting keys, the resulting
         // schema is a new non-nullable object type — skip optional/nullable/nullish.
         // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
-        base = `${base}.omit({ ${keysToOmit.map((k) => `"${k}": true`).join(', ')} })`
+        base = `${base}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
       }
 
       return applyMiniModifiers({

@@ -1,5 +1,4 @@
 ---
-"@kubb/core": major
 "@kubb/plugin-oas": major
 "@kubb/plugin-ts": major
 "@kubb/plugin-client": major
@@ -15,4 +14,4 @@
 "@kubb/plugin-mcp": major
 ---
 
-Rename `PluginManager` to `PluginDriver`. The `pluginManager` property in context/meta is now `driver`. The hook `usePluginManager` is now `usePluginDriver`.
+**Breaking:** Rename `PluginManager` to `PluginDriver`. The `pluginManager` property in context is now `driver`. The hook `usePluginManager` is now `usePluginDriver`.

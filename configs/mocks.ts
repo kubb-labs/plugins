@@ -5,7 +5,7 @@ import pluginTypescript from 'prettier/plugins/typescript'
 import { expect } from 'vitest'
 import { camelCase, pascalCase } from '../internals/utils/src/index.ts'
 import { transform } from '../packages/ast/src/index.ts'
-import type { FileNode, OperationNode, SchemaNode, Visitor } from '../packages/ast/src/types.ts'
+import type { FileNode, OperationNode, SchemaNode, Visitor } from '@kubb/core'
 import type {
   Adapter,
   AdapterFactoryOptions,

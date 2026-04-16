@@ -512,8 +512,8 @@ describe('printerZodMini', () => {
     test('override can call this.transform for nested nodes', () => {
       const p = printerZodMini({
         nodes: {
-          array(node) {
-            const inner = node.items?.map((item) => this.transform(item)).join(', ') ?? 'z.unknown()'
+          array(node: ast.ArraySchemaNode) {
+            const inner = node.items?.map((item: ast.SchemaNode) => (this as { transform: (n: ast.SchemaNode) => string }).transform(item)).join(', ') ?? 'z.unknown()'
             return `z.set(${inner})`
           },
         },
@@ -527,7 +527,7 @@ describe('printerZodMini', () => {
         guidType: 'guid',
         nodes: {
           uuid() {
-            return this.options.guidType === 'guid' ? 'z.guid().custom()' : 'z.uuid()'
+            return (this as { options: { guidType?: string } }).options.guidType === 'guid' ? 'z.guid().custom()' : 'z.uuid()'
           },
         },
       })
