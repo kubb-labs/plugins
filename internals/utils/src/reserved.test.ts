@@ -1,11 +1,20 @@
 import { describe, expect, test } from 'vitest'
-import { transformReservedWord } from './reserved.ts'
+import { isValidVarName } from './reserved.ts'
 
-describe('transformReservedWord', () => {
-  test('template rendering', () => {
-    expect(transformReservedWord('delete')).toBe('_delete')
-    expect(transformReservedWord('this')).toBe('_this')
-    expect(transformReservedWord('var')).toBe('_var')
-    expect(transformReservedWord('1test')).toBe('_1test')
+describe('isValidVarName', () => {
+  test('returns true for valid identifiers', () => {
+    expect(isValidVarName('foo')).toBe(true)
+    expect(isValidVarName('fooBar')).toBe(true)
+    expect(isValidVarName('_foo')).toBe(true)
+  })
+
+  test('returns false for reserved words', () => {
+    expect(isValidVarName('delete')).toBe(false)
+    expect(isValidVarName('var')).toBe(false)
+  })
+
+  test('returns false for invalid identifiers', () => {
+    expect(isValidVarName('1test')).toBe(false)
+    expect(isValidVarName('foo-bar')).toBe(false)
   })
 })

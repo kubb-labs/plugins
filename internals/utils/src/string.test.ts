@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { jsStringEscape, maskString, trimExtName, trimQuotes } from './string.ts'
+import { jsStringEscape, trimExtName, trimQuotes } from './string.ts'
 
 describe('jsStringEscape', () => {
   test('return jsStringEscape text', () => {
@@ -43,15 +43,7 @@ describe('trimQuotes', () => {
   })
 })
 
-describe('maskString', () => {
-  test('returns masked value when long enough', () => {
-    expect(maskString('KUBB_STUDIO-abc123-xyz789')).toBe('KUBB_STU…z789')
-  })
 
-  test('returns original value when too short to mask', () => {
-    expect(maskString('short')).toBe('short')
-  })
-})
 
 describe('trimExtName', () => {
   test('strips .ts extension', () => {
