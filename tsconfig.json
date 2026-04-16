@@ -4,14 +4,8 @@
     "rootDir": ".",
     "types": ["bun-types"],
     "paths": {
+      "#mocks": ["./configs/mocks.ts"],
       "@internals/utils": ["./internals/utils/src/index.ts"],
-      "@kubb/ast": ["./packages/ast/src/index.ts"],
-      "@kubb/core": ["./packages/core/src/index.ts"],
-      "@kubb/renderer-jsx": ["./packages/renderer-jsx/src/index.ts"],
-      "@kubb/renderer-jsx/jsx-runtime": ["./packages/renderer-jsx/src/jsx-runtime.ts"],
-      "@kubb/renderer-jsx/jsx-dev-runtime": ["./packages/renderer-jsx/src/jsx-runtime.ts"],
-      "@kubb/parser-ts": ["./packages/parser-ts/src/index.ts"],
-      "@kubb/plugin-oas": ["./packages/plugin-oas/src/index.ts"],
       "@kubb/plugin-ts/components": ["./packages/plugin-ts/src/components/index.ts"],
       "@kubb/plugin-ts/resolvers": ["./packages/plugin-ts/src/resolvers/index.ts"],
       "@kubb/plugin-ts": ["./packages/plugin-ts/src/index.ts"]

@@ -19,7 +19,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "url": "git+https://github.com/kubb-labs/plugin-ts.git",
     "directory": "packages/plugin-ts"
   },
   "license": "MIT",
@@ -54,21 +54,20 @@
     "lint": "bun biome lint .",
     "lint:fix": "bun biome lint --fix --unsafe .",
     "release": "pnpm publish --no-git-check",
-    "release:canary": "bash ../../.github/canary.sh && node ../../scripts/build.js canary && pnpm publish --no-git-check",
     "start": "tsdown --watch",
     "test": "vitest --passWithNoTests",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@kubb/ast": "workspace:*",
-    "@kubb/core": "workspace:*",
-    "@kubb/parser-ts": "workspace:*",
-    "@kubb/renderer-jsx": "workspace:*",
+    "@kubb/ast": "5.0.0-alpha.34",
+    "@kubb/core": "5.0.0-alpha.34",
+    "@kubb/parser-ts": "5.0.0-alpha.34",
+    "@kubb/renderer-jsx": "5.0.0-alpha.34",
     "remeda": "catalog:",
     "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "@kubb/renderer-jsx": "workspace:*"
+    "@kubb/renderer-jsx": "5.0.0-alpha.34"
   },
   "engines": {
     "node": ">=22"
