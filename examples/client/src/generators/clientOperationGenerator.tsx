@@ -1,5 +1,4 @@
-import { ast } from '@kubb/core'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 
 const toURL = (path: string) => path.replaceAll('{', ':').replaceAll('}', '')

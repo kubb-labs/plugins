@@ -86,7 +86,7 @@ export type PrinterTsOptions = {
 /**
  * TypeScript printer factory options: maps `SchemaNode` → `ts.TypeNode` (raw) or `ts.Node` (full declaration).
  */
-export type PrinterTsFactory =  ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, ts.TypeNode, string>
+export type PrinterTsFactory = ast.PrinterFactoryOptions<'typescript', PrinterTsOptions, ts.TypeNode, string>
 
 type PrinterTs = PrinterTsFactory
 

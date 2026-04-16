@@ -513,7 +513,8 @@ describe('printerZodMini', () => {
       const p = printerZodMini({
         nodes: {
           array(node: ast.ArraySchemaNode) {
-            const inner = node.items?.map((item: ast.SchemaNode) => (this as { transform: (n: ast.SchemaNode) => string }).transform(item)).join(', ') ?? 'z.unknown()'
+            const inner =
+              node.items?.map((item: ast.SchemaNode) => (this as { transform: (n: ast.SchemaNode) => string }).transform(item)).join(', ') ?? 'z.unknown()'
             return `z.set(${inner})`
           },
         },

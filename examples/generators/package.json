@@ -18,11 +18,11 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "@kubb/core": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
     "axios": "^1.15.0",
     "kubb": "catalog:"
