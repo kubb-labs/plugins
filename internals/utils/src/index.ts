@@ -1,4 +1,3 @@
-export { AsyncEventEmitter } from './asyncEventEmitter.ts'
 export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
 export { getRelativePath } from './fs.ts'
 export { buildJSDoc } from './jsdoc.ts'
