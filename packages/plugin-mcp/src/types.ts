@@ -1,16 +1,4 @@
-import type {
-  ast,
-  Exclude,
-  Generator,
-  Group,
-  Include,
-  Output,
-  Override,
-  PluginFactoryOptions,
-  ResolvePathOptions,
-  Resolver,
-  UserGroup,
-} from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 /**

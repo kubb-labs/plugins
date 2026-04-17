@@ -27,8 +27,7 @@ export default defineConfig(() => {
       pluginTs({
         output: { path: 'models/ts' },
       }),
-      pluginZod({
-      }),
+      pluginZod({}),
       pluginMcp({
         client: {
           baseURL: 'https://petstore.swagger.io/v2',
