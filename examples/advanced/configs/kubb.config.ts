@@ -85,6 +85,7 @@ export default defineConfig({
           pattern: 'store',
         },
       ],
+      compatibilityPreset: 'kubbV4',
       override: [
         {
           type: 'operationId',
