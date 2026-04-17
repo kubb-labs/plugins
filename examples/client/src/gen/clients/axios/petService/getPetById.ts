@@ -1,10 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { GetPetById400, GetPetById404, GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../../models/ts/petController/GetPetById.js'
+import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathParams['petId'] }) {
+function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
   const res = { method: 'GET', url: `/pet/${petId}` as const }
 
   return res
@@ -15,10 +15,10 @@ function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathParams['petId'] }) {
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById({ petId }: { petId: GetPetByIdPathParams['petId'] }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetPetByIdQueryResponse, ResponseErrorConfig<GetPetById400 | GetPetById404>, unknown>({
+  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
     url: getGetPetByIdUrl({ petId }).url.toString(),
     ...requestConfig,

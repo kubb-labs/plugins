@@ -1,36 +1,44 @@
-import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { InfiniteData, InfiniteQueryObserverOptions, QueryClient, QueryKey, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
-import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
 import type {
-  FindPetsByTags400,
-  FindPetsByTagsHeaderParams,
-  FindPetsByTagsQueryParams,
-  FindPetsByTagsQueryResponse,
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
+import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
 
-export const findPetsByTagsInfiniteQueryKey = (params?: FindPetsByTagsQueryParams) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsInfiniteQueryKey = (params?: {
+  tags?: FindPetsByTagsQueryTags
+  page?: FindPetsByTagsQueryPage
+  pageSize?: FindPetsByTagsQueryPageSize
+}) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
 export function findPetsByTagsInfiniteQueryOptions(
-  { headers, params }: { headers: FindPetsByTagsHeaderParams; params?: FindPetsByTagsQueryParams },
+  {
+    headers,
+    params,
+  }: {
+    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
+    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
+  },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
   return infiniteQueryOptions<
-    ResponseConfig<FindPetsByTagsQueryResponse>,
-    ResponseErrorConfig<FindPetsByTags400>,
-    InfiniteData<ResponseConfig<FindPetsByTagsQueryResponse>>,
+    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseErrorConfig<FindPetsByTagsStatus400>,
+    InfiniteData<ResponseConfig<FindPetsByTagsResponse>>,
     typeof queryKey,
-    NonNullable<FindPetsByTagsQueryParams['pageSize']>
+    number
   >({
     queryKey,
-    queryFn: async ({ signal, pageParam }) => {
-      params = {
-        ...(params ?? {}),
-        ['pageSize']: pageParam as unknown as FindPetsByTagsQueryParams['pageSize'],
-      } as FindPetsByTagsQueryParams
+    queryFn: async ({ signal }) => {
       return findPetsByTags({ headers, params }, { ...config, signal: config.signal ?? signal })
     },
     initialPageParam: 0,
@@ -45,13 +53,19 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = ResponseConfig<FindPetsByTagsQueryResponse>,
-  TError = ResponseErrorConfig<FindPetsByTags400>,
+  TQueryFnData = ResponseConfig<FindPetsByTagsResponse>,
+  TError = ResponseErrorConfig<FindPetsByTagsStatus400>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
-  TPageParam = NonNullable<FindPetsByTagsQueryParams['pageSize']>,
+  TPageParam = number,
 >(
-  { headers, params }: { headers: FindPetsByTagsHeaderParams; params?: FindPetsByTagsQueryParams },
+  {
+    headers,
+    params,
+  }: {
+    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
+    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
+  },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

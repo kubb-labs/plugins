@@ -1,14 +1,9 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
-import type {
-  UploadFileMutationRequest,
-  UploadFileMutationResponse,
-  UploadFilePathParams,
-  UploadFileQueryParams,
-} from '../../../models/ts/petController/UploadFile.ts'
-import { uploadFileMutationRequestSchema, uploadFileMutationResponseSchema } from '../../../zod/petController/uploadFileSchema.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
+import { uploadFileResponseSchema, uploadFileDataSchema } from '../../../zod/petController/uploadFileSchema.ts'
 
-export function getUploadFileUrl({ petId }: { petId: UploadFilePathParams['petId'] }) {
+export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}/uploadImage` as const }
 
   return res
@@ -19,14 +14,14 @@ export function getUploadFileUrl({ petId }: { petId: UploadFilePathParams['petId
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  { petId, data, params }: { petId: UploadFilePathParams['petId']; data: UploadFileMutationRequest; params?: UploadFileQueryParams },
-  config: Partial<RequestConfig<UploadFileMutationRequest>> & { client?: Client } = {},
+  { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = uploadFileMutationRequestSchema.parse(data)
+  const requestData = uploadFileDataSchema.parse(data)
 
-  const res = await request<UploadFileMutationResponse, ResponseErrorConfig<Error>, UploadFileMutationRequest>({
+  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl({ petId }).url.toString(),
     params,
@@ -35,5 +30,5 @@ export async function uploadFile(
     headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })
 
-  return { ...res, data: uploadFileMutationResponseSchema.parse(res.data) }
+  return { ...res, data: uploadFileResponseSchema.parse(res.data) }
 }

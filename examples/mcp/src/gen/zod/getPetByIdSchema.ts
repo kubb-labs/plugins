@@ -6,20 +6,10 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.js'
 
-export const getPetByIdPathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet to return'),
-})
+export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
-export const getPetById200Schema = petSchema.omit({ name: true }).describe('successful operation')
+export const getPetByIdStatus200Schema = petSchema.omit({ name: true })
 
-export const getPetById400Schema = z.any().describe('Invalid ID supplied')
+export const getPetByIdStatus400Schema = z.any()
 
-export const getPetById404Schema = z.any().describe('Pet not found')
-
-export const getPetByIdQueryResponseSchema = getPetById200Schema
-
-export const getPetByIdQuerySchema = z.object({
-  Response: getPetById200Schema,
-  PathParams: getPetByIdPathParamsSchema,
-  Errors: z.union([getPetById400Schema, getPetById404Schema]),
-})
+export const getPetByIdStatus404Schema = z.any()

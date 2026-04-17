@@ -1,24 +1,19 @@
-import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
-import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type {
-  UploadFileMutationRequest,
-  UploadFileMutationResponse,
-  UploadFilePathParams,
-  UploadFileQueryParams,
-} from '../../../models/ts/petController/UploadFile.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../../axios/petService/uploadFile.ts'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
-export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UploadFileMutationRequest>> & { client?: Client } = {}) {
+export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<
-    ResponseConfig<UploadFileMutationResponse>,
+    ResponseConfig<UploadFileResponse>,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathParams['petId']; data: UploadFileMutationRequest; params?: UploadFileQueryParams },
+    { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >({
     mutationKey,
@@ -35,12 +30,12 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Re
 export function useUploadFile<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<UploadFileMutationResponse>,
+      ResponseConfig<UploadFileResponse>,
       ResponseErrorConfig<Error>,
-      { petId: UploadFilePathParams['petId']; data: UploadFileMutationRequest; params?: UploadFileQueryParams },
+      { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UploadFileMutationRequest>> & { client?: Client }
+    client?: Partial<RequestConfig<UploadFileData>> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -48,16 +43,16 @@ export function useUploadFile<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
 
   const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<UploadFileMutationResponse>,
+    ResponseConfig<UploadFileResponse>,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathParams['petId']; data: UploadFileMutationRequest; params?: UploadFileQueryParams },
+    { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >
 
   return useMutation<
-    ResponseConfig<UploadFileMutationResponse>,
+    ResponseConfig<UploadFileResponse>,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathParams['petId']; data: UploadFileMutationRequest; params?: UploadFileQueryParams },
+    { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >(
     {
@@ -67,9 +62,9 @@ export function useUploadFile<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ResponseConfig<UploadFileMutationResponse>,
+    ResponseConfig<UploadFileResponse>,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathParams['petId']; data: UploadFileMutationRequest; params?: UploadFileQueryParams },
+    { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >
 }

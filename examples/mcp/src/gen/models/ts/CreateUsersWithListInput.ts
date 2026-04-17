@@ -6,29 +6,43 @@
 import type { User } from './User.js'
 
 /**
- * @description Successful operation
  * @type object
  */
-export type CreateUsersWithListInput200 = User
+export type CreateUsersWithListInputStatus200 = User
 
 /**
- * @description successful operation
  * @type any
  */
-export type CreateUsersWithListInputError = any
+export type CreateUsersWithListInputStatusDefault = any
 
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputMutationRequest = User[] | undefined
-
-export type CreateUsersWithListInputMutationResponse = CreateUsersWithListInput200
+export type CreateUsersWithListInputData = User[] | undefined
 
 /**
  * @type object
  */
-export type CreateUsersWithListInputMutation = {
-  Response: CreateUsersWithListInput200
-  Request: CreateUsersWithListInputMutationRequest
-  Errors: CreateUsersWithListInputError
+export type CreateUsersWithListInputRequestConfig = {
+  data?: CreateUsersWithListInputData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/user/createWithList'
 }
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputResponses = {
+  '200': CreateUsersWithListInputStatus200
+  default: CreateUsersWithListInputStatusDefault
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault

@@ -6,23 +6,12 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.js'
 
-export const findPetsByStatusPathParamsSchema = z.object({
-  step_id: z.string(),
-})
+export const findPetsByStatusPathStepIdSchema = z.string()
 
-export const findPetsByStatus200Schema = z
+export const findPetsByStatusStatus200Schema = z
   .array(petSchema)
   .min(1)
   .max(3)
   .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
-  .describe('successful operation')
 
-export const findPetsByStatus400Schema = z.any().describe('Invalid status value')
-
-export const findPetsByStatusQueryResponseSchema = findPetsByStatus200Schema
-
-export const findPetsByStatusQuerySchema = z.object({
-  Response: findPetsByStatus200Schema,
-  PathParams: findPetsByStatusPathParamsSchema,
-  Errors: findPetsByStatus400Schema,
-})
+export const findPetsByStatusStatus400Schema = z.any()

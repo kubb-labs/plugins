@@ -1,23 +1,17 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
-import type { UpdateUserMutationRequest, UpdateUserMutationResponse, UpdateUserPathParams } from '../models/ts/UpdateUser.js'
+import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../models/ts/UpdateUser.js'
 
 /**
  * @description This can only be done by the logged in user.
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUserHandler({
-  username,
-  data,
-}: {
-  username: UpdateUserPathParams['username']
-  data?: UpdateUserMutationRequest
-}): Promise<Promise<CallToolResult>> {
+export async function updateUserHandler({ username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData }): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<UpdateUserMutationResponse, ResponseErrorConfig<Error>, UpdateUserMutationRequest>({
+  const res = await fetch<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
     method: 'PUT',
     url: `/user/${username}`,
     baseURL: 'https://petstore.swagger.io/v2',

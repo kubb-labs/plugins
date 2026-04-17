@@ -7,16 +7,14 @@ import type { AddPetRequest } from '../AddPetRequest.js'
 import type { Pet } from '../Pet.js'
 
 /**
- * @description Successful operation
  * @type object
  */
-export type AddPet200 = Pet
+export type AddPetStatus200 = Pet
 
 /**
- * @description Pet not found
  * @type object
  */
-export type AddPet405 = {
+export type AddPetStatus405 = {
   /**
    * @type integer | undefined
    */
@@ -31,15 +29,31 @@ export type AddPet405 = {
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetMutationRequest = AddPetRequest
-
-export type AddPetMutationResponse = AddPet200
+export type AddPetData = AddPetRequest
 
 /**
  * @type object
  */
-export type AddPetMutation = {
-  Response: AddPet200
-  Request: AddPetMutationRequest
-  Errors: AddPet405
+export type AddPetRequestConfig = {
+  data?: AddPetData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet'
 }
+
+/**
+ * @type object
+ */
+export type AddPetResponses = {
+  '200': AddPetStatus200
+  '405': AddPetStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type AddPetResponse = AddPetStatus200 | AddPetStatus405

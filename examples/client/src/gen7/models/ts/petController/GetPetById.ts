@@ -6,41 +6,55 @@
 import type { Pet } from '../Pet.ts'
 
 /**
+ * @description ID of pet to return
+ * @type integer
+ */
+export type GetPetByIdPathPetId = number
+
+/**
  * @type object
  */
-export type GetPetByIdPathParams = {
+export type GetPetByIdStatus200 = Pet
+
+/**
+ * @type any
+ */
+export type GetPetByIdStatus400 = any
+
+/**
+ * @type any
+ */
+export type GetPetByIdStatus404 = any
+
+/**
+ * @type object
+ */
+export type GetPetByIdRequestConfig = {
+  data?: never
   /**
-   * @description ID of pet to return
-   * @type integer
+   * @type object
    */
-  petId: number
+  pathParams: {
+    petId: GetPetByIdPathPetId
+  }
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/pet/${string}`
 }
-
-/**
- * @description successful operation
- * @type object
- */
-export type GetPetById200 = Pet
-
-/**
- * @description Invalid ID supplied
- * @type any
- */
-export type GetPetById400 = any
-
-/**
- * @description Pet not found
- * @type any
- */
-export type GetPetById404 = any
-
-export type GetPetByIdQueryResponse = GetPetById200
 
 /**
  * @type object
  */
-export type GetPetByIdQuery = {
-  Response: GetPetById200
-  PathParams: GetPetByIdPathParams
-  Errors: GetPetById400 | GetPetById404
+export type GetPetByIdResponses = {
+  '200': GetPetByIdStatus200
+  '400': GetPetByIdStatus400
+  '404': GetPetByIdStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404

@@ -89,338 +89,139 @@ export const petNotFoundSchema = z.object({
 
 export const userArraySchema = z.array(userSchema)
 
-export const updatePet200Schema = petSchema.describe('Successful operation')
+export const updatePetStatus200Schema = petSchema
 
-export const updatePet400Schema = z.any().describe('Invalid ID supplied')
+export const updatePetStatus400Schema = z.any()
 
-export const updatePet404Schema = z.any().describe('Pet not found')
+export const updatePetStatus404Schema = z.any()
 
-export const updatePet405Schema = z.any().describe('Validation exception')
+export const updatePetStatus405Schema = z.any()
 
-export const updatePetMutationRequestSchema = petSchema.describe('Update an existent pet in the store')
+export const updatePetDataSchema = petSchema.describe('Update an existent pet in the store')
 
-export const updatePetMutationResponseSchema = updatePet200Schema
+export const addPetStatus200Schema = petSchema
 
-export const updatePetMutationSchema = z.object({
-  Response: updatePet200Schema,
-  Request: updatePetMutationRequestSchema,
-  Errors: z.union([updatePet400Schema, updatePet404Schema, updatePet405Schema]),
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
 })
 
-export const addPet200Schema = petSchema.describe('Successful operation')
+export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
 
-export const addPet405Schema = z
-  .object({
-    code: z.int().optional(),
-    message: z.string().optional(),
-  })
-  .describe('Pet not found')
-
-export const addPetMutationRequestSchema = addPetRequestSchema.describe('Create a new pet in the store')
-
-export const addPetMutationResponseSchema = addPet200Schema
-
-export const addPetMutationSchema = z.object({
-  Response: addPet200Schema,
-  Request: addPetMutationRequestSchema,
-  Errors: addPet405Schema,
-})
-
-export const findPetsByStatusQueryParamsSchema = z
-  .object({
-    status: z.enum(['available', 'pending', 'sold']).optional().default('available').describe('Status values that need to be considered for filter'),
-  })
+export const findPetsByStatusQueryStatusSchema = z
+  .enum(['available', 'pending', 'sold'])
   .optional()
+  .default('available')
+  .describe('Status values that need to be considered for filter')
 
-export const findPetsByStatus200Schema = z.array(petSchema).describe('successful operation')
+export const findPetsByStatusStatus200Schema = z.array(petSchema)
 
-export const findPetsByStatus400Schema = z.any().describe('Invalid status value')
+export const findPetsByStatusStatus400Schema = z.any()
 
-export const findPetsByStatusQueryResponseSchema = findPetsByStatus200Schema
+export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
-export const findPetsByStatusQuerySchema = z.object({
-  Response: findPetsByStatus200Schema,
-  QueryParams: findPetsByStatusQueryParamsSchema,
-  Errors: findPetsByStatus400Schema,
-})
+export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
-export const findPetsByTagsQueryParamsSchema = z
-  .object({
-    tags: z.array(z.string()).optional().describe('Tags to filter by'),
-    page: z.string().optional().describe('to request with required page number or pagination'),
-    pageSize: z.string().optional().describe('to request with required page size'),
-  })
-  .optional()
+export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export const findPetsByTags200Schema = z.array(petSchema).describe('successful operation')
+export const findPetsByTagsStatus200Schema = z.array(petSchema)
 
-export const findPetsByTags400Schema = z.any().describe('Invalid tag value')
+export const findPetsByTagsStatus400Schema = z.any()
 
-export const findPetsByTagsQueryResponseSchema = findPetsByTags200Schema
+export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
-export const findPetsByTagsQuerySchema = z.object({
-  Response: findPetsByTags200Schema,
-  QueryParams: findPetsByTagsQueryParamsSchema,
-  Errors: findPetsByTags400Schema,
-})
+export const getPetByIdStatus200Schema = petSchema
 
-export const getPetByIdPathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet to return'),
-})
+export const getPetByIdStatus400Schema = z.any()
 
-export const getPetById200Schema = petSchema.describe('successful operation')
+export const getPetByIdStatus404Schema = z.any()
 
-export const getPetById400Schema = z.any().describe('Invalid ID supplied')
+export const updatePetWithFormPathPetIdSchema = z.int().describe('ID of pet that needs to be updated')
 
-export const getPetById404Schema = z.any().describe('Pet not found')
+export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
-export const getPetByIdQueryResponseSchema = getPetById200Schema
+export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
-export const getPetByIdQuerySchema = z.object({
-  Response: getPetById200Schema,
-  PathParams: getPetByIdPathParamsSchema,
-  Errors: z.union([getPetById400Schema, getPetById404Schema]),
-})
+export const updatePetWithFormStatus405Schema = z.any()
 
-export const updatePetWithFormPathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet that needs to be updated'),
-})
+export const deletePetHeaderApiKeySchema = z.string().optional()
 
-export const updatePetWithFormQueryParamsSchema = z
-  .object({
-    name: z.string().optional().describe('Name of pet that needs to be updated'),
-    status: z.string().optional().describe('Status of pet that needs to be updated'),
-  })
-  .optional()
+export const deletePetPathPetIdSchema = z.int().describe('Pet id to delete')
 
-export const updatePetWithForm405Schema = z.any().describe('Invalid input')
+export const deletePetStatus400Schema = z.any()
 
-export const updatePetWithFormMutationResponseSchema = z.any()
+export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
 
-export const updatePetWithFormMutationSchema = z.object({
-  Response: z.any(),
-  QueryParams: updatePetWithFormQueryParamsSchema,
-  PathParams: updatePetWithFormPathParamsSchema,
-  Errors: updatePetWithForm405Schema,
-})
+export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
-export const deletePetPathParamsSchema = z.object({
-  petId: z.int().describe('Pet id to delete'),
-})
+export const uploadFileStatus200Schema = apiResponseSchema
 
-export const deletePetHeaderParamsSchema = z
-  .object({
-    api_key: z.string().optional(),
-  })
-  .optional()
+export const uploadFileDataSchema = z.instanceof(File).optional()
 
-export const deletePet400Schema = z.any().describe('Invalid pet value')
+export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
 
-export const deletePetMutationResponseSchema = z.any()
+export const placeOrderStatus200Schema = orderSchema
 
-export const deletePetMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deletePetPathParamsSchema,
-  HeaderParams: deletePetHeaderParamsSchema,
-  Errors: deletePet400Schema,
-})
+export const placeOrderStatus405Schema = z.any()
 
-export const uploadFilePathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet to update'),
-})
+export const placeOrderDataSchema = orderSchema.optional()
 
-export const uploadFileQueryParamsSchema = z
-  .object({
-    additionalMetadata: z.string().optional().describe('Additional Metadata'),
-  })
-  .optional()
+export const placeOrderPatchStatus200Schema = orderSchema
 
-export const uploadFile200Schema = apiResponseSchema.describe('successful operation')
+export const placeOrderPatchStatus405Schema = z.any()
 
-export const uploadFileMutationRequestSchema = z.instanceof(File).optional()
+export const placeOrderPatchDataSchema = orderSchema.optional()
 
-export const uploadFileMutationResponseSchema = uploadFile200Schema
+export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
 
-export const uploadFileMutationSchema = z.object({
-  Response: uploadFile200Schema,
-  Request: uploadFileMutationRequestSchema,
-  QueryParams: uploadFileQueryParamsSchema,
-  PathParams: uploadFilePathParamsSchema,
-  Errors: z.any(),
-})
+export const getOrderByIdStatus200Schema = orderSchema
 
-export const getInventory200Schema = z.object({}).catchall(z.int()).describe('successful operation')
+export const getOrderByIdStatus400Schema = z.any()
 
-export const getInventoryQueryResponseSchema = getInventory200Schema
+export const getOrderByIdStatus404Schema = z.any()
 
-export const getInventoryQuerySchema = z.object({
-  Response: getInventory200Schema,
-  Errors: z.any(),
-})
+export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
 
-export const placeOrder200Schema = orderSchema.describe('successful operation')
+export const deleteOrderStatus400Schema = z.any()
 
-export const placeOrder405Schema = z.any().describe('Invalid input')
+export const deleteOrderStatus404Schema = z.any()
 
-export const placeOrderMutationRequestSchema = orderSchema.optional()
+export const createUserStatusDefaultSchema = userSchema
 
-export const placeOrderMutationResponseSchema = placeOrder200Schema
+export const createUserDataSchema = userSchema.optional().describe('Created user object')
 
-export const placeOrderMutationSchema = z.object({
-  Response: placeOrder200Schema,
-  Request: placeOrderMutationRequestSchema,
-  Errors: placeOrder405Schema,
-})
+export const createUsersWithListInputStatus200Schema = userSchema
 
-export const placeOrderPatch200Schema = orderSchema.describe('successful operation')
+export const createUsersWithListInputStatusDefaultSchema = z.any()
 
-export const placeOrderPatch405Schema = z.any().describe('Invalid input')
+export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
-export const placeOrderPatchMutationRequestSchema = orderSchema.optional()
+export const loginUserQueryUsernameSchema = z.string().optional().describe('The user name for login')
 
-export const placeOrderPatchMutationResponseSchema = placeOrderPatch200Schema
+export const loginUserQueryPasswordSchema = z.string().optional().describe('The password for login in clear text')
 
-export const placeOrderPatchMutationSchema = z.object({
-  Response: placeOrderPatch200Schema,
-  Request: placeOrderPatchMutationRequestSchema,
-  Errors: placeOrderPatch405Schema,
-})
+export const loginUserStatus200Schema = z.string()
 
-export const getOrderByIdPathParamsSchema = z.object({
-  orderId: z.int().describe('ID of order that needs to be fetched'),
-})
+export const loginUserStatus400Schema = z.any()
 
-export const getOrderById200Schema = orderSchema.describe('successful operation')
+export const logoutUserStatusDefaultSchema = z.any()
 
-export const getOrderById400Schema = z.any().describe('Invalid ID supplied')
+export const getUserByNamePathUsernameSchema = z.string().describe('The name that needs to be fetched. Use user1 for testing. ')
 
-export const getOrderById404Schema = z.any().describe('Order not found')
+export const getUserByNameStatus200Schema = userSchema
 
-export const getOrderByIdQueryResponseSchema = getOrderById200Schema
+export const getUserByNameStatus400Schema = z.any()
 
-export const getOrderByIdQuerySchema = z.object({
-  Response: getOrderById200Schema,
-  PathParams: getOrderByIdPathParamsSchema,
-  Errors: z.union([getOrderById400Schema, getOrderById404Schema]),
-})
+export const getUserByNameStatus404Schema = z.any()
 
-export const deleteOrderPathParamsSchema = z.object({
-  orderId: z.int().describe('ID of the order that needs to be deleted'),
-})
+export const updateUserPathUsernameSchema = z.string().describe('name that need to be deleted')
 
-export const deleteOrder400Schema = z.any().describe('Invalid ID supplied')
+export const updateUserStatusDefaultSchema = z.any()
 
-export const deleteOrder404Schema = z.any().describe('Order not found')
+export const updateUserDataSchema = userSchema.optional().describe('Update an existent user in the store')
 
-export const deleteOrderMutationResponseSchema = z.any()
+export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
 
-export const deleteOrderMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteOrderPathParamsSchema,
-  Errors: z.union([deleteOrder400Schema, deleteOrder404Schema]),
-})
+export const deleteUserStatus400Schema = z.any()
 
-export const createUserErrorSchema = userSchema.describe('successful operation')
-
-export const createUserMutationRequestSchema = userSchema.optional().describe('Created user object')
-
-export const createUserMutationResponseSchema = z.any()
-
-export const createUserMutationSchema = z.object({
-  Response: z.any(),
-  Request: createUserMutationRequestSchema,
-  Errors: createUserErrorSchema,
-})
-
-export const createUsersWithListInput200Schema = userSchema.describe('Successful operation')
-
-export const createUsersWithListInputErrorSchema = z.any().describe('successful operation')
-
-export const createUsersWithListInputMutationRequestSchema = z.array(userSchema).optional()
-
-export const createUsersWithListInputMutationResponseSchema = createUsersWithListInput200Schema
-
-export const createUsersWithListInputMutationSchema = z.object({
-  Response: createUsersWithListInput200Schema,
-  Request: createUsersWithListInputMutationRequestSchema,
-  Errors: createUsersWithListInputErrorSchema,
-})
-
-export const loginUserQueryParamsSchema = z
-  .object({
-    username: z.string().optional().describe('The user name for login'),
-    password: z.string().optional().describe('The password for login in clear text'),
-  })
-  .optional()
-
-export const loginUser200Schema = z.string().describe('successful operation')
-
-export const loginUser400Schema = z.any().describe('Invalid username/password supplied')
-
-export const loginUserQueryResponseSchema = loginUser200Schema
-
-export const loginUserQuerySchema = z.object({
-  Response: loginUser200Schema,
-  QueryParams: loginUserQueryParamsSchema,
-  Errors: loginUser400Schema,
-})
-
-export const logoutUserErrorSchema = z.any().describe('successful operation')
-
-export const logoutUserQueryResponseSchema = z.any()
-
-export const logoutUserQuerySchema = z.object({
-  Response: z.any(),
-  Errors: logoutUserErrorSchema,
-})
-
-export const getUserByNamePathParamsSchema = z.object({
-  username: z.string().describe('The name that needs to be fetched. Use user1 for testing. '),
-})
-
-export const getUserByName200Schema = userSchema.describe('successful operation')
-
-export const getUserByName400Schema = z.any().describe('Invalid username supplied')
-
-export const getUserByName404Schema = z.any().describe('User not found')
-
-export const getUserByNameQueryResponseSchema = getUserByName200Schema
-
-export const getUserByNameQuerySchema = z.object({
-  Response: getUserByName200Schema,
-  PathParams: getUserByNamePathParamsSchema,
-  Errors: z.union([getUserByName400Schema, getUserByName404Schema]),
-})
-
-export const updateUserPathParamsSchema = z.object({
-  username: z.string().describe('name that need to be deleted'),
-})
-
-export const updateUserErrorSchema = z.any().describe('successful operation')
-
-export const updateUserMutationRequestSchema = userSchema.optional().describe('Update an existent user in the store')
-
-export const updateUserMutationResponseSchema = z.any()
-
-export const updateUserMutationSchema = z.object({
-  Response: z.any(),
-  Request: updateUserMutationRequestSchema,
-  PathParams: updateUserPathParamsSchema,
-  Errors: updateUserErrorSchema,
-})
-
-export const deleteUserPathParamsSchema = z.object({
-  username: z.string().describe('The name that needs to be deleted'),
-})
-
-export const deleteUser400Schema = z.any().describe('Invalid username supplied')
-
-export const deleteUser404Schema = z.any().describe('User not found')
-
-export const deleteUserMutationResponseSchema = z.any()
-
-export const deleteUserMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteUserPathParamsSchema,
-  Errors: z.union([deleteUser400Schema, deleteUser404Schema]),
-})
+export const deleteUserStatus404Schema = z.any()

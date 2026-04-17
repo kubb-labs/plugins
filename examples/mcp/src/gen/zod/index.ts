@@ -1,138 +1,67 @@
-export {
-  addFiles200Schema,
-  addFiles405Schema,
-  addFilesMutationRequestSchema,
-  addFilesMutationResponseSchema,
-  addFilesMutationSchema,
-} from './addFilesSchema.js'
+export { addFilesDataSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './addFilesSchema.js'
 export { addPetRequestSchema } from './addPetRequestSchema.js'
-export { addPet200Schema, addPet405Schema, addPetMutationRequestSchema, addPetMutationResponseSchema, addPetMutationSchema } from './addPetSchema.js'
+export { addPetDataSchema, addPetStatus200Schema, addPetStatus405Schema } from './addPetSchema.js'
 export { addressSchema } from './addressSchema.js'
 export { apiResponseSchema } from './apiResponseSchema.js'
 export { categorySchema } from './categorySchema.js'
 export {
-  createPets201Schema,
-  createPetsErrorSchema,
-  createPetsHeaderParamsSchema,
-  createPetsMutationRequestSchema,
-  createPetsMutationResponseSchema,
-  createPetsMutationSchema,
-  createPetsPathParamsSchema,
-  createPetsQueryParamsSchema,
+  createPetsDataSchema,
+  createPetsHeaderXEXAMPLESchema,
+  createPetsPathUuidSchema,
+  createPetsQueryOffsetSchema,
+  createPetsStatus201Schema,
+  createPetsStatusDefaultSchema,
 } from './createPetsSchema.js'
-export { createUserErrorSchema, createUserMutationRequestSchema, createUserMutationResponseSchema, createUserMutationSchema } from './createUserSchema.js'
+export { createUserDataSchema, createUserStatusDefaultSchema } from './createUserSchema.js'
 export {
-  createUsersWithListInput200Schema,
-  createUsersWithListInputErrorSchema,
-  createUsersWithListInputMutationRequestSchema,
-  createUsersWithListInputMutationResponseSchema,
-  createUsersWithListInputMutationSchema,
+  createUsersWithListInputDataSchema,
+  createUsersWithListInputStatus200Schema,
+  createUsersWithListInputStatusDefaultSchema,
 } from './createUsersWithListInputSchema.js'
 export { customerSchema } from './customerSchema.js'
+export { deleteOrderPathOrderIdSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './deleteOrderSchema.js'
+export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetStatus400Schema } from './deletePetSchema.js'
+export { deleteUserPathUsernameSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './deleteUserSchema.js'
+export { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema } from './findPetsByStatusSchema.js'
 export {
-  deleteOrder400Schema,
-  deleteOrder404Schema,
-  deleteOrderMutationResponseSchema,
-  deleteOrderMutationSchema,
-  deleteOrderPathParamsSchema,
-} from './deleteOrderSchema.js'
-export {
-  deletePet400Schema,
-  deletePetHeaderParamsSchema,
-  deletePetMutationResponseSchema,
-  deletePetMutationSchema,
-  deletePetPathParamsSchema,
-} from './deletePetSchema.js'
-export {
-  deleteUser400Schema,
-  deleteUser404Schema,
-  deleteUserMutationResponseSchema,
-  deleteUserMutationSchema,
-  deleteUserPathParamsSchema,
-} from './deleteUserSchema.js'
-export {
-  findPetsByStatus200Schema,
-  findPetsByStatus400Schema,
-  findPetsByStatusPathParamsSchema,
-  findPetsByStatusQueryResponseSchema,
-  findPetsByStatusQuerySchema,
-} from './findPetsByStatusSchema.js'
-export {
-  findPetsByTags200Schema,
-  findPetsByTags400Schema,
-  findPetsByTagsHeaderParamsSchema,
-  findPetsByTagsQueryParamsSchema,
-  findPetsByTagsQueryResponseSchema,
-  findPetsByTagsQuerySchema,
+  findPetsByTagsHeaderXEXAMPLESchema,
+  findPetsByTagsQueryPageSchema,
+  findPetsByTagsQueryPageSizeSchema,
+  findPetsByTagsQueryTagsSchema,
+  findPetsByTagsStatus200Schema,
+  findPetsByTagsStatus400Schema,
 } from './findPetsByTagsSchema.js'
-export { getInventory200Schema, getInventoryQueryResponseSchema, getInventoryQuerySchema } from './getInventorySchema.js'
+export { getInventoryStatus200Schema } from './getInventorySchema.js'
+export { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema } from './getOrderByIdSchema.js'
+export { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema } from './getPetByIdSchema.js'
 export {
-  getOrderById200Schema,
-  getOrderById400Schema,
-  getOrderById404Schema,
-  getOrderByIdPathParamsSchema,
-  getOrderByIdQueryResponseSchema,
-  getOrderByIdQuerySchema,
-} from './getOrderByIdSchema.js'
-export {
-  getPetById200Schema,
-  getPetById400Schema,
-  getPetById404Schema,
-  getPetByIdPathParamsSchema,
-  getPetByIdQueryResponseSchema,
-  getPetByIdQuerySchema,
-} from './getPetByIdSchema.js'
-export {
-  getUserByName200Schema,
-  getUserByName400Schema,
-  getUserByName404Schema,
-  getUserByNamePathParamsSchema,
-  getUserByNameQueryResponseSchema,
-  getUserByNameQuerySchema,
+  getUserByNamePathUsernameSchema,
+  getUserByNameStatus200Schema,
+  getUserByNameStatus400Schema,
+  getUserByNameStatus404Schema,
 } from './getUserByNameSchema.js'
-export { loginUser200Schema, loginUser400Schema, loginUserQueryParamsSchema, loginUserQueryResponseSchema, loginUserQuerySchema } from './loginUserSchema.js'
-export { logoutUserErrorSchema, logoutUserQueryResponseSchema, logoutUserQuerySchema } from './logoutUserSchema.js'
+export { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema, loginUserStatus400Schema } from './loginUserSchema.js'
+export { logoutUserStatusDefaultSchema } from './logoutUserSchema.js'
 export { orderSchema } from './orderSchema.js'
 export { petNotFoundSchema } from './petNotFoundSchema.js'
 export { petSchema } from './petSchema.js'
-export {
-  placeOrderPatch200Schema,
-  placeOrderPatch405Schema,
-  placeOrderPatchMutationRequestSchema,
-  placeOrderPatchMutationResponseSchema,
-  placeOrderPatchMutationSchema,
-} from './placeOrderPatchSchema.js'
-export {
-  placeOrder200Schema,
-  placeOrder405Schema,
-  placeOrderMutationRequestSchema,
-  placeOrderMutationResponseSchema,
-  placeOrderMutationSchema,
-} from './placeOrderSchema.js'
+export { placeOrderPatchDataSchema, placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema } from './placeOrderPatchSchema.js'
+export { placeOrderDataSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './placeOrderSchema.js'
 export { tagTagSchema } from './tag/tagSchema.js'
 export {
-  updatePet200Schema,
-  updatePet202Schema,
-  updatePet400Schema,
-  updatePet404Schema,
-  updatePet405Schema,
-  updatePetMutationRequestSchema,
-  updatePetMutationResponseSchema,
-  updatePetMutationSchema,
+  updatePetDataSchema,
+  updatePetStatus200Schema,
+  updatePetStatus202Schema,
+  updatePetStatus400Schema,
+  updatePetStatus404Schema,
+  updatePetStatus405Schema,
 } from './updatePetSchema.js'
 export {
-  updatePetWithForm405Schema,
-  updatePetWithFormMutationResponseSchema,
-  updatePetWithFormMutationSchema,
-  updatePetWithFormPathParamsSchema,
-  updatePetWithFormQueryParamsSchema,
+  updatePetWithFormPathPetIdSchema,
+  updatePetWithFormQueryNameSchema,
+  updatePetWithFormQueryStatusSchema,
+  updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.js'
-export {
-  updateUserErrorSchema,
-  updateUserMutationRequestSchema,
-  updateUserMutationResponseSchema,
-  updateUserMutationSchema,
-  updateUserPathParamsSchema,
-} from './updateUserSchema.js'
+export { updateUserDataSchema, updateUserPathUsernameSchema, updateUserStatusDefaultSchema } from './updateUserSchema.js'
 export { userArraySchema } from './userArraySchema.js'
 export { userSchema } from './userSchema.js'

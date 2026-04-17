@@ -1,8 +1,8 @@
-import type { CreateUserMutationRequest, CreateUserMutationResponse } from '../../models/ts/userController/CreateUser.ts'
+import type { CreateUserData, CreateUserResponse } from '../../models/ts/userController/CreateUser.ts'
 
-export function createUser(data?: CreateUserMutationRequest, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateUserMutationResponse> {
+export function createUser(data?: CreateUserData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateUserResponse> {
   return cy
-    .request<CreateUserMutationResponse>({
+    .request<CreateUserResponse>({
       method: 'POST',
       url: '/user',
       body: data,

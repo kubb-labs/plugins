@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
+import type { UpdatePetWithFormStatus405 } from '../../../models/UpdatePetWithForm.ts'
 import { http } from 'msw'
-import type { UpdatePetWithForm405 } from '../../../models/UpdatePetWithForm.ts'
 
-export function updatePetWithFormHandlerResponse405(data?: UpdatePetWithForm405) {
+export function updatePetWithFormHandlerResponse405(data?: UpdatePetWithFormStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
   })

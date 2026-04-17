@@ -1,7 +1,7 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
-import type { DeletePet400, DeletePetHeaderParams, DeletePetMutationResponse, DeletePetPathParams } from '../models/ts/DeletePet.js'
+import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../models/ts/DeletePet.js'
 
 /**
  * @description delete a pet
@@ -12,10 +12,10 @@ export async function deletePetHandler({
   petId,
   headers,
 }: {
-  petId: DeletePetPathParams['petId']
-  headers?: DeletePetHeaderParams
+  petId: DeletePetPathPetId
+  headers?: { api_key?: DeletePetHeaderApiKey }
 }): Promise<Promise<CallToolResult>> {
-  const res = await fetch<DeletePetMutationResponse, ResponseErrorConfig<DeletePet400>, unknown>({
+  const res = await fetch<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
     url: `/pet/${petId}`,
     baseURL: 'https://petstore.swagger.io/v2',

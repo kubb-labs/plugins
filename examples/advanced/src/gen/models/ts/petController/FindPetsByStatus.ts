@@ -1,34 +1,48 @@
 import type { Pet } from '../Pet.ts'
 
 /**
+ * @type string
+ */
+export type FindPetsByStatusPathStepId = string
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200 = Array<Pet>
+
+/**
+ * @type any
+ */
+export type FindPetsByStatusStatus400 = any
+
+/**
  * @type object
  */
-export type FindPetsByStatusPathParams = {
+export type FindPetsByStatusRequestConfig = {
+  data?: never
+  /**
+   * @type object
+   */
+  pathParams: {
+    stepId: FindPetsByStatusPathStepId
+  }
+  queryParams?: never
+  headerParams?: never
   /**
    * @type string
    */
-  stepId: string
+  url: `/pet/findByStatus/${string}`
 }
-
-/**
- * @description successful operation
- * @type array
- */
-export type FindPetsByStatus200 = Array<Pet>
-
-/**
- * @description Invalid status value
- * @type any
- */
-export type FindPetsByStatus400 = any
-
-export type FindPetsByStatusQueryResponse = FindPetsByStatus200
 
 /**
  * @type object
  */
-export type FindPetsByStatusQuery = {
-  Response: FindPetsByStatus200
-  PathParams: FindPetsByStatusPathParams
-  Errors: FindPetsByStatus400
+export type FindPetsByStatusResponses = {
+  '200': FindPetsByStatusStatus200
+  '400': FindPetsByStatusStatus400
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400

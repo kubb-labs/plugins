@@ -1,13 +1,7 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
-import type {
-  CreatePetsHeaderParams,
-  CreatePetsMutationRequest,
-  CreatePetsMutationResponse,
-  CreatePetsPathParams,
-  CreatePetsQueryParams,
-} from '../models/ts/CreatePets.js'
+import type { CreatePetsData, CreatePetsHeaderXEXAMPLE, CreatePetsPathUuid, CreatePetsQueryOffset, CreatePetsResponse } from '../models/ts/CreatePets.js'
 
 /**
  * @summary Create a pet
@@ -19,14 +13,14 @@ export async function createPetsHandler({
   headers,
   params,
 }: {
-  uuid: CreatePetsPathParams['uuid']
-  data: CreatePetsMutationRequest
-  headers: CreatePetsHeaderParams
-  params?: CreatePetsQueryParams
+  uuid: CreatePetsPathUuid
+  data: CreatePetsData
+  headers: { 'X-EXAMPLE': CreatePetsHeaderXEXAMPLE }
+  params?: { offset?: CreatePetsQueryOffset }
 }): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<CreatePetsMutationResponse, ResponseErrorConfig<Error>, CreatePetsMutationRequest>({
+  const res = await fetch<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: `/pets/${uuid}`,
     baseURL: 'https://petstore.swagger.io/v2',

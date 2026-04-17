@@ -1,40 +1,53 @@
 // version: 1.0.11
 
 /**
- * @type object
- */
-export type DeletePetPathParams = {
-  /**
-   * @description Pet id to delete
-   * @type integer
-   */
-  pet_id: number
-}
+ * @type string | undefined
+*/
+export type DeletePetHeaderApiKey = string | undefined;
 
 /**
- * @type object
- */
-export type DeletePetHeaderParams = {
-  /**
-   * @type string | undefined
-   */
-  api_key?: string
-}
+ * @description Pet id to delete
+ * @type integer
+*/
+export type DeletePetPathPetId = number;
 
 /**
- * @description Invalid pet value
  * @type any
- */
-export type DeletePet400 = any
-
-export type DeletePetMutationResponse = any
+*/
+export type DeletePetStatus400 = any;
 
 /**
  * @type object
- */
-export type DeletePetMutation = {
-  Response: any
-  PathParams: DeletePetPathParams
-  HeaderParams: DeletePetHeaderParams
-  Errors: DeletePet400
-}
+*/
+export type DeletePetRequestConfig = {
+    data?: never;
+    /**
+     * @type object
+    */
+    pathParams: {
+        pet_id: DeletePetPathPetId;
+    };
+    queryParams?: never;
+    /**
+     * @type object | undefined
+    */
+    headerParams?: {
+        api_key?: DeletePetHeaderApiKey;
+    };
+    /**
+     * @type string
+    */
+    url: `/pet/${string}`;
+};
+
+/**
+ * @type object
+*/
+export type DeletePetResponses = {
+    "400": DeletePetStatus400;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type DeletePetResponse = DeletePetStatus400;

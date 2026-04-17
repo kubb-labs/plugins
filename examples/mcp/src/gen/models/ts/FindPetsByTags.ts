@@ -6,65 +6,74 @@
 import type { Pet } from './Pet.js'
 
 /**
- * @type object
+ * @description Tags to filter by
+ * @type array | undefined
  */
-export type FindPetsByTagsQueryParams = {
-  /**
-   * @description Tags to filter by
-   * @type array | undefined
-   */
-  tags?: string[]
-  /**
-   * @description to request with required page number or pagination
-   * @type string | undefined
-   */
-  page?: string
-  /**
-   * @description to request with required page size
-   * @type string | undefined
-   */
-  pageSize?: string
-}
-
-export const findPetsByTagsHeaderParamsXEXAMPLEEnum = {
-  ONE: 'ONE',
-  TWO: 'TWO',
-  THREE: 'THREE',
-} as const
-
-export type FindPetsByTagsHeaderParamsXEXAMPLEEnumKey = (typeof findPetsByTagsHeaderParamsXEXAMPLEEnum)[keyof typeof findPetsByTagsHeaderParamsXEXAMPLEEnum]
+export type FindPetsByTagsQueryTags = string[] | undefined
 
 /**
- * @type object
+ * @description to request with required page number or pagination
+ * @type string | undefined
  */
-export type FindPetsByTagsHeaderParams = {
-  /**
-   * @description Header parameters
-   * @type string
-   */
-  'X-EXAMPLE': FindPetsByTagsHeaderParamsXEXAMPLEEnumKey
-}
+export type FindPetsByTagsQueryPage = string | undefined
 
 /**
- * @description successful operation
+ * @description to request with required page size
+ * @type string | undefined
+ */
+export type FindPetsByTagsQueryPageSize = string | undefined
+
+/**
+ * @description Header parameters
+ * @type string
+ */
+export type FindPetsByTagsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+
+/**
  * @type array
  */
-export type FindPetsByTags200 = Pet[]
+export type FindPetsByTagsStatus200 = Pet[]
 
 /**
- * @description Invalid tag value
  * @type any
  */
-export type FindPetsByTags400 = any
-
-export type FindPetsByTagsQueryResponse = FindPetsByTags200
+export type FindPetsByTagsStatus400 = any
 
 /**
  * @type object
  */
-export type FindPetsByTagsQuery = {
-  Response: FindPetsByTags200
-  QueryParams: FindPetsByTagsQueryParams
-  HeaderParams: FindPetsByTagsHeaderParams
-  Errors: FindPetsByTags400
+export type FindPetsByTagsRequestConfig = {
+  data?: never
+  pathParams?: never
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    tags?: FindPetsByTagsQueryTags
+    page?: FindPetsByTagsQueryPage
+    pageSize?: FindPetsByTagsQueryPageSize
+  }
+  /**
+   * @type object | undefined
+   */
+  headerParams?: {
+    'X-EXAMPLE': FindPetsByTagsHeaderXEXAMPLE
+  }
+  /**
+   * @type string
+   */
+  url: '/pet/findByTags'
 }
+
+/**
+ * @type object
+ */
+export type FindPetsByTagsResponses = {
+  '200': FindPetsByTagsStatus200
+  '400': FindPetsByTagsStatus400
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400

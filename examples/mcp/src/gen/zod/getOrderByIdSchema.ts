@@ -6,20 +6,10 @@
 import * as z from 'zod'
 import { orderSchema } from './orderSchema.js'
 
-export const getOrderByIdPathParamsSchema = z.object({
-  orderId: z.int().describe('ID of order that needs to be fetched'),
-})
+export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
 
-export const getOrderById200Schema = orderSchema.describe('successful operation')
+export const getOrderByIdStatus200Schema = orderSchema
 
-export const getOrderById400Schema = z.any().describe('Invalid ID supplied')
+export const getOrderByIdStatus400Schema = z.any()
 
-export const getOrderById404Schema = z.any().describe('Order not found')
-
-export const getOrderByIdQueryResponseSchema = getOrderById200Schema
-
-export const getOrderByIdQuerySchema = z.object({
-  Response: getOrderById200Schema,
-  PathParams: getOrderByIdPathParamsSchema,
-  Errors: z.union([getOrderById400Schema, getOrderById404Schema]),
-})
+export const getOrderByIdStatus404Schema = z.any()

@@ -6,42 +6,56 @@
 import type { Pet } from '../Pet.js'
 
 /**
- * @description Successful operation
  * @type object
  */
-export type UpdatePet200 = Pet
+export type UpdatePetStatus200 = Pet
 
 /**
- * @description Invalid ID supplied
  * @type any
  */
-export type UpdatePet400 = any
+export type UpdatePetStatus400 = any
 
 /**
- * @description Pet not found
  * @type any
  */
-export type UpdatePet404 = any
+export type UpdatePetStatus404 = any
 
 /**
- * @description Validation exception
  * @type any
  */
-export type UpdatePet405 = any
+export type UpdatePetStatus405 = any
 
 /**
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetMutationRequest = Pet
-
-export type UpdatePetMutationResponse = UpdatePet200
+export type UpdatePetData = Pet
 
 /**
  * @type object
  */
-export type UpdatePetMutation = {
-  Response: UpdatePet200
-  Request: UpdatePetMutationRequest
-  Errors: UpdatePet400 | UpdatePet404 | UpdatePet405
+export type UpdatePetRequestConfig = {
+  data?: UpdatePetData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet'
 }
+
+/**
+ * @type object
+ */
+export type UpdatePetResponses = {
+  '200': UpdatePetStatus200
+  '400': UpdatePetStatus400
+  '404': UpdatePetStatus404
+  '405': UpdatePetStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405

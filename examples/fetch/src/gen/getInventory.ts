@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { GetInventoryQueryResponse } from './models.ts'
+import type { GetInventoryResponse } from './models.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetInventoryUrl() {
   const res = { method: 'GET', url: 'https://petstore3.swagger.io/api/v3/store/inventory' as const }
@@ -21,7 +21,7 @@ function getGetInventoryUrl() {
 export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetInventoryQueryResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getGetInventoryUrl().url.toString(),
     ...requestConfig,

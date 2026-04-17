@@ -1,11 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type {
-  CreateUsersWithListInputMutationRequest,
-  CreateUsersWithListInputMutationResponse,
-} from '../../../models/ts/userController/CreateUsersWithListInput.js'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: '/user/createWithList' as const }
@@ -19,14 +16,14 @@ function getCreateUsersWithListInputUrl() {
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput(
-  data?: CreateUsersWithListInputMutationRequest,
-  config: Partial<RequestConfig<CreateUsersWithListInputMutationRequest>> & { client?: Client } = {},
+  data?: CreateUsersWithListInputData,
+  config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<CreateUsersWithListInputMutationResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputMutationRequest>({
+  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: getCreateUsersWithListInputUrl().url.toString(),
     data: requestData,

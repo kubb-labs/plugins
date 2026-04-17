@@ -1,15 +1,16 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type {
-  UpdatePetWithForm405,
-  UpdatePetWithFormMutationResponse,
-  UpdatePetWithFormPathParams,
-  UpdatePetWithFormQueryParams,
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryName,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormStatus405,
 } from '../../../models/ts/petController/UpdatePetWithForm.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathParams['petId'] }) {
+function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
   const res = { method: 'POST', url: `/pet/${petId}` as const }
 
   return res
@@ -20,13 +21,13 @@ function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathParams
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  { petId }: { petId: UpdatePetWithFormPathParams['petId'] },
-  params?: UpdatePetWithFormQueryParams,
+  { petId }: { petId: UpdatePetWithFormPathPetId },
+  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<UpdatePetWithFormMutationResponse, ResponseErrorConfig<UpdatePetWithForm405>, unknown>({
+  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
     url: getUpdatePetWithFormUrl({ petId }).url.toString(),
     params,

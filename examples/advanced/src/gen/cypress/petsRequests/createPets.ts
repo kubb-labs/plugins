@@ -1,20 +1,21 @@
 import type {
-  CreatePetsHeaderParams,
-  CreatePetsMutationRequest,
-  CreatePetsMutationResponse,
-  CreatePetsPathParams,
-  CreatePetsQueryParams,
+  CreatePetsPathUuid,
+  CreatePetsQueryBoolParam,
+  CreatePetsQueryOffset,
+  CreatePetsHeaderXEXAMPLE,
+  CreatePetsData,
+  CreatePetsResponse,
 } from '../../models/ts/petsController/CreatePets.ts'
 
 export function createPets(
-  uuid: CreatePetsPathParams['uuid'],
-  data: CreatePetsMutationRequest,
-  headers: CreatePetsHeaderParams,
-  params?: CreatePetsQueryParams,
+  uuid: CreatePetsPathUuid,
+  data: CreatePetsData,
+  headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE },
+  params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<CreatePetsMutationResponse> {
+): Cypress.Chainable<CreatePetsResponse> {
   return cy
-    .request<CreatePetsMutationResponse>({
+    .request<CreatePetsResponse>({
       method: 'POST',
       url: `/pets/${uuid}`,
       qs: params ? { bool_param: params.boolParam, offset: params.offset } : undefined,

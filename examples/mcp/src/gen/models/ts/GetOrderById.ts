@@ -6,41 +6,55 @@
 import type { Order } from './Order.js'
 
 /**
+ * @description ID of order that needs to be fetched
+ * @type integer
+ */
+export type GetOrderByIdPathOrderId = number
+
+/**
  * @type object
  */
-export type GetOrderByIdPathParams = {
+export type GetOrderByIdStatus200 = Order
+
+/**
+ * @type any
+ */
+export type GetOrderByIdStatus400 = any
+
+/**
+ * @type any
+ */
+export type GetOrderByIdStatus404 = any
+
+/**
+ * @type object
+ */
+export type GetOrderByIdRequestConfig = {
+  data?: never
   /**
-   * @description ID of order that needs to be fetched
-   * @type integer
+   * @type object
    */
-  orderId: number
+  pathParams: {
+    orderId: GetOrderByIdPathOrderId
+  }
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/store/order/${string}`
 }
-
-/**
- * @description successful operation
- * @type object
- */
-export type GetOrderById200 = Order
-
-/**
- * @description Invalid ID supplied
- * @type any
- */
-export type GetOrderById400 = any
-
-/**
- * @description Order not found
- * @type any
- */
-export type GetOrderById404 = any
-
-export type GetOrderByIdQueryResponse = GetOrderById200
 
 /**
  * @type object
  */
-export type GetOrderByIdQuery = {
-  Response: GetOrderById200
-  PathParams: GetOrderByIdPathParams
-  Errors: GetOrderById400 | GetOrderById404
+export type GetOrderByIdResponses = {
+  '200': GetOrderByIdStatus200
+  '400': GetOrderByIdStatus400
+  '404': GetOrderByIdStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404

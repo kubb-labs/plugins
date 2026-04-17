@@ -1,26 +1,18 @@
-import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
-import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type {
-  CreateUsersWithListInputMutationRequest,
-  CreateUsersWithListInputMutationResponse,
-} from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createUsersWithListInput } from '../../axios/userService/createUsersWithListInput.ts'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
 export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
 
 export function createUsersWithListInputMutationOptions<TContext = unknown>(
-  config: Partial<RequestConfig<CreateUsersWithListInputMutationRequest>> & { client?: Client } = {},
+  config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const mutationKey = createUsersWithListInputMutationKey()
-  return mutationOptions<
-    ResponseConfig<CreateUsersWithListInputMutationResponse>,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUsersWithListInputMutationRequest },
-    TContext
-  >({
+  return mutationOptions<ResponseConfig<CreateUsersWithListInputResponse>, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>({
     mutationKey,
     mutationFn: async ({ data }) => {
       return createUsersWithListInput({ data }, config)
@@ -36,12 +28,12 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
 export function useCreateUsersWithListInput<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<CreateUsersWithListInputMutationResponse>,
+      ResponseConfig<CreateUsersWithListInputResponse>,
       ResponseErrorConfig<Error>,
-      { data?: CreateUsersWithListInputMutationRequest },
+      { data?: CreateUsersWithListInputData },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<CreateUsersWithListInputMutationRequest>> & { client?: Client }
+    client?: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -49,28 +41,18 @@ export function useCreateUsersWithListInput<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? createUsersWithListInputMutationKey()
 
   const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<CreateUsersWithListInputMutationResponse>,
+    ResponseConfig<CreateUsersWithListInputResponse>,
     ResponseErrorConfig<Error>,
-    { data?: CreateUsersWithListInputMutationRequest },
+    { data?: CreateUsersWithListInputData },
     TContext
   >
 
-  return useMutation<
-    ResponseConfig<CreateUsersWithListInputMutationResponse>,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUsersWithListInputMutationRequest },
-    TContext
-  >(
+  return useMutation<ResponseConfig<CreateUsersWithListInputResponse>, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    ResponseConfig<CreateUsersWithListInputMutationResponse>,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUsersWithListInputMutationRequest },
-    TContext
-  >
+  ) as UseMutationResult<ResponseConfig<CreateUsersWithListInputResponse>, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>
 }

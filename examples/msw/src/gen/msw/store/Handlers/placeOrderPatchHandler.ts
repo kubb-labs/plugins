@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
+import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch.ts'
 import { http } from 'msw'
-import type { PlaceOrderPatch405, PlaceOrderPatchMutationResponse } from '../../../models/PlaceOrderPatch.ts'
 
-export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchMutationResponse) {
+export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,14 +15,14 @@ export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchMutationR
   })
 }
 
-export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatch405) {
+export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
   })
 }
 
 export function placeOrderPatchHandler(
-  data?: PlaceOrderPatchMutationResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Response | Promise<Response>),
+  data?: PlaceOrderPatchResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Response | Promise<Response>),
 ) {
   return http.patch('http://localhost:3000/store/order', function handler(info) {
     if (typeof data === 'function') return data(info)

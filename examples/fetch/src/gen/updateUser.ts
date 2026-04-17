@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { UpdateUserMutationRequest, UpdateUserMutationResponse, UpdateUserPathParams } from './models.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from './models.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getUpdateUserUrl(username: UpdateUserPathParams['username']) {
+function getUpdateUserUrl(username: UpdateUserPathUsername) {
   const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }
 
   return res
@@ -19,15 +19,15 @@ function getUpdateUserUrl(username: UpdateUserPathParams['username']) {
  * {@link /user/:username}
  */
 export async function updateUser(
-  username: UpdateUserPathParams['username'],
-  data?: UpdateUserMutationRequest,
-  config: Partial<RequestConfig<UpdateUserMutationRequest>> & { client?: Client } = {},
+  username: UpdateUserPathUsername,
+  data?: UpdateUserData,
+  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<UpdateUserMutationResponse, ResponseErrorConfig<Error>, UpdateUserMutationRequest>({
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
     method: 'PUT',
     url: getUpdateUserUrl(username).url.toString(),
     data: requestData,

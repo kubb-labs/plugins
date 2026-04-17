@@ -1,35 +1,49 @@
 // version: 1.0.11
 
 /**
- * @type object
- */
-export type DeleteUserPathParams = {
-  /**
-   * @description The name that needs to be deleted
-   * @type string
-   */
-  username: string
-}
+ * @description The name that needs to be deleted
+ * @type string
+*/
+export type DeleteUserPathUsername = string;
 
 /**
- * @description Invalid username supplied
  * @type any
- */
-export type DeleteUser400 = any
+*/
+export type DeleteUserStatus400 = any;
 
 /**
- * @description User not found
  * @type any
- */
-export type DeleteUser404 = any
-
-export type DeleteUserMutationResponse = any
+*/
+export type DeleteUserStatus404 = any;
 
 /**
  * @type object
- */
-export type DeleteUserMutation = {
-  Response: any
-  PathParams: DeleteUserPathParams
-  Errors: DeleteUser400 | DeleteUser404
-}
+*/
+export type DeleteUserRequestConfig = {
+    data?: never;
+    /**
+     * @type object
+    */
+    pathParams: {
+        username: DeleteUserPathUsername;
+    };
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: `/user/${string}`;
+};
+
+/**
+ * @type object
+*/
+export type DeleteUserResponses = {
+    "400": DeleteUserStatus400;
+    "404": DeleteUserStatus404;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type DeleteUserResponse = (DeleteUserStatus400 | DeleteUserStatus404);

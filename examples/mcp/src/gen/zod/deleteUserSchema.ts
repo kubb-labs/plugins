@@ -5,18 +5,8 @@
 
 import * as z from 'zod'
 
-export const deleteUserPathParamsSchema = z.object({
-  username: z.string().describe('The name that needs to be deleted'),
-})
+export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
 
-export const deleteUser400Schema = z.any().describe('Invalid username supplied')
+export const deleteUserStatus400Schema = z.any()
 
-export const deleteUser404Schema = z.any().describe('User not found')
-
-export const deleteUserMutationResponseSchema = z.any()
-
-export const deleteUserMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteUserPathParamsSchema,
-  Errors: z.union([deleteUser400Schema, deleteUser404Schema]),
-})
+export const deleteUserStatus404Schema = z.any()

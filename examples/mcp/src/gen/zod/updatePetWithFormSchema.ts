@@ -5,24 +5,10 @@
 
 import * as z from 'zod'
 
-export const updatePetWithFormPathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet that needs to be updated'),
-})
+export const updatePetWithFormPathPetIdSchema = z.int().describe('ID of pet that needs to be updated')
 
-export const updatePetWithFormQueryParamsSchema = z
-  .object({
-    name: z.string().optional().describe('Name of pet that needs to be updated'),
-    status: z.string().optional().describe('Status of pet that needs to be updated'),
-  })
-  .optional()
+export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
-export const updatePetWithForm405Schema = z.any().describe('Invalid input')
+export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
-export const updatePetWithFormMutationResponseSchema = z.any()
-
-export const updatePetWithFormMutationSchema = z.object({
-  Response: z.any(),
-  QueryParams: updatePetWithFormQueryParamsSchema,
-  PathParams: updatePetWithFormPathParamsSchema,
-  Errors: updatePetWithForm405Schema,
-})
+export const updatePetWithFormStatus405Schema = z.any()
