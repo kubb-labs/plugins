@@ -194,11 +194,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
         />
 
         <File.Import name={['useInfiniteQuery']} path={importPath} />
-        <File.Import
-          name={['QueryKey', 'QueryClient', 'UseInfiniteQueryOptions', 'UseInfiniteQueryReturnType']}
-          path={importPath}
-          isTypeOnly
-        />
+        <File.Import name={['QueryKey', 'QueryClient', 'UseInfiniteQueryOptions', 'UseInfiniteQueryReturnType']} path={importPath} isTypeOnly />
 
         <InfiniteQuery
           name={queryName}

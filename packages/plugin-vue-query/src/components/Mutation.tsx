@@ -41,7 +41,6 @@ function getParams(
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
-  const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
 
   // Vue-query uses MutationObserverOptions instead of UseMutationOptions, and wraps params with MaybeRefOrGetter
   const mutationArgWrapped = mutationArgParamsNode.params.map((param) => {

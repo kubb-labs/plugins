@@ -1,63 +1,96 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+
 import type { Config } from '@kubb/core'
-import { createMockedPlugin, createMockedPluginDriver } from '@kubb/core/mocks'
-import type { HttpMethod } from '@kubb/oas'
-import { parse } from '@kubb/oas'
-import { OperationGenerator, renderOperation } from '@kubb/plugin-oas'
+import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { MutationKey, QueryKey } from '../components'
+import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
 
-describe('queryGenerator operation', async () => {
+const defaultOptions: PluginVueQuery['resolvedOptions'] = {
+  client: {
+    dataReturnType: 'data',
+    client: 'axios',
+    clientType: 'function',
+    importPath: undefined,
+    bundle: false,
+  },
+  parser: 'zod',
+  paramsType: 'inline',
+  paramsCasing: undefined,
+  pathParamsType: 'inline',
+  queryKey: QueryKey.getTransformer,
+  mutationKey: MutationKey.getTransformer,
+  query: {
+    importPath: '@tanstack/react-query',
+    methods: ['get'],
+  },
+  mutation: {
+    methods: ['post'],
+    importPath: '@tanstack/react-query',
+  },
+  infinite: false,
+  output: { path: '.' },
+  group: undefined,
+  exclude: [],
+  include: undefined,
+  override: [],
+  resolver: resolverVueQuery,
+  transformers: {},
+}
+
+const mockedTsPlugin = createMockedPlugin<PluginTs>({
+  name: 'plugin-ts',
+  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  resolver: resolverTs,
+})
+
+const findByTagsNode = ast.createOperation({
+  operationId: 'findPetsByTags',
+  method: 'GET',
+  path: '/pet/findByTags',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      required: true,
+    }),
+    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+  ],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
+const updatePetWithFormNode = ast.createOperation({
+  operationId: 'updatePetWithForm',
+  method: 'POST',
+  path: '/pet/{petId}',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+  ],
+  requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
+describe('queryGenerator operation', () => {
   const testData = [
-    {
-      name: 'findByTags',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {},
-    },
-    {
-      name: 'findByTagsTemplateString',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        client: {
-          baseURL: '${123456}',
-        },
-      },
-    },
-    {
-      name: 'findByTagsPathParamsObject',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        pathParamsType: 'object',
-      },
-    },
-    {
-      name: 'findByTagsWithZod',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        parser: 'zod',
-      },
-    },
+    { name: 'findByTags', node: findByTagsNode, options: {} },
+    { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
+    { name: 'findByTagsPathParamsObject', node: findByTagsNode, options: { pathParamsType: 'object' as const } },
+    { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
     {
       name: 'findByTagsWithCustomQueryKey',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
+      node: findByTagsNode,
       options: {
         query: {
           methods: ['get'],
@@ -69,35 +102,11 @@ describe('queryGenerator operation', async () => {
         },
       },
     },
-    {
-      name: 'clientGetImportPath',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        client: {
-          dataReturnType: 'data',
-          importPath: 'axios',
-        },
-      },
-    },
-    {
-      name: 'clientDataReturnTypeFull',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        client: {
-          dataReturnType: 'full',
-          client: 'axios',
-        },
-      },
-    },
+    { name: 'clientGetImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    { name: 'clientDataReturnTypeFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
     {
       name: 'postAsQuery',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/{petId}',
-      method: 'post',
+      node: updatePetWithFormNode,
       options: {
         query: {
           importPath: 'custom-query',
@@ -105,84 +114,28 @@ describe('queryGenerator operation', async () => {
         },
       },
     },
-    {
-      name: 'findByTagsObject',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        paramsType: 'object',
-        pathParamsType: 'object',
-      },
-    },
-  ] as const satisfies Array<{
-    input: string
-    name: string
-    path: string
-    method: HttpMethod
-    options: Partial<PluginVueQuery['resolvedOptions']>
-  }>
+    { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
+  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {
-    const oas = await parse(path.resolve(__dirname, props.input))
-
     const options: PluginVueQuery['resolvedOptions'] = {
-      client: {
-        dataReturnType: 'data',
-        client: 'axios',
-        importPath: undefined,
-        bundle: false,
-      },
-      parser: 'zod',
-      paramsType: 'inline',
-      paramsCasing: undefined,
-      pathParamsType: 'inline',
-      queryKey: QueryKey.getTransformer,
-      mutationKey: MutationKey.getTransformer,
-      query: {
-        importPath: '@tanstack/react-query',
-        methods: ['get'],
-      },
-      mutation: {
-        methods: ['post'],
-        importPath: '@tanstack/react-query',
-      },
-      infinite: false,
-      output: {
-        path: '.',
-      },
-      group: undefined,
-      exclude: [],
-      include: undefined,
-      override: [],
+      ...defaultOptions,
       ...props.options,
     }
-    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options })
+    const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
+    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
 
-    const mockedPluginDriver = createMockedPluginDriver({ name: props.name })
-    const generator = new OperationGenerator(options, {
-      oas,
-      include: undefined,
-      driver: mockedPluginDriver,
-
+    await renderGeneratorOperation(queryGenerator, props.node, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
+      }),
+      driver,
       plugin,
-      contentType: undefined,
-      override: undefined,
-      mode: 'split',
-      exclude: [],
+      options,
+      resolver: resolverVueQuery,
     })
 
-    const operation = oas.operation(props.path, props.method)
-    await renderOperation(operation, {
-      config: { root: '.', output: { path: 'test' } } as Config,
-      driver: mockedPluginDriver,
-      oas,
-      mode: 'split',
-      generator,
-      Component: queryGenerator.Operation,
-      plugin,
-    })
-
-    await matchFiles(mockedPluginDriver.fileManager.files, props.name)
+    await matchFiles(driver.fileManager.files, props.name)
   })
 })

@@ -45,8 +45,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
 
-  const selectedGenerators =
-    options.generators ?? [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter(Boolean)
+  const selectedGenerators = options.generators ?? [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter(Boolean)
 
   const groupConfig = group
     ? ({
@@ -168,4 +167,3 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     },
   }
 })
-

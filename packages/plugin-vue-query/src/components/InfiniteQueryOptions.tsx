@@ -178,18 +178,15 @@ export function InfiniteQueryOptions({
 
 function addToValueCalls(callStr: string): string {
   // Step 1: Transform shorthand object params like { petId } → { petId: toValue(petId) }
-  let result = callStr.replace(
-    /\{\s*([\w,\s]+)\s*\}(?=\s*,)/g,
-    (match, inner: string) => {
-      if (inner.includes(':') || inner.includes('...')) return match
-      const keys = inner
-        .split(',')
-        .map((k: string) => k.trim())
-        .filter(Boolean)
-      const wrapped = keys.map((k: string) => `${k}: toValue(${k})`).join(', ')
-      return `{ ${wrapped} }`
-    },
-  )
+  let result = callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
+    if (inner.includes(':') || inner.includes('...')) return match
+    const keys = inner
+      .split(',')
+      .map((k: string) => k.trim())
+      .filter(Boolean)
+    const wrapped = keys.map((k: string) => `${k}: toValue(${k})`).join(', ')
+    return `{ ${wrapped} }`
+  })
 
   // Step 2: Handle standalone identifiers like `data, params`
   result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => {

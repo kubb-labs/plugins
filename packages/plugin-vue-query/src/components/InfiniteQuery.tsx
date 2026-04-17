@@ -36,7 +36,7 @@ function getParams(
     resolver: PluginTs['resolver']
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver } = options
+  const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
   const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
@@ -107,8 +107,6 @@ export function InfiniteQuery({
   dataReturnType,
   node,
   tsResolver,
-  initialPageParam,
-  queryParam,
 }: Props): KubbReactNode {
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
