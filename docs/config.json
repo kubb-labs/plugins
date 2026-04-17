@@ -126,21 +126,6 @@
               "activeMatch": "^/plugins/plugin-vue-query/?$"
             },
             {
-              "text": "@kubb/plugin-solid-query",
-              "link": "/plugins/plugin-solid-query",
-              "activeMatch": "^/plugins/plugin-solid-query/?$"
-            },
-            {
-              "text": "@kubb/plugin-svelte-query",
-              "link": "/plugins/plugin-svelte-query",
-              "activeMatch": "^/plugins/plugin-svelte-query/?$"
-            },
-            {
-              "text": "@kubb/plugin-swr",
-              "link": "/plugins/plugin-swr",
-              "activeMatch": "^/plugins/plugin-swr/?$"
-            },
-            {
               "text": "@kubb/plugin-faker",
               "link": "/plugins/plugin-faker",
               "activeMatch": "^/plugins/plugin-faker/?$"
