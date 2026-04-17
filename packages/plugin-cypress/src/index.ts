@@ -2,7 +2,7 @@ export { Request } from './components/Request.tsx'
 
 export { cypressGenerator } from './generators/cypressGenerator.tsx'
 
-export { pluginCypress, pluginCypressName } from './plugin.ts'
+export { default, pluginCypress, pluginCypressName } from './plugin.ts'
 
 export { resolverCypress } from './resolvers/resolverCypress.ts'
 

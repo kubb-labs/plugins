@@ -31,7 +31,7 @@ export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
  *
  * @example
  * ```ts
- * import { pluginClient } from '@kubb/plugin-client'
+ * import pluginClient from '@kubb/plugin-client'
  *
  * export default defineConfig({
  *   plugins: [pluginClient({ output: { path: 'clients' } })],
@@ -158,3 +158,5 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     },
   }
 })
+
+export default pluginClient

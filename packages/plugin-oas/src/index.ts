@@ -7,7 +7,7 @@ export type { CreateParserConfig, KeywordHandler } from './createParser.ts'
 export { createParser, findSchemaKeyword } from './createParser.ts'
 export type { OperationMethodResult } from './OperationGenerator.ts'
 export { OperationGenerator } from './OperationGenerator.ts'
-export { pluginOas, pluginOasName } from './plugin.ts'
+export { default, pluginOas, pluginOasName } from './plugin.ts'
 export type {
   GetSchemaGeneratorOptions,
   SchemaGeneratorBuildOptions,

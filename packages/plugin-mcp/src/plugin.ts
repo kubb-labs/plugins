@@ -122,3 +122,5 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     },
   }
 })
+
+export default pluginMcp

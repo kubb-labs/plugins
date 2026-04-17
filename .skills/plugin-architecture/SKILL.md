@@ -30,6 +30,8 @@ export const pluginExample = createPlugin<PluginOptions>((options) => ({
   resolveName(name, type) { /* ... */ },
   async install() { /* ... */ },
 }))
+
+export default pluginExample
 ```
 
 ## Utilities to Reference

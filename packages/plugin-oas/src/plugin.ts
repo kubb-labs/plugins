@@ -187,3 +187,5 @@ export const pluginOas = createPlugin<PluginOas>((options) => {
     },
   }
 })
+
+export default pluginOas

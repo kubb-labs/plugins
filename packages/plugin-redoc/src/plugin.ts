@@ -57,3 +57,5 @@ export const pluginRedoc = createPlugin<PluginRedoc>((options) => {
     },
   }
 })
+
+export default pluginRedoc

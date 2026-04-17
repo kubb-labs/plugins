@@ -20,7 +20,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
  *
  * @example
  * ```ts
- * import { pluginZod } from '@kubb/plugin-zod'
+ * import pluginZod from '@kubb/plugin-zod'
  *
  * export default defineConfig({
  *   plugins: [pluginZod({ output: { path: 'zod' } })],
@@ -101,3 +101,5 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     },
   }
 })
+
+export default pluginZod

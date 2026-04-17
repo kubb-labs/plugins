@@ -20,7 +20,7 @@ export const pluginCypressName = 'plugin-cypress' satisfies PluginCypress['name'
  *
  * @example
  * ```ts
- * import { pluginCypress } from '@kubb/plugin-cypress'
+ * import pluginCypress from '@kubb/plugin-cypress'
  *
  * export default defineConfig({
  *   plugins: [pluginCypress({ output: { path: 'cypress' } })],
@@ -91,3 +91,5 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     },
   }
 })
+
+export default pluginCypress

@@ -150,3 +150,5 @@ export const pluginFaker = createPlugin<PluginFaker>((options) => {
     },
   }
 })
+
+export default pluginFaker

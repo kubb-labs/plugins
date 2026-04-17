@@ -5,7 +5,7 @@ export { mcpGenerator } from './generators/mcpGenerator.tsx'
 export { serverGenerator } from './generators/serverGenerator.tsx'
 export { serverGeneratorLegacy } from './generators/serverGeneratorLegacy.tsx'
 
-export { pluginMcp, pluginMcpName } from './plugin.ts'
+export { default, pluginMcp, pluginMcpName } from './plugin.ts'
 
 export { resolverMcp } from './resolvers/resolverMcp.ts'
 

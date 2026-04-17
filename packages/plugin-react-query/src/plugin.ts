@@ -189,3 +189,5 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     },
   }
 })
+
+export default pluginReactQuery
