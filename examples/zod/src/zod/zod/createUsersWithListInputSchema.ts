@@ -6,26 +6,18 @@
 import { z } from '../../zod.ts'
 import { userSchema } from './userSchema.ts'
 
-export const createUsersWithListInput200Schema = userSchema.describe('Successful operation')
+export const createUsersWithListInputStatus200Schema = userSchema
 
-export type CreateUsersWithListInput200Schema = z.infer<typeof createUsersWithListInput200Schema>
+export type CreateUsersWithListInputStatus200Schema = z.infer<typeof createUsersWithListInputStatus200Schema>
 
-export const createUsersWithListInputErrorSchema = z.any().describe('successful operation')
+export const createUsersWithListInputStatusDefaultSchema = z.any()
 
-export type CreateUsersWithListInputErrorSchema = z.infer<typeof createUsersWithListInputErrorSchema>
+export type CreateUsersWithListInputStatusDefaultSchema = z.infer<typeof createUsersWithListInputStatusDefaultSchema>
 
-export const createUsersWithListInputMutationRequestSchema = z.array(userSchema).optional()
+export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
 
-export type CreateUsersWithListInputMutationRequestSchema = z.infer<typeof createUsersWithListInputMutationRequestSchema>
+export type CreateUsersWithListInputResponseSchema = z.infer<typeof createUsersWithListInputResponseSchema>
 
-export const createUsersWithListInputMutationResponseSchema = createUsersWithListInput200Schema
+export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
-export type CreateUsersWithListInputMutationResponseSchema = z.infer<typeof createUsersWithListInputMutationResponseSchema>
-
-export const createUsersWithListInputMutationSchema = z.object({
-  Response: createUsersWithListInput200Schema,
-  Request: createUsersWithListInputMutationRequestSchema,
-  Errors: createUsersWithListInputErrorSchema,
-})
-
-export type CreateUsersWithListInputMutationSchema = z.infer<typeof createUsersWithListInputMutationSchema>
+export type CreateUsersWithListInputDataSchema = z.infer<typeof createUsersWithListInputDataSchema>

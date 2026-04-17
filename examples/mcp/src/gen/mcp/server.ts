@@ -6,32 +6,38 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
-import { addFilesMutationRequestSchema, addFilesMutationResponseSchema } from '../zod/addFilesSchema.js'
-import { addPetMutationRequestSchema, addPetMutationResponseSchema } from '../zod/addPetSchema.js'
+import { addFilesDataSchema, addFilesStatus200Schema } from '../zod/addFilesSchema.js'
+import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.js'
 import {
-  createPetsHeaderParamsSchema,
-  createPetsMutationRequestSchema,
-  createPetsMutationResponseSchema,
-  createPetsQueryParamsSchema,
+  createPetsDataSchema,
+  createPetsHeaderXEXAMPLESchema,
+  createPetsPathUuidSchema,
+  createPetsQueryOffsetSchema,
+  createPetsStatus201Schema,
 } from '../zod/createPetsSchema.js'
-import { createUserMutationRequestSchema, createUserMutationResponseSchema } from '../zod/createUserSchema.js'
-import { createUsersWithListInputMutationRequestSchema, createUsersWithListInputMutationResponseSchema } from '../zod/createUsersWithListInputSchema.js'
-import { deleteOrderMutationResponseSchema } from '../zod/deleteOrderSchema.js'
-import { deletePetHeaderParamsSchema, deletePetMutationResponseSchema } from '../zod/deletePetSchema.js'
-import { deleteUserMutationResponseSchema } from '../zod/deleteUserSchema.js'
-import { findPetsByStatusQueryResponseSchema } from '../zod/findPetsByStatusSchema.js'
-import { findPetsByTagsHeaderParamsSchema, findPetsByTagsQueryParamsSchema, findPetsByTagsQueryResponseSchema } from '../zod/findPetsByTagsSchema.js'
-import { getInventoryQueryResponseSchema } from '../zod/getInventorySchema.js'
-import { getOrderByIdQueryResponseSchema } from '../zod/getOrderByIdSchema.js'
-import { getPetByIdQueryResponseSchema } from '../zod/getPetByIdSchema.js'
-import { getUserByNameQueryResponseSchema } from '../zod/getUserByNameSchema.js'
-import { loginUserQueryParamsSchema, loginUserQueryResponseSchema } from '../zod/loginUserSchema.js'
-import { logoutUserQueryResponseSchema } from '../zod/logoutUserSchema.js'
-import { placeOrderPatchMutationRequestSchema, placeOrderPatchMutationResponseSchema } from '../zod/placeOrderPatchSchema.js'
-import { placeOrderMutationRequestSchema, placeOrderMutationResponseSchema } from '../zod/placeOrderSchema.js'
-import { updatePetMutationRequestSchema, updatePetMutationResponseSchema } from '../zod/updatePetSchema.js'
-import { updatePetWithFormMutationResponseSchema, updatePetWithFormQueryParamsSchema } from '../zod/updatePetWithFormSchema.js'
-import { updateUserMutationRequestSchema, updateUserMutationResponseSchema } from '../zod/updateUserSchema.js'
+import { createUserDataSchema } from '../zod/createUserSchema.js'
+import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from '../zod/createUsersWithListInputSchema.js'
+import { deleteOrderPathOrderIdSchema } from '../zod/deleteOrderSchema.js'
+import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.js'
+import { deleteUserPathUsernameSchema } from '../zod/deleteUserSchema.js'
+import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.js'
+import {
+  findPetsByTagsHeaderXEXAMPLESchema,
+  findPetsByTagsQueryPageSchema,
+  findPetsByTagsQueryPageSizeSchema,
+  findPetsByTagsQueryTagsSchema,
+  findPetsByTagsStatus200Schema,
+} from '../zod/findPetsByTagsSchema.js'
+import { getInventoryStatus200Schema } from '../zod/getInventorySchema.js'
+import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema.js'
+import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.js'
+import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from '../zod/getUserByNameSchema.js'
+import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from '../zod/loginUserSchema.js'
+import { placeOrderPatchDataSchema, placeOrderPatchStatus200Schema } from '../zod/placeOrderPatchSchema.js'
+import { placeOrderDataSchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.js'
+import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.js'
+import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.js'
+import { updateUserDataSchema, updateUserPathUsernameSchema } from '../zod/updateUserSchema.js'
 import { addFilesHandler } from './addFiles.js'
 import { addPetHandler } from './addPet.js'
 import { createPetsHandler } from './createPets.js'
@@ -56,7 +62,7 @@ import { updateUserHandler } from './updateUser.js'
 
 export const server = new McpServer({
   name: 'Swagger PetStore - OpenAPI 3.0',
-  version: '3.0.3',
+  version: '1.0.11',
 })
 
 server.registerTool(
@@ -64,8 +70,13 @@ server.registerTool(
   {
     title: 'Create a pet',
     description: 'Make a POST request to /pets/{uuid}',
-    outputSchema: { data: createPetsMutationResponseSchema },
-    inputSchema: { uuid: z.string(), data: createPetsMutationRequestSchema, headers: createPetsHeaderParamsSchema, params: createPetsQueryParamsSchema },
+    outputSchema: { data: createPetsStatus201Schema },
+    inputSchema: {
+      uuid: createPetsPathUuidSchema,
+      data: createPetsDataSchema,
+      headers: z.object({ 'X-EXAMPLE': createPetsHeaderXEXAMPLESchema }),
+      params: z.object({ offset: createPetsQueryOffsetSchema }),
+    },
   },
   async ({ uuid, data, headers, params }) => {
     return createPetsHandler({ uuid, data, headers, params })
@@ -77,8 +88,8 @@ server.registerTool(
   {
     title: 'Update an existing pet',
     description: 'Update an existing pet by Id',
-    outputSchema: { data: updatePetMutationResponseSchema },
-    inputSchema: { data: updatePetMutationRequestSchema },
+    outputSchema: { data: updatePetStatus200Schema },
+    inputSchema: { data: updatePetDataSchema },
   },
   async ({ data }) => {
     return updatePetHandler({ data })
@@ -90,8 +101,8 @@ server.registerTool(
   {
     title: 'Add a new pet to the store',
     description: 'Add a new pet to the store',
-    outputSchema: { data: addPetMutationResponseSchema },
-    inputSchema: { data: addPetMutationRequestSchema },
+    outputSchema: { data: addPetStatus200Schema },
+    inputSchema: { data: addPetDataSchema },
   },
   async ({ data }) => {
     return addPetHandler({ data })
@@ -103,8 +114,8 @@ server.registerTool(
   {
     title: 'Finds Pets by status',
     description: 'Multiple status values can be provided with comma separated strings',
-    outputSchema: { data: findPetsByStatusQueryResponseSchema },
-    inputSchema: { step_id: z.string() },
+    outputSchema: { data: findPetsByStatusStatus200Schema },
+    inputSchema: { step_id: findPetsByStatusPathStepIdSchema },
   },
   async ({ step_id }) => {
     return findPetsByStatusHandler({ step_id })
@@ -116,8 +127,11 @@ server.registerTool(
   {
     title: 'Finds Pets by tags',
     description: 'Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.',
-    outputSchema: { data: findPetsByTagsQueryResponseSchema },
-    inputSchema: { headers: findPetsByTagsHeaderParamsSchema, params: findPetsByTagsQueryParamsSchema },
+    outputSchema: { data: findPetsByTagsStatus200Schema },
+    inputSchema: {
+      headers: z.object({ 'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema }),
+      params: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
+    },
   },
   async ({ headers, params }) => {
     return findPetsByTagsHandler({ headers, params })
@@ -129,8 +143,8 @@ server.registerTool(
   {
     title: 'Find pet by ID',
     description: 'Returns a single pet',
-    outputSchema: { data: getPetByIdQueryResponseSchema },
-    inputSchema: { petId: z.coerce.number() },
+    outputSchema: { data: getPetByIdStatus200Schema },
+    inputSchema: { petId: getPetByIdPathPetIdSchema },
   },
   async ({ petId }) => {
     return getPetByIdHandler({ petId })
@@ -142,8 +156,10 @@ server.registerTool(
   {
     title: 'Updates a pet in the store with form data',
     description: 'Make a POST request to /pet/{petId}',
-    outputSchema: { data: updatePetWithFormMutationResponseSchema },
-    inputSchema: { petId: z.coerce.number(), params: updatePetWithFormQueryParamsSchema },
+    inputSchema: {
+      petId: updatePetWithFormPathPetIdSchema,
+      params: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
+    },
   },
   async ({ petId, params }) => {
     return updatePetWithFormHandler({ petId, params })
@@ -155,8 +171,7 @@ server.registerTool(
   {
     title: 'Deletes a pet',
     description: 'delete a pet',
-    outputSchema: { data: deletePetMutationResponseSchema },
-    inputSchema: { petId: z.coerce.number(), headers: deletePetHeaderParamsSchema },
+    inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ api_key: deletePetHeaderApiKeySchema }) },
   },
   async ({ petId, headers }) => {
     return deletePetHandler({ petId, headers })
@@ -168,8 +183,8 @@ server.registerTool(
   {
     title: 'Place an file for a pet',
     description: 'Place a new file in the store',
-    outputSchema: { data: addFilesMutationResponseSchema },
-    inputSchema: { data: addFilesMutationRequestSchema },
+    outputSchema: { data: addFilesStatus200Schema },
+    inputSchema: { data: addFilesDataSchema },
   },
   async ({ data }) => {
     return addFilesHandler({ data })
@@ -181,7 +196,7 @@ server.registerTool(
   {
     title: 'Returns pet inventories by status',
     description: 'Returns a map of status codes to quantities',
-    outputSchema: { data: getInventoryQueryResponseSchema },
+    outputSchema: { data: getInventoryStatus200Schema },
   },
   async () => {
     return getInventoryHandler()
@@ -193,8 +208,8 @@ server.registerTool(
   {
     title: 'Place an order for a pet',
     description: 'Place a new order in the store',
-    outputSchema: { data: placeOrderMutationResponseSchema },
-    inputSchema: { data: placeOrderMutationRequestSchema },
+    outputSchema: { data: placeOrderStatus200Schema },
+    inputSchema: { data: placeOrderDataSchema },
   },
   async ({ data }) => {
     return placeOrderHandler({ data })
@@ -206,8 +221,8 @@ server.registerTool(
   {
     title: 'Place an order for a pet with patch',
     description: 'Place a new order in the store with patch',
-    outputSchema: { data: placeOrderPatchMutationResponseSchema },
-    inputSchema: { data: placeOrderPatchMutationRequestSchema },
+    outputSchema: { data: placeOrderPatchStatus200Schema },
+    inputSchema: { data: placeOrderPatchDataSchema },
   },
   async ({ data }) => {
     return placeOrderPatchHandler({ data })
@@ -219,8 +234,8 @@ server.registerTool(
   {
     title: 'Find purchase order by ID',
     description: 'For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.',
-    outputSchema: { data: getOrderByIdQueryResponseSchema },
-    inputSchema: { orderId: z.coerce.number() },
+    outputSchema: { data: getOrderByIdStatus200Schema },
+    inputSchema: { orderId: getOrderByIdPathOrderIdSchema },
   },
   async ({ orderId }) => {
     return getOrderByIdHandler({ orderId })
@@ -232,8 +247,7 @@ server.registerTool(
   {
     title: 'Delete purchase order by ID',
     description: 'For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors',
-    outputSchema: { data: deleteOrderMutationResponseSchema },
-    inputSchema: { orderId: z.coerce.number() },
+    inputSchema: { orderId: deleteOrderPathOrderIdSchema },
   },
   async ({ orderId }) => {
     return deleteOrderHandler({ orderId })
@@ -245,8 +259,7 @@ server.registerTool(
   {
     title: 'Create user',
     description: 'This can only be done by the logged in user.',
-    outputSchema: { data: createUserMutationResponseSchema },
-    inputSchema: { data: createUserMutationRequestSchema },
+    inputSchema: { data: createUserDataSchema },
   },
   async ({ data }) => {
     return createUserHandler({ data })
@@ -258,8 +271,8 @@ server.registerTool(
   {
     title: 'Creates list of users with given input array',
     description: 'Creates list of users with given input array',
-    outputSchema: { data: createUsersWithListInputMutationResponseSchema },
-    inputSchema: { data: createUsersWithListInputMutationRequestSchema },
+    outputSchema: { data: createUsersWithListInputStatus200Schema },
+    inputSchema: { data: createUsersWithListInputDataSchema },
   },
   async ({ data }) => {
     return createUsersWithListInputHandler({ data })
@@ -271,8 +284,8 @@ server.registerTool(
   {
     title: 'Logs user into the system',
     description: 'Make a GET request to /user/login',
-    outputSchema: { data: loginUserQueryResponseSchema },
-    inputSchema: { params: loginUserQueryParamsSchema },
+    outputSchema: { data: loginUserStatus200Schema },
+    inputSchema: { params: z.object({ username: loginUserQueryUsernameSchema, password: loginUserQueryPasswordSchema }) },
   },
   async ({ params }) => {
     return loginUserHandler({ params })
@@ -284,7 +297,6 @@ server.registerTool(
   {
     title: 'Logs out current logged in user session',
     description: 'Make a GET request to /user/logout',
-    outputSchema: { data: logoutUserQueryResponseSchema },
   },
   async () => {
     return logoutUserHandler()
@@ -296,8 +308,8 @@ server.registerTool(
   {
     title: 'Get user by user name',
     description: 'Make a GET request to /user/{username}',
-    outputSchema: { data: getUserByNameQueryResponseSchema },
-    inputSchema: { username: z.string() },
+    outputSchema: { data: getUserByNameStatus200Schema },
+    inputSchema: { username: getUserByNamePathUsernameSchema },
   },
   async ({ username }) => {
     return getUserByNameHandler({ username })
@@ -309,8 +321,7 @@ server.registerTool(
   {
     title: 'Update user',
     description: 'This can only be done by the logged in user.',
-    outputSchema: { data: updateUserMutationResponseSchema },
-    inputSchema: { username: z.string(), data: updateUserMutationRequestSchema },
+    inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
   },
   async ({ username, data }) => {
     return updateUserHandler({ username, data })
@@ -322,8 +333,7 @@ server.registerTool(
   {
     title: 'Delete user',
     description: 'This can only be done by the logged in user.',
-    outputSchema: { data: deleteUserMutationResponseSchema },
-    inputSchema: { username: z.string() },
+    inputSchema: { username: deleteUserPathUsernameSchema },
   },
   async ({ username }) => {
     return deleteUserHandler({ username })

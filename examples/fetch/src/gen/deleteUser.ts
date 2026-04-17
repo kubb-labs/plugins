@@ -5,9 +5,9 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { DeleteUser400, DeleteUser404, DeleteUserMutationResponse, DeleteUserPathParams } from './models.ts'
+import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from './models.ts'
 
-function getDeleteUserUrl(username: DeleteUserPathParams['username']) {
+function getDeleteUserUrl(username: DeleteUserPathUsername) {
   const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }
 
   return res
@@ -18,10 +18,10 @@ function getDeleteUserUrl(username: DeleteUserPathParams['username']) {
  * @summary Delete user
  * {@link /user/:username}
  */
-export async function deleteUser(username: DeleteUserPathParams['username'], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteUser(username: DeleteUserPathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<DeleteUserMutationResponse, ResponseErrorConfig<DeleteUser400 | DeleteUser404>, unknown>({
+  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({
     method: 'DELETE',
     url: getDeleteUserUrl(username).url.toString(),
     ...requestConfig,

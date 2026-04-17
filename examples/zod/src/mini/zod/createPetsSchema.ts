@@ -6,36 +6,19 @@
 import * as z from 'zod/mini'
 import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
-export const createPetsPathParamsSchema = z.object({
-  uuid: z.string(),
-})
+export const createPetsPathUuidSchema = z.string()
 
-export const createPetsQueryParamsSchema = z.optional(
-  z.object({
-    offset: z.optional(z.int()),
-  }),
-)
+export const createPetsQueryOffsetSchema = z.optional(z.int())
 
-export const createPetsHeaderParamsSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']),
-})
+export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
-export const createPets201Schema = z.any()
+export const createPetsStatus201Schema = z.any()
 
-export const createPetsErrorSchema = petNotFoundSchema
+export const createPetsStatusDefaultSchema = petNotFoundSchema
 
-export const createPetsMutationRequestSchema = z.object({
+export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
+
+export const createPetsDataSchema = z.object({
   name: z.string(),
   tag: z.string(),
-})
-
-export const createPetsMutationResponseSchema = createPets201Schema
-
-export const createPetsMutationSchema = z.object({
-  Response: createPets201Schema,
-  Request: createPetsMutationRequestSchema,
-  QueryParams: createPetsQueryParamsSchema,
-  PathParams: createPetsPathParamsSchema,
-  HeaderParams: createPetsHeaderParamsSchema,
-  Errors: createPetsErrorSchema,
 })

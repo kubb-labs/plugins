@@ -2,10 +2,11 @@ import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tansta
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
-  UpdatePetWithForm405,
-  UpdatePetWithFormMutationResponse,
-  UpdatePetWithFormPathParams,
-  UpdatePetWithFormQueryParams,
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryName,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormStatus405,
 } from '../../../models/ts/petController/UpdatePetWithForm.ts'
 import { updatePetWithForm } from '../../axios/petService/updatePetWithForm.ts'
 
@@ -16,9 +17,9 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = updatePetWithFormMutationKey()
   return mutationOptions<
-    ResponseConfig<UpdatePetWithFormMutationResponse>,
-    ResponseErrorConfig<UpdatePetWithForm405>,
-    { petId: UpdatePetWithFormPathParams['petId']; params?: UpdatePetWithFormQueryParams },
+    ResponseConfig<UpdatePetWithFormResponse>,
+    ResponseErrorConfig<UpdatePetWithFormStatus405>,
+    { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
     TContext
   >({
     mutationKey,
@@ -35,9 +36,9 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
 export function useUpdatePetWithForm<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<UpdatePetWithFormMutationResponse>,
-      ResponseErrorConfig<UpdatePetWithForm405>,
-      { petId: UpdatePetWithFormPathParams['petId']; params?: UpdatePetWithFormQueryParams },
+      ResponseConfig<UpdatePetWithFormResponse>,
+      ResponseErrorConfig<UpdatePetWithFormStatus405>,
+      { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -48,16 +49,16 @@ export function useUpdatePetWithForm<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetWithFormMutationKey()
 
   const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<UpdatePetWithFormMutationResponse>,
-    ResponseErrorConfig<UpdatePetWithForm405>,
-    { petId: UpdatePetWithFormPathParams['petId']; params?: UpdatePetWithFormQueryParams },
+    ResponseConfig<UpdatePetWithFormResponse>,
+    ResponseErrorConfig<UpdatePetWithFormStatus405>,
+    { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
     TContext
   >
 
   return useMutation<
-    ResponseConfig<UpdatePetWithFormMutationResponse>,
-    ResponseErrorConfig<UpdatePetWithForm405>,
-    { petId: UpdatePetWithFormPathParams['petId']; params?: UpdatePetWithFormQueryParams },
+    ResponseConfig<UpdatePetWithFormResponse>,
+    ResponseErrorConfig<UpdatePetWithFormStatus405>,
+    { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
     TContext
   >(
     {
@@ -67,9 +68,9 @@ export function useUpdatePetWithForm<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ResponseConfig<UpdatePetWithFormMutationResponse>,
-    ResponseErrorConfig<UpdatePetWithForm405>,
-    { petId: UpdatePetWithFormPathParams['petId']; params?: UpdatePetWithFormQueryParams },
+    ResponseConfig<UpdatePetWithFormResponse>,
+    ResponseErrorConfig<UpdatePetWithFormStatus405>,
+    { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
     TContext
   >
 }

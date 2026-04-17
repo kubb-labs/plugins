@@ -1,13 +1,7 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
-import type {
-  CreateUsersWithListInputMutationRequest,
-  CreateUsersWithListInputMutationResponse,
-} from '../../../models/ts/userController/CreateUsersWithListInput.ts'
-import {
-  createUsersWithListInputMutationRequestSchema,
-  createUsersWithListInputMutationResponseSchema,
-} from '../../../zod/userController/createUsersWithListInputSchema.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import { createUsersWithListInputDataSchema, createUsersWithListInputResponseSchema } from '../../../zod/userController/createUsersWithListInputSchema.ts'
 
 export function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: 'https://petstore3.swagger.io/api/v3/user/createWithList' as const }
@@ -21,19 +15,19 @@ export function getCreateUsersWithListInputUrl() {
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput(
-  { data }: { data?: CreateUsersWithListInputMutationRequest } = {},
-  config: Partial<RequestConfig<CreateUsersWithListInputMutationRequest>> & { client?: Client } = {},
+  { data }: { data?: CreateUsersWithListInputData } = {},
+  config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = createUsersWithListInputMutationRequestSchema.parse(data)
+  const requestData = createUsersWithListInputDataSchema.parse(data)
 
-  const res = await request<CreateUsersWithListInputMutationResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputMutationRequest>({
+  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: getCreateUsersWithListInputUrl().url.toString(),
     data: requestData,
     ...requestConfig,
   })
 
-  return { ...res, data: createUsersWithListInputMutationResponseSchema.parse(res.data) }
+  return { ...res, data: createUsersWithListInputResponseSchema.parse(res.data) }
 }

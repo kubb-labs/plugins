@@ -1,40 +1,56 @@
 // version: 1.0.11
 
 /**
- * @type object
+ * @description The user name for login
+ * @type string | undefined
  */
-export type LoginUserQueryParams = {
-  /**
-   * @description The user name for login
-   * @type string | undefined
-   */
-  username?: string
-  /**
-   * @description The password for login in clear text
-   * @type string | undefined
-   */
-  password?: string
-}
+export type LoginUserQueryUsername = string | undefined
 
 /**
- * @description successful operation
+ * @description The password for login in clear text
+ * @type string | undefined
+ */
+export type LoginUserQueryPassword = string | undefined
+
+/**
  * @type string
  */
-export type LoginUser200 = string
+export type LoginUserStatus200 = string
 
 /**
- * @description Invalid username/password supplied
  * @type any
  */
-export type LoginUser400 = any
-
-export type LoginUserQueryResponse = LoginUser200
+export type LoginUserStatus400 = any
 
 /**
  * @type object
  */
-export type LoginUserQuery = {
-  Response: LoginUser200
-  QueryParams: LoginUserQueryParams
-  Errors: LoginUser400
+export type LoginUserRequestConfig = {
+  data?: never
+  pathParams?: never
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    username?: LoginUserQueryUsername
+    password?: LoginUserQueryPassword
+  }
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/user/login'
 }
+
+/**
+ * @type object
+ */
+export type LoginUserResponses = {
+  '200': LoginUserStatus200
+  '400': LoginUserStatus400
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type LoginUserResponse = LoginUserStatus200 | LoginUserStatus400

@@ -5,24 +5,12 @@
 
 import * as z from 'zod/mini'
 
-export const updatePetWithFormPathParamsSchema = z.object({
-  petId: z.int(),
-})
+export const updatePetWithFormPathPetIdSchema = z.int()
 
-export const updatePetWithFormQueryParamsSchema = z.optional(
-  z.object({
-    name: z.optional(z.string()),
-    status: z.optional(z.string()),
-  }),
-)
+export const updatePetWithFormQueryNameSchema = z.optional(z.string())
 
-export const updatePetWithForm405Schema = z.any()
+export const updatePetWithFormQueryStatusSchema = z.optional(z.string())
 
-export const updatePetWithFormMutationResponseSchema = z.any()
+export const updatePetWithFormStatus405Schema = z.any()
 
-export const updatePetWithFormMutationSchema = z.object({
-  Response: z.any(),
-  QueryParams: updatePetWithFormQueryParamsSchema,
-  PathParams: updatePetWithFormPathParamsSchema,
-  Errors: updatePetWithForm405Schema,
-})
+export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema

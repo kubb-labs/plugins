@@ -10,3 +10,5 @@ export const getPetsHeaderXRequestIdSchema = z.string()
 export const getPetsHeaderXCorrelationIdSchema = z.string().optional()
 
 export const getPetsStatus200Schema = z.object({})
+
+export const getPetsResponseSchema = getPetsStatus200Schema

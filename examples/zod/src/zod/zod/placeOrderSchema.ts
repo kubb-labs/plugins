@@ -6,26 +6,18 @@
 import { z } from '../../zod.ts'
 import { orderSchema } from './orderSchema.ts'
 
-export const placeOrder200Schema = orderSchema.describe('successful operation')
+export const placeOrderStatus200Schema = orderSchema
 
-export type PlaceOrder200Schema = z.infer<typeof placeOrder200Schema>
+export type PlaceOrderStatus200Schema = z.infer<typeof placeOrderStatus200Schema>
 
-export const placeOrder405Schema = z.any().describe('Invalid input')
+export const placeOrderStatus405Schema = z.any()
 
-export type PlaceOrder405Schema = z.infer<typeof placeOrder405Schema>
+export type PlaceOrderStatus405Schema = z.infer<typeof placeOrderStatus405Schema>
 
-export const placeOrderMutationRequestSchema = orderSchema.optional()
+export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
-export type PlaceOrderMutationRequestSchema = z.infer<typeof placeOrderMutationRequestSchema>
+export type PlaceOrderResponseSchema = z.infer<typeof placeOrderResponseSchema>
 
-export const placeOrderMutationResponseSchema = placeOrder200Schema
+export const placeOrderDataSchema = orderSchema.optional()
 
-export type PlaceOrderMutationResponseSchema = z.infer<typeof placeOrderMutationResponseSchema>
-
-export const placeOrderMutationSchema = z.object({
-  Response: placeOrder200Schema,
-  Request: placeOrderMutationRequestSchema,
-  Errors: placeOrder405Schema,
-})
-
-export type PlaceOrderMutationSchema = z.infer<typeof placeOrderMutationSchema>
+export type PlaceOrderDataSchema = z.infer<typeof placeOrderDataSchema>

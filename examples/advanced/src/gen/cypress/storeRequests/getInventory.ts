@@ -1,8 +1,8 @@
-import type { GetInventoryQueryResponse } from '../../models/ts/storeController/GetInventory.ts'
+import type { GetInventoryResponse } from '../../models/ts/storeController/GetInventory.ts'
 
-export function getInventory(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetInventoryQueryResponse> {
+export function getInventory(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetInventoryResponse> {
   return cy
-    .request<GetInventoryQueryResponse>({
+    .request<GetInventoryResponse>({
       method: 'GET',
       url: '/store/inventory',
       ...options,

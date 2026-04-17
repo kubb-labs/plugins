@@ -1,47 +1,59 @@
 import type { ApiResponse } from '../ApiResponse.ts'
 
 /**
- * @type object
+ * @description ID of pet to update
+ * @type integer
  */
-export type UploadFilePathParams = {
-  /**
-   * @description ID of pet to update
-   * @type integer
-   */
-  petId: number
-}
+export type UploadFilePathPetId = number
+
+/**
+ * @description Additional Metadata
+ * @type string | undefined
+ */
+export type UploadFileQueryAdditionalMetadata = string | undefined
 
 /**
  * @type object
  */
-export type UploadFileQueryParams = {
-  /**
-   * @description Additional Metadata
-   * @type string | undefined
-   */
-  additionalMetadata?: string
-}
-
-/**
- * @description successful operation
- * @type object
- */
-export type UploadFile200 = ApiResponse
+export type UploadFileStatus200 = ApiResponse
 
 /**
  * @type string
  */
-export type UploadFileMutationRequest = Blob
-
-export type UploadFileMutationResponse = UploadFile200
+export type UploadFileData = Blob
 
 /**
  * @type object
  */
-export type UploadFileMutation = {
-  Response: UploadFile200
-  Request: UploadFileMutationRequest
-  QueryParams: UploadFileQueryParams
-  PathParams: UploadFilePathParams
-  Errors: any
+export type UploadFileRequestConfig = {
+  data?: UploadFileData
+  /**
+   * @type object
+   */
+  pathParams: {
+    petId: UploadFilePathPetId
+  }
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    additionalMetadata?: UploadFileQueryAdditionalMetadata
+  }
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/pet/${string}/uploadImage`
 }
+
+/**
+ * @type object
+ */
+export type UploadFileResponses = {
+  '200': UploadFileStatus200
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type UploadFileResponse = UploadFileStatus200

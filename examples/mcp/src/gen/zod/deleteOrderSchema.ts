@@ -5,18 +5,10 @@
 
 import * as z from 'zod'
 
-export const deleteOrderPathParamsSchema = z.object({
-  orderId: z.int().describe('ID of the order that needs to be deleted'),
-})
+export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
 
-export const deleteOrder400Schema = z.any().describe('Invalid ID supplied')
+export const deleteOrderStatus400Schema = z.any()
 
-export const deleteOrder404Schema = z.any().describe('Order not found')
+export const deleteOrderStatus404Schema = z.any()
 
-export const deleteOrderMutationResponseSchema = z.any()
-
-export const deleteOrderMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteOrderPathParamsSchema,
-  Errors: z.union([deleteOrder400Schema, deleteOrder404Schema]),
-})
+export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])

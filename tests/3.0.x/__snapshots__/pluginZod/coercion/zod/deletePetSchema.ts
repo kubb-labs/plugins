@@ -10,3 +10,5 @@ export const deletePetHeaderApiKeySchema = z.coerce.string().optional()
 export const deletePetPathPetIdSchema = z.coerce.number().int().describe("Pet id to delete")
 
 export const deletePetStatus400Schema = z.any()
+
+export const deletePetResponseSchema = deletePetStatus400Schema

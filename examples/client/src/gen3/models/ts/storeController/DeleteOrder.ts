@@ -4,35 +4,49 @@
  */
 
 /**
+ * @description ID of the order that needs to be deleted
+ * @type integer
+ */
+export type DeleteOrderPathOrderId = number
+
+/**
+ * @type any
+ */
+export type DeleteOrderStatus400 = any
+
+/**
+ * @type any
+ */
+export type DeleteOrderStatus404 = any
+
+/**
  * @type object
  */
-export type DeleteOrderPathParams = {
+export type DeleteOrderRequestConfig = {
+  data?: never
   /**
-   * @description ID of the order that needs to be deleted
-   * @type integer
+   * @type object
    */
-  orderId: number
+  pathParams: {
+    orderId: DeleteOrderPathOrderId
+  }
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/store/order/${string}`
 }
-
-/**
- * @description Invalid ID supplied
- * @type any
- */
-export type DeleteOrder400 = any
-
-/**
- * @description Order not found
- * @type any
- */
-export type DeleteOrder404 = any
-
-export type DeleteOrderMutationResponse = any
 
 /**
  * @type object
  */
-export type DeleteOrderMutation = {
-  Response: any
-  PathParams: DeleteOrderPathParams
-  Errors: DeleteOrder400 | DeleteOrder404
+export type DeleteOrderResponses = {
+  '400': DeleteOrderStatus400
+  '404': DeleteOrderStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404

@@ -9,4 +9,6 @@ export const addPetStatus200Schema = z.object({})
 
 export const addPetStatus405Schema = z.object({})
 
+export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+
 export const addPetDataSchema = z.object({})

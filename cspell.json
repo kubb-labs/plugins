@@ -15,6 +15,7 @@
     "**/changelog.md",
     "README.md",
     "examples/**/src/gen*/**",
+    "examples/zod/src/mini/**",
     "examples/**/kubb-gen/**",
     "examples/zod/src/zod/**",
     "tests/**/gen/**",

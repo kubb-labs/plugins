@@ -6,29 +6,43 @@
 import type { Order } from '../Order.js'
 
 /**
- * @description successful operation
  * @type object
  */
-export type PlaceOrder200 = Order
+export type PlaceOrderStatus200 = Order
 
 /**
- * @description Invalid input
  * @type any
  */
-export type PlaceOrder405 = any
+export type PlaceOrderStatus405 = any
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderMutationRequest = Order | undefined
-
-export type PlaceOrderMutationResponse = PlaceOrder200
+export type PlaceOrderData = Order | undefined
 
 /**
  * @type object
  */
-export type PlaceOrderMutation = {
-  Response: PlaceOrder200
-  Request: PlaceOrderMutationRequest
-  Errors: PlaceOrder405
+export type PlaceOrderRequestConfig = {
+  data?: PlaceOrderData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/store/order'
 }
+
+/**
+ * @type object
+ */
+export type PlaceOrderResponses = {
+  '200': PlaceOrderStatus200
+  '405': PlaceOrderStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405

@@ -7,6 +7,8 @@ import * as z from 'zod/mini'
 
 export const addPetMiniStatus200Schema = z.object({})
 
+export const addPetMiniResponseSchema = addPetMiniStatus200Schema
+
 export const addPetMiniDataSchema = z.object({
   name: z.string(),
 })

@@ -5,9 +5,9 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { GetUserByName400, GetUserByName404, GetUserByNamePathParams, GetUserByNameQueryResponse } from './models.ts'
+import type { GetUserByNamePathUsername, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from './models.ts'
 
-function getGetUserByNameUrl(username: GetUserByNamePathParams['username']) {
+function getGetUserByNameUrl(username: GetUserByNamePathUsername) {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }
 
   return res
@@ -17,10 +17,10 @@ function getGetUserByNameUrl(username: GetUserByNamePathParams['username']) {
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export async function getUserByName(username: GetUserByNamePathParams['username'], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getUserByName(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetUserByNameQueryResponse, ResponseErrorConfig<GetUserByName400 | GetUserByName404>, unknown>({
+  const res = await request<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',
     url: getGetUserByNameUrl(username).url.toString(),
     ...requestConfig,

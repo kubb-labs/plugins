@@ -8,7 +8,7 @@ import fetch from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { useMutation } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import type { PlaceOrder405, PlaceOrderMutationRequest, PlaceOrderMutationResponse } from '../models/PlaceOrder.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../models/PlaceOrder.ts'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -19,12 +19,12 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderMutationRequest, config: Partial<RequestConfig<PlaceOrderMutationRequest>> & { client?: Client } = {}) {
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<PlaceOrderMutationResponse, ResponseErrorConfig<PlaceOrder405>, PlaceOrderMutationRequest>({
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: '/store/order',
     data: requestData,
@@ -41,20 +41,17 @@ export async function placeOrder(data?: PlaceOrderMutationRequest, config: Parti
  */
 export function usePlaceOrder<TContext>(
   options: {
-    mutation?: MutationObserverOptions<
-      PlaceOrderMutationResponse,
-      ResponseErrorConfig<PlaceOrder405>,
-      { data?: MaybeRefOrGetter<PlaceOrderMutationRequest> },
-      TContext
-    > & { client?: QueryClient }
-    client?: Partial<RequestConfig<PlaceOrderMutationRequest>> & { client?: Client }
+    mutation?: MutationObserverOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: MaybeRefOrGetter<PlaceOrderData> }, TContext> & {
+      client?: QueryClient
+    }
+    client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
 
-  return useMutation<PlaceOrderMutationResponse, ResponseErrorConfig<PlaceOrder405>, { data?: PlaceOrderMutationRequest }, TContext>(
+  return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>(
     {
       mutationFn: async ({ data }) => {
         return placeOrder(data, config)

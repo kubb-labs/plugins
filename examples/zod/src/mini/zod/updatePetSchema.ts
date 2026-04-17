@@ -6,20 +6,14 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema.ts'
 
-export const updatePet200Schema = petSchema
+export const updatePetStatus200Schema = petSchema
 
-export const updatePet400Schema = z.any()
+export const updatePetStatus400Schema = z.any()
 
-export const updatePet404Schema = z.any()
+export const updatePetStatus404Schema = z.any()
 
-export const updatePet405Schema = z.any()
+export const updatePetStatus405Schema = z.any()
 
-export const updatePetMutationRequestSchema = petSchema
+export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetMutationResponseSchema = updatePet200Schema
-
-export const updatePetMutationSchema = z.object({
-  Response: updatePet200Schema,
-  Request: updatePetMutationRequestSchema,
-  Errors: z.union([updatePet400Schema, updatePet404Schema, updatePet405Schema]),
-})
+export const updatePetDataSchema = petSchema

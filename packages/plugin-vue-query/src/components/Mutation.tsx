@@ -74,6 +74,14 @@ function printType(typeNode: ast.ParamsTypeNode | undefined): string {
   if (!typeNode) return 'unknown'
   if (typeNode.variant === 'reference') return typeNode.name
   if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
+  if (typeNode.variant === 'struct') {
+    const parts = typeNode.properties.map((p) => {
+      const typeStr = printType(p.type)
+      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
+      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
+    })
+    return `{ ${parts.join('; ')} }`
+  }
   return 'unknown'
 }
 

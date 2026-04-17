@@ -6,16 +6,10 @@
 import * as z from 'zod/mini'
 import { orderSchema } from './orderSchema.ts'
 
-export const placeOrderPatch200Schema = orderSchema
+export const placeOrderPatchStatus200Schema = orderSchema
 
-export const placeOrderPatch405Schema = z.any()
+export const placeOrderPatchStatus405Schema = z.any()
 
-export const placeOrderPatchMutationRequestSchema = z.optional(orderSchema)
+export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
-export const placeOrderPatchMutationResponseSchema = placeOrderPatch200Schema
-
-export const placeOrderPatchMutationSchema = z.object({
-  Response: placeOrderPatch200Schema,
-  Request: placeOrderPatchMutationRequestSchema,
-  Errors: placeOrderPatch405Schema,
-})
+export const placeOrderPatchDataSchema = z.optional(orderSchema)

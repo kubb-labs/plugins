@@ -2,29 +2,21 @@ import * as z from 'zod'
 import { addPetRequestSchema } from '../addPetRequestSchema.ts'
 import { petSchema } from '../petSchema.ts'
 
-export const addPet405Schema = z.object({
+export const addPetStatus405Schema = z.object({
   code: z.int().optional(),
   message: z.string().optional(),
 })
 
-export type AddPet405Schema = z.infer<typeof addPet405Schema>
+export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
 
-export const addPetErrorSchema = petSchema.omit({ name: true }).describe('Successful operation')
+export const addPetStatusDefaultSchema = petSchema.omit({ name: true })
 
-export type AddPetErrorSchema = z.infer<typeof addPetErrorSchema>
+export type AddPetStatusDefaultSchema = z.infer<typeof addPetStatusDefaultSchema>
 
-export const addPetMutationRequestSchema = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetResponseSchema = z.union([addPetStatus405Schema, addPetStatusDefaultSchema])
 
-export type AddPetMutationRequestSchema = z.infer<typeof addPetMutationRequestSchema>
+export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
 
-export const addPetMutationResponseSchema = z.any()
+export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
 
-export type AddPetMutationResponseSchema = z.infer<typeof addPetMutationResponseSchema>
-
-export const addPetMutationSchema = z.object({
-  Response: z.any(),
-  Request: addPetMutationRequestSchema,
-  Errors: z.union([addPet405Schema, addPetErrorSchema]),
-})
-
-export type AddPetMutationSchema = z.infer<typeof addPetMutationSchema>
+export type AddPetDataSchema = z.infer<typeof addPetDataSchema>

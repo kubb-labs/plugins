@@ -10,3 +10,5 @@ export const listPetsQueryLimitSchema = z.int().optional()
 export const listPetsStatus200Schema = z.object({})
 
 export const listPetsStatusDefaultSchema = z.object({})
+
+export const listPetsResponseSchema = z.union([listPetsStatus200Schema, listPetsStatusDefaultSchema])

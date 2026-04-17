@@ -11,3 +11,5 @@ export const findPetsByTagsQueryTagsSchema = z.array(z.coerce.string()).optional
 export const findPetsByTagsStatus200Schema = z.array(petSchema)
 
 export const findPetsByTagsStatus400Schema = z.any()
+
+export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])

@@ -1,16 +1,17 @@
 import type {
-  UpdatePetWithFormMutationResponse,
-  UpdatePetWithFormPathParams,
-  UpdatePetWithFormQueryParams,
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryName,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormResponse,
 } from '../../models/ts/petController/UpdatePetWithForm.ts'
 
 export function updatePetWithForm(
-  petId: UpdatePetWithFormPathParams['petId'],
-  params?: UpdatePetWithFormQueryParams,
+  petId: UpdatePetWithFormPathPetId,
+  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<UpdatePetWithFormMutationResponse> {
+): Cypress.Chainable<UpdatePetWithFormResponse> {
   return cy
-    .request<UpdatePetWithFormMutationResponse>({
+    .request<UpdatePetWithFormResponse>({
       method: 'POST',
       url: `/pet/${petId}:search`,
       qs: params,

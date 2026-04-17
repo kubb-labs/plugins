@@ -2,11 +2,12 @@ import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type {
-  CreatePetsHeaderParams,
-  CreatePetsMutationRequest,
-  CreatePetsMutationResponse,
-  CreatePetsPathParams,
-  CreatePetsQueryParams,
+  CreatePetsData,
+  CreatePetsHeaderXEXAMPLE,
+  CreatePetsPathUuid,
+  CreatePetsQueryBoolParam,
+  CreatePetsQueryOffset,
+  CreatePetsResponse,
 } from '../../models/ts/petsController/CreatePets.ts'
 
 /**
@@ -19,10 +20,10 @@ export async function createPetsHandler({
   headers,
   params,
 }: {
-  uuid: CreatePetsPathParams['uuid']
-  data: CreatePetsMutationRequest
-  headers: CreatePetsHeaderParams
-  params?: CreatePetsQueryParams
+  uuid: CreatePetsPathUuid
+  data: CreatePetsData
+  headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
+  params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
 }): Promise<Promise<CallToolResult>> {
   const mappedParams = params ? { bool_param: params.boolParam, offset: params.offset } : undefined
 
@@ -30,7 +31,7 @@ export async function createPetsHandler({
 
   const requestData = data
 
-  const res = await fetch<CreatePetsMutationResponse, ResponseErrorConfig<Error>, CreatePetsMutationRequest>({
+  const res = await fetch<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: `/pets/${uuid}`,
     baseURL: 'https://petstore.swagger.io/v2',

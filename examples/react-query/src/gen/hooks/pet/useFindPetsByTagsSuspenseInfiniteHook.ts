@@ -8,10 +8,19 @@ import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
 import { fetch } from '../../.kubb/fetch.ts'
-import type { FindPetsByTags400, FindPetsByTagsQueryParams, FindPetsByTagsQueryResponse } from '../../models/FindPetsByTags.ts'
+import type {
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsResponse,
+  FindPetsByTagsStatus400,
+} from '../../models/FindPetsByTags.ts'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = (params?: FindPetsByTagsQueryParams) =>
-  ['v5', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsSuspenseInfiniteQueryKey = (params?: {
+  tags?: FindPetsByTagsQueryTags
+  page?: FindPetsByTagsQueryPage
+  pageSize?: FindPetsByTagsQueryPageSize
+}) => ['v5', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
 
@@ -20,10 +29,13 @@ export type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsB
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsSuspenseInfiniteHook(params?: FindPetsByTagsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTagsSuspenseInfiniteHook(
+  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsQueryResponse, ResponseErrorConfig<FindPetsByTags400>, unknown>({
+  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: '/pet/findByTags',
     params,
@@ -33,21 +45,20 @@ export async function findPetsByTagsSuspenseInfiniteHook(params?: FindPetsByTags
   return res
 }
 
-export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(params?: FindPetsByTagsQueryParams, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(
+  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey(params)
   return infiniteQueryOptions<
-    ResponseConfig<FindPetsByTagsQueryResponse>,
-    ResponseErrorConfig<FindPetsByTags400>,
-    InfiniteData<ResponseConfig<FindPetsByTagsQueryResponse>>,
+    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseErrorConfig<FindPetsByTagsStatus400>,
+    InfiniteData<ResponseConfig<FindPetsByTagsResponse>>,
     typeof queryKey,
-    NonNullable<FindPetsByTagsQueryParams['pageSize']>
+    number
   >({
     queryKey,
-    queryFn: async ({ signal, pageParam }) => {
-      params = {
-        ...(params ?? {}),
-        ['pageSize']: pageParam as unknown as FindPetsByTagsQueryParams['pageSize'],
-      } as FindPetsByTagsQueryParams
+    queryFn: async ({ signal }) => {
       return findPetsByTagsSuspenseInfiniteHook(params, { ...config, signal: config.signal ?? signal })
     },
     initialPageParam: 0,
@@ -62,13 +73,13 @@ export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(params?: FindPets
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspenseInfiniteHook<
-  TQueryFnData = ResponseConfig<FindPetsByTagsQueryResponse>,
-  TError = ResponseErrorConfig<FindPetsByTags400>,
+  TQueryFnData = ResponseConfig<FindPetsByTagsResponse>,
+  TError = ResponseErrorConfig<FindPetsByTagsStatus400>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
-  TPageParam = NonNullable<FindPetsByTagsQueryParams['pageSize']>,
+  TPageParam = number,
 >(
-  params?: FindPetsByTagsQueryParams,
+  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

@@ -7,19 +7,13 @@ import * as z from 'zod/mini'
 import { addPetRequestSchema } from './addPetRequestSchema.ts'
 import { petSchema } from './petSchema.ts'
 
-export const addPet200Schema = petSchema
+export const addPetStatus200Schema = petSchema
 
-export const addPet405Schema = z.object({
+export const addPetStatus405Schema = z.object({
   code: z.optional(z.int()),
   message: z.optional(z.string()),
 })
 
-export const addPetMutationRequestSchema = addPetRequestSchema
+export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetMutationResponseSchema = addPet200Schema
-
-export const addPetMutationSchema = z.object({
-  Response: addPet200Schema,
-  Request: addPetMutationRequestSchema,
-  Errors: addPet405Schema,
-})
+export const addPetDataSchema = addPetRequestSchema

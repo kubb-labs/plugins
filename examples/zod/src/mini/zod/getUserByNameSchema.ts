@@ -6,20 +6,12 @@
 import * as z from 'zod/mini'
 import { userSchema } from './userSchema.ts'
 
-export const getUserByNamePathParamsSchema = z.object({
-  username: z.string(),
-})
+export const getUserByNamePathUsernameSchema = z.string()
 
-export const getUserByName200Schema = userSchema
+export const getUserByNameStatus200Schema = userSchema
 
-export const getUserByName400Schema = z.any()
+export const getUserByNameStatus400Schema = z.any()
 
-export const getUserByName404Schema = z.any()
+export const getUserByNameStatus404Schema = z.any()
 
-export const getUserByNameQueryResponseSchema = getUserByName200Schema
-
-export const getUserByNameQuerySchema = z.object({
-  Response: getUserByName200Schema,
-  PathParams: getUserByNamePathParamsSchema,
-  Errors: z.union([getUserByName400Schema, getUserByName404Schema]),
-})
+export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])

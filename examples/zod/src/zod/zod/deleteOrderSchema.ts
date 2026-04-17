@@ -5,28 +5,18 @@
 
 import { z } from '../../zod.ts'
 
-export const deleteOrderPathParamsSchema = z.object({
-  orderId: z.int().describe('ID of the order that needs to be deleted'),
-})
+export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
 
-export type DeleteOrderPathParamsSchema = z.infer<typeof deleteOrderPathParamsSchema>
+export type DeleteOrderPathOrderIdSchema = z.infer<typeof deleteOrderPathOrderIdSchema>
 
-export const deleteOrder400Schema = z.any().describe('Invalid ID supplied')
+export const deleteOrderStatus400Schema = z.any()
 
-export type DeleteOrder400Schema = z.infer<typeof deleteOrder400Schema>
+export type DeleteOrderStatus400Schema = z.infer<typeof deleteOrderStatus400Schema>
 
-export const deleteOrder404Schema = z.any().describe('Order not found')
+export const deleteOrderStatus404Schema = z.any()
 
-export type DeleteOrder404Schema = z.infer<typeof deleteOrder404Schema>
+export type DeleteOrderStatus404Schema = z.infer<typeof deleteOrderStatus404Schema>
 
-export const deleteOrderMutationResponseSchema = z.any()
+export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
-export type DeleteOrderMutationResponseSchema = z.infer<typeof deleteOrderMutationResponseSchema>
-
-export const deleteOrderMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteOrderPathParamsSchema,
-  Errors: z.union([deleteOrder400Schema, deleteOrder404Schema]),
-})
-
-export type DeleteOrderMutationSchema = z.infer<typeof deleteOrderMutationSchema>
+export type DeleteOrderResponseSchema = z.infer<typeof deleteOrderResponseSchema>

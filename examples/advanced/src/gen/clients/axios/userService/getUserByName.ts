@@ -1,14 +1,14 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
 import type {
-  GetUserByName400,
-  GetUserByName404,
-  GetUserByNamePathParams,
-  GetUserByNameQueryResponse,
+  GetUserByNamePathUsername,
+  GetUserByNameResponse,
+  GetUserByNameStatus400,
+  GetUserByNameStatus404,
 } from '../../../models/ts/userController/GetUserByName.ts'
-import { getUserByNameQueryResponseSchema } from '../../../zod/userController/getUserByNameSchema.ts'
+import { getUserByNameResponseSchema } from '../../../zod/userController/getUserByNameSchema.ts'
 
-export function getGetUserByNameUrl({ username }: { username: GetUserByNamePathParams['username'] }) {
+export function getGetUserByNameUrl({ username }: { username: GetUserByNamePathUsername }) {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }
 
   return res
@@ -18,17 +18,14 @@ export function getGetUserByNameUrl({ username }: { username: GetUserByNamePathP
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export async function getUserByName(
-  { username }: { username: GetUserByNamePathParams['username'] },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetUserByNameQueryResponse, ResponseErrorConfig<GetUserByName400 | GetUserByName404>, unknown>({
+  const res = await request<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',
     url: getGetUserByNameUrl({ username }).url.toString(),
     ...requestConfig,
   })
 
-  return { ...res, data: getUserByNameQueryResponseSchema.parse(res.data) }
+  return { ...res, data: getUserByNameResponseSchema.parse(res.data) }
 }

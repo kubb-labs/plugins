@@ -12,3 +12,5 @@ export const loginUserQueryPasswordSchema = z.coerce.string().optional().describ
 export const loginUserStatus200Schema = z.coerce.string()
 
 export const loginUserStatus400Schema = z.any()
+
+export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])

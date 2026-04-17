@@ -17,3 +17,7 @@ export type FindPetsByStatusStatus200Schema = z.infer<typeof findPetsByStatusSta
 export const findPetsByStatusStatus400Schema = z.any()
 
 export type FindPetsByStatusStatus400Schema = z.infer<typeof findPetsByStatusStatus400Schema>
+
+export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])
+
+export type FindPetsByStatusResponseSchema = z.infer<typeof findPetsByStatusResponseSchema>

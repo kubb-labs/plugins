@@ -20,255 +20,265 @@ export { server } from './mcp/server.js'
 export { updatePetHandler } from './mcp/updatePet.js'
 export { updatePetWithFormHandler } from './mcp/updatePetWithForm.js'
 export { updateUserHandler } from './mcp/updateUser.js'
-export type { AddFiles200, AddFiles405, AddFilesMutation, AddFilesMutationRequest, AddFilesMutationResponse } from './models/ts/AddFiles.js'
-export type { AddPet200, AddPet405, AddPetMutation, AddPetMutationRequest, AddPetMutationResponse } from './models/ts/AddPet.js'
+export type { AddFilesData, AddFilesRequestConfig, AddFilesResponse, AddFilesResponses, AddFilesStatus200, AddFilesStatus405 } from './models/ts/AddFiles.js'
+export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './models/ts/AddPet.js'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/ts/AddPetRequest.js'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.js'
 export type { Address } from './models/ts/Address.js'
 export type { ApiResponse } from './models/ts/ApiResponse.js'
 export type { Category } from './models/ts/Category.js'
 export type {
-  CreatePets201,
-  CreatePetsError,
-  CreatePetsHeaderParams,
-  CreatePetsHeaderParamsXEXAMPLEEnumKey,
-  CreatePetsMutation,
-  CreatePetsMutationRequest,
-  CreatePetsMutationResponse,
-  CreatePetsPathParams,
-  CreatePetsQueryParams,
+  CreatePetsData,
+  CreatePetsHeaderXEXAMPLE,
+  CreatePetsPathUuid,
+  CreatePetsQueryOffset,
+  CreatePetsRequestConfig,
+  CreatePetsResponse,
+  CreatePetsResponses,
+  CreatePetsStatus201,
+  CreatePetsStatusDefault,
 } from './models/ts/CreatePets.js'
-export { createPetsHeaderParamsXEXAMPLEEnum } from './models/ts/CreatePets.js'
-export type { CreateUserError, CreateUserMutation, CreateUserMutationRequest, CreateUserMutationResponse } from './models/ts/CreateUser.js'
+export type { CreateUserData, CreateUserRequestConfig, CreateUserResponse, CreateUserResponses, CreateUserStatusDefault } from './models/ts/CreateUser.js'
 export type {
-  CreateUsersWithListInput200,
-  CreateUsersWithListInputError,
-  CreateUsersWithListInputMutation,
-  CreateUsersWithListInputMutationRequest,
-  CreateUsersWithListInputMutationResponse,
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputRequestConfig,
+  CreateUsersWithListInputResponse,
+  CreateUsersWithListInputResponses,
+  CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatusDefault,
 } from './models/ts/CreateUsersWithListInput.js'
 export type { Customer } from './models/ts/Customer.js'
-export type { DeleteOrder400, DeleteOrder404, DeleteOrderMutation, DeleteOrderMutationResponse, DeleteOrderPathParams } from './models/ts/DeleteOrder.js'
-export type { DeletePet400, DeletePetHeaderParams, DeletePetMutation, DeletePetMutationResponse, DeletePetPathParams } from './models/ts/DeletePet.js'
-export type { DeleteUser400, DeleteUser404, DeleteUserMutation, DeleteUserMutationResponse, DeleteUserPathParams } from './models/ts/DeleteUser.js'
 export type {
-  FindPetsByStatus200,
-  FindPetsByStatus400,
-  FindPetsByStatusPathParams,
-  FindPetsByStatusQuery,
-  FindPetsByStatusQueryResponse,
+  DeleteOrderPathOrderId,
+  DeleteOrderRequestConfig,
+  DeleteOrderResponse,
+  DeleteOrderResponses,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+} from './models/ts/DeleteOrder.js'
+export type {
+  DeletePetHeaderApiKey,
+  DeletePetPathPetId,
+  DeletePetRequestConfig,
+  DeletePetResponse,
+  DeletePetResponses,
+  DeletePetStatus400,
+} from './models/ts/DeletePet.js'
+export type {
+  DeleteUserPathUsername,
+  DeleteUserRequestConfig,
+  DeleteUserResponse,
+  DeleteUserResponses,
+  DeleteUserStatus400,
+  DeleteUserStatus404,
+} from './models/ts/DeleteUser.js'
+export type {
+  FindPetsByStatusPathStepId,
+  FindPetsByStatusRequestConfig,
+  FindPetsByStatusResponse,
+  FindPetsByStatusResponses,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus400,
 } from './models/ts/FindPetsByStatus.js'
 export type {
-  FindPetsByTags200,
-  FindPetsByTags400,
-  FindPetsByTagsHeaderParams,
-  FindPetsByTagsHeaderParamsXEXAMPLEEnumKey,
-  FindPetsByTagsQuery,
-  FindPetsByTagsQueryParams,
-  FindPetsByTagsQueryResponse,
+  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsRequestConfig,
+  FindPetsByTagsResponse,
+  FindPetsByTagsResponses,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus400,
 } from './models/ts/FindPetsByTags.js'
-export { findPetsByTagsHeaderParamsXEXAMPLEEnum } from './models/ts/FindPetsByTags.js'
-export type { GetInventory200, GetInventoryQuery, GetInventoryQueryResponse } from './models/ts/GetInventory.js'
+export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/GetInventory.js'
 export type {
-  GetOrderById200,
-  GetOrderById400,
-  GetOrderById404,
-  GetOrderByIdPathParams,
-  GetOrderByIdQuery,
-  GetOrderByIdQueryResponse,
+  GetOrderByIdPathOrderId,
+  GetOrderByIdRequestConfig,
+  GetOrderByIdResponse,
+  GetOrderByIdResponses,
+  GetOrderByIdStatus200,
+  GetOrderByIdStatus400,
+  GetOrderByIdStatus404,
 } from './models/ts/GetOrderById.js'
-export type { GetPetById200, GetPetById400, GetPetById404, GetPetByIdPathParams, GetPetByIdQuery, GetPetByIdQueryResponse } from './models/ts/GetPetById.js'
 export type {
-  GetUserByName200,
-  GetUserByName400,
-  GetUserByName404,
-  GetUserByNamePathParams,
-  GetUserByNameQuery,
-  GetUserByNameQueryResponse,
+  GetPetByIdPathPetId,
+  GetPetByIdRequestConfig,
+  GetPetByIdResponse,
+  GetPetByIdResponses,
+  GetPetByIdStatus200,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+} from './models/ts/GetPetById.js'
+export type {
+  GetUserByNamePathUsername,
+  GetUserByNameRequestConfig,
+  GetUserByNameResponse,
+  GetUserByNameResponses,
+  GetUserByNameStatus200,
+  GetUserByNameStatus400,
+  GetUserByNameStatus404,
 } from './models/ts/GetUserByName.js'
-export type { LoginUser200, LoginUser400, LoginUserQuery, LoginUserQueryParams, LoginUserQueryResponse } from './models/ts/LoginUser.js'
-export type { LogoutUserError, LogoutUserQuery, LogoutUserQueryResponse } from './models/ts/LogoutUser.js'
+export type {
+  LoginUserQueryPassword,
+  LoginUserQueryUsername,
+  LoginUserRequestConfig,
+  LoginUserResponse,
+  LoginUserResponses,
+  LoginUserStatus200,
+  LoginUserStatus400,
+} from './models/ts/LoginUser.js'
+export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/LogoutUser.js'
 export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderStatusEnumKey } from './models/ts/Order.js'
 export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './models/ts/Order.js'
 export type { Pet, PetStatusEnumKey } from './models/ts/Pet.js'
 export { petStatusEnum } from './models/ts/Pet.js'
 export type { PetNotFound } from './models/ts/PetNotFound.js'
-export type { PlaceOrder200, PlaceOrder405, PlaceOrderMutation, PlaceOrderMutationRequest, PlaceOrderMutationResponse } from './models/ts/PlaceOrder.js'
 export type {
-  PlaceOrderPatch200,
-  PlaceOrderPatch405,
-  PlaceOrderPatchMutation,
-  PlaceOrderPatchMutationRequest,
-  PlaceOrderPatchMutationResponse,
+  PlaceOrderData,
+  PlaceOrderRequestConfig,
+  PlaceOrderResponse,
+  PlaceOrderResponses,
+  PlaceOrderStatus200,
+  PlaceOrderStatus405,
+} from './models/ts/PlaceOrder.js'
+export type {
+  PlaceOrderPatchData,
+  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
 } from './models/ts/PlaceOrderPatch.js'
 export type { TagTag } from './models/ts/tag/Tag.js'
 export type {
-  UpdatePet200,
-  UpdatePet202,
-  UpdatePet400,
-  UpdatePet404,
-  UpdatePet405,
-  UpdatePetMutation,
-  UpdatePetMutationRequest,
-  UpdatePetMutationResponse,
+  UpdatePetData,
+  UpdatePetRequestConfig,
+  UpdatePetResponse,
+  UpdatePetResponses,
+  UpdatePetStatus200,
+  UpdatePetStatus202,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
 } from './models/ts/UpdatePet.js'
 export type {
-  UpdatePetWithForm405,
-  UpdatePetWithFormMutation,
-  UpdatePetWithFormMutationResponse,
-  UpdatePetWithFormPathParams,
-  UpdatePetWithFormQueryParams,
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryName,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormResponses,
+  UpdatePetWithFormStatus405,
 } from './models/ts/UpdatePetWithForm.js'
 export type {
-  UpdateUserError,
-  UpdateUserMutation,
-  UpdateUserMutationRequest,
-  UpdateUserMutationResponse,
-  UpdateUserPathParams,
+  UpdateUserData,
+  UpdateUserPathUsername,
+  UpdateUserRequestConfig,
+  UpdateUserResponse,
+  UpdateUserResponses,
+  UpdateUserStatusDefault,
 } from './models/ts/UpdateUser.js'
 export type { User } from './models/ts/User.js'
 export type { UserArray } from './models/ts/UserArray.js'
-export {
-  addFiles200Schema,
-  addFiles405Schema,
-  addFilesMutationRequestSchema,
-  addFilesMutationResponseSchema,
-  addFilesMutationSchema,
-} from './zod/addFilesSchema.js'
+export { addFilesDataSchema, addFilesResponseSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './zod/addFilesSchema.js'
 export { addPetRequestSchema } from './zod/addPetRequestSchema.js'
-export { addPet200Schema, addPet405Schema, addPetMutationRequestSchema, addPetMutationResponseSchema, addPetMutationSchema } from './zod/addPetSchema.js'
+export { addPetDataSchema, addPetResponseSchema, addPetStatus200Schema, addPetStatus405Schema } from './zod/addPetSchema.js'
 export { addressSchema } from './zod/addressSchema.js'
 export { apiResponseSchema } from './zod/apiResponseSchema.js'
 export { categorySchema } from './zod/categorySchema.js'
 export {
-  createPets201Schema,
-  createPetsErrorSchema,
-  createPetsHeaderParamsSchema,
-  createPetsMutationRequestSchema,
-  createPetsMutationResponseSchema,
-  createPetsMutationSchema,
-  createPetsPathParamsSchema,
-  createPetsQueryParamsSchema,
+  createPetsDataSchema,
+  createPetsHeaderXEXAMPLESchema,
+  createPetsPathUuidSchema,
+  createPetsQueryOffsetSchema,
+  createPetsResponseSchema,
+  createPetsStatus201Schema,
+  createPetsStatusDefaultSchema,
 } from './zod/createPetsSchema.js'
-export { createUserErrorSchema, createUserMutationRequestSchema, createUserMutationResponseSchema, createUserMutationSchema } from './zod/createUserSchema.js'
+export { createUserDataSchema, createUserResponseSchema, createUserStatusDefaultSchema } from './zod/createUserSchema.js'
 export {
-  createUsersWithListInput200Schema,
-  createUsersWithListInputErrorSchema,
-  createUsersWithListInputMutationRequestSchema,
-  createUsersWithListInputMutationResponseSchema,
-  createUsersWithListInputMutationSchema,
+  createUsersWithListInputDataSchema,
+  createUsersWithListInputResponseSchema,
+  createUsersWithListInputStatus200Schema,
+  createUsersWithListInputStatusDefaultSchema,
 } from './zod/createUsersWithListInputSchema.js'
 export { customerSchema } from './zod/customerSchema.js'
+export { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './zod/deleteOrderSchema.js'
+export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './zod/deletePetSchema.js'
+export { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './zod/deleteUserSchema.js'
 export {
-  deleteOrder400Schema,
-  deleteOrder404Schema,
-  deleteOrderMutationResponseSchema,
-  deleteOrderMutationSchema,
-  deleteOrderPathParamsSchema,
-} from './zod/deleteOrderSchema.js'
-export {
-  deletePet400Schema,
-  deletePetHeaderParamsSchema,
-  deletePetMutationResponseSchema,
-  deletePetMutationSchema,
-  deletePetPathParamsSchema,
-} from './zod/deletePetSchema.js'
-export {
-  deleteUser400Schema,
-  deleteUser404Schema,
-  deleteUserMutationResponseSchema,
-  deleteUserMutationSchema,
-  deleteUserPathParamsSchema,
-} from './zod/deleteUserSchema.js'
-export {
-  findPetsByStatus200Schema,
-  findPetsByStatus400Schema,
-  findPetsByStatusPathParamsSchema,
-  findPetsByStatusQueryResponseSchema,
-  findPetsByStatusQuerySchema,
+  findPetsByStatusPathStepIdSchema,
+  findPetsByStatusResponseSchema,
+  findPetsByStatusStatus200Schema,
+  findPetsByStatusStatus400Schema,
 } from './zod/findPetsByStatusSchema.js'
 export {
-  findPetsByTags200Schema,
-  findPetsByTags400Schema,
-  findPetsByTagsHeaderParamsSchema,
-  findPetsByTagsQueryParamsSchema,
-  findPetsByTagsQueryResponseSchema,
-  findPetsByTagsQuerySchema,
+  findPetsByTagsHeaderXEXAMPLESchema,
+  findPetsByTagsQueryPageSchema,
+  findPetsByTagsQueryPageSizeSchema,
+  findPetsByTagsQueryTagsSchema,
+  findPetsByTagsResponseSchema,
+  findPetsByTagsStatus200Schema,
+  findPetsByTagsStatus400Schema,
 } from './zod/findPetsByTagsSchema.js'
-export { getInventory200Schema, getInventoryQueryResponseSchema, getInventoryQuerySchema } from './zod/getInventorySchema.js'
+export { getInventoryResponseSchema, getInventoryStatus200Schema } from './zod/getInventorySchema.js'
 export {
-  getOrderById200Schema,
-  getOrderById400Schema,
-  getOrderById404Schema,
-  getOrderByIdPathParamsSchema,
-  getOrderByIdQueryResponseSchema,
-  getOrderByIdQuerySchema,
+  getOrderByIdPathOrderIdSchema,
+  getOrderByIdResponseSchema,
+  getOrderByIdStatus200Schema,
+  getOrderByIdStatus400Schema,
+  getOrderByIdStatus404Schema,
 } from './zod/getOrderByIdSchema.js'
 export {
-  getPetById200Schema,
-  getPetById400Schema,
-  getPetById404Schema,
-  getPetByIdPathParamsSchema,
-  getPetByIdQueryResponseSchema,
-  getPetByIdQuerySchema,
+  getPetByIdPathPetIdSchema,
+  getPetByIdResponseSchema,
+  getPetByIdStatus200Schema,
+  getPetByIdStatus400Schema,
+  getPetByIdStatus404Schema,
 } from './zod/getPetByIdSchema.js'
 export {
-  getUserByName200Schema,
-  getUserByName400Schema,
-  getUserByName404Schema,
-  getUserByNamePathParamsSchema,
-  getUserByNameQueryResponseSchema,
-  getUserByNameQuerySchema,
+  getUserByNamePathUsernameSchema,
+  getUserByNameResponseSchema,
+  getUserByNameStatus200Schema,
+  getUserByNameStatus400Schema,
+  getUserByNameStatus404Schema,
 } from './zod/getUserByNameSchema.js'
 export {
-  loginUser200Schema,
-  loginUser400Schema,
-  loginUserQueryParamsSchema,
-  loginUserQueryResponseSchema,
-  loginUserQuerySchema,
+  loginUserQueryPasswordSchema,
+  loginUserQueryUsernameSchema,
+  loginUserResponseSchema,
+  loginUserStatus200Schema,
+  loginUserStatus400Schema,
 } from './zod/loginUserSchema.js'
-export { logoutUserErrorSchema, logoutUserQueryResponseSchema, logoutUserQuerySchema } from './zod/logoutUserSchema.js'
+export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './zod/logoutUserSchema.js'
 export { orderSchema } from './zod/orderSchema.js'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.js'
 export { petSchema } from './zod/petSchema.js'
 export {
-  placeOrderPatch200Schema,
-  placeOrderPatch405Schema,
-  placeOrderPatchMutationRequestSchema,
-  placeOrderPatchMutationResponseSchema,
-  placeOrderPatchMutationSchema,
+  placeOrderPatchDataSchema,
+  placeOrderPatchResponseSchema,
+  placeOrderPatchStatus200Schema,
+  placeOrderPatchStatus405Schema,
 } from './zod/placeOrderPatchSchema.js'
-export {
-  placeOrder200Schema,
-  placeOrder405Schema,
-  placeOrderMutationRequestSchema,
-  placeOrderMutationResponseSchema,
-  placeOrderMutationSchema,
-} from './zod/placeOrderSchema.js'
+export { placeOrderDataSchema, placeOrderResponseSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './zod/placeOrderSchema.js'
 export { tagTagSchema } from './zod/tag/tagSchema.js'
 export {
-  updatePet200Schema,
-  updatePet202Schema,
-  updatePet400Schema,
-  updatePet404Schema,
-  updatePet405Schema,
-  updatePetMutationRequestSchema,
-  updatePetMutationResponseSchema,
-  updatePetMutationSchema,
+  updatePetDataSchema,
+  updatePetResponseSchema,
+  updatePetStatus200Schema,
+  updatePetStatus202Schema,
+  updatePetStatus400Schema,
+  updatePetStatus404Schema,
+  updatePetStatus405Schema,
 } from './zod/updatePetSchema.js'
 export {
-  updatePetWithForm405Schema,
-  updatePetWithFormMutationResponseSchema,
-  updatePetWithFormMutationSchema,
-  updatePetWithFormPathParamsSchema,
-  updatePetWithFormQueryParamsSchema,
+  updatePetWithFormPathPetIdSchema,
+  updatePetWithFormQueryNameSchema,
+  updatePetWithFormQueryStatusSchema,
+  updatePetWithFormResponseSchema,
+  updatePetWithFormStatus405Schema,
 } from './zod/updatePetWithFormSchema.js'
-export {
-  updateUserErrorSchema,
-  updateUserMutationRequestSchema,
-  updateUserMutationResponseSchema,
-  updateUserMutationSchema,
-  updateUserPathParamsSchema,
-} from './zod/updateUserSchema.js'
+export { updateUserDataSchema, updateUserPathUsernameSchema, updateUserResponseSchema, updateUserStatusDefaultSchema } from './zod/updateUserSchema.js'
 export { userArraySchema } from './zod/userArraySchema.js'
 export { userSchema } from './zod/userSchema.js'

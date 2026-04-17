@@ -4,7 +4,7 @@ import type { Pet } from '../Pet.ts'
 /**
  * @type object
  */
-export type AddPet405 = {
+export type AddPetStatus405 = {
   /**
    * @type integer | undefined
    */
@@ -16,24 +16,39 @@ export type AddPet405 = {
 }
 
 /**
- * @description Successful operation
  * @type object
  */
-export type AddPetError = Omit<NonNullable<Pet>, 'name'>
+export type AddPetStatusDefault = Omit<NonNullable<Pet>, 'name'>
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetMutationRequest = AddPetRequest
-
-export type AddPetMutationResponse = any
+export type AddPetData = AddPetRequest
 
 /**
  * @type object
  */
-export type AddPetMutation = {
-  Response: any
-  Request: AddPetMutationRequest
-  Errors: AddPet405 | AddPetError
+export type AddPetRequestConfig = {
+  data?: AddPetData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet'
 }
+
+/**
+ * @type object
+ */
+export type AddPetResponses = {
+  '405': AddPetStatus405
+  default: AddPetStatusDefault
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type AddPetResponse = AddPetStatus405 | AddPetStatusDefault

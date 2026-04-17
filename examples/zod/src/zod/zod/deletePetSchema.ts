@@ -5,33 +5,18 @@
 
 import { z } from '../../zod.ts'
 
-export const deletePetPathParamsSchema = z.object({
-  petId: z.int().describe('Pet id to delete'),
-})
+export const deletePetHeaderApiKeySchema = z.string().optional()
 
-export type DeletePetPathParamsSchema = z.infer<typeof deletePetPathParamsSchema>
+export type DeletePetHeaderApiKeySchema = z.infer<typeof deletePetHeaderApiKeySchema>
 
-export const deletePetHeaderParamsSchema = z
-  .object({
-    api_key: z.string().optional(),
-  })
-  .optional()
+export const deletePetPathPetIdSchema = z.int().describe('Pet id to delete')
 
-export type DeletePetHeaderParamsSchema = z.infer<typeof deletePetHeaderParamsSchema>
+export type DeletePetPathPetIdSchema = z.infer<typeof deletePetPathPetIdSchema>
 
-export const deletePet400Schema = z.any().describe('Invalid pet value')
+export const deletePetStatus400Schema = z.any()
 
-export type DeletePet400Schema = z.infer<typeof deletePet400Schema>
+export type DeletePetStatus400Schema = z.infer<typeof deletePetStatus400Schema>
 
-export const deletePetMutationResponseSchema = z.any()
+export const deletePetResponseSchema = deletePetStatus400Schema
 
-export type DeletePetMutationResponseSchema = z.infer<typeof deletePetMutationResponseSchema>
-
-export const deletePetMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deletePetPathParamsSchema,
-  HeaderParams: deletePetHeaderParamsSchema,
-  Errors: deletePet400Schema,
-})
-
-export type DeletePetMutationSchema = z.infer<typeof deletePetMutationSchema>
+export type DeletePetResponseSchema = z.infer<typeof deletePetResponseSchema>

@@ -1,38 +1,22 @@
 import * as z from 'zod'
 import { apiResponseSchema } from '../apiResponseSchema.ts'
 
-export const uploadFilePathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet to update'),
-})
+export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
 
-export type UploadFilePathParamsSchema = z.infer<typeof uploadFilePathParamsSchema>
+export type UploadFilePathPetIdSchema = z.infer<typeof uploadFilePathPetIdSchema>
 
-export const uploadFileQueryParamsSchema = z
-  .object({
-    additionalMetadata: z.string().optional().describe('Additional Metadata'),
-  })
-  .optional()
+export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
-export type UploadFileQueryParamsSchema = z.infer<typeof uploadFileQueryParamsSchema>
+export type UploadFileQueryAdditionalMetadataSchema = z.infer<typeof uploadFileQueryAdditionalMetadataSchema>
 
-export const uploadFile200Schema = apiResponseSchema.describe('successful operation')
+export const uploadFileStatus200Schema = apiResponseSchema
 
-export type UploadFile200Schema = z.infer<typeof uploadFile200Schema>
+export type UploadFileStatus200Schema = z.infer<typeof uploadFileStatus200Schema>
 
-export const uploadFileMutationRequestSchema = z.instanceof(File)
+export const uploadFileResponseSchema = uploadFileStatus200Schema
 
-export type UploadFileMutationRequestSchema = z.infer<typeof uploadFileMutationRequestSchema>
+export type UploadFileResponseSchema = z.infer<typeof uploadFileResponseSchema>
 
-export const uploadFileMutationResponseSchema = uploadFile200Schema
+export const uploadFileDataSchema = z.instanceof(File)
 
-export type UploadFileMutationResponseSchema = z.infer<typeof uploadFileMutationResponseSchema>
-
-export const uploadFileMutationSchema = z.object({
-  Response: uploadFile200Schema,
-  Request: uploadFileMutationRequestSchema,
-  QueryParams: uploadFileQueryParamsSchema,
-  PathParams: uploadFilePathParamsSchema,
-  Errors: z.any(),
-})
-
-export type UploadFileMutationSchema = z.infer<typeof uploadFileMutationSchema>
+export type UploadFileDataSchema = z.infer<typeof uploadFileDataSchema>

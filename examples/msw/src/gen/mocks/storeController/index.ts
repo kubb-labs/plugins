@@ -1,16 +1,5 @@
-export { createDeleteOrder400, createDeleteOrder404, createDeleteOrderPathParams } from './createDeleteOrder.ts'
-export { createGetInventory200, createGetInventoryQueryResponse } from './createGetInventory.ts'
-export {
-  createGetOrderById200,
-  createGetOrderById400,
-  createGetOrderById404,
-  createGetOrderByIdPathParams,
-  createGetOrderByIdQueryResponse,
-} from './createGetOrderById.ts'
-export { createPlaceOrder200, createPlaceOrder405, createPlaceOrderMutationRequest, createPlaceOrderMutationResponse } from './createPlaceOrder.ts'
-export {
-  createPlaceOrderPatch200,
-  createPlaceOrderPatch405,
-  createPlaceOrderPatchMutationRequest,
-  createPlaceOrderPatchMutationResponse,
-} from './createPlaceOrderPatch.ts'
+export { deleteOrderPathOrderId, deleteOrderResponse, deleteOrderStatus400, deleteOrderStatus404 } from './deleteOrder.ts'
+export { getInventoryResponse, getInventoryStatus200 } from './getInventory.ts'
+export { getOrderByIdPathOrderId, getOrderByIdResponse, getOrderByIdStatus200, getOrderByIdStatus400, getOrderByIdStatus404 } from './getOrderById.ts'
+export { placeOrderData, placeOrderResponse, placeOrderStatus200, placeOrderStatus405 } from './placeOrder.ts'
+export { placeOrderPatchData, placeOrderPatchResponse, placeOrderPatchStatus200, placeOrderPatchStatus405 } from './placeOrderPatch.ts'

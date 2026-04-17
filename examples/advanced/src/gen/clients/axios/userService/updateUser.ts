@@ -1,9 +1,9 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
-import type { UpdateUserMutationRequest, UpdateUserMutationResponse, UpdateUserPathParams } from '../../../models/ts/userController/UpdateUser.ts'
-import { updateUserMutationRequestSchema, updateUserMutationResponseSchema } from '../../../zod/userController/updateUserSchema.ts'
+import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.ts'
+import { updateUserDataSchema, updateUserResponseSchema } from '../../../zod/userController/updateUserSchema.ts'
 
-export function getUpdateUserUrl({ username }: { username: UpdateUserPathParams['username'] }) {
+export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
   const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }
 
   return res
@@ -15,19 +15,19 @@ export function getUpdateUserUrl({ username }: { username: UpdateUserPathParams[
  * {@link /user/:username}
  */
 export async function updateUser(
-  { username, data }: { username: UpdateUserPathParams['username']; data?: UpdateUserMutationRequest },
-  config: Partial<RequestConfig<UpdateUserMutationRequest>> & { client?: Client } = {},
+  { username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData },
+  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = updateUserMutationRequestSchema.parse(data)
+  const requestData = updateUserDataSchema.parse(data)
 
-  const res = await request<UpdateUserMutationResponse, ResponseErrorConfig<Error>, UpdateUserMutationRequest>({
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
     method: 'PUT',
     url: getUpdateUserUrl({ username }).url.toString(),
     data: requestData,
     ...requestConfig,
   })
 
-  return { ...res, data: updateUserMutationResponseSchema.parse(res.data) }
+  return { ...res, data: updateUserResponseSchema.parse(res.data) }
 }

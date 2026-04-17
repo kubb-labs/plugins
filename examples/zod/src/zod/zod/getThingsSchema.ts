@@ -6,31 +6,22 @@
 import { z } from '../../zod.ts'
 import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
-export const getThingsQueryParamsSchema = z
-  .object({
-    limit: z.int().min(1).max(100).optional().default(100).describe('Maximum number of things to return'),
-    skip: z.int().min(0).optional().default(0).describe('Number of things to skip'),
-  })
-  .optional()
+export const getThingsQueryLimitSchema = z.int().min(1).max(100).optional().default(100).describe('Maximum number of things to return')
 
-export type GetThingsQueryParamsSchema = z.infer<typeof getThingsQueryParamsSchema>
+export type GetThingsQueryLimitSchema = z.infer<typeof getThingsQueryLimitSchema>
 
-export const getThings201Schema = z.any().describe('Null response')
+export const getThingsQuerySkipSchema = z.int().min(0).optional().default(0).describe('Number of things to skip')
 
-export type GetThings201Schema = z.infer<typeof getThings201Schema>
+export type GetThingsQuerySkipSchema = z.infer<typeof getThingsQuerySkipSchema>
 
-export const getThingsErrorSchema = petNotFoundSchema.describe('unexpected error')
+export const getThingsStatus201Schema = z.any()
 
-export type GetThingsErrorSchema = z.infer<typeof getThingsErrorSchema>
+export type GetThingsStatus201Schema = z.infer<typeof getThingsStatus201Schema>
 
-export const getThingsQueryResponseSchema = getThings201Schema
+export const getThingsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
 
-export type GetThingsQueryResponseSchema = z.infer<typeof getThingsQueryResponseSchema>
+export type GetThingsStatusDefaultSchema = z.infer<typeof getThingsStatusDefaultSchema>
 
-export const getThingsQuerySchema = z.object({
-  Response: getThings201Schema,
-  QueryParams: getThingsQueryParamsSchema,
-  Errors: getThingsErrorSchema,
-})
+export const getThingsResponseSchema = z.union([getThingsStatus201Schema, getThingsStatusDefaultSchema])
 
-export type GetThingsQuerySchema = z.infer<typeof getThingsQuerySchema>
+export type GetThingsResponseSchema = z.infer<typeof getThingsResponseSchema>
