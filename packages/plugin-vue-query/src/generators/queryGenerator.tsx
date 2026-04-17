@@ -1,7 +1,7 @@
 import path from 'node:path'
 
 import { ast, defineGenerator } from '@kubb/core'
-import { Client as ClientComponent, pluginClientName } from '@kubb/plugin-client'
+import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -142,7 +142,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
         />
 
         {!shouldUseClientPlugin && (
-          <ClientComponent
+          <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
             dataReturnType={clientOptions.dataReturnType || 'data'}
