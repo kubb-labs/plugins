@@ -6,20 +6,12 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema.ts'
 
-export const getPetByIdPathParamsSchema = z.object({
-  petId: z.int(),
-})
+export const getPetByIdPathPetIdSchema = z.int()
 
-export const getPetById200Schema = petSchema
+export const getPetByIdStatus200Schema = petSchema
 
-export const getPetById400Schema = z.any()
+export const getPetByIdStatus400Schema = z.any()
 
-export const getPetById404Schema = z.any()
+export const getPetByIdStatus404Schema = z.any()
 
-export const getPetByIdQueryResponseSchema = getPetById200Schema
-
-export const getPetByIdQuerySchema = z.object({
-  Response: getPetById200Schema,
-  PathParams: getPetByIdPathParamsSchema,
-  Errors: z.union([getPetById400Schema, getPetById404Schema]),
-})
+export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])

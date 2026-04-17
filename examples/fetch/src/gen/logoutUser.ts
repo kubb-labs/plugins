@@ -5,7 +5,7 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { LogoutUserQueryResponse } from './models.ts'
+import type { LogoutUserResponse } from './models.ts'
 
 function getLogoutUserUrl() {
   const res = { method: 'GET', url: 'https://petstore3.swagger.io/api/v3/user/logout' as const }
@@ -20,7 +20,7 @@ function getLogoutUserUrl() {
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<LogoutUserQueryResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getLogoutUserUrl().url.toString(),
     ...requestConfig,

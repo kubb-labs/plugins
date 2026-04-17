@@ -1,7 +1,7 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
-import type { LogoutUserQueryResponse } from '../../../models/ts/userController/LogoutUser.ts'
-import { logoutUserQueryResponseSchema } from '../../../zod/userController/logoutUserSchema.ts'
+import type { LogoutUserResponse } from '../../../models/ts/userController/LogoutUser.ts'
+import { logoutUserResponseSchema } from '../../../zod/userController/logoutUserSchema.ts'
 
 export function getLogoutUserUrl() {
   const res = { method: 'GET', url: 'https://petstore3.swagger.io/api/v3/user/logout' as const }
@@ -16,11 +16,11 @@ export function getLogoutUserUrl() {
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<LogoutUserQueryResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getLogoutUserUrl().url.toString(),
     ...requestConfig,
   })
 
-  return { ...res, data: logoutUserQueryResponseSchema.parse(res.data) }
+  return { ...res, data: logoutUserResponseSchema.parse(res.data) }
 }

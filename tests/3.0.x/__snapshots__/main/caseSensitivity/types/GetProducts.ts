@@ -6,7 +6,7 @@
 /**
  * @type object
 */
-export type GetProducts200 = {
+export type GetProductsStatus200 = {
     /**
      * @type string | undefined
     */
@@ -21,12 +21,28 @@ export type GetProducts200 = {
     stock?: number;
 };
 
-export type GetProductsQueryResponse = GetProducts200;
+/**
+ * @type object
+*/
+export type GetProductsRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/products";
+};
 
 /**
  * @type object
 */
-export type GetProductsQuery = {
-    Response: GetProducts200;
-    Errors: any;
+export type GetProductsResponses = {
+    "200": GetProductsStatus200;
 };
+
+/**
+ * @description Union of all possible responses
+*/
+export type GetProductsResponse = GetProductsStatus200;

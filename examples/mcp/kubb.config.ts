@@ -26,13 +26,9 @@ export default defineConfig(() => {
     plugins: [
       pluginTs({
         output: { path: 'models/ts' },
-        compatibilityPreset: 'kubbV4',
       }),
-      pluginZod({
-        compatibilityPreset: 'kubbV4',
-      }),
+      pluginZod({}),
       pluginMcp({
-        compatibilityPreset: 'kubbV4',
         client: {
           baseURL: 'https://petstore.swagger.io/v2',
           importPath: '../../client.ts',

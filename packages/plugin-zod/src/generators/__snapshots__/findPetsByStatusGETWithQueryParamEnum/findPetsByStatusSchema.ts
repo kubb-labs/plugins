@@ -8,3 +8,5 @@ import * as z from 'zod'
 export const findPetsByStatusQueryStatusSchema = z.enum(['available', 'pending', 'sold']).optional()
 
 export const findPetsByStatusStatus200Schema = z.object({})
+
+export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema

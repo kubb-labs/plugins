@@ -14,7 +14,7 @@ import { toValue } from 'vue'
 export const updatePetWithFormQueryKey = (
   petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
-  params?: MaybeRefOrGetter<unknown>,
+  params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
 ) => [{ url: '/pet/:petId', params: { petId: petId } }, ...(params ? [params] : []), ...(data ? [data] : [])] as const
 
 export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
@@ -23,9 +23,9 @@ export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQuery
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId['petId'],
+  petId: UpdatePetWithFormPathPetId,
   data?: UpdatePetWithFormData,
-  params?: UpdatePetWithFormQueryStatus,
+  params?: { status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
@@ -44,7 +44,7 @@ export async function updatePetWithForm(
 export function updatePetWithFormQueryOptions(
   petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
-  params?: MaybeRefOrGetter<unknown>,
+  params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const queryKey = updatePetWithFormQueryKey(petId, data, params)
@@ -67,7 +67,7 @@ export function useUpdatePetWithForm<
 >(
   petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
-  params?: MaybeRefOrGetter<unknown>,
+  params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   options: {
     query?: Partial<UseQueryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client }

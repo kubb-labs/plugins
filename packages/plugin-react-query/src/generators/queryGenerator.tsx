@@ -1,7 +1,7 @@
 import path from 'node:path'
 
 import { ast, defineGenerator } from '@kubb/core'
-import { ClientLegacy as ClientLegacyComponent, pluginClientName } from '@kubb/plugin-client'
+import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -21,7 +21,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     if (!pluginTs?.resolver) return null
     const tsResolver = pluginTs.resolver
 
-    // query: false means "this IS a query op, but skip the useQuery hook" (v4 compat)
+    // query: false means "this IS a query op, but skip the useQuery hook"
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
     const isMutation =
       mutation !== false &&
@@ -60,7 +60,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
       ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
       ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
       ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-    ].filter(Boolean)
+    ].filter((name): name is string => !!name && name !== queryKeyTypeName)
 
     const pluginZodRaw = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
     const pluginZod = pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined
@@ -142,24 +142,17 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
         />
 
         {!shouldUseClientPlugin && (
-          <ClientLegacyComponent
+          <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
-            operation={{
-              path: node.path,
-              method: node.method,
-              getDescription: () => node.description,
-              getSummary: () => node.summary,
-              isDeprecated: () => node.deprecated ?? false,
-              getContentType: () => node.requestBody?.contentType ?? 'application/json',
-            }}
-            typeSchemas={buildLegacyTypeSchemas(node, tsResolver)}
-            zodSchemas={zodResolver ? buildLegacyTypeSchemas(node, zodResolver) : undefined}
             dataReturnType={clientOptions.dataReturnType || 'data'}
             paramsCasing={clientOptions.paramsCasing || paramsCasing}
             paramsType={paramsType}
             pathParamsType={pathParamsType}
             parser={parser}
+            node={node}
+            tsResolver={tsResolver}
+            zodResolver={zodResolver}
           />
         )}
 
@@ -200,57 +193,3 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     )
   },
 })
-
-function buildLegacyTypeSchemas(node: ast.OperationNode, resolver: any) {
-  const pathParams = node.parameters.filter((p) => p.in === 'path')
-  const queryParams = node.parameters.filter((p) => p.in === 'query')
-  const headerParams = node.parameters.filter((p) => p.in === 'header')
-
-  const buildSchemaProps = (params: typeof pathParams) => {
-    const properties: Record<string, { type: string }> = {}
-    const required: string[] = []
-    for (const p of params) {
-      properties[p.name] = { type: p.schema?.primitive ?? 'unknown' }
-      if (p.required) required.push(p.name)
-    }
-    return { properties, required }
-  }
-
-  return {
-    response: { name: resolver.resolveResponseName(node) },
-    request: node.requestBody?.schema
-      ? {
-          name: resolver.resolveDataName(node),
-          schema: { required: node.requestBody.required ? ['body'] : [] },
-        }
-      : undefined,
-    pathParams:
-      pathParams.length > 0 && resolver.resolvePathParamsName
-        ? {
-            name: resolver.resolvePathParamsName(node, pathParams[0]!),
-            schema: buildSchemaProps(pathParams),
-          }
-        : undefined,
-    queryParams:
-      queryParams.length > 0 && resolver.resolveQueryParamsName
-        ? {
-            name: resolver.resolveQueryParamsName(node, queryParams[0]!),
-            schema: buildSchemaProps(queryParams),
-          }
-        : undefined,
-    headerParams:
-      headerParams.length > 0 && resolver.resolveHeaderParamsName
-        ? {
-            name: resolver.resolveHeaderParamsName(node, headerParams[0]!),
-            schema: buildSchemaProps(headerParams),
-          }
-        : undefined,
-    errors: node.responses
-      .filter((r) => {
-        const code = Number.parseInt(r.statusCode, 10)
-        return code >= 400
-      })
-      .map((r) => ({ name: resolver.resolveResponseStatusName(node, r.statusCode) })),
-    statusCodes: node.responses.map((r) => ({ name: resolver.resolveResponseStatusName(node, r.statusCode) })),
-  }
-}

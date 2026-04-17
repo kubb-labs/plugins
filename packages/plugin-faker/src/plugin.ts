@@ -2,9 +2,7 @@ import { camelCase } from '@internals/utils'
 import { definePlugin, type Group } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { fakerGenerator } from './generators/fakerGenerator.tsx'
-import { fakerGeneratorLegacy } from './generators/fakerGeneratorLegacy.tsx'
 import { resolverFaker } from './resolvers/resolverFaker.ts'
-import { resolverFakerLegacy } from './resolvers/resolverFakerLegacy.ts'
 import type { PluginFaker } from './types.ts'
 
 /**
@@ -42,11 +40,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     printer,
     resolver: userResolver,
     transformer: userTransformer,
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverFakerLegacy : resolverFaker
-  const defaultGenerator = compatibilityPreset === 'kubbV4' ? fakerGeneratorLegacy : fakerGenerator
 
   const groupConfig = group
     ? ({
@@ -82,11 +76,11 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
           paramsCasing,
           printer,
         })
-        ctx.setResolver(userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver)
+        ctx.setResolver(userResolver ? { ...resolverFaker, ...userResolver } : resolverFaker)
         if (userTransformer) {
           ctx.setTransformer(userTransformer)
         }
-        ctx.addGenerator(defaultGenerator)
+        ctx.addGenerator(fakerGenerator)
         for (const generator of userGenerators) {
           ctx.addGenerator(generator)
         }

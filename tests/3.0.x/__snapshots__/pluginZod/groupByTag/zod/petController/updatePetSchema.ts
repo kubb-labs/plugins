@@ -14,4 +14,6 @@ export const updatePetStatus404Schema = z.any()
 
 export const updatePetStatus405Schema = z.any()
 
+export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
+
 export const updatePetDataSchema = petSchema.describe("Update an existent pet in the store")

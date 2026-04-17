@@ -1,33 +1,21 @@
 import * as z from 'zod'
 
-export const updatePetWithFormPathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet that needs to be updated'),
-})
+export const updatePetWithFormPathPetIdSchema = z.int().describe('ID of pet that needs to be updated')
 
-export type UpdatePetWithFormPathParamsSchema = z.infer<typeof updatePetWithFormPathParamsSchema>
+export type UpdatePetWithFormPathPetIdSchema = z.infer<typeof updatePetWithFormPathPetIdSchema>
 
-export const updatePetWithFormQueryParamsSchema = z
-  .object({
-    name: z.string().optional().describe('Name of pet that needs to be updated'),
-    status: z.string().optional().describe('Status of pet that needs to be updated'),
-  })
-  .optional()
+export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
-export type UpdatePetWithFormQueryParamsSchema = z.infer<typeof updatePetWithFormQueryParamsSchema>
+export type UpdatePetWithFormQueryNameSchema = z.infer<typeof updatePetWithFormQueryNameSchema>
 
-export const updatePetWithForm405Schema = z.any().describe('Invalid input')
+export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
-export type UpdatePetWithForm405Schema = z.infer<typeof updatePetWithForm405Schema>
+export type UpdatePetWithFormQueryStatusSchema = z.infer<typeof updatePetWithFormQueryStatusSchema>
 
-export const updatePetWithFormMutationResponseSchema = z.any()
+export const updatePetWithFormStatus405Schema = z.any()
 
-export type UpdatePetWithFormMutationResponseSchema = z.infer<typeof updatePetWithFormMutationResponseSchema>
+export type UpdatePetWithFormStatus405Schema = z.infer<typeof updatePetWithFormStatus405Schema>
 
-export const updatePetWithFormMutationSchema = z.object({
-  Response: z.any(),
-  QueryParams: updatePetWithFormQueryParamsSchema,
-  PathParams: updatePetWithFormPathParamsSchema,
-  Errors: updatePetWithForm405Schema,
-})
+export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema
 
-export type UpdatePetWithFormMutationSchema = z.infer<typeof updatePetWithFormMutationSchema>
+export type UpdatePetWithFormResponseSchema = z.infer<typeof updatePetWithFormResponseSchema>

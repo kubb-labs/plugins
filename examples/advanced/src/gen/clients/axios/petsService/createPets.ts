@@ -1,15 +1,16 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
 import type {
-  CreatePetsHeaderParams,
-  CreatePetsMutationRequest,
-  CreatePetsMutationResponse,
-  CreatePetsPathParams,
-  CreatePetsQueryParams,
+  CreatePetsData,
+  CreatePetsHeaderXEXAMPLE,
+  CreatePetsPathUuid,
+  CreatePetsQueryBoolParam,
+  CreatePetsQueryOffset,
+  CreatePetsResponse,
 } from '../../../models/ts/petsController/CreatePets.ts'
-import { createPetsMutationRequestSchema, createPetsMutationResponseSchema } from '../../../zod/petsController/createPetsSchema.ts'
+import { createPetsDataSchema, createPetsResponseSchema } from '../../../zod/petsController/createPetsSchema.ts'
 
-export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathParams['uuid'] }) {
+export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathUuid }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${uuid}` as const }
 
   return res
@@ -25,8 +26,13 @@ export async function createPets(
     data,
     headers,
     params,
-  }: { uuid: CreatePetsPathParams['uuid']; data: CreatePetsMutationRequest; headers: CreatePetsHeaderParams; params?: CreatePetsQueryParams },
-  config: Partial<RequestConfig<CreatePetsMutationRequest>> & { client?: Client } = {},
+  }: {
+    uuid: CreatePetsPathUuid
+    data: CreatePetsData
+    headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
+    params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
+  },
+  config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
@@ -34,9 +40,9 @@ export async function createPets(
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const requestData = createPetsMutationRequestSchema.parse(data)
+  const requestData = createPetsDataSchema.parse(data)
 
-  const res = await request<CreatePetsMutationResponse, ResponseErrorConfig<Error>, CreatePetsMutationRequest>({
+  const res = await request<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,
@@ -45,5 +51,5 @@ export async function createPets(
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
-  return { ...res, data: createPetsMutationResponseSchema.parse(res.data) }
+  return { ...res, data: createPetsResponseSchema.parse(res.data) }
 }

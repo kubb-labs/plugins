@@ -3,17 +3,10 @@
  * Do not edit manually.
  */
 
-import * as z from 'zod'
 import { userSchema } from './userSchema.js'
 
-export const createUserErrorSchema = userSchema.describe('successful operation')
+export const createUserStatusDefaultSchema = userSchema
 
-export const createUserMutationRequestSchema = userSchema.optional().describe('Created user object')
+export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export const createUserMutationResponseSchema = z.any()
-
-export const createUserMutationSchema = z.object({
-  Response: z.any(),
-  Request: createUserMutationRequestSchema,
-  Errors: createUserErrorSchema,
-})
+export const createUserDataSchema = userSchema.optional().describe('Created user object')

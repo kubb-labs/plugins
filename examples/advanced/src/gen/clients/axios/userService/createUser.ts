@@ -1,7 +1,7 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
-import type { CreateUserMutationRequest, CreateUserMutationResponse } from '../../../models/ts/userController/CreateUser.ts'
-import { createUserMutationRequestSchema, createUserMutationResponseSchema } from '../../../zod/userController/createUserSchema.ts'
+import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
+import { createUserDataSchema, createUserResponseSchema } from '../../../zod/userController/createUserSchema.ts'
 
 export function getCreateUserUrl() {
   const res = { method: 'POST', url: 'https://petstore3.swagger.io/api/v3/user' as const }
@@ -14,20 +14,17 @@ export function getCreateUserUrl() {
  * @summary Create user
  * {@link /user}
  */
-export async function createUser(
-  { data }: { data?: CreateUserMutationRequest } = {},
-  config: Partial<RequestConfig<CreateUserMutationRequest>> & { client?: Client } = {},
-) {
+export async function createUser({ data }: { data?: CreateUserData } = {}, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = createUserMutationRequestSchema.parse(data)
+  const requestData = createUserDataSchema.parse(data)
 
-  const res = await request<CreateUserMutationResponse, ResponseErrorConfig<Error>, CreateUserMutationRequest>({
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
     method: 'POST',
     url: getCreateUserUrl().url.toString(),
     data: requestData,
     ...requestConfig,
   })
 
-  return { ...res, data: createUserMutationResponseSchema.parse(res.data) }
+  return { ...res, data: createUserResponseSchema.parse(res.data) }
 }

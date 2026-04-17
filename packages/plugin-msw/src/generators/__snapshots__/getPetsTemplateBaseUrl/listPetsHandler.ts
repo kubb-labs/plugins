@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { ListPetsQueryResponse, ListPets400 } from './ListPets'
+import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
 import { http } from 'msw'
 
-export function listPetsHandlerResponse200(data: ListPetsQueryResponse) {
+export function listPetsHandlerResponse200(data: ListPetsResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,13 +15,13 @@ export function listPetsHandlerResponse200(data: ListPetsQueryResponse) {
   })
 }
 
-export function listPetsHandlerResponse400(data?: ListPets400) {
+export function listPetsHandlerResponse400(data?: ListPetsStatus400) {
   return new Response(JSON.stringify(data), {
     status: 400,
   })
 }
 
-export function listPetsHandler(data?: ListPetsQueryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
+export function listPetsHandler(data?: ListPetsResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
   return http.get(`${123456}/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

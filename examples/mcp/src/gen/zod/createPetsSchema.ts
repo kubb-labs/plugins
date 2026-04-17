@@ -6,36 +6,19 @@
 import * as z from 'zod'
 import { petNotFoundSchema } from './petNotFoundSchema.js'
 
-export const createPetsPathParamsSchema = z.object({
-  uuid: z.string().describe('UUID'),
-})
+export const createPetsPathUuidSchema = z.string().describe('UUID')
 
-export const createPetsQueryParamsSchema = z
-  .object({
-    offset: z.int().optional().describe('Offset */'),
-  })
-  .optional()
+export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset */')
 
-export const createPetsHeaderParamsSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
-})
+export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
-export const createPets201Schema = z.any().describe('Null response')
+export const createPetsStatus201Schema = z.any()
 
-export const createPetsErrorSchema = petNotFoundSchema.describe('unexpected error')
+export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
 
-export const createPetsMutationRequestSchema = z.object({
+export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
+
+export const createPetsDataSchema = z.object({
   name: z.string(),
   tag: z.string(),
-})
-
-export const createPetsMutationResponseSchema = createPets201Schema
-
-export const createPetsMutationSchema = z.object({
-  Response: createPets201Schema,
-  Request: createPetsMutationRequestSchema,
-  QueryParams: createPetsQueryParamsSchema,
-  PathParams: createPetsPathParamsSchema,
-  HeaderParams: createPetsHeaderParamsSchema,
-  Errors: createPetsErrorSchema,
 })

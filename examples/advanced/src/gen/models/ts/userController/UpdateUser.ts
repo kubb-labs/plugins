@@ -1,36 +1,49 @@
 import type { User } from '../User.ts'
 
 /**
- * @type object
+ * @description name that need to be deleted
+ * @type string
  */
-export type UpdateUserPathParams = {
-  /**
-   * @description name that need to be deleted
-   * @type string
-   */
-  username: string
-}
+export type UpdateUserPathUsername = string
 
 /**
- * @description successful operation
  * @type any
  */
-export type UpdateUserError = any
+export type UpdateUserStatusDefault = any
 
 /**
  * @description Update an existent user in the store
  * @type object | undefined
  */
-export type UpdateUserMutationRequest = User | undefined
-
-export type UpdateUserMutationResponse = any
+export type UpdateUserData = User | undefined
 
 /**
  * @type object
  */
-export type UpdateUserMutation = {
-  Response: any
-  Request: UpdateUserMutationRequest
-  PathParams: UpdateUserPathParams
-  Errors: UpdateUserError
+export type UpdateUserRequestConfig = {
+  data?: UpdateUserData
+  /**
+   * @type object
+   */
+  pathParams: {
+    username: UpdateUserPathUsername
+  }
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/user/${string}`
 }
+
+/**
+ * @type object
+ */
+export type UpdateUserResponses = {
+  default: UpdateUserStatusDefault
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateUserResponse = UpdateUserStatusDefault

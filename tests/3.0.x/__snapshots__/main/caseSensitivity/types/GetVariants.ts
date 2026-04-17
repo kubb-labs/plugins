@@ -6,17 +6,32 @@
 import type { Variant } from "./Variant.ts";
 
 /**
- * @description Get variants
  * @type object
 */
-export type GetVariants200 = Variant;
-
-export type GetVariantsQueryResponse = GetVariants200;
+export type GetVariantsStatus200 = Variant;
 
 /**
  * @type object
 */
-export type GetVariantsQuery = {
-    Response: GetVariants200;
-    Errors: any;
+export type GetVariantsRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/variants";
 };
+
+/**
+ * @type object
+*/
+export type GetVariantsResponses = {
+    "200": GetVariantsStatus200;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type GetVariantsResponse = GetVariantsStatus200;

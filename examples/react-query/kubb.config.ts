@@ -25,7 +25,6 @@ export const config = {
           return `// version: ${oas?.meta?.version || 'unknown'}`
         },
       },
-      compatibilityPreset: 'kubbV4',
     }),
     pluginReactQuery({
       client: {
@@ -39,7 +38,6 @@ export const config = {
           return name
         },
       },
-      compatibilityPreset: 'kubbV4',
       output: {
         path: './hooks',
       },

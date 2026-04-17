@@ -1,5 +1,4 @@
 export { zodGenerator } from './generators/zodGenerator.tsx'
-export { zodGeneratorLegacy } from './generators/zodGeneratorLegacy.tsx'
 
 export { default, pluginZod, pluginZodName } from './plugin.ts'
 export type { PrinterZodFactory, PrinterZodNodes, PrinterZodOptions } from './printers/printerZod.ts'
@@ -8,6 +7,5 @@ export type { PrinterZodMiniFactory, PrinterZodMiniNodes, PrinterZodMiniOptions 
 export { printerZodMini } from './printers/printerZodMini.ts'
 
 export { resolverZod } from './resolvers/resolverZod.ts'
-export { resolverZodLegacy } from './resolvers/resolverZodLegacy.ts'
 
 export type { PluginZod, ResolverZod } from './types.ts'

@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { ShowPetByIdQueryResponse } from './ShowPetById'
+import type { ShowPetByIdResponse } from './ShowPetById'
 import { http } from 'msw'
 
-export function showPetByIdHandlerResponse200(data: ShowPetByIdQueryResponse) {
+export function showPetByIdHandlerResponse200(data: ShowPetByIdResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export function showPetByIdHandlerResponse200(data: ShowPetByIdQueryResponse) {
   })
 }
 
-export function showPetByIdHandler(data?: ShowPetByIdQueryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
+export function showPetByIdHandler(data?: ShowPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
   return http.get(`/pets/:petId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

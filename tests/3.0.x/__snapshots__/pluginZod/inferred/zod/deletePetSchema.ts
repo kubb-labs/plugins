@@ -16,3 +16,7 @@ export type DeletePetPathPetIdSchema = z.infer<typeof deletePetPathPetIdSchema>
 export const deletePetStatus400Schema = z.any()
 
 export type DeletePetStatus400Schema = z.infer<typeof deletePetStatus400Schema>
+
+export const deletePetResponseSchema = deletePetStatus400Schema
+
+export type DeletePetResponseSchema = z.infer<typeof deletePetResponseSchema>

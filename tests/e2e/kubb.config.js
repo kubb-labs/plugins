@@ -59,7 +59,6 @@ const baseConfig = {
         type: 'tag',
       },
       enumType: 'asConst',
-      compatibilityPreset: 'kubbV4',
     }),
     pluginReactQuery({
       output: {
@@ -99,7 +98,6 @@ const baseConfig = {
       inferred: true,
       typed: false,
       operations: false,
-      compatibilityPreset: 'kubbV4',
     }),
     pluginFaker({
       output: {

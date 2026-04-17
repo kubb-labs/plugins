@@ -38,12 +38,10 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'models.ts' },
-        compatibilityPreset: 'kubbV4',
       }),
       pluginCypress({
         output: { path: 'cypress' },
         baseURL: 'http://localhost:3000',
-        compatibilityPreset: 'kubbV4',
       }),
     ],
   },

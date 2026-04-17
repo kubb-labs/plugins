@@ -5,21 +5,12 @@
 
 import * as z from 'zod/mini'
 
-export const loginUserQueryParamsSchema = z.optional(
-  z.object({
-    username: z.optional(z.string()),
-    password: z.optional(z.string()),
-  }),
-)
+export const loginUserQueryUsernameSchema = z.optional(z.string())
 
-export const loginUser200Schema = z.string()
+export const loginUserQueryPasswordSchema = z.optional(z.string())
 
-export const loginUser400Schema = z.any()
+export const loginUserStatus200Schema = z.string()
 
-export const loginUserQueryResponseSchema = loginUser200Schema
+export const loginUserStatus400Schema = z.any()
 
-export const loginUserQuerySchema = z.object({
-  Response: loginUser200Schema,
-  QueryParams: loginUserQueryParamsSchema,
-  Errors: loginUser400Schema,
-})
+export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])

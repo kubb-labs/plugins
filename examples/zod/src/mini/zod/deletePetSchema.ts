@@ -5,23 +5,10 @@
 
 import * as z from 'zod/mini'
 
-export const deletePetPathParamsSchema = z.object({
-  petId: z.int(),
-})
+export const deletePetHeaderApiKeySchema = z.optional(z.string())
 
-export const deletePetHeaderParamsSchema = z.optional(
-  z.object({
-    api_key: z.optional(z.string()),
-  }),
-)
+export const deletePetPathPetIdSchema = z.int()
 
-export const deletePet400Schema = z.any()
+export const deletePetStatus400Schema = z.any()
 
-export const deletePetMutationResponseSchema = z.any()
-
-export const deletePetMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deletePetPathParamsSchema,
-  HeaderParams: deletePetHeaderParamsSchema,
-  Errors: deletePet400Schema,
-})
+export const deletePetResponseSchema = deletePetStatus400Schema

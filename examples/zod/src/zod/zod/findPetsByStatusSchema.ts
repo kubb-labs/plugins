@@ -6,30 +6,22 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema.ts'
 
-export const findPetsByStatusQueryParamsSchema = z
-  .object({
-    status: z.enum(['available', 'pending', 'sold']).optional().default('available').describe('Status values that need to be considered for filter'),
-  })
+export const findPetsByStatusQueryStatusSchema = z
+  .enum(['available', 'pending', 'sold'])
   .optional()
+  .default('available')
+  .describe('Status values that need to be considered for filter')
 
-export type FindPetsByStatusQueryParamsSchema = z.infer<typeof findPetsByStatusQueryParamsSchema>
+export type FindPetsByStatusQueryStatusSchema = z.infer<typeof findPetsByStatusQueryStatusSchema>
 
-export const findPetsByStatus200Schema = z.array(petSchema).describe('successful operation')
+export const findPetsByStatusStatus200Schema = z.array(petSchema)
 
-export type FindPetsByStatus200Schema = z.infer<typeof findPetsByStatus200Schema>
+export type FindPetsByStatusStatus200Schema = z.infer<typeof findPetsByStatusStatus200Schema>
 
-export const findPetsByStatus400Schema = z.any().describe('Invalid status value')
+export const findPetsByStatusStatus400Schema = z.any()
 
-export type FindPetsByStatus400Schema = z.infer<typeof findPetsByStatus400Schema>
+export type FindPetsByStatusStatus400Schema = z.infer<typeof findPetsByStatusStatus400Schema>
 
-export const findPetsByStatusQueryResponseSchema = findPetsByStatus200Schema
+export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])
 
-export type FindPetsByStatusQueryResponseSchema = z.infer<typeof findPetsByStatusQueryResponseSchema>
-
-export const findPetsByStatusQuerySchema = z.object({
-  Response: findPetsByStatus200Schema,
-  QueryParams: findPetsByStatusQueryParamsSchema,
-  Errors: findPetsByStatus400Schema,
-})
-
-export type FindPetsByStatusQuerySchema = z.infer<typeof findPetsByStatusQuerySchema>
+export type FindPetsByStatusResponseSchema = z.infer<typeof findPetsByStatusResponseSchema>

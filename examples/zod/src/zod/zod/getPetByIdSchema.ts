@@ -6,32 +6,22 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema.ts'
 
-export const getPetByIdPathParamsSchema = z.object({
-  petId: z.int().describe('ID of pet to return'),
-})
+export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
-export type GetPetByIdPathParamsSchema = z.infer<typeof getPetByIdPathParamsSchema>
+export type GetPetByIdPathPetIdSchema = z.infer<typeof getPetByIdPathPetIdSchema>
 
-export const getPetById200Schema = petSchema.describe('successful operation')
+export const getPetByIdStatus200Schema = petSchema
 
-export type GetPetById200Schema = z.infer<typeof getPetById200Schema>
+export type GetPetByIdStatus200Schema = z.infer<typeof getPetByIdStatus200Schema>
 
-export const getPetById400Schema = z.any().describe('Invalid ID supplied')
+export const getPetByIdStatus400Schema = z.any()
 
-export type GetPetById400Schema = z.infer<typeof getPetById400Schema>
+export type GetPetByIdStatus400Schema = z.infer<typeof getPetByIdStatus400Schema>
 
-export const getPetById404Schema = z.any().describe('Pet not found')
+export const getPetByIdStatus404Schema = z.any()
 
-export type GetPetById404Schema = z.infer<typeof getPetById404Schema>
+export type GetPetByIdStatus404Schema = z.infer<typeof getPetByIdStatus404Schema>
 
-export const getPetByIdQueryResponseSchema = getPetById200Schema
+export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
-export type GetPetByIdQueryResponseSchema = z.infer<typeof getPetByIdQueryResponseSchema>
-
-export const getPetByIdQuerySchema = z.object({
-  Response: getPetById200Schema,
-  PathParams: getPetByIdPathParamsSchema,
-  Errors: z.union([getPetById400Schema, getPetById404Schema]),
-})
-
-export type GetPetByIdQuerySchema = z.infer<typeof getPetByIdQuerySchema>
+export type GetPetByIdResponseSchema = z.infer<typeof getPetByIdResponseSchema>

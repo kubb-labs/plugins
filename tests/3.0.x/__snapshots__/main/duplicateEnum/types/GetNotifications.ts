@@ -7,17 +7,32 @@ import type { NotificationTypeA } from "./NotificationTypeA.ts";
 import type { NotificationTypeB } from "./NotificationTypeB.ts";
 
 /**
- * @description Success
  * @type array
 */
-export type GetNotifications200 = (NotificationTypeA | NotificationTypeB)[];
-
-export type GetNotificationsQueryResponse = GetNotifications200;
+export type GetNotificationsStatus200 = (NotificationTypeA | NotificationTypeB)[];
 
 /**
  * @type object
 */
-export type GetNotificationsQuery = {
-    Response: GetNotifications200;
-    Errors: any;
+export type GetNotificationsRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/notifications";
 };
+
+/**
+ * @type object
+*/
+export type GetNotificationsResponses = {
+    "200": GetNotificationsStatus200;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type GetNotificationsResponse = GetNotificationsStatus200;

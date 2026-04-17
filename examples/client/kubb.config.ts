@@ -12,7 +12,6 @@ const tsPlugin = pluginTs({
   output: { path: 'models/ts' },
   group: { type: 'tag' },
   enumType: 'asConst',
-  compatibilityPreset: 'kubbV4',
 })
 
 export default defineConfig([
@@ -30,7 +29,6 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: {
           path: './clients/axios',
           barrelType: 'propagate',
@@ -57,7 +55,6 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: {
           path: './clients/axios/xml',
           barrelType: 'propagate',
@@ -76,7 +73,6 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: { path: './tagObject.ts' },
         generators: [clientStaticGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
@@ -98,7 +94,6 @@ export default defineConfig([
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: { path: './tagClientOperation.ts' },
         generators: [clientOperationGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
@@ -114,7 +109,6 @@ export default defineConfig([
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: { path: './tagClientOperationReact.ts' },
         generators: [clientOperationReactGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
@@ -131,7 +125,6 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: { path: './tag.ts' },
         parser: 'client',
         include: [{ type: 'tag', pattern: 'store' }],
@@ -155,7 +148,6 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        compatibilityPreset: 'kubbV4',
         output: {
           path: './clients/class',
           barrelType: false,

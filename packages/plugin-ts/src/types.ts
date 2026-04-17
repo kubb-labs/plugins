@@ -1,17 +1,4 @@
-import type {
-  ast,
-  CompatibilityPreset,
-  Exclude,
-  Generator,
-  Group,
-  Include,
-  Output,
-  Override,
-  PluginFactoryOptions,
-  ResolvePathOptions,
-  Resolver,
-  UserGroup,
-} from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -249,15 +236,8 @@ export type Options = {
    */
   generators?: Array<Generator<PluginTs>>
   /**
-   * Apply a compatibility naming preset.
-   * Use `kubbV4` for strict v4 type-generation compatibility.
-   * You can further customize naming with `resolvers`.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
-  /**
    * Override naming conventions. When a method returns `null` or `undefined`, the preset
-   * resolver (`resolverTs` / `resolverTsLegacy`) is used as fallback.
+   * resolver (`resolverTs`) is used as fallback.
    */
   resolver?: Partial<ResolverTs> & ThisType<ResolverTs>
   /**

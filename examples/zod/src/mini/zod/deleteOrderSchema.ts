@@ -5,18 +5,10 @@
 
 import * as z from 'zod/mini'
 
-export const deleteOrderPathParamsSchema = z.object({
-  orderId: z.int(),
-})
+export const deleteOrderPathOrderIdSchema = z.int()
 
-export const deleteOrder400Schema = z.any()
+export const deleteOrderStatus400Schema = z.any()
 
-export const deleteOrder404Schema = z.any()
+export const deleteOrderStatus404Schema = z.any()
 
-export const deleteOrderMutationResponseSchema = z.any()
-
-export const deleteOrderMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteOrderPathParamsSchema,
-  Errors: z.union([deleteOrder400Schema, deleteOrder404Schema]),
-})
+export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])

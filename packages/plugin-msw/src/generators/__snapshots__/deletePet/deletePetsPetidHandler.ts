@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { DeletePetsPetidMutationResponse } from './DeletePetsPetid'
+import type { DeletePetsPetidResponse } from './DeletePetsPetid'
 import { http } from 'msw'
 
-export function deletePetsPetidHandlerResponse200(data?: DeletePetsPetidMutationResponse) {
+export function deletePetsPetidHandlerResponse200(data?: DeletePetsPetidResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
   })

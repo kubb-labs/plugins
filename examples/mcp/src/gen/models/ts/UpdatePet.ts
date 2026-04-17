@@ -6,16 +6,14 @@
 import type { Pet } from './Pet.js'
 
 /**
- * @description Successful operation
  * @type object
  */
-export type UpdatePet200 = Omit<NonNullable<Pet>, 'name'>
+export type UpdatePetStatus200 = Omit<NonNullable<Pet>, 'name'>
 
 /**
- * @description accepted operation
  * @type object
  */
-export type UpdatePet202 = {
+export type UpdatePetStatus202 = {
   /**
    * @example 10
    * @type integer | undefined
@@ -24,36 +22,52 @@ export type UpdatePet202 = {
 }
 
 /**
- * @description Invalid ID supplied
  * @type any
  */
-export type UpdatePet400 = any
+export type UpdatePetStatus400 = any
 
 /**
- * @description Pet not found
  * @type any
  */
-export type UpdatePet404 = any
+export type UpdatePetStatus404 = any
 
 /**
- * @description Validation exception
  * @type any
  */
-export type UpdatePet405 = any
+export type UpdatePetStatus405 = any
 
 /**
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetMutationRequest = Omit<NonNullable<Pet>, 'id'>
-
-export type UpdatePetMutationResponse = UpdatePet200 | UpdatePet202
+export type UpdatePetData = Omit<NonNullable<Pet>, 'id'>
 
 /**
  * @type object
  */
-export type UpdatePetMutation = {
-  Response: UpdatePet200 | UpdatePet202
-  Request: UpdatePetMutationRequest
-  Errors: UpdatePet400 | UpdatePet404 | UpdatePet405
+export type UpdatePetRequestConfig = {
+  data?: UpdatePetData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet'
 }
+
+/**
+ * @type object
+ */
+export type UpdatePetResponses = {
+  '200': UpdatePetStatus200
+  '202': UpdatePetStatus202
+  '400': UpdatePetStatus400
+  '404': UpdatePetStatus404
+  '405': UpdatePetStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus202 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405

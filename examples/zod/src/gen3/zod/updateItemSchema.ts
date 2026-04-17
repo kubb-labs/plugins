@@ -3,17 +3,10 @@
  * Do not edit manually.
  */
 
-import * as z from 'zod'
 import { itemSchema } from './itemSchema.ts'
 
-export const updateItem200Schema = itemSchema.describe('Success')
+export const updateItemStatus200Schema = itemSchema
 
-export const updateItemMutationRequestSchema = itemSchema.describe('Item to update')
+export const updateItemResponseSchema = updateItemStatus200Schema
 
-export const updateItemMutationResponseSchema = updateItem200Schema
-
-export const updateItemMutationSchema = z.object({
-  Response: updateItem200Schema,
-  Request: updateItemMutationRequestSchema,
-  Errors: z.any(),
-})
+export const updateItemDataSchema = itemSchema.describe('Item to update')

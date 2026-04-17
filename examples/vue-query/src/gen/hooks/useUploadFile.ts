@@ -8,7 +8,7 @@ import fetch from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { useMutation } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import type { UploadFileMutationRequest, UploadFileMutationResponse, UploadFilePathParams, UploadFileQueryParams } from '../models/UploadFile.ts'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../models/UploadFile.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -19,16 +19,16 @@ export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  { petId }: { petId: UploadFilePathParams['petId'] },
-  data?: UploadFileMutationRequest,
-  params?: UploadFileQueryParams,
-  config: Partial<RequestConfig<UploadFileMutationRequest>> & { client?: Client } = {},
+  { petId }: { petId: UploadFilePathPetId },
+  data?: UploadFileData,
+  params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<UploadFileMutationResponse, ResponseErrorConfig<Error>, UploadFileMutationRequest>({
+  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     params,
@@ -47,16 +47,16 @@ export async function uploadFile(
 export function useUploadFile<TContext>(
   options: {
     mutation?: MutationObserverOptions<
-      UploadFileMutationResponse,
+      UploadFileResponse,
       ResponseErrorConfig<Error>,
       {
-        petId: MaybeRefOrGetter<UploadFilePathParams['petId']>
-        data?: MaybeRefOrGetter<UploadFileMutationRequest>
-        params?: MaybeRefOrGetter<UploadFileQueryParams>
+        petId: MaybeRefOrGetter<UploadFilePathPetId>
+        data?: MaybeRefOrGetter<UploadFileData>
+        params?: MaybeRefOrGetter<{ additionalMetadata?: UploadFileQueryAdditionalMetadata }>
       },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UploadFileMutationRequest>> & { client?: Client }
+    client?: Partial<RequestConfig<UploadFileData>> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -64,9 +64,9 @@ export function useUploadFile<TContext>(
   const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
   return useMutation<
-    UploadFileMutationResponse,
+    UploadFileResponse,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathParams['petId']; data?: UploadFileMutationRequest; params?: UploadFileQueryParams },
+    { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >(
     {

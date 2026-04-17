@@ -11,6 +11,8 @@ export const updatePetQueryIncludeDeletedSchema = z.boolean().optional()
 
 export const updatePetStatus200Schema = z.object({})
 
+export const updatePetResponseSchema = updatePetStatus200Schema
+
 export const updatePetDataSchema = z.object({
   name: z.string(),
 })

@@ -11,3 +11,5 @@ export const findPetsByStatusQueryStatusSchema = z.enum(["available", "pending",
 export const findPetsByStatusStatus200Schema = z.array(petSchema)
 
 export const findPetsByStatusStatus400Schema = z.any()
+
+export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])

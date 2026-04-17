@@ -6,20 +6,10 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema.ts'
 
-export const findPetsByStatusQueryParamsSchema = z.optional(
-  z.object({
-    status: z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available'),
-  }),
-)
+export const findPetsByStatusQueryStatusSchema = z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available')
 
-export const findPetsByStatus200Schema = z.array(petSchema)
+export const findPetsByStatusStatus200Schema = z.array(petSchema)
 
-export const findPetsByStatus400Schema = z.any()
+export const findPetsByStatusStatus400Schema = z.any()
 
-export const findPetsByStatusQueryResponseSchema = findPetsByStatus200Schema
-
-export const findPetsByStatusQuerySchema = z.object({
-  Response: findPetsByStatus200Schema,
-  QueryParams: findPetsByStatusQueryParamsSchema,
-  Errors: findPetsByStatus400Schema,
-})
+export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])

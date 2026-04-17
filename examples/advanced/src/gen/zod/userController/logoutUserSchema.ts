@@ -1,16 +1,9 @@
 import * as z from 'zod'
 
-export const logoutUserErrorSchema = z.any().describe('successful operation')
+export const logoutUserStatusDefaultSchema = z.any()
 
-export type LogoutUserErrorSchema = z.infer<typeof logoutUserErrorSchema>
+export type LogoutUserStatusDefaultSchema = z.infer<typeof logoutUserStatusDefaultSchema>
 
-export const logoutUserQueryResponseSchema = z.any()
+export const logoutUserResponseSchema = logoutUserStatusDefaultSchema
 
-export type LogoutUserQueryResponseSchema = z.infer<typeof logoutUserQueryResponseSchema>
-
-export const logoutUserQuerySchema = z.object({
-  Response: z.any(),
-  Errors: logoutUserErrorSchema,
-})
-
-export type LogoutUserQuerySchema = z.infer<typeof logoutUserQuerySchema>
+export type LogoutUserResponseSchema = z.infer<typeof logoutUserResponseSchema>

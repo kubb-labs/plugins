@@ -6,17 +6,32 @@
 import type { Pet } from './Pet.ts'
 
 /**
- * @description successful operation
  * @type array
  */
-export type OptionsFindPetsByStatus200 = Pet[]
-
-export type OptionsFindPetsByStatusMutationResponse = OptionsFindPetsByStatus200
+export type OptionsFindPetsByStatusStatus200 = Pet[]
 
 /**
  * @type object
  */
-export type OptionsFindPetsByStatusMutation = {
-  Response: OptionsFindPetsByStatus200
-  Errors: any
+export type OptionsFindPetsByStatusRequestConfig = {
+  data?: never
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet/findByStatus'
 }
+
+/**
+ * @type object
+ */
+export type OptionsFindPetsByStatusResponses = {
+  '200': OptionsFindPetsByStatusStatus200
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type OptionsFindPetsByStatusResponse = OptionsFindPetsByStatusStatus200

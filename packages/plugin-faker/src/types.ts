@@ -1,17 +1,4 @@
-import type {
-  ast,
-  CompatibilityPreset,
-  Exclude,
-  Generator,
-  Group,
-  Include,
-  Output,
-  Override,
-  PluginFactoryOptions,
-  ResolvePathOptions,
-  Resolver,
-  UserGroup,
-} from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -125,11 +112,6 @@ export type Options = {
    * Define additional generators next to the faker generators.
    */
   generators?: Array<Generator<PluginFaker>>
-  /**
-   * Apply a compatibility naming preset.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * Override individual resolver methods. Any method you omit falls back to the
    * active preset resolver.

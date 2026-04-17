@@ -1,27 +1,17 @@
 import * as z from 'zod'
 
-export const deleteUserPathParamsSchema = z.object({
-  username: z.string().describe('The name that needs to be deleted'),
-})
+export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
 
-export type DeleteUserPathParamsSchema = z.infer<typeof deleteUserPathParamsSchema>
+export type DeleteUserPathUsernameSchema = z.infer<typeof deleteUserPathUsernameSchema>
 
-export const deleteUser400Schema = z.any().describe('Invalid username supplied')
+export const deleteUserStatus400Schema = z.any()
 
-export type DeleteUser400Schema = z.infer<typeof deleteUser400Schema>
+export type DeleteUserStatus400Schema = z.infer<typeof deleteUserStatus400Schema>
 
-export const deleteUser404Schema = z.any().describe('User not found')
+export const deleteUserStatus404Schema = z.any()
 
-export type DeleteUser404Schema = z.infer<typeof deleteUser404Schema>
+export type DeleteUserStatus404Schema = z.infer<typeof deleteUserStatus404Schema>
 
-export const deleteUserMutationResponseSchema = z.any()
+export const deleteUserResponseSchema = z.union([deleteUserStatus400Schema, deleteUserStatus404Schema])
 
-export type DeleteUserMutationResponseSchema = z.infer<typeof deleteUserMutationResponseSchema>
-
-export const deleteUserMutationSchema = z.object({
-  Response: z.any(),
-  PathParams: deleteUserPathParamsSchema,
-  Errors: z.union([deleteUser400Schema, deleteUser404Schema]),
-})
-
-export type DeleteUserMutationSchema = z.infer<typeof deleteUserMutationSchema>
+export type DeleteUserResponseSchema = z.infer<typeof deleteUserResponseSchema>

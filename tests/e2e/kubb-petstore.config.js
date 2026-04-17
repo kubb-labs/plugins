@@ -31,7 +31,6 @@ export default defineConfig(() => {
           type: 'tag',
         },
         enumType: 'asConst',
-        compatibilityPreset: 'kubbV4',
       }),
       pluginReactQuery({
         output: {
@@ -75,7 +74,6 @@ export default defineConfig(() => {
         inferred: true,
         typed: false,
         operations: false,
-        compatibilityPreset: 'kubbV4',
       }),
       pluginFaker({
         output: {

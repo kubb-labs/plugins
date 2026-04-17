@@ -6,26 +6,18 @@
 import { z } from '../../zod.ts'
 import { orderSchema } from './orderSchema.ts'
 
-export const placeOrderPatch200Schema = orderSchema.describe('successful operation')
+export const placeOrderPatchStatus200Schema = orderSchema
 
-export type PlaceOrderPatch200Schema = z.infer<typeof placeOrderPatch200Schema>
+export type PlaceOrderPatchStatus200Schema = z.infer<typeof placeOrderPatchStatus200Schema>
 
-export const placeOrderPatch405Schema = z.any().describe('Invalid input')
+export const placeOrderPatchStatus405Schema = z.any()
 
-export type PlaceOrderPatch405Schema = z.infer<typeof placeOrderPatch405Schema>
+export type PlaceOrderPatchStatus405Schema = z.infer<typeof placeOrderPatchStatus405Schema>
 
-export const placeOrderPatchMutationRequestSchema = orderSchema.optional()
+export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
-export type PlaceOrderPatchMutationRequestSchema = z.infer<typeof placeOrderPatchMutationRequestSchema>
+export type PlaceOrderPatchResponseSchema = z.infer<typeof placeOrderPatchResponseSchema>
 
-export const placeOrderPatchMutationResponseSchema = placeOrderPatch200Schema
+export const placeOrderPatchDataSchema = orderSchema.optional()
 
-export type PlaceOrderPatchMutationResponseSchema = z.infer<typeof placeOrderPatchMutationResponseSchema>
-
-export const placeOrderPatchMutationSchema = z.object({
-  Response: placeOrderPatch200Schema,
-  Request: placeOrderPatchMutationRequestSchema,
-  Errors: placeOrderPatch405Schema,
-})
-
-export type PlaceOrderPatchMutationSchema = z.infer<typeof placeOrderPatchMutationSchema>
+export type PlaceOrderPatchDataSchema = z.infer<typeof placeOrderPatchDataSchema>

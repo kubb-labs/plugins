@@ -1,12 +1,18 @@
-import type { FindPetsByTagsHeaderParams, FindPetsByTagsQueryParams, FindPetsByTagsQueryResponse } from '../../models/ts/petController/FindPetsByTags.ts'
+import type {
+  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsResponse,
+} from '../../models/ts/petController/FindPetsByTags.ts'
 
 export function findPetsByTags(
-  headers: FindPetsByTagsHeaderParams,
-  params?: FindPetsByTagsQueryParams,
+  headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE },
+  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
   options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<FindPetsByTagsQueryResponse> {
+): Cypress.Chainable<FindPetsByTagsResponse> {
   return cy
-    .request<FindPetsByTagsQueryResponse>({
+    .request<FindPetsByTagsResponse>({
       method: 'GET',
       url: '/pet/findByTags',
       qs: params,

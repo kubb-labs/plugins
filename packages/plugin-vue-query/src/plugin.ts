@@ -11,7 +11,6 @@ import { MutationKey } from './components/MutationKey.tsx'
 import { QueryKey } from './components/QueryKey.tsx'
 import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
-import { resolverVueQueryLegacy } from './resolvers/resolverVueQueryLegacy.ts'
 import type { PluginVueQuery } from './types.ts'
 
 export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['name']
@@ -37,10 +36,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     resolver: userResolver,
     transformer: userTransformer,
     generators: userGenerators = [],
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverVueQueryLegacy : resolverVueQuery
 
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
@@ -67,7 +63,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter(Boolean),
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver
+        const resolver = userResolver ? { ...resolverVueQuery, ...userResolver } : resolverVueQuery
 
         ctx.setOptions({
           output,

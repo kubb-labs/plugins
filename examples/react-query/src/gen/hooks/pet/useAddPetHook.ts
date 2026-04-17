@@ -8,7 +8,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
 import { fetch } from '../../.kubb/fetch.ts'
-import type { AddPet405, AddPetMutationRequest, AddPetMutationResponse } from '../../models/AddPet.ts'
+import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../models/AddPet.ts'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -19,12 +19,12 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPetHook(data: AddPetMutationRequest, config: Partial<RequestConfig<AddPetMutationRequest>> & { client?: Client } = {}) {
+export async function addPetHook(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<AddPetMutationResponse, ResponseErrorConfig<AddPet405>, AddPetMutationRequest>({
+  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: '/pet',
     data: requestData,
@@ -34,9 +34,9 @@ export async function addPetHook(data: AddPetMutationRequest, config: Partial<Re
   return res.data
 }
 
-export function addPetMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<AddPetMutationRequest>> & { client?: Client } = {}) {
+export function addPetMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetMutationResponse, ResponseErrorConfig<AddPet405>, { data: AddPetMutationRequest }, TContext>({
+  return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>({
     mutationKey,
     mutationFn: async ({ data }) => {
       return addPetHook(data, config)
@@ -51,8 +51,8 @@ export function addPetMutationOptionsHook<TContext = unknown>(config: Partial<Re
  */
 export function useAddPetHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<AddPetMutationResponse, ResponseErrorConfig<AddPet405>, { data: AddPetMutationRequest }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<AddPetMutationRequest>> & { client?: Client }
+    mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig<AddPetData>> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -60,19 +60,19 @@ export function useAddPetHook<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
   const baseOptions = addPetMutationOptionsHook(config) as UseMutationOptions<
-    AddPetMutationResponse,
-    ResponseErrorConfig<AddPet405>,
-    { data: AddPetMutationRequest },
+    AddPetResponse,
+    ResponseErrorConfig<AddPetStatus405>,
+    { data: AddPetData },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useAddPetHook', operationId: 'addPet' }) as UseMutationOptions<
-    AddPetMutationResponse,
-    ResponseErrorConfig<AddPet405>,
-    { data: AddPetMutationRequest },
+    AddPetResponse,
+    ResponseErrorConfig<AddPetStatus405>,
+    { data: AddPetData },
     TContext
   >
 
-  return useMutation<AddPetMutationResponse, ResponseErrorConfig<AddPet405>, { data: AddPetMutationRequest }, TContext>(
+  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -80,5 +80,5 @@ export function useAddPetHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<AddPetMutationResponse, ResponseErrorConfig<AddPet405>, { data: AddPetMutationRequest }, TContext>
+  ) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>
 }

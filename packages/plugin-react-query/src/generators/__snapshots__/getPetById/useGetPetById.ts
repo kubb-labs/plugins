@@ -16,7 +16,7 @@ export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 /**
  * {@link /pet/:petId}
  */
-export async function getPetById(petId: GetPetByIdPathPetId['petId'], config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })

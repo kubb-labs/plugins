@@ -2,9 +2,9 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { DeleteUser400, DeleteUser404, DeleteUserMutationResponse, DeleteUserPathParams } from '../../../models/ts/userController/DeleteUser.js'
+import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.js'
 
-function getDeleteUserUrl({ username }: { username: DeleteUserPathParams['username'] }) {
+function getDeleteUserUrl({ username }: { username: DeleteUserPathUsername }) {
   const res = { method: 'DELETE', url: `/user/${username}` as const }
 
   return res
@@ -15,10 +15,10 @@ function getDeleteUserUrl({ username }: { username: DeleteUserPathParams['userna
  * @summary Delete user
  * {@link /user/:username}
  */
-export async function deleteUser({ username }: { username: DeleteUserPathParams['username'] }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteUser({ username }: { username: DeleteUserPathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<DeleteUserMutationResponse, ResponseErrorConfig<DeleteUser400 | DeleteUser404>, unknown>({
+  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({
     method: 'DELETE',
     url: getDeleteUserUrl({ username }).url.toString(),
     ...requestConfig,

@@ -6,52 +6,33 @@
 import { z } from '../../zod.ts'
 import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
-export const createPetsPathParamsSchema = z.object({
-  uuid: z.string().describe('UUID'),
-})
+export const createPetsPathUuidSchema = z.string().describe('UUID')
 
-export type CreatePetsPathParamsSchema = z.infer<typeof createPetsPathParamsSchema>
+export type CreatePetsPathUuidSchema = z.infer<typeof createPetsPathUuidSchema>
 
-export const createPetsQueryParamsSchema = z
-  .object({
-    offset: z.int().optional().describe('Offset'),
-  })
-  .optional()
+export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset')
 
-export type CreatePetsQueryParamsSchema = z.infer<typeof createPetsQueryParamsSchema>
+export type CreatePetsQueryOffsetSchema = z.infer<typeof createPetsQueryOffsetSchema>
 
-export const createPetsHeaderParamsSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
-})
+export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
-export type CreatePetsHeaderParamsSchema = z.infer<typeof createPetsHeaderParamsSchema>
+export type CreatePetsHeaderXEXAMPLESchema = z.infer<typeof createPetsHeaderXEXAMPLESchema>
 
-export const createPets201Schema = z.any().describe('Null response')
+export const createPetsStatus201Schema = z.any()
 
-export type CreatePets201Schema = z.infer<typeof createPets201Schema>
+export type CreatePetsStatus201Schema = z.infer<typeof createPetsStatus201Schema>
 
-export const createPetsErrorSchema = petNotFoundSchema.describe('unexpected error')
+export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
 
-export type CreatePetsErrorSchema = z.infer<typeof createPetsErrorSchema>
+export type CreatePetsStatusDefaultSchema = z.infer<typeof createPetsStatusDefaultSchema>
 
-export const createPetsMutationRequestSchema = z.object({
+export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
+
+export type CreatePetsResponseSchema = z.infer<typeof createPetsResponseSchema>
+
+export const createPetsDataSchema = z.object({
   name: z.string(),
   tag: z.string(),
 })
 
-export type CreatePetsMutationRequestSchema = z.infer<typeof createPetsMutationRequestSchema>
-
-export const createPetsMutationResponseSchema = createPets201Schema
-
-export type CreatePetsMutationResponseSchema = z.infer<typeof createPetsMutationResponseSchema>
-
-export const createPetsMutationSchema = z.object({
-  Response: createPets201Schema,
-  Request: createPetsMutationRequestSchema,
-  QueryParams: createPetsQueryParamsSchema,
-  PathParams: createPetsPathParamsSchema,
-  HeaderParams: createPetsHeaderParamsSchema,
-  Errors: createPetsErrorSchema,
-})
-
-export type CreatePetsMutationSchema = z.infer<typeof createPetsMutationSchema>
+export type CreatePetsDataSchema = z.infer<typeof createPetsDataSchema>

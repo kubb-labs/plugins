@@ -8,3 +8,5 @@ import * as z from "zod";
 export const getInventoryStatus200Schema = z.object({
     
     }).catchall(z.coerce.number().int())
+
+export const getInventoryResponseSchema = getInventoryStatus200Schema

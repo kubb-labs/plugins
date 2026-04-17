@@ -4,7 +4,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { LegacyTransformerOperation, LegacyTransformerSchemas, Transformer } from '../types.ts'
+import type { Transformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 
 type Props = {
@@ -45,6 +45,14 @@ function printType(typeNode: ast.ParamsTypeNode | undefined): string {
   if (!typeNode) return 'unknown'
   if (typeNode.variant === 'reference') return typeNode.name
   if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
+  if (typeNode.variant === 'struct') {
+    const parts = typeNode.properties.map((p) => {
+      const typeStr = printType(p.type)
+      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
+      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
+    })
+    return `{ ${parts.join('; ')} }`
+  }
   return 'unknown'
 }
 
@@ -53,28 +61,6 @@ function getParams(
   options: { pathParamsType: 'object' | 'inline'; paramsCasing: 'camelcase' | undefined; resolver: PluginTs['resolver'] },
 ): ast.FunctionParametersNode {
   return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
-}
-
-function createLegacyOperation(node: ast.OperationNode): LegacyTransformerOperation {
-  return {
-    ...node,
-    getOperationId() {
-      return node.operationId
-    },
-  }
-}
-
-function createLegacySchemas(node: ast.OperationNode, resolver: PluginTs['resolver']): LegacyTransformerSchemas {
-  const queryParam = node.parameters.find((param) => param.in === 'query')
-  const pathParam = node.parameters.find((param) => param.in === 'path')
-  const headerParam = node.parameters.find((param) => param.in === 'header')
-
-  return {
-    request: node.requestBody?.schema ? { name: resolver.resolveDataName(node) } : undefined,
-    queryParams: queryParam ? { name: resolver.resolveQueryParamsName(node, queryParam) } : undefined,
-    pathParams: pathParam ? { name: resolver.resolvePathParamsName(node, pathParam) } : undefined,
-    headerParams: headerParam ? { name: resolver.resolveHeaderParamsName(node, headerParam) } : undefined,
-  }
 }
 
 const getTransformer: Transformer = ({ node, casing }) => {
@@ -94,8 +80,6 @@ export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType,
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({
     node,
-    operation: createLegacyOperation(node),
-    schemas: createLegacySchemas(node, tsResolver),
     casing: paramsCasing,
   })
 

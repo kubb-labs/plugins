@@ -37,7 +37,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       const nodeInfinite = 'infinite' in opOverrides ? opOverrides.infinite : infinite
       const nodeInfiniteOptions = nodeInfinite && typeof nodeInfinite === 'object' ? nodeInfinite : undefined
 
-      // v4 compat: query: false means "still a query but skip the useQuery hook"
+      // query: false means "still a query but skip the useQuery hook"
       const isQueryOp =
         nodeQuery === false
           ? !!query && query.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())

@@ -1,18 +1,5 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type {
-  ast,
-  CompatibilityPreset,
-  Exclude,
-  Generator,
-  Group,
-  Include,
-  Output,
-  Override,
-  PluginFactoryOptions,
-  ResolvePathOptions,
-  Resolver,
-  UserGroup,
-} from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
@@ -193,11 +180,6 @@ export type Options = {
      */
     name?: (name: string, type?: string) => string
   }
-  /**
-   * Apply a compatibility naming preset.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * Override individual resolver methods. Any method you omit falls back to the
    * preset resolver's implementation. Use `this.default(...)` to call it.

@@ -4,19 +4,34 @@
 */
 
 /**
- * @description successful operation
  * @type object
 */
-export type GetInventory200 = {
+export type GetInventoryStatus200 = {
     [key: string]: number;
 };
-
-export type GetInventoryQueryResponse = GetInventory200;
 
 /**
  * @type object
 */
-export type GetInventoryQuery = {
-    Response: GetInventory200;
-    Errors: any;
+export type GetInventoryRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/store/inventory";
 };
+
+/**
+ * @type object
+*/
+export type GetInventoryResponses = {
+    "200": GetInventoryStatus200;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type GetInventoryResponse = GetInventoryStatus200;

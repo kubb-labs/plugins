@@ -1,72 +1,43 @@
 import type { PetNotFound } from '../PetNotFound.ts'
 
 /**
- * @type object
+ * @type boolean | undefined
  */
-export type CreatePetsPathParams = {
-  /**
-   * @description UUID
-   * @type string
-   */
-  uuid: string
-}
-
-export const createPetsQueryParamsBoolParamEnum = {
-  true: true,
-} as const
-
-export type CreatePetsQueryParamsBoolParamEnumKey = (typeof createPetsQueryParamsBoolParamEnum)[keyof typeof createPetsQueryParamsBoolParamEnum]
+export type CreatePetsQueryBoolParam = true | undefined
 
 /**
- * @type object
+ * @description UUID
+ * @type string
  */
-export type CreatePetsQueryParams = {
-  /**
-   * @type boolean | undefined
-   */
-  boolParam?: CreatePetsQueryParamsBoolParamEnumKey
-  /**
-   * @description Offset *\/
-   * @type integer | undefined
-   */
-  offset?: number
-}
-
-export const createPetsHeaderParamsXEXAMPLEEnum = {
-  ONE: 'ONE',
-  TWO: 'TWO',
-  THREE: 'THREE',
-} as const
-
-export type CreatePetsHeaderParamsXEXAMPLEEnumKey = (typeof createPetsHeaderParamsXEXAMPLEEnum)[keyof typeof createPetsHeaderParamsXEXAMPLEEnum]
+export type CreatePetsPathUuid = string
 
 /**
- * @type object
+ * @description Offset *\/
+ * @type integer | undefined
  */
-export type CreatePetsHeaderParams = {
-  /**
-   * @description Header parameters
-   * @type string
-   */
-  xEXAMPLE: CreatePetsHeaderParamsXEXAMPLEEnumKey
-}
+export type CreatePetsQueryOffset = number | undefined
 
 /**
- * @description Null response
+ * @description Header parameters
+ * @type string
+ */
+export type CreatePetsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+
+/**
  * @type any
  */
-export type CreatePets201 = any
+export type CreatePetsStatus201 = any
 
 /**
- * @description unexpected error
+ * @description Pet not found
  * @type any
  */
-export type CreatePetsError = PetNotFound
+export type CreatePetsStatusDefault = PetNotFound
 
 /**
  * @type object
  */
-export type CreatePetsMutationRequest = {
+export type CreatePetsData = {
   /**
    * @type string
    */
@@ -77,16 +48,45 @@ export type CreatePetsMutationRequest = {
   tag: string
 }
 
-export type CreatePetsMutationResponse = CreatePets201
+/**
+ * @type object
+ */
+export type CreatePetsRequestConfig = {
+  data?: CreatePetsData
+  /**
+   * @type object
+   */
+  pathParams: {
+    uuid: CreatePetsPathUuid
+  }
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    boolParam?: CreatePetsQueryBoolParam
+    offset?: CreatePetsQueryOffset
+  }
+  /**
+   * @type object | undefined
+   */
+  headerParams?: {
+    xEXAMPLE: CreatePetsHeaderXEXAMPLE
+  }
+  /**
+   * @type string
+   */
+  url: `/pets/${string}`
+}
 
 /**
  * @type object
  */
-export type CreatePetsMutation = {
-  Response: CreatePets201
-  Request: CreatePetsMutationRequest
-  QueryParams: CreatePetsQueryParams
-  PathParams: CreatePetsPathParams
-  HeaderParams: CreatePetsHeaderParams
-  Errors: CreatePetsError
+export type CreatePetsResponses = {
+  '201': CreatePetsStatus201
+  default: CreatePetsStatusDefault
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreatePetsResponse = CreatePetsStatus201 | CreatePetsStatusDefault

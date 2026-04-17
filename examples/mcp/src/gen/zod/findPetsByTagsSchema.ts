@@ -6,27 +6,16 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.js'
 
-export const findPetsByTagsQueryParamsSchema = z
-  .object({
-    tags: z.array(z.string()).optional().describe('Tags to filter by'),
-    page: z.string().optional().describe('to request with required page number or pagination'),
-    pageSize: z.string().optional().describe('to request with required page size'),
-  })
-  .optional()
+export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
-export const findPetsByTagsHeaderParamsSchema = z.object({
-  'X-EXAMPLE': z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters'),
-})
+export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
-export const findPetsByTags200Schema = z.array(petSchema).describe('successful operation')
+export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export const findPetsByTags400Schema = z.any().describe('Invalid tag value')
+export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
-export const findPetsByTagsQueryResponseSchema = findPetsByTags200Schema
+export const findPetsByTagsStatus200Schema = z.array(petSchema)
 
-export const findPetsByTagsQuerySchema = z.object({
-  Response: findPetsByTags200Schema,
-  QueryParams: findPetsByTagsQueryParamsSchema,
-  HeaderParams: findPetsByTagsHeaderParamsSchema,
-  Errors: findPetsByTags400Schema,
-})
+export const findPetsByTagsStatus400Schema = z.any()
+
+export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])

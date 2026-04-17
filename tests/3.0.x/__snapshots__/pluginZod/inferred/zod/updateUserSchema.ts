@@ -14,6 +14,10 @@ export const updateUserStatusDefaultSchema = z.any()
 
 export type UpdateUserStatusDefaultSchema = z.infer<typeof updateUserStatusDefaultSchema>
 
+export const updateUserResponseSchema = updateUserStatusDefaultSchema
+
+export type UpdateUserResponseSchema = z.infer<typeof updateUserResponseSchema>
+
 export const updateUserDataSchema = userSchema.optional().describe("Update an existent user in the store")
 
 export type UpdateUserDataSchema = z.infer<typeof updateUserDataSchema>

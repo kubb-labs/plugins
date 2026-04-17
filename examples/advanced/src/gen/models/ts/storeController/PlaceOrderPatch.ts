@@ -1,29 +1,43 @@
 import type { Order } from '../Order.ts'
 
 /**
- * @description successful operation
  * @type object
  */
-export type PlaceOrderPatch200 = Order
+export type PlaceOrderPatchStatus200 = Order
 
 /**
- * @description Invalid input
  * @type any
  */
-export type PlaceOrderPatch405 = any
+export type PlaceOrderPatchStatus405 = any
 
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchMutationRequest = Order | undefined
-
-export type PlaceOrderPatchMutationResponse = PlaceOrderPatch200
+export type PlaceOrderPatchData = Order | undefined
 
 /**
  * @type object
  */
-export type PlaceOrderPatchMutation = {
-  Response: PlaceOrderPatch200
-  Request: PlaceOrderPatchMutationRequest
-  Errors: PlaceOrderPatch405
+export type PlaceOrderPatchRequestConfig = {
+  data?: PlaceOrderPatchData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/store/order'
 }
+
+/**
+ * @type object
+ */
+export type PlaceOrderPatchResponses = {
+  '200': PlaceOrderPatchStatus200
+  '405': PlaceOrderPatchStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405

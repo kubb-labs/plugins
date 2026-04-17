@@ -1,16 +1,16 @@
 import { QueryClient, QueryClientProvider, useQueries } from '@tanstack/react-query'
 import { useState } from 'react'
 import { findPetsByStatusQueryOptionsHook, useFindPetsByStatusHook, useFindPetsByTagsInfiniteHook, useUpdatePetWithFormHook } from './gen/hooks/index.ts'
-import type { FindPetsByStatusQueryParamsStatusEnumKey } from './gen/models'
+import type { FindPetsByStatusQueryStatus } from './gen/models'
 
 const queryClient = new QueryClient()
 
 function Pets() {
-  const [status, setStatus] = useState<FindPetsByStatusQueryParamsStatusEnumKey>('available')
+  const [status, setStatus] = useState<FindPetsByStatusQueryStatus>('available')
   const { data: pets, queryKey } = useFindPetsByStatusHook({ status }, { query: { enabled: true } })
   const { data } = useUpdatePetWithFormHook(2)
   const { queryKey: _queryKey, initialData } = findPetsByStatusQueryOptionsHook()
-  const statuses: FindPetsByStatusQueryParamsStatusEnumKey[] = ['available', 'pending']
+  const statuses: FindPetsByStatusQueryStatus[] = ['available', 'pending']
 
   const queries = useQueries({
     queries: statuses.map((status) => findPetsByStatusQueryOptionsHook({ status })),

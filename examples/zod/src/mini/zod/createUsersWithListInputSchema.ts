@@ -6,16 +6,10 @@
 import * as z from 'zod/mini'
 import { userSchema } from './userSchema.ts'
 
-export const createUsersWithListInput200Schema = userSchema
+export const createUsersWithListInputStatus200Schema = userSchema
 
-export const createUsersWithListInputErrorSchema = z.any()
+export const createUsersWithListInputStatusDefaultSchema = z.any()
 
-export const createUsersWithListInputMutationRequestSchema = z.optional(z.array(userSchema))
+export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
 
-export const createUsersWithListInputMutationResponseSchema = createUsersWithListInput200Schema
-
-export const createUsersWithListInputMutationSchema = z.object({
-  Response: createUsersWithListInput200Schema,
-  Request: createUsersWithListInputMutationRequestSchema,
-  Errors: createUsersWithListInputErrorSchema,
-})
+export const createUsersWithListInputDataSchema = z.optional(z.array(userSchema))

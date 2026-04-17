@@ -1,12 +1,14 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
 import type {
-  FindPetsByTags400,
-  FindPetsByTagsHeaderParams,
-  FindPetsByTagsQueryParams,
-  FindPetsByTagsQueryResponse,
+  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsResponse,
+  FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
-import { findPetsByTagsQueryResponseSchema } from '../../../zod/petController/findPetsByTagsSchema.ts'
+import { findPetsByTagsResponseSchema } from '../../../zod/petController/findPetsByTagsSchema.ts'
 
 export function getFindPetsByTagsUrl() {
   const res = { method: 'GET', url: 'https://petstore3.swagger.io/api/v3/pet/findByTags' as const }
@@ -20,14 +22,20 @@ export function getFindPetsByTagsUrl() {
  * {@link /pet/findByTags}
  */
 export async function findPetsByTags(
-  { headers, params }: { headers: FindPetsByTagsHeaderParams; params?: FindPetsByTagsQueryParams },
+  {
+    headers,
+    params,
+  }: {
+    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
+    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
+  },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await request<FindPetsByTagsQueryResponse, ResponseErrorConfig<FindPetsByTags400>, unknown>({
+  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByTagsUrl().url.toString(),
     params,
@@ -35,5 +43,5 @@ export async function findPetsByTags(
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
-  return { ...res, data: findPetsByTagsQueryResponseSchema.parse(res.data) }
+  return { ...res, data: findPetsByTagsResponseSchema.parse(res.data) }
 }

@@ -20,7 +20,10 @@ export type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSus
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsSuspense({ params }: { params: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTagsSuspense(
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })

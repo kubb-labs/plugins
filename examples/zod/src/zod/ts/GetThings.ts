@@ -6,45 +6,62 @@
 import type { PetNotFound } from './PetNotFound.ts'
 
 /**
- * @type object
+ * @description Maximum number of things to return
+ * @minLength 1
+ * @maxLength 100
+ * @default 100
+ * @type integer | undefined
  */
-export type GetThingsQueryParams = {
-  /**
-   * @description Maximum number of things to return
-   * @minLength 1
-   * @maxLength 100
-   * @default 100
-   * @type integer | undefined
-   */
-  limit?: number
-  /**
-   * @description Number of things to skip
-   * @minLength 0
-   * @default 0
-   * @type integer | undefined
-   */
-  skip?: number
-}
+export type GetThingsQueryLimit = number | undefined
 
 /**
- * @description Null response
- * @type any
+ * @description Number of things to skip
+ * @minLength 0
+ * @default 0
+ * @type integer | undefined
  */
-export type GetThings201 = any
+export type GetThingsQuerySkip = number | undefined
 
 /**
- * @description unexpected error
  * @type any
  */
-export type GetThingsError = PetNotFound
+export type GetThingsStatus201 = any
 
-export type GetThingsQueryResponse = GetThings201
+/**
+ * @description Pet not found
+ * @type any
+ */
+export type GetThingsStatusDefault = PetNotFound
 
 /**
  * @type object
  */
-export type GetThingsQuery = {
-  Response: GetThings201
-  QueryParams: GetThingsQueryParams
-  Errors: GetThingsError
+export type GetThingsRequestConfig = {
+  data?: never
+  pathParams?: never
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    limit?: GetThingsQueryLimit
+    skip?: GetThingsQuerySkip
+  }
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/pets/${string}`
 }
+
+/**
+ * @type object
+ */
+export type GetThingsResponses = {
+  '201': GetThingsStatus201
+  default: GetThingsStatusDefault
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetThingsResponse = GetThingsStatus201 | GetThingsStatusDefault

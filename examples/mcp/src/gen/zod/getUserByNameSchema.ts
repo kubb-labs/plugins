@@ -6,20 +6,12 @@
 import * as z from 'zod'
 import { userSchema } from './userSchema.js'
 
-export const getUserByNamePathParamsSchema = z.object({
-  username: z.string().describe('The name that needs to be fetched. Use user1 for testing. '),
-})
+export const getUserByNamePathUsernameSchema = z.string().describe('The name that needs to be fetched. Use user1 for testing. ')
 
-export const getUserByName200Schema = userSchema.describe('successful operation')
+export const getUserByNameStatus200Schema = userSchema
 
-export const getUserByName400Schema = z.any().describe('Invalid username supplied')
+export const getUserByNameStatus400Schema = z.any()
 
-export const getUserByName404Schema = z.any().describe('User not found')
+export const getUserByNameStatus404Schema = z.any()
 
-export const getUserByNameQueryResponseSchema = getUserByName200Schema
-
-export const getUserByNameQuerySchema = z.object({
-  Response: getUserByName200Schema,
-  PathParams: getUserByNamePathParamsSchema,
-  Errors: z.union([getUserByName400Schema, getUserByName404Schema]),
-})
+export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])

@@ -8,7 +8,7 @@ import fetch from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { useMutation } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import type { DeletePet400, DeletePetHeaderParams, DeletePetMutationResponse, DeletePetPathParams } from '../models/DeletePet.ts'
+import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../models/DeletePet.ts'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -20,13 +20,13 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
  * {@link /pet/:petId}
  */
 export async function deletePet(
-  { petId }: { petId: DeletePetPathParams['petId'] },
-  headers?: DeletePetHeaderParams,
+  { petId }: { petId: DeletePetPathPetId },
+  headers?: { api_key?: DeletePetHeaderApiKey },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<DeletePetMutationResponse, ResponseErrorConfig<DeletePet400>, unknown>({
+  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
     url: `/pet/${petId}`,
     ...requestConfig,
@@ -44,9 +44,9 @@ export async function deletePet(
 export function useDeletePet<TContext>(
   options: {
     mutation?: MutationObserverOptions<
-      DeletePetMutationResponse,
-      ResponseErrorConfig<DeletePet400>,
-      { petId: MaybeRefOrGetter<DeletePetPathParams['petId']>; headers?: MaybeRefOrGetter<DeletePetHeaderParams> },
+      DeletePetResponse,
+      ResponseErrorConfig<DeletePetStatus400>,
+      { petId: MaybeRefOrGetter<DeletePetPathPetId>; headers?: MaybeRefOrGetter<{ api_key?: DeletePetHeaderApiKey }> },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -57,9 +57,9 @@ export function useDeletePet<TContext>(
   const mutationKey = mutationOptions?.mutationKey ?? deletePetMutationKey()
 
   return useMutation<
-    DeletePetMutationResponse,
-    ResponseErrorConfig<DeletePet400>,
-    { petId: DeletePetPathParams['petId']; headers?: DeletePetHeaderParams },
+    DeletePetResponse,
+    ResponseErrorConfig<DeletePetStatus400>,
+    { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
     TContext
   >(
     {
