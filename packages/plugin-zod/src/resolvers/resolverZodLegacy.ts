@@ -4,7 +4,7 @@ import { resolverZod } from './resolverZod.ts'
 
 /**
  * Legacy resolver for `@kubb/plugin-zod` that reproduces the naming conventions
- * used in Kubb v4. Enable via `compatibilityPreset: 'kubbV4'`
+ * used in Kubb v4. Use this resolver directly when you need legacy naming.
  * (or by composing this resolver manually).
  *
  * Key differences from the default resolver:

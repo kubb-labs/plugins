@@ -6,17 +6,32 @@
 import type { User } from "./User.ts";
 
 /**
- * @description Current user
  * @type object
 */
-export type GetMe200 = User;
-
-export type GetMeQueryResponse = GetMe200;
+export type GetMeStatus200 = User;
 
 /**
  * @type object
 */
-export type GetMeQuery = {
-    Response: GetMe200;
-    Errors: any;
+export type GetMeRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/me";
 };
+
+/**
+ * @type object
+*/
+export type GetMeResponses = {
+    "200": GetMeStatus200;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type GetMeResponse = GetMeStatus200;

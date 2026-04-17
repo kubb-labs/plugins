@@ -14,7 +14,7 @@ async function run() {
     },
     adapter: adapterOas(),
     parsers: [parserTs],
-    plugins: [pluginTs({ output: { path: './models', barrelType: false }, compatibilityPreset: 'kubbV4' })],
+    plugins: [pluginTs({ output: { path: './models', barrelType: false } })],
   })
   await kubb.build()
 }

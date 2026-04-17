@@ -4,7 +4,7 @@ import { resolverTs } from './resolverTs.ts'
 
 /**
  * Legacy resolver for `@kubb/plugin-ts` that reproduces the naming conventions
- * used before the v2 resolver refactor. Enable via `compatibilityPreset: 'kubbV4'`
+ * used before the v2 resolver refactor. Use this resolver directly when you need legacy naming.
  * (or by composing this resolver manually).
  *
  * Key differences from the default resolver:

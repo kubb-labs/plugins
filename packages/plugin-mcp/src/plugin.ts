@@ -10,7 +10,6 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
 import { serverGenerator } from './generators/serverGenerator.tsx'
-import { serverGeneratorLegacy } from './generators/serverGeneratorLegacy.tsx'
 import { resolverMcp } from './resolvers/resolverMcp.ts'
 import type { PluginMcp } from './types.ts'
 
@@ -28,10 +27,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     resolver: userResolver,
     transformer: userTransformer,
     generators: userGenerators = [],
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultServerGenerator = compatibilityPreset === 'kubbV4' ? serverGeneratorLegacy : serverGenerator
 
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
@@ -81,7 +77,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           ctx.setTransformer(userTransformer)
         }
         ctx.addGenerator(mcpGenerator)
-        ctx.addGenerator(defaultServerGenerator)
+        ctx.addGenerator(serverGenerator)
         for (const gen of userGenerators) {
           ctx.addGenerator(gen)
         }

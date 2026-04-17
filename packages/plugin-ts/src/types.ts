@@ -1,6 +1,5 @@
 import type {
   ast,
-  CompatibilityPreset,
   Exclude,
   Generator,
   Group,
@@ -248,13 +247,6 @@ export type Options = {
    * Define some generators next to the ts generators
    */
   generators?: Array<Generator<PluginTs>>
-  /**
-   * Apply a compatibility naming preset.
-   * Use `kubbV4` for strict v4 type-generation compatibility.
-   * You can further customize naming with `resolvers`.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * Override naming conventions. When a method returns `null` or `undefined`, the preset
    * resolver (`resolverTs` / `resolverTsLegacy`) is used as fallback.

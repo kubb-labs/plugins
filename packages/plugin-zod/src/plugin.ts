@@ -1,9 +1,7 @@
 import { camelCase } from '@internals/utils'
 import { definePlugin, type Group } from '@kubb/core'
 import { zodGenerator } from './generators/zodGenerator.tsx'
-import { zodGeneratorLegacy } from './generators/zodGeneratorLegacy.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
-import { resolverZodLegacy } from './resolvers/resolverZodLegacy.ts'
 import type { PluginZod } from './types.ts'
 
 /**
@@ -48,11 +46,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     resolver: userResolver,
     transformer: userTransformer,
     generators: userGenerators = [],
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverZodLegacy : resolverZod
-  const defaultGenerator = compatibilityPreset === 'kubbV4' ? zodGeneratorLegacy : zodGenerator
 
   const groupConfig = group
     ? ({
@@ -89,11 +83,11 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           paramsCasing,
           printer,
         })
-        ctx.setResolver(userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver)
+        ctx.setResolver(userResolver ? { ...resolverZod, ...userResolver } : resolverZod)
         if (userTransformer) {
           ctx.setTransformer(userTransformer)
         }
-        ctx.addGenerator(defaultGenerator)
+        ctx.addGenerator(zodGenerator)
         for (const gen of userGenerators) {
           ctx.addGenerator(gen)
         }

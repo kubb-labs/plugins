@@ -21,14 +21,12 @@ export default defineConfig(() => {
     plugins: [
       pluginTs({
         output: { path: 'models.ts' },
-        compatibilityPreset: 'kubbV4',
       }),
       pluginClient({
         output: {
           path: '.',
         },
         client: 'fetch',
-        compatibilityPreset: 'kubbV4',
       }),
     ],
   }

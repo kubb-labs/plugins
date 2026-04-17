@@ -1,6 +1,5 @@
 import type {
   ast,
-  CompatibilityPreset,
   Exclude,
   Generator,
   Group,
@@ -104,11 +103,6 @@ export type Options = {
    * Array containing override parameters to override `options` based on tags/operations/methods/paths.
    */
   override?: Array<Override<ResolvedOptions>>
-  /**
-   * Apply a compatibility naming preset.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * A single resolver whose methods override the default resolver's naming conventions.
    * When a method returns `null` or `undefined`, the default resolver's result is used instead.

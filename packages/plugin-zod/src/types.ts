@@ -1,6 +1,5 @@
 import type {
   ast,
-  CompatibilityPreset,
   Exclude,
   Generator,
   Group,
@@ -181,10 +180,6 @@ export type Options = {
    * Define additional generators next to the zod generators.
    */
   generators?: Array<Generator<PluginZod>>
-  /**
-   * Compatibility preset to ease migration from previous Kubb versions.
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * A single resolver whose methods override the default resolver's naming conventions.
    * When a method returns `null` or `undefined`, the default resolver's result is used instead.

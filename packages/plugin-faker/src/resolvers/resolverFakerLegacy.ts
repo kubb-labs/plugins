@@ -5,7 +5,7 @@ import { resolverFaker } from './resolverFaker.ts'
 
 /**
  * Legacy resolver for `@kubb/plugin-faker` that reproduces the naming conventions
- * used in Kubb v4. Enable via `compatibilityPreset: 'kubbV4'`.
+ * used in Kubb v4. Use this resolver directly when you need legacy naming.
  */
 export const resolverFakerLegacy = defineResolver<PluginFaker>(() => {
   return {

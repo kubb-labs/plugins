@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Priority } from "./Priority.ts";
-import type { Status } from "./Status.ts";
+import type { PriorityKey } from "./Priority.ts";
+import type { StatusKey } from "./Status.ts";
 
 /**
  * @type object
@@ -17,11 +17,11 @@ export type Task = {
     /**
      * @type string
     */
-    status: Status;
+    status: StatusKey;
     /**
      * @type string | undefined
     */
-    priority?: Priority;
+    priority?: PriorityKey;
     /**
      * @type string | undefined
     */

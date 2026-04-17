@@ -4,6 +4,6 @@ import { resolverVueQuery } from './resolverVueQuery.ts'
 
 export const resolverVueQueryLegacy = defineResolver<PluginVueQuery>(() => ({
   ...resolverVueQuery,
-  name: 'kubbV4',
+  name: 'legacy',
   pluginName: 'plugin-vue-query',
 }))

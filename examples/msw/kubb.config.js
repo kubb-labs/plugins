@@ -23,7 +23,6 @@ export default defineConfig(() => {
         output: {
           path: 'models',
         },
-        compatibilityPreset: 'kubbV4',
       }),
       pluginFaker({
         output: {
@@ -33,7 +32,6 @@ export default defineConfig(() => {
           type: 'tag',
           output: './mocks/{{tag}}Mocks',
         },
-        compatibilityPreset: 'kubbV4',
         seed: [220],
       }),
       pluginMsw({

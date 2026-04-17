@@ -8,7 +8,7 @@ import type { PluginMcp } from '../types.ts'
 import { findSuccessStatusCode } from '../utils.ts'
 
 /**
- * Default server generator for `compatibilityPreset: 'default'` (v5).
+ * Default v5 server generator for `@kubb/plugin-mcp`.
  *
  * Uses individual zod schemas for each param (e.g. `createPetsPathUuidSchema`, `createPetsQueryOffsetSchema`)
  * and `resolveResponseStatusName` for per-status response schemas.

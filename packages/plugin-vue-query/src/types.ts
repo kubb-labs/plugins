@@ -1,6 +1,5 @@
 import type {
   ast,
-  CompatibilityPreset,
   Exclude,
   Generator,
   Group,
@@ -173,11 +172,6 @@ export type Options = {
      */
     name?: (name: string, type?: string) => string
   }
-  /**
-   * Apply a compatibility naming preset.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * Override individual resolver methods. Any method you omit falls back to the
    * preset resolver's implementation. Use `this.default(...)` to call it.

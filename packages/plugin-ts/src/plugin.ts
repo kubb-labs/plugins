@@ -1,9 +1,7 @@
 import { camelCase } from '@internals/utils'
 import { definePlugin, type Group } from '@kubb/core'
 import { typeGenerator } from './generators/typeGenerator.tsx'
-import { typeGeneratorLegacy } from './generators/typeGeneratorLegacy.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
-import { resolverTsLegacy } from './resolvers/resolverTsLegacy.ts'
 import type { PluginTs } from './types.ts'
 
 /**
@@ -45,11 +43,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     resolver: userResolver,
     transformer: userTransformer,
     generators: userGenerators = [],
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverTsLegacy : resolverTs
-  const defaultGenerator = compatibilityPreset === 'kubbV4' ? typeGeneratorLegacy : typeGenerator
 
   const groupConfig = group
     ? ({
@@ -83,11 +77,11 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           paramsCasing,
           printer,
         })
-        ctx.setResolver(userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver)
+        ctx.setResolver(userResolver ? { ...resolverTs, ...userResolver } : resolverTs)
         if (userTransformer) {
           ctx.setTransformer(userTransformer)
         }
-        ctx.addGenerator(defaultGenerator)
+        ctx.addGenerator(typeGenerator)
         for (const gen of userGenerators) {
           ctx.addGenerator(gen)
         }

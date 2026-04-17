@@ -10,7 +10,6 @@ import { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 import { operationsGenerator } from './generators/operationsGenerator.tsx'
 import { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
 import { resolverClient } from './resolvers/resolverClient.ts'
-import { resolverClientLegacy } from './resolvers/resolverClientLegacy.ts'
 import { source as axiosClientSource } from './templates/clients/axios.source.ts'
 import { source as fetchClientSource } from './templates/clients/fetch.source.ts'
 import { source as configSource } from './templates/config.source.ts'
@@ -60,10 +59,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     baseURL,
     resolver: userResolver,
     transformer: userTransformer,
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverClientLegacy : resolverClient
 
   const resolvedImportPath = importPath ?? (!bundle ? `@kubb/plugin-client/clients/${client}` : undefined)
 
@@ -95,7 +91,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter(Boolean),
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver
+        const resolver = userResolver ? { ...resolverClient, ...userResolver } : resolverClient
 
         ctx.setOptions({
           client,

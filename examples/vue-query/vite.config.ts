@@ -27,7 +27,6 @@ export default defineConfig({
             output: {
               path: 'models',
             },
-            compatibilityPreset: 'kubbV4',
           }),
           pluginVueQuery({
             output: {

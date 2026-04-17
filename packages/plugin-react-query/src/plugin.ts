@@ -19,7 +19,6 @@ import {
   suspenseQueryGenerator,
 } from './generators'
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
-import { resolverReactQueryLegacy } from './resolvers/resolverReactQueryLegacy.ts'
 import type { PluginReactQuery } from './types.ts'
 
 export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQuery['name']
@@ -47,10 +46,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     resolver: userResolver,
     transformer: userTransformer,
     generators: userGenerators = [],
-    compatibilityPreset = 'default',
   } = options
-
-  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverReactQueryLegacy : resolverReactQuery
 
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
@@ -87,7 +83,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter(Boolean),
     hooks: {
       'kubb:plugin:setup'(ctx) {
-        const resolver = userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver
+        const resolver = userResolver ? { ...resolverReactQuery, ...userResolver } : resolverReactQuery
 
         ctx.setOptions({
           output,

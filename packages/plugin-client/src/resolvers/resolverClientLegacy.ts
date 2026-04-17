@@ -15,7 +15,7 @@ import type { PluginClient } from '../types.ts'
  * ```
  */
 export const resolverClientLegacy = defineResolver<PluginClient>(() => ({
-  name: 'kubbV4',
+  name: 'legacy',
   pluginName: 'plugin-client',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })

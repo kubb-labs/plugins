@@ -6,17 +6,32 @@
 import type { Order } from "./Order.ts";
 
 /**
- * @description Order created
  * @type object
 */
-export type CreateOrder201 = Order;
-
-export type CreateOrderMutationResponse = CreateOrder201;
+export type CreateOrderStatus201 = Order;
 
 /**
  * @type object
 */
-export type CreateOrderMutation = {
-    Response: CreateOrder201;
-    Errors: any;
+export type CreateOrderRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/orders";
 };
+
+/**
+ * @type object
+*/
+export type CreateOrderResponses = {
+    "201": CreateOrderStatus201;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type CreateOrderResponse = CreateOrderStatus201;

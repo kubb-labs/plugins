@@ -6,17 +6,32 @@
 import type { Employer } from "./Employer.ts";
 
 /**
- * @description List of employers
  * @type array
 */
-export type GetEmployers200 = Employer[];
-
-export type GetEmployersQueryResponse = GetEmployers200;
+export type GetEmployersStatus200 = Employer[];
 
 /**
  * @type object
 */
-export type GetEmployersQuery = {
-    Response: GetEmployers200;
-    Errors: any;
+export type GetEmployersRequestConfig = {
+    data?: never;
+    pathParams?: never;
+    queryParams?: never;
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: "/employers";
 };
+
+/**
+ * @type object
+*/
+export type GetEmployersResponses = {
+    "200": GetEmployersStatus200;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type GetEmployersResponse = GetEmployersStatus200;

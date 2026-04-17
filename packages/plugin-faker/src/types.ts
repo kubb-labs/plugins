@@ -1,6 +1,5 @@
 import type {
   ast,
-  CompatibilityPreset,
   Exclude,
   Generator,
   Group,
@@ -125,11 +124,6 @@ export type Options = {
    * Define additional generators next to the faker generators.
    */
   generators?: Array<Generator<PluginFaker>>
-  /**
-   * Apply a compatibility naming preset.
-   * @default 'default'
-   */
-  compatibilityPreset?: CompatibilityPreset
   /**
    * Override individual resolver methods. Any method you omit falls back to the
    * active preset resolver.

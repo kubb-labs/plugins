@@ -4,46 +4,61 @@
 */
 
 /**
- * @type object
+ * @description ID of pet that needs to be updated
+ * @type integer
 */
-export type UpdatePetWithFormPathParams = {
-    /**
-     * @description ID of pet that needs to be updated
-     * @type integer
-    */
-    petId: number;
-};
+export type UpdatePetWithFormPathPetId = number;
 
 /**
- * @type object
+ * @description Name of pet that needs to be updated
+ * @type string | undefined
 */
-export type UpdatePetWithFormQueryParams = {
-    /**
-     * @description Name of pet that needs to be updated
-     * @type string | undefined
-    */
-    name?: string;
-    /**
-     * @description Status of pet that needs to be updated
-     * @type string | undefined
-    */
-    status?: string;
-};
+export type UpdatePetWithFormQueryName = string | undefined;
 
 /**
- * @description Invalid input
+ * @description Status of pet that needs to be updated
+ * @type string | undefined
+*/
+export type UpdatePetWithFormQueryStatus = string | undefined;
+
+/**
  * @type any
 */
-export type UpdatePetWithForm405 = any;
-
-export type UpdatePetWithFormMutationResponse = any;
+export type UpdatePetWithFormStatus405 = any;
 
 /**
  * @type object
 */
-export type UpdatePetWithFormMutation = {
-    Response: any;
-    QueryParams: UpdatePetWithFormQueryParams;
-    PathParams: UpdatePetWithFormPathParams;
-    Errors: UpdatePetWithForm405;
+export type UpdatePetWithFormRequestConfig = {
+    data?: never;
+    /**
+     * @type object
+    */
+    pathParams: {
+        petId: UpdatePetWithFormPathPetId;
+    };
+    /**
+     * @type object | undefined
+    */
+    queryParams?: {
+        name?: UpdatePetWithFormQueryName;
+        status?: UpdatePetWithFormQueryStatus;
+    };
+    headerParams?: never;
+    /**
+     * @type string
+    */
+    url: `/pet/${string}`;
 };
+
+/**
+ * @type object
+*/
+export type UpdatePetWithFormResponses = {
+    "405": UpdatePetWithFormStatus405;
+};
+
+/**
+ * @description Union of all possible responses
+*/
+export type UpdatePetWithFormResponse = UpdatePetWithFormStatus405;

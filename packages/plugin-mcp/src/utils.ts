@@ -20,7 +20,7 @@ export type ZodParam = {
 }
 
 /**
- * Render a group param value — either a group schema name directly (kubbV4),
+ * Render a group param value — either a legacy group schema name directly,
  * or compose individual schemas into `z.object({ ... })` (v5).
  */
 export function zodGroupExpr(entry: string | Array<ZodParam>): string {

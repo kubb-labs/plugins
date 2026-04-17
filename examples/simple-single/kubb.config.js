@@ -34,7 +34,6 @@ export default defineConfig([
       }),
       pluginTs({
         output: { path: 'models.ts', clean: true },
-        compatibilityPreset: 'kubbV4',
       }),
       pluginReactQuery({
         output: {
@@ -46,7 +45,6 @@ export default defineConfig([
           path: './zod.ts',
         },
         operations: false,
-        compatibilityPreset: 'kubbV4',
       }),
     ],
   },

@@ -7,7 +7,7 @@ import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
 
 /**
- * Legacy server generator for `compatibilityPreset: 'kubbV4'`.
+ * Legacy server generator for the pre-v5 grouped-schema output.
  *
  * Uses grouped zod schemas for query/header params (e.g. `createPetsQueryParamsSchema`)
  * and `resolveResponseName` for the combined response schema.

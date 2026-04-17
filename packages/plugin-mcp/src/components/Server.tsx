@@ -40,11 +40,11 @@ type Props = {
     zod: {
       pathParams: Array<ZodParam>
       /**
-       * Query params — either a group schema name (kubbV4) or individual schemas to compose (v5).
+       * Query params — either a legacy group schema name or individual schemas to compose in v5.
        */
       queryParams?: string | Array<ZodParam>
       /**
-       * Header params — either a group schema name (kubbV4) or individual schemas to compose (v5).
+       * Header params — either a legacy group schema name or individual schemas to compose in v5.
        */
       headerParams?: string | Array<ZodParam>
       requestName?: string

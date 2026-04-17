@@ -53,7 +53,6 @@ export default defineConfig({
           },
         },
       ],
-      compatibilityPreset: 'kubbV4',
     }),
     pluginZod({
       output: {
@@ -71,7 +70,6 @@ export default defineConfig({
       typed: true,
       operations: false,
       paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
-      compatibilityPreset: 'kubbV4',
     }),
     pluginReactQuery({
       output: {
@@ -83,7 +81,6 @@ export default defineConfig({
           pattern: 'store',
         },
       ],
-      compatibilityPreset: 'kubbV4',
       override: [
         {
           type: 'operationId',
@@ -134,7 +131,6 @@ export default defineConfig({
       paramsCasing: 'camelcase',
       paramsType: 'object',
       urlType: 'export',
-      compatibilityPreset: 'kubbV4',
       override: [
         {
           type: 'contentType',
@@ -157,7 +153,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      compatibilityPreset: 'kubbV4',
       paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
       client: {
         baseURL: 'https://petstore.swagger.io/v2',
@@ -174,7 +169,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      compatibilityPreset: 'kubbV4',
       paramsCasing: 'camelcase',
       mapper: {
         status: `faker.helpers.arrayElement<any>(['working', 'idle'])`,
