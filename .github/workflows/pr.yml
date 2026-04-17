@@ -176,7 +176,7 @@ jobs:
         run: pnpm run build
 
       - name: Publish preview packages
-        run: pnpx pkg-pr-new publish --pnpm --owner=stijnvanhulle --repo=kubb-labs-plugins './packages/*' --template './examples/*'
+        run: pnpx pkg-pr-new publish --pnpm --owner=stijnvanhulle --repo=https://github.com/kubb-labs/plugins.git './packages/*' --template './examples/*'
 
   dependency-diff:
     name: Dependency Diff
