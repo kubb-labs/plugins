@@ -34,18 +34,16 @@ export async function uploadFile({ petId }: { petId: UploadFilePathParams["petId
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export function useUploadFile<TContext>(options: 
-{
-  mutation?: MutationObserverOptions<UploadFileMutationResponse, ResponseErrorConfig<Error>, {petId: MaybeRefOrGetter<UploadFilePathParams["petId"]>, data?: MaybeRefOrGetter<UploadFileMutationRequest>, params?: MaybeRefOrGetter<UploadFileQueryParams>}, TContext> & { client?: QueryClient },
+export function useUploadFile<TContext>(options: {
+  mutation?: MutationObserverOptions<UploadFileMutationResponse, ResponseErrorConfig<Error>, {petId: MaybeRefOrGetter<UploadFilePathParams['petId']>, data?: MaybeRefOrGetter<UploadFileMutationRequest>, params?: MaybeRefOrGetter<UploadFileQueryParams>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UploadFileMutationRequest>> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
-          return useMutation<UploadFileMutationResponse, ResponseErrorConfig<Error>, {petId: UploadFilePathParams["petId"], data?: UploadFileMutationRequest, params?: UploadFileQueryParams}, TContext>({
+          return useMutation<UploadFileMutationResponse, ResponseErrorConfig<Error>, {petId: UploadFilePathParams['petId'], data?: UploadFileMutationRequest, params?: UploadFileQueryParams}, TContext>({
             mutationFn: async({ petId, data, params }) => {
               return uploadFile({ petId }, data, params, config)
             },

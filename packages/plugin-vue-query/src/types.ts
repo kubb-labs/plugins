@@ -1,10 +1,25 @@
-import type { Output, PluginFactoryOptions, ResolveNameParams, UserGroup } from '@kubb/core'
-import type { contentType, HttpMethod, Oas, Operation } from '@kubb/oas'
+import type { Transformer } from '@internals/tanstack-query'
+import type {
+  ast,
+  CompatibilityPreset,
+  Exclude,
+  Generator,
+  Group,
+  Include,
+  Output,
+  Override,
+  PluginFactoryOptions,
+  ResolvePathOptions,
+  Resolver,
+  UserGroup,
+} from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
-import type { Exclude, Include, OperationSchemas, Override, ResolvePathOptions } from '@kubb/plugin-oas'
-import type { Generator } from '@kubb/plugin-oas/generators'
 
-export type Transformer = (props: { operation: Operation; schemas: OperationSchemas; casing: 'camelcase' | undefined }) => unknown[]
+export type { Transformer } from '@internals/tanstack-query'
+
+export type ResolverVueQuery = Resolver & {
+  resolveName(this: ResolverVueQuery, name: string): string
+}
 
 /**
  * Customize the queryKey
@@ -21,13 +36,13 @@ type Query = {
    * Define which HttpMethods can be used for queries
    * @default ['get']
    */
-  methods: Array<HttpMethod>
+  methods?: Array<string>
   /**
    * Path to the useQuery hook for useQuery functionality.
    * Used as `import { useQuery } from '${importPath}'`.
    * Accepts relative and absolute paths.
    * Path is used as-is; relative paths are based on the generated file location.
-   * @default '@tanstack/react-query'
+   * @default '@tanstack/vue-query'
    */
   importPath?: string
 }
@@ -37,13 +52,13 @@ type Mutation = {
    * Define which HttpMethods can be used for mutations
    * @default ['post', 'put', 'delete']
    */
-  methods: Array<HttpMethod>
+  methods?: Array<string>
   /**
-   * Path to the useQuery hook for useQuery functionality.
-   * Used as `import { useQuery } from '${importPath}'`.
+   * Path to the useMutation hook for useMutation functionality.
+   * Used as `import { useMutation } from '${importPath}'`.
    * Accepts relative and absolute paths.
    * Path is used as-is; relative paths are based on the generated file location.
-   * @default '@tanstack/react-query'
+   * @default '@tanstack/vue-query'
    */
   importPath?: string
 }
@@ -51,7 +66,7 @@ type Mutation = {
 export type Infinite = {
   /**
    * Specify the params key used for `pageParam`.
-   * @default `'id'`
+   * @default 'id'
    */
   queryParam: string
   /**
@@ -71,7 +86,7 @@ export type Infinite = {
   previousParam?: string | string[] | undefined
   /**
    * The initial value, the value of the first page.
-   * @default `0`
+   * @default 0
    */
   initialPageParam: unknown
 }
@@ -81,12 +96,7 @@ export type Options = {
    * Specify the export location for the files and define the behavior of the output
    * @default { path: 'hooks', barrelType: 'named' }
    */
-  output?: Output<Oas>
-  /**
-   * Define which contentType should be used.
-   * By default, the first JSON valid mediaType is used
-   */
-  contentType?: contentType
+  output?: Output
   /**
    * Group the @tanstack/query hooks based on the provided name.
    */
@@ -110,7 +120,7 @@ export type Options = {
    */
   paramsCasing?: 'camelcase'
   /**
-   * How to pass your params
+   * How to pass your params.
    * - 'object' returns the params and pathParams as an object.
    * - 'inline' returns the params as comma separated params.
    * @default 'inline'
@@ -146,8 +156,23 @@ export type Options = {
     /**
      * Customize the names based on the type that is provided by the plugin.
      */
-    name?: (name: ResolveNameParams['name'], type?: ResolveNameParams['type']) => string
+    name?: (name: string, type?: string) => string
   }
+  /**
+   * Apply a compatibility naming preset.
+   * @default 'default'
+   */
+  compatibilityPreset?: CompatibilityPreset
+  /**
+   * Override individual resolver methods. Any method you omit falls back to the
+   * preset resolver's implementation. Use `this.default(...)` to call it.
+   */
+  resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
+  /**
+   * Single AST visitor applied to each node before printing.
+   * Return `null` or `undefined` from a method to leave the node unchanged.
+   */
+  transformer?: ast.Visitor
   /**
    * Define some generators next to the vue-query generators
    */
@@ -155,27 +180,29 @@ export type Options = {
 }
 
 type ResolvedOptions = {
-  output: Output<Oas>
-  group: Options['group']
+  output: Output
+  group: Group | undefined
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
   client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'bundle' | 'paramsCasing'>
   parser: Required<NonNullable<Options['parser']>>
+  pathParamsType: NonNullable<Options['pathParamsType']>
   paramsCasing: Options['paramsCasing']
   paramsType: NonNullable<Options['paramsType']>
-  pathParamsType: NonNullable<Options['pathParamsType']>
   /**
-   * Only used of infinite
+   * Only used for infinite
    */
   infinite: NonNullable<Infinite> | false
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined
   mutation: NonNullable<Required<Mutation>> | false
+  resolver: ResolverVueQuery
+  transformers: NonNullable<Options['transformers']>
 }
 
-export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, never, ResolvePathOptions>
+export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, never, ResolvePathOptions, ResolverVueQuery>
 
 declare global {
   namespace Kubb {

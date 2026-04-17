@@ -35,8 +35,8 @@ export function loginUserQueryOptions(params?: MaybeRefOrGetter<LoginUserQueryPa
         const queryKey = loginUserQueryKey(params)
         return queryOptions<LoginUserQueryResponse, ResponseErrorConfig<LoginUser400>, LoginUserQueryResponse, typeof queryKey>({
 
-        queryKey,
-        queryFn: async ({ signal }) => {
+         queryKey,
+         queryFn: async ({ signal }) => {
             return loginUser(toValue(params), { ...config, signal: config.signal ?? signal })
          },
         })
@@ -47,12 +47,10 @@ export function loginUserQueryOptions(params?: MaybeRefOrGetter<LoginUserQueryPa
  * @summary Logs user into the system
  * {@link /user/login}
  */
-export function useLoginUser<TData = LoginUserQueryResponse, TQueryData = LoginUserQueryResponse, TQueryKey extends QueryKey = LoginUserQueryKey>(params?: MaybeRefOrGetter<LoginUserQueryParams>, options: 
-{
+export function useLoginUser<TData = LoginUserQueryResponse, TQueryData = LoginUserQueryResponse, TQueryKey extends QueryKey = LoginUserQueryKey>(params?: MaybeRefOrGetter<LoginUserQueryParams>, options: {
   query?: Partial<UseQueryOptions<LoginUserQueryResponse, ResponseErrorConfig<LoginUser400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
-}
- = {}) {
+} = {}) {
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig

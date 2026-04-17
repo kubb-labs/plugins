@@ -1,171 +1,149 @@
-import { FunctionParams } from '@kubb/core'
-import { getDefaultValue, isOptional } from '@kubb/oas'
-import { ClientLegacy as Client } from '@kubb/plugin-client'
-import type { OperationSchemas } from '@kubb/plugin-oas'
-import { getPathParams } from '@kubb/plugin-oas/utils'
+import { ast } from '@kubb/core'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
+import { resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
 
 type Props = {
   name: string
   clientName: string
   queryKeyName: string
-  typeSchemas: OperationSchemas
+  node: ast.OperationNode
+  tsResolver: PluginTs['resolver']
   paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginVueQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
 }
 
-type GetParamsProps = {
-  paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
-  typeSchemas: OperationSchemas
-}
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
 
-function getParams({ paramsType, paramsCasing, pathParamsType, typeSchemas }: GetParamsProps) {
-  if (paramsType === 'object') {
-    const children = {
-      ...getPathParams(typeSchemas.pathParams, {
-        typed: true,
-        casing: paramsCasing,
-        override(item) {
-          return {
-            ...item,
-            type: `MaybeRefOrGetter<${item.type}>`,
-          }
-        },
-      }),
-      data: typeSchemas.request?.name
-        ? {
-            type: `MaybeRefOrGetter<${typeSchemas.request?.name}>`,
-            optional: isOptional(typeSchemas.request?.schema),
-          }
-        : undefined,
-      params: typeSchemas.queryParams?.name
-        ? {
-            type: `MaybeRefOrGetter<${typeSchemas.queryParams?.name}>`,
-            optional: isOptional(typeSchemas.queryParams?.schema),
-          }
-        : undefined,
-      headers: typeSchemas.headerParams?.name
-        ? {
-            type: `MaybeRefOrGetter<${typeSchemas.queryParams?.name}>`,
-            optional: isOptional(typeSchemas.headerParams?.schema),
-          }
-        : undefined,
-    }
+export function getQueryOptionsParams(
+  node: ast.OperationNode,
+  options: {
+    paramsType: PluginVueQuery['resolvedOptions']['paramsType']
+    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
+    pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
+    resolver: PluginTs['resolver']
+  },
+): ast.FunctionParametersNode {
+  const { paramsType, paramsCasing, pathParamsType, resolver } = options
+  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
 
-    // Check if all children are optional or undefined
-    const allChildrenAreOptional = Object.values(children).every((child) => !child || child.optional)
-
-    return FunctionParams.factory({
-      data: {
-        mode: 'object',
-        children,
-        default: allChildrenAreOptional ? '{}' : undefined,
-      },
-      config: {
-        type: typeSchemas.request?.name
-          ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }`
-          : 'Partial<RequestConfig> & { client?: Client }',
-        default: '{}',
-      },
-    })
-  }
-
-  return FunctionParams.factory({
-    pathParams: {
-      mode: pathParamsType === 'object' ? 'object' : 'inlineSpread',
-      children: getPathParams(typeSchemas.pathParams, {
-        typed: true,
-        casing: paramsCasing,
-        override(item) {
-          return {
-            ...item,
-            type: `MaybeRefOrGetter<${item.type}>`,
-          }
-        },
-      }),
-      default: getDefaultValue(typeSchemas.pathParams?.schema),
-    },
-    data: typeSchemas.request?.name
-      ? {
-          type: `MaybeRefOrGetter<${typeSchemas.request?.name}>`,
-          optional: isOptional(typeSchemas.request?.schema),
-        }
-      : undefined,
-    params: typeSchemas.queryParams?.name
-      ? {
-          type: `MaybeRefOrGetter<${typeSchemas.queryParams?.name}>`,
-          optional: isOptional(typeSchemas.queryParams?.schema),
-        }
-      : undefined,
-    headers: typeSchemas.headerParams?.name
-      ? {
-          type: `MaybeRefOrGetter<${typeSchemas.queryParams?.name}>`,
-          optional: isOptional(typeSchemas.headerParams?.schema),
-        }
-      : undefined,
-    config: {
-      type: typeSchemas.request?.name
-        ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }`
-        : 'Partial<RequestConfig> & { client?: Client }',
-      default: '{}',
-    },
-  })
-}
-
-export function QueryOptions({ name, clientName, dataReturnType, typeSchemas, paramsCasing, paramsType, pathParamsType, queryKeyName }: Props): KubbReactNode {
-  const TData = dataReturnType === 'data' ? typeSchemas.response.name : `ResponseConfig<${typeSchemas.response.name}>`
-  const TError = `ResponseErrorConfig<${typeSchemas.errors?.map((item) => item.name).join(' | ') || 'Error'}>`
-
-  const params = getParams({ paramsType, paramsCasing, pathParamsType, typeSchemas })
-  const clientParams = Client.getParams({
+  const baseParams = ast.createOperationParams(node, {
     paramsType,
+    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
-    typeSchemas,
-    pathParamsType,
-    isConfigurable: true,
-  })
-  const queryKeyParams = QueryKey.getParams({
-    pathParamsType,
-    typeSchemas,
-    paramsCasing,
+    resolver,
+    extraParams: [
+      ast.createFunctionParameter({
+        name: 'config',
+        type: ast.createParamsType({
+          variant: 'reference',
+          name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+        }),
+        default: '{}',
+      }),
+    ],
   })
 
-  const enabled = Object.entries(queryKeyParams.flatParams)
-    .map(([key, item]) => {
-      // Only include if the parameter exists and is NOT optional
-      // This ensures we only check required parameters
-      return item && !item.optional && !item.default ? key : undefined
-    })
-    .filter(Boolean)
-    .join('&& ')
+  return wrapOperationParamsWithMaybeRef(baseParams)
+}
 
-  const enabledText = enabled ? `enabled: !!(${enabled}),` : ''
+function wrapOperationParamsWithMaybeRef(paramsNode: ast.FunctionParametersNode): ast.FunctionParametersNode {
+  const wrappedParams = paramsNode.params.map((param) => {
+    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+      const group = param as ast.ParameterGroupNode
+      return {
+        ...group,
+        properties: group.properties.map((p) => ({
+          ...p,
+          type: p.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(p.type)}>` }) : p.type,
+        })),
+      }
+    }
+    const fp = param as ast.FunctionParameterNode
+    // Don't wrap 'config' param — it's not reactive
+    if (fp.name === 'config') return fp
+    return {
+      ...fp,
+      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
+    }
+  })
+  return ast.createFunctionParameters({ params: wrappedParams })
+}
+
+function printType(typeNode: ast.ParamsTypeNode | undefined): string {
+  if (!typeNode) return 'unknown'
+  if (typeNode.variant === 'reference') return typeNode.name
+  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
+  return 'unknown'
+}
+
+export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
+  const required: string[] = []
+  for (const param of paramsNode.params) {
+    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+      const group = param as ast.ParameterGroupNode
+      for (const child of group.properties) {
+        if (!child.optional && child.default === undefined) {
+          required.push(child.name)
+        }
+      }
+    } else {
+      const fp = param as ast.FunctionParameterNode
+      if (!fp.optional && fp.default === undefined) {
+        required.push(fp.name)
+      }
+    }
+  }
+  return required.join(' && ')
+}
+
+export function QueryOptions({
+  name,
+  clientName,
+  dataReturnType,
+  node,
+  tsResolver,
+  paramsCasing,
+  paramsType,
+  pathParamsType,
+  queryKeyName,
+}: Props): KubbReactNode {
+  const responseName = tsResolver.resolveResponseName(node)
+  const errorNames = resolveErrorNames(node, tsResolver)
+
+  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+
+  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
+
+  // Transform: wrap non-config params with toValue(), add signal to config
+  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
+
+  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
+
+  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
+  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={params.toConstructor()}>
+      <Function name={name} export params={paramsSignature}>
         {`
-      const queryKey = ${queryKeyName}(${queryKeyParams.toCall()})
+      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({
-      ${enabledText}
-      queryKey,
-      queryFn: async ({ signal }) => {
-          return ${clientName}(${clientParams.toCall({
-            transformName(name) {
-              if (name === 'config') {
-                return '{ ...config, signal: config.signal ?? signal }'
-              }
-
-              return `toValue(${name})`
-            },
-          })})
+       ${enabledText}
+       queryKey,
+       queryFn: async ({ signal }) => {
+          return ${clientName}(${addToValueCalls(clientCallStr)})
        },
       })
 `}
@@ -174,4 +152,37 @@ export function QueryOptions({ name, clientName, dataReturnType, typeSchemas, pa
   )
 }
 
-QueryOptions.getParams = getParams
+/**
+ * Wraps parameter names with `toValue()` in the client call string,
+ * except for 'config'-related params (which are already plain objects).
+ *
+ * Handles both inline params (`petId, config`) and object shorthand
+ * params (`{ petId }, config`) by expanding to `{ petId: toValue(petId) }`.
+ */
+function addToValueCalls(callStr: string): string {
+  // Step 1: Transform shorthand object params like { petId } → { petId: toValue(petId) }
+  let result = callStr.replace(
+    /\{\s*([\w,\s]+)\s*\}(?=\s*,)/g,
+    (match, inner: string) => {
+      // Only transform simple shorthand (no colons, no spread)
+      if (inner.includes(':') || inner.includes('...')) return match
+      const keys = inner
+        .split(',')
+        .map((k: string) => k.trim())
+        .filter(Boolean)
+      const wrapped = keys.map((k: string) => `${k}: toValue(${k})`).join(', ')
+      return `{ ${wrapped} }`
+    },
+  )
+
+  // Step 2: Handle standalone identifiers like `data, params`
+  result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => {
+    if (name === 'config' || name === 'signal' || name === 'undefined') return match
+    if (match.includes('toValue(')) return match
+    return `toValue(${name})`
+  })
+
+  return result
+}
+
+QueryOptions.getParams = getQueryOptionsParams

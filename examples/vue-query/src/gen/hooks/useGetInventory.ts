@@ -35,8 +35,8 @@ export function getInventoryQueryOptions(config: Partial<RequestConfig> & { clie
         const queryKey = getInventoryQueryKey()
         return queryOptions<GetInventoryQueryResponse, ResponseErrorConfig<Error>, GetInventoryQueryResponse, typeof queryKey>({
 
-        queryKey,
-        queryFn: async ({ signal }) => {
+         queryKey,
+         queryFn: async ({ signal }) => {
             return getInventory({ ...config, signal: config.signal ?? signal })
          },
         })
@@ -48,12 +48,10 @@ export function getInventoryQueryOptions(config: Partial<RequestConfig> & { clie
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function useGetInventory<TData = GetInventoryQueryResponse, TQueryData = GetInventoryQueryResponse, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: 
-{
+export function useGetInventory<TData = GetInventoryQueryResponse, TQueryData = GetInventoryQueryResponse, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
   query?: Partial<UseQueryOptions<GetInventoryQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
-}
- = {}) {
+} = {}) {
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig

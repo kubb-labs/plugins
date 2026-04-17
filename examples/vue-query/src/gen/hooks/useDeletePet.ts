@@ -35,18 +35,16 @@ export async function deletePet({ petId }: { petId: DeletePetPathParams["petId"]
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export function useDeletePet<TContext>(options: 
-{
-  mutation?: MutationObserverOptions<DeletePetMutationResponse, ResponseErrorConfig<DeletePet400>, {petId: MaybeRefOrGetter<DeletePetPathParams["petId"]>, headers?: MaybeRefOrGetter<DeletePetHeaderParams>}, TContext> & { client?: QueryClient },
+export function useDeletePet<TContext>(options: {
+  mutation?: MutationObserverOptions<DeletePetMutationResponse, ResponseErrorConfig<DeletePet400>, {petId: MaybeRefOrGetter<DeletePetPathParams['petId']>, headers?: MaybeRefOrGetter<DeletePetHeaderParams>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? deletePetMutationKey()
 
-          return useMutation<DeletePetMutationResponse, ResponseErrorConfig<DeletePet400>, {petId: DeletePetPathParams["petId"], headers?: DeletePetHeaderParams}, TContext>({
+          return useMutation<DeletePetMutationResponse, ResponseErrorConfig<DeletePet400>, {petId: DeletePetPathParams['petId'], headers?: DeletePetHeaderParams}, TContext>({
             mutationFn: async({ petId, headers }) => {
               return deletePet({ petId }, headers, config)
             },

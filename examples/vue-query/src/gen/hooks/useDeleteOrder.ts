@@ -35,18 +35,16 @@ export async function deleteOrder({ orderId }: { orderId: DeleteOrderPathParams[
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export function useDeleteOrder<TContext>(options: 
-{
-  mutation?: MutationObserverOptions<DeleteOrderMutationResponse, ResponseErrorConfig<DeleteOrder400 | DeleteOrder404>, {orderId: MaybeRefOrGetter<DeleteOrderPathParams["orderId"]>}, TContext> & { client?: QueryClient },
+export function useDeleteOrder<TContext>(options: {
+  mutation?: MutationObserverOptions<DeleteOrderMutationResponse, ResponseErrorConfig<DeleteOrder400 | DeleteOrder404>, {orderId: MaybeRefOrGetter<DeleteOrderPathParams['orderId']>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? deleteOrderMutationKey()
 
-          return useMutation<DeleteOrderMutationResponse, ResponseErrorConfig<DeleteOrder400 | DeleteOrder404>, {orderId: DeleteOrderPathParams["orderId"]}, TContext>({
+          return useMutation<DeleteOrderMutationResponse, ResponseErrorConfig<DeleteOrder400 | DeleteOrder404>, {orderId: DeleteOrderPathParams['orderId']}, TContext>({
             mutationFn: async({ orderId }) => {
               return deleteOrder({ orderId }, config)
             },

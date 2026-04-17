@@ -36,18 +36,16 @@ export async function updateUser({ username }: { username: UpdateUserPathParams[
  * @summary Update user
  * {@link /user/:username}
  */
-export function useUpdateUser<TContext>(options: 
-{
-  mutation?: MutationObserverOptions<UpdateUserMutationResponse, ResponseErrorConfig<Error>, {username: MaybeRefOrGetter<UpdateUserPathParams["username"]>, data?: MaybeRefOrGetter<UpdateUserMutationRequest>}, TContext> & { client?: QueryClient },
+export function useUpdateUser<TContext>(options: {
+  mutation?: MutationObserverOptions<UpdateUserMutationResponse, ResponseErrorConfig<Error>, {username: MaybeRefOrGetter<UpdateUserPathParams['username']>, data?: MaybeRefOrGetter<UpdateUserMutationRequest>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdateUserMutationRequest>> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? updateUserMutationKey()
 
-          return useMutation<UpdateUserMutationResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathParams["username"], data?: UpdateUserMutationRequest}, TContext>({
+          return useMutation<UpdateUserMutationResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathParams['username'], data?: UpdateUserMutationRequest}, TContext>({
             mutationFn: async({ username, data }) => {
               return updateUser({ username }, data, config)
             },

@@ -35,18 +35,16 @@ export async function deleteUser({ username }: { username: DeleteUserPathParams[
  * @summary Delete user
  * {@link /user/:username}
  */
-export function useDeleteUser<TContext>(options: 
-{
-  mutation?: MutationObserverOptions<DeleteUserMutationResponse, ResponseErrorConfig<DeleteUser400 | DeleteUser404>, {username: MaybeRefOrGetter<DeleteUserPathParams["username"]>}, TContext> & { client?: QueryClient },
+export function useDeleteUser<TContext>(options: {
+  mutation?: MutationObserverOptions<DeleteUserMutationResponse, ResponseErrorConfig<DeleteUser400 | DeleteUser404>, {username: MaybeRefOrGetter<DeleteUserPathParams['username']>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? deleteUserMutationKey()
 
-          return useMutation<DeleteUserMutationResponse, ResponseErrorConfig<DeleteUser400 | DeleteUser404>, {username: DeleteUserPathParams["username"]}, TContext>({
+          return useMutation<DeleteUserMutationResponse, ResponseErrorConfig<DeleteUser400 | DeleteUser404>, {username: DeleteUserPathParams['username']}, TContext>({
             mutationFn: async({ username }) => {
               return deleteUser({ username }, config)
             },

@@ -36,12 +36,10 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputMu
  * @summary Creates list of users with given input array
  * {@link /user/createWithList}
  */
-export function useCreateUsersWithListInput<TContext>(options: 
-{
+export function useCreateUsersWithListInput<TContext>(options: {
   mutation?: MutationObserverOptions<CreateUsersWithListInputMutationResponse, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUsersWithListInputMutationRequest>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUsersWithListInputMutationRequest>> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;

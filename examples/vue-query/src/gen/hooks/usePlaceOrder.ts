@@ -36,12 +36,10 @@ export async function placeOrder(data?: PlaceOrderMutationRequest, config: Parti
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export function usePlaceOrder<TContext>(options: 
-{
+export function usePlaceOrder<TContext>(options: {
   mutation?: MutationObserverOptions<PlaceOrderMutationResponse, ResponseErrorConfig<PlaceOrder405>, {data?: MaybeRefOrGetter<PlaceOrderMutationRequest>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<PlaceOrderMutationRequest>> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;

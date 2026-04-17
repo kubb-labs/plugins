@@ -33,18 +33,16 @@ export async function updatePetWithForm({ petId }: { petId: UpdatePetWithFormPat
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}
  */
-export function useUpdatePetWithForm<TContext>(options: 
-{
-  mutation?: MutationObserverOptions<UpdatePetWithFormMutationResponse, ResponseErrorConfig<UpdatePetWithForm405>, {petId: MaybeRefOrGetter<UpdatePetWithFormPathParams["petId"]>, params?: MaybeRefOrGetter<UpdatePetWithFormQueryParams>}, TContext> & { client?: QueryClient },
+export function useUpdatePetWithForm<TContext>(options: {
+  mutation?: MutationObserverOptions<UpdatePetWithFormMutationResponse, ResponseErrorConfig<UpdatePetWithForm405>, {petId: MaybeRefOrGetter<UpdatePetWithFormPathParams['petId']>, params?: MaybeRefOrGetter<UpdatePetWithFormQueryParams>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? updatePetWithFormMutationKey()
 
-          return useMutation<UpdatePetWithFormMutationResponse, ResponseErrorConfig<UpdatePetWithForm405>, {petId: UpdatePetWithFormPathParams["petId"], params?: UpdatePetWithFormQueryParams}, TContext>({
+          return useMutation<UpdatePetWithFormMutationResponse, ResponseErrorConfig<UpdatePetWithForm405>, {petId: UpdatePetWithFormPathParams['petId'], params?: UpdatePetWithFormQueryParams}, TContext>({
             mutationFn: async({ petId, params }) => {
               return updatePetWithForm({ petId }, params, config)
             },

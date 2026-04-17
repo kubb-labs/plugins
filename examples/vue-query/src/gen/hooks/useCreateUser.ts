@@ -36,12 +36,10 @@ export async function createUser(data?: CreateUserMutationRequest, config: Parti
  * @summary Create user
  * {@link /user}
  */
-export function useCreateUser<TContext>(options: 
-{
+export function useCreateUser<TContext>(options: {
   mutation?: MutationObserverOptions<CreateUserMutationResponse, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUserMutationRequest>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUserMutationRequest>> & { client?: Client },
-}
- = {}) {
+} = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}
           const { client: queryClient, ...mutationOptions } = mutation;

@@ -36,8 +36,8 @@ export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<FindPetsB
         const queryKey = findPetsByStatusQueryKey(params)
         return queryOptions<FindPetsByStatusQueryResponse, ResponseErrorConfig<FindPetsByStatus400>, FindPetsByStatusQueryResponse, typeof queryKey>({
 
-        queryKey,
-        queryFn: async ({ signal }) => {
+         queryKey,
+         queryFn: async ({ signal }) => {
             return findPetsByStatus(toValue(params), { ...config, signal: config.signal ?? signal })
          },
         })
@@ -49,12 +49,10 @@ export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<FindPetsB
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus<TData = FindPetsByStatusQueryResponse, TQueryData = FindPetsByStatusQueryResponse, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: MaybeRefOrGetter<FindPetsByStatusQueryParams>, options: 
-{
+export function useFindPetsByStatus<TData = FindPetsByStatusQueryResponse, TQueryData = FindPetsByStatusQueryResponse, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: MaybeRefOrGetter<FindPetsByStatusQueryParams>, options: {
   query?: Partial<UseQueryOptions<FindPetsByStatusQueryResponse, ResponseErrorConfig<FindPetsByStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
-}
- = {}) {
+} = {}) {
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig

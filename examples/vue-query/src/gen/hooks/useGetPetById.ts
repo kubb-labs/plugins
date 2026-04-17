@@ -11,7 +11,7 @@ import type { MaybeRefOrGetter } from "vue";
 import { queryOptions, useQuery } from "@tanstack/vue-query";
 import { toValue } from "vue";
 
-export const getPetByIdQueryKey = ({ petId }: { petId: MaybeRefOrGetter<GetPetByIdPathParams["petId"]> }) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
+export const getPetByIdQueryKey = ({ petId }: { petId: MaybeRefOrGetter<GetPetByIdPathParams['petId']> }) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
 export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -31,14 +31,14 @@ export async function getPetById({ petId }: { petId: GetPetByIdPathParams["petId
   return res.data
 }
 
-export function getPetByIdQueryOptions({ petId }: { petId: MaybeRefOrGetter<GetPetByIdPathParams["petId"]> }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ petId }: { petId: MaybeRefOrGetter<GetPetByIdPathParams['petId']> }, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getPetByIdQueryKey({ petId })
         return queryOptions<GetPetByIdQueryResponse, ResponseErrorConfig<GetPetById400 | GetPetById404>, GetPetByIdQueryResponse, typeof queryKey>({
-        enabled: !!(petId),
-        queryKey,
-        queryFn: async ({ signal }) => {
-            return getPetById(toValue({ petId: toValue(petId) }), { ...config, signal: config.signal ?? signal })
+         enabled: !!(petId),
+         queryKey,
+         queryFn: async ({ signal }) => {
+            return getPetById({ petId: toValue(petId) }, { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -49,12 +49,10 @@ export function getPetByIdQueryOptions({ petId }: { petId: MaybeRefOrGetter<GetP
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetById<TData = GetPetByIdQueryResponse, TQueryData = GetPetByIdQueryResponse, TQueryKey extends QueryKey = GetPetByIdQueryKey>({ petId }: { petId: MaybeRefOrGetter<GetPetByIdPathParams["petId"]> }, options: 
-{
+export function useGetPetById<TData = GetPetByIdQueryResponse, TQueryData = GetPetByIdQueryResponse, TQueryKey extends QueryKey = GetPetByIdQueryKey>({ petId }: { petId: MaybeRefOrGetter<GetPetByIdPathParams['petId']> }, options: {
   query?: Partial<UseQueryOptions<GetPetByIdQueryResponse, ResponseErrorConfig<GetPetById400 | GetPetById404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
-}
- = {}) {
+} = {}) {
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig

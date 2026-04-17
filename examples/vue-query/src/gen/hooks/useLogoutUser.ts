@@ -34,8 +34,8 @@ export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client
         const queryKey = logoutUserQueryKey()
         return queryOptions<LogoutUserQueryResponse, ResponseErrorConfig<Error>, LogoutUserQueryResponse, typeof queryKey>({
 
-        queryKey,
-        queryFn: async ({ signal }) => {
+         queryKey,
+         queryFn: async ({ signal }) => {
             return logoutUser({ ...config, signal: config.signal ?? signal })
          },
         })
@@ -46,12 +46,10 @@ export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client
  * @summary Logs out current logged in user session
  * {@link /user/logout}
  */
-export function useLogoutUser<TData = LogoutUserQueryResponse, TQueryData = LogoutUserQueryResponse, TQueryKey extends QueryKey = LogoutUserQueryKey>(options: 
-{
+export function useLogoutUser<TData = LogoutUserQueryResponse, TQueryData = LogoutUserQueryResponse, TQueryKey extends QueryKey = LogoutUserQueryKey>(options: {
   query?: Partial<UseQueryOptions<LogoutUserQueryResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
-}
- = {}) {
+} = {}) {
 
          const { query: queryConfig = {}, client: config = {} } = options ?? {}
          const { client: queryClient, ...resolvedOptions } = queryConfig
