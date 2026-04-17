@@ -861,12 +861,33 @@ importers:
       '@kubb/parser-ts':
         specifier: 'catalog:'
         version: 5.0.0-alpha.42(@kubb/renderer-jsx@5.0.0-alpha.42)
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../../packages/plugin-client
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress
+      '@kubb/plugin-faker':
+        specifier: workspace:*
+        version: link:../../packages/plugin-faker
+      '@kubb/plugin-mcp':
+        specifier: workspace:*
+        version: link:../../packages/plugin-mcp
+      '@kubb/plugin-msw':
+        specifier: workspace:*
+        version: link:../../packages/plugin-msw
+      '@kubb/plugin-react-query':
+        specifier: workspace:*
+        version: link:../../packages/plugin-react-query
+      '@kubb/plugin-redoc':
+        specifier: workspace:*
+        version: link:../../packages/plugin-redoc
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+      '@kubb/plugin-vue-query':
+        specifier: workspace:*
+        version: link:../../packages/plugin-vue-query
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
