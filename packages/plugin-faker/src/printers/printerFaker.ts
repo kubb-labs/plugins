@@ -210,11 +210,15 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
       },
       ref(node) {
-        if (!node.name) {
+        // Parser-generated refs (with $ref) carry raw schema names that need resolving.
+        // Use the canonical name from the $ref path — node.name may have been overridden
+        // (e.g. by single-member allOf flatten using the property-derived child name).
+        // Inline refs (without $ref) from faker utils already carry resolved helper names.
+        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name ?? node.schema?.name) : (node.name ?? node.schema?.name)
+
+        if (!refName) {
           throw new Error('Name not defined for ref node')
         }
-
-        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
 
         if (this.options.schemaName && refName === this.options.schemaName) {
           return 'undefined as any'

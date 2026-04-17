@@ -5,6 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
+import { resolveFakerTypeUsage } from '../utils.ts'
 
 type Props = {
   name: string
@@ -16,8 +17,8 @@ type Props = {
   canOverride: boolean
 }
 
-const ARRAY_TYPES = new Set<ast.SchemaNode['type']>(['array'])
 const OBJECT_TYPES = new Set<ast.SchemaNode['type']>(['object', 'intersection'])
+const ARRAY_TYPES = new Set<ast.SchemaNode['type']>(['array'])
 const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
   'string',
   'email',
@@ -34,34 +35,6 @@ const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
   'enum',
 ])
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
-
-function getScalarType(node: ast.SchemaNode, typeName: string): string {
-  switch (node.type) {
-    case 'string':
-    case 'email':
-    case 'url':
-    case 'uuid':
-      return 'string'
-    case 'number':
-    case 'integer':
-      return 'number'
-    case 'bigint':
-      return 'bigint'
-    case 'boolean':
-      return 'boolean'
-    case 'date':
-    case 'time':
-      return node.representation === 'date' ? 'Date' : 'string'
-    case 'datetime':
-      return 'string'
-    case 'blob':
-      return 'Blob'
-    case 'enum':
-      return typeName
-    default:
-      return typeName
-  }
-}
 
 export function Faker({ node, description, name, typeName, printer, seed, canOverride }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
@@ -95,15 +68,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
     fakerTextWithOverride = `data ?? ${fakerText}`
   }
 
-  let dataType = `Partial<${typeName}>`
-
-  if (isArray || isTuple || node.type === 'union' || node.type === 'enum') {
-    dataType = typeName
-  }
-
-  if (isScalar) {
-    dataType = getScalarType(node, typeName)
-  }
+  const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
   const usesData = /\bdata\b/.test(fakerTextWithOverride)
   const dataParamName = usesData ? 'data' : '_data'
@@ -118,11 +83,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   })
   const paramsSignature = declarationPrinter.print(params) ?? ''
 
-  let returnType = canOverride ? typeName : undefined
-
-  if (isScalar) {
-    returnType = getScalarType(node, typeName)
-  }
+  const returnType = resolvedReturnType
 
   return (
     <File.Source name={name} isExportable isIndexable>
