@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import type { LoginUserQueryParams, LoginUserQueryResponse } from '../../models/ts/userController/LoginUser.ts'
+import type { LoginUserQueryParams } from '../../models/ts/userController/LoginUser.ts'
 
 export function createLoginUserQueryParamsFaker(data?: Partial<LoginUserQueryParams>): LoginUserQueryParams {
   return {
@@ -11,8 +11,8 @@ export function createLoginUserQueryParamsFaker(data?: Partial<LoginUserQueryPar
 /**
  * @description successful operation
  */
-export function createLoginUser200Faker() {
-  return faker.string.alpha()
+export function createLoginUser200Faker(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**
@@ -22,6 +22,6 @@ export function createLoginUser400Faker() {
   return undefined
 }
 
-export function createLoginUserQueryResponseFaker(data?: Partial<LoginUserQueryResponse>): LoginUserQueryResponse {
-  return data || faker.helpers.arrayElement<any>([createLoginUser200Faker()])
+export function createLoginUserQueryResponseFaker(data?: string): string {
+  return data ?? faker.string.alpha()
 }

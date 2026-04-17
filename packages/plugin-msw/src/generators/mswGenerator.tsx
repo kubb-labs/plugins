@@ -21,12 +21,10 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const fakerPlugin = driver.getPlugin(pluginFakerName)
     const faker =
-      parser === 'faker' && fakerPlugin
+      parser === 'faker' && fakerPlugin?.resolver
         ? resolveFakerMeta(node, {
             root,
-            output,
-            group,
-            transformers,
+            fakerResolver: fakerPlugin.resolver,
             fakerOutput: fakerPlugin.options?.output ?? {},
             fakerGroup: fakerPlugin.options?.group,
           })

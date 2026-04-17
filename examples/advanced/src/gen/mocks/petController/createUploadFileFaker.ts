@@ -23,10 +23,10 @@ export function createUploadFile200Faker(data?: Partial<UploadFile200>): UploadF
   return createApiResponseFaker(data)
 }
 
-export function createUploadFileMutationRequestFaker() {
-  return faker.image.url() as unknown as Blob
+export function createUploadFileMutationRequestFaker(data?: Blob): Blob {
+  return data ?? (faker.image.url() as unknown as Blob)
 }
 
 export function createUploadFileMutationResponseFaker(data?: Partial<UploadFileMutationResponse>): UploadFileMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createUploadFile200Faker()])
+  return createUploadFile200Faker(data)
 }

@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import type { TreeNode } from './types/TreeNode'
 import { faker } from '@faker-js/faker'
 
 export function treeNode(data?: Partial<TreeNode>): TreeNode {

@@ -1,16 +1,32 @@
-import path from 'node:path'
 import { camelCase } from '@internals/utils'
-import type { ast } from '@kubb/core'
-import { createPlugin, getBarrelFiles, type UserGroup } from '@kubb/core'
-import { OperationGenerator, pluginOasName, SchemaGenerator } from '@kubb/plugin-oas'
+import { definePlugin, type Group } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { version } from '../package.json'
 import { fakerGenerator } from './generators/fakerGenerator.tsx'
+import { fakerGeneratorLegacy } from './generators/fakerGeneratorLegacy.tsx'
+import { resolverFaker } from './resolvers/resolverFaker.ts'
+import { resolverFakerLegacy } from './resolvers/resolverFakerLegacy.ts'
 import type { PluginFaker } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-faker`, used to identify the plugin in driver lookups and warnings.
+ */
 export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
 
-export const pluginFaker = createPlugin<PluginFaker>((options) => {
+/**
+ * The `@kubb/plugin-faker` plugin factory.
+ *
+ * Generates Faker mock helpers from schema and operation AST nodes.
+ *
+ * @example
+ * ```ts
+ * import pluginFaker from '@kubb/plugin-faker'
+ *
+ * export default defineConfig({
+ *   plugins: [pluginFaker({ output: { path: 'mocks' } })],
+ * })
+ * ```
+ */
+export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {
     output = { path: 'mocks', barrelType: 'named' },
     seed,
@@ -18,135 +34,63 @@ export const pluginFaker = createPlugin<PluginFaker>((options) => {
     exclude = [],
     include,
     override = [],
-    transformers = {},
     mapper = {},
-    unknownType = 'any',
-    emptySchemaType = unknownType,
-    dateType = 'string',
-    integerType = 'number',
     dateParser = 'faker',
-    generators = [fakerGenerator].filter(Boolean),
+    generators: userGenerators = [],
     regexGenerator = 'faker',
     paramsCasing,
-    contentType,
+    printer,
+    resolver: userResolver,
+    transformer: userTransformer,
+    compatibilityPreset = 'default',
   } = options
 
-  // @deprecated Will be removed in v5 when collisionDetection defaults to true
-  const usedEnumNames = {}
+  const defaultResolver = compatibilityPreset === 'kubbV4' ? resolverFakerLegacy : resolverFaker
+  const defaultGenerator = compatibilityPreset === 'kubbV4' ? fakerGeneratorLegacy : fakerGenerator
+
+  const groupConfig = group
+    ? ({
+        ...group,
+        name: group.name
+          ? group.name
+          : (ctx: { group: string }) => {
+              if (group.type === 'path') {
+                return `${ctx.group.split('/')[1]}`
+              }
+
+              return `${camelCase(ctx.group)}Controller`
+            },
+      } satisfies Group)
+    : undefined
 
   return {
     name: pluginFakerName,
-    version,
-    options: {
-      output,
-      transformers,
-      seed,
-      dateType,
-      integerType,
-      unknownType,
-      emptySchemaType,
-      dateParser,
-      mapper,
-      override,
-      exclude,
-      include,
-      regexGenerator,
-      paramsCasing,
-      group,
-      usedEnumNames,
-    },
-    dependencies: [pluginOasName, pluginTsName],
-    resolvePath(baseName, pathMode, options) {
-      const root = this.root
-      const mode = pathMode ?? this.getMode(output)
-
-      if (mode === 'single') {
-        /**
-         * when output is a file then we will always append to the same file(output file), see fileManager.addOrAppend
-         * Other plugins then need to call addOrAppend instead of just add from the fileManager class
-         */
-        return path.resolve(root, output.path)
-      }
-
-      if (group && (options?.group?.path || options?.group?.tag)) {
-        const groupName: UserGroup['name'] = group?.name
-          ? group.name
-          : (ctx) => {
-              if (group?.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            }
-
-        return path.resolve(
-          root,
-          output.path,
-          groupName({
-            group: group.type === 'path' ? options.group.path! : options.group.tag!,
-          }),
-          baseName,
-        )
-      }
-
-      return path.resolve(root, output.path, baseName)
-    },
-    resolveName(name, type) {
-      const resolvedName = camelCase(name, {
-        prefix: type ? 'create' : undefined,
-        isFile: type === 'file',
-      })
-
-      if (type) {
-        return transformers?.name?.(resolvedName, type) || resolvedName
-      }
-
-      return resolvedName
-    },
-    async buildStart() {
-      const root = this.root
-      const mode = this.getMode(output)
-      const oas = await this.getOas()
-
-      const schemaGenerator = new SchemaGenerator(this.plugin.options, {
-        oas,
-        driver: this.driver,
-        hooks: this.hooks,
-        plugin: this.plugin,
-        contentType,
-        include: undefined,
-        override,
-        mode,
-        output: output.path,
-      })
-
-      const schemaFiles = await schemaGenerator.build(...generators)
-      await this.upsertFile(...schemaFiles)
-
-      const operationGenerator = new OperationGenerator(this.plugin.options, {
-        oas,
-        driver: this.driver,
-        hooks: this.hooks,
-        plugin: this.plugin,
-        contentType,
-        exclude,
-        include,
-        override,
-        mode,
-      })
-
-      const operationFiles = await operationGenerator.build(...generators)
-      await this.upsertFile(...operationFiles)
-
-      const barrelFiles = await getBarrelFiles(this.driver.fileManager.files as unknown as ast.FileNode[], {
-        type: output.barrelType ?? 'named',
-        root,
-        output,
-        meta: {
-          pluginName: this.plugin.name,
-        },
-      })
-
-      await this.upsertFile(...barrelFiles)
+    options,
+    dependencies: [pluginTsName],
+    hooks: {
+      'kubb:plugin:setup'(ctx) {
+        ctx.setOptions({
+          output,
+          seed,
+          exclude,
+          include,
+          override,
+          group: groupConfig,
+          mapper,
+          dateParser,
+          regexGenerator,
+          paramsCasing,
+          printer,
+        })
+        ctx.setResolver(userResolver ? { ...defaultResolver, ...userResolver } : defaultResolver)
+        if (userTransformer) {
+          ctx.setTransformer(userTransformer)
+        }
+        ctx.addGenerator(defaultGenerator)
+        for (const generator of userGenerators) {
+          ctx.addGenerator(generator)
+        }
+      },
     },
   }
 })

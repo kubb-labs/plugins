@@ -27,5 +27,5 @@ export function createCreateUsersWithListInputMutationRequestFaker(data?: Create
 export function createCreateUsersWithListInputMutationResponseFaker(
   data?: Partial<CreateUsersWithListInputMutationResponse>,
 ): CreateUsersWithListInputMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createCreateUsersWithListInput200Faker()])
+  return createCreateUsersWithListInput200Faker(data)
 }

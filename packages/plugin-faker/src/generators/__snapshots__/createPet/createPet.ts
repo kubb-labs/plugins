@@ -3,30 +3,26 @@
  * Do not edit manually.
  */
 
+import type { CreatePetData, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
 import { faker } from '@faker-js/faker'
-import { error } from '../createPet'
 
 /**
- * @description Null response
+ * @description Created pet
  */
-export function createPets201() {
-  return undefined
+export function createPetStatus201(data?: Partial<CreatePetStatus201>): CreatePetStatus201 {
+  return pet(data)
 }
 
 /**
- * @description unexpected error
+ * @description Pet to add
  */
-export function createPetsError(data?: Partial<CreatePetsError>): CreatePetsError {
-  return error(data)
-}
-
-export function createPetsMutationRequest(data?: Partial<CreatePetsMutationRequest>): CreatePetsMutationRequest {
+export function createPetData(data?: Partial<CreatePetData>): CreatePetData {
   return {
-    ...{ name: faker.string.alpha(), tag: faker.string.alpha() },
+    ...{ name: faker.string.alpha(), category: category() },
     ...(data || {}),
   }
 }
 
-export function createPetsMutationResponse(data?: Partial<CreatePetsMutationResponse>): CreatePetsMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createPets201()])
+export function createPetResponse(data?: Partial<CreatePetResponse>): CreatePetResponse {
+  return createPetStatus201(data)
 }

@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
 export function pet(data?: Partial<Pet>): Pet {
@@ -10,11 +11,10 @@ export function pet(data?: Partial<Pet>): Pet {
     ...{
       id: faker.number.int(),
       name: faker.string.alpha(),
-      tag: faker.string.alpha(),
-      code: faker.helpers.fromRegExp('\b[1-9]\b'),
-      shipDate: faker.date.anytime(),
-      shipTime: faker.date.anytime(),
-      info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
+      code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
+      shipDate: faker.date.anytime().toISOString().substring(0, 10),
+      category: category(),
+      status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
     },
     ...(data || {}),
   }

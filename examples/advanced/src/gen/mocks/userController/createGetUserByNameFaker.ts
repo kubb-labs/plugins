@@ -31,5 +31,5 @@ export function createGetUserByName404Faker() {
 }
 
 export function createGetUserByNameQueryResponseFaker(data?: Partial<GetUserByNameQueryResponse>): GetUserByNameQueryResponse {
-  return data || faker.helpers.arrayElement<any>([createGetUserByName200Faker()])
+  return createGetUserByName200Faker(data)
 }

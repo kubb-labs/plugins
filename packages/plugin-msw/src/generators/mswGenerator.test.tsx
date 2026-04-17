@@ -2,7 +2,7 @@
 import type { Config } from '@kubb/core'
 import { ast } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
-import { pluginFakerName } from '@kubb/plugin-faker'
+import { pluginFakerName, resolverFakerLegacy } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTsLegacy } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
@@ -35,6 +35,7 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
 const mockedFakerPlugin = createMockedPlugin<any>({
   name: pluginFakerName,
   options: { output: { path: '.' }, group: undefined },
+  resolver: resolverFakerLegacy,
 })
 
 const listPetsNode = ast.createOperation({

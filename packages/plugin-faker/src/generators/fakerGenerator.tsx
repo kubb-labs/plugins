@@ -1,88 +1,149 @@
-import { useDriver, useMode } from '@kubb/core/hooks'
-import { type OperationSchema as OperationSchemaType, SchemaGenerator, schemaKeywords } from '@kubb/plugin-oas'
-import { createReactGenerator } from '@kubb/plugin-oas/generators'
-import { useOas, useOperationManager, useSchemaManager } from '@kubb/plugin-oas/hooks'
-import { applyParamsCasing, getBanner, getFooter, getImports, isParameterSchema } from '@kubb/plugin-oas/utils'
-import { pluginTsName } from '@kubb/plugin-ts'
-import { File } from '@kubb/renderer-jsx'
-import { Faker } from '../components'
-import type { PluginFaker } from '../types'
+import { ast, defineGenerator } from '@kubb/core'
+import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { Faker } from '../components/Faker.tsx'
+import { printerFaker } from '../printers/printerFaker.ts'
+import type { PluginFaker } from '../types.ts'
+import { buildResponseUnionSchema, canOverrideSchema, resolveParamNameByLocation } from '../utils.ts'
 
-export const fakerGenerator = createReactGenerator<PluginFaker>({
+export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
-  Operation({ operation, generator, plugin }) {
-    const {
-      options,
-      options: { dateParser, regexGenerator, seed, mapper },
-    } = plugin
-    const mode = useMode()
-    const driver = useDriver()
+  renderer: jsxRenderer,
+  schema(node, ctx) {
+    const { adapter, config, resolver, root } = ctx
+    const { output, group, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
+    const pluginTs = ctx.driver.getPlugin<PluginTs>(pluginTsName)
 
-    const oas = useOas()
-    const { getSchemas, getFile, getGroup } = useOperationManager(generator)
-    const schemaManager = useSchemaManager()
+    if (!node.name || !pluginTs?.resolver) {
+      return
+    }
 
-    const file = getFile(operation)
-    const schemas = getSchemas(operation)
-    const schemaGenerator = new SchemaGenerator(options, {
-      oas,
-      plugin,
-      hooks: generator.context.hooks,
-      driver,
-      mode,
-      override: options.override,
-    })
+    const mode = ctx.getMode(output)
+    const meta = {
+      name: resolver.resolveName(node.name),
+      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group }),
+      typeName: pluginTs.resolver.resolveTypeName(node.name),
+      typeFile: pluginTs.resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output: pluginTs.options.output, group: pluginTs.options.group }),
+    } as const
 
-    const operationSchemas = [schemas.pathParams, schemas.queryParams, schemas.headerParams, schemas.statusCodes, schemas.request, schemas.response]
-      .flat()
-      .filter((x): x is OperationSchemaType => Boolean(x))
+    const imports = adapter
+      .getImports(node, (schemaName) => ({
+        name: resolver.resolveName(schemaName),
+        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+      }))
+      .filter((entry) => entry.path !== meta.file.path)
 
-    const mapOperationSchema = ({ name, schema, description, ...options }: OperationSchemaType) => {
-      // Apply paramsCasing transformation if enabled and this is a parameter schema
-      const shouldTransform = isParameterSchema(name) && plugin.options.paramsCasing
-      const transformedSchema = shouldTransform ? applyParamsCasing(schema, plugin.options.paramsCasing) : schema
+    return (
+      <File
+        baseName={meta.file.baseName}
+        path={meta.file.path}
+        meta={meta.file.meta}
+        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
+        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+      >
+        <File.Import name={['faker']} path="@faker-js/faker" />
+        {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
+        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
+        <File.Import isTypeOnly root={meta.file.path} path={meta.typeFile.path} name={[meta.typeName]} />
+        {mode === 'split' &&
+          imports.map((imp) => <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
+        <Faker
+          name={meta.name}
+          typeName={meta.typeName}
+          description={node.description}
+          node={node}
+          printer={printerFaker({
+            resolver,
+            schemaName: node.name,
+            typeName: meta.typeName,
+            dateParser,
+            regexGenerator,
+            mapper,
+            nodes: printer?.nodes,
+          })}
+          seed={seed}
+          canOverride={canOverrideSchema(node)}
+        />
+      </File>
+    )
+  },
+  operation(node, ctx) {
+    const { adapter, config, resolver, root } = ctx
+    const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
+    const pluginTs = ctx.driver.getPlugin<PluginTs>(pluginTsName)
 
-      const tree = schemaGenerator.parse({ schema: transformedSchema, name, parentName: null })
-      const imports = getImports(tree)
-      const group = options.operation ? getGroup(options.operation) : undefined
+    if (!pluginTs?.resolver) {
+      return
+    }
 
-      const faker = {
-        name: schemaManager.getName(name, { type: 'function' }),
-        file: schemaManager.getFile(name),
+    const params = ast.caseParams(node.parameters, paramsCasing)
+    const meta = {
+      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      typeFile: pluginTs.resolver.resolveFile(
+        {
+          name: node.operationId,
+          extname: '.ts',
+          tag: node.tags[0] ?? 'default',
+          path: node.path,
+        },
+        {
+          root,
+          output: pluginTs.options.output,
+          group: pluginTs.options.group,
+        },
+      ),
+    } as const
+
+    function resolveMockImports(schema: ast.SchemaNode) {
+      return adapter
+        .getImports(schema, (schemaName) => ({
+          name: resolver.resolveName(schemaName),
+          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+        }))
+        .filter((entry) => entry.path !== meta.file.path)
+    }
+
+    function renderEntry({
+      schema,
+      name,
+      typeName,
+      description,
+      skipImportNames = [],
+    }: {
+      schema: ast.SchemaNode | null
+      name: string
+      typeName: string
+      description?: string
+      skipImportNames?: Array<string>
+    }) {
+      if (!schema) {
+        return null
       }
 
-      const type = {
-        name: schemaManager.getName(name, { type: 'type', pluginName: pluginTsName }),
-        file: schemaManager.getFile(options.operationName || name, { pluginName: pluginTsName, group }),
-      }
-
-      const canOverride = tree.some(
-        ({ keyword }) =>
-          keyword === schemaKeywords.array ||
-          keyword === schemaKeywords.and ||
-          keyword === schemaKeywords.object ||
-          keyword === schemaKeywords.union ||
-          keyword === schemaKeywords.tuple ||
-          keyword === schemaKeywords.enum ||
-          keyword === schemaKeywords.ref,
-      )
+      const imports = resolveMockImports(schema).filter((entry) => (typeof entry.name === 'string' ? !skipImportNames.includes(entry.name) : true))
 
       return (
         <>
-          {canOverride && <File.Import isTypeOnly root={file.path} path={type.file.path} name={[type.name]} />}
+          <File.Import isTypeOnly root={meta.file.path} path={meta.typeFile.path} name={[typeName]} />
           {imports.map((imp) => (
-            <File.Import key={[imp.path, imp.name, imp.isTypeOnly].join('-')} root={file.path} path={imp.path} name={imp.name} />
+            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}
           <Faker
-            name={faker.name}
-            typeName={type.name}
+            name={name}
+            typeName={typeName}
             description={description}
-            tree={tree}
-            regexGenerator={regexGenerator}
-            dateParser={dateParser}
-            mapper={mapper}
+            node={schema}
+            printer={printerFaker({
+              resolver,
+              schemaName: name,
+              typeName,
+              dateParser,
+              regexGenerator,
+              mapper,
+              nodes: printer?.nodes,
+            })}
             seed={seed}
-            canOverride={canOverride}
+            canOverride={canOverrideSchema(schema)}
           />
         </>
       )
@@ -90,79 +151,47 @@ export const fakerGenerator = createReactGenerator<PluginFaker>({
 
     return (
       <File
-        baseName={file.baseName}
-        path={file.path}
-        meta={file.meta}
-        banner={getBanner({ oas, output: plugin.options.output, config: driver.config })}
-        footer={getFooter({ oas, output: plugin.options.output })}
+        baseName={meta.file.baseName}
+        path={meta.file.path}
+        meta={meta.file.meta}
+        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
+        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
         <File.Import name={['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        {operationSchemas.map(mapOperationSchema)}
-      </File>
-    )
-  },
-  Schema({ schema, plugin }) {
-    const { getName, getFile } = useSchemaManager()
-    const {
-      options: { output, dateParser, regexGenerator, seed, mapper },
-    } = plugin
-    const driver = useDriver()
-    const oas = useOas()
-    const imports = getImports(schema.tree)
-
-    const faker = {
-      name: getName(schema.name, { type: 'function' }),
-      file: getFile(schema.name),
-    }
-
-    const type = {
-      name: getName(schema.name, { type: 'type', pluginName: pluginTsName }),
-      file: getFile(schema.name, { pluginName: pluginTsName }),
-    }
-
-    const canOverride = schema.tree.some(
-      ({ keyword }) =>
-        keyword === schemaKeywords.array ||
-        keyword === schemaKeywords.and ||
-        keyword === schemaKeywords.object ||
-        keyword === schemaKeywords.union ||
-        keyword === schemaKeywords.tuple ||
-        keyword === schemaKeywords.ref ||
-        keyword === schemaKeywords.enum ||
-        keyword === schemaKeywords.string ||
-        keyword === schemaKeywords.integer ||
-        keyword === schemaKeywords.number,
-    )
-
-    return (
-      <File
-        baseName={faker.file.baseName}
-        path={faker.file.path}
-        meta={faker.file.meta}
-        banner={getBanner({ oas, output, config: driver.config })}
-        footer={getFooter({ oas, output })}
-      >
-        <File.Import name={['faker']} path="@faker-js/faker" />
-        {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
-        {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        <File.Import isTypeOnly root={faker.file.path} path={type.file.path} name={[type.name]} />
-        {imports.map((imp) => (
-          <File.Import key={[imp.path, imp.name, imp.isTypeOnly].join('-')} root={faker.file.path} path={imp.path} name={imp.name} />
-        ))}
-
-        <Faker
-          name={faker.name}
-          typeName={type.name}
-          description={schema.value.description}
-          tree={schema.tree}
-          regexGenerator={regexGenerator}
-          dateParser={dateParser}
-          mapper={mapper}
-          seed={seed}
-          canOverride={canOverride}
-        />
+        {params.map((param) =>
+          renderEntry({
+            schema: param.schema,
+            name: resolveParamNameByLocation(resolver, node, param),
+            typeName: resolveParamNameByLocation(pluginTs.resolver, node, param),
+          }),
+        )}
+        {node.responses.map((response) =>
+          renderEntry({
+            schema: response.schema,
+            name: resolver.resolveResponseStatusName(node, response.statusCode),
+            typeName: pluginTs.resolver.resolveResponseStatusName(node, response.statusCode),
+            description: response.description,
+          }),
+        )}
+        {node.requestBody?.schema
+          ? renderEntry({
+              schema: {
+                ...node.requestBody.schema,
+                description: node.requestBody.description ?? node.requestBody.schema.description,
+              },
+              name: resolver.resolveDataName(node),
+              typeName: pluginTs.resolver.resolveDataName(node),
+              description: node.requestBody.description ?? node.requestBody.schema.description,
+            })
+          : null}
+        {renderEntry({
+          schema: buildResponseUnionSchema(node, resolver),
+          name: resolver.resolveResponseName(node),
+          typeName: pluginTs.resolver.resolveResponseName(node),
+          skipImportNames: node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode)),
+        })}
       </File>
     )
   },

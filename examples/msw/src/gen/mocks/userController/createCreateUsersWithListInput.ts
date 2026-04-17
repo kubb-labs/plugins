@@ -40,5 +40,5 @@ export function createCreateUsersWithListInputMutationResponse(
 ): CreateUsersWithListInputMutationResponse {
   faker.seed([220])
 
-  return data || faker.helpers.arrayElement<any>([createCreateUsersWithListInput200()])
+  return createCreateUsersWithListInput200(data)
 }

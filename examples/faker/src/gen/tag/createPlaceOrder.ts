@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { PlaceOrder200, PlaceOrderMutationRequest, PlaceOrderMutationResponse } from '../models/PlaceOrder.ts'
 import { createOrder } from './createOrder.ts'
 
@@ -26,5 +25,5 @@ export function createPlaceOrderMutationRequest(data?: Partial<PlaceOrderMutatio
 }
 
 export function createPlaceOrderMutationResponse(data?: Partial<PlaceOrderMutationResponse>): PlaceOrderMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createPlaceOrder200()])
+  return createPlaceOrder200(data)
 }

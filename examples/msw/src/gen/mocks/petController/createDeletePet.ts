@@ -4,7 +4,7 @@
  */
 
 import { faker } from '@faker-js/faker'
-import type { DeletePetHeaderParams, DeletePetMutationResponse, DeletePetPathParams } from '../../models/DeletePet.ts'
+import type { DeletePetHeaderParams, DeletePetPathParams } from '../../models/DeletePet.ts'
 
 export function createDeletePetPathParams(data?: Partial<DeletePetPathParams>): DeletePetPathParams {
   faker.seed([220])
@@ -28,12 +28,6 @@ export function createDeletePetHeaderParams(data?: Partial<DeletePetHeaderParams
  * @description Invalid pet value
  */
 export function createDeletePet400() {
-  faker.seed([220])
-
-  return undefined
-}
-
-export function createDeletePetMutationResponse(_data?: Partial<DeletePetMutationResponse>): DeletePetMutationResponse {
   faker.seed([220])
 
   return undefined

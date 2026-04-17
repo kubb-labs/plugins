@@ -83,18 +83,8 @@ export {
   createAddFilesMutationRequestFaker,
   createAddFilesMutationResponseFaker,
 } from './mocks/petController/createAddFilesFaker.ts'
-export {
-  createAddPet405Faker,
-  createAddPetErrorFaker,
-  createAddPetMutationRequestFaker,
-  createAddPetMutationResponseFaker,
-} from './mocks/petController/createAddPetFaker.ts'
-export {
-  createDeletePet400Faker,
-  createDeletePetHeaderParamsFaker,
-  createDeletePetMutationResponseFaker,
-  createDeletePetPathParamsFaker,
-} from './mocks/petController/createDeletePetFaker.ts'
+export { createAddPet405Faker, createAddPetErrorFaker, createAddPetMutationRequestFaker } from './mocks/petController/createAddPetFaker.ts'
+export { createDeletePet400Faker, createDeletePetHeaderParamsFaker, createDeletePetPathParamsFaker } from './mocks/petController/createDeletePetFaker.ts'
 export {
   createFindPetsByStatus200Faker,
   createFindPetsByStatus400Faker,
@@ -126,7 +116,6 @@ export {
 } from './mocks/petController/createUpdatePetFaker.ts'
 export {
   createUpdatePetWithForm405Faker,
-  createUpdatePetWithFormMutationResponseFaker,
   createUpdatePetWithFormPathParamsFaker,
   createUpdatePetWithFormQueryParamsFaker,
 } from './mocks/petController/createUpdatePetWithFormFaker.ts'
@@ -147,23 +136,14 @@ export {
   createCreatePetsQueryParamsFaker,
 } from './mocks/petsController/createCreatePetsFaker.ts'
 export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
-export {
-  createCreateUserErrorFaker,
-  createCreateUserMutationRequestFaker,
-  createCreateUserMutationResponseFaker,
-} from './mocks/userController/createCreateUserFaker.ts'
+export { createCreateUserErrorFaker, createCreateUserMutationRequestFaker } from './mocks/userController/createCreateUserFaker.ts'
 export {
   createCreateUsersWithListInput200Faker,
   createCreateUsersWithListInputErrorFaker,
   createCreateUsersWithListInputMutationRequestFaker,
   createCreateUsersWithListInputMutationResponseFaker,
 } from './mocks/userController/createCreateUsersWithListInputFaker.ts'
-export {
-  createDeleteUser400Faker,
-  createDeleteUser404Faker,
-  createDeleteUserMutationResponseFaker,
-  createDeleteUserPathParamsFaker,
-} from './mocks/userController/createDeleteUserFaker.ts'
+export { createDeleteUser400Faker, createDeleteUser404Faker, createDeleteUserPathParamsFaker } from './mocks/userController/createDeleteUserFaker.ts'
 export {
   createGetUserByName200Faker,
   createGetUserByName400Faker,
@@ -177,11 +157,10 @@ export {
   createLoginUserQueryParamsFaker,
   createLoginUserQueryResponseFaker,
 } from './mocks/userController/createLoginUserFaker.ts'
-export { createLogoutUserErrorFaker, createLogoutUserQueryResponseFaker } from './mocks/userController/createLogoutUserFaker.ts'
+export { createLogoutUserErrorFaker } from './mocks/userController/createLogoutUserFaker.ts'
 export {
   createUpdateUserErrorFaker,
   createUpdateUserMutationRequestFaker,
-  createUpdateUserMutationResponseFaker,
   createUpdateUserPathParamsFaker,
 } from './mocks/userController/createUpdateUserFaker.ts'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/ts/AddPetRequest.ts'

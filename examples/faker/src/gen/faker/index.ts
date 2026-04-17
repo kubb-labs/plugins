@@ -14,11 +14,6 @@ export {
   createUpdatePetMutationRequest,
   createUpdatePetMutationResponse,
 } from './createUpdatePet.ts'
-export {
-  createUpdatePetWithForm405,
-  createUpdatePetWithFormMutationResponse,
-  createUpdatePetWithFormPathParams,
-  createUpdatePetWithFormQueryParams,
-} from './createUpdatePetWithForm.ts'
+export { createUpdatePetWithForm405, createUpdatePetWithFormPathParams, createUpdatePetWithFormQueryParams } from './createUpdatePetWithForm.ts'
 export { createUser } from './createUser.ts'
 export { createUserArray } from './createUserArray.ts'

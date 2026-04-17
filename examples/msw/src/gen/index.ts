@@ -10,12 +10,7 @@ export { createTag } from './mocks/createTag.ts'
 export { createUser } from './mocks/createUser.ts'
 export { createUserArray } from './mocks/createUserArray.ts'
 export { createAddPet200, createAddPet405, createAddPetMutationRequest, createAddPetMutationResponse } from './mocks/petController/createAddPet.ts'
-export {
-  createDeletePet400,
-  createDeletePetHeaderParams,
-  createDeletePetMutationResponse,
-  createDeletePetPathParams,
-} from './mocks/petController/createDeletePet.ts'
+export { createDeletePet400, createDeletePetHeaderParams, createDeletePetPathParams } from './mocks/petController/createDeletePet.ts'
 export {
   createFindPetsByStatus200,
   createFindPetsByStatus400,
@@ -46,7 +41,6 @@ export {
 } from './mocks/petController/createUpdatePet.ts'
 export {
   createUpdatePetWithForm405,
-  createUpdatePetWithFormMutationResponse,
   createUpdatePetWithFormPathParams,
   createUpdatePetWithFormQueryParams,
 } from './mocks/petController/createUpdatePetWithForm.ts'
@@ -57,12 +51,7 @@ export {
   createUploadFilePathParams,
   createUploadFileQueryParams,
 } from './mocks/petController/createUploadFile.ts'
-export {
-  createDeleteOrder400,
-  createDeleteOrder404,
-  createDeleteOrderMutationResponse,
-  createDeleteOrderPathParams,
-} from './mocks/storeController/createDeleteOrder.ts'
+export { createDeleteOrder400, createDeleteOrder404, createDeleteOrderPathParams } from './mocks/storeController/createDeleteOrder.ts'
 export { createGetInventory200, createGetInventoryQueryResponse } from './mocks/storeController/createGetInventory.ts'
 export {
   createGetOrderById200,
@@ -83,19 +72,14 @@ export {
   createPlaceOrderPatchMutationRequest,
   createPlaceOrderPatchMutationResponse,
 } from './mocks/storeController/createPlaceOrderPatch.ts'
-export { createCreateUserError, createCreateUserMutationRequest, createCreateUserMutationResponse } from './mocks/userController/createCreateUser.ts'
+export { createCreateUserError, createCreateUserMutationRequest } from './mocks/userController/createCreateUser.ts'
 export {
   createCreateUsersWithListInput200,
   createCreateUsersWithListInputError,
   createCreateUsersWithListInputMutationRequest,
   createCreateUsersWithListInputMutationResponse,
 } from './mocks/userController/createCreateUsersWithListInput.ts'
-export {
-  createDeleteUser400,
-  createDeleteUser404,
-  createDeleteUserMutationResponse,
-  createDeleteUserPathParams,
-} from './mocks/userController/createDeleteUser.ts'
+export { createDeleteUser400, createDeleteUser404, createDeleteUserPathParams } from './mocks/userController/createDeleteUser.ts'
 export {
   createGetUserByName200,
   createGetUserByName400,
@@ -104,13 +88,8 @@ export {
   createGetUserByNameQueryResponse,
 } from './mocks/userController/createGetUserByName.ts'
 export { createLoginUser200, createLoginUser400, createLoginUserQueryParams, createLoginUserQueryResponse } from './mocks/userController/createLoginUser.ts'
-export { createLogoutUserError, createLogoutUserQueryResponse } from './mocks/userController/createLogoutUser.ts'
-export {
-  createUpdateUserError,
-  createUpdateUserMutationRequest,
-  createUpdateUserMutationResponse,
-  createUpdateUserPathParams,
-} from './mocks/userController/createUpdateUser.ts'
+export { createLogoutUserError } from './mocks/userController/createLogoutUser.ts'
+export { createUpdateUserError, createUpdateUserMutationRequest, createUpdateUserPathParams } from './mocks/userController/createUpdateUser.ts'
 export type { AddPet200, AddPet405, AddPetMutation, AddPetMutationRequest, AddPetMutationResponse } from './models/AddPet.ts'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/AddPetRequest.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'

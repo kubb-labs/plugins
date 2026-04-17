@@ -34,5 +34,5 @@ export function createPlaceOrderMutationRequest(data?: Partial<PlaceOrderMutatio
 export function createPlaceOrderMutationResponse(data?: Partial<PlaceOrderMutationResponse>): PlaceOrderMutationResponse {
   faker.seed([220])
 
-  return data || faker.helpers.arrayElement<any>([createPlaceOrder200()])
+  return createPlaceOrder200(data)
 }

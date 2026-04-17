@@ -46,5 +46,5 @@ export function createGetOrderById404() {
 export function createGetOrderByIdQueryResponse(data?: Partial<GetOrderByIdQueryResponse>): GetOrderByIdQueryResponse {
   faker.seed([220])
 
-  return data || faker.helpers.arrayElement<any>([createGetOrderById200()])
+  return createGetOrderById200(data)
 }

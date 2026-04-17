@@ -3,7 +3,6 @@ import type {
   CreatePetsError,
   CreatePetsHeaderParams,
   CreatePetsMutationRequest,
-  CreatePetsMutationResponse,
   CreatePetsPathParams,
   CreatePetsQueryParams,
 } from '../../models/ts/petsController/CreatePets.ts'
@@ -51,6 +50,6 @@ export function createCreatePetsMutationRequestFaker(data?: Partial<CreatePetsMu
   }
 }
 
-export function createCreatePetsMutationResponseFaker(data?: Partial<CreatePetsMutationResponse>): CreatePetsMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createCreatePets201Faker()])
+export function createCreatePetsMutationResponseFaker() {
+  return undefined
 }

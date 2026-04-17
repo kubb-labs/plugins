@@ -33,6 +33,7 @@ module.exports = defineConfig(() => {
             path: './tag',
             barrelType: 'propagate',
           },
+          compatibilityPreset: 'kubbV4',
           include: [
             {
               type: 'tag',
@@ -67,6 +68,7 @@ module.exports = defineConfig(() => {
           output: {
             path: './faker',
           },
+          compatibilityPreset: 'kubbV4',
           transformers: {
             schema({ schema: _schema, name, parentName }, defaultSchemas) {
               /* override a property with name 'name'

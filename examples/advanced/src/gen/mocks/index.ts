@@ -18,18 +18,8 @@ export {
   createAddFilesMutationRequestFaker,
   createAddFilesMutationResponseFaker,
 } from './petController/createAddFilesFaker.ts'
-export {
-  createAddPet405Faker,
-  createAddPetErrorFaker,
-  createAddPetMutationRequestFaker,
-  createAddPetMutationResponseFaker,
-} from './petController/createAddPetFaker.ts'
-export {
-  createDeletePet400Faker,
-  createDeletePetHeaderParamsFaker,
-  createDeletePetMutationResponseFaker,
-  createDeletePetPathParamsFaker,
-} from './petController/createDeletePetFaker.ts'
+export { createAddPet405Faker, createAddPetErrorFaker, createAddPetMutationRequestFaker } from './petController/createAddPetFaker.ts'
+export { createDeletePet400Faker, createDeletePetHeaderParamsFaker, createDeletePetPathParamsFaker } from './petController/createDeletePetFaker.ts'
 export {
   createFindPetsByStatus200Faker,
   createFindPetsByStatus400Faker,
@@ -61,7 +51,6 @@ export {
 } from './petController/createUpdatePetFaker.ts'
 export {
   createUpdatePetWithForm405Faker,
-  createUpdatePetWithFormMutationResponseFaker,
   createUpdatePetWithFormPathParamsFaker,
   createUpdatePetWithFormQueryParamsFaker,
 } from './petController/createUpdatePetWithFormFaker.ts'
@@ -82,23 +71,14 @@ export {
   createCreatePetsQueryParamsFaker,
 } from './petsController/createCreatePetsFaker.ts'
 export { createTagTagFaker } from './tag/createTagFaker.ts'
-export {
-  createCreateUserErrorFaker,
-  createCreateUserMutationRequestFaker,
-  createCreateUserMutationResponseFaker,
-} from './userController/createCreateUserFaker.ts'
+export { createCreateUserErrorFaker, createCreateUserMutationRequestFaker } from './userController/createCreateUserFaker.ts'
 export {
   createCreateUsersWithListInput200Faker,
   createCreateUsersWithListInputErrorFaker,
   createCreateUsersWithListInputMutationRequestFaker,
   createCreateUsersWithListInputMutationResponseFaker,
 } from './userController/createCreateUsersWithListInputFaker.ts'
-export {
-  createDeleteUser400Faker,
-  createDeleteUser404Faker,
-  createDeleteUserMutationResponseFaker,
-  createDeleteUserPathParamsFaker,
-} from './userController/createDeleteUserFaker.ts'
+export { createDeleteUser400Faker, createDeleteUser404Faker, createDeleteUserPathParamsFaker } from './userController/createDeleteUserFaker.ts'
 export {
   createGetUserByName200Faker,
   createGetUserByName400Faker,
@@ -112,10 +92,5 @@ export {
   createLoginUserQueryParamsFaker,
   createLoginUserQueryResponseFaker,
 } from './userController/createLoginUserFaker.ts'
-export { createLogoutUserErrorFaker, createLogoutUserQueryResponseFaker } from './userController/createLogoutUserFaker.ts'
-export {
-  createUpdateUserErrorFaker,
-  createUpdateUserMutationRequestFaker,
-  createUpdateUserMutationResponseFaker,
-  createUpdateUserPathParamsFaker,
-} from './userController/createUpdateUserFaker.ts'
+export { createLogoutUserErrorFaker } from './userController/createLogoutUserFaker.ts'
+export { createUpdateUserErrorFaker, createUpdateUserMutationRequestFaker, createUpdateUserPathParamsFaker } from './userController/createUpdateUserFaker.ts'
