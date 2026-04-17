@@ -106,7 +106,7 @@ Next steps:
 ```
 
 > [!NOTE]
-> The init command automatically selects `@kubb/plugin-oas` and `@kubb/plugin-ts` as recommended defaults.
+> The init command automatically selects `@kubb/adapter-oas` and `@kubb/plugin-ts` as recommended defaults.
 
 ## `kubb generate`
 Generate files based on a `kubb.config.ts` file

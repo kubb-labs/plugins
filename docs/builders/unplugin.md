@@ -56,7 +56,7 @@ type Options = {
 import kubb from 'unplugin-kubb/vite'
 import { defineConfig as defineViteConfig } from 'vite'
 import { defineConfig, UserConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export const config = {
@@ -68,8 +68,8 @@ export const config = {
     path: './src/gen',
     clean: true,
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs({
       output: {
         path: 'models',

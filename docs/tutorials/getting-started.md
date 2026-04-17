@@ -75,9 +75,9 @@ components:
 
 ## Step 2: Configure Kubb
 
-Create a `kubb.config.ts` file and add the [`@kubb/plugin-oas`](/plugins/plugin-oas/) and [`@kubb/plugin-ts`](/plugins/plugin-ts/) plugins.
+Create a `kubb.config.ts` file and add the [`@kubb/adapter-oas`](/adapters/adapter-oas/) and [`@kubb/plugin-ts`](/plugins/plugin-ts/) plugins.
 
-Set `generators` to an empty array for the [`@kubb/plugin-oas`](/plugins/plugin-oas) plugin since you only need TypeScript type generation.
+Set `generators` to an empty array for the [`@kubb/adapter-oas`](/adapters/adapter-oas) plugin since you only need TypeScript type generation.
 
 For the [`@kubb/plugin-ts`](/plugins/plugin-ts/) plugin, set `output` to the `models` folder.
 
@@ -85,7 +85,7 @@ For the [`@kubb/plugin-ts`](/plugins/plugin-ts/) plugin, set `output` to the `mo
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig(() => {
@@ -97,13 +97,8 @@ export default defineConfig(() => {
     output: {
       path: './src',
     },
-    plugins: [
-      pluginOas(
-        {
-          generators: [],
-          validate: true,
-        },
-      ),
+adapter: adapterOas(),
+plugins: [
       pluginTs(
         {
           output: {
@@ -133,7 +128,7 @@ Update your `package.json` with the required Kubb packages:
   "dependencies": {
     "@kubb/cli": "latest",
     "@kubb/core": "latest",
-    "@kubb/plugin-oas": "latest",
+    "@kubb/adapter-oas": "latest",
     "@kubb/plugin-ts": "latest"
   },
   "devDependencies": {
@@ -238,7 +233,7 @@ Generation process:
 
 ## Understanding the Configuration
 
-**pluginOas()** - Parses your OpenAPI specification:
+**adapterOas()** - Parses your OpenAPI specification:
 - `generators` - Set to `[]` to skip JSON schema generation
 - `validate` - Validates the OpenAPI spec
 

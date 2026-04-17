@@ -172,7 +172,7 @@ Kubb automatically detects configuration files in this order:
 
 ```typescript [generate.ts]
 import { build } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 const { error, files, driver } = await build({
@@ -184,8 +184,8 @@ const { error, files, driver } = await build({
     output: {
       path: './gen',
     },
-    plugins: [
-      pluginOas(),
+adapter: adapterOas(),
+plugins: [
       pluginTs(),
     ]
   },
@@ -210,7 +210,7 @@ Generate TypeScript types and React Query hooks from a single OpenAPI file:
 
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 
@@ -223,8 +223,8 @@ export default defineConfig({
     path: './src/gen',
     clean: true, // Remove old files before generating
   },
-  plugins: [
-    pluginOas(), // Required: Parse OpenAPI specification
+adapter: adapterOas(),
+plugins: [
     pluginTs(), // Generate TypeScript types
     pluginReactQuery(), // Generate React Query hooks
   ],
@@ -237,7 +237,7 @@ Generate code from multiple API specifications in one command:
 
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig([
@@ -245,13 +245,15 @@ export default defineConfig([
     name: 'petStore',
     input: { path: './petStore.yaml' },
     output: { path: './src/gen/petStore' },
-    plugins: [pluginOas(), pluginTs()],
+adapter: adapterOas(),
+plugins: [],
   },
   {
     name: 'userApi',
     input: { path: './userApi.yaml' },
     output: { path: './src/gen/userApi' },
-    plugins: [pluginOas(), pluginTs()],
+adapter: adapterOas(),
+plugins: [],
   },
 ])
 ```

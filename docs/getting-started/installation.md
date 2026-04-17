@@ -327,7 +327,7 @@ If you see an error, check that:
       <h3>Configuration</h3>
       <p>Learn how to configure Kubb for your project</p>
     </a>
-    <a href="/plugins/plugin-oas" class="vp-card">
+    <a href="/adapters/adapter-oas" class="vp-card">
       <h3>Explore Plugins</h3>
       <p>View available plugins and their features</p>
     </a>

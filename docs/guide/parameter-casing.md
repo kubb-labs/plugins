@@ -33,7 +33,7 @@ To enable parameter casing, add `paramsCasing: 'camelcase'` to each plugin that 
 
 ```typescript twoslash
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
@@ -45,8 +45,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs({
       output: { path: './types' },
       paramsCasing: 'camelcase', // Transform TypeScript types

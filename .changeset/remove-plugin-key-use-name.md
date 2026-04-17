@@ -1,5 +1,4 @@
 ---
-"@kubb/plugin-oas": major
 "@kubb/plugin-ts": major
 "@kubb/plugin-client": major
 "@kubb/plugin-faker": major

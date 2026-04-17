@@ -129,18 +129,18 @@ export default defineConfig({
 
 **Solution**: Install the required dependency plugin. Check the plugin documentation for its prerequisites.
 
-Most plugins require `@kubb/plugin-oas`:
+Most plugins require `@kubb/adapter-oas`:
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig({
   input: { path: './petStore.yaml' },
   output: { path: './src/gen' },
-  plugins: [
-    pluginOas(), // Required by most plugins
+adapter: adapterOas(),
+plugins: [
     pluginTs(),
   ],
 })

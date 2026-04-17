@@ -13,7 +13,7 @@ Name of the generated wrapper class.
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig({
@@ -23,8 +23,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs(),
     pluginClient({
       output: {

@@ -9,7 +9,6 @@
 "@kubb/plugin-redoc": major
 "@kubb/plugin-mcp": major
 "@kubb/plugin-msw": major
-"@kubb/plugin-oas": major
 "@kubb/plugin-swr": major
 "@kubb/plugin-zod": major
 "@kubb/plugin-ts": major

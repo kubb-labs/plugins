@@ -141,12 +141,12 @@ export type QueryParams = {
 
 ### Validation
 
-It's recommended to validate your OpenAPI file before using it with Kubb. The [`@kubb/plugin-oas`](/plugins/plugin-oas/) plugin includes built-in validation.
+It's recommended to validate your OpenAPI file before using it with Kubb. The [`@kubb/adapter-oas`](/adapters/adapter-oas/) plugin includes built-in validation.
 
 ```typescript
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 
-pluginOas({
+adapterOas({
   validate: true, // Enable validation
 })
 ```
@@ -453,9 +453,9 @@ Kubb supports two modes for discriminator handling:
 
 **Strict Mode (default):**
 ```typescript
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 
-pluginOas({
+adapterOas({
   discriminator: 'strict', // Default
 })
 ```
@@ -464,9 +464,9 @@ In strict mode, the discriminator property is not automatically added to child s
 
 **Inherit Mode:**
 ```typescript
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 
-pluginOas({
+adapterOas({
   discriminator: 'inherit',
 })
 ```
@@ -570,4 +570,4 @@ paths:
 
 - [OpenAPI Specification](https://spec.openapis.org/oas/latest.html)
 - [Swagger Editor](https://editor.swagger.io/)
-- [@kubb/plugin-oas](/plugins/plugin-oas/)
+- [@kubb/adapter-oas](/adapters/adapter-oas/)

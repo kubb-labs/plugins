@@ -948,7 +948,7 @@ The MCP plugin has been updated to use the v5 architecture. The following change
 
 #### `pluginOas()` no longer required
 
-In v5, `@kubb/plugin-mcp` no longer depends on `@kubb/plugin-oas`. Use `adapterOas()` in the `adapter` field instead. `pluginOas()` is still available for validation but is no longer a prerequisite.
+In v5, `@kubb/plugin-mcp` no longer depends on `@kubb/plugin-oas`. Use `adapterOas()` in the `adapter` field instead.
 
 ::: code-group
 ```typescript [Before (v4)]

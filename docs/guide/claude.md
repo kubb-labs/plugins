@@ -64,19 +64,19 @@ Additionally, you’ll need to install Kubb with the [MCP plugin](/plugins/plugi
 
 ::: code-group
 ```shell [bun]
-bun add -d @kubb/plugin-mcp @kubb/plugin-oas @kubb/plugin-ts @kubb/plugin-zod
+bun add -d @kubb/plugin-mcp @kubb/adapter-oas @kubb/plugin-ts @kubb/plugin-zod
 ```
 
 ```shell [pnpm]
-pnpm add -D @kubb/plugin-mcp @kubb/plugin-oas @kubb/plugin-ts @kubb/plugin-zod
+pnpm add -D @kubb/plugin-mcp @kubb/adapter-oas @kubb/plugin-ts @kubb/plugin-zod
 ```
 
 ```shell [npm]
-npm install --save-dev @kubb/plugin-mcp @kubb/plugin-oas @kubb/plugin-ts @kubb/plugin-zod
+npm install --save-dev @kubb/plugin-mcp @kubb/adapter-oas @kubb/plugin-ts @kubb/plugin-zod
 ```
 
 ```shell [yarn]
-yarn add -D @kubb/plugin-mcp @kubb/plugin-oas @kubb/plugin-ts @kubb/plugin-zod
+yarn add -D @kubb/plugin-mcp @kubb/adapter-oas @kubb/plugin-ts @kubb/plugin-zod
 ```
 :::
 
@@ -88,7 +88,7 @@ To use [Claude](https://claude.ai), define a `kubb.config.ts` file with [MCP](ht
 
 ```typescript [kubb.config.ts] twoslash
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -100,8 +100,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs(),
     pluginMcp({
       client: {
