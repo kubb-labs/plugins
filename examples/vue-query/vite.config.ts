@@ -1,4 +1,4 @@
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginVueQuery } from '@kubb/plugin-vue-query'
 import vue from '@vitejs/plugin-vue'
@@ -15,6 +15,7 @@ export default defineConfig({
         input: {
           path: './petStore.yaml',
         },
+        adapter: adapterOas(),
         output: {
           path: './src/gen',
           clean: true,
@@ -22,9 +23,6 @@ export default defineConfig({
           lint: 'biome',
         },
         plugins: [
-          pluginOas({
-            generators: [],
-          }),
           pluginTs({
             output: {
               path: 'models',

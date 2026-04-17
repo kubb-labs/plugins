@@ -144,7 +144,7 @@ type ResolveType = 'file' | 'function' | 'type' | 'const'
 
 ```typescript twoslash
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginMsw} from '@kubb/plugin-msw'
 import { pluginTs } from '@kubb/plugin-ts'
 
@@ -155,8 +155,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs(),
     pluginMsw({
       output: {

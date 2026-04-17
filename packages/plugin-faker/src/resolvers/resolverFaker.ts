@@ -1,6 +1,8 @@
+import { createHash } from 'node:crypto'
+import path from 'node:path'
 import { camelCase } from '@internals/utils'
-import { defaultResolveFile, defineResolver } from '@kubb/core'
-import type { PluginFaker, ResolverFaker } from '../types.ts'
+import { defineResolver, PluginDriver } from '@kubb/core'
+import type { PluginFaker } from '../types.ts'
 
 function isValidStrictIdentifier(name: string): boolean {
   try {
@@ -42,23 +44,31 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     resolvePathName(name, type) {
       return this.default(name, type)
     },
-    resolveFile(params, context) {
-      const originalDefault = this.default
-      const originalResolveName = this.resolveName
-
-      const resolverForFile: ResolverFaker = {
-        ...this,
-        default(name, type) {
-          const resolverWithOriginalDefault: ResolverFaker = {
-            ...this,
-            default: originalDefault,
-          }
-
-          return originalResolveName.call(resolverWithOriginalDefault, name, type)
+    resolveFile({ name, extname, tag, path: groupPath }, context) {
+      const pathMode = PluginDriver.getMode(path.resolve(context.root, context.output.path))
+      const baseName = `${pathMode === 'single' ? '' : this.resolveName(name, 'file')}${extname}` as `${string}.${string}`
+      const filePath = this.resolvePath(
+        {
+          baseName,
+          pathMode,
+          tag,
+          path: groupPath,
         },
-      }
+        context,
+      )
 
-      return defaultResolveFile.call(resolverForFile, params, context)
+      return {
+        kind: 'File',
+        id: createHash('sha256').update(filePath).digest('hex'),
+        name: path.basename(filePath, extname),
+        path: filePath,
+        baseName,
+        extname,
+        meta: { pluginName: this.pluginName },
+        sources: [],
+        imports: [],
+        exports: [],
+      }
     },
     resolveParamName(node, param) {
       return this.resolveName(`${node.operationId} ${param.in} ${param.name}`)

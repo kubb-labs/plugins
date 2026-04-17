@@ -97,7 +97,10 @@ describe('cypressGenerator — Operation', () => {
 
   test.each(operations)('$name', async (props) => {
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: props.name,
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, props.node, {
       config: testConfig,
@@ -125,7 +128,10 @@ describe('cypressGenerator — dataReturnType', () => {
   test('data — returns res.body', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, dataReturnType: 'data' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'dataReturnType data', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'dataReturnType data',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -141,7 +147,10 @@ describe('cypressGenerator — dataReturnType', () => {
   test('full — returns entire Chainable', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, dataReturnType: 'full' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'dataReturnType full', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'dataReturnType full',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -172,7 +181,10 @@ describe('cypressGenerator — paramsType', () => {
   test('inline — separate arguments per param group', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'inline' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'paramsType inline', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'paramsType inline',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -188,7 +200,10 @@ describe('cypressGenerator — paramsType', () => {
   test('object — all params merged into single object', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'object' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'paramsType object', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'paramsType object',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -218,7 +233,10 @@ describe('cypressGenerator — pathParamsType', () => {
   test('inline — each path param as individual argument', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'inline', pathParamsType: 'inline' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'pathParamsType inline', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'pathParamsType inline',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -234,7 +252,10 @@ describe('cypressGenerator — pathParamsType', () => {
   test('object — path params grouped into destructured object', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'inline', pathParamsType: 'object' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'pathParamsType object', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'pathParamsType object',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -261,7 +282,10 @@ describe('cypressGenerator — paramsCasing', () => {
   test('camelcase — query param name is camelCased', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsCasing: 'camelcase' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'paramsCasing camelcase',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -277,7 +301,10 @@ describe('cypressGenerator — paramsCasing', () => {
   test('undefined — query param name is unchanged', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsCasing: undefined }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'paramsCasing undefined', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'paramsCasing undefined',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -307,7 +334,10 @@ describe('cypressGenerator — paramsCasing headers', () => {
   test('camelcase — header and query param names are camelCased and remapped', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsCasing: 'camelcase' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase headers', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'paramsCasing camelcase headers',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, nodeWithHeaders, {
       config: testConfig,
@@ -334,7 +364,10 @@ describe('cypressGenerator — baseURL', () => {
   test('static string — prepended to url', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, baseURL: 'https://api.example.com' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'baseURL static', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'baseURL static',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -350,7 +383,10 @@ describe('cypressGenerator — baseURL', () => {
   test('template string — emitted as template literal', async () => {
     const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, baseURL: '${123456}' }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({ name: 'baseURL template', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'baseURL template',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(cypressGenerator, node, {
       config: testConfig,
@@ -376,7 +412,10 @@ describe('cypressGenerator — transformers', () => {
     }
 
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress, transformer })
-    const driver = createMockedPluginDriver({ name: 'transformers schema visitor', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'transformers schema visitor',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     const node = ast.createOperation({
       operationId: 'createPets',

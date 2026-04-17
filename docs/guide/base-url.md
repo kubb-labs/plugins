@@ -62,7 +62,7 @@ export const client = async <TData, TError = unknown, TVariables = unknown>(conf
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig({
@@ -72,8 +72,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs(),
     pluginClient({
       importPath: '../../client.ts' // [!code ++]
@@ -84,7 +84,7 @@ export default defineConfig({
 :::
 
 ## Use serverIndex
-Reuse the server URL from your Swagger/OpenAPI spec file by defining [which index](/plugins/plugin-oas/#serverindex) to use.
+Reuse the server URL from your Swagger/OpenAPI spec file by defining [which index](/adapters/adapter-oas/#serverindex) to use.
 
 :::code-group
 ```yaml [OpenAPI]
@@ -102,7 +102,7 @@ servers:
 ```
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginClient } from '@kubb/plugin-client'
 
 export default defineConfig({
@@ -112,10 +112,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas({
-      serverIndex: 0, // [!code ++]
-    }),
+adapter: adapterOas(),
+plugins: [
     pluginClient(),
   ],
 })
@@ -128,7 +126,7 @@ Set the baseURL in your config.
 :::code-group
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 
@@ -139,8 +137,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginClient({
       baseURL: 'https://localhost:8080/api/v1' // [!code ++]
     }),

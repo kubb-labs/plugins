@@ -6,7 +6,6 @@ import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
@@ -199,9 +198,6 @@ const configs = [
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginOas({
-          generators: [],
-        }),
         pluginZod({
           output: {
             path: './zod',
@@ -292,9 +288,6 @@ const configs = [
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginOas({
-          generators: [],
-        }),
         pluginTs({
           output: {
             path: './types',
@@ -393,16 +386,18 @@ describe(`Main OpenAPI ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
     const output = path.join(tmpDir, name)
-    const { files, failedPlugins, error } = await createKubb({
-      config: {
+    const { files, failedPlugins, error } = await createKubb(
+      {
         ...config,
         output: {
           ...config.output,
           path: output,
         },
-      } as Config,
-      hooks: new AsyncEventEmitter<KubbHooks>(),
-    }).safeBuild()
+      } as unknown as Config,
+      {
+        hooks: new AsyncEventEmitter<KubbHooks>(),
+      },
+    ).safeBuild()
 
     expect(files.length).toBeGreaterThan(1)
     expect(failedPlugins.size).toBe(0)

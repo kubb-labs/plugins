@@ -1,7 +1,6 @@
-import type { PluginOas } from '@kubb/plugin-oas'
-import { createReactGenerator } from '@kubb/plugin-oas/generators'
-import { useOperationManager } from '@kubb/plugin-oas/hooks'
-import { Const, File, Function, Jsx } from '@kubb/renderer-jsx'
+import { defineGenerator } from '@kubb/core'
+import type { PluginClient } from '@kubb/plugin-client'
+import { Const, File, Function, Jsx, jsxRenderer } from '@kubb/renderer-jsx'
 
 const pascalCase = (str: string) =>
   str
@@ -11,21 +10,19 @@ const pascalCase = (str: string) =>
 
 const toURL = (path: string) => path.replaceAll('{', ':').replaceAll('}', '')
 
-export const example3 = createReactGenerator<PluginOas>({
+export const example3 = defineGenerator<PluginClient>({
   name: 'client-operation',
-  Operation({ operation, generator }) {
-    const { getName, getFile } = useOperationManager(generator)
+  renderer: jsxRenderer,
+  operation(node, ctx) {
+    const { resolver, root } = ctx
+    const { output } = ctx.options
+    const file = resolver.resolveFile({ name: node.operationId, extname: '.tsx', tag: node.tags[0] ?? 'default', path: node.path }, { root, output })
 
-    const client = {
-      name: getName(operation, { type: 'function' }),
-      file: getFile(operation, { extname: '.tsx' }),
-    }
-
-    const componentName = pascalCase(operation.getOperationId())
-    const href = toURL(operation.path)
+    const componentName = pascalCase(node.operationId)
+    const href = toURL(node.path)
 
     return (
-      <File baseName={client.file.baseName} path={client.file.path} meta={client.file.meta}>
+      <File baseName={file.baseName} path={file.path} meta={file.meta}>
         <File.Source>
           <Function name={componentName} export>
             <Const name="href">{`'${href}'`}</Const>
@@ -33,7 +30,7 @@ export const example3 = createReactGenerator<PluginOas>({
             <br />
             <Jsx>{`return (
   <>
-    <a href={href}>Open ${operation.method}</a>
+    <a href={href}>Open ${node.method}</a>
   </>
 )`}</Jsx>
           </Function>

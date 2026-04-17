@@ -48,7 +48,7 @@ yarn add -D @kubb/react-fabric
 import { openDevtools } from '@kubb/react-fabric' // [!code ++]
 
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig(() => {
@@ -61,8 +61,8 @@ export default defineConfig(() => {
     output: {
       path: './src/gen',
     },
-    plugins: [
-      pluginOas(),
+adapter: adapterOas(),
+plugins: [
       pluginTs(),
     ],
   }

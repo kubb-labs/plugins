@@ -93,7 +93,10 @@ describe('operationsGenerator operations', () => {
       ...props.options,
     }
     const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
-    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: props.name,
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperations(operationsGenerator, operationNodes, {
       config: testConfig,

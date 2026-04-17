@@ -18,7 +18,7 @@ See [plugins/plugin-client](/plugins/plugin-client/#client).
 ```typescript twoslash
 import { defineConfig } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig(() => {
@@ -31,11 +31,8 @@ export default defineConfig(() => {
       path: './src/gen',
       clean: true,
     },
-    plugins: [
-      pluginOas({
-        validate: false,
-        generators: [],
-      }),
+adapter: adapterOas(),
+plugins: [
       pluginTs({
         output: { path: 'models.ts' },
       }),

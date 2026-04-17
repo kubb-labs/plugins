@@ -1,6 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { pluginClient } from '@kubb/plugin-client'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
 import { clientOperationGenerator } from './src/generators/clientOperationGenerator'
@@ -29,7 +28,6 @@ export default defineConfig([
     },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       tsPlugin,
       pluginClient({
         compatibilityPreset: 'kubbV4',
@@ -57,7 +55,6 @@ export default defineConfig([
     output: { path: './src/gen2' },
     adapter: adapterOas({ dateType: 'date', contentType: 'application/xml' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       tsPlugin,
       pluginClient({
         compatibilityPreset: 'kubbV4',
@@ -77,7 +74,6 @@ export default defineConfig([
     output: { path: './src/gen3', clean: true },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       tsPlugin,
       pluginClient({
         compatibilityPreset: 'kubbV4',
@@ -101,7 +97,6 @@ export default defineConfig([
     output: { path: './src/gen4', clean: true },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       pluginClient({
         compatibilityPreset: 'kubbV4',
         output: { path: './tagClientOperation.ts' },
@@ -118,7 +113,6 @@ export default defineConfig([
     output: { path: './src/gen5', clean: true },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       pluginClient({
         compatibilityPreset: 'kubbV4',
         output: { path: './tagClientOperationReact.ts' },
@@ -135,7 +129,6 @@ export default defineConfig([
     output: { path: './src/gen6', clean: true },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       tsPlugin,
       pluginClient({
         compatibilityPreset: 'kubbV4',
@@ -160,7 +153,6 @@ export default defineConfig([
     },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      pluginOas({ validate: false, generators: [] }),
       tsPlugin,
       pluginClient({
         compatibilityPreset: 'kubbV4',

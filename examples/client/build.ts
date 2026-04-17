@@ -1,22 +1,20 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
-import { pluginOas } from '@kubb/plugin-oas'
+import { pluginTs } from '@kubb/plugin-ts'
 
 async function run() {
   const kubb = createKubb({
-    config: {
-      input: {
-        path: './petStore.yaml',
-      },
-      output: {
-        path: './src/gen2',
-        clean: true,
-      },
-      adapter: adapterOas(),
-      parsers: [parserTs],
-      plugins: [pluginOas()],
+    input: {
+      path: './petStore.yaml',
     },
+    output: {
+      path: './src/gen2',
+      clean: true,
+    },
+    adapter: adapterOas(),
+    parsers: [parserTs],
+    plugins: [pluginTs({ output: { path: './models', barrelType: false }, compatibilityPreset: 'kubbV4' })],
   })
   await kubb.build()
 }

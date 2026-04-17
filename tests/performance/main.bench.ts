@@ -1,9 +1,9 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { AsyncEventEmitter, type Config, createKubb, type HookStylePlugin } from '@kubb/core'
+import { adapterOas } from '@kubb/adapter-oas'
+import { AsyncEventEmitter, createKubb, type HookStylePlugin } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginFaker } from '@kubb/plugin-faker'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
@@ -31,13 +31,13 @@ describe('Plugin Generation Performance', () => {
         input: {
           path: petStorePath,
         },
+        adapter: adapterOas({ validate: false }),
         output: {
           path: './src/gen',
           clean: false,
           write: false,
         },
         plugins: [
-          pluginOas({ validate: false }),
           pluginTs({
             output: {
               path: 'types',
@@ -49,7 +49,7 @@ describe('Plugin Generation Performance', () => {
       })
 
       const hooks = new AsyncEventEmitter()
-      await createKubb({ config: config as Config, hooks }).build()
+      await createKubb(config, { hooks }).build()
     },
     {
       time: 10000,
@@ -64,13 +64,13 @@ describe('Plugin Generation Performance', () => {
         input: {
           path: petStorePath,
         },
+        adapter: adapterOas({ validate: false }),
         output: {
           path: './src/gen',
           clean: false,
           write: false,
         },
         plugins: [
-          pluginOas({ validate: false }),
           pluginTs({
             output: {
               path: 'types',
@@ -87,7 +87,7 @@ describe('Plugin Generation Performance', () => {
       })
 
       const hooks = new AsyncEventEmitter()
-      await createKubb({ config: config as Config, hooks }).build()
+      await createKubb(config, { hooks }).build()
     },
     {
       time: 10000,
@@ -102,13 +102,13 @@ describe('Plugin Generation Performance', () => {
         input: {
           path: petStorePath,
         },
+        adapter: adapterOas({ validate: false }),
         output: {
           path: './src/gen',
           clean: false,
           write: false,
         },
         plugins: [
-          pluginOas({ validate: false }),
           pluginTs({
             output: {
               path: 'types',
@@ -138,7 +138,7 @@ describe('Plugin Generation Performance', () => {
       })
 
       const hooks = new AsyncEventEmitter()
-      await createKubb({ config: config as Config, hooks }).build()
+      await createKubb(config, { hooks }).build()
     },
     {
       time: 10000,

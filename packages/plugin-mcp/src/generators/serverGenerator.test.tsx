@@ -54,7 +54,10 @@ describe('serverGenerator — Operations', () => {
 
   test('showPetById', async () => {
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options: defaultOptions, resolver: resolverMcp })
-    const driver = createMockedPluginDriver({ name: 'showPetById', plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'showPetById',
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
     // Also register zod plugin — serverGenerator needs it for zod schema imports
     const originalGetPlugin = driver.getPlugin.bind(driver)
     driver.getPlugin = (pluginName: string) => {

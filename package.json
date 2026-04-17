@@ -55,7 +55,6 @@
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-cypress": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@manypkg/cli": "^0.25.1",

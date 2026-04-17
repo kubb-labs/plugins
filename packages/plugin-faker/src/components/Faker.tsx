@@ -1,6 +1,6 @@
 import { jsStringEscape } from '@internals/utils'
-import type { ast } from '@kubb/core'
-import { FunctionParams } from '@kubb/core'
+import { ast } from '@kubb/core'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
@@ -34,6 +34,7 @@ const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
   'blob',
   'enum',
 ])
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function Faker({ node, description, name, typeName, printer, seed, canOverride }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
@@ -71,12 +72,16 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const usesData = /\bdata\b/.test(fakerTextWithOverride)
   const dataParamName = usesData ? 'data' : '_data'
-  const params = FunctionParams.factory({
-    [dataParamName]: {
-      type: dataType,
-      optional: true,
-    },
+  const params = ast.createFunctionParameters({
+    params: [
+      ast.createFunctionParameter({
+        name: dataParamName,
+        type: ast.createParamsType({ variant: 'reference', name: dataType }),
+        optional: true,
+      }),
+    ],
   })
+  const paramsSignature = declarationPrinter.print(params) ?? ''
 
   const returnType = resolvedReturnType
 
@@ -86,7 +91,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
         export
         name={name}
         JSDoc={{ comments: [description ? `@description ${jsStringEscape(description)}` : undefined].filter(Boolean) }}
-        params={canOverride ? params.toConstructor() : undefined}
+        params={canOverride ? paramsSignature : undefined}
         returnType={returnType}
       >
         {seed ? `faker.seed(${JSON.stringify(seed)})` : undefined}

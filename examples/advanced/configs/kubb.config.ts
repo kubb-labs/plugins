@@ -1,9 +1,9 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginMsw } from '@kubb/plugin-msw'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginRedoc } from '@kubb/plugin-redoc'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -17,6 +17,10 @@ export default defineConfig({
   input: {
     path: './petStore.yaml',
   },
+  adapter: adapterOas({
+    validate: true,
+    discriminator: 'strict',
+  }),
   output: {
     path: './src/gen',
     clean: true,
@@ -29,11 +33,6 @@ export default defineConfig({
     done: ['npm run typecheck'],
   },
   plugins: [
-    pluginOas({
-      validate: true,
-      discriminator: 'strict',
-      collisionDetection: true,
-    }),
     pluginRedoc(),
     pluginTs({
       output: {

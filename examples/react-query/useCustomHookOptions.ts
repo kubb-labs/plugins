@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import type { HookOptions } from './hooks/index.ts'
 
 function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Partial<HookOptions> {
+  void queryClient
   return {
     // TODO: Define custom hook options here
     // Example:
@@ -14,6 +15,7 @@ function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Pa
   }
 }
 export function useCustomHookOptions<T extends keyof HookOptions>({ hookName, operationId }: { hookName: T; operationId: string }): HookOptions[T] {
+  void operationId
   const queryClient = useQueryClient()
   const customOptions = getCustomHookOptions({ queryClient })
   return customOptions[hookName] ?? {}

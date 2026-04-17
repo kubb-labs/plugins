@@ -50,8 +50,8 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/agent": "catalog:",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:",
     "typescript": "^5.9.3"

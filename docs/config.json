@@ -85,11 +85,6 @@
               "activeMatch": "^/plugins/?$"
             },
             {
-              "text": "@kubb/plugin-oas",
-              "link": "/plugins/plugin-oas",
-              "activeMatch": "^/plugins/plugin-oas/?$"
-            },
-            {
               "text": "@kubb/plugin-cypress",
               "link": "/plugins/plugin-cypress",
               "activeMatch": "^/plugins/plugin-cypress/?$"

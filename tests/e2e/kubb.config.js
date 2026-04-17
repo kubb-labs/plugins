@@ -1,8 +1,8 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -42,6 +42,7 @@ const baseConfig = {
   input: {
     path: 'https://petstore3.swagger.io/api/v3/openapi.json',
   },
+  adapter: adapterOas({ validate: false }),
   output: {
     path: './gen',
     clean: true,
@@ -49,11 +50,6 @@ const baseConfig = {
     format: 'auto',
   },
   plugins: [
-    pluginOas({
-      generators: [],
-      validate: false,
-      docs: false,
-    }),
     pluginTs({
       output: {
         path: 'models/ts',

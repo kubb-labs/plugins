@@ -5,7 +5,6 @@
 "@kubb/plugin-vue-query": minor
 "@kubb/plugin-client": minor
 "@kubb/plugin-redoc": minor
-"@kubb/plugin-oas": minor
 "@kubb/plugin-swr": minor
 "@kubb/plugin-ts": minor
 ---

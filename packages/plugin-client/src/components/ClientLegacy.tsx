@@ -1,8 +1,9 @@
 import { camelCase, isValidVarName, URLPath } from '@internals/utils'
-import type { Params } from '@kubb/core'
-import { FunctionParams } from '@kubb/core'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { createFunctionParams } from '../functionParams.ts'
+
+type Params = Record<string, { default?: string; type?: string; optional?: boolean }>
 
 /**
  * Structural type matching OperationSchema from @kubb/plugin-oas.
@@ -190,9 +191,9 @@ function getParams({ paramsType, paramsCasing, pathParamsType, typeSchemas, isCo
         : undefined,
     }
 
-    const allChildrenAreOptional = Object.values(children).every((child) => !child || child.optional)
+    const allChildrenAreOptional = Object.values(children).every((child) => !child || !('optional' in child) || !!child.optional)
 
-    return FunctionParams.factory({
+    return createFunctionParams({
       data: {
         mode: 'object' as const,
         children,
@@ -209,7 +210,7 @@ function getParams({ paramsType, paramsCasing, pathParamsType, typeSchemas, isCo
     })
   }
 
-  return FunctionParams.factory({
+  return createFunctionParams({
     pathParams: typeSchemas.pathParams?.name
       ? {
           mode: pathParamsType === 'object' ? ('object' as const) : ('inlineSpread' as const),
@@ -297,7 +298,7 @@ export function ClientLegacy({
     typeSchemas,
   })
 
-  const clientParams = FunctionParams.factory({
+  const clientParams = createFunctionParams({
     config: {
       mode: 'object' as const,
       children: {
@@ -438,7 +439,7 @@ function getUrlParams({ paramsType, paramsCasing, pathParamsType, typeSchemas }:
       casing: paramsCasing,
     })
 
-    return FunctionParams.factory({
+    return createFunctionParams({
       data: {
         mode: 'object' as const,
         children: {
@@ -448,7 +449,7 @@ function getUrlParams({ paramsType, paramsCasing, pathParamsType, typeSchemas }:
     })
   }
 
-  return FunctionParams.factory({
+  return createFunctionParams({
     pathParams: typeSchemas.pathParams?.name
       ? {
           mode: pathParamsType === 'object' ? ('object' as const) : ('inlineSpread' as const),

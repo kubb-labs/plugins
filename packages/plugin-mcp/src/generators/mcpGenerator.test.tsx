@@ -108,7 +108,10 @@ describe('mcpGenerator — Operation', () => {
       ...('options' in props ? props.options : {}),
     }
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options, resolver: resolverMcp })
-    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: props.name,
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(mcpGenerator, props.node, {
       config: testConfig,

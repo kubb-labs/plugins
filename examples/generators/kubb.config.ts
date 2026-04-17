@@ -1,4 +1,5 @@
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginClient } from '@kubb/plugin-client'
 import { defineConfig } from 'kubb'
 import { example1 } from './src/generators/example1'
 import { example2 } from './src/generators/example2'
@@ -10,14 +11,14 @@ export default defineConfig([
   {
     root: '.',
     input,
+    adapter: adapterOas({ validate: false }),
     output: {
       path: './src/gen',
       clean: true,
     },
     plugins: [
-      pluginOas({
+      pluginClient({
         output: { path: './example1.ts' },
-        validate: false,
         generators: [example1],
       }),
     ],
@@ -25,11 +26,11 @@ export default defineConfig([
   {
     root: '.',
     input,
+    adapter: adapterOas({ validate: false }),
     output: { path: './src/gen2' },
     plugins: [
-      pluginOas({
+      pluginClient({
         output: { path: './example2.ts' },
-        validate: false,
         generators: [example2],
       }),
     ],
@@ -37,14 +38,14 @@ export default defineConfig([
   {
     root: '.',
     input,
+    adapter: adapterOas({ validate: false }),
     output: { path: './src/gen3' },
     hooks: {
       done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
     },
     plugins: [
-      pluginOas({
+      pluginClient({
         output: { path: './example3.tsx' },
-        validate: false,
         generators: [example3],
       }),
     ],

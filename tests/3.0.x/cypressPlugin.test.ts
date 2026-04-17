@@ -78,16 +78,18 @@ describe(`plugin-cypress options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
     const output = path.join(tmpDir, name)
-    const { files, failedPlugins, error } = await createKubb({
-      config: {
+    const { files, failedPlugins, error } = await createKubb(
+      {
         ...config,
         output: {
           ...config.output,
           path: output,
         },
       } as Config,
-      hooks: new AsyncEventEmitter<KubbHooks>(),
-    }).safeBuild()
+      {
+        hooks: new AsyncEventEmitter<KubbHooks>(),
+      },
+    ).safeBuild()
 
     expect(files.length).toBeGreaterThan(0)
     expect(failedPlugins.size).toBe(0)

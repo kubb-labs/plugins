@@ -23,9 +23,9 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "dayjs": "^1.11.20",
     "kubb": "catalog:",

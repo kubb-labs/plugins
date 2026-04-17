@@ -115,7 +115,10 @@ describe('mutationGenerator operation', () => {
       ...props.options,
     }
     const plugin = createMockedPlugin<PluginVueQuery>({ name: 'plugin-vue-query', options, resolver: resolverVueQuery })
-    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: props.name,
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(mutationGenerator, props.node, {
       config: testConfig,

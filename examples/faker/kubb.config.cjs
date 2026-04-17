@@ -2,7 +2,7 @@
 
 const { defineConfig } = require('kubb')
 
-const { pluginOas, schemaKeywords } = require('@kubb/plugin-oas')
+const { adapterOas } = require('@kubb/adapter-oas')
 const { pluginFaker } = require('@kubb/plugin-faker')
 const { pluginTs } = require('@kubb/plugin-ts')
 
@@ -17,11 +17,11 @@ module.exports = defineConfig(() => {
         path: './src/gen',
         clean: true,
       },
+      adapter: adapterOas(),
       hooks: {
         done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
       },
       plugins: [
-        pluginOas({ generators: [] }),
         pluginTs({
           output: {
             path: 'models',
@@ -53,11 +53,11 @@ module.exports = defineConfig(() => {
       output: {
         path: './src/gen',
       },
+      adapter: adapterOas(),
       hooks: {
         done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
       },
       plugins: [
-        pluginOas({ generators: [] }),
         pluginTs({
           output: {
             path: 'models',
@@ -83,7 +83,7 @@ module.exports = defineConfig(() => {
             */
               if (parentName === 'Pet' && name === 'name') {
                 // see mapper where we map `productionName` to `faker.commerce.productName`, the original name will be kept.
-                return [...defaultSchemas, { keyword: schemaKeywords.name, args: 'productName' }]
+                return [...defaultSchemas, { keyword: 'name', args: 'productName' }]
               }
               return undefined
             },

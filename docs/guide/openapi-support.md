@@ -100,7 +100,7 @@ Discriminators are used for polymorphic schemas (`oneOf` / `anyOf`). Kubb suppor
 
 ### Modes
 
-Configure via `pluginOas({ discriminator: ... })`:
+Configure via `adapterOas({ discriminator: ... })`:
 
 | Mode | Behavior |
 |------|----------|

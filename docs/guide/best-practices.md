@@ -26,7 +26,7 @@ Use tags from your OpenAPI specification to organize generated code by feature:
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginClient } from '@kubb/plugin-client'
 
@@ -38,8 +38,8 @@ export default defineConfig({
     path: './src/gen',
     clean: true,
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs({
       output: {
         path: './types',
@@ -117,8 +117,8 @@ export default defineConfig({
     path: './src/gen/pets',
     clean: true,
   },
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs({
       include: [{ type: 'tag', pattern: 'pets' }],
     }),
@@ -175,7 +175,7 @@ Only install plugins you actually use. Each plugin adds processing time:
 {
   "devDependencies": {
     "@kubb/core": "latest",
-    "@kubb/plugin-oas": "latest",
+    "@kubb/adapter-oas": "latest",
     "@kubb/plugin-ts": "latest",
     "@kubb/plugin-client": "latest"
     // Only add what you need
@@ -390,7 +390,7 @@ This creates log files in `.kubb/`:
 Most issues stem from OpenAPI specification problems:
 
 ```typescript [kubb.config.ts]
-pluginOas({
+adapterOas({
   validate: true, // Enable OpenAPI validation
 })
 ```
@@ -514,8 +514,8 @@ You can use Kubb selectively:
 ```typescript [kubb.config.ts]
 // Generate only for stable parts of your API
 export default defineConfig({
-  plugins: [
-    pluginOas(),
+adapter: adapterOas(),
+plugins: [
     pluginTs({
       include: [
         { type: 'tag', pattern: 'stable-api' },
@@ -541,7 +541,7 @@ Use an array in `defineConfig` to handle multiple API specifications in a single
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginClient } from '@kubb/plugin-client'
 
@@ -555,8 +555,8 @@ export default defineConfig([
       path: './src/gen/petStore',
       clean: true,
     },
-    plugins: [
-      pluginOas(),
+adapter: adapterOas(),
+plugins: [
       pluginTs(),
       pluginClient(),
     ],
@@ -570,8 +570,8 @@ export default defineConfig([
       path: './src/gen/users',
       clean: true,
     },
-    plugins: [
-      pluginOas(),
+adapter: adapterOas(),
+plugins: [
       pluginTs(),
       pluginClient(),
     ],
@@ -583,7 +583,7 @@ You can also dynamically generate configs from a list of schemas:
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 const schemas = [
@@ -600,8 +600,8 @@ export default defineConfig(() => {
       path: `./src/gen/${name}`,
       clean: true,
     },
-    plugins: [
-      pluginOas(),
+adapter: adapterOas(),
+plugins: [
       pluginTs(),
     ],
   }))
@@ -621,7 +621,7 @@ For production applications, it's highly recommended to enable `collisionDetecti
 
 ```typescript [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig({
@@ -632,10 +632,8 @@ export default defineConfig({
     path: './src/gen',
     clean: true,
   },
-  plugins: [
-    pluginOas({
-      collisionDetection: true, // ✅ Recommended - prevents name collisions
-    }),
+adapter: adapterOas(),
+plugins: [
     pluginTs(),
   ],
 })
@@ -647,7 +645,7 @@ export default defineConfig({
 - **Avoids enum duplicates**: Prevents nested enum name conflicts across different schemas
 - **Future-proof**: Will be the default in Kubb v5
 
-See [collisionDetection](/plugins/plugin-oas#collisiondetection) for more details.
+See [collisionDetection](/adapters/adapter-oas#collisiondetection) for more details.
 :::
 
 ### Extending Generated Types

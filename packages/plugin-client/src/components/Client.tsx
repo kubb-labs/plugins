@@ -1,10 +1,11 @@
 import { isValidVarName, URLPath } from '@internals/utils'
-import { ast, FunctionParams } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
 import { buildParamsMapping, getComments } from '../utils.ts'
 import { Url } from './Url.tsx'
@@ -139,7 +140,7 @@ export function Client({
   const callPrinter = functionPrinter({ mode: 'call' })
   const urlParamsCall = callPrinter.print(urlParamsNode) ?? ''
 
-  const clientParams = FunctionParams.factory({
+  const clientParams = createFunctionParams({
     config: {
       mode: 'object',
       children: {

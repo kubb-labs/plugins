@@ -523,7 +523,7 @@ How to use and set up plugins, see [plugins](/guide/plugins/).
 
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
 
 export default defineConfig({
   input: {
@@ -532,14 +532,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginOas({
-      output: {
-        path: 'schemas',
-      },
-      validate: true,
-    }),
-  ],
+  adapter: adapterOas(),
+  plugins: [],
 })
 ```
 
@@ -655,7 +649,8 @@ export default defineConfig(({ config, watch, logLevel }) => {
 
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig(() => {
   return {
@@ -666,21 +661,18 @@ export default defineConfig(() => {
     output: {
       path: './src/gen',
     },
+    adapter: adapterOas(),
     plugins: [
-      pluginOas(
-        {
-          output: {
-            path: 'schemas',
-          },
+      pluginTs({
+        output: {
+          path: 'types-1',
         },
-      ),
-      pluginOas(
-        {
-          output: {
-            path: 'schemas2',
-          },
+      }),
+      pluginTs({
+        output: {
+          path: 'types-2',
         },
-      ),
+      }),
     ],
   }
 })
@@ -693,7 +685,8 @@ export default defineConfig(() => {
 
 ```typescript twoslash [kubb.config.ts]
 import { defineConfig } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginTs } from '@kubb/plugin-ts'
 
 export default defineConfig([
   {
@@ -705,15 +698,8 @@ export default defineConfig([
     output: {
       path: './src/gen',
     },
-    plugins: [
-      pluginOas(
-        {
-           output: {
-            path: 'schemas',
-          },
-        },
-      ),
-    ],
+    adapter: adapterOas(),
+    plugins: [pluginTs()],
   },
   {
     name: 'petStoreV2',
@@ -724,15 +710,8 @@ export default defineConfig([
     output: {
       path: './src/gen-v2',
     },
-    plugins: [
-      pluginOas(
-        {
-          output: {
-            path: 'schemas',
-          },
-        },
-      ),
-    ],
+    adapter: adapterOas(),
+    plugins: [pluginTs()],
   },
 ])
 ```
