@@ -28,7 +28,7 @@ export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
 }
 
 export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get('http://localhost:3000/pet/:petId\\\\:search', function handler(info) {
+  return http.get('http://localhost:3000/pet/:petId\\:search', function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

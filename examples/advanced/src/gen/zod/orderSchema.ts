@@ -12,7 +12,7 @@ export const orderSchema = z.object({
   quantity: z.int().optional(),
   orderType: z.enum(['foo', 'bar']).optional(),
   type: z.string().optional().describe('Order Status'),
-  shipDate: z.iso.datetime().optional(),
+  shipDate: z.iso.datetime({ offset: true }).optional(),
   status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
   http_status: z
     .union([z.literal(200), z.literal(400)])
