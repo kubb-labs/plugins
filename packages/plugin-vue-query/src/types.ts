@@ -1,8 +1,7 @@
 import type { Output, PluginFactoryOptions, ResolveNameParams, UserGroup } from '@kubb/core'
 import type { contentType, HttpMethod, Oas, Operation } from '@kubb/oas'
-import type { OperationSchemas } from '@kubb/plugin-oas'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
-import type { Exclude, Include, Override, ResolvePathOptions } from '@kubb/plugin-oas'
+import type { Exclude, Include, OperationSchemas, Override, ResolvePathOptions } from '@kubb/plugin-oas'
 import type { Generator } from '@kubb/plugin-oas/generators'
 
 export type Transformer = (props: { operation: Operation; schemas: OperationSchemas; casing: 'camelcase' | undefined }) => unknown[]
