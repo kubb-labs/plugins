@@ -23,9 +23,9 @@ export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQuery
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId['petId'],
+  petId: UpdatePetWithFormPathPetId,
   data?: UpdatePetWithFormData,
-  params?: UpdatePetWithFormQueryStatus,
+  params?: { status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config

@@ -97,7 +97,7 @@ describe('mutationGenerator operation', () => {
       node: updatePetWithFormNode,
       options: {
         mutationKey(props) {
-          const id = props.operation.getOperationId()
+          const id = props.node.operationId
           const keys = MutationKey.getTransformer(props)
           return [`"${id}"`, ...keys]
         },

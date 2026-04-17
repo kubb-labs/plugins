@@ -20,7 +20,10 @@ export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInf
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsInfinite(params: FindPetsByTagsQueryTags, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTagsInfinite(
+  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })

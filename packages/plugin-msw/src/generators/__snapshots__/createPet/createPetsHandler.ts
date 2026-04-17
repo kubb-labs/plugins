@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsMutationResponse } from './CreatePets'
+import type { CreatePetsResponse } from './CreatePets'
 import { http } from 'msw'
 
-export function createPetsHandlerResponse201(data?: CreatePetsMutationResponse) {
+export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   return new Response(JSON.stringify(data), {
     status: 201,
   })

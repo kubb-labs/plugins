@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags } from './FindPetsByTags'
+import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { fetch } from './.kubb/fetch'
@@ -18,7 +18,10 @@ export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags(params: FindPetsByTagsQueryTags, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTags(
+  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })

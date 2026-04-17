@@ -21,7 +21,7 @@ export type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsB
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsSuspenseInfinite(
-  { params }: { params: FindPetsByTagsQueryTags },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config

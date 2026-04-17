@@ -3,23 +3,21 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsMutationResponse } from './CreatePets'
-import { createCreatePetsMutationResponse } from './createCreatePets'
+import type { CreatePetsResponse } from './CreatePets'
+import { createPetsResponse } from './createPets'
 import { http } from 'msw'
 
-export function createPetsHandlerResponse201(data?: CreatePetsMutationResponse) {
+export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   return new Response(JSON.stringify(data), {
     status: 201,
   })
 }
 
-export function createPetsHandler(
-  data?: CreatePetsMutationResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
-) {
+export function createPetsHandler(data?: CreatePetsResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>)) {
   return http.post('/pets', function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data || createCreatePetsMutationResponse(data)), {
+    return new Response(JSON.stringify(data || createPetsResponse(data)), {
       status: 201,
     })
   })

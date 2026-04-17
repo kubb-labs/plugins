@@ -97,7 +97,7 @@ describe('queryGenerator operation', () => {
           importPath: '@tanstack/react-query',
         },
         queryKey(props) {
-          const id = props.operation.getOperationId()
+          const id = props.node.operationId
           const keys = QueryKey.getTransformer(props)
           return [`"${id}"`, ...keys]
         },
