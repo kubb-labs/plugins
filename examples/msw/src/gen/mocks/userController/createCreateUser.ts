@@ -4,7 +4,7 @@
  */
 
 import { faker } from '@faker-js/faker'
-import type { CreateUserError, CreateUserMutationRequest, CreateUserMutationResponse } from '../../models/CreateUser.ts'
+import type { CreateUserError, CreateUserMutationRequest } from '../../models/CreateUser.ts'
 import { createUser } from '../createUser.ts'
 
 /**
@@ -23,10 +23,4 @@ export function createCreateUserMutationRequest(data?: Partial<CreateUserMutatio
   faker.seed([220])
 
   return createUser(data)
-}
-
-export function createCreateUserMutationResponse(_data?: Partial<CreateUserMutationResponse>): CreateUserMutationResponse {
-  faker.seed([220])
-
-  return undefined
 }

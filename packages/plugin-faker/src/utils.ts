@@ -55,6 +55,31 @@ export function buildGroupedParamsSchema(params: Array<ast.ParameterNode>): ast.
   })
 }
 
+function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
+  return new Set<ast.SchemaNode['type']>([
+    'any',
+    'unknown',
+    'void',
+    'null',
+    'array',
+    'tuple',
+    'string',
+    'email',
+    'url',
+    'uuid',
+    'number',
+    'integer',
+    'bigint',
+    'boolean',
+    'date',
+    'time',
+    'datetime',
+    'blob',
+    'enum',
+    'union',
+  ]).has(schema.type)
+}
+
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
   const responses = node.responses.filter((response) => response.schema)
 
@@ -63,6 +88,10 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   }
 
   if (responses.length === 1) {
+    if (shouldInlineSingleResponseSchema(responses[0]!.schema)) {
+      return responses[0]!.schema
+    }
+
     return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, responses[0]!.statusCode) })
   }
 
@@ -83,6 +112,10 @@ export function buildLegacyResponseUnionSchema(node: ast.OperationNode, resolver
   }
 
   if (successResponses.length === 1) {
+    if (shouldInlineSingleResponseSchema(successResponses[0]!.schema)) {
+      return successResponses[0]!.schema
+    }
+
     return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, successResponses[0]!.statusCode) })
   }
 

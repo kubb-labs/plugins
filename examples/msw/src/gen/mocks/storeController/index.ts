@@ -1,4 +1,4 @@
-export { createDeleteOrder400, createDeleteOrder404, createDeleteOrderMutationResponse, createDeleteOrderPathParams } from './createDeleteOrder.ts'
+export { createDeleteOrder400, createDeleteOrder404, createDeleteOrderPathParams } from './createDeleteOrder.ts'
 export { createGetInventory200, createGetInventoryQueryResponse } from './createGetInventory.ts'
 export {
   createGetOrderById200,

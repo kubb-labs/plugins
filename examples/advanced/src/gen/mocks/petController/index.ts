@@ -4,13 +4,8 @@ export {
   createAddFilesMutationRequestFaker,
   createAddFilesMutationResponseFaker,
 } from './createAddFilesFaker.ts'
-export { createAddPet405Faker, createAddPetErrorFaker, createAddPetMutationRequestFaker, createAddPetMutationResponseFaker } from './createAddPetFaker.ts'
-export {
-  createDeletePet400Faker,
-  createDeletePetHeaderParamsFaker,
-  createDeletePetMutationResponseFaker,
-  createDeletePetPathParamsFaker,
-} from './createDeletePetFaker.ts'
+export { createAddPet405Faker, createAddPetErrorFaker, createAddPetMutationRequestFaker } from './createAddPetFaker.ts'
+export { createDeletePet400Faker, createDeletePetHeaderParamsFaker, createDeletePetPathParamsFaker } from './createDeletePetFaker.ts'
 export {
   createFindPetsByStatus200Faker,
   createFindPetsByStatus400Faker,
@@ -42,7 +37,6 @@ export {
 } from './createUpdatePetFaker.ts'
 export {
   createUpdatePetWithForm405Faker,
-  createUpdatePetWithFormMutationResponseFaker,
   createUpdatePetWithFormPathParamsFaker,
   createUpdatePetWithFormQueryParamsFaker,
 } from './createUpdatePetWithFormFaker.ts'

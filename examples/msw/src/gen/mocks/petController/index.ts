@@ -1,5 +1,5 @@
 export { createAddPet200, createAddPet405, createAddPetMutationRequest, createAddPetMutationResponse } from './createAddPet.ts'
-export { createDeletePet400, createDeletePetHeaderParams, createDeletePetMutationResponse, createDeletePetPathParams } from './createDeletePet.ts'
+export { createDeletePet400, createDeletePetHeaderParams, createDeletePetPathParams } from './createDeletePet.ts'
 export {
   createFindPetsByStatus200,
   createFindPetsByStatus400,
@@ -17,12 +17,7 @@ export {
   createUpdatePetMutationRequest,
   createUpdatePetMutationResponse,
 } from './createUpdatePet.ts'
-export {
-  createUpdatePetWithForm405,
-  createUpdatePetWithFormMutationResponse,
-  createUpdatePetWithFormPathParams,
-  createUpdatePetWithFormQueryParams,
-} from './createUpdatePetWithForm.ts'
+export { createUpdatePetWithForm405, createUpdatePetWithFormPathParams, createUpdatePetWithFormQueryParams } from './createUpdatePetWithForm.ts'
 export {
   createUploadFile200,
   createUploadFileMutationRequest,

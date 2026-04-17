@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { UpdatePet200, UpdatePetMutationRequest, UpdatePetMutationResponse } from '../models/UpdatePet.ts'
 import { createPet } from './createPet.ts'
 
@@ -43,5 +42,5 @@ export function createUpdatePetMutationRequest(data?: Partial<UpdatePetMutationR
 }
 
 export function createUpdatePetMutationResponse(data?: Partial<UpdatePetMutationResponse>): UpdatePetMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createUpdatePet200()])
+  return createUpdatePet200(data)
 }

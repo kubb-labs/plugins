@@ -1,5 +1,3 @@
-import path from 'node:path'
-import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import type { PluginMsw } from './types.ts'
@@ -68,37 +66,22 @@ export function resolveFakerMeta(
   node: ast.OperationNode,
   options: {
     root: string
-    output: PluginMsw['resolvedOptions']['output']
-    group: PluginMsw['resolvedOptions']['group']
-    transformers: PluginMsw['resolvedOptions']['transformers']
-    fakerOutput: { path?: string }
-    fakerGroup: { type: 'path' | 'tag'; name?: (context: { group: string }) => string } | undefined
+    fakerResolver: {
+      resolveResponseName(node: ast.OperationNode): string
+      resolveFile(
+        params: { name: string; extname: '.ts'; tag: string; path: string },
+        options: { root: string; output: PluginMsw['resolvedOptions']['output']; group: PluginMsw['resolvedOptions']['group'] },
+      ): { path: string }
+    }
+    fakerOutput: PluginMsw['resolvedOptions']['output']
+    fakerGroup: PluginMsw['resolvedOptions']['group']
   },
 ): { name: string; file: { path: string } } {
-  const { root, output, group, transformers, fakerOutput, fakerGroup } = options
-  const baseName = camelCase(node.operationId, { isFile: true })
-  const fakerName = transformName(camelCase(node.operationId, { prefix: 'create' }), 'function', transformers)
+  const { root, fakerResolver, fakerOutput, fakerGroup } = options
   const tag = node.tags[0] ?? 'default'
-  const outputPath = fakerOutput.path ?? output.path
-
-  const groupName = fakerGroup
-    ? fakerGroup.name
-      ? fakerGroup.name({ group: fakerGroup.type === 'path' ? node.path : tag })
-      : fakerGroup.type === 'path'
-        ? `${node.path.split('/')[1]}`
-        : `${camelCase(tag)}Controller`
-    : group
-      ? group.name
-        ? group.name({ group: group.type === 'path' ? node.path : tag })
-        : group.type === 'path'
-          ? `${node.path.split('/')[1]}`
-          : `${camelCase(tag)}Controller`
-      : undefined
 
   return {
-    name: fakerName,
-    file: {
-      path: groupName ? path.resolve(root, outputPath, groupName, `${baseName}.ts`) : path.resolve(root, outputPath, `${baseName}.ts`),
-    },
+    name: fakerResolver.resolveResponseName(node),
+    file: fakerResolver.resolveFile({ name: node.operationId, extname: '.ts', tag, path: node.path }, { root, output: fakerOutput, group: fakerGroup }),
   }
 }

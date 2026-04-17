@@ -175,13 +175,14 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
+      compatibilityPreset: 'kubbV4',
       paramsCasing: 'camelcase',
       mapper: {
         status: `faker.helpers.arrayElement<any>(['working', 'idle'])`,
       },
-      transformers: {
-        name(name, _type) {
-          return `${name}Faker`
+      resolver: {
+        resolveName(name, type) {
+          return `${this.default(name, type)}Faker`
         },
       },
     }),

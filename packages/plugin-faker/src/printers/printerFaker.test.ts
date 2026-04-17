@@ -1,7 +1,7 @@
 import { ast } from '@kubb/core'
 import { describe, expect, test } from 'vitest'
-import { printerFaker } from './printerFaker.ts'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
+import { printerFaker } from './printerFaker.ts'
 
 describe('printerFaker', () => {
   test('renders object properties recursively', () => {
@@ -46,14 +46,51 @@ describe('printerFaker', () => {
   test('renders regex matches with randexp', () => {
     const node = ast.createSchema({ type: 'string', pattern: '^[A-Z]+$' })
 
-    expect(printerFaker({ resolver: resolverFaker, regexGenerator: 'randexp' }).print(node)).toMatchInlineSnapshot(
-      `"new RandExp("^[A-Z]+$").gen()"`,
-    )
+    expect(printerFaker({ resolver: resolverFaker, regexGenerator: 'randexp' }).print(node)).toMatchInlineSnapshot(`"new RandExp("^[A-Z]+$").gen()"`)
   })
 
   test('guards self refs', () => {
     const node = ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
 
     expect(printerFaker({ resolver: resolverFaker, schemaName: 'TreeNode' }).print(node)).toMatchInlineSnapshot(`"undefined as any"`)
+  })
+
+  test('does not re-resolve internal helper refs', () => {
+    const node = ast.createSchema({ type: 'ref', name: 'showPetByIdResponseFaker' })
+
+    expect(
+      printerFaker({
+        resolver: {
+          ...resolverFaker,
+          resolveName(name) {
+            return `${this.default(name)}Faker`
+          },
+        },
+      }).print(node),
+    ).toMatchInlineSnapshot(`"showPetByIdResponseFaker(data)"`)
+  })
+
+  test('uses tuple item types for nested enum members', () => {
+    const node = ast.createSchema({
+      type: 'tuple',
+      items: [
+        ast.createSchema({ type: 'integer' }),
+        ast.createSchema({ type: 'string' }),
+        ast.createSchema({
+          type: 'enum',
+          primitive: 'string',
+          enumValues: ['NW', 'NE', 'SW', 'SE'],
+        }),
+      ],
+    })
+
+    expect(
+      printerFaker({
+        resolver: resolverFaker,
+        typeName: `NonNullable<Address>["identifier"]`,
+      }).print(node),
+    ).toMatchInlineSnapshot(
+      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(["NW", "NE", "SW", "SE"])]"`,
+    )
   })
 })

@@ -164,143 +164,144 @@ function parseEnumValue(value: string | number | boolean | undefined) {
   return value
 }
 
-export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.definePrinter<PrinterFakerFactory>(
-  (options) => {
-    const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
-      return (
-        printerFaker({
+export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.definePrinter<PrinterFakerFactory>((options) => {
+  const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
+    return (
+      printerFaker({
         ...options,
         ...overrideOptions,
         nodes: options.nodes,
-        }).print(node) ?? 'undefined'
-      )
-    }
+      }).print(node) ?? 'undefined'
+    )
+  }
 
-    return {
-      name: 'faker',
-      options,
-      nodes: {
-        any: () => fakerKeywordMapper.any(),
-        unknown: () => fakerKeywordMapper.unknown(),
-        void: () => fakerKeywordMapper.void(),
-        boolean: () => fakerKeywordMapper.boolean(),
-        null: () => fakerKeywordMapper.null(),
-        string(node) {
-          if (node.pattern) {
-            return fakerKeywordMapper.matches(node.pattern, this.options.regexGenerator)
-          }
+  return {
+    name: 'faker',
+    options,
+    nodes: {
+      any: () => fakerKeywordMapper.any(),
+      unknown: () => fakerKeywordMapper.unknown(),
+      void: () => fakerKeywordMapper.void(),
+      boolean: () => fakerKeywordMapper.boolean(),
+      null: () => fakerKeywordMapper.null(),
+      string(node) {
+        if (node.pattern) {
+          return fakerKeywordMapper.matches(node.pattern, this.options.regexGenerator)
+        }
 
-          return fakerKeywordMapper.string(node.min, node.max)
-        },
-        email: () => fakerKeywordMapper.email(),
-        url: () => fakerKeywordMapper.url(),
-        uuid: () => fakerKeywordMapper.uuid(),
-        number(node) {
-          return fakerKeywordMapper.number(node.min, node.max)
-        },
-        integer(node) {
-          return fakerKeywordMapper.integer(node.min, node.max)
-        },
-        bigint: () => fakerKeywordMapper.bigint(),
-        blob: () => fakerKeywordMapper.blob(),
-        datetime: () => fakerKeywordMapper.datetime(),
-        date(node) {
-          return fakerKeywordMapper.date(node.representation ?? 'string', this.options.dateParser)
-        },
-        time(node) {
-          return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
-        },
-        ref(node) {
-          if (!node.name) {
-            throw new Error('Name not defined for ref node')
-          }
-
-          const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
-
-          if (this.options.schemaName && refName === this.options.schemaName) {
-            return 'undefined as any'
-          }
-
-          const resolvedName = this.options.resolver.resolveName(refName)
-
-          if (!this.options.nestedInObject) {
-            return `${resolvedName}(data)`
-          }
-
-          return `${resolvedName}()`
-        },
-        enum(node) {
-          return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
-        },
-        union(node): string {
-          const items: string[] = (node.members ?? [])
-            .map((member) =>
-              printNested(member, {
-                nestedInObject: true,
-              }),
-            )
-            .filter((item): item is string => Boolean(item))
-
-          return fakerKeywordMapper.union(items)
-        },
-        intersection(node): string {
-          const items: string[] = (node.members ?? [])
-            .map((member) =>
-              printNested(member, {
-                nestedInObject: true,
-              }),
-            )
-            .filter((item): item is string => Boolean(item))
-
-          return fakerKeywordMapper.and(items)
-        },
-        array(node): string {
-          const items: string[] = (node.items ?? [])
-            .map((member) =>
-              printNested(member, {
-                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
-                nestedInObject: true,
-              }),
-            )
-            .filter((item): item is string => Boolean(item))
-
-          return fakerKeywordMapper.array(items, node.min, node.max)
-        },
-        tuple(node): string {
-          const items: string[] = (node.items ?? [])
-            .map((member) =>
-              printNested(member, {
-                nestedInObject: true,
-              }),
-            )
-            .filter((item): item is string => Boolean(item))
-
-          return fakerKeywordMapper.tuple(items)
-        },
-        object(node): string {
-          const properties = (node.properties ?? [])
-            .map((property): string => {
-              if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
-                return `"${property.name}": ${this.options.mapper[property.name]}`
-              }
-
-              const value: string =
-                printNested(property.schema, {
-                  typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
-                  nestedInObject: true,
-                }) ?? 'undefined'
-
-              return `"${property.name}": ${value}`
-            })
-            .join(',')
-
-          return `{${properties}}`
-        },
-        ...options.nodes,
+        return fakerKeywordMapper.string(node.min, node.max)
       },
-      print(node) {
-        return this.transform(node) ?? null
+      email: () => fakerKeywordMapper.email(),
+      url: () => fakerKeywordMapper.url(),
+      uuid: () => fakerKeywordMapper.uuid(),
+      number(node) {
+        return fakerKeywordMapper.number(node.min, node.max)
       },
-    }
-  },
-)
+      integer(node) {
+        return fakerKeywordMapper.integer(node.min, node.max)
+      },
+      bigint: () => fakerKeywordMapper.bigint(),
+      blob: () => fakerKeywordMapper.blob(),
+      datetime: () => fakerKeywordMapper.datetime(),
+      date(node) {
+        return fakerKeywordMapper.date(node.representation ?? 'string', this.options.dateParser)
+      },
+      time(node) {
+        return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
+      },
+      ref(node) {
+        if (!node.name) {
+          throw new Error('Name not defined for ref node')
+        }
+
+        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
+
+        if (this.options.schemaName && refName === this.options.schemaName) {
+          return 'undefined as any'
+        }
+
+        // Internal helper refs (for generated response/data helpers) are already
+        // emitted with resolver output and should not be transformed twice.
+        const resolvedName = node.ref ? this.options.resolver.resolveName(refName) : refName
+
+        if (!this.options.nestedInObject) {
+          return `${resolvedName}(data)`
+        }
+
+        return `${resolvedName}()`
+      },
+      enum(node) {
+        return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
+      },
+      union(node): string {
+        const items: string[] = (node.members ?? [])
+          .map((member) =>
+            printNested(member, {
+              nestedInObject: true,
+            }),
+          )
+          .filter((item): item is string => Boolean(item))
+
+        return fakerKeywordMapper.union(items)
+      },
+      intersection(node): string {
+        const items: string[] = (node.members ?? [])
+          .map((member) =>
+            printNested(member, {
+              nestedInObject: true,
+            }),
+          )
+          .filter((item): item is string => Boolean(item))
+
+        return fakerKeywordMapper.and(items)
+      },
+      array(node): string {
+        const items: string[] = (node.items ?? [])
+          .map((member) =>
+            printNested(member, {
+              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
+              nestedInObject: true,
+            }),
+          )
+          .filter((item): item is string => Boolean(item))
+
+        return fakerKeywordMapper.array(items, node.min, node.max)
+      },
+      tuple(node): string {
+        const items: string[] = (node.items ?? [])
+          .map((member, index) =>
+            printNested(member, {
+              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${index}]` : undefined,
+              nestedInObject: true,
+            }),
+          )
+          .filter((item): item is string => Boolean(item))
+
+        return fakerKeywordMapper.tuple(items)
+      },
+      object(node): string {
+        const properties = (node.properties ?? [])
+          .map((property): string => {
+            if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
+              return `"${property.name}": ${this.options.mapper[property.name]}`
+            }
+
+            const value: string =
+              printNested(property.schema, {
+                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
+                nestedInObject: true,
+              }) ?? 'undefined'
+
+            return `"${property.name}": ${value}`
+          })
+          .join(',')
+
+        return `{${properties}}`
+      },
+      ...options.nodes,
+    },
+    print(node) {
+      return this.transform(node) ?? null
+    },
+  }
+})

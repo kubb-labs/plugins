@@ -1,3 +1,4 @@
+import { camelCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginFaker } from '../types.ts'
 import { resolverFaker } from './resolverFaker.ts'
@@ -10,6 +11,12 @@ export const resolverFakerLegacy = defineResolver<PluginFaker>(() => {
   return {
     ...resolverFaker,
     pluginName: 'plugin-faker',
+    default(name, type) {
+      return camelCase(name, { isFile: type === 'file', prefix: 'create' })
+    },
+    resolvePathName(name, type) {
+      return camelCase(name, { isFile: type === 'file', prefix: 'create' })
+    },
     resolveResponseStatusName(node, statusCode) {
       if (statusCode === 'default') {
         return this.resolveName(`${node.operationId} Error`)

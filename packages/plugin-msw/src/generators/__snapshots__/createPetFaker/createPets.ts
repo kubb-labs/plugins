@@ -4,6 +4,7 @@
  */
 
 import type { CreatePetsMutationResponse } from './CreatePets'
+import { createPetsMutationResponse } from './createPets'
 import { http } from 'msw'
 
 export function createPetsResponse201(data?: CreatePetsMutationResponse) {
@@ -16,7 +17,7 @@ export function createPets(data?: CreatePetsMutationResponse | ((info: Parameter
   return http.post('/pets', function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data || createCreatePets(data)), {
+    return new Response(JSON.stringify(data || createPetsMutationResponse(data)), {
       status: 201,
     })
   })

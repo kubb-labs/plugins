@@ -1,5 +1,5 @@
 import { ast, defineGenerator } from '@kubb/core'
-import { pluginTsName, type PluginTs } from '@kubb/plugin-ts'
+import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'

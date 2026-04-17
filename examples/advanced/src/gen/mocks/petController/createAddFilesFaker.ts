@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker'
 import type { AddFiles200, AddFilesMutationRequest, AddFilesMutationResponse } from '../../models/ts/petController/AddFiles.ts'
 import { createPetFaker } from '../createPetFaker.ts'
 
@@ -21,5 +20,5 @@ export function createAddFilesMutationRequestFaker(data?: Partial<AddFilesMutati
 }
 
 export function createAddFilesMutationResponseFaker(data?: Partial<AddFilesMutationResponse>): AddFilesMutationResponse {
-  return data || faker.helpers.arrayElement<any>([createAddFiles200Faker()])
+  return createAddFiles200Faker(data)
 }

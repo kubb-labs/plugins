@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { GetInventory200, GetInventoryQueryResponse } from '../models/GetInventory.ts'
 
 /**
@@ -17,5 +16,5 @@ export function createGetInventory200(data?: Partial<GetInventory200>): GetInven
 }
 
 export function createGetInventoryQueryResponse(data?: Partial<GetInventoryQueryResponse>): GetInventoryQueryResponse {
-  return data || faker.helpers.arrayElement<any>([createGetInventory200()])
+  return createGetInventory200(data)
 }

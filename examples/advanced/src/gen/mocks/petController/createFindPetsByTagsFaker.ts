@@ -35,6 +35,6 @@ export function createFindPetsByTags400Faker() {
   return undefined
 }
 
-export function createFindPetsByTagsQueryResponseFaker(data?: Partial<FindPetsByTagsQueryResponse>): FindPetsByTagsQueryResponse {
-  return data || faker.helpers.arrayElement<any>([createFindPetsByTags200Faker()])
+export function createFindPetsByTagsQueryResponseFaker(data?: FindPetsByTagsQueryResponse): FindPetsByTagsQueryResponse {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])]
 }

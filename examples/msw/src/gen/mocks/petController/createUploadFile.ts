@@ -34,14 +34,14 @@ export function createUploadFile200(data?: Partial<UploadFile200>): UploadFile20
   return createApiResponse(data)
 }
 
-export function createUploadFileMutationRequest() {
+export function createUploadFileMutationRequest(data?: Blob): Blob {
   faker.seed([220])
 
-  return faker.image.url() as unknown as Blob
+  return data ?? (faker.image.url() as unknown as Blob)
 }
 
 export function createUploadFileMutationResponse(data?: Partial<UploadFileMutationResponse>): UploadFileMutationResponse {
   faker.seed([220])
 
-  return data || faker.helpers.arrayElement<any>([createUploadFile200()])
+  return createUploadFile200(data)
 }

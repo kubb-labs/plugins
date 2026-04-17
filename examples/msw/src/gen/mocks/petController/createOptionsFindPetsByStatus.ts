@@ -16,10 +16,8 @@ export function createOptionsFindPetsByStatus200(data?: OptionsFindPetsByStatus2
   return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
 }
 
-export function createOptionsFindPetsByStatusMutationResponse(
-  data?: Partial<OptionsFindPetsByStatusMutationResponse>,
-): OptionsFindPetsByStatusMutationResponse {
+export function createOptionsFindPetsByStatusMutationResponse(data?: OptionsFindPetsByStatusMutationResponse): OptionsFindPetsByStatusMutationResponse {
   faker.seed([220])
 
-  return data || faker.helpers.arrayElement<any>([createOptionsFindPetsByStatus200()])
+  return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
 }

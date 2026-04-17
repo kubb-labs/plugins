@@ -10,7 +10,7 @@ export { createTag } from './createTag.ts'
 export { createUser } from './createUser.ts'
 export { createUserArray } from './createUserArray.ts'
 export { createAddPet200, createAddPet405, createAddPetMutationRequest, createAddPetMutationResponse } from './petController/createAddPet.ts'
-export { createDeletePet400, createDeletePetHeaderParams, createDeletePetMutationResponse, createDeletePetPathParams } from './petController/createDeletePet.ts'
+export { createDeletePet400, createDeletePetHeaderParams, createDeletePetPathParams } from './petController/createDeletePet.ts'
 export {
   createFindPetsByStatus200,
   createFindPetsByStatus400,
@@ -39,12 +39,7 @@ export {
   createUpdatePetMutationRequest,
   createUpdatePetMutationResponse,
 } from './petController/createUpdatePet.ts'
-export {
-  createUpdatePetWithForm405,
-  createUpdatePetWithFormMutationResponse,
-  createUpdatePetWithFormPathParams,
-  createUpdatePetWithFormQueryParams,
-} from './petController/createUpdatePetWithForm.ts'
+export { createUpdatePetWithForm405, createUpdatePetWithFormPathParams, createUpdatePetWithFormQueryParams } from './petController/createUpdatePetWithForm.ts'
 export {
   createUploadFile200,
   createUploadFileMutationRequest,
@@ -52,12 +47,7 @@ export {
   createUploadFilePathParams,
   createUploadFileQueryParams,
 } from './petController/createUploadFile.ts'
-export {
-  createDeleteOrder400,
-  createDeleteOrder404,
-  createDeleteOrderMutationResponse,
-  createDeleteOrderPathParams,
-} from './storeController/createDeleteOrder.ts'
+export { createDeleteOrder400, createDeleteOrder404, createDeleteOrderPathParams } from './storeController/createDeleteOrder.ts'
 export { createGetInventory200, createGetInventoryQueryResponse } from './storeController/createGetInventory.ts'
 export {
   createGetOrderById200,
@@ -78,14 +68,14 @@ export {
   createPlaceOrderPatchMutationRequest,
   createPlaceOrderPatchMutationResponse,
 } from './storeController/createPlaceOrderPatch.ts'
-export { createCreateUserError, createCreateUserMutationRequest, createCreateUserMutationResponse } from './userController/createCreateUser.ts'
+export { createCreateUserError, createCreateUserMutationRequest } from './userController/createCreateUser.ts'
 export {
   createCreateUsersWithListInput200,
   createCreateUsersWithListInputError,
   createCreateUsersWithListInputMutationRequest,
   createCreateUsersWithListInputMutationResponse,
 } from './userController/createCreateUsersWithListInput.ts'
-export { createDeleteUser400, createDeleteUser404, createDeleteUserMutationResponse, createDeleteUserPathParams } from './userController/createDeleteUser.ts'
+export { createDeleteUser400, createDeleteUser404, createDeleteUserPathParams } from './userController/createDeleteUser.ts'
 export {
   createGetUserByName200,
   createGetUserByName400,
@@ -94,10 +84,5 @@ export {
   createGetUserByNameQueryResponse,
 } from './userController/createGetUserByName.ts'
 export { createLoginUser200, createLoginUser400, createLoginUserQueryParams, createLoginUserQueryResponse } from './userController/createLoginUser.ts'
-export { createLogoutUserError, createLogoutUserQueryResponse } from './userController/createLogoutUser.ts'
-export {
-  createUpdateUserError,
-  createUpdateUserMutationRequest,
-  createUpdateUserMutationResponse,
-  createUpdateUserPathParams,
-} from './userController/createUpdateUser.ts'
+export { createLogoutUserError } from './userController/createLogoutUser.ts'
+export { createUpdateUserError, createUpdateUserMutationRequest, createUpdateUserPathParams } from './userController/createUpdateUser.ts'

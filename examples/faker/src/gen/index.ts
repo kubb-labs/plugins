@@ -14,12 +14,7 @@ export {
   createUpdatePetMutationRequest,
   createUpdatePetMutationResponse,
 } from './faker/createUpdatePet.ts'
-export {
-  createUpdatePetWithForm405,
-  createUpdatePetWithFormMutationResponse,
-  createUpdatePetWithFormPathParams,
-  createUpdatePetWithFormQueryParams,
-} from './faker/createUpdatePetWithForm.ts'
+export { createUpdatePetWithForm405, createUpdatePetWithFormPathParams, createUpdatePetWithFormQueryParams } from './faker/createUpdatePetWithForm.ts'
 export { createUser } from './faker/createUser.ts'
 export { createUserArray } from './faker/createUserArray.ts'
 export type { AddPet200, AddPet405, AddPetMutation, AddPetMutationRequest, AddPetMutationResponse } from './models/AddPet.ts'

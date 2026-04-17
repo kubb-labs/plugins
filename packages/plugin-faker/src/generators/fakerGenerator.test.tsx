@@ -1,8 +1,8 @@
 import type { Config } from '@kubb/core'
 import { ast } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
-import { resolverTs, resolverTsLegacy, type PluginTs } from '@kubb/plugin-ts'
-import { describe, test } from 'vitest'
+import { type PluginTs, resolverTs, resolverTsLegacy } from '@kubb/plugin-ts'
+import { describe, expect, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { resolverFakerLegacy } from '../resolvers/resolverFakerLegacy.ts'
@@ -261,5 +261,42 @@ describe('fakerGeneratorLegacy — operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'legacyShowPetById')
+  })
+
+  test('legacy resolver prefixes create for schema and operations', () => {
+    const node = ast.createOperation({
+      operationId: 'addFiles',
+      method: 'POST',
+      path: '/pet/files',
+      tags: ['pets'],
+      responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'string' }) })],
+    })
+
+    expect(resolverFakerLegacy.resolveName('Address')).toBe('createAddress')
+    expect(resolverFakerLegacy.resolvePathName('Address', 'file')).toBe('createAddress')
+    expect(resolverFakerLegacy.resolvePathName('addFiles', 'file')).toBe('createAddFiles')
+    expect(resolverFakerLegacy.resolveResponseStatusName(node, '200')).toBe('createAddFiles200')
+    expect(resolverFakerLegacy.resolveDataName(node)).toBe('createAddFilesMutationRequest')
+    expect(resolverFakerLegacy.resolveResponseName(node)).toBe('createAddFilesMutationResponse')
+  })
+
+  test('custom resolveName also affects filenames', () => {
+    const resolver = {
+      ...resolverFakerLegacy,
+      resolveName(name: string, type?: 'file' | 'function' | 'type' | 'const') {
+        return `${this.default(name, type)}Faker`
+      },
+    }
+
+    const file = resolver.resolveFile(
+      { name: 'addFiles', extname: '.ts', tag: 'pets', path: '/pet/files' },
+      {
+        root: '.',
+        output: { path: 'mocks' },
+        group: undefined,
+      },
+    )
+
+    expect(file.baseName).toBe('createAddFilesFaker.ts')
   })
 })

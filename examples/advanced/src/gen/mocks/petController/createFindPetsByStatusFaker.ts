@@ -23,6 +23,6 @@ export function createFindPetsByStatus400Faker() {
   return undefined
 }
 
-export function createFindPetsByStatusQueryResponseFaker(data?: Partial<FindPetsByStatusQueryResponse>): FindPetsByStatusQueryResponse {
-  return data || faker.helpers.arrayElement<any>([createFindPetsByStatus200Faker()])
+export function createFindPetsByStatusQueryResponseFaker(data?: FindPetsByStatusQueryResponse): FindPetsByStatusQueryResponse {
+  return [...faker.helpers.multiple(() => createPetFaker(), { count: { min: 1, max: 3 } }), ...(data || [])]
 }

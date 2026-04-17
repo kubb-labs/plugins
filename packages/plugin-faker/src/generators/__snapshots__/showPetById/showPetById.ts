@@ -24,6 +24,6 @@ export function showPetByIdStatusDefault(data?: Partial<ShowPetByIdStatusDefault
   return error(data)
 }
 
-export function showPetByIdResponse(data?: ShowPetByIdResponse): ShowPetByIdResponse {
+export function showPetByIdResponse(_data?: ShowPetByIdResponse): ShowPetByIdResponse {
   return faker.helpers.arrayElement<any>([showPetByIdStatus200(), showPetByIdStatusDefault()])
 }

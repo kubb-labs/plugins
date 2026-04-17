@@ -62,15 +62,7 @@ function getScalarType(node: ast.SchemaNode, typeName: string): string {
   }
 }
 
-export function Faker({
-  node,
-  description,
-  name,
-  typeName,
-  printer,
-  seed,
-  canOverride,
-}: Props): KubbReactNode {
+export function Faker({ node, description, name, typeName, printer, seed, canOverride }: Props): KubbReactNode {
   const fakerText = printer.print(node) ?? 'undefined'
 
   const isArray = ARRAY_TYPES.has(node.type)
@@ -112,8 +104,10 @@ export function Faker({
     dataType = getScalarType(node, typeName)
   }
 
+  const usesData = /\bdata\b/.test(fakerTextWithOverride)
+  const dataParamName = usesData ? 'data' : '_data'
   const params = FunctionParams.factory({
-    data: {
+    [dataParamName]: {
       type: dataType,
       optional: true,
     },
