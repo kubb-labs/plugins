@@ -70,6 +70,20 @@ describe('printerFaker', () => {
     ).toMatchInlineSnapshot(`"showPetByIdResponseFaker(data)"`)
   })
 
+  test('resolves ref names from ref path when name is missing', () => {
+    const node = ast.createSchema({
+      type: 'ref',
+      ref: '#/components/schemas/EpisodeBase',
+      schema: ast.createSchema({
+        type: 'object',
+        name: 'EpisodeBase',
+        properties: [],
+      }),
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"episodeBase(data)"`)
+  })
+
   test('uses tuple item types for nested enum members', () => {
     const node = ast.createSchema({
       type: 'tuple',
