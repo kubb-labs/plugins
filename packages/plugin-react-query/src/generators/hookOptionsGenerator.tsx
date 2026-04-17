@@ -1,193 +1,135 @@
-import { useDriver } from '@kubb/core/hooks'
-import type { Operation } from '@kubb/oas'
-import { createReactGenerator } from '@kubb/plugin-oas/generators'
-import { useOas, useOperationManager } from '@kubb/plugin-oas/hooks'
-import { getBanner, getFooter } from '@kubb/plugin-oas/utils'
-import { File, Type } from '@kubb/renderer-jsx'
+import { defineGenerator } from '@kubb/core'
+import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { difference } from 'remeda'
 import type { PluginReactQuery } from '../types'
+import { resolveOperationOverrides, transformName } from '../utils.ts'
 
-export const hookOptionsGenerator = createReactGenerator<PluginReactQuery>({
+type QueryOption = PluginReactQuery['resolvedOptions']['query']
+type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
+
+export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
-  Operations({ operations, plugin, generator }) {
-    const {
-      options,
-      options: { output },
-      name: pluginName,
-    } = plugin
-    const driver = useDriver()
+  renderer: jsxRenderer,
+  operations(nodes, ctx) {
+    const { resolver, config, root, adapter } = ctx
+    const { output, customOptions, query, mutation, suspense, infinite, group, transformers, override } = ctx.options
 
-    const oas = useOas()
-    const { getName, getFile } = useOperationManager(generator)
+    if (!customOptions) return null
 
-    if (!options.customOptions) {
-      return null
+    const resolvedFile = resolver.resolveFile({ name: 'HookOptions', extname: '.ts' }, { root, output, group })
+    const hookOptionsFile = {
+      ...resolvedFile,
+      baseName: 'HookOptions.ts' as const,
+      path: resolvedFile.path.replace(/hookOptions\.ts$/, 'HookOptions.ts'),
+    }
+
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+    const imports: KubbReactNode[] = []
+    const hookOptions: Record<string, string> = {}
+
+    for (const node of nodes) {
+      const baseName = resolver.resolveName(node.operationId)
+      const opOverrides = resolveOperationOverrides(node, override)
+      const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
+      const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation
+      const nodeInfinite = 'infinite' in opOverrides ? opOverrides.infinite : infinite
+      const nodeInfiniteOptions = nodeInfinite && typeof nodeInfinite === 'object' ? nodeInfinite : undefined
+
+      // v4 compat: query: false means "still a query but skip the useQuery hook"
+      const isQueryOp =
+        nodeQuery === false
+          ? !!query && query.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
+          : !!nodeQuery && nodeQuery.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
+      const isMutationOp =
+        nodeMutation !== false &&
+        !isQueryOp &&
+        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some(
+          (m) => node.method.toLowerCase() === m.toLowerCase(),
+        )
+      const isSuspenseOp = !!suspense
+      const isInfiniteOp = !!nodeInfiniteOptions
+
+      if (isQueryOp) {
+        const queryOptionsName = transformName(`${baseName}QueryOptions`, 'function', transformers)
+        const queryHookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
+        const queryHookFile = resolver.resolveFile(
+          { name: queryHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+          { root, output, group },
+        )
+        imports.push(<File.Import name={[queryOptionsName]} root={hookOptionsFile.path} path={queryHookFile.path} />)
+        hookOptions[queryHookName] = `Partial<ReturnType<typeof ${queryOptionsName}>>`
+
+        if (isSuspenseOp) {
+          const suspenseOptionsName = transformName(`${baseName}SuspenseQueryOptions`, 'function', transformers)
+          const suspenseHookName = transformName(`use${capitalize(baseName)}Suspense`, 'function', transformers)
+          const suspenseHookFile = resolver.resolveFile(
+            { name: suspenseHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+            { root, output, group },
+          )
+          imports.push(<File.Import name={[suspenseOptionsName]} root={hookOptionsFile.path} path={suspenseHookFile.path} />)
+          hookOptions[suspenseHookName] = `Partial<ReturnType<typeof ${suspenseOptionsName}>>`
+        }
+
+        if (isInfiniteOp) {
+          // Validate queryParam
+          const normalizeKey = (key: string) => key.replace(/\?$/, '')
+          const queryParamKeys = node.parameters.filter((p) => p.in === 'query').map((p) => p.name)
+          const hasQueryParam = nodeInfiniteOptions!.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === nodeInfiniteOptions!.queryParam) : false
+
+          if (hasQueryParam) {
+            const infiniteOptionsName = transformName(`${baseName}InfiniteQueryOptions`, 'function', transformers)
+            const infiniteHookName = transformName(`use${capitalize(baseName)}Infinite`, 'function', transformers)
+            const infiniteHookFile = resolver.resolveFile(
+              { name: infiniteHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+              { root, output, group },
+            )
+            imports.push(<File.Import name={[infiniteOptionsName]} root={hookOptionsFile.path} path={infiniteHookFile.path} />)
+            hookOptions[infiniteHookName] = `Partial<ReturnType<typeof ${infiniteOptionsName}>>`
+
+            if (isSuspenseOp) {
+              const suspenseInfiniteOptionsName = transformName(`${baseName}SuspenseInfiniteQueryOptions`, 'function', transformers)
+              const suspenseInfiniteHookName = transformName(`use${capitalize(baseName)}SuspenseInfinite`, 'function', transformers)
+              const suspenseInfiniteHookFile = resolver.resolveFile(
+                { name: suspenseInfiniteHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+                { root, output, group },
+              )
+              imports.push(<File.Import name={[suspenseInfiniteOptionsName]} root={hookOptionsFile.path} path={suspenseInfiniteHookFile.path} />)
+              hookOptions[suspenseInfiniteHookName] = `Partial<ReturnType<typeof ${suspenseInfiniteOptionsName}>>`
+            }
+          }
+        }
+      }
+
+      if (isMutationOp) {
+        const mutationOptionsName = transformName(`${baseName}MutationOptions`, 'function', transformers)
+        const mutationHookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
+        const mutationHookFile = resolver.resolveFile(
+          { name: mutationHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+          { root, output, group },
+        )
+        imports.push(<File.Import name={[mutationOptionsName]} root={hookOptionsFile.path} path={mutationHookFile.path} />)
+        hookOptions[mutationHookName] = `Partial<ReturnType<typeof ${mutationOptionsName}>>`
+      }
     }
 
     const name = 'HookOptions'
-    const file = driver.getFile({ name, extname: '.ts', pluginName })
-
-    const getOperationOptions = (operation: Operation) => {
-      const operationOptions = generator.getOptions(operation, operation.method)
-      return { ...options, ...operationOptions }
-    }
-
-    const isQuery = (operation: Operation) => {
-      const operationOptions = getOperationOptions(operation)
-      return typeof operationOptions.query === 'boolean' ? true : operationOptions.query?.methods.some((method) => operation.method === method)
-    }
-
-    const isMutation = (operation: Operation) => {
-      const operationOptions = getOperationOptions(operation)
-      return (
-        operationOptions.mutation !== false &&
-        !isQuery(operation) &&
-        difference(operationOptions.mutation ? operationOptions.mutation.methods : [], operationOptions.query ? operationOptions.query.methods : []).some(
-          (method) => operation.method === method,
-        )
-      )
-    }
-
-    const isSuspense = (operation: Operation) => {
-      const operationOptions = getOperationOptions(operation)
-      return !!operationOptions.suspense
-    }
-
-    const isInfinite = (operation: Operation) => {
-      const operationOptions = getOperationOptions(operation)
-      const infiniteOptions = operationOptions.infinite && typeof operationOptions.infinite === 'object' ? operationOptions.infinite : undefined
-      return !!infiniteOptions
-    }
-
-    // Query/mutation hooks
-    const getHookName = (operation: Operation) => {
-      return getName(operation, { type: 'function', prefix: 'use' })
-    }
-
-    const getHookFile = (operation: Operation) => {
-      return getFile(operation, { prefix: 'use' })
-    }
-
-    // Query hooks
-    const getQueryHookOptions = (operation: Operation) => {
-      return getName(operation, { type: 'function', suffix: 'QueryOptions' })
-    }
-
-    const getQueryHookOptionsImport = (operation: Operation) => {
-      return <File.Import name={[getQueryHookOptions(operation)]} root={file.path} path={getHookFile(operation).path} />
-    }
-
-    // Mutation hooks
-    const getMutationHookOptions = (operation: Operation) => {
-      return getName(operation, { type: 'function', suffix: 'MutationOptions' })
-    }
-
-    const getMutationHookOptionsImport = (operation: Operation) => {
-      return <File.Import name={[getMutationHookOptions(operation)]} root={file.path} path={getHookFile(operation).path} />
-    }
-
-    // Suspense hooks
-    const getSuspenseHookName = (operation: Operation) => {
-      return getName(operation, { type: 'function', prefix: 'use', suffix: 'suspense' })
-    }
-
-    const getSuspenseHookFile = (operation: Operation) => {
-      return getFile(operation, { prefix: 'use', suffix: 'suspense' })
-    }
-
-    const getSuspenseHookOptions = (operation: Operation) => {
-      return getName(operation, { type: 'function', suffix: 'SuspenseQueryOptions' })
-    }
-
-    const getSuspenseHookOptionsImport = (operation: Operation) => {
-      return <File.Import name={[getSuspenseHookOptions(operation)]} root={file.path} path={getSuspenseHookFile(operation).path} />
-    }
-
-    // Infinite hooks
-    const getInfiniteHookName = (operation: Operation) => {
-      return getName(operation, { type: 'function', prefix: 'use', suffix: 'infinite' })
-    }
-
-    const getInfiniteHookFile = (operation: Operation) => {
-      return getFile(operation, { prefix: 'use', suffix: 'infinite' })
-    }
-
-    const getInfiniteHookOptions = (operation: Operation) => {
-      return getName(operation, { type: 'function', suffix: 'InfiniteQueryOptions' })
-    }
-
-    const getInfiniteHookOptionsImport = (operation: Operation) => {
-      return <File.Import name={[getInfiniteHookOptions(operation)]} root={file.path} path={getInfiniteHookFile(operation).path} />
-    }
-
-    // Suspense infinite hooks
-    const getSuspenseInfiniteHookName = (operation: Operation) => {
-      return getName(operation, { type: 'function', prefix: 'use', suffix: 'suspenseInfinite' })
-    }
-
-    const getSuspenseInfiniteHookFile = (operation: Operation) => {
-      return getFile(operation, { prefix: 'use', suffix: 'suspenseInfinite' })
-    }
-
-    const getSuspenseInfiniteHookOptions = (operation: Operation) => {
-      return getName(operation, { type: 'function', suffix: 'SuspenseInfiniteQueryOptions' })
-    }
-
-    const getSuspenseInfiniteHookOptionsImport = (operation: Operation) => {
-      return <File.Import name={[getSuspenseInfiniteHookOptions(operation)]} root={file.path} path={getSuspenseInfiniteHookFile(operation).path} />
-    }
-
-    const imports = operations
-      .flatMap((operation) => {
-        if (isQuery(operation)) {
-          return [
-            getQueryHookOptionsImport(operation),
-            isSuspense(operation) ? getSuspenseHookOptionsImport(operation) : undefined,
-            isInfinite(operation) ? getInfiniteHookOptionsImport(operation) : undefined,
-            isSuspense(operation) && isInfinite(operation) ? getSuspenseInfiniteHookOptionsImport(operation) : undefined,
-          ].filter(Boolean)
-        }
-        if (isMutation(operation)) {
-          return [getMutationHookOptionsImport(operation)]
-        }
-        return []
-      })
-      .filter(Boolean)
-
-    const hookOptions = operations.reduce(
-      (acc, operation) => {
-        if (isQuery(operation)) {
-          acc[getHookName(operation)] = `Partial<ReturnType<typeof ${getQueryHookOptions(operation)}>>`
-          if (isSuspense(operation)) {
-            acc[getSuspenseHookName(operation)] = `Partial<ReturnType<typeof ${getSuspenseHookOptions(operation)}>>`
-          }
-          if (isInfinite(operation)) {
-            acc[getInfiniteHookName(operation)] = `Partial<ReturnType<typeof ${getInfiniteHookOptions(operation)}>>`
-          }
-          if (isSuspense(operation) && isInfinite(operation)) {
-            acc[getSuspenseInfiniteHookName(operation)] = `Partial<ReturnType<typeof ${getSuspenseInfiniteHookOptions(operation)}>>`
-          }
-        }
-        if (isMutation(operation)) {
-          acc[getHookName(operation)] = `Partial<ReturnType<typeof ${getMutationHookOptions(operation)}>>`
-        }
-        return acc
-      },
-      {} as Record<string, string>,
-    )
 
     return (
       <File
-        baseName={file.baseName}
-        path={file.path}
-        meta={file.meta}
-        banner={getBanner({ oas, output, config: driver.config })}
-        footer={getFooter({ oas, output })}
+        baseName={hookOptionsFile.baseName}
+        path={hookOptionsFile.path}
+        meta={hookOptionsFile.meta}
+        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
+        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
         {imports}
         <File.Source name={name} isExportable isIndexable isTypeOnly>
           <Type export name={name}>
-            {`{ ${Object.keys(hookOptions).map((key) => `${JSON.stringify(key)}: ${hookOptions[key]}`)} }`}
+            {`{ ${Object.keys(hookOptions)
+              .map((key) => `${JSON.stringify(key)}: ${hookOptions[key]}`)
+              .join(', ')} }`}
           </Type>
         </File.Source>
       </File>

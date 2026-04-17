@@ -1,37 +1,40 @@
-import type { Params } from '@kubb/core'
-import { FunctionParams } from '@kubb/core'
-import { isOptional } from '@kubb/oas'
-import { ClientLegacy as Client } from '@kubb/plugin-client'
-import type { OperationSchemas } from '@kubb/plugin-oas'
-import { getPathParams } from '@kubb/plugin-oas/utils'
+import { ast } from '@kubb/core'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { MutationKey } from './MutationKey.tsx'
+import { buildMutationArgParams, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
   clientName: string
   mutationKeyName: string
-  typeSchemas: OperationSchemas
+  node: ast.OperationNode
+  tsResolver: PluginTs['resolver']
   paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
 }
 
-type GetParamsProps = {
-  typeSchemas: OperationSchemas
-}
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
+const keysPrinter = functionPrinter({ mode: 'keys' })
 
-function getParams({ typeSchemas }: GetParamsProps) {
-  return FunctionParams.factory({
-    config: {
-      type: typeSchemas.request?.name
-        ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }`
-        : 'Partial<RequestConfig> & { client?: Client }',
-      default: '{}',
-    },
+function getConfigParam(node: ast.OperationNode, resolver: PluginTs['resolver']): ast.FunctionParametersNode {
+  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
+  return ast.createFunctionParameters({
+    params: [
+      ast.createFunctionParameter({
+        name: 'config',
+        type: ast.createParamsType({
+          variant: 'reference',
+          name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+        }),
+        default: '{}',
+      }),
+    ],
   })
 }
 
@@ -39,80 +42,56 @@ export function MutationOptions({
   name,
   clientName,
   dataReturnType,
-  typeSchemas,
+  node,
+  tsResolver,
   paramsCasing,
   paramsType,
   pathParamsType,
   mutationKeyName,
 }: Props): KubbReactNode {
-  const params = getParams({ typeSchemas })
-  const TData = dataReturnType === 'data' ? typeSchemas.response.name : `ResponseConfig<${typeSchemas.response.name}>`
-  const TError = typeSchemas.errors?.map((item) => item.name).join(' | ') || 'Error'
+  const responseName = tsResolver.resolveResponseName(node)
+  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const errorNames = resolveErrorNames(node, tsResolver)
+  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const clientParams = Client.getParams({
-    typeSchemas,
-    paramsCasing,
+  const configParamsNode = getConfigParam(node, tsResolver)
+  const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
+
+  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver: tsResolver })
+  const hasMutationParams = mutationArgParamsNode.params.length > 0
+
+  const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
+  const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
+
+  const clientCallParamsNode = ast.createOperationParams(node, {
     paramsType,
-    pathParamsType,
-    isConfigurable: true,
+    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
+    paramsCasing,
+    resolver: tsResolver,
+    extraParams: [
+      ast.createFunctionParameter({
+        name: 'config',
+        type: ast.createParamsType({
+          variant: 'reference',
+          name: node.requestBody?.schema
+            ? `Partial<RequestConfig<${tsResolver.resolveDataName(node)}>> & { client?: Client }`
+            : 'Partial<RequestConfig> & { client?: Client }',
+        }),
+        default: '{}',
+      }),
+    ],
   })
-
-  const mutationKeyParams = MutationKey.getParams({
-    pathParamsType,
-    typeSchemas,
-  })
-
-  const mutationParams = FunctionParams.factory({
-    ...getPathParams(typeSchemas.pathParams, { typed: true, casing: paramsCasing }),
-    data: typeSchemas.request?.name
-      ? {
-          type: typeSchemas.request?.name,
-          optional: isOptional(typeSchemas.request?.schema),
-        }
-      : undefined,
-    params: typeSchemas.queryParams?.name
-      ? {
-          type: typeSchemas.queryParams?.name,
-          optional: isOptional(typeSchemas.queryParams?.schema),
-        }
-      : undefined,
-    headers: typeSchemas.headerParams?.name
-      ? {
-          type: typeSchemas.headerParams?.name,
-          optional: isOptional(typeSchemas.headerParams?.schema),
-        }
-      : undefined,
-  })
-
-  const dataParams = FunctionParams.factory({
-    data: {
-      // No use of pathParams because useMutation can only take one argument in object form,
-      // see https://tanstack.com/query/latest/docs/framework/react/reference/useMutation#usemutation
-      mode: 'object',
-      children: Object.entries(mutationParams.params).reduce((acc, [key, value]) => {
-        if (value) {
-          acc[key] = {
-            ...value,
-            type: undefined,
-          }
-        }
-
-        return acc
-      }, {} as Params),
-    },
-  })
-
-  const TRequest = mutationParams.toConstructor()
+  const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={params.toConstructor()} generics={['TContext = unknown']}>
+      <Function name={name} export params={paramsSignature} generics={['TContext = unknown']}>
         {`
-      const mutationKey = ${mutationKeyName}(${mutationKeyParams.toCall()})
-      return mutationOptions<${TData}, ResponseErrorConfig<${TError}>, ${TRequest ? `{${TRequest}}` : 'void'}, TContext>({
+      const mutationKey = ${mutationKeyName}()
+      return mutationOptions<${TData}, ${TError}, ${TRequest ? `{${TRequest}}` : 'void'}, TContext>({
         mutationKey,
-        mutationFn: async(${dataParams.toConstructor()}) => {
-          return ${clientName}(${clientParams.toCall()})
+        mutationFn: async(${hasMutationParams ? `{ ${argKeysStr} }` : '_'}) => {
+          return ${clientName}(${clientCallStr})
         },
       })
 `}
@@ -121,4 +100,4 @@ export function MutationOptions({
   )
 }
 
-MutationOptions.getParams = getParams
+MutationOptions.getParams = getConfigParam

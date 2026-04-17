@@ -1,148 +1,137 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { Config } from '@kubb/core'
-import { createMockedPlugin, createMockedPluginDriver } from '@kubb/core/mocks'
-import type { HttpMethod } from '@kubb/oas'
-import { parse } from '@kubb/oas'
-import { OperationGenerator, renderOperation } from '@kubb/plugin-oas'
+import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { MutationKey, QueryKey } from '../components'
+import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator.tsx'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
 
-describe('suspenseInfiniteQueryGenerator operation', async () => {
+const defaultOptions: PluginReactQuery['resolvedOptions'] = {
+  client: {
+    dataReturnType: 'data',
+    client: 'axios',
+    clientType: 'function',
+    bundle: false,
+  },
+  parser: 'zod',
+  paramsCasing: undefined,
+  paramsType: 'inline',
+  pathParamsType: 'inline',
+  queryKey: QueryKey.getTransformer,
+  mutationKey: MutationKey.getTransformer,
+  query: {
+    importPath: '@tanstack/react-query',
+    methods: ['get'],
+  },
+  mutation: {
+    methods: ['post', 'put', 'patch', 'delete'],
+    importPath: '@tanstack/react-query',
+  },
+  suspense: false,
+  infinite: false,
+  customOptions: undefined,
+  exclude: [],
+  include: undefined,
+  override: [],
+  output: { path: '.' },
+  group: undefined,
+  resolver: resolverReactQuery,
+  transformers: {},
+}
+
+const mockedTsPlugin = createMockedPlugin<PluginTs>({
+  name: 'plugin-ts',
+  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  resolver: resolverTs,
+})
+
+// Shared operation nodes
+const findByTagsNode = ast.createOperation({
+  operationId: 'findPetsByTags',
+  method: 'GET',
+  path: '/pet/findByTags',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      required: true,
+    }),
+    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+    ast.createParameter({ name: 'pageSize', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+  ],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
+const getPetByIdNode = ast.createOperation({
+  operationId: 'getPetById',
+  method: 'GET',
+  path: '/pet/{petId}',
+  tags: ['pet'],
+  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' }),
+    ast.createResponse({ statusCode: '400', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
+  ],
+})
+
+const suspenseInfiniteConfig = {
+  suspense: {},
+  infinite: {
+    queryParam: 'pageSize',
+    initialPageParam: 0,
+    cursorParam: undefined,
+    nextParam: undefined,
+    previousParam: undefined,
+  },
+} as const
+
+describe('suspenseInfiniteQueryGenerator operation', () => {
   const testData = [
+    { name: 'findByTags', node: findByTagsNode, options: { ...suspenseInfiniteConfig } },
+    { name: 'findByTagsWithZod', node: findByTagsNode, options: { ...suspenseInfiniteConfig, parser: 'zod' as const } },
     {
-      name: 'findSuspenseInfiniteByTags',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        suspense: {},
-        infinite: {
-          queryParam: 'pageSize',
-          initialPageParam: 0,
-          cursorParam: undefined,
-        },
-      },
+      name: 'findByTagsFull',
+      node: findByTagsNode,
+      options: { ...suspenseInfiniteConfig, client: { dataReturnType: 'full' as const, client: 'axios' as const } },
     },
     {
-      name: 'findSuspenseInfiniteByTagsCursor',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        suspense: {},
-        infinite: {
-          queryParam: 'pageSize',
-          initialPageParam: 0,
-          cursorParam: 'cursor',
-        },
-      },
+      name: 'clientPostImportPath',
+      node: findByTagsNode,
+      options: { ...suspenseInfiniteConfig, client: { dataReturnType: 'data' as const, importPath: 'axios' as const } },
     },
     {
-      name: 'findSuspenseInfiniteByTagsWithCustomOptions',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        suspense: {},
-        infinite: {
-          queryParam: 'pageSize',
-          initialPageParam: 0,
-          cursorParam: undefined,
-        },
-        customOptions: {
-          importPath: 'useCustomHookOptions.ts',
-          name: 'useCustomHookOptions',
-        },
-      },
+      name: 'findByTagsObject',
+      node: findByTagsNode,
+      options: { ...suspenseInfiniteConfig, paramsType: 'object' as const, pathParamsType: 'object' as const },
     },
-    {
-      name: 'findSuspenseInfiniteByStatusAllOptional',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByStatus',
-      method: 'get',
-      options: {
-        paramsType: 'object',
-        suspense: {},
-        infinite: {
-          queryParam: 'status',
-          initialPageParam: 'available',
-        },
-      },
-    },
-  ] as const satisfies Array<{
-    input: string
-    name: string
-    path: string
-    method: HttpMethod
-    options: Partial<PluginReactQuery['resolvedOptions']>
-  }>
+    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { ...suspenseInfiniteConfig, paramsCasing: 'camelcase' as const } },
+  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {
-    const oas = await parse(path.resolve(__dirname, props.input))
-
     const options: PluginReactQuery['resolvedOptions'] = {
-      client: {
-        dataReturnType: 'data',
-        client: 'axios',
-        bundle: false,
-      },
-      parser: 'zod',
-      paramsCasing: undefined,
-      paramsType: 'inline',
-      pathParamsType: 'inline',
-      query: {
-        importPath: '@tanstack/react-query',
-        methods: ['get'],
-      },
-      queryKey: QueryKey.getTransformer,
-      mutationKey: MutationKey.getTransformer,
-      mutation: {
-        methods: ['post'],
-        importPath: '@tanstack/react-query',
-      },
-      customOptions: undefined,
-      exclude: [],
-      include: undefined,
-      override: [],
-      output: {
-        path: '.',
-      },
-      group: undefined,
+      ...defaultOptions,
       ...props.options,
     }
-    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options })
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
 
-    const mockedPluginDriver = createMockedPluginDriver({ name: props.name })
-    const generator = new OperationGenerator(options, {
-      oas,
-      include: undefined,
-      driver: mockedPluginDriver,
-
+    await renderGeneratorOperation(suspenseInfiniteQueryGenerator, props.node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
       plugin,
-      contentType: undefined,
-      override: undefined,
-      mode: 'split',
-      exclude: [],
+      options,
+      resolver: resolverReactQuery,
     })
 
-    const operation = oas.operation(props.path, props.method)
-    await renderOperation(operation, {
-      config: { root: '.', output: { path: 'test' } } as Config,
-      driver: mockedPluginDriver,
-      oas,
-      mode: 'split',
-      generator,
-      Component: suspenseInfiniteQueryGenerator.Operation,
-      plugin,
-    })
-
-    await matchFiles(mockedPluginDriver.fileManager.files, props.name)
+    await matchFiles(driver.fileManager.files, props.name)
   })
 })

@@ -1,67 +1,55 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { useDriver } from '@kubb/core/hooks'
-import type { Operation } from '@kubb/oas'
-import { createReactGenerator } from '@kubb/plugin-oas/generators'
-import { useOperationManager } from '@kubb/plugin-oas/hooks'
-import { File, Function } from '@kubb/renderer-jsx'
+
+import { defineGenerator } from '@kubb/core'
+import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
+import { transformName } from '../utils.ts'
 
-export const customHookOptionsFileGenerator = createReactGenerator<PluginReactQuery>({
+export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-custom-hook-options-file',
-  Operations({ operations, generator, plugin, config }) {
-    const {
-      options,
-      options: { output },
-      name: pluginName,
-    } = plugin
-    const driver = useDriver()
+  renderer: jsxRenderer,
+  operations(nodes, ctx) {
+    const { resolver, config, root } = ctx
+    const { output, customOptions, query, group, transformers } = ctx.options
 
-    const { getFile } = useOperationManager(generator)
-
-    if (!options.customOptions) {
-      return null
-    }
+    if (!customOptions) return null
 
     const override = output.override ?? config.output.override ?? false
-    const { importPath, name } = options.customOptions
+    const { importPath, name } = customOptions
 
-    const root = path.resolve(config.root, config.output.path)
+    const reactQueryImportPath = query ? query.importPath : '@tanstack/react-query'
 
-    const reactQueryImportPath = options.query ? options.query.importPath : '@tanstack/react-query'
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-    const getHookFilePath = (operations: Operation[]) => {
-      const firstOperation = operations[0]
-      if (firstOperation != null) {
-        // Get the file of the first generated hook
-        return getFile(firstOperation, { prefix: 'use' }).path
-      }
-      // Get the index file of the hooks directory
-      return driver.getFile({ name: 'index', extname: '.ts', pluginName }).path
+    let hookFilePath: string
+    const firstNode = nodes[0]
+    if (firstNode) {
+      const baseName = resolver.resolveName(firstNode.operationId)
+      const hookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
+      const hookFile = resolver.resolveFile(
+        { name: hookName, extname: '.ts', tag: firstNode.tags[0] ?? 'default', path: firstNode.path },
+        { root, output, group },
+      )
+      hookFilePath = hookFile.path
+    } else {
+      hookFilePath = path.resolve(root, 'index.ts')
     }
 
     const ensureExtension = (filePath: string, extname: string) => {
-      if (path.extname(filePath) === '') {
-        return filePath + extname
-      }
+      if (path.extname(filePath) === '') return filePath + extname
       return filePath
     }
 
-    const getExternalFile = (filePath: string, rootPath: string) => {
-      const actualFilePath = ensureExtension(filePath, '.ts')
-      return {
-        baseName: path.basename(actualFilePath) as `${string}.${string}`,
-        name: path.basename(actualFilePath, path.extname(actualFilePath)),
-        path: path.resolve(rootPath, actualFilePath),
-      }
+    const basePath = path.dirname(hookFilePath)
+    const actualFilePath = ensureExtension(importPath, '.ts')
+    const file = {
+      baseName: path.basename(actualFilePath) as `${string}.${string}`,
+      name: path.basename(actualFilePath, path.extname(actualFilePath)),
+      path: path.resolve(basePath, actualFilePath),
     }
 
-    const basePath = path.dirname(getHookFilePath(operations))
-    const file = getExternalFile(importPath, basePath)
-
-    if (fs.existsSync(file.path) && !override) {
-      return null
-    }
+    if (fs.existsSync(file.path) && !override) return null
 
     return (
       <File baseName={file.baseName} path={file.path}>

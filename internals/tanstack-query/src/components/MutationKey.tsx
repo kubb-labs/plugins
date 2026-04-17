@@ -1,44 +1,39 @@
 import { URLPath } from '@internals/utils'
-import { FunctionParams } from '@kubb/core'
-import type { Operation } from '@kubb/oas'
-import type { OperationSchemas } from '@kubb/plugin-oas'
+import { ast } from '@kubb/core'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { ParamsCasing, PathParamsType, Transformer } from '../types.ts'
+import type { Transformer } from '../types.ts'
 
 type Props = {
   name: string
   typeName: string
-  typeSchemas: OperationSchemas
-  operation: Operation
-  paramsCasing: ParamsCasing
-  pathParamsType: PathParamsType
+  node: ast.OperationNode
+  paramsCasing: 'camelcase' | undefined
+  pathParamsType: 'object' | 'inline'
   transformer: Transformer | undefined
 }
 
-type GetParamsProps = {
-  pathParamsType: PathParamsType
-  typeSchemas: OperationSchemas
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+
+function getParams(): ast.FunctionParametersNode {
+  return ast.createFunctionParameters({ params: [] })
 }
 
-function getParams({}: GetParamsProps) {
-  return FunctionParams.factory({})
-}
-
-const getTransformer: Transformer = ({ operation, casing }) => {
-  const path = new URLPath(operation.path, { casing })
-
+const getTransformer: Transformer = ({ node, casing }) => {
+  const path = new URLPath(node.path, { casing })
   return [`{ url: '${path.toURLPath()}' }`]
 }
 
-export function MutationKey({ name, typeSchemas, pathParamsType, paramsCasing, operation, typeName, transformer = getTransformer }: Props): KubbReactNode {
-  const params = getParams({ pathParamsType, typeSchemas })
-  const keys = transformer({ operation, schemas: typeSchemas, casing: paramsCasing })
+export function MutationKey({ name, paramsCasing, node, typeName, transformer = getTransformer }: Props): KubbReactNode {
+  const paramsNode = getParams()
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const keys = transformer({ node, casing: paramsCasing })
 
   return (
     <>
       <File.Source name={name} isExportable isIndexable>
-        <Function.Arrow name={name} export params={params.toConstructor()} singleLine>
+        <Function.Arrow name={name} export params={paramsSignature} singleLine>
           {`[${keys.join(', ')}] as const`}
         </Function.Arrow>
       </File.Source>

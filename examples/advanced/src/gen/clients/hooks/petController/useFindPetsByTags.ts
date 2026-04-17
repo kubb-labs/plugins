@@ -1,12 +1,12 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type {
-  FindPetsByTagsQueryResponse,
-  FindPetsByTagsQueryParams,
-  FindPetsByTagsHeaderParams,
-  FindPetsByTags400,
-} from '../../../models/ts/petController/FindPetsByTags.ts'
+import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { QueryClient, QueryKey, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
+import type {
+  FindPetsByTags400,
+  FindPetsByTagsHeaderParams,
+  FindPetsByTagsQueryParams,
+  FindPetsByTagsQueryResponse,
+} from '../../../models/ts/petController/FindPetsByTags.ts'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
 
 export const findPetsByTagsQueryKey = (params?: FindPetsByTagsQueryParams) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
@@ -26,7 +26,7 @@ export function findPetsByTagsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags({ headers: headers, params: params }, { ...config, signal: config.signal ?? signal })
+      return findPetsByTags({ headers, params }, { ...config, signal: config.signal ?? signal })
     },
   })
 }

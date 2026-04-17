@@ -1,7 +1,7 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { FindPetsByStatusQueryResponse, FindPetsByStatusPathParams, FindPetsByStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
+import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { QueryClient, QueryKey, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
+import type { FindPetsByStatus400, FindPetsByStatusPathParams, FindPetsByStatusQueryResponse } from '../../../models/ts/petController/FindPetsByStatus.ts'
 import { findPetsByStatus } from '../../axios/petService/findPetsByStatus.ts'
 
 export const findPetsByStatusQueryKey = ({ stepId }: { stepId: FindPetsByStatusPathParams['stepId'] }) =>
@@ -23,7 +23,7 @@ export function findPetsByStatusQueryOptions(
     enabled: !!stepId,
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatus({ stepId: stepId }, { ...config, signal: config.signal ?? signal })
+      return findPetsByStatus({ stepId }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
