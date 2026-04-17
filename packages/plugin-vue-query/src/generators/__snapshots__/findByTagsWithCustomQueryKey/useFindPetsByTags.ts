@@ -11,7 +11,8 @@ import { fetch } from './.kubb/fetch'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = (params: MaybeRefOrGetter<unknown>) => ['test', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsQueryKey = (params: MaybeRefOrGetter<unknown>) =>
+  ['findPetsByTags', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
