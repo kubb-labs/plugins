@@ -5,6 +5,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
+import { resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
 import { buildEnabledCheck, getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -46,12 +47,7 @@ export function SuspenseInfiniteQueryOptions({
 }: Props): KubbReactNode {
   const responseName = tsResolver.resolveResponseName(node)
   const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
-  const errorNames = node.responses
-    .filter((r) => {
-      const code = Number.parseInt(r.statusCode, 10)
-      return code >= 400 || r.statusCode === 'default'
-    })
-    .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
+  const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
