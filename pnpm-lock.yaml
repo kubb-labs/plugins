@@ -65,15 +65,9 @@ importers:
       '@changesets/cli':
         specifier: ^2.30.0
         version: 2.30.0(@types/node@22.19.17)
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:internals/utils
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/ast':
-        specifier: 5.0.0-alpha.36
-        version: 5.0.0-alpha.36
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
