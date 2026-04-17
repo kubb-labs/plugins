@@ -43,7 +43,7 @@ export function getUserByNameQueryOptionsHook(
     enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getUserByNameHook({ username: username }, { ...config, signal: config.signal ?? signal })
+      return getUserByNameHook({ username }, { ...config, signal: config.signal ?? signal })
     },
   })
 }

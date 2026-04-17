@@ -43,7 +43,7 @@ export function getUserByNameSuspenseQueryOptionsHook(
     enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getUserByNameSuspenseHook({ username: username }, { ...config, signal: config.signal ?? signal })
+      return getUserByNameSuspenseHook({ username }, { ...config, signal: config.signal ?? signal })
     },
   })
 }

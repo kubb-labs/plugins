@@ -1,23 +1,20 @@
-import { FunctionParams } from '@kubb/core'
-import { isAllOptional, isOptional, type Operation } from '@kubb/oas'
-import type { OperationSchemas } from '@kubb/plugin-oas'
-import { getComments, getPathParams } from '@kubb/plugin-oas/utils'
+import { ast } from '@kubb/core'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
+import { getComments, resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
-import { QueryOptions } from './QueryOptions.tsx'
+import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
-  /**
-   * Name of the function
-   */
   name: string
   queryOptionsName: string
   queryKeyName: string
   queryKeyTypeName: string
-  typeSchemas: OperationSchemas
-  operation: Operation
+  node: ast.OperationNode
+  tsResolver: PluginTs['resolver']
   paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
@@ -27,99 +24,41 @@ type Props = {
   queryParam?: Infinite['queryParam']
 }
 
-type GetParamsProps = {
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
-  typeSchemas: OperationSchemas
-  pageParamGeneric: string
-}
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
 
-function getParams({ paramsType, paramsCasing, pathParamsType, typeSchemas, pageParamGeneric }: GetParamsProps) {
-  if (paramsType === 'object') {
-    const pathParams = getPathParams(typeSchemas.pathParams, { typed: true, casing: paramsCasing })
+function getParams(
+  node: ast.OperationNode,
+  options: {
+    paramsType: PluginReactQuery['resolvedOptions']['paramsType']
+    paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
+    pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
+    dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+    resolver: PluginTs['resolver']
+    pageParamGeneric: string
+  },
+): ast.FunctionParametersNode {
+  const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
+  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
 
-    const children = {
-      ...pathParams,
-      data: typeSchemas.request?.name
-        ? {
-            type: typeSchemas.request?.name,
-            optional: isOptional(typeSchemas.request?.schema),
-          }
-        : undefined,
-      params: typeSchemas.queryParams?.name
-        ? {
-            type: typeSchemas.queryParams?.name,
-            optional: isOptional(typeSchemas.queryParams?.schema),
-          }
-        : undefined,
-      headers: typeSchemas.headerParams?.name
-        ? {
-            type: typeSchemas.headerParams?.name,
-            optional: isOptional(typeSchemas.headerParams?.schema),
-          }
-        : undefined,
-    }
-
-    // Check if all children are optional or undefined
-    const allChildrenAreOptional = Object.values(children).every((child) => !child || child.optional)
-
-    return FunctionParams.factory({
-      data: {
-        mode: 'object',
-        children,
-        default: allChildrenAreOptional ? '{}' : undefined,
-      },
-      options: {
-        type: `
-{
+  const optionsParam = ast.createFunctionParameter({
+    name: 'options',
+    type: ast.createParamsType({
+      variant: 'reference',
+      name: `{
   query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
-  client?: ${typeSchemas.request?.name ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
-}
-`,
-        default: '{}',
-      },
-    })
-  }
+  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
+}`,
+    }),
+    default: '{}',
+  })
 
-  return FunctionParams.factory({
-    pathParams: typeSchemas.pathParams?.name
-      ? {
-          mode: pathParamsType === 'object' ? 'object' : 'inlineSpread',
-          children: getPathParams(typeSchemas.pathParams, {
-            typed: true,
-            casing: paramsCasing,
-          }),
-          default: isAllOptional(typeSchemas.pathParams?.schema) ? '{}' : undefined,
-        }
-      : undefined,
-    data: typeSchemas.request?.name
-      ? {
-          type: typeSchemas.request?.name,
-          optional: isOptional(typeSchemas.request?.schema),
-        }
-      : undefined,
-    params: typeSchemas.queryParams?.name
-      ? {
-          type: typeSchemas.queryParams?.name,
-          optional: isOptional(typeSchemas.queryParams?.schema),
-        }
-      : undefined,
-    headers: typeSchemas.headerParams?.name
-      ? {
-          type: typeSchemas.headerParams?.name,
-          optional: isOptional(typeSchemas.headerParams?.schema),
-        }
-      : undefined,
-    options: {
-      type: `
-{
-  query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
-  client?: ${typeSchemas.request?.name ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
-}
-`,
-      default: '{}',
-    },
+  return ast.createOperationParams(node, {
+    paramsType,
+    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
+    paramsCasing,
+    resolver,
+    extraParams: [optionsParam],
   })
 }
 
@@ -132,14 +71,18 @@ export function SuspenseInfiniteQuery({
   paramsCasing,
   pathParamsType,
   dataReturnType,
-  typeSchemas,
-  operation,
+  node,
+  tsResolver,
   customOptions,
   initialPageParam,
   queryParam,
 }: Props): KubbReactNode {
-  const responseType = dataReturnType === 'data' ? typeSchemas.response.name : `ResponseConfig<${typeSchemas.response.name}>`
-  const errorType = `ResponseErrorConfig<${typeSchemas.errors?.map((item) => item.name).join(' | ') || 'Error'}>`
+  const responseName = tsResolver.resolveResponseName(node)
+  const errorNames = resolveErrorNames(node, tsResolver)
+
+  const responseType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+
   const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
   const fallbackPageParamType =
     typeof initialPageParam === 'number'
@@ -154,8 +97,20 @@ export function SuspenseInfiniteQuery({
         : typeof initialPageParam === 'boolean'
           ? 'boolean'
           : 'unknown'
-  const queryParamType = queryParam && typeSchemas.queryParams?.name ? `${typeSchemas.queryParams?.name}['${queryParam}']` : undefined
+
+  const rawQueryParams = node.parameters.filter((p) => p.in === 'query')
+  const queryParamsTypeName =
+    rawQueryParams.length > 0
+      ? (() => {
+          const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
+          const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
+          return groupName !== individualName ? groupName : undefined
+        })()
+      : undefined
+
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
+
   const returnType = 'UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }'
   const generics = [
     `TQueryFnData = ${responseType}`,
@@ -165,46 +120,26 @@ export function SuspenseInfiniteQuery({
     `TPageParam = ${pageParamType}`,
   ]
 
-  const queryKeyParams = QueryKey.getParams({
-    pathParamsType,
-    typeSchemas,
-    paramsCasing,
-  })
-  const queryOptionsParams = QueryOptions.getParams({
-    paramsType,
-    pathParamsType,
-    typeSchemas,
-    paramsCasing,
-  })
-  const params = getParams({
-    paramsCasing,
-    paramsType,
-    pathParamsType,
-    typeSchemas,
-    pageParamGeneric: 'TPageParam',
-  })
+  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const queryOptions = `${queryOptionsName}(${queryOptionsParams.toCall()})`
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
+
+  const paramsNode = getParams(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver, pageParamGeneric: 'TPageParam' })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      <Function
-        name={name}
-        export
-        generics={generics.join(', ')}
-        params={params.toConstructor()}
-        JSDoc={{
-          comments: getComments(operation),
-        }}
-      >
+      <Function name={name} export generics={generics.join(', ')} params={paramsSignature} returnType={undefined} JSDoc={{ comments: getComments(node) }}>
         {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig
-       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParams.toCall()})
-       ${customOptions ? `const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${operation.getOperationId()}' })` : ''}
+       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})
+       ${customOptions ? `const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
        const query = useSuspenseInfiniteQuery({
-        ...${queryOptions},${customOptions ? '\n...customOptions,' : ''}
+        ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
        } as unknown as UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient) as ${returnType}

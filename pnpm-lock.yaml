@@ -646,12 +646,9 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-oas':
+      '@kubb/plugin-ts':
         specifier: workspace:*
-        version: link:../../packages/plugin-oas
+        version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-alpha.36
@@ -800,15 +797,9 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../plugin-oas
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts

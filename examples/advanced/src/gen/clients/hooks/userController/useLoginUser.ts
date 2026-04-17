@@ -13,7 +13,7 @@ export function loginUserQueryOptions({ params }: { params?: LoginUserQueryParam
   return queryOptions<ResponseConfig<LoginUserQueryResponse>, ResponseErrorConfig<LoginUser400>, ResponseConfig<LoginUserQueryResponse>, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return loginUser({ params: params }, { ...config, signal: config.signal ?? signal })
+      return loginUser({ params }, { ...config, signal: config.signal ?? signal })
     },
   })
 }

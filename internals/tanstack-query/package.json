@@ -49,8 +49,7 @@
   "dependencies": {
     "@internals/utils": "workspace:*",
     "@kubb/core": "catalog:",
-    "@kubb/oas": "catalog:",
-    "@kubb/plugin-oas": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"
   },
   "peerDependencies": {

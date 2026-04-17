@@ -1,241 +1,145 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+
 import type { Config } from '@kubb/core'
-import { createMockedPlugin, createMockedPluginDriver } from '@kubb/core/mocks'
-import type { HttpMethod } from '@kubb/oas'
-import { parse } from '@kubb/oas'
-import { OperationGenerator, renderOperation } from '@kubb/plugin-oas'
+import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { MutationKey, QueryKey } from '../components'
+import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
 
-describe('queryGenerator operation', async () => {
+const defaultOptions: PluginReactQuery['resolvedOptions'] = {
+  client: {
+    dataReturnType: 'data',
+    client: 'axios',
+    clientType: 'function',
+    bundle: false,
+  },
+  parser: 'zod',
+  paramsCasing: undefined,
+  paramsType: 'inline',
+  pathParamsType: 'inline',
+  queryKey: QueryKey.getTransformer,
+  mutationKey: MutationKey.getTransformer,
+  query: {
+    importPath: '@tanstack/react-query',
+    methods: ['get'],
+  },
+  mutation: {
+    methods: ['post', 'put', 'patch', 'delete'],
+    importPath: '@tanstack/react-query',
+  },
+  suspense: false,
+  infinite: false,
+  customOptions: undefined,
+  exclude: [],
+  include: undefined,
+  override: [],
+  output: { path: '.' },
+  group: undefined,
+  resolver: resolverReactQuery,
+  transformers: {},
+}
+
+const mockedTsPlugin = createMockedPlugin<PluginTs>({
+  name: 'plugin-ts',
+  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  resolver: resolverTs,
+})
+
+// Shared operation nodes
+const findByTagsNode = ast.createOperation({
+  operationId: 'findPetsByTags',
+  method: 'GET',
+  path: '/pet/findByTags',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      required: true,
+    }),
+    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+    ast.createParameter({ name: 'pageSize', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+  ],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
+const getPetByIdNode = ast.createOperation({
+  operationId: 'getPetById',
+  method: 'GET',
+  path: '/pet/{petId}',
+  tags: ['pet'],
+  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' }),
+    ast.createResponse({ statusCode: '400', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
+  ],
+})
+
+const findByStatusNode = ast.createOperation({
+  operationId: 'findPetsByStatus',
+  method: 'GET',
+  path: '/pet/findByStatus',
+  tags: ['pet'],
+  parameters: [ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) })],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
+const createUsersWithListInputNode = ast.createOperation({
+  operationId: 'createUsersWithListInput',
+  method: 'POST',
+  path: '/user/createWithList',
+  tags: ['user'],
+  requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
+describe('queryGenerator operation', () => {
   const testData = [
-    {
-      name: 'findByTags',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {},
-    },
-    {
-      name: 'findByTagsTemplateString',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        client: {
-          baseURL: '${123456}',
-        },
-      },
-    },
-    {
-      name: 'findByTagsPathParamsObject',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        pathParamsType: 'object',
-      },
-    },
-    {
-      name: 'findByTagsWithZod',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        parser: 'zod',
-      },
-    },
-    {
-      name: 'findByTagsWithCustomQueryKey',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        query: {
-          methods: ['get'],
-          importPath: '@tanstack/react-query',
-        },
-        queryKey(props) {
-          const keys = QueryKey.getTransformer(props)
-          return ['"test"', ...keys]
-        },
-      },
-    },
-    {
-      name: 'findByTagsWithCustomOptions',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        customOptions: {
-          importPath: 'useCustomHookOptions.ts',
-          name: 'useCustomHookOptions',
-        },
-      },
-    },
-    {
-      name: 'clientGetImportPath',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        client: {
-          dataReturnType: 'data',
-          importPath: 'axios',
-        },
-      },
-    },
-    {
-      name: 'clientDataReturnTypeFull',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        client: {
-          dataReturnType: 'full',
-          client: 'axios',
-        },
-      },
-    },
-    {
-      name: 'postAsQuery',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/{pet_id}',
-      method: 'post',
-      options: {
-        query: {
-          importPath: 'custom-query',
-          methods: ['post'],
-        },
-      },
-    },
-    {
-      name: 'findByTagsObject',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {
-        paramsType: 'object',
-        pathParamsType: 'object',
-      },
-    },
-    {
-      name: 'getPetIdCamelCase',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/{pet_id}',
-      method: 'get',
-      options: {
-        paramsCasing: 'camelcase',
-      },
-    },
-    {
-      name: 'findByStatusAllOptional',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByStatus',
-      method: 'get',
-      options: {
-        paramsType: 'object',
-      },
-    },
-    {
-      name: 'findByStatusAllOptionalInline',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByStatus',
-      method: 'get',
-      options: {
-        paramsType: 'inline',
-      },
-    },
+    { name: 'findByTags', node: findByTagsNode, options: {} },
+    { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
+    { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
+    { name: 'findByTagsFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
+    { name: 'clientPostImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    { name: 'getPetById', node: getPetByIdNode, options: {} },
+    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { paramsCasing: 'camelcase' as const } },
+    { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
+    { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const } },
+    { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const } },
     {
       name: 'createUsersWithListInputAsQuery',
-      input: '../../mocks/petStore.yaml',
-      path: '/user/createWithList',
-      method: 'post',
-      options: {
-        query: {
-          importPath: '@tanstack/react-query',
-          methods: ['post'],
-        },
-      },
+      node: createUsersWithListInputNode,
+      options: { query: { importPath: '@tanstack/react-query', methods: ['post'] } },
     },
-  ] as const satisfies Array<{
-    input: string
-    name: string
-    path: string
-    method: HttpMethod
-    options: Partial<PluginReactQuery['resolvedOptions']>
-  }>
+  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {
-    const oas = await parse(path.resolve(__dirname, props.input))
-
     const options: PluginReactQuery['resolvedOptions'] = {
-      client: {
-        dataReturnType: 'data',
-        client: 'axios',
-        clientType: 'function',
-        bundle: false,
-      },
-      parser: 'zod',
-      paramsCasing: undefined,
-      paramsType: 'inline',
-      pathParamsType: 'inline',
-      queryKey: QueryKey.getTransformer,
-      mutationKey: MutationKey.getTransformer,
-      query: {
-        importPath: '@tanstack/react-query',
-        methods: ['get'],
-      },
-      mutation: {
-        methods: ['post'],
-        importPath: '@tanstack/react-query',
-      },
-      suspense: false,
-      infinite: false,
-      customOptions: undefined,
-      exclude: [],
-      include: undefined,
-      override: [],
-      output: {
-        path: '.',
-      },
-      group: undefined,
+      ...defaultOptions,
       ...props.options,
     }
-    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options })
+    const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
+    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
 
-    const mockedPluginDriver = createMockedPluginDriver({ name: props.name })
-    const generator = new OperationGenerator(options, {
-      oas,
-      include: undefined,
-      driver: mockedPluginDriver,
-
+    await renderGeneratorOperation(queryGenerator, props.node, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
+      }),
+      driver,
       plugin,
-      contentType: undefined,
-      override: undefined,
-      mode: 'split',
-      exclude: [],
+      options,
+      resolver: resolverReactQuery,
     })
 
-    const operation = oas.operation(props.path, props.method)
-    await renderOperation(operation, {
-      config: { root: '.', output: { path: 'test' } } as Config,
-      driver: mockedPluginDriver,
-      oas,
-      mode: 'split',
-      generator,
-      Component: queryGenerator.Operation,
-      plugin,
-    })
-
-    await matchFiles(mockedPluginDriver.fileManager.files, props.name)
+    await matchFiles(driver.fileManager.files, props.name)
   })
 })

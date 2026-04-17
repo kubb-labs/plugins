@@ -1,19 +1,20 @@
 import { getNestedAccessor } from '@internals/utils'
-import { FunctionParams } from '@kubb/core'
-import { isAllOptional, isOptional } from '@kubb/oas'
-import { ClientLegacy as Client } from '@kubb/plugin-client'
-import type { OperationSchemas } from '@kubb/plugin-oas'
-import { getPathParams } from '@kubb/plugin-oas/utils'
+import type { ast } from '@kubb/core'
+import type { PluginTs } from '@kubb/plugin-ts'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
+import { resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
+import { buildEnabledCheck, getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
   name: string
   clientName: string
   queryKeyName: string
-  typeSchemas: OperationSchemas
+  node: ast.OperationNode
+  tsResolver: PluginTs['resolver']
   paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
@@ -25,94 +26,8 @@ type Props = {
   queryParam: Infinite['queryParam']
 }
 
-type GetParamsProps = {
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
-  typeSchemas: OperationSchemas
-}
-
-function getParams({ paramsType, paramsCasing, pathParamsType, typeSchemas }: GetParamsProps) {
-  if (paramsType === 'object') {
-    const pathParams = getPathParams(typeSchemas.pathParams, { typed: true, casing: paramsCasing })
-
-    const children = {
-      ...pathParams,
-      data: typeSchemas.request?.name
-        ? {
-            type: typeSchemas.request?.name,
-            optional: isOptional(typeSchemas.request?.schema),
-          }
-        : undefined,
-      params: typeSchemas.queryParams?.name
-        ? {
-            type: typeSchemas.queryParams?.name,
-            optional: isOptional(typeSchemas.queryParams?.schema),
-          }
-        : undefined,
-      headers: typeSchemas.headerParams?.name
-        ? {
-            type: typeSchemas.headerParams?.name,
-            optional: isOptional(typeSchemas.headerParams?.schema),
-          }
-        : undefined,
-    }
-
-    // Check if all children are optional or undefined
-    const allChildrenAreOptional = Object.values(children).every((child) => !child || child.optional)
-
-    return FunctionParams.factory({
-      data: {
-        mode: 'object',
-        children,
-        default: allChildrenAreOptional ? '{}' : undefined,
-      },
-      config: {
-        type: typeSchemas.request?.name
-          ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }`
-          : 'Partial<RequestConfig> & { client?: Client }',
-        default: '{}',
-      },
-    })
-  }
-
-  return FunctionParams.factory({
-    pathParams: typeSchemas.pathParams?.name
-      ? {
-          mode: pathParamsType === 'object' ? 'object' : 'inlineSpread',
-          children: getPathParams(typeSchemas.pathParams, {
-            typed: true,
-            casing: paramsCasing,
-          }),
-          default: isAllOptional(typeSchemas.pathParams?.schema) ? '{}' : undefined,
-        }
-      : undefined,
-    data: typeSchemas.request?.name
-      ? {
-          type: typeSchemas.request?.name,
-          optional: isOptional(typeSchemas.request?.schema),
-        }
-      : undefined,
-    params: typeSchemas.queryParams?.name
-      ? {
-          type: typeSchemas.queryParams?.name,
-          optional: isOptional(typeSchemas.queryParams?.schema),
-        }
-      : undefined,
-    headers: typeSchemas.headerParams?.name
-      ? {
-          type: typeSchemas.headerParams?.name,
-          optional: isOptional(typeSchemas.headerParams?.schema),
-        }
-      : undefined,
-    config: {
-      type: typeSchemas.request?.name
-        ? `Partial<RequestConfig<${typeSchemas.request?.name}>> & { client?: Client }`
-        : 'Partial<RequestConfig> & { client?: Client }',
-      default: '{}',
-    },
-  })
-}
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
+const callPrinter = functionPrinter({ mode: 'call' })
 
 export function InfiniteQueryOptions({
   name,
@@ -121,7 +36,8 @@ export function InfiniteQueryOptions({
   cursorParam,
   nextParam,
   previousParam,
-  typeSchemas,
+  node,
+  tsResolver,
   paramsCasing,
   paramsType,
   dataReturnType,
@@ -129,8 +45,11 @@ export function InfiniteQueryOptions({
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const queryFnDataType = dataReturnType === 'data' ? typeSchemas.response.name : `ResponseConfig<${typeSchemas.response.name}>`
-  const errorType = `ResponseErrorConfig<${typeSchemas.errors?.map((item) => item.name).join(' | ') || 'Error'}>`
+  const responseName = tsResolver.resolveResponseName(node)
+  const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const errorNames = resolveErrorNames(node, tsResolver)
+  const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
+
   const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
   const fallbackPageParamType =
     typeof initialPageParam === 'number'
@@ -145,36 +64,37 @@ export function InfiniteQueryOptions({
         : typeof initialPageParam === 'boolean'
           ? 'boolean'
           : 'unknown'
-  const queryParamType = queryParam && typeSchemas.queryParams?.name ? `${typeSchemas.queryParams?.name}['${queryParam}']` : undefined
+
+  const rawQueryParams = node.parameters.filter((p) => p.in === 'query')
+  const queryParamsTypeName =
+    rawQueryParams.length > 0
+      ? (() => {
+          const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
+          const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
+          return groupName !== individualName ? groupName : undefined
+        })()
+      : undefined
+
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const params = getParams({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
-    typeSchemas,
-  })
-  const clientParams = Client.getParams({
-    paramsCasing,
-    typeSchemas,
-    paramsType,
-    pathParamsType,
-    isConfigurable: true,
-  })
-  const queryKeyParams = QueryKey.getParams({
-    pathParamsType,
-    typeSchemas,
-    paramsCasing,
-  })
+  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
+  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  // Determine if we should use the new nextParam/previousParam or fall back to legacy cursorParam behavior
+  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
+
+  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
+  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+
   const hasNewParams = nextParam !== undefined || previousParam !== undefined
 
   let getNextPageParamExpr: string | undefined
   let getPreviousPageParamExpr: string | undefined
 
   if (hasNewParams) {
-    // Use the new nextParam and previousParam
     if (nextParam) {
       const accessor = getNestedAccessor(nextParam, 'lastPage')
       if (accessor) {
@@ -188,11 +108,9 @@ export function InfiniteQueryOptions({
       }
     }
   } else if (cursorParam) {
-    // Legacy behavior: use cursorParam for both next and previous
     getNextPageParamExpr = `getNextPageParam: (lastPage) => lastPage['${cursorParam}']`
     getPreviousPageParamExpr = `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`
   } else {
-    // Fallback behavior: page-based pagination
     if (dataReturnType === 'full') {
       getNextPageParamExpr =
         'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1'
@@ -203,56 +121,35 @@ export function InfiniteQueryOptions({
     getPreviousPageParamExpr = 'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1'
   }
 
-  const queryOptions = [
+  const queryOptionsArr = [
     `initialPageParam: ${typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : initialPageParam}`,
     getNextPageParamExpr,
     getPreviousPageParamExpr,
   ].filter(Boolean)
 
   const infiniteOverrideParams =
-    queryParam && typeSchemas.queryParams?.name
+    queryParam && queryParamsTypeName
       ? `
           params = {
             ...(params ?? {}),
-            ['${queryParam}']: pageParam as unknown as ${typeSchemas.queryParams?.name}['${queryParam}'],
-          } as ${typeSchemas.queryParams?.name}`
+            ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
+          } as ${queryParamsTypeName}`
       : ''
-
-  // Only add enabled check for required (non-optional) parameters
-  // Optional parameters with defaults should not prevent query execution
-  const enabled = Object.entries(queryKeyParams.flatParams)
-    .map(([key, item]) => {
-      // Only include if the parameter exists and is NOT optional
-      // This ensures we only check required parameters
-      return item && !item.optional && !item.default ? key : undefined
-    })
-    .filter(Boolean)
-    .join('&& ')
-
-  const enabledText = enabled ? `enabled: !!(${enabled}),` : ''
 
   if (infiniteOverrideParams) {
     return (
       <File.Source name={name} isExportable isIndexable>
-        <Function name={name} export params={params.toConstructor()}>
+        <Function name={name} export params={paramsSignature}>
           {`
-      const queryKey = ${queryKeyName}(${queryKeyParams.toCall()})
+      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
        ${enabledText}
        queryKey,
        queryFn: async ({ signal, pageParam }) => {
           ${infiniteOverrideParams}
-          return ${clientName}(${clientParams.toCall({
-            transformName(name) {
-              if (name === 'config') {
-                return '{ ...config, signal: config.signal ?? signal }'
-              }
-
-              return name
-            },
-          })})
+          return ${clientName}(${clientCallStr})
         },
-       ${queryOptions.join(',\n')}
+       ${queryOptionsArr.join(',\n')}
       })
 `}
         </Function>
@@ -262,24 +159,16 @@ export function InfiniteQueryOptions({
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      <Function name={name} export params={params.toConstructor()}>
+      <Function name={name} export params={paramsSignature}>
         {`
-      const queryKey = ${queryKeyName}(${queryKeyParams.toCall()})
+      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
        ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
-          return ${clientName}(${clientParams.toCall({
-            transformName(name) {
-              if (name === 'config') {
-                return '{ ...config, signal: config.signal ?? signal }'
-              }
-
-              return name
-            },
-          })})
+          return ${clientName}(${clientCallStr})
         },
-       ${queryOptions.join(',\n')}
+       ${queryOptionsArr.join(',\n')}
       })
 `}
       </Function>
@@ -287,4 +176,12 @@ export function InfiniteQueryOptions({
   )
 }
 
-InfiniteQueryOptions.getParams = getParams
+InfiniteQueryOptions.getParams = (
+  node: ast.OperationNode,
+  options: {
+    paramsType: PluginReactQuery['resolvedOptions']['paramsType']
+    paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
+    pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
+    resolver: PluginTs['resolver']
+  },
+) => getQueryOptionsParams(node, options)

@@ -1,11 +1,34 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type { Output, PluginFactoryOptions, ResolveNameParams, UserGroup } from '@kubb/core'
-import type { contentType, HttpMethod, Oas } from '@kubb/oas'
+import type {
+  ast,
+  CompatibilityPreset,
+  Exclude,
+  Generator,
+  Group,
+  Include,
+  Output,
+  Override,
+  PluginFactoryOptions,
+  ResolvePathOptions,
+  Resolver,
+  UserGroup,
+} from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
-import type { Exclude, Include, Override, ResolvePathOptions } from '@kubb/plugin-oas'
-import type { Generator } from '@kubb/plugin-oas/generators'
 
 export type { Transformer } from '@internals/tanstack-query'
+
+/**
+ * The concrete resolver type for `@kubb/plugin-react-query`.
+ * Extends the base `Resolver` with a `resolveName` helper for hook function names.
+ */
+export type ResolverReactQuery = Resolver & {
+  /**
+   * Resolves the hook function name for a given raw operation name.
+   * @example
+   * resolver.resolveName('show pet by id') // -> 'showPetById'
+   */
+  resolveName(this: ResolverReactQuery, name: string): string
+}
 
 type Suspense = object
 
@@ -24,7 +47,7 @@ type Query = {
    * Define which HttpMethods can be used for queries
    * @default ['get']
    */
-  methods: Array<HttpMethod>
+  methods?: Array<string>
   /**
    * Path to the useQuery hook for useQuery functionality.
    * Used as `import { useQuery } from '${importPath}'`.
@@ -40,10 +63,10 @@ type Mutation = {
    * Define which HttpMethods can be used for mutations
    * @default ['post', 'put', 'delete']
    */
-  methods: Array<HttpMethod>
+  methods?: Array<string>
   /**
-   * Path to the useQuery hook for useQuery functionality.
-   * Used as `import { useQuery } from '${importPath}'`.
+   * Path to the useMutation hook for useMutation functionality.
+   * Used as `import { useMutation } from '${importPath}'`.
    * Accepts relative and absolute paths.
    * Path is used as-is; relative paths are based on the generated file location.
    * @default '@tanstack/react-query'
@@ -99,12 +122,7 @@ export type Options = {
    * Specify the export location for the files and define the behavior of the output
    * @default { path: 'hooks', barrelType: 'named' }
    */
-  output?: Output<Oas>
-  /**
-   * Define which contentType should be used.
-   * By default, the first JSON valid mediaType is used
-   */
-  contentType?: contentType
+  output?: Output
   /**
    * Group the @tanstack/query hooks based on the provided name.
    */
@@ -141,7 +159,6 @@ export type Options = {
    * @default 'inline'
    */
   pathParamsType?: PluginClient['options']['pathParamsType']
-
   /**
    * When set, an infiniteQuery hooks is added.
    */
@@ -174,8 +191,23 @@ export type Options = {
     /**
      * Customize the names based on the type that is provided by the plugin.
      */
-    name?: (name: ResolveNameParams['name'], type?: ResolveNameParams['type']) => string
+    name?: (name: string, type?: string) => string
   }
+  /**
+   * Apply a compatibility naming preset.
+   * @default 'default'
+   */
+  compatibilityPreset?: CompatibilityPreset
+  /**
+   * Override individual resolver methods. Any method you omit falls back to the
+   * preset resolver's implementation. Use `this.default(...)` to call it.
+   */
+  resolver?: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
+  /**
+   * Single AST visitor applied to each node before printing.
+   * Return `null` or `undefined` from a method to leave the node unchanged.
+   */
+  transformer?: ast.Visitor
   /**
    * Define some generators next to the react-query generators
    */
@@ -183,8 +215,8 @@ export type Options = {
 }
 
 type ResolvedOptions = {
-  output: Output<Oas>
-  group: Options['group']
+  output: Output
+  group: Group | undefined
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
@@ -194,7 +226,7 @@ type ResolvedOptions = {
   paramsCasing: Options['paramsCasing']
   paramsType: NonNullable<Options['paramsType']>
   /**
-   * Only used of infinite
+   * Only used for infinite
    */
   infinite: NonNullable<Infinite> | false
   suspense: Suspense | false
@@ -203,9 +235,11 @@ type ResolvedOptions = {
   mutationKey: MutationKey | undefined
   mutation: NonNullable<Required<Mutation>> | false
   customOptions: NonNullable<Required<CustomOptions>> | undefined
+  resolver: ResolverReactQuery
+  transformers: NonNullable<Options['transformers']>
 }
 
-export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, never, ResolvePathOptions>
+export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, never, ResolvePathOptions, ResolverReactQuery>
 
 declare global {
   namespace Kubb {
