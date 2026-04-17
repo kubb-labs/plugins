@@ -11,7 +11,8 @@ import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from '../models/LoginUser.ts'
 
-export const loginUserQueryKey = (params?: MaybeRefOrGetter<unknown>) => [{ url: '/user/login' }, ...(params ? [params] : [])] as const
+export const loginUserQueryKey = (params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>) =>
+  [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
 export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
@@ -35,7 +36,10 @@ export async function loginUser(
   return res.data
 }
 
-export function loginUserQueryOptions(params?: MaybeRefOrGetter<unknown>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function loginUserQueryOptions(
+  params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>,
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = loginUserQueryKey(params)
   return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse, typeof queryKey>({
     queryKey,
@@ -50,7 +54,7 @@ export function loginUserQueryOptions(params?: MaybeRefOrGetter<unknown>, config
  * {@link /user/login}
  */
 export function useLoginUser<TData = LoginUserResponse, TQueryData = LoginUserResponse, TQueryKey extends QueryKey = LoginUserQueryKey>(
-  params?: MaybeRefOrGetter<unknown>,
+  params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>,
   options: {
     query?: Partial<UseQueryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

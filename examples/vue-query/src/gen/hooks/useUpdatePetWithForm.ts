@@ -50,7 +50,10 @@ export function useUpdatePetWithForm<TContext>(
     mutation?: MutationObserverOptions<
       UpdatePetWithFormResponse,
       ResponseErrorConfig<UpdatePetWithFormStatus405>,
-      { petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>; params?: MaybeRefOrGetter<unknown> },
+      {
+        petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>
+        params?: MaybeRefOrGetter<{ name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }>
+      },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

@@ -11,7 +11,8 @@ import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../models/FindPetsByTags.ts'
 
-export const findPetsByTagsQueryKey = (params?: MaybeRefOrGetter<unknown>) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsQueryKey = (params?: MaybeRefOrGetter<{ tags?: FindPetsByTagsQueryTags }>) =>
+  [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
@@ -33,7 +34,10 @@ export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }
   return res.data
 }
 
-export function findPetsByTagsQueryOptions(params?: MaybeRefOrGetter<unknown>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsQueryOptions(
+  params?: MaybeRefOrGetter<{ tags?: FindPetsByTagsQueryTags }>,
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsResponse, typeof queryKey>({
     queryKey,
@@ -49,7 +53,7 @@ export function findPetsByTagsQueryOptions(params?: MaybeRefOrGetter<unknown>, c
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<TData = FindPetsByTagsResponse, TQueryData = FindPetsByTagsResponse, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
-  params?: MaybeRefOrGetter<unknown>,
+  params?: MaybeRefOrGetter<{ tags?: FindPetsByTagsQueryTags }>,
   options: {
     query?: Partial<UseQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

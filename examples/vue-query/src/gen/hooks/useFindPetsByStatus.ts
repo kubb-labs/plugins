@@ -11,7 +11,8 @@ import type { MaybeRefOrGetter } from 'vue'
 import { toValue } from 'vue'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../models/FindPetsByStatus.ts'
 
-export const findPetsByStatusQueryKey = (params?: MaybeRefOrGetter<unknown>) => [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
+export const findPetsByStatusQueryKey = (params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>) =>
+  [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
@@ -33,7 +34,10 @@ export async function findPetsByStatus(params?: { status?: FindPetsByStatusQuery
   return res.data
 }
 
-export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<unknown>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions(
+  params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>,
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = findPetsByStatusQueryKey(params)
   return queryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusResponse, typeof queryKey>({
     queryKey,
@@ -53,7 +57,7 @@ export function useFindPetsByStatus<
   TQueryData = FindPetsByStatusResponse,
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
-  params?: MaybeRefOrGetter<unknown>,
+  params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>,
   options: {
     query?: Partial<UseQueryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

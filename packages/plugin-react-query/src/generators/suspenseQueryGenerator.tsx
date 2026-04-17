@@ -74,7 +74,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
       ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
       ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
       ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-    ].filter(Boolean)
+    ].filter((name): name is string => !!name && name !== queryKeyTypeName)
 
     const pluginZodRaw = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
     const pluginZod = pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined

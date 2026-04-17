@@ -49,7 +49,11 @@ export function useUploadFile<TContext>(
     mutation?: MutationObserverOptions<
       UploadFileResponse,
       ResponseErrorConfig<Error>,
-      { petId: MaybeRefOrGetter<UploadFilePathPetId>; data?: MaybeRefOrGetter<UploadFileData>; params?: MaybeRefOrGetter<unknown> },
+      {
+        petId: MaybeRefOrGetter<UploadFilePathPetId>
+        data?: MaybeRefOrGetter<UploadFileData>
+        params?: MaybeRefOrGetter<{ additionalMetadata?: UploadFileQueryAdditionalMetadata }>
+      },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UploadFileData>> & { client?: Client }

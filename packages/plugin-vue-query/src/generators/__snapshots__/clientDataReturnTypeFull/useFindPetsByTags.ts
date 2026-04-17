@@ -11,7 +11,8 @@ import { fetch } from './.kubb/fetch'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = (params: MaybeRefOrGetter<unknown>) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsQueryKey = (params: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>) =>
+  [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
@@ -27,7 +28,10 @@ export async function findPetsByTags(
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 }
 
-export function findPetsByTagsQueryOptions(params: MaybeRefOrGetter<unknown>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsQueryOptions(
+  params: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>, ResponseConfig<FindPetsByTagsResponse>, typeof queryKey>({
     enabled: !!params,
@@ -46,7 +50,7 @@ export function useFindPetsByTags<
   TQueryData = ResponseConfig<FindPetsByTagsResponse>,
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  params: MaybeRefOrGetter<unknown>,
+  params: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
   options: {
     query?: Partial<UseQueryOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

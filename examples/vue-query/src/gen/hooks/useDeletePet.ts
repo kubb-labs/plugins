@@ -46,7 +46,7 @@ export function useDeletePet<TContext>(
     mutation?: MutationObserverOptions<
       DeletePetResponse,
       ResponseErrorConfig<DeletePetStatus400>,
-      { petId: MaybeRefOrGetter<DeletePetPathPetId>; headers?: MaybeRefOrGetter<unknown> },
+      { petId: MaybeRefOrGetter<DeletePetPathPetId>; headers?: MaybeRefOrGetter<{ api_key?: DeletePetHeaderApiKey }> },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
