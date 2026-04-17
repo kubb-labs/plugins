@@ -184,7 +184,6 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
   },
 })
 
-// biome-ignore lint/suspicious/noExplicitAny: bridge between v5 resolver types and legacy OperationSchemas format
 function buildLegacyTypeSchemas(node: ast.OperationNode, resolver: any) {
   const pathParams = node.parameters.filter((p) => p.in === 'path')
   const queryParams = node.parameters.filter((p) => p.in === 'query')
