@@ -386,16 +386,18 @@ describe(`Main OpenAPI ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
     const output = path.join(tmpDir, name)
-    const { files, failedPlugins, error } = await createKubb({
-      config: {
+    const { files, failedPlugins, error } = await createKubb(
+      {
         ...config,
         output: {
           ...config.output,
           path: output,
         },
       } as unknown as Config,
-      hooks: new AsyncEventEmitter<KubbHooks>(),
-    }).safeBuild()
+      {
+        hooks: new AsyncEventEmitter<KubbHooks>(),
+      },
+    ).safeBuild()
 
     expect(files.length).toBeGreaterThan(1)
     expect(failedPlugins.size).toBe(0)

@@ -149,7 +149,7 @@ describe('fakerGenerator — schema', () => {
   test('named string schema omits unused type import', async () => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
-    const driver = createMockedPluginDriver({ name: 'emoji', plugin: defaultTsPlugin })
+    const driver = createMockedPluginDriver({ name: 'emoji', plugin: defaultTsPlugin as any })
 
     await renderGeneratorSchema(fakerGenerator, emojiSchema, {
       config: testConfig,

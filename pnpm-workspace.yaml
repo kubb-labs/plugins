@@ -5,13 +5,13 @@ packages:
   - tests/**
 
 catalog:
-  "@kubb/adapter-oas": 5.0.0-alpha.39
-  "@kubb/agent": 5.0.0-alpha.39
-  "@kubb/core": 5.0.0-alpha.39
-  "@kubb/parser-ts": 5.0.0-alpha.39
-  "@kubb/renderer-jsx": 5.0.0-alpha.39
-  kubb: 5.0.0-alpha.39
-  unplugin-kubb: 5.0.0-alpha.39
+  "@kubb/adapter-oas": 5.0.0-alpha.41
+  "@kubb/agent": 5.0.0-alpha.41
+  "@kubb/core": 5.0.0-alpha.41
+  "@kubb/parser-ts": 5.0.0-alpha.41
+  "@kubb/renderer-jsx": 5.0.0-alpha.41
+  kubb: 5.0.0-alpha.41
+  unplugin-kubb: 5.0.0-alpha.41
   "@types/node": ^22.19.17
   "@types/react": ^19.2.14
   "@types/react-reconciler": 0.32.0
@@ -21,4 +21,4 @@ catalog:
   p-limit: ^7.3.0
   remeda: ^2.33.7
   tsdown: ^0.21.9
-  typescript: ^6.0.2
+  typescript: ^6.0.3
