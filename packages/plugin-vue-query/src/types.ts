@@ -1,4 +1,3 @@
-import type { Transformer } from '@internals/tanstack-query'
 import type {
   ast,
   CompatibilityPreset,
@@ -15,7 +14,23 @@ import type {
 } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
-export type { Transformer } from '@internals/tanstack-query'
+export type LegacyTransformerOperation = ast.OperationNode & {
+  getOperationId: (options?: { friendlyCase?: boolean }) => string
+}
+
+export type LegacyTransformerSchemas = {
+  request?: { name: string }
+  queryParams?: { name: string }
+  pathParams?: { name: string }
+  headerParams?: { name: string }
+}
+
+export type Transformer = (props: {
+  node: ast.OperationNode
+  operation: LegacyTransformerOperation
+  schemas: LegacyTransformerSchemas
+  casing: 'camelcase' | undefined
+}) => unknown[]
 
 export type ResolverVueQuery = Resolver & {
   resolveName(this: ResolverVueQuery, name: string): string
