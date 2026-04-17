@@ -220,3 +220,5 @@ export const pluginVueQuery = createPlugin<PluginVueQuery>((options) => {
     },
   }
 })
+
+export default pluginVueQuery

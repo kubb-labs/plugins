@@ -118,3 +118,5 @@ export const pluginMsw = createPlugin<PluginMsw>((options) => {
     },
   }
 })
+
+export default pluginMsw

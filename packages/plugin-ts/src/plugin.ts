@@ -20,7 +20,7 @@ export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
  *
  * @example
  * ```ts
- * import { pluginTs } from '@kubb/plugin-ts'
+ * import pluginTs from '@kubb/plugin-ts'
  *
  * export default defineConfig({
  *   plugins: [pluginTs({ output: { path: 'types' }, enumType: 'asConst' })],
@@ -95,3 +95,5 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     },
   }
 })
+
+export default pluginTs
