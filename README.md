@@ -40,10 +40,7 @@ Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/
 | Package | Version | Description |
 |---------|---------|-------------|
 | [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://www.npmjs.com/package/@kubb/plugin-react-query) | TanStack Query hooks for React |
-| [`@kubb/plugin-solid-query`](./packages/plugin-solid-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-solid-query.svg)](https://www.npmjs.com/package/@kubb/plugin-solid-query) | TanStack Query primitives for Solid.js |
-| [`@kubb/plugin-svelte-query`](./packages/plugin-svelte-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-svelte-query.svg)](https://www.npmjs.com/package/@kubb/plugin-svelte-query) | TanStack Query stores for Svelte |
 | [`@kubb/plugin-vue-query`](./packages/plugin-vue-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://www.npmjs.com/package/@kubb/plugin-vue-query) | TanStack Query composables for Vue |
-| [`@kubb/plugin-swr`](./packages/plugin-swr) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-swr.svg)](https://www.npmjs.com/package/@kubb/plugin-swr) | SWR hooks for React |
 
 ### Testing & Mocking
 
@@ -69,10 +66,7 @@ Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/
 | [`fetch`](./examples/fetch) | Generate API clients with Fetch |
 | [`zod`](./examples/zod) | Generate Zod validation schemas |
 | [`react-query`](./examples/react-query) | Generate React Query hooks |
-| [`solid-query`](./examples/solid-query) | Generate Solid Query primitives |
-| [`svelte-query`](./examples/svelte-query) | Generate Svelte Query stores |
 | [`vue-query`](./examples/vue-query) | Generate Vue Query composables |
-| [`swr`](./examples/swr) | Generate SWR hooks |
 | [`faker`](./examples/faker) | Generate Faker.js mock data |
 | [`msw`](./examples/msw) | Generate MSW handlers |
 | [`cypress`](./examples/cypress) | Generate Cypress tests |
@@ -88,10 +82,7 @@ plugins/
 │   ├── plugin-client/     # API client generation
 │   ├── plugin-zod/        # Zod schemas
 │   ├── plugin-react-query/# React Query hooks
-│   ├── plugin-solid-query/# Solid Query primitives
-│   ├── plugin-svelte-query/# Svelte Query stores
 │   ├── plugin-vue-query/  # Vue Query composables
-│   ├── plugin-swr/        # SWR hooks
 │   ├── plugin-faker/      # Faker.js mocks
 │   ├── plugin-msw/        # MSW handlers
 │   ├── plugin-cypress/    # Cypress tests
