@@ -161,9 +161,6 @@ importers:
       '@kubb/plugin-redoc':
         specifier: workspace:*
         version: link:../../packages/plugin-redoc
-      '@kubb/plugin-swr':
-        specifier: workspace:*
-        version: link:../../packages/plugin-swr
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
@@ -176,12 +173,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.99.0
         version: 5.99.0(react@19.2.5)
-      '@tanstack/solid-query':
-        specifier: ^5.99.0
-        version: 5.99.0(solid-js@1.9.12)
-      '@tanstack/svelte-query':
-        specifier: ^5.90.2
-        version: 5.90.2(svelte@5.55.4)
       '@tanstack/vue-query':
         specifier: ^5.99.0
         version: 5.99.0(vue@3.5.32(typescript@5.9.3))
@@ -555,117 +546,6 @@ importers:
         specifier: ^4.3.6
         version: 4.3.6
 
-  examples/solid-query:
-    dependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../../packages/plugin-oas
-      '@kubb/plugin-solid-query':
-        specifier: workspace:*
-        version: link:../../packages/plugin-solid-query
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../../packages/plugin-zod
-      '@tanstack/solid-query':
-        specifier: ^5.99.0
-        version: 5.99.0(solid-js@1.9.12)
-      axios:
-        specifier: ^1.15.0
-        version: 1.15.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)(axios@1.15.0)(typescript@5.9.3)
-      solid-js:
-        specifier: ^1.9.12
-        version: 1.9.12
-    devDependencies:
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-
-  examples/svelte-query:
-    dependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../../packages/plugin-oas
-      '@kubb/plugin-svelte-query':
-        specifier: workspace:*
-        version: link:../../packages/plugin-svelte-query
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../../packages/plugin-zod
-      '@tanstack/svelte-query':
-        specifier: 5.62.7
-        version: 5.62.7(svelte@5.55.4)
-      axios:
-        specifier: ^1.15.0
-        version: 1.15.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)(axios@1.15.0)(typescript@6.0.2)
-      svelte:
-        specifier: ^5.55.4
-        version: 5.55.4
-    devDependencies:
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.2
-
-  examples/swr:
-    dependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../../packages/plugin-oas
-      '@kubb/plugin-swr':
-        specifier: workspace:*
-        version: link:../../packages/plugin-swr
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../../packages/plugin-zod
-      axios:
-        specifier: ^1.15.0
-        version: 1.15.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)(axios@1.15.0)(typescript@6.0.2)
-      react:
-        specifier: ^18.3.1
-        version: 18.3.1
-      swr:
-        specifier: ^2.4.1
-        version: 2.4.1(react@18.3.1)
-    devDependencies:
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.2
-
   examples/typescript:
     dependencies:
       '@kubb/adapter-oas':
@@ -965,99 +845,6 @@ importers:
         specifier: workspace:*
         version: link:../../internals/utils
 
-  packages/plugin-solid-query:
-    dependencies:
-      '@kubb/core':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../plugin-client
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../plugin-oas
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36
-      remeda:
-        specifier: 'catalog:'
-        version: 2.33.7
-    devDependencies:
-      '@internals/tanstack-query':
-        specifier: workspace:*
-        version: link:../../internals/tanstack-query
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
-
-  packages/plugin-svelte-query:
-    dependencies:
-      '@kubb/core':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../plugin-client
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../plugin-oas
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36
-      remeda:
-        specifier: 'catalog:'
-        version: 2.33.7
-    devDependencies:
-      '@internals/tanstack-query':
-        specifier: workspace:*
-        version: link:../../internals/tanstack-query
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
-
-  packages/plugin-swr:
-    dependencies:
-      '@kubb/core':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../plugin-client
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36
-      remeda:
-        specifier: 'catalog:'
-        version: 2.33.7
-    devDependencies:
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
-
   packages/plugin-ts:
     dependencies:
       '@kubb/core':
@@ -1187,9 +974,6 @@ importers:
       '@kubb/plugin-react-query':
         specifier: workspace:*
         version: link:../../packages/plugin-react-query
-      '@kubb/plugin-swr':
-        specifier: workspace:*
-        version: link:../../packages/plugin-swr
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -1199,12 +983,6 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.99.0
         version: 5.99.0(react@18.3.1)
-      '@tanstack/solid-query':
-        specifier: ^5.99.0
-        version: 5.99.0(solid-js@1.9.12)
-      '@tanstack/svelte-query':
-        specifier: ^5.90.2
-        version: 5.90.2(svelte@5.55.4)
       '@tanstack/vue-query':
         specifier: ^5.99.0
         version: 5.99.0(vue@3.5.32(typescript@6.0.2))
@@ -1223,15 +1001,6 @@ importers:
       react:
         specifier: ^18.3.1
         version: 18.3.1
-      solid-js:
-        specifier: ^1.9.12
-        version: 1.9.12
-      svelte:
-        specifier: ^5.55.4
-        version: 5.55.4
-      swr:
-        specifier: ^2.4.1
-        version: 2.4.1(react@18.3.1)
       vue:
         specifier: ^3.5.32
         version: 3.5.32(typescript@6.0.2)
@@ -2609,14 +2378,8 @@ packages:
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.62.7':
-    resolution: {integrity: sha512-fgpfmwatsrUal6V+8EC2cxZIQVl9xvL7qYa03gsdsCy985UTUlS4N+/3hCzwR0PclYDqisca2AqR1BVgJGpUDA==}
-
   '@tanstack/query-core@5.81.5':
     resolution: {integrity: sha512-ZJOgCy/z2qpZXWaj/oxvodDx07XcQa9BF92c0oINjHkoqUPsmm3uG08HpTaviviZ/N9eP1f9CM7mKSEkIo7O1Q==}
-
-  '@tanstack/query-core@5.90.2':
-    resolution: {integrity: sha512-k/TcR3YalnzibscALLwxeiLUub6jN5EDLwKDiO7q5f4ICEoptJ+n9+7vcEFy5/x/i6Q+Lb/tXrsKCggf5uQJXQ==}
 
   '@tanstack/query-core@5.99.0':
     resolution: {integrity: sha512-3Jv3WQG0BCcH7G+7lf/bP8QyBfJOXeY+T08Rin3GZ1bshvwlbPt7NrDHMEzGdKIOmOzvIQmxjk28YEQX60k7pQ==}
@@ -2634,21 +2397,6 @@ packages:
     resolution: {integrity: sha512-OY2bCqPemT1LlqJ8Y2CUau4KELnIhhG9Ol3ZndPbdnB095pRbPo1cHuXTndg8iIwtoHTgwZjyaDnQ0xD0mYwAw==}
     peerDependencies:
       react: ^18 || ^19
-
-  '@tanstack/solid-query@5.99.0':
-    resolution: {integrity: sha512-XZxt95MYWivATb6ykmUobhtzR0l8uW3CNQt7FKkV1AgMR8YDirDoHoXBbNGRQidN30g3lqDxgFWdbi6HrZqDdg==}
-    peerDependencies:
-      solid-js: ^1.6.0
-
-  '@tanstack/svelte-query@5.62.7':
-    resolution: {integrity: sha512-WTu70TtgX90r8OVlvQbRhDAnj12mvQRQ5Sp+2Dgsvdq1b3uDWwjV9ufhyhAM/2YkY03Gtlfs2GL1fyMhSx9tbQ==}
-    peerDependencies:
-      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0-next.0
-
-  '@tanstack/svelte-query@5.90.2':
-    resolution: {integrity: sha512-owjnp0w8sOXlMhLZhucHrsYvCjgjHrVyII/wlqMGefxKFyroZS3xCwTee+IUx7UHbL+QmKr/HQTeTqhgxmxPQw==}
-    peerDependencies:
-      svelte: ^3.54.0 || ^4.0.0 || ^5.0.0
 
   '@tanstack/vue-query@5.81.5':
     resolution: {integrity: sha512-Ylt2pzRj1KyXOoidRemRoySU8ub3PXLKwGBr+iQxs6lhfvo1JlimTS2CANM2+3Uph+7JIIguFc8w0Mw3vSjVsw==}
@@ -7528,11 +7276,7 @@ snapshots:
     dependencies:
       remove-accents: 0.5.0
 
-  '@tanstack/query-core@5.62.7': {}
-
   '@tanstack/query-core@5.81.5': {}
-
-  '@tanstack/query-core@5.90.2': {}
 
   '@tanstack/query-core@5.99.0': {}
 
@@ -7553,21 +7297,6 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.99.0
       react: 19.2.5
-
-  '@tanstack/solid-query@5.99.0(solid-js@1.9.12)':
-    dependencies:
-      '@tanstack/query-core': 5.99.0
-      solid-js: 1.9.12
-
-  '@tanstack/svelte-query@5.62.7(svelte@5.55.4)':
-    dependencies:
-      '@tanstack/query-core': 5.62.7
-      svelte: 5.55.4
-
-  '@tanstack/svelte-query@5.90.2(svelte@5.55.4)':
-    dependencies:
-      '@tanstack/query-core': 5.90.2
-      svelte: 5.55.4
 
   '@tanstack/vue-query@5.81.5(vue@3.5.32(typescript@5.9.3))':
     dependencies:
@@ -10527,12 +10256,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  swr@2.4.1(react@18.3.1):
-    dependencies:
-      dequal: 2.0.3
-      react: 18.3.1
-      use-sync-external-store: 1.6.0(react@18.3.1)
-
   swr@2.4.1(react@19.2.5):
     dependencies:
       dequal: 2.0.3
@@ -10793,10 +10516,6 @@ snapshots:
       browserslist: 4.28.2
       escalade: 3.2.0
       picocolors: 1.1.1
-
-  use-sync-external-store@1.6.0(react@18.3.1):
-    dependencies:
-      react: 18.3.1
 
   use-sync-external-store@1.6.0(react@19.2.5):
     dependencies:

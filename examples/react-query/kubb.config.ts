@@ -41,6 +41,7 @@ export const config = {
           return name
         },
       },
+      compatibilityPreset: 'kubbV4',
       output: {
         path: './hooks',
       },

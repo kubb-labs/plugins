@@ -6,7 +6,6 @@ import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginOas } from '@kubb/plugin-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginRedoc } from '@kubb/plugin-redoc'
-import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 
@@ -85,6 +84,7 @@ export default defineConfig({
           pattern: 'store',
         },
       ],
+      compatibilityPreset: 'kubbV4',
       override: [
         {
           type: 'operationId',
@@ -114,32 +114,6 @@ export default defineConfig({
       paramsType: 'object',
       paramsCasing: 'camelcase',
       parser: 'zod',
-    }),
-    pluginSwr({
-      output: {
-        path: './clients/swr',
-      },
-      exclude: [
-        {
-          type: 'tag',
-          pattern: 'store',
-        },
-      ],
-      group: { type: 'tag' },
-      client: {
-        importPath: '../../../../axios-client.ts',
-        dataReturnType: 'full',
-        baseURL: 'https://petstore3.swagger.io/api/v3',
-      },
-      paramsType: 'object',
-      pathParamsType: 'object',
-      paramsCasing: 'camelcase',
-      transformers: {
-        name(name, _type) {
-          return `${name}SWR`
-        },
-      },
-      compatibilityPreset: 'kubbV4',
     }),
     pluginClient({
       output: {

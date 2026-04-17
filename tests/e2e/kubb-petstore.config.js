@@ -4,7 +4,6 @@ import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginOas } from '@kubb/plugin-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
-import { pluginSwr } from '@kubb/plugin-swr'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
@@ -46,13 +45,6 @@ export default defineConfig(() => {
         mutation: {
           methods: ['post', 'put', 'delete'],
         },
-      }),
-      pluginSwr({
-        output: {
-          path: './clients/swr',
-          barrelType: false,
-        },
-        group: { type: 'tag' },
       }),
       pluginClient({
         output: {
