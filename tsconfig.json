@@ -17,6 +17,8 @@
       "@kubb/plugin-client/templates/clients/axios.source": ["./packages/plugin-client/src/templates/clients/axios.source.ts"],
       "@kubb/plugin-client/templates/clients/fetch.source": ["./packages/plugin-client/src/templates/clients/fetch.source.ts"],
       "@kubb/plugin-client": ["./packages/plugin-client/src/index.ts"],
+      "@kubb/plugin-mcp": ["./packages/plugin-mcp/src/index.ts"],
+      "@kubb/plugin-msw": ["./packages/plugin-msw/src/index.ts"],
       "@kubb/plugin-react-query": ["./packages/plugin-react-query/src/index.ts"],
       "@kubb/plugin-solid-query": ["./packages/plugin-solid-query/src/index.ts"],
       "@kubb/plugin-svelte-query": ["./packages/plugin-svelte-query/src/index.ts"],
