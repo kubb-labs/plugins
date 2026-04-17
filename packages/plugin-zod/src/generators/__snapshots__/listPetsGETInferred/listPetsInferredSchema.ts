@@ -12,3 +12,7 @@ export type ListPetsInferredQueryLimitSchema = z.infer<typeof listPetsInferredQu
 export const listPetsInferredStatus200Schema = z.object({})
 
 export type ListPetsInferredStatus200Schema = z.infer<typeof listPetsInferredStatus200Schema>
+
+export const listPetsInferredResponseSchema = listPetsInferredStatus200Schema
+
+export type ListPetsInferredResponseSchema = z.infer<typeof listPetsInferredResponseSchema>

@@ -177,15 +177,41 @@ export const typeGenerator = defineGenerator<PluginTs>({
       name: resolver.resolveResponsesName(node),
     })
 
-    const responseType = renderSchemaType({
-      schema: node.responses.some((res) => res.schema)
-        ? {
-            ...buildResponseUnion(node, { resolver })!,
-            description: 'Union of all possible responses',
-          }
-        : null,
-      name: resolver.resolveResponseName(node),
-    })
+    const responseType = (() => {
+      if (!node.responses.some((res) => res.schema)) {
+        return null
+      }
+
+      const responseName = resolver.resolveResponseName(node)
+
+      // Skip generating the response union type when an imported component schema
+      // has the same resolved name to avoid redeclaration errors.
+      const responsesWithSchema = node.responses.filter((res) => res.schema)
+      const importedNames = new Set(
+        responsesWithSchema.flatMap((res) =>
+          res.schema
+            ? adapter
+                .getImports(res.schema, (schemaName) => ({
+                  name: resolveImportName(schemaName),
+                  path: '',
+                }))
+                .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+            : [],
+        ),
+      )
+
+      if (importedNames.has(responseName)) {
+        return null
+      }
+
+      return renderSchemaType({
+        schema: {
+          ...buildResponseUnion(node, { resolver })!,
+          description: 'Union of all possible responses',
+        },
+        name: responseName,
+      })
+    })()
 
     return (
       <File

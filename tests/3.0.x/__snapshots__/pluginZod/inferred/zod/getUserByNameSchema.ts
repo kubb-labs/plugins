@@ -21,3 +21,7 @@ export type GetUserByNameStatus400Schema = z.infer<typeof getUserByNameStatus400
 export const getUserByNameStatus404Schema = z.any()
 
 export type GetUserByNameStatus404Schema = z.infer<typeof getUserByNameStatus404Schema>
+
+export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])
+
+export type GetUserByNameResponseSchema = z.infer<typeof getUserByNameResponseSchema>

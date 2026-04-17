@@ -15,6 +15,10 @@ export const addPetStatus405Schema = z.any()
 
 export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
 
+export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+
+export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
+
 export const addPetDataSchema = addPetRequestSchema.describe("Create a new pet in the store")
 
 export type AddPetDataSchema = z.infer<typeof addPetDataSchema>

@@ -10,4 +10,6 @@ export const updateUserPathUsernameSchema = z.string().describe("name that need 
 
 export const updateUserStatusDefaultSchema = z.any()
 
+export const updateUserResponseSchema = updateUserStatusDefaultSchema
+
 export const updateUserDataSchema = userSchema.optional().describe("Update an existent user in the store")

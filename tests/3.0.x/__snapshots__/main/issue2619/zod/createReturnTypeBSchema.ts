@@ -6,3 +6,5 @@
 import { resultSchema } from "./resultSchema.ts";
 
 export const createReturnTypeBStatus200Schema = resultSchema
+
+export const createReturnTypeBResponseSchema = createReturnTypeBStatus200Schema

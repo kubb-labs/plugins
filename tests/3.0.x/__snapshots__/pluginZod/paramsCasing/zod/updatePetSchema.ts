@@ -15,4 +15,6 @@ export const updatePetQueryRequestSourceSchema = z.string().optional()
 
 export const updatePetStatus200Schema = petSchema
 
+export const updatePetResponseSchema = updatePetStatus200Schema
+
 export const updatePetDataSchema = petUpdateSchema

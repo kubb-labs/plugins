@@ -103,12 +103,34 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const responseUnionSchema =
       responsesWithSchema.length > 0
         ? (() => {
+            const responseUnionName = resolver.resolveResponseName(node)
+
+            // Collect all import names from response schemas to detect naming collisions.
+            // When a response is a $ref to a component schema whose resolved name matches
+            // the response union name, skip generation to avoid redeclaration errors.
+            const importedNames = new Set(
+              responsesWithSchema.flatMap((res) =>
+                res.schema
+                  ? adapter
+                      .getImports(res.schema, (schemaName) => ({
+                        name: resolver.resolveSchemaName(schemaName),
+                        path: '',
+                      }))
+                      .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+                  : [],
+              ),
+            )
+
+            if (importedNames.has(responseUnionName)) {
+              return null
+            }
+
             const members = responsesWithSchema.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }))
             const unionNode = members.length === 1 ? members[0]! : ast.createSchema({ type: 'union', members })
 
             return renderSchemaEntry({
               schema: unionNode,
-              name: resolver.resolveResponseName(node),
+              name: responseUnionName,
             })
           })()
         : null
