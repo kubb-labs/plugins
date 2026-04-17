@@ -13,7 +13,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, dateType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
 
     if (!node.name) {
       return
@@ -36,7 +36,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const schemaPrinter = mini
       ? printerZodMini({ guidType, wrapOutput, resolver, schemaName: meta.name, nodes: printer?.nodes })
-      : printerZod({ coercion, guidType, wrapOutput, resolver, schemaName: meta.name, nodes: printer?.nodes })
+      : printerZod({ coercion, guidType, dateType, wrapOutput, resolver, schemaName: meta.name, nodes: printer?.nodes })
 
     return (
       <File
@@ -55,7 +55,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   },
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
+    const { output, coercion, guidType, dateType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
 
     const mode = ctx.getMode(output)
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
@@ -78,7 +78,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const schemaPrinter = mini
         ? printerZodMini({ guidType, wrapOutput, resolver, schemaName: name, keysToOmit, nodes: printer?.nodes })
-        : printerZod({ coercion, guidType, wrapOutput, resolver, schemaName: name, keysToOmit, nodes: printer?.nodes })
+        : printerZod({ coercion, guidType, dateType, wrapOutput, resolver, schemaName: name, keysToOmit, nodes: printer?.nodes })
 
       return (
         <>

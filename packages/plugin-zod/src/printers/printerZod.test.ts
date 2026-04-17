@@ -100,6 +100,20 @@ describe('printerZod', () => {
       expect(printer.print(ast.createSchema({ type: 'datetime' }))).toBe('z.iso.datetime()')
     })
 
+    test('datetime with dateType stringOffset option', () => {
+      const p = printerZod({ dateType: 'stringOffset' })
+      expect(p.print(ast.createSchema({ type: 'datetime' }))).toBe('z.iso.datetime({ offset: true })')
+    })
+
+    test('datetime with dateType stringLocal option', () => {
+      const p = printerZod({ dateType: 'stringLocal' })
+      expect(p.print(ast.createSchema({ type: 'datetime' }))).toBe('z.iso.datetime({ local: true })')
+    })
+
+    test('datetime with node.offset takes precedence', () => {
+      expect(printer.print(ast.createSchema({ type: 'datetime', offset: true }))).toBe('z.iso.datetime({ offset: true })')
+    })
+
     test('time (ISO string)', () => {
       expect(printer.print(ast.createSchema({ type: 'time', representation: 'string' }))).toBe('z.iso.time()')
     })

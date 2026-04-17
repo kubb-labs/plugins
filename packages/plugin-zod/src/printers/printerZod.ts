@@ -29,6 +29,7 @@ export type PrinterZodNodes = ast.PrinterPartial<string, PrinterZodOptions>
 export type PrinterZodOptions = {
   coercion?: PluginZod['resolvedOptions']['coercion']
   guidType?: PluginZod['resolvedOptions']['guidType']
+  dateType?: PluginZod['resolvedOptions']['dateType']
   wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
   resolver?: ResolverZod
   schemaName?: string
@@ -95,8 +96,11 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
       },
       datetime(node) {
-        if (node.offset) return 'z.iso.datetime({ offset: true })'
-        if (node.local) return 'z.iso.datetime({ local: true })'
+        const offset = node.offset || this.options.dateType === 'stringOffset'
+        const local = node.local || this.options.dateType === 'stringLocal'
+
+        if (offset) return 'z.iso.datetime({ offset: true })'
+        if (local) return 'z.iso.datetime({ local: true })'
 
         return 'z.iso.datetime()'
       },

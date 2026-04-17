@@ -19,7 +19,7 @@ export function Mock({ baseURL = '', name, typeName, node }: Props): KubbReactNo
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
   const contentType = getContentType(successResponse)
-  const url = new URLPath(getMswUrl(node)).toURLPath().replace(/([^/]):/g, '$1\\\\:')
+  const url = new URLPath(getMswUrl(node)).toURLPath()
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
   const responseHasSchema = hasResponseSchema(successResponse)
