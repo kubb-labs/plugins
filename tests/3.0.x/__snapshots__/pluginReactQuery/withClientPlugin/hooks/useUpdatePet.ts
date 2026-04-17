@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
-export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
-
 export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
 
         const mutationKey = updatePetMutationKey()

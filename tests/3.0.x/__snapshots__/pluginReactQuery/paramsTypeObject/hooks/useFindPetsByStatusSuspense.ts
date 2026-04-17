@@ -11,7 +11,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const findPetsByStatusSuspenseQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) => [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
+type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
 /**
  * @description Multiple status values can be provided with comma separated strings

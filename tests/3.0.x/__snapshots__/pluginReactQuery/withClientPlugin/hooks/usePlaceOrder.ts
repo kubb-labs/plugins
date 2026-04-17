@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
-export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
-
 export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
 
         const mutationKey = placeOrderMutationKey()

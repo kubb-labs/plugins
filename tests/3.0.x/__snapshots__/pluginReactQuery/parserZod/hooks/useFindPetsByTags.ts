@@ -12,7 +12,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
+type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.

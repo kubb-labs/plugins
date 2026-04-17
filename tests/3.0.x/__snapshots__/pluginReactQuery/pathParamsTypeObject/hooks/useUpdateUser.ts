@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
-export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Update user

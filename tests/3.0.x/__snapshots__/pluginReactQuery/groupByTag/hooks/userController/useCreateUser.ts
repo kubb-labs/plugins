@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
-export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Create user

@@ -12,8 +12,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
-export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
-
 /**
  * @description delete a pet
  * @summary Deletes a pet

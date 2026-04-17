@@ -12,7 +12,7 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
   [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
+type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 /**
  * {@link /pet/findByStatus}

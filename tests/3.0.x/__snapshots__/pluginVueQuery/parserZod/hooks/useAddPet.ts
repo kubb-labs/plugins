@@ -13,8 +13,6 @@ import { useMutation } from "@tanstack/vue-query";
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
-
 /**
  * @description Add a new pet to the store
  * @summary Add a new pet to the store

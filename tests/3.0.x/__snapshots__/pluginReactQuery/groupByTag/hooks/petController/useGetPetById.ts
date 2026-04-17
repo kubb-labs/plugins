@@ -11,7 +11,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getPetByIdQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
-export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
+type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 /**
  * @description Returns a single pet

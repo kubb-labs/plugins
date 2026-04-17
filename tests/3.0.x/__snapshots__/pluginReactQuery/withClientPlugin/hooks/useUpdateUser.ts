@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
-export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
-
 export function updateUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
 
         const mutationKey = updateUserMutationKey()

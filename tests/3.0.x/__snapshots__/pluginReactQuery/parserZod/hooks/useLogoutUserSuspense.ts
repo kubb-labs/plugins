@@ -12,7 +12,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const logoutUserSuspenseQueryKey = () => [{ url: '/user/logout' }] as const
 
-export type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
+type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
 
 /**
  * @summary Logs out current logged in user session

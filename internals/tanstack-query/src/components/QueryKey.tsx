@@ -51,8 +51,8 @@ export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType,
           {`[${keys.join(', ')}] as const`}
         </Function.Arrow>
       </File.Source>
-      <File.Source name={typeName} isExportable isIndexable isTypeOnly>
-        <Type name={typeName} export>
+      <File.Source name={typeName} isTypeOnly>
+        <Type name={typeName}>
           {`ReturnType<typeof ${name}>`}
         </Type>
       </File.Source>

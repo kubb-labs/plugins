@@ -12,7 +12,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
-export type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
+type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
 /**
  * @summary Logs out current logged in user session

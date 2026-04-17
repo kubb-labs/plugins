@@ -37,7 +37,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const mutationTypeName = transformName(`${capitalize(baseName)}`, 'type', transformers)
     const mutationOptionsName = transformName(`${baseName}MutationOptions`, 'function', transformers)
     const mutationKeyName = transformName(`${baseName}MutationKey`, 'const', transformers)
-    const mutationKeyTypeName = transformName(`${capitalize(baseName)}MutationKey`, 'type', transformers)
     const clientName = transformName(baseName, 'function', transformers)
 
     const meta = {
@@ -60,7 +59,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
       ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
       ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
       ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-    ].filter((name): name is string => !!name && name !== mutationKeyTypeName)
+    ].filter((name): name is string => !!name)
 
     const pluginZodRaw = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
     const pluginZod = pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined
@@ -133,7 +132,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
 
         <MutationKey
           name={mutationKeyName}
-          typeName={mutationKeyTypeName}
           node={node}
           pathParamsType={pathParamsType}
           paramsCasing={paramsCasing}

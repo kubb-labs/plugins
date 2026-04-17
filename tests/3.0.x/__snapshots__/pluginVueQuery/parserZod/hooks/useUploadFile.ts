@@ -13,8 +13,6 @@ import { useMutation } from "@tanstack/vue-query";
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
-
 /**
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}

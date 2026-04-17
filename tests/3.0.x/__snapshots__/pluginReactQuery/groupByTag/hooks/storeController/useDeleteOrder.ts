@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
-export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
-
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID

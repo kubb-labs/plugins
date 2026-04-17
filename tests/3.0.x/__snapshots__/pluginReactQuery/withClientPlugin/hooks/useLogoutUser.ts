@@ -11,7 +11,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
-export type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
+type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
 

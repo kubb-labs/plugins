@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
-export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
-
 export function deleteUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const mutationKey = deleteUserMutationKey()

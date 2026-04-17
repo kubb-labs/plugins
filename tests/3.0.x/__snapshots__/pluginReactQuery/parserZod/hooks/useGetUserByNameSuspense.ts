@@ -12,7 +12,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getUserByNameSuspenseQueryKey = (username: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
 
-export type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
+type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
 /**
  * @summary Get user by user name

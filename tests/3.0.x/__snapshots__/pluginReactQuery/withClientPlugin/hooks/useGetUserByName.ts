@@ -11,7 +11,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getUserByNameQueryKey = (username: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
 
-export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
+type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
 

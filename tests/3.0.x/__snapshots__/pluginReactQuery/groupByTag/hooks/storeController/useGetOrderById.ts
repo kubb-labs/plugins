@@ -11,7 +11,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getOrderByIdQueryKey = (orderId: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
-export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
+type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.

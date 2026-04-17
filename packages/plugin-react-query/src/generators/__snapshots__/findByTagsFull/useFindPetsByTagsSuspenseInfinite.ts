@@ -15,7 +15,7 @@ export const findPetsByTagsSuspenseInfiniteQueryKey = (params: {
   pageSize?: FindPetsByTagsQueryPageSize
 }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
+type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
 
 /**
  * {@link /pet/findByTags}

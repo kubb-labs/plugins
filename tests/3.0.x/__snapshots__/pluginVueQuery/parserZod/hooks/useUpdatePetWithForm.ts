@@ -13,8 +13,6 @@ import { useMutation } from "@tanstack/vue-query";
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
-export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
-
 /**
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}

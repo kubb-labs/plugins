@@ -11,8 +11,6 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
-export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
-
 /**
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array

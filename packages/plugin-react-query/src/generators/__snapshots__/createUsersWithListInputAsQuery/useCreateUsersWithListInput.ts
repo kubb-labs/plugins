@@ -11,7 +11,7 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const createUsersWithListInputQueryKey = (data?: CreateUsersWithListInputData) => [{ url: '/user/createWithList' }, ...(data ? [data] : [])] as const
 
-export type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInputQueryKey>
+type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInputQueryKey>
 
 /**
  * {@link /user/createWithList}

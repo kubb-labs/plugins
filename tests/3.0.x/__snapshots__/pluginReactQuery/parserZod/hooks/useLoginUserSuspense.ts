@@ -12,7 +12,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const loginUserSuspenseQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) => [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
-export type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
+type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
 
 /**
  * @summary Logs user into the system

@@ -11,7 +11,7 @@ import { queryOptions, useQuery } from "@tanstack/react-query";
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
-export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
+type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
 /**
  * @description Returns a map of status codes to quantities

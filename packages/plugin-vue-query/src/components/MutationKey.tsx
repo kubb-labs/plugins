@@ -1,13 +1,12 @@
 import { URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function, Type } from '@kubb/renderer-jsx'
+import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Transformer } from '../types.ts'
 
 type Props = {
   name: string
-  typeName: string
   node: ast.OperationNode
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'
@@ -25,7 +24,7 @@ const getTransformer: Transformer = ({ node, casing }) => {
   return [`{ url: '${path.toURLPath()}' }`]
 }
 
-export function MutationKey({ name, paramsCasing, node, typeName, transformer = getTransformer }: Props): KubbReactNode {
+export function MutationKey({ name, paramsCasing, node, transformer = getTransformer }: Props): KubbReactNode {
   const paramsNode = getParams()
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({
@@ -34,18 +33,11 @@ export function MutationKey({ name, paramsCasing, node, typeName, transformer = 
   })
 
   return (
-    <>
-      <File.Source name={name} isExportable isIndexable>
-        <Function.Arrow name={name} export params={paramsSignature} singleLine>
-          {`[${keys.join(', ')}] as const`}
-        </Function.Arrow>
-      </File.Source>
-      <File.Source name={typeName} isExportable isIndexable isTypeOnly>
-        <Type name={typeName} export>
-          {`ReturnType<typeof ${name}>`}
-        </Type>
-      </File.Source>
-    </>
+    <File.Source name={name} isExportable isIndexable>
+      <Function.Arrow name={name} export params={paramsSignature} singleLine>
+        {`[${keys.join(', ')}] as const`}
+      </Function.Arrow>
+    </File.Source>
   )
 }
 

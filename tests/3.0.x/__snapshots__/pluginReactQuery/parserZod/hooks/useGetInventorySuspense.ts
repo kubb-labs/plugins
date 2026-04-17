@@ -12,7 +12,7 @@ import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
 
-export type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
+type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
 
 /**
  * @description Returns a map of status codes to quantities
