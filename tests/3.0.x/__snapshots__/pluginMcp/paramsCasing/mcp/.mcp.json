@@ -1,0 +1,9 @@
+{
+            "mcpServers": {
+              "Params Casing Test": {
+                "type": "stdio",
+                "command": "npx",
+                "args": ["tsx", "server.ts"]
+              }
+            }
+          }
