@@ -21,8 +21,8 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@tanstack/react-query": "^5.99.0",

@@ -15,11 +15,7 @@ This monorepo contains all official Kubb plugins for code generation from OpenAP
 
 ## Packages
 
-### OpenAPI
-
-| Package | Version | Description |
-|---------|---------|-------------|
-| [`@kubb/plugin-oas`](./packages/plugin-oas) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-oas.svg)](https://www.npmjs.com/package/@kubb/plugin-oas) | OpenAPI specification parsing and processing |
+Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
 
 ### TypeScript
 
@@ -88,7 +84,6 @@ This monorepo contains all official Kubb plugins for code generation from OpenAP
 ```
 plugins/
 ├── packages/              # Kubb plugins
-│   ├── plugin-oas/        # OpenAPI parsing
 │   ├── plugin-ts/         # TypeScript generation
 │   ├── plugin-client/     # API client generation
 │   ├── plugin-zod/        # Zod schemas

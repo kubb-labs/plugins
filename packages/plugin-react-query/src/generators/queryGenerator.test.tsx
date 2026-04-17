@@ -127,7 +127,10 @@ describe('queryGenerator operation', () => {
       ...props.options,
     }
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-    const driver = createMockedPluginDriver({ name: props.name, plugin: mockedTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: props.name,
+      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(queryGenerator, props.node, {
       config: testConfig,

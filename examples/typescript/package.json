@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/oas": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "axios": "^1.15.0",
     "kubb": "catalog:"

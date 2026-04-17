@@ -114,7 +114,10 @@ describe('fakerGenerator — schema', () => {
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
-    const driver = createMockedPluginDriver({ name, plugin: defaultTsPlugin })
+    const driver = createMockedPluginDriver({
+      name,
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorSchema(fakerGenerator, node, {
       config: testConfig,
@@ -194,7 +197,10 @@ describe('fakerGenerator — operation', () => {
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
-    const driver = createMockedPluginDriver({ name, plugin: defaultTsPlugin })
+    const driver = createMockedPluginDriver({
+      name,
+      plugin: defaultTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(fakerGenerator, node, {
       config: testConfig,
@@ -242,7 +248,10 @@ describe('fakerGeneratorLegacy — operation', () => {
     })
 
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFakerLegacy })
-    const driver = createMockedPluginDriver({ name: 'legacyShowPetById', plugin: legacyTsPlugin })
+    const driver = createMockedPluginDriver({
+      name: 'legacyShowPetById',
+      plugin: legacyTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
 
     await renderGeneratorOperation(fakerGeneratorLegacy, node, {
       config: testConfig,

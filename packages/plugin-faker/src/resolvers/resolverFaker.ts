@@ -1,6 +1,6 @@
 import { camelCase } from '@internals/utils'
-import { defaultResolveFile, defineResolver } from '@kubb/core'
-import type { PluginFaker, ResolverFaker } from '../types.ts'
+import { defineResolver } from '@kubb/core'
+import type { PluginFaker } from '../types.ts'
 
 /**
  * Default resolver for `@kubb/plugin-faker`.
@@ -25,24 +25,6 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     },
     resolvePathName(name, type) {
       return this.default(name, type)
-    },
-    resolveFile(params, context) {
-      const originalDefault = this.default
-      const originalResolveName = this.resolveName
-
-      const resolverForFile: ResolverFaker = {
-        ...this,
-        default(name, type) {
-          const resolverWithOriginalDefault: ResolverFaker = {
-            ...this,
-            default: originalDefault,
-          }
-
-          return originalResolveName.call(resolverWithOriginalDefault, name, type)
-        },
-      }
-
-      return defaultResolveFile.call(resolverForFile, params, context)
     },
     resolveParamName(node, param) {
       return this.resolveName(`${node.operationId} ${param.in} ${param.name}`)

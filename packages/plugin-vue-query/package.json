@@ -85,9 +85,7 @@
   },
   "dependencies": {
     "@kubb/core": "catalog:",
-    "@kubb/oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@kubb/renderer-jsx": "catalog:",

@@ -27,7 +27,6 @@
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-msw": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@mswjs/http-middleware": "^0.9.2",
     "kubb": "catalog:",

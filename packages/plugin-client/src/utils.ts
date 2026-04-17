@@ -1,8 +1,8 @@
 import { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
-import { FunctionParams } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import type { PluginZod } from '@kubb/plugin-zod'
+import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
 export function getComments(node: ast.OperationNode): Array<string> {
@@ -66,7 +66,7 @@ export function buildClassClientParams({
       : undefined
   const requestName = node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined
 
-  return FunctionParams.factory({
+  return createFunctionParams({
     config: {
       mode: 'object',
       children: {

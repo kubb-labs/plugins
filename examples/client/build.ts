@@ -1,7 +1,7 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { createKubb } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
-import { pluginOas } from '@kubb/plugin-oas'
+import { pluginTs } from '@kubb/plugin-ts'
 
 async function run() {
   const kubb = createKubb({
@@ -15,7 +15,7 @@ async function run() {
       },
       adapter: adapterOas(),
       parsers: [parserTs],
-      plugins: [pluginOas()],
+      plugins: [pluginTs({ output: { path: './models', barrelType: false }, compatibilityPreset: 'kubbV4' })],
     },
   })
   await kubb.build()

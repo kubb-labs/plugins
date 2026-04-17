@@ -23,7 +23,6 @@
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-client": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:",
     "axios": "^1.15.0",

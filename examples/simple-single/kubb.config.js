@@ -1,5 +1,4 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginRedoc } from '@kubb/plugin-redoc'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -28,10 +27,6 @@ export default defineConfig([
     },
     adapter: adapterOas({ collisionDetection: false }),
     plugins: [
-      pluginOas({
-        validate: true,
-        generators: [],
-      }),
       pluginRedoc({
         output: {
           path: './docs/index.html',

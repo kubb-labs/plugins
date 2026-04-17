@@ -27,14 +27,14 @@ pnpm vitest bench --config ./configs/vitest.bench.config.ts tests/performance/ma
 Tests performance of TypeScript type generation from an OpenAPI specification.
 
 **Plugins used:**
-- `plugin-oas` - OpenAPI specification parser
+- `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 
 ### Multiple Plugins Generation (plugin-ts + plugin-client)
 Tests performance with multiple code generators running simultaneously.
 
 **Plugins used:**
-- `plugin-oas` - OpenAPI specification parser
+- `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 - `plugin-client` - API client generator
 
@@ -42,7 +42,7 @@ Tests performance with multiple code generators running simultaneously.
 Tests performance with a full suite of generators including validation and mocking.
 
 **Plugins used:**
-- `plugin-oas` - OpenAPI specification parser
+- `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 - `plugin-client` - API client generator
 - `plugin-zod` - Zod validation schemas
@@ -75,8 +75,8 @@ To add a new benchmark:
 
 ```typescript
 import { bench, describe } from 'vitest'
+import { adapterOas } from '@kubb/adapter-oas'
 import { build } from '@kubb/core'
-import { pluginOas } from '@kubb/plugin-oas'
 // ... other imports
 
 describe('My Benchmark Suite', () => {

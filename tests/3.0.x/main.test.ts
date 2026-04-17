@@ -6,7 +6,6 @@ import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
@@ -199,9 +198,6 @@ const configs = [
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginOas({
-          generators: [],
-        }),
         pluginZod({
           output: {
             path: './zod',
@@ -292,9 +288,6 @@ const configs = [
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginOas({
-          generators: [],
-        }),
         pluginTs({
           output: {
             path: './types',
@@ -400,7 +393,7 @@ describe(`Main OpenAPI ${version}`, () => {
           ...config.output,
           path: output,
         },
-      } as Config,
+      } as unknown as Config,
       hooks: new AsyncEventEmitter<KubbHooks>(),
     }).safeBuild()
 

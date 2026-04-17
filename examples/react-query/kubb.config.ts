@@ -1,4 +1,3 @@
-import { pluginOas } from '@kubb/plugin-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { QueryKey } from '@kubb/plugin-react-query/components'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -19,7 +18,6 @@ export const config = {
     done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
   },
   plugins: [
-    pluginOas({ generators: [] }),
     pluginTs({
       output: {
         path: 'models',
