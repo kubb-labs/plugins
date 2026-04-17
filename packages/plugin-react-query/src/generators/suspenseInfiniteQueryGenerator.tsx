@@ -39,9 +39,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some(
-        (method) => node.method.toLowerCase() === method.toLowerCase(),
-      )
+      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
     const isSuspense = !!suspense
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : undefined
 

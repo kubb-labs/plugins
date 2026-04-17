@@ -45,9 +45,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       const isMutationOp =
         nodeMutation !== false &&
         !isQueryOp &&
-        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some(
-          (m) => node.method.toLowerCase() === m.toLowerCase(),
-        )
+        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some((m) => node.method.toLowerCase() === m.toLowerCase())
       const isSuspenseOp = !!suspense
       const isInfiniteOp = !!nodeInfiniteOptions
 

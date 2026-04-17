@@ -26,9 +26,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some(
-        (method) => node.method.toLowerCase() === method.toLowerCase(),
-      )
+      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
 
     if (!isQuery || isMutation) return null
 

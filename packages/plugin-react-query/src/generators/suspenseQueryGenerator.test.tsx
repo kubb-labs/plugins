@@ -87,7 +87,11 @@ describe('suspenseQueryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: { suspense: {} } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { suspense: {}, parser: 'zod' as const } },
     { name: 'findByTagsFull', node: findByTagsNode, options: { suspense: {}, client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
-    { name: 'clientPostImportPath', node: findByTagsNode, options: { suspense: {}, client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    {
+      name: 'clientPostImportPath',
+      node: findByTagsNode,
+      options: { suspense: {}, client: { dataReturnType: 'data' as const, importPath: 'axios' as const } },
+    },
     { name: 'findByTagsObject', node: findByTagsNode, options: { suspense: {}, paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { suspense: {}, paramsCasing: 'camelcase' as const } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>

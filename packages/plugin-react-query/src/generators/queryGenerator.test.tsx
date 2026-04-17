@@ -114,7 +114,11 @@ describe('queryGenerator operation', () => {
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const } },
     { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const } },
-    { name: 'createUsersWithListInputAsQuery', node: createUsersWithListInputNode, options: { query: { importPath: '@tanstack/react-query', methods: ['post'] } } },
+    {
+      name: 'createUsersWithListInputAsQuery',
+      node: createUsersWithListInputNode,
+      options: { query: { importPath: '@tanstack/react-query', methods: ['post'] } },
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {

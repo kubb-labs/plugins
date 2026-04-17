@@ -1,3 +1,4 @@
+import type { Transformer } from '@internals/tanstack-query'
 import type {
   ast,
   CompatibilityPreset,
@@ -13,7 +14,6 @@ import type {
   UserGroup,
 } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
-import type { Transformer } from '@internals/tanstack-query'
 
 export type { Transformer } from '@internals/tanstack-query'
 

@@ -60,16 +60,7 @@ function getParams(
   })
 }
 
-export function Mutation({
-  name,
-  mutationOptionsName,
-  paramsCasing,
-  dataReturnType,
-  node,
-  tsResolver,
-  mutationKeyName,
-  customOptions,
-}: Props): KubbReactNode {
+export function Mutation({ name, mutationOptionsName, paramsCasing, dataReturnType, node, tsResolver, mutationKeyName, customOptions }: Props): KubbReactNode {
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
