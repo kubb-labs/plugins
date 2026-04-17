@@ -1,7 +1,5 @@
-import type { AsyncEventEmitter } from '@internals/utils'
 import { getUniqueName, pascalCase, stringify } from '@internals/utils'
-
-import type { ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions, ResolveNameParams } from '@kubb/core'
+import type { AsyncEventEmitter, ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions, ResolveNameParams } from '@kubb/core'
 import type { contentType, Oas, OasTypes, OpenAPIV3, SchemaObject } from '@kubb/oas'
 import { isDiscriminator, isNullable, isReference, KUBB_INLINE_REF_PREFIX } from '@kubb/oas'
 import { isDeepEqual, isNumber, uniqueWith } from 'remeda'

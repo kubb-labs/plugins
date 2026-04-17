@@ -2,9 +2,9 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { AsyncEventEmitter, getRelativePath } from '@internals/utils'
+import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { createKubb, type KubbHooks, type UserConfig } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginOas } from '@kubb/plugin-oas'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -16,7 +16,7 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-const configs: Array<{ name: string; config: UserConfig }> = [
+const configs = [
   {
     name: 'simple',
     config: {
@@ -400,7 +400,7 @@ describe(`Main OpenAPI ${version}`, () => {
           ...config.output,
           path: output,
         },
-      },
+      } as Config,
       hooks: new AsyncEventEmitter<KubbHooks>(),
     }).safeBuild()
 

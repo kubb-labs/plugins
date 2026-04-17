@@ -21,6 +21,6 @@
     "strict": true,
     "types": ["cypress", "node"]
   },
-  "include": ["./src/**/*", "./templates/**/*"],
+  "include": ["./src/**/*", "./kubb-petstore.config.js", "kubb.config.js"],
   "exclude": ["**/node_modules", "**/types/**", "**/mocks/**"]
 }

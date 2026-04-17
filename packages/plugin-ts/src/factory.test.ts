@@ -1,4 +1,5 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: just for testing */
+
 import { print } from '@kubb/parser-ts'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'

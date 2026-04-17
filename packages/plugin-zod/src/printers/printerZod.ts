@@ -1,7 +1,6 @@
 import { stringify } from '@internals/utils'
 
-import type { PrinterFactoryOptions, PrinterPartial } from '@kubb/core'
-import { ast, definePrinter } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyModifiers, containsSelfRef, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
 
@@ -25,7 +24,7 @@ import { applyModifiers, containsSelfRef, formatLiteral, lengthConstraints, numb
  * })
  * ```
  */
-export type PrinterZodNodes = PrinterPartial<string, PrinterZodOptions>
+export type PrinterZodNodes = ast.PrinterPartial<string, PrinterZodOptions>
 
 export type PrinterZodOptions = {
   coercion?: PluginZod['resolvedOptions']['coercion']
@@ -43,7 +42,7 @@ export type PrinterZodOptions = {
   nodes?: PrinterZodNodes
 }
 
-export type PrinterZodFactory = PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
+export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
 /**
  * Zod v4 printer built with `definePrinter`.
@@ -59,7 +58,7 @@ export type PrinterZodFactory = PrinterFactoryOptions<'zod', PrinterZodOptions, 
  * const code = printer.print(stringSchemaNode) // "z.string()"
  * ```
  */
-export const printerZod = definePrinter<PrinterZodFactory>((options) => {
+export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
   return {
     name: 'zod',
     options,
@@ -282,7 +281,7 @@ export const printerZod = definePrinter<PrinterZodFactory>((options) => {
         // Mirror printerTs `nonNullable: true`: when omitting keys, the resulting
         // schema is a new non-nullable object type — skip optional/nullable/nullish.
         // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
-        base = `${base}.omit({ ${keysToOmit.map((k) => `"${k}": true`).join(', ')} })`
+        base = `${base}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
       }
 
       return applyModifiers({

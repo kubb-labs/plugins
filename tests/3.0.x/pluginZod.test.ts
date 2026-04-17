@@ -2,9 +2,9 @@ import fs from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { AsyncEventEmitter, getRelativePath } from '@internals/utils'
+import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { createKubb, type KubbHooks, type UserConfig } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
@@ -14,7 +14,9 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-const configs: Array<{ name: string; config: UserConfig }> = [
+type BuildConfig = Omit<Config, 'plugins'> & { plugins: unknown }
+
+const configs: Array<{ name: string; config: BuildConfig }> = [
   // ─── basic ──────────────────────────────────────────────────────────────
   {
     name: 'petStore',
@@ -165,7 +167,7 @@ describe(`plugin-zod options ${version}`, () => {
           ...config.output,
           path: output,
         },
-      },
+      } as Config,
       hooks: new AsyncEventEmitter<KubbHooks>(),
     }).safeBuild()
 

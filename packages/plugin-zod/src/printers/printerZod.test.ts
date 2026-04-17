@@ -536,8 +536,9 @@ describe('printerZod', () => {
     test('override can call this.transform for nested nodes', () => {
       const p = printerZod({
         nodes: {
-          array(node) {
-            const inner = node.items?.map((item) => this.transform(item)).join(', ') ?? 'z.unknown()'
+          array(node: ast.ArraySchemaNode) {
+            const inner =
+              node.items?.map((item: ast.SchemaNode) => (this as { transform: (n: ast.SchemaNode) => string }).transform(item)).join(', ') ?? 'z.unknown()'
             return `z.set(${inner})`
           },
         },
@@ -551,7 +552,7 @@ describe('printerZod', () => {
         coercion: true,
         nodes: {
           string() {
-            return this.options.coercion ? 'z.coerce.string().custom()' : 'z.string()'
+            return (this as { options: { coercion?: boolean } }).options.coercion ? 'z.coerce.string().custom()' : 'z.string()'
           },
         },
       })

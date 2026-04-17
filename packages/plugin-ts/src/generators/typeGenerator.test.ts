@@ -3,8 +3,9 @@ import { camelCase } from '@internals/utils'
 
 import type { Config, Group } from '@kubb/core'
 import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { describe, expect, test } from 'vitest'
-import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, matchFiles, renderGeneratorOperation, renderGeneratorSchema } from '#mocks'
+import { matchFiles } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import type { PluginTs } from '../types.ts'
 import { typeGenerator } from './typeGenerator.tsx'
@@ -264,7 +265,7 @@ describe('typeGenerator — Operation — group', () => {
       resolver: resolverTs,
     })
 
-    const file = driver.fileManager.files.find((f) => f.baseName === expectedBaseName)
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === expectedBaseName)
     expect(file).toBeDefined()
     const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
     const expectedPath = expectedDir ? path.resolve(root, expectedDir, expectedBaseName) : path.resolve(root, expectedBaseName)
@@ -298,7 +299,7 @@ describe('typeGenerator — Operation — group', () => {
       resolver: resolverTs,
     })
 
-    const file = driver.fileManager.files.find((f) => f.baseName === 'GetConfig.ts')
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === 'GetConfig.ts')
     expect(file).toBeDefined()
     const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
     expect(file!.path).toBe(path.resolve(root, 'defaultController', 'GetConfig.ts'))

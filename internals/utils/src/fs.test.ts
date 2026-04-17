@@ -1,102 +1,8 @@
 import { mkdir, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
-import { afterAll, beforeAll, describe, expect, it, test } from 'vitest'
-import { clean, exists, getRelativePath, read, readSync, write } from './fs.ts'
-
-const existsTestDir = path.join(os.tmpdir(), 'kubb-test-exists')
-const existsTestFile = path.join(existsTestDir, 'test.txt')
-
-describe('exists', () => {
-  beforeAll(async () => {
-    await mkdir(existsTestDir, { recursive: true })
-    await write(existsTestFile, 'test content')
-  })
-
-  afterAll(async () => {
-    await rm(existsTestDir, { recursive: true, force: true })
-  })
-
-  it('should return true for existing file', async () => {
-    expect(await exists(existsTestFile)).toBe(true)
-  })
-
-  it('should return false for non-existing file', async () => {
-    expect(await exists(path.join(existsTestDir, 'nonexistent.txt'))).toBe(false)
-  })
-
-  it('should return true for existing directory', async () => {
-    expect(await exists(existsTestDir)).toBe(true)
-  })
-})
-
-const rwTestDir = path.join(os.tmpdir(), 'kubb-test-read-write')
-const rwFilePath = path.join(rwTestDir, 'helloWorld.js')
-
-describe('read / write', () => {
-  beforeAll(async () => {
-    await mkdir(rwTestDir, { recursive: true })
-  })
-
-  afterAll(async () => {
-    await rm(rwTestDir, { recursive: true, force: true })
-  })
-
-  test('write creates a file and read returns its content', async () => {
-    const text = `export const hallo = 'world'`
-    await write(rwFilePath, text)
-
-    expect(await read(rwFilePath)).toBe(text)
-  })
-
-  test('readSync reads file synchronously', async () => {
-    const text = `export const hallo = 'world sync'`
-    await write(rwFilePath, text)
-
-    expect(readSync(rwFilePath)).toBe(text)
-  })
-
-  test('write does not rewrite when content is identical', async () => {
-    const text = `export const hallo = 'world'`
-    await write(rwFilePath, text)
-    const result = await write(rwFilePath, text)
-
-    expect(result).toBeNull()
-  })
-
-  it('write returns undefined for empty/whitespace data', async () => {
-    expect(await write(rwFilePath, '   ')).toBeNull()
-  })
-
-  it('write performs sanity check when enabled', async () => {
-    const text = `export const hallo = 'world with sanity'`
-
-    expect(await write(rwFilePath, text, { sanity: true })).toBe(text)
-  })
-
-  it('write trims data before saving', async () => {
-    const text = `  export const hallo = 'world'  `
-    await write(rwFilePath, text)
-
-    expect(await read(rwFilePath)).toBe(text.trim())
-  })
-})
-
-describe('clean', () => {
-  const cleanDir = path.join(os.tmpdir(), 'kubb-test-clean')
-
-  it('removes directory recursively', async () => {
-    await mkdir(cleanDir, { recursive: true })
-    await write(path.join(cleanDir, 'file.ts'), 'export {}')
-    await clean(cleanDir)
-
-    expect(await exists(cleanDir)).toBe(false)
-  })
-
-  it('does not throw when path does not exist', async () => {
-    await expect(clean(path.join(os.tmpdir(), 'kubb-does-not-exist'))).resolves.not.toThrow()
-  })
-})
+import { afterAll, beforeAll, describe, expect, test } from 'vitest'
+import { getRelativePath } from './fs.ts'
 
 describe('getRelativePath', () => {
   const relTestDir = path.join(os.tmpdir(), 'kubb-test-rel')
@@ -111,13 +17,8 @@ describe('getRelativePath', () => {
   })
 
   test('returns correct relative path (POSIX)', async () => {
-    const testFile = path.join(folderPath, 'test.js')
-    await write(testFile, 'test')
-
-    expect(getRelativePath(relTestDir, testFile)).toBe('./folder/test.js')
+    expect(getRelativePath(relTestDir, path.join(folderPath, 'test.js'))).toBe('./folder/test.js')
     expect(getRelativePath(folderPath, relTestDir)).toBe('./..')
-
-    await clean(testFile)
   })
 
   test('returns correct relative path for Windows-style paths', () => {

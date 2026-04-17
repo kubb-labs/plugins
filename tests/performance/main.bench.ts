@@ -1,7 +1,6 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { AsyncEventEmitter } from '@internals/utils'
-import { type Config, createKubb } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type HookStylePlugin } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginOas } from '@kubb/plugin-oas'
@@ -46,7 +45,7 @@ describe('Plugin Generation Performance', () => {
             },
             enumType: 'asConst',
           }),
-        ],
+        ] as HookStylePlugin[],
       })
 
       const hooks = new AsyncEventEmitter()
@@ -84,7 +83,7 @@ describe('Plugin Generation Performance', () => {
               path: 'clients',
             },
           }),
-        ],
+        ] as HookStylePlugin[],
       })
 
       const hooks = new AsyncEventEmitter()
@@ -135,7 +134,7 @@ describe('Plugin Generation Performance', () => {
               barrelType: false,
             },
           }),
-        ],
+        ] as HookStylePlugin[],
       })
 
       const hooks = new AsyncEventEmitter()

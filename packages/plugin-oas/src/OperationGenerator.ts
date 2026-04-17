@@ -1,7 +1,5 @@
-import type { AsyncEventEmitter } from '@internals/utils'
 import { pascalCase } from '@internals/utils'
-
-import type { ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions } from '@kubb/core'
+import type { AsyncEventEmitter, ast, FileMetaBase, KubbHooks, Plugin, PluginDriver, PluginFactoryOptions } from '@kubb/core'
 import type { contentType, HttpMethod, Oas, OasTypes, Operation, SchemaObject } from '@kubb/oas'
 import type { CoreGenerator } from './generators/createGenerator.ts'
 import type { ReactGenerator } from './generators/createReactGenerator.ts'
@@ -57,7 +55,7 @@ export class OperationGenerator<TPluginOptions extends PluginFactoryOptions = Pl
       case 'path':
         return !!operation.path.match(pattern)
       case 'method':
-        return !!method.match(pattern)
+        return typeof pattern === 'string' ? method.toLowerCase() === pattern.toLowerCase() : !!method.match(pattern)
       case 'contentType':
         return !!operation.getContentType().match(pattern)
       default:

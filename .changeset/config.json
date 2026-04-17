@@ -7,7 +7,7 @@
     }
   ],
   "commit": false,
-  "fixed": [["@kubb/*", "kubb"]],
+  "fixed": [["@kubb/plugin-*"]],
   "linked": [],
   "access": "restricted",
   "baseBranch": "main",
@@ -16,5 +16,5 @@
     "onlyUpdatePeerDependentsWhenOutOfRange": true
   },
   "useCalculatedVersion": true,
-  "ignore": ["e2e", "*-pet-store", "@internals/*"]
+  "ignore": ["@internals/*"]
 }

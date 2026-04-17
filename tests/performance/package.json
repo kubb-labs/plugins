@@ -5,13 +5,16 @@
   "description": "Performance benchmarks for Kubb plugin generation",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kubb-labs/kubb.git",
+    "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "tests/performance"
   },
   "license": "MIT",
   "author": "stijnvanhulle",
   "sideEffects": false,
   "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
   "dependencies": {
     "@internals/utils": "workspace:*",
     "@kubb/core": "catalog:",
