@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
