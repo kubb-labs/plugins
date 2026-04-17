@@ -6,8 +6,6 @@ import { addFiles } from '../../axios/petService/addFiles.ts'
 
 export const addFilesMutationKey = () => [{ url: '/pet/files' }] as const
 
-export type AddFilesMutationKey = ReturnType<typeof addFilesMutationKey>
-
 export function addFilesMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddFilesData>> & { client?: Client } = {}) {
   const mutationKey = addFilesMutationKey()
   return mutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>({

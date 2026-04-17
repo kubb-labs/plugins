@@ -21,7 +21,7 @@ export const updatePetWithFormQueryKey = (
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
 ) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }, ...(params ? [params] : [])] as const
 
-export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
+type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
 
 /**
  * @summary Updates a pet in the store with form data

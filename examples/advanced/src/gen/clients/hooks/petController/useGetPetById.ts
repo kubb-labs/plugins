@@ -6,7 +6,7 @@ import { getPetById } from '../../axios/petService/getPetById.ts'
 
 export const getPetByIdQueryKey = ({ petId }: { petId: GetPetByIdPathPetId }) => [{ url: '/pet/:petId:search', params: { petId: petId } }] as const
 
-export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
+type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 export function getPetByIdQueryOptions({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ petId })

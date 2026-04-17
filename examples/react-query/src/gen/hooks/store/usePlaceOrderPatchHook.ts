@@ -12,8 +12,6 @@ import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatu
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
-export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutationKey>
-
 /**
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch

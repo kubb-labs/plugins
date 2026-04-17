@@ -13,7 +13,7 @@ import type { GetUserByNamePathUsername, GetUserByNameResponse, GetUserByNameSta
 export const getUserByNameSuspenseQueryKey = ({ username }: { username: GetUserByNamePathUsername }) =>
   ['v5', { url: '/user/:username', params: { username: username } }] as const
 
-export type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
+type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
 /**
  * @summary Get user by user name

@@ -89,8 +89,6 @@ import type {
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
-export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
-
 /**
  * @description Update an existing pet by Id
  * @summary Update an existing pet
@@ -170,8 +168,6 @@ export function useUpdatePet<TContext>(
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
-
 /**
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
@@ -232,7 +228,7 @@ export function useAddPet<TContext>(
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
   [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
+type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -301,7 +297,7 @@ export function useFindPetsByStatus<
 export const findPetsByStatusSuspenseQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
   [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
+type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -369,7 +365,7 @@ export function useFindPetsByStatusSuspense<TData = FindPetsByStatusResponse, TQ
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }) =>
   [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
+type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -443,7 +439,7 @@ export const findPetsByTagsSuspenseQueryKey = (params?: {
   pageSize?: FindPetsByTagsQueryPageSize
 }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQueryKey>
+type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQueryKey>
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -511,7 +507,7 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsResponse, TQuery
 
 export const getPetByIdQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
 
-export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
+type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 /**
  * @description Returns a single pet
@@ -575,7 +571,7 @@ export function useGetPetById<TData = GetPetByIdResponse, TQueryData = GetPetByI
 
 export const getPetByIdSuspenseQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
 
-export type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
+type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
 /**
  * @description Returns a single pet
@@ -638,8 +634,6 @@ export function useGetPetByIdSuspense<TData = GetPetByIdResponse, TQueryKey exte
 }
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
 
 /**
  * @summary Updates a pet in the store with form data
@@ -724,8 +718,6 @@ export function useUpdatePetWithForm<TContext>(
 }
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 
 /**
  * @description delete a pet
@@ -812,8 +804,6 @@ export function useDeletePet<TContext>(
 }
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
-
-export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
 /**
  * @summary uploads an image
@@ -904,7 +894,7 @@ export function useUploadFile<TContext>(
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
-export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
+type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
 /**
  * @description Returns a map of status codes to quantities
@@ -960,7 +950,7 @@ export function useGetInventory<TData = GetInventoryResponse, TQueryData = GetIn
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
 
-export type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
+type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
 
 /**
  * @description Returns a map of status codes to quantities
@@ -1015,8 +1005,6 @@ export function useGetInventorySuspense<TData = GetInventoryResponse, TQueryKey 
 }
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
-
-export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 
 /**
  * @description Place a new order in the store
@@ -1081,8 +1069,6 @@ export function usePlaceOrder<TContext>(
 }
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
-
-export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutationKey>
 
 /**
  * @description Place a new order in the store with patch
@@ -1150,7 +1136,7 @@ export function usePlaceOrderPatch<TContext>(
 
 export const getOrderByIdQueryKey = (orderId: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: { orderId: orderId } }] as const
 
-export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
+type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
@@ -1214,7 +1200,7 @@ export function useGetOrderById<TData = GetOrderByIdResponse, TQueryData = GetOr
 
 export const getOrderByIdSuspenseQueryKey = (orderId: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: { orderId: orderId } }] as const
 
-export type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
+type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
@@ -1277,8 +1263,6 @@ export function useGetOrderByIdSuspense<TData = GetOrderByIdResponse, TQueryKey 
 }
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
-
-export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -1346,8 +1330,6 @@ export function useDeleteOrder<TContext>(
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
-export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Create user
@@ -1411,8 +1393,6 @@ export function useCreateUser<TContext>(
 }
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
-
-export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
 
 /**
  * @description Creates list of users with given input array
@@ -1486,7 +1466,7 @@ export function useCreateUsersWithListInput<TContext>(
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
   [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
-export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
+type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 /**
  * @summary Logs user into the system
@@ -1553,7 +1533,7 @@ export function useLoginUser<TData = LoginUserResponse, TQueryData = LoginUserRe
 export const loginUserSuspenseQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
   [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
-export type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
+type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
 
 /**
  * @summary Logs user into the system
@@ -1619,7 +1599,7 @@ export function useLoginUserSuspense<TData = LoginUserResponse, TQueryKey extend
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
-export type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
+type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
 /**
  * @summary Logs out current logged in user session
@@ -1673,7 +1653,7 @@ export function useLogoutUser<TData = LogoutUserResponse, TQueryData = LogoutUse
 
 export const logoutUserSuspenseQueryKey = () => [{ url: '/user/logout' }] as const
 
-export type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
+type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
 
 /**
  * @summary Logs out current logged in user session
@@ -1727,7 +1707,7 @@ export function useLogoutUserSuspense<TData = LogoutUserResponse, TQueryKey exte
 
 export const getUserByNameQueryKey = (username: GetUserByNamePathUsername) => [{ url: '/user/:username', params: { username: username } }] as const
 
-export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
+type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 /**
  * @summary Get user by user name
@@ -1789,7 +1769,7 @@ export function useGetUserByName<TData = GetUserByNameResponse, TQueryData = Get
 
 export const getUserByNameSuspenseQueryKey = (username: GetUserByNamePathUsername) => [{ url: '/user/:username', params: { username: username } }] as const
 
-export type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
+type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
 /**
  * @summary Get user by user name
@@ -1850,8 +1830,6 @@ export function useGetUserByNameSuspense<TData = GetUserByNameResponse, TQueryKe
 }
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
-
-export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
 
 /**
  * @description This can only be done by the logged in user.
@@ -1922,8 +1900,6 @@ export function useUpdateUser<TContext>(
 }
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
-
-export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
 
 /**
  * @description This can only be done by the logged in user.

@@ -22,7 +22,7 @@ export const findPetsByTagsInfiniteQueryKey = (params?: {
   pageSize?: FindPetsByTagsQueryPageSize
 }) => ['v5', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
+type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.

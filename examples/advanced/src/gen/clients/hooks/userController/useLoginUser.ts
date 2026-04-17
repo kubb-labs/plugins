@@ -7,7 +7,7 @@ import { loginUser } from '../../axios/userService/loginUser.ts'
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
   [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
-export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
+type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 export function loginUserQueryOptions(
   { params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {},

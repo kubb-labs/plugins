@@ -6,8 +6,6 @@ import { deletePet } from '../../axios/petService/deletePet.ts'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 
-export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
-
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<

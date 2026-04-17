@@ -12,8 +12,6 @@ import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } f
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
-export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
-
 /**
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array

@@ -13,7 +13,7 @@ import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse,
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
   ['v5', { url: '/user/login' }, ...(params ? [params] : [])] as const
 
-export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
+type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 
 /**
  * @summary Logs user into the system

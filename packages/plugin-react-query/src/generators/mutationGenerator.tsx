@@ -130,13 +130,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <MutationKey
-          name={mutationKeyName}
-          node={node}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          transformer={ctx.options.mutationKey}
-        />
+        <MutationKey name={mutationKeyName} node={node} pathParamsType={pathParamsType} paramsCasing={paramsCasing} transformer={ctx.options.mutationKey} />
 
         {!shouldUseClientPlugin && (
           <Client

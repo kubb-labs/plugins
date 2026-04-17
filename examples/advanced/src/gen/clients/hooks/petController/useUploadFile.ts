@@ -6,8 +6,6 @@ import { uploadFile } from '../../axios/petService/uploadFile.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
-
 export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<

@@ -12,8 +12,6 @@ import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, D
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
-export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Delete user
