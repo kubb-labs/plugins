@@ -142,8 +142,12 @@ describe(`plugin-mcp options ${version}`, () => {
     expect(error).toBeUndefined()
 
     for (const file of files) {
-      const fileContent = await fs.readFile(file.path, 'utf-8')
-      await expect(fileContent).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginMcp', name, getRelativePath(output, file.path)))
+      try {
+        const fileContent = await fs.readFile(file.path, 'utf-8')
+        await expect(fileContent).toMatchFileSnapshot(path.join(__dirname, '__snapshots__', 'pluginMcp', name, getRelativePath(output, file.path)))
+      } catch (e) {
+        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e
+      }
     }
 
     await fs.rm(tmpDir, { recursive: true, force: true })

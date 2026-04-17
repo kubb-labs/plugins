@@ -4,6 +4,7 @@
 #.vscode
 .idea/
 .vscode
+.claude
 
 # dependencies
 node_modules
