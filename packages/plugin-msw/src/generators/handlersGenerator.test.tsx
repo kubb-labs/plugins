@@ -1,79 +1,76 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { Config } from '@kubb/core'
-import { createMockedPlugin, createMockedPluginDriver } from '@kubb/core/mocks'
-import type { HttpMethod } from '@kubb/oas'
-import { parse } from '@kubb/oas'
-import { OperationGenerator, renderOperations } from '@kubb/plugin-oas'
+import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations } from '@kubb/core/mocks'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
+import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
 import { handlersGenerator } from './handlersGenerator.tsx'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
 
-describe('handlersGenerator operations', async () => {
-  const testData = [
-    {
-      name: 'findByTags',
-      input: '../../mocks/petStore.yaml',
-      path: '/pet/findByTags',
-      method: 'get',
-      options: {},
-    },
-  ] as const satisfies Array<{
-    input: string
-    name: string
-    path: string
-    method: HttpMethod
-    options: Partial<PluginMsw['resolvedOptions']>
-  }>
+const defaultOptions: PluginMsw['resolvedOptions'] = {
+  output: { path: '.' },
+  parser: 'data',
+  baseURL: undefined,
+  group: undefined,
+  exclude: [],
+  include: undefined,
+  override: [],
+  handlers: true,
+  transformers: {},
+  resolver: resolverMsw,
+}
 
-  test.each(testData)('$name', async (props) => {
-    const oas = await parse(path.resolve(__dirname, props.input))
+const operationNodes: Array<ast.OperationNode> = [
+  ast.createOperation({
+    operationId: 'listPets',
+    method: 'GET',
+    path: '/pets',
+    tags: ['pets'],
+    responses: [
+      ast.createResponse({
+        statusCode: '200',
+        description: 'ok',
+        schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'object', properties: [] })] }),
+      }),
+    ],
+  }),
+  ast.createOperation({
+    operationId: 'createPets',
+    method: 'POST',
+    path: '/pets',
+    tags: ['pets'],
+    requestBody: { required: true, schema: ast.createSchema({ type: 'object', properties: [] }) },
+    responses: [ast.createResponse({ statusCode: '201', description: 'created', schema: ast.createSchema({ type: 'void' }) })],
+  }),
+  ast.createOperation({
+    operationId: 'showPetById',
+    method: 'GET',
+    path: '/pets/{petId}',
+    tags: ['pets'],
+    parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+    responses: [ast.createResponse({ statusCode: '200', description: 'ok', schema: ast.createSchema({ type: 'object', properties: [] }) })],
+  }),
+]
 
+describe('handlersGenerator operations', () => {
+  test('findByTags', async () => {
     const options: PluginMsw['resolvedOptions'] = {
-      output: {
-        path: '.',
-      },
-      parser: 'data',
-      baseURL: undefined,
-      group: undefined,
-      exclude: [],
-      include: undefined,
-      override: [],
-      ...props.options,
+      ...defaultOptions,
     }
-    const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options })
-    const mockedPluginDriver = createMockedPluginDriver({ name: props.name })
-    const generator = new OperationGenerator(options, {
-      oas,
-      include: undefined,
-      driver: mockedPluginDriver,
+    const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: resolverMsw })
+    const driver = createMockedPluginDriver({ name: 'findByTags' })
 
+    await renderGeneratorOperations(handlersGenerator, operationNodes, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
       plugin,
-      contentType: undefined,
-      override: undefined,
-      mode: 'split',
-      exclude: [],
+      options,
+      resolver: resolverMsw,
     })
 
-    const operations = await generator.getOperations()
-
-    await renderOperations(
-      operations.map((item) => item.operation),
-      {
-        config: { root: '.', output: { path: 'test' } } as Config,
-        driver: mockedPluginDriver,
-        oas,
-        mode: 'split',
-        generator,
-        Component: handlersGenerator.Operations,
-        plugin,
-      },
-    )
-
-    await matchFiles(mockedPluginDriver.fileManager.files, props.name)
+    await matchFiles(driver.fileManager.files, 'findByTags')
   })
 })

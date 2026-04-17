@@ -1,17 +1,14 @@
-import path from 'node:path'
 import { camelCase } from '@internals/utils'
-import type { ast } from '@kubb/core'
-import { createPlugin, getBarrelFiles, type UserGroup } from '@kubb/core'
+import { definePlugin, type Group } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
-import { OperationGenerator, pluginOasName } from '@kubb/plugin-oas'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { version } from '../package.json'
 import { handlersGenerator, mswGenerator } from './generators'
+import { resolverMsw } from './resolvers/resolverMsw.ts'
 import type { PluginMsw } from './types.ts'
 
 export const pluginMswName = 'plugin-msw' satisfies PluginMsw['name']
 
-export const pluginMsw = createPlugin<PluginMsw>((options) => {
+export const pluginMsw = definePlugin<PluginMsw>((options) => {
   const {
     output = { path: 'handlers', barrelType: 'named' },
     group,
@@ -21,100 +18,59 @@ export const pluginMsw = createPlugin<PluginMsw>((options) => {
     transformers = {},
     handlers = false,
     parser = 'data',
-    generators = [mswGenerator, handlers ? handlersGenerator : undefined].filter(Boolean),
-    contentType,
     baseURL,
+    resolver: userResolver,
+    transformer: userTransformer,
+    generators: userGenerators = [],
   } = options
 
-  return {
-    name: pluginMswName,
-    version,
-    options: {
-      output,
-      parser,
-      group,
-      baseURL,
-      exclude,
-      include,
-      override,
-    },
-    dependencies: [pluginOasName, pluginTsName, parser === 'faker' ? pluginFakerName : undefined].filter(Boolean),
-    resolvePath(baseName, pathMode, options) {
-      const root = path.resolve(this.config.root, this.config.output.path)
-      const mode = pathMode ?? this.getMode(output)
-
-      if (mode === 'single') {
-        /**
-         * when output is a file then we will always append to the same file(output file), see fileManager.addOrAppend
-         * Other plugins then need to call addOrAppend instead of just add from the fileManager class
-         */
-        return path.resolve(root, output.path)
-      }
-
-      if (group && (options?.group?.path || options?.group?.tag)) {
-        const groupName: UserGroup['name'] = group?.name
+  const groupConfig = group
+    ? ({
+        ...group,
+        name: group.name
           ? group.name
-          : (ctx) => {
-              if (group?.type === 'path') {
+          : (ctx: { group: string }) => {
+              if (group.type === 'path') {
                 return `${ctx.group.split('/')[1]}`
               }
               return `${camelCase(ctx.group)}Controller`
-            }
+            },
+      } satisfies Group)
+    : undefined
 
-        return path.resolve(
-          root,
-          output.path,
-          groupName({
-            group: group.type === 'path' ? options.group.path! : options.group.tag!,
-          }),
-          baseName,
-        )
-      }
+  return {
+    name: pluginMswName,
+    options,
+    dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : undefined].filter(Boolean),
+    hooks: {
+      'kubb:plugin:setup'(ctx) {
+        const resolver = userResolver ? { ...resolverMsw, ...userResolver } : resolverMsw
 
-      return path.resolve(root, output.path, baseName)
-    },
-    resolveName(name, type) {
-      const resolvedName = camelCase(name, {
-        suffix: type ? 'handler' : undefined,
-        isFile: type === 'file',
-      })
+        ctx.setOptions({
+          output,
+          parser,
+          baseURL,
+          group: groupConfig,
+          exclude,
+          include,
+          override,
+          handlers,
+          transformers,
+          resolver,
+        })
+        ctx.setResolver(resolver)
+        if (userTransformer) {
+          ctx.setTransformer(userTransformer)
+        }
 
-      if (type) {
-        return transformers?.name?.(resolvedName, type) || resolvedName
-      }
-
-      return resolvedName
-    },
-    async buildStart() {
-      const root = path.resolve(this.config.root, this.config.output.path)
-      const mode = this.getMode(output)
-      const oas = await this.getOas()
-
-      const operationGenerator = new OperationGenerator(this.plugin.options, {
-        oas,
-        driver: this.driver,
-        hooks: this.hooks,
-        plugin: this.plugin,
-        contentType,
-        exclude,
-        include,
-        override,
-        mode,
-      })
-
-      const files = await operationGenerator.build(...generators)
-      await this.upsertFile(...files)
-
-      const barrelFiles = await getBarrelFiles(this.driver.fileManager.files as unknown as ast.FileNode[], {
-        type: output.barrelType ?? 'named',
-        root,
-        output,
-        meta: {
-          pluginName: this.plugin.name,
-        },
-      })
-
-      await this.upsertFile(...barrelFiles)
+        ctx.addGenerator(mswGenerator)
+        if (handlers) {
+          ctx.addGenerator(handlersGenerator)
+        }
+        for (const gen of userGenerators) {
+          ctx.addGenerator(gen)
+        }
+      },
     },
   }
 })

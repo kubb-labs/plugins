@@ -1,20 +1,28 @@
-import type { Output, PluginFactoryOptions, ResolveNameParams, UserGroup } from '@kubb/core'
+import type {
+  ast,
+  Exclude,
+  Generator,
+  Group,
+  Include,
+  Output,
+  Override,
+  PluginFactoryOptions,
+  ResolveNameParams,
+  ResolvePathOptions,
+  Resolver,
+  UserGroup,
+} from '@kubb/core'
 
-import type { contentType, Oas } from '@kubb/oas'
-import type { Exclude, Include, Override, ResolvePathOptions } from '@kubb/plugin-oas'
-import type { Generator } from '@kubb/plugin-oas/generators'
+export type ResolverMsw = Resolver & {
+  resolveName(this: ResolverMsw, name: string): string
+}
 
 export type Options = {
   /**
    * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'mocks', barrelType: 'named' }
+   * @default { path: 'handlers', barrelType: 'named' }
    */
-  output?: Output<Oas>
-  /**
-   * Define which contentType should be used.
-   * By default, the first JSON valid mediaType is used
-   */
-  contentType?: contentType
+  output?: Output
   baseURL?: string
   /**
    * Group the MSW mocks based on the provided name.
@@ -39,6 +47,14 @@ export type Options = {
     name?: (name: ResolveNameParams['name'], type?: ResolveNameParams['type']) => string
   }
   /**
+   * Override individual resolver methods.
+   */
+  resolver?: Partial<ResolverMsw> & ThisType<ResolverMsw>
+  /**
+   * Single AST visitor applied before printing.
+   */
+  transformer?: ast.Visitor
+  /**
    * Create `handlers.ts` file with all handlers grouped by methods.
    * @default false
    */
@@ -55,17 +71,21 @@ export type Options = {
    */
   generators?: Array<Generator<PluginMsw>>
 }
+
 type ResolvedOptions = {
-  output: Output<Oas>
-  group: Options['group']
+  output: Output
+  group: Group | undefined
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
   parser: NonNullable<Options['parser']>
   baseURL: Options['baseURL'] | undefined
+  handlers: boolean
+  transformers: NonNullable<Options['transformers']>
+  resolver: ResolverMsw
 }
 
-export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, ResolvePathOptions>
+export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, ResolvePathOptions, ResolverMsw>
 
 declare global {
   namespace Kubb {

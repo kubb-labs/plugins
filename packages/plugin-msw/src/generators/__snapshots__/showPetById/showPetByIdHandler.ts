@@ -6,7 +6,7 @@
 import type { ShowPetByIdQueryResponse } from './ShowPetById'
 import { http } from 'msw'
 
-export function showPetByIdResponse200(data: ShowPetByIdQueryResponse) {
+export function showPetByIdHandlerResponse200(data: ShowPetByIdQueryResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -15,7 +15,7 @@ export function showPetByIdResponse200(data: ShowPetByIdQueryResponse) {
   })
 }
 
-export function showPetById(data?: ShowPetByIdQueryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
+export function showPetByIdHandler(data?: ShowPetByIdQueryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
   return http.get(`/pets/:petId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
