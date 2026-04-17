@@ -10,7 +10,7 @@ export function pet(data?: Partial<Pet>): Pet {
   return {
     ...{
       id: faker.number.int(),
-      name: faker.string.alpha(),
+      name: faker.string.fromCharacters('abc'),
       code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
       shipDate: faker.date.anytime().toISOString().substring(0, 10),
       category: category(),

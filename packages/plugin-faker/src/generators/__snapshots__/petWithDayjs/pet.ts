@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import dayjs from 'dayjs'
 import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
@@ -12,7 +13,7 @@ export function pet(data?: Partial<Pet>): Pet {
       id: faker.number.int(),
       name: faker.string.alpha(),
       code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
-      shipDate: faker.date.anytime().toISOString().substring(0, 10),
+      shipDate: dayjs(faker.date.anytime()).format('YYYY-MM-DD'),
       category: category(),
       status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
     },

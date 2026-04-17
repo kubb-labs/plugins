@@ -1,20 +1,80 @@
-import type { Output, PluginFactoryOptions, ResolveNameParams, UserGroup } from '@kubb/core'
+import type {
+  ast,
+  CompatibilityPreset,
+  Exclude,
+  Generator,
+  Group,
+  Include,
+  Output,
+  Override,
+  PluginFactoryOptions,
+  ResolvePathOptions,
+  Resolver,
+  UserGroup,
+} from '@kubb/core'
+import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
-import type { contentType, Oas, SchemaObject } from '@kubb/oas'
-import type { Exclude, Include, Override, ResolvePathOptions, Schema } from '@kubb/plugin-oas'
-import type { Generator } from '@kubb/plugin-oas/generators'
+/**
+ * Default resolver contract for `@kubb/plugin-faker`.
+ */
+export type ResolverFaker = Resolver &
+  ast.OperationParamsResolver & {
+    /**
+     * Resolves the generated faker function name for a named schema.
+     * @example
+     * resolver.resolveName('show pet by id') // -> 'showPetById'
+     */
+    resolveName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+    /**
+     * Resolves the output file name/path for a generated faker module.
+     * @example
+     * resolver.resolvePathName('show pet by id', 'file') // -> 'showPetById'
+     */
+    resolvePathName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+    /**
+     * Resolves the faker function name for an operation request body.
+     * @example
+     * resolver.resolveDataName(node) // -> 'createPetsData'
+     */
+    resolveDataName(this: ResolverFaker, node: ast.OperationNode): string
+    /**
+     * Resolves the faker function name for an operation response by status code.
+     * @example
+     * resolver.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'
+     */
+    resolveResponseStatusName(this: ResolverFaker, node: ast.OperationNode, statusCode: ast.StatusCode): string
+    /**
+     * Resolves the faker function name for the operation response union.
+     * @example
+     * resolver.resolveResponseName(node) // -> 'listPetsResponse'
+     */
+    resolveResponseName(this: ResolverFaker, node: ast.OperationNode): string
+    /**
+     * Resolves the faker function name for grouped path params or a single path param.
+     * @example
+     * resolver.resolvePathParamsName(node, param) // -> 'showPetByIdPathPetId'
+     */
+    resolvePathParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the faker function name for grouped query params or a single query param.
+     * @example
+     * resolver.resolveQueryParamsName(node, param) // -> 'listPetsQueryLimit'
+     */
+    resolveQueryParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+    /**
+     * Resolves the faker function name for grouped header params or a single header param.
+     * @example
+     * resolver.resolveHeaderParamsName(node, param) // -> 'deletePetHeaderApiKey'
+     */
+    resolveHeaderParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
+  }
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'handlers', barrelType: 'named' }
+   * Specify the export location for the files and define the behavior of the output.
+   * @default { path: 'mocks', barrelType: 'named' }
    */
-  output?: Output<Oas>
-  /**
-   * Define which contentType should be used.
-   * By default, the first JSON valid mediaType is used
-   */
-  contentType?: contentType
+  output?: Output
   /**
    * Group the Faker mocks based on the provided name.
    */
@@ -32,55 +92,26 @@ export type Options = {
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Choose to use date or datetime as JavaScript Date instead of string.
-   * - 'string' represents dates as string values.
-   * - 'date' represents dates as JavaScript Date objects.
-   * @default 'string'
-   */
-  dateType?: 'string' | 'date'
-  /**
-   * Choose to use `number` or `bigint` for integer fields with `int64` format.
-   * - 'number' uses the JavaScript `number` type (matches JSON.parse() runtime behavior).
-   * - 'bigint' uses the JavaScript `bigint` type (accurate for values exceeding Number.MAX_SAFE_INTEGER).
-   * @note in v5 of Kubb 'bigint' will become the default to better align with OpenAPI's int64 specification.
-   * @default 'number'
-   */
-  integerType?: 'number' | 'bigint'
-  /**
-   * Which parser should be used when dateType is set to string.
-   * - 'faker' uses faker's built-in date formatting methods.
-   * - 'dayjs' uses dayjs for date formatting with custom patterns.
-   * - 'moment' uses moment for date formatting with custom patterns.
+   * Which parser should be used when date/time values are represented as strings.
+   * - 'faker' uses faker's built-in ISO formatting.
+   * - 'dayjs' uses dayjs for custom formatting.
+   * - 'moment' uses moment for custom formatting.
    * @default 'faker'
    */
   dateParser?: 'faker' | 'dayjs' | 'moment' | (string & {})
   /**
-   * Which type to use when the Swagger/OpenAPI file is not providing more information.
-   * - 'any' allows any value.
-   * - 'unknown' requires type narrowing before use.
-   * - 'void' represents no value.
-   * @default 'any'
-   */
-  unknownType?: 'any' | 'unknown' | 'void'
-  /**
-   * Which type to use for empty schema values.
-   * - 'any' allows any value.
-   * - 'unknown' requires type narrowing before use.
-   * - 'void' represents no value.
-   * @default `unknownType`
-   */
-  emptySchemaType?: 'any' | 'unknown' | 'void'
-  /**
-   * Choose which generator to use when using Regexp.
-   * - 'faker' uses faker.helpers.fromRegExp for generating values from regex patterns.
-   * - 'randexp' uses RandExp library for generating values from regex patterns.
+   * Choose which generator to use when using RegExp patterns.
+   * - 'faker' uses faker.helpers.fromRegExp.
+   * - 'randexp' uses RandExp.
    * @default 'faker'
    */
   regexGenerator?: 'faker' | 'randexp'
-
+  /**
+   * Provide per-property faker expressions keyed by property name.
+   */
   mapper?: Record<string, string>
   /**
-   * The use of Seed is intended to allow for consistent values in a test.
+   * Seed faker for deterministic output.
    */
   seed?: number | number[]
   /**
@@ -90,42 +121,47 @@ export type Options = {
    * @default undefined
    */
   paramsCasing?: 'camelcase'
-  transformers?: {
-    /**
-     * Customize the names based on the type that is provided by the plugin.
-     */
-    name?: (name: ResolveNameParams['name'], type?: ResolveNameParams['type']) => string
-    /**
-     * Receive schema and baseName(propertyName) and return FakerMeta array
-     * TODO TODO add docs
-     * @beta
-     */
-    schema?: (props: { schema: SchemaObject | null; name: string | null; parentName: string | null }, defaultSchemas: Schema[]) => Schema[] | undefined
-  }
   /**
-   * Define some generators next to the faker generators
+   * Define additional generators next to the faker generators.
    */
   generators?: Array<Generator<PluginFaker>>
+  /**
+   * Apply a compatibility naming preset.
+   * @default 'default'
+   */
+  compatibilityPreset?: CompatibilityPreset
+  /**
+   * Override individual resolver methods. Any method you omit falls back to the
+   * active preset resolver.
+   */
+  resolver?: Partial<ResolverFaker> & ThisType<ResolverFaker>
+  /**
+   * Single AST visitor applied to each node before rendering.
+   */
+  transformer?: ast.Visitor
+  /**
+   * Override individual faker printer node handlers.
+   */
+  printer?: {
+    nodes?: PrinterFakerNodes
+  }
 }
 
 type ResolvedOptions = {
-  output: Output<Oas>
-  group: Options['group']
+  output: Output
+  group: Group | undefined
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
-  dateType: NonNullable<Options['dateType']>
-  integerType: NonNullable<Options['integerType']>
   dateParser: NonNullable<Options['dateParser']>
-  unknownType: NonNullable<Options['unknownType']>
-  emptySchemaType: NonNullable<Options['emptySchemaType']>
-  transformers: NonNullable<Options['transformers']>
-  seed: NonNullable<Options['seed']> | undefined
-  mapper: NonNullable<Options['mapper']>
   regexGenerator: NonNullable<Options['regexGenerator']>
+  mapper: NonNullable<Options['mapper']>
+  seed: NonNullable<Options['seed']> | undefined
   paramsCasing: Options['paramsCasing']
+  printer: Options['printer']
 }
-export type PluginFaker = PluginFactoryOptions<'plugin-faker', Options, ResolvedOptions, never, ResolvePathOptions>
+
+export type PluginFaker = PluginFactoryOptions<'plugin-faker', Options, ResolvedOptions, never, ResolvePathOptions, ResolverFaker>
 
 declare global {
   namespace Kubb {

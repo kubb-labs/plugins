@@ -4,10 +4,10 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, resolveParamNameByLocation } from '../utils.ts'
+import { buildGroupedParamsSchema, buildLegacyResponseUnionSchema, canOverrideSchema } from '../utils.ts'
 
-export const fakerGenerator = defineGenerator<PluginFaker>({
-  name: 'faker',
+export const fakerGeneratorLegacy = defineGenerator<PluginFaker>({
+  name: 'faker-legacy',
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
@@ -77,6 +77,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     }
 
     const params = ast.caseParams(node.parameters, paramsCasing)
+    const pathParams = params.filter((param) => param.in === 'path')
+    const queryParams = params.filter((param) => param.in === 'query')
+    const headerParams = params.filter((param) => param.in === 'header')
     const meta = {
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       typeFile: pluginTs.resolver.resolveFile(
@@ -160,13 +163,24 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        {params.map((param) =>
+        {pathParams[0] &&
           renderEntry({
-            schema: param.schema,
-            name: resolveParamNameByLocation(resolver, node, param),
-            typeName: resolveParamNameByLocation(pluginTs.resolver, node, param),
-          }),
-        )}
+            schema: buildGroupedParamsSchema(pathParams),
+            name: resolver.resolvePathParamsName(node, pathParams[0]),
+            typeName: pluginTs.resolver.resolvePathParamsName(node, pathParams[0]),
+          })}
+        {queryParams[0] &&
+          renderEntry({
+            schema: buildGroupedParamsSchema(queryParams),
+            name: resolver.resolveQueryParamsName(node, queryParams[0]),
+            typeName: pluginTs.resolver.resolveQueryParamsName(node, queryParams[0]),
+          })}
+        {headerParams[0] &&
+          renderEntry({
+            schema: buildGroupedParamsSchema(headerParams),
+            name: resolver.resolveHeaderParamsName(node, headerParams[0]),
+            typeName: pluginTs.resolver.resolveHeaderParamsName(node, headerParams[0]),
+          })}
         {node.responses.map((response) =>
           renderEntry({
             schema: response.schema,
@@ -187,7 +201,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             })
           : null}
         {renderEntry({
-          schema: buildResponseUnionSchema(node, resolver),
+          schema: buildLegacyResponseUnionSchema(node, resolver),
           name: resolver.resolveResponseName(node),
           typeName: pluginTs.resolver.resolveResponseName(node),
           skipImportNames: node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode)),

@@ -778,6 +778,170 @@ pluginZod({
 | `printer.nodes` | `PrinterZodNodes \| PrinterZodMiniNodes` | — | Override per-type code generation handlers |
 | `inferred` | `boolean` | `false` | Export `z.infer<typeof ...>` type aliases |
 
+### `@kubb/plugin-faker` — v5 migration
+
+`@kubb/plugin-faker` now follows the same v5 schema-plugin architecture as `@kubb/plugin-ts` and `@kubb/plugin-zod`. It no longer depends on `@kubb/plugin-oas`, and schema rendering now goes through a dedicated printer surface.
+
+#### `pluginOas()` no longer required
+
+In v5, `@kubb/plugin-faker` reads schema and operation nodes from `adapterOas()`. Remove `pluginOas()` from the plugin list and configure the adapter instead.
+
+::: code-group
+```typescript [Before (v4)]
+import { defineConfig } from '@kubb/core'
+import { pluginOas } from '@kubb/plugin-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginFaker } from '@kubb/plugin-faker'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  plugins: [
+    pluginOas(),
+    pluginTs(),
+    pluginFaker({
+      output: { path: './mocks' },
+    }),
+  ],
+})
+```
+
+```typescript [After (v5)]
+import { adapterOas } from '@kubb/adapter-oas'
+import { defineConfig } from '@kubb/core'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginFaker } from '@kubb/plugin-faker'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  adapter: adapterOas(),
+  plugins: [
+    pluginTs(),
+    pluginFaker({
+      output: { path: './mocks' },
+    }),
+  ],
+})
+```
+:::
+
+#### `transformers.name` replaced by `resolver`
+
+The `transformers: { name }` callback has been removed. Use the `resolver` option to customize generated helper names and file names.
+
+::: code-group
+```typescript [Before (v4)]
+pluginFaker({
+  transformers: {
+    name: (name) => `${name}Mock`,
+  },
+})
+```
+
+```typescript [After (v5)]
+import { pluginFaker } from '@kubb/plugin-faker'
+
+pluginFaker({
+  resolver: {
+    resolveName(name) {
+      return `${this.default(name)}Mock`
+    },
+  },
+})
+```
+:::
+
+#### `transformers` replaced by `transformer`
+
+The old `transformers` object has been replaced by a single AST `Visitor` `transformer`, matching the v5 pattern used by the other schema plugins.
+
+```typescript
+pluginFaker({
+  transformer: {
+    schema(node) {
+      return { ...node, description: undefined }
+    },
+  },
+})
+```
+
+#### Removed options
+
+The following options are no longer available in `@kubb/plugin-faker`:
+
+- `contentType`
+- `dateType`
+- `unknownType`
+- `emptySchemaType`
+
+Move `contentType`, `unknownType`, and `emptySchemaType` to `adapterOas(...)`. The plugin no longer switches date-like schemas between `string` and `Date` with `dateType`; it uses the normalized AST schema representation instead, and `dateParser` only controls how string date and time values are formatted.
+
+::: code-group
+```typescript [Before (v4)]
+pluginFaker({
+  contentType: 'application/json',
+  dateType: 'string',
+  unknownType: 'unknown',
+  emptySchemaType: 'void',
+})
+```
+
+```typescript [After (v5)]
+adapterOas({
+  contentType: 'application/json',
+  unknownType: 'unknown',
+  emptySchemaType: 'void',
+})
+
+pluginFaker({
+  dateParser: 'faker',
+})
+```
+:::
+
+#### New `compatibilityPreset` option
+
+Use `compatibilityPreset: 'kubbV4'` to keep the v4 helper naming convention while you migrate existing tests or imports.
+
+```typescript
+import { pluginFaker } from '@kubb/plugin-faker'
+
+pluginFaker({ compatibilityPreset: 'kubbV4' })
+```
+
+#### New `printer.nodes` option
+
+Use `printer.nodes` to override individual schema-type renderers without replacing the full faker generator.
+
+```typescript
+import { pluginFaker } from '@kubb/plugin-faker'
+
+pluginFaker({
+  printer: {
+    nodes: {
+      integer() {
+        return 'faker.number.float()'
+      },
+    },
+  },
+})
+```
+
+#### New exports
+
+`@kubb/plugin-faker` now exports `resolverFaker`, `resolverFakerLegacy`, and `printerFaker` for custom generators and deeper printer customization.
+
+### `@kubb/plugin-faker` — new options in v5
+
+| New option | Type | Default | Description |
+|---|---|---|---|
+| `paramsCasing` | `'camelcase'` | `undefined` | Apply camelCase to path/query/header param names |
+| `compatibilityPreset` | `'default' \| 'kubbV4'` | `'default'` | Naming convention preset |
+| `resolver` | `Partial<ResolverFaker> & ThisType<ResolverFaker>` | — | Override individual resolver methods |
+| `transformer` | `Visitor` | — | Single AST visitor applied before printing |
+| `printer.nodes` | `PrinterFakerNodes` | — | Override per-type faker rendering handlers |
+
 ### `@kubb/plugin-mcp` — v5 migration
 
 The MCP plugin has been updated to use the v5 architecture. The following changes are required when migrating from v4.

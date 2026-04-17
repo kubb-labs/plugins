@@ -1,94 +1,129 @@
 import { jsStringEscape } from '@internals/utils'
+import type { ast } from '@kubb/core'
 import { FunctionParams } from '@kubb/core'
-import type { Schema } from '@kubb/plugin-oas'
-import { isKeyword, schemaKeywords } from '@kubb/plugin-oas'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import * as parserFaker from '../parser.ts'
+import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 
 type Props = {
   name: string
   typeName: string
-  tree: Array<Schema>
+  node: ast.SchemaNode
+  printer: ast.Printer<PrinterFakerFactory>
   seed?: PluginFaker['options']['seed']
   description?: string
-  regexGenerator?: PluginFaker['options']['regexGenerator']
-  mapper?: PluginFaker['options']['mapper']
-  dateParser?: PluginFaker['options']['dateParser']
   canOverride: boolean
 }
 
-export function Faker({ tree, description, name, typeName, seed, regexGenerator, canOverride, mapper, dateParser }: Props): KubbReactNode {
-  const fakerText = parserFaker.joinItems(
-    tree
-      .map((schema, _index, siblings) =>
-        parserFaker.parse(
-          { name, schema, parent: undefined, current: schema, siblings },
-          {
-            typeName,
-            rootTypeName: name,
-            regexGenerator,
-            mapper,
-            canOverride,
-            dateParser,
-          },
-        ),
-      )
-      .filter((x): x is string => Boolean(x)),
-  )
+const ARRAY_TYPES = new Set<ast.SchemaNode['type']>(['array'])
+const OBJECT_TYPES = new Set<ast.SchemaNode['type']>(['object', 'intersection'])
+const SCALAR_TYPES = new Set<ast.SchemaNode['type']>([
+  'string',
+  'email',
+  'url',
+  'uuid',
+  'number',
+  'integer',
+  'bigint',
+  'boolean',
+  'date',
+  'time',
+  'datetime',
+  'blob',
+  'enum',
+])
 
-  const isArray = fakerText.startsWith('faker.helpers.arrayElements') || fakerText.startsWith('faker.helpers.multiple')
-  const isRefToArray = tree.some((s) => isKeyword(s, schemaKeywords.schema) && s.args.type === 'array')
-  const isObject = fakerText.startsWith('{')
-  const isTuple = fakerText.startsWith('faker.helpers.arrayElement')
+function getScalarType(node: ast.SchemaNode, typeName: string): string {
+  switch (node.type) {
+    case 'string':
+    case 'email':
+    case 'url':
+    case 'uuid':
+      return 'string'
+    case 'number':
+    case 'integer':
+      return 'number'
+    case 'bigint':
+      return 'bigint'
+    case 'boolean':
+      return 'boolean'
+    case 'date':
+    case 'time':
+      return node.representation === 'date' ? 'Date' : 'string'
+    case 'datetime':
+      return 'string'
+    case 'blob':
+      return 'Blob'
+    case 'enum':
+      return typeName
+    default:
+      return typeName
+  }
+}
 
-  const isSimpleString = name === 'string'
-  const isSimpleInt = name === 'integer'
-  const isSimpleFloat = name === 'float'
+export function Faker({
+  node,
+  description,
+  name,
+  typeName,
+  printer,
+  seed,
+  canOverride,
+}: Props): KubbReactNode {
+  const fakerText = printer.print(node) ?? 'undefined'
+
+  const isArray = ARRAY_TYPES.has(node.type)
+  const isObject = OBJECT_TYPES.has(node.type)
+  const isTuple = node.type === 'tuple'
+  const isScalar = SCALAR_TYPES.has(node.type)
 
   let fakerTextWithOverride = fakerText
 
   if (canOverride && isObject) {
     fakerTextWithOverride = `{
   ...${fakerText},
-  ...data || {}
+  ...(data || {})
 }`
   }
 
-  if (canOverride && isTuple) fakerTextWithOverride = `data || ${fakerText}`
+  if (canOverride && isTuple) {
+    fakerTextWithOverride = `data || ${fakerText}`
+  }
 
   if (canOverride && isArray) {
     fakerTextWithOverride = `[
-      ...${fakerText},
-      ...data || []
-    ]`
+  ...${fakerText},
+  ...(data || [])
+]`
   }
 
-  if (canOverride && isSimpleString) fakerTextWithOverride = 'data ?? faker.string.alpha()'
+  if (canOverride && isScalar) {
+    fakerTextWithOverride = `data ?? ${fakerText}`
+  }
 
-  if (canOverride && isSimpleInt) fakerTextWithOverride = 'data ?? faker.number.int()'
+  let dataType = `Partial<${typeName}>`
 
-  if (canOverride && isSimpleFloat) fakerTextWithOverride = 'data ?? faker.number.float()'
+  if (isArray || isTuple || node.type === 'union' || node.type === 'enum') {
+    dataType = typeName
+  }
 
-  let type = `Partial<${typeName}>`
-
-  if (isArray) type = typeName
-  if (isRefToArray) type = typeName
-  if (isSimpleString) type = name
-  if (isSimpleInt || isSimpleFloat) type = 'number'
+  if (isScalar) {
+    dataType = getScalarType(node, typeName)
+  }
 
   const params = FunctionParams.factory({
     data: {
-      // making a partial out of an array does not make sense
-      type,
+      type: dataType,
       optional: true,
     },
   })
 
   let returnType = canOverride ? typeName : undefined
 
-  if (isSimpleString || isSimpleInt || isSimpleFloat) returnType = type
+  if (isScalar) {
+    returnType = getScalarType(node, typeName)
+  }
 
   return (
     <File.Source name={name} isExportable isIndexable>

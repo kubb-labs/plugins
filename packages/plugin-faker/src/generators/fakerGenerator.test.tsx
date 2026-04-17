@@ -1,314 +1,265 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { Config } from '@kubb/core'
-import { createMockedPlugin, createMockedPluginDriver } from '@kubb/core/mocks'
-import type { HttpMethod, SchemaObject } from '@kubb/oas'
-import { parse } from '@kubb/oas'
-import { OperationGenerator, renderOperation, renderSchema, SchemaGenerator } from '@kubb/plugin-oas'
-import { getSchemas } from '@kubb/plugin-oas/utils'
+import { ast } from '@kubb/core'
+import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
+import { resolverTs, resolverTsLegacy, type PluginTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
+import { resolverFaker } from '../resolvers/resolverFaker.ts'
+import { resolverFakerLegacy } from '../resolvers/resolverFakerLegacy.ts'
 import type { PluginFaker } from '../types.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'
+import { fakerGeneratorLegacy } from './fakerGeneratorLegacy.tsx'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const categorySchema = ast.createSchema({
+  type: 'object',
+  name: 'Category',
+  properties: [ast.createProperty({ name: 'label', required: true, schema: ast.createSchema({ type: 'string' }) })],
+})
 
-describe('fakerGenerator schema', async () => {
-  const testData = [
+const errorSchema = ast.createSchema({
+  type: 'object',
+  name: 'Error',
+  properties: [ast.createProperty({ name: 'message', required: true, schema: ast.createSchema({ type: 'string' }) })],
+})
+
+const petSchema = ast.createSchema({
+  type: 'object',
+  name: 'Pet',
+  properties: [
+    ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
+    ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
+    ast.createProperty({ name: 'code', schema: ast.createSchema({ type: 'string', pattern: '^[A-Z]{3}$' }) }),
+    ast.createProperty({ name: 'shipDate', schema: ast.createSchema({ type: 'date', representation: 'string' }) }),
+    ast.createProperty({
+      name: 'category',
+      schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+    }),
+    ast.createProperty({
+      name: 'status',
+      schema: ast.createSchema({
+        type: 'enum',
+        primitive: 'string',
+        enumValues: ['available', 'pending', 'sold'],
+      }),
+    }),
+  ],
+})
+
+const treeNodeSchema = ast.createSchema({
+  type: 'object',
+  name: 'TreeNode',
+  properties: [
+    ast.createProperty({ name: 'value', required: true, schema: ast.createSchema({ type: 'string' }) }),
+    ast.createProperty({
+      name: 'left',
+      schema: ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+    }),
+    ast.createProperty({
+      name: 'right',
+      schema: ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+    }),
+  ],
+})
+
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+}
+
+const defaultOptions: PluginFaker['resolvedOptions'] = {
+  output: { path: '.' },
+  exclude: [],
+  include: undefined,
+  override: [],
+  group: undefined,
+  mapper: {},
+  dateParser: 'faker',
+  regexGenerator: 'faker',
+  seed: undefined,
+  paramsCasing: undefined,
+  printer: undefined,
+}
+
+const defaultTsPlugin = createMockedPlugin<PluginTs>({
+  name: 'plugin-ts',
+  options: { output: { path: 'types' }, group: undefined } as PluginTs['resolvedOptions'],
+  resolver: resolverTs,
+})
+
+const legacyTsPlugin = createMockedPlugin<PluginTs>({
+  name: 'plugin-ts',
+  options: { output: { path: 'types' }, group: undefined } as PluginTs['resolvedOptions'],
+  resolver: resolverTsLegacy,
+})
+
+describe('fakerGenerator — schema', () => {
+  test.each([
+    { name: 'pet', node: petSchema, options: {} },
+    { name: 'petWithDayjs', node: petSchema, options: { dateParser: 'dayjs' as const } },
+    { name: 'petWithRandExp', node: petSchema, options: { regexGenerator: 'randexp' as const } },
     {
-      name: 'Pet',
-      path: 'Pet',
-      input: '../../mocks/petStore.yaml',
-      options: {},
-    },
-    {
-      name: 'PetWithDayjs',
-      input: '../../mocks/petStore.yaml',
-      path: 'Pet',
-      options: {
-        dateType: 'string',
-        dateParser: 'dayjs',
-      },
-    },
-    {
-      name: 'String',
-      input: '../../mocks/petStore.yaml',
-      path: 'String',
-      options: {},
-    },
-    {
-      name: 'Integer',
-      input: '../../mocks/petStore.yaml',
-      path: 'Integer',
-      options: {},
-    },
-    {
-      name: 'Float',
-      input: '../../mocks/petStore.yaml',
-      path: 'Float',
-      options: {},
-    },
-    {
-      name: 'PetWithDateString',
-      input: '../../mocks/petStore.yaml',
-      path: 'Pet',
-      options: {
-        dateParser: 'faker',
-        dateType: 'string',
-      },
-    },
-    {
-      name: 'PetWithMapper',
-      input: '../../mocks/petStore.yaml',
-      path: 'Pet',
+      name: 'petWithMapper',
+      node: petSchema,
       options: {
         mapper: {
-          id: `faker.string.fromCharacters('abc')`,
-          name: `faker.string.alpha({casing: 'lower'})`,
+          name: `faker.string.fromCharacters('abc')`,
         },
       },
     },
-    {
-      name: 'PetWithRandExp',
-      input: '../../mocks/petStore.yaml',
-      path: 'Pet',
-      options: {
-        regexGenerator: 'randexp',
-      },
-    },
-    {
-      name: 'enumVarNames',
-      input: '../../mocks/enums.yaml',
-      path: 'enumVarNames.Type',
-      options: {},
-    },
-    {
-      name: 'enumNames',
-      input: '../../mocks/enums.yaml',
-      path: 'enumNames.Type',
-      options: {},
-    },
-    {
-      name: 'PetAdoptionError',
-      input: '../../mocks/enums.yaml',
-      path: 'PetAdoptionError',
-      options: {},
-    },
-    {
-      name: 'PetAdoption400',
-      input: '../../mocks/enums.yaml',
-      path: 'PetAdoption400',
-      options: {},
-    },
-    {
-      name: 'Pets',
-      path: 'Pets',
-      input: '../../mocks/petStore.yaml',
-      options: {},
-    },
-    {
-      name: 'Node',
-      path: 'Node',
-      input: '../../mocks/selfReferencing.yaml',
-      options: {},
-    },
-    {
-      name: 'TreeNode',
-      path: 'TreeNode',
-      input: '../../mocks/selfReferencing.yaml',
-      options: {},
-    },
-  ] as const satisfies Array<{
-    input: string
-    name: string
-    path: string
-    options: Partial<PluginFaker['resolvedOptions']>
-  }>
+    { name: 'treeNode', node: treeNodeSchema, options: {} },
+  ] as const)('$name', async ({ name, node, options }) => {
+    const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({ name, plugin: defaultTsPlugin })
 
-  test.each(testData)('$name', async (props) => {
-    const oas = await parse(path.resolve(__dirname, props.input))
-
-    const options: PluginFaker['resolvedOptions'] = {
-      dateType: 'date',
-      dateParser: 'faker',
-      seed: undefined,
-      regexGenerator: 'faker',
-      override: [],
-      transformers: {},
-      unknownType: 'unknown',
-      integerType: 'number',
-      mapper: {},
-      exclude: [],
-      include: undefined,
-      output: {
-        path: '.',
-      },
-      group: undefined,
-      emptySchemaType: 'unknown',
-      ...props.options,
-      paramsCasing: undefined,
-    }
-    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options })
-
-    const mockedPluginDriver = createMockedPluginDriver({ name: props.name })
-    const generator = new SchemaGenerator(options, {
-      oas,
-      driver: mockedPluginDriver,
-
+    await renderGeneratorSchema(fakerGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: {
+          kind: 'Input',
+          schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
+          operations: [],
+          meta: {},
+        },
+      }),
+      driver,
       plugin,
-      contentType: 'application/json',
-      include: undefined,
-      override: undefined,
-      mode: 'split',
-      output: './gen',
+      options: resolvedOptions,
+      resolver: resolverFaker,
     })
 
-    const { schemas } = getSchemas({ oas })
-    const name = props.path
-    const schema = schemas[name] as SchemaObject
-    const tree = generator.parse({ schema, name, parentName: null })
-
-    await renderSchema(
-      {
-        name,
-        tree,
-        value: schema,
-      },
-      {
-        config: { root: '.', output: { path: 'test' } } as Config,
-        driver: mockedPluginDriver,
-        oas,
-        mode: 'split',
-        generator,
-        Component: fakerGenerator.Schema,
-        plugin,
-      },
-    )
-
-    await matchFiles(mockedPluginDriver.fileManager.files, props.name)
+    await matchFiles(driver.fileManager.files, name)
   })
 })
 
-describe('fakerGenerator operation', async () => {
-  const testData = [
+describe('fakerGenerator — operation', () => {
+  test.each([
     {
       name: 'showPetById',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets/{petId}',
-      method: 'get',
-      options: {},
-    },
-    {
-      name: 'getPets',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets',
-      method: 'get',
+      node: ast.createOperation({
+        operationId: 'showPetById',
+        method: 'GET',
+        path: '/pets/{petId}',
+        tags: ['pets'],
+        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.createResponse({
+            statusCode: '200',
+            description: 'Expected response to a valid request',
+            schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+          ast.createResponse({
+            statusCode: 'default',
+            description: 'Unexpected error',
+            schema: ast.createSchema({ type: 'ref', name: 'Error', ref: '#/components/schemas/Error' }),
+          }),
+        ],
+      }),
       options: {},
     },
     {
       name: 'createPet',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets',
-      method: 'post',
+      node: ast.createOperation({
+        operationId: 'createPet',
+        method: 'POST',
+        path: '/pets',
+        tags: ['pets'],
+        requestBody: {
+          description: 'Pet to add',
+          schema: ast.createSchema({
+            type: 'object',
+            properties: [
+              ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
+              ast.createProperty({
+                name: 'category',
+                schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+              }),
+            ],
+          }),
+        },
+        responses: [
+          ast.createResponse({
+            statusCode: '201',
+            description: 'Created pet',
+            schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+        ],
+      }),
       options: {},
     },
-    {
-      name: 'createPetUnknownTypeAny',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets',
-      method: 'post',
-      options: {
-        unknownType: 'any',
-      },
-    },
-    {
-      name: 'createPetSeed',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets',
-      method: 'post',
-      options: {
-        seed: [222],
-      },
-    },
-    {
-      name: 'updatePet',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets/{petId}',
-      method: 'put',
-      options: {},
-    },
-    {
-      name: 'deletePet',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets/{petId}',
-      method: 'delete',
-      options: {},
-    },
-    {
-      name: 'getPetsArray',
-      input: '../../mocks/petStore.yaml',
-      path: '/pets-array',
-      method: 'get',
-      options: {},
-    },
-  ] as const satisfies Array<{
-    input: string
-    name: string
-    path: string
-    method: HttpMethod
-    options: Partial<PluginFaker['resolvedOptions']>
-  }>
+  ] as const)('$name', async ({ name, node, options }) => {
+    const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({ name, plugin: defaultTsPlugin })
 
-  test.each(testData)('$name', async (props) => {
-    const oas = await parse(path.resolve(__dirname, props.input))
-
-    const options: PluginFaker['resolvedOptions'] = {
-      dateType: 'date',
-      dateParser: 'faker',
-      seed: undefined,
-      regexGenerator: 'faker',
-      override: [],
-      integerType: 'number',
-      transformers: {},
-      unknownType: 'unknown',
-      mapper: {},
-      exclude: [],
-      include: undefined,
-      output: {
-        path: '.',
-      },
-      group: undefined,
-      emptySchemaType: 'unknown',
-      ...props.options,
-      paramsCasing: undefined,
-    }
-    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options })
-
-    const mockedPluginDriver = createMockedPluginDriver({ name: props.name })
-    const generator = new OperationGenerator(options, {
-      oas,
-      include: undefined,
-      driver: mockedPluginDriver,
-
+    await renderGeneratorOperation(fakerGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: {
+          kind: 'Input',
+          schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
+          operations: [],
+          meta: {},
+        },
+      }),
+      driver,
       plugin,
-      contentType: undefined,
-      override: undefined,
-      mode: 'split',
-      exclude: [],
-    })
-    const operation = oas.operation(props.path, props.method)
-
-    await renderOperation(operation, {
-      config: { root: '.', output: { path: 'test' } } as Config,
-      driver: mockedPluginDriver,
-      oas,
-      mode: 'split',
-      generator,
-      Component: fakerGenerator.Operation,
-      plugin,
+      options: resolvedOptions,
+      resolver: resolverFaker,
     })
 
-    await matchFiles(mockedPluginDriver.fileManager.files, props.name)
+    await matchFiles(driver.fileManager.files, name)
+  })
+})
+
+describe('fakerGeneratorLegacy — operation', () => {
+  test('legacy naming and grouped params', async () => {
+    const node = ast.createOperation({
+      operationId: 'showPetById',
+      method: 'GET',
+      path: '/pets/{petId}',
+      tags: ['pets'],
+      parameters: [
+        ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+        ast.createParameter({ name: 'includeDetails', in: 'query', schema: ast.createSchema({ type: 'boolean' }) }),
+      ],
+      responses: [
+        ast.createResponse({
+          statusCode: '200',
+          description: 'Expected response to a valid request',
+          schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+        }),
+        ast.createResponse({
+          statusCode: 'default',
+          description: 'Unexpected error',
+          schema: ast.createSchema({ type: 'ref', name: 'Error', ref: '#/components/schemas/Error' }),
+        }),
+      ],
+    })
+
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFakerLegacy })
+    const driver = createMockedPluginDriver({ name: 'legacyShowPetById', plugin: legacyTsPlugin })
+
+    await renderGeneratorOperation(fakerGeneratorLegacy, node, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: {
+          kind: 'Input',
+          schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
+          operations: [],
+          meta: {},
+        },
+      }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverFakerLegacy,
+    })
+
+    await matchFiles(driver.fileManager.files, 'legacyShowPetById')
   })
 })

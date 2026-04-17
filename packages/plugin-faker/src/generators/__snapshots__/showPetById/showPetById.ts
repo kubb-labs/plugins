@@ -3,30 +3,27 @@
  * Do not edit manually.
  */
 
+import type { ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById'
 import { faker } from '@faker-js/faker'
-import { error, pet } from '../showPetById'
 
-export function showPetByIdPathParams(data?: Partial<ShowPetByIdPathParams>): ShowPetByIdPathParams {
-  return {
-    ...{ petId: faker.string.alpha(), testId: faker.string.alpha() },
-    ...(data || {}),
-  }
+export function showPetByIdPathPetId(data?: string): string {
+  return data ?? faker.string.alpha()
 }
 
 /**
  * @description Expected response to a valid request
  */
-export function showPetById200(data?: Partial<ShowPetById200>): ShowPetById200 {
+export function showPetByIdStatus200(data?: Partial<ShowPetByIdStatus200>): ShowPetByIdStatus200 {
   return pet(data)
 }
 
 /**
- * @description unexpected error
+ * @description Unexpected error
  */
-export function showPetByIdError(data?: Partial<ShowPetByIdError>): ShowPetByIdError {
+export function showPetByIdStatusDefault(data?: Partial<ShowPetByIdStatusDefault>): ShowPetByIdStatusDefault {
   return error(data)
 }
 
-export function showPetByIdQueryResponse(data?: Partial<ShowPetByIdQueryResponse>): ShowPetByIdQueryResponse {
-  return data || faker.helpers.arrayElement<any>([showPetById200()])
+export function showPetByIdResponse(data?: ShowPetByIdResponse): ShowPetByIdResponse {
+  return faker.helpers.arrayElement<any>([showPetByIdStatus200(), showPetByIdStatusDefault()])
 }
