@@ -4,7 +4,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, resolveParamNameByLocation } from '../utils.ts'
+import { buildResponseUnionSchema, canOverrideSchema, filterUsedImports, resolveParamNameByLocation, resolveSchemaRef, resolveTypeReference } from '../utils.ts'
 
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
@@ -14,24 +14,46 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const { output, group, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin<PluginTs>(pluginTsName)
 
-    if (!node.name || !pluginTs?.resolver) {
+    if (!node.name || !pluginTs?.resolver || !adapter.inputNode) {
       return
     }
 
+    const schemaNode = resolveSchemaRef(node, adapter.inputNode.schemas)
+    const schemaName = schemaNode.name ?? node.name
     const mode = ctx.getMode(output)
     const meta = {
-      name: resolver.resolveName(node.name),
-      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group }),
-      typeName: pluginTs.resolver.resolveTypeName(node.name),
-      typeFile: pluginTs.resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output: pluginTs.options.output, group: pluginTs.options.group }),
+      name: resolver.resolveName(schemaName),
+      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }),
+      typeName: pluginTs.resolver.resolveTypeName(schemaName),
+      typeFile: pluginTs.resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output: pluginTs.options.output, group: pluginTs.options.group }),
     } as const
+    const canOverride = canOverrideSchema(schemaNode)
+    const printerInstance = printerFaker({
+      resolver,
+      schemaName,
+      typeName: meta.typeName,
+      dateParser,
+      regexGenerator,
+      mapper,
+      nodes: printer?.nodes,
+    })
+    const fakerText = printerInstance.print(schemaNode) ?? 'undefined'
+    const typeReference = resolveTypeReference({
+      node: schemaNode,
+      canOverride,
+      name: meta.name,
+      typeName: meta.typeName,
+      filePath: meta.file.path,
+      typeFilePath: meta.typeFile.path,
+    })
 
     const imports = adapter
-      .getImports(node, (schemaName) => ({
+      .getImports(schemaNode, (schemaName) => ({
         name: resolver.resolveName(schemaName),
         path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
       }))
       .filter((entry) => entry.path !== meta.file.path)
+    const usedImports = filterUsedImports(imports, fakerText)
 
     return (
       <File
@@ -44,25 +66,17 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        <File.Import isTypeOnly root={meta.file.path} path={meta.typeFile.path} name={[meta.typeName]} />
+        {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
         {mode === 'split' &&
-          imports.map((imp) => <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
+          usedImports.map((imp) => <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
         <Faker
           name={meta.name}
-          typeName={meta.typeName}
-          description={node.description}
-          node={node}
-          printer={printerFaker({
-            resolver,
-            schemaName: node.name,
-            typeName: meta.typeName,
-            dateParser,
-            regexGenerator,
-            mapper,
-            nodes: printer?.nodes,
-          })}
+          typeName={typeReference.typeName}
+          description={schemaNode.description}
+          node={schemaNode}
+          printer={printerInstance}
           seed={seed}
-          canOverride={canOverrideSchema(node)}
+          canOverride={canOverride}
         />
       </File>
     )
@@ -120,30 +134,41 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         return null
       }
 
-      const imports = resolveMockImports(schema).filter((entry) => (typeof entry.name === 'string' ? !skipImportNames.includes(entry.name) : true))
+      const canOverride = canOverrideSchema(schema)
+      const printerInstance = printerFaker({
+        resolver,
+        schemaName: name,
+        typeName,
+        dateParser,
+        regexGenerator,
+        mapper,
+        nodes: printer?.nodes,
+      })
+      const fakerText = printerInstance.print(schema) ?? 'undefined'
+      const imports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
+      const typeReference = resolveTypeReference({
+        node: schema,
+        canOverride,
+        name,
+        typeName,
+        filePath: meta.file.path,
+        typeFilePath: meta.typeFile.path,
+      })
 
       return (
         <>
-          <File.Import isTypeOnly root={meta.file.path} path={meta.typeFile.path} name={[typeName]} />
+          {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[typeName]} />}
           {imports.map((imp) => (
             <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
           ))}
           <Faker
             name={name}
-            typeName={typeName}
+            typeName={typeReference.typeName}
             description={description}
             node={schema}
-            printer={printerFaker({
-              resolver,
-              schemaName: name,
-              typeName,
-              dateParser,
-              regexGenerator,
-              mapper,
-              nodes: printer?.nodes,
-            })}
+            printer={printerInstance}
             seed={seed}
-            canOverride={canOverrideSchema(schema)}
+            canOverride={canOverride}
           />
         </>
       )

@@ -1,9 +1,10 @@
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, FileProcessor } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
+import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs, resolverTsLegacy } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
-import { matchFiles } from '#mocks'
+import { format, matchFiles } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { resolverFakerLegacy } from '../resolvers/resolverFakerLegacy.ts'
 import type { PluginFaker } from '../types.ts'
@@ -20,6 +21,12 @@ const errorSchema = ast.createSchema({
   type: 'object',
   name: 'Error',
   properties: [ast.createProperty({ name: 'message', required: true, schema: ast.createSchema({ type: 'string' }) })],
+})
+
+const emojiSchema = ast.createSchema({
+  type: 'string',
+  name: 'Emoji',
+  description: 'Emoji shortcode',
 })
 
 const petSchema = ast.createSchema({
@@ -121,7 +128,7 @@ describe('fakerGenerator — schema', () => {
       adapter: createMockedAdapter({
         inputNode: {
           kind: 'Input',
-          schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
+          schemas: [categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema],
           operations: [],
           meta: {},
         },
@@ -133,6 +140,41 @@ describe('fakerGenerator — schema', () => {
     })
 
     await matchFiles(driver.fileManager.files, name)
+  })
+
+  test('named string schema omits unused type import', async () => {
+    const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions }
+    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
+    const driver = createMockedPluginDriver({ name: 'emoji', plugin: defaultTsPlugin })
+
+    await renderGeneratorSchema(fakerGenerator, emojiSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: {
+          kind: 'Input',
+          schemas: [emojiSchema],
+          operations: [],
+          meta: {},
+        },
+      }),
+      driver,
+      plugin,
+      options: resolvedOptions,
+      resolver: resolverFaker,
+    })
+
+    const file = driver.fileManager.files.find((item) => item.baseName === 'emoji.ts')
+    expect(file).toBeDefined()
+
+    const fileProcessor = new FileProcessor()
+    const output = await format(
+      await fileProcessor.parse(file!, {
+        parsers: new Map([['.ts', parserTs]]),
+      }),
+    )
+
+    expect(output).toContain('export function emoji(data?: string): string')
+    expect(output).not.toContain('import type { Emoji }')
   })
 })
 
