@@ -13,8 +13,6 @@ import { createPets } from '../../axios/petsService/createPets.ts'
 
 export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const
 
-export type CreatePetsMutationKey = ReturnType<typeof createPetsMutationKey>
-
 export function createPetsMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {}) {
   const mutationKey = createPetsMutationKey()
   return mutationOptions<

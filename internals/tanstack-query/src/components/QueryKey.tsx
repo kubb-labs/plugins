@@ -52,9 +52,7 @@ export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType,
         </Function.Arrow>
       </File.Source>
       <File.Source name={typeName} isTypeOnly>
-        <Type name={typeName}>
-          {`ReturnType<typeof ${name}>`}
-        </Type>
+        <Type name={typeName}>{`ReturnType<typeof ${name}>`}</Type>
       </File.Source>
     </>
   )

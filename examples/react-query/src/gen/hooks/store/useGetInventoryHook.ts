@@ -10,7 +10,7 @@ import type { GetInventoryResponse } from '../../models/GetInventory.ts'
 
 export const getInventoryQueryKey = () => ['v5', { url: '/store/inventory' }] as const
 
-export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
+type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
 /**
  * @description Returns a map of status codes to quantities

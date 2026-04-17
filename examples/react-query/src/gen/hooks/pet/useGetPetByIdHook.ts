@@ -12,7 +12,7 @@ import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetP
 
 export const getPetByIdQueryKey = ({ pet_id }: { pet_id: GetPetByIdPathPetId }) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }] as const
 
-export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
+type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 /**
  * @description Returns a single pet

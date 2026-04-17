@@ -12,7 +12,7 @@ import { getUserByName } from '../../axios/userService/getUserByName.ts'
 export const getUserByNameQueryKey = ({ username }: { username: GetUserByNamePathUsername }) =>
   [{ url: '/user/:username', params: { username: username } }] as const
 
-export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
+type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getUserByNameQueryKey({ username })

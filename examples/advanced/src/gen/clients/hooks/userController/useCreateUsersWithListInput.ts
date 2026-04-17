@@ -6,8 +6,6 @@ import { createUsersWithListInput } from '../../axios/userService/createUsersWit
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
-export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersWithListInputMutationKey>
-
 export function createUsersWithListInputMutationOptions<TContext = unknown>(
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {

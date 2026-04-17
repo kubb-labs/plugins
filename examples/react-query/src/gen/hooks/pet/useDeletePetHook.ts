@@ -12,8 +12,6 @@ import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, Dele
 
 export const deletePetMutationKey = () => [{ url: '/pet/:pet_id' }] as const
 
-export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
-
 /**
  * @description delete a pet
  * @summary Deletes a pet

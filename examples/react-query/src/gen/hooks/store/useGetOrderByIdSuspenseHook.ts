@@ -13,7 +13,7 @@ import type { GetOrderByIdPathOrderId, GetOrderByIdResponse, GetOrderByIdStatus4
 export const getOrderByIdSuspenseQueryKey = ({ orderId }: { orderId: GetOrderByIdPathOrderId }) =>
   ['v5', { url: '/store/order/:orderId', params: { orderId: orderId } }] as const
 
-export type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
+type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.

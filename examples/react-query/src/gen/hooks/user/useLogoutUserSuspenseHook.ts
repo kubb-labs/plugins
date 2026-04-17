@@ -12,7 +12,7 @@ import type { LogoutUserResponse } from '../../models/LogoutUser.ts'
 
 export const logoutUserSuspenseQueryKey = () => ['v5', { url: '/user/logout' }] as const
 
-export type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
+type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
 
 /**
  * @summary Logs out current logged in user session

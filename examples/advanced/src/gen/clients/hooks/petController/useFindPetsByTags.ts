@@ -14,7 +14,7 @@ import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }) =>
   [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
+type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
   {

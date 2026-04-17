@@ -13,7 +13,7 @@ import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByS
 export const findPetsByStatusSuspenseQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
   ['v5', { url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
 
-export type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
+type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
 /**
  * @description Multiple status values can be provided with comma separated strings

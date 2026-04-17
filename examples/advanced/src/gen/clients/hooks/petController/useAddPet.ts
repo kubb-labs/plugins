@@ -6,8 +6,6 @@ import { addPet } from '../../axios/petService/addPet.ts'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
-
 export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>({

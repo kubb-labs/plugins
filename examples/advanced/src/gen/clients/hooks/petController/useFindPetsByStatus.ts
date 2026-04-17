@@ -7,7 +7,7 @@ import { findPetsByStatus } from '../../axios/petService/findPetsByStatus.ts'
 export const findPetsByStatusQueryKey = ({ stepId }: { stepId: FindPetsByStatusPathStepId }) =>
   [{ url: '/pet/findByStatus/:step_id', params: { stepId: stepId } }] as const
 
-export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
+type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions({ stepId }: { stepId: FindPetsByStatusPathStepId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByStatusQueryKey({ stepId })
