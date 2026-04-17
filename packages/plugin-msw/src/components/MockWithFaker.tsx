@@ -1,43 +1,47 @@
 import { URLPath } from '@internals/utils'
-import { FunctionParams } from '@kubb/core'
-import type { OasTypes, Operation } from '@kubb/oas'
+import { ast } from '@kubb/core'
+import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { getContentType, getMswMethod, getMswUrl, getPrimarySuccessResponse } from '../utils.ts'
 
 type Props = {
-  /**
-   * Name of the function
-   */
   name: string
   typeName: string
   fakerName: string
   baseURL: string | undefined
-  operation: Operation
+  node: ast.OperationNode
 }
 
-export function MockWithFaker({ baseURL = '', name, fakerName, typeName, operation }: Props): KubbReactNode {
-  const method = operation.method
-  const successStatusCodes = operation.getResponseStatusCodes().filter((code) => code.startsWith('2'))
-  const statusCode = successStatusCodes.length > 0 ? Number(successStatusCodes[0]) : 200
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-  const responseObject = operation.getResponseByStatusCode(statusCode) as OasTypes.ResponseObject
-  const contentType = Object.keys(responseObject.content || {})?.[0]
-  const url = new URLPath(operation.path).toURLPath().replace(/([^/]):/g, '$1\\\\:')
+export function MockWithFaker({ baseURL = '', name, fakerName, typeName, node }: Props): KubbReactNode {
+  const method = getMswMethod(node)
+  const successResponse = getPrimarySuccessResponse(node)
+  const statusCode = successResponse ? Number(successResponse.statusCode) : 200
+  const contentType = getContentType(successResponse)
+  const url = new URLPath(getMswUrl(node)).toURLPath().replace(/([^/]):/g, '$1\\\\:')
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
 
-  const params = FunctionParams.factory({
-    data: {
-      type: `${typeName} | ((
-        info: Parameters<Parameters<typeof http.${method}>[1]>[0],
-      ) => Response | Promise<Response>)`,
-      optional: true,
-    },
-  })
+  const params = declarationPrinter.print(
+    ast.createFunctionParameters({
+      params: [
+        ast.createFunctionParameter({
+          name: 'data',
+          type: ast.createParamsType({
+            variant: 'reference',
+            name: `${typeName} | ((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`,
+          }),
+          optional: true,
+        }),
+      ],
+    }),
+  )
 
   return (
     <File.Source name={name} isIndexable isExportable>
-      <Function name={name} export params={params.toConstructor()}>
+      <Function name={name} export params={params ?? ''}>
         {`return http.${method}('${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}', function handler(info) {
     if(typeof data === 'function') return data(info)
 

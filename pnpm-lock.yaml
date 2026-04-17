@@ -750,15 +750,9 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
-      '@kubb/oas':
-        specifier: 'catalog:'
-        version: 5.0.0-alpha.36(@kubb/renderer-jsx@5.0.0-alpha.36)
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../plugin-faker
-      '@kubb/plugin-oas':
-        specifier: workspace:*
-        version: link:../plugin-oas
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts

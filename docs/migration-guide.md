@@ -907,6 +907,105 @@ pluginMcp({
 | `transformer` | `Visitor` | — | Single AST visitor applied before printing |
 | `paramsCasing` | `'camelcase'` | `undefined` | Apply camelCase to parameter names |
 
+### `@kubb/plugin-msw` — v5 migration
+
+`@kubb/plugin-msw` now uses the v5 hook-style plugin architecture. The core MSW options from v4 still work (`handlers`, `parser`, `baseURL`, `group`, `include`, `exclude`, `override`, and `transformers.name`), but the plugin no longer depends on `@kubb/plugin-oas`.
+
+#### `pluginOas()` no longer required
+
+In v5, `@kubb/plugin-msw` no longer requires `pluginOas()`. Use `adapterOas()` in the root config instead.
+
+::: code-group
+```typescript [Before (v4)]
+import { defineConfig } from '@kubb/core'
+import { pluginOas } from '@kubb/plugin-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginMsw } from '@kubb/plugin-msw'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  plugins: [
+    pluginOas(),
+    pluginTs(),
+    pluginMsw({
+      output: { path: './msw' },
+      handlers: true,
+    }),
+  ],
+})
+```
+
+```typescript [After (v5)]
+import { defineConfig } from '@kubb/core'
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginMsw } from '@kubb/plugin-msw'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  adapter: adapterOas(),
+  plugins: [
+    pluginTs(),
+    pluginMsw({
+      output: { path: './msw' },
+      handlers: true,
+    }),
+  ],
+})
+```
+:::
+
+#### `contentType` moved to the adapter
+
+The `contentType` option has been removed from `@kubb/plugin-msw`. Configure content-type filtering on `adapterOas(...)` instead.
+
+::: code-group
+```typescript [Before (v4)]
+pluginMsw({
+  contentType: 'application/json',
+})
+```
+
+```typescript [After (v5)]
+adapterOas({
+  contentType: 'application/json',
+})
+```
+:::
+
+#### New `resolver` and `transformer` options
+
+Use `resolver` to override naming and file resolution behavior, and `transformer` to apply a single AST `Visitor` before MSW files are rendered.
+
+```typescript
+import { pluginMsw, resolverMsw } from '@kubb/plugin-msw'
+
+pluginMsw({
+  resolver: {
+    ...resolverMsw,
+    resolveName(name) {
+      return `${resolverMsw.resolveName(name)}Mock`
+    },
+  },
+  transformer: {
+    operation(node) {
+      return { ...node, operationId: `mock_${node.operationId}` }
+    },
+  },
+})
+```
+
+### `@kubb/plugin-msw` — new options and exports in v5
+
+| Item | Type | Description |
+|---|---|---|
+| `resolver` | `Partial<ResolverMsw> & ThisType<ResolverMsw>` | Override individual resolver methods |
+| `transformer` | `Visitor` | Single AST visitor applied before printing |
+| `generators` | `Array<Generator<PluginMsw>>` | Register extra generators next to the default MSW generators |
+| `resolverMsw` | export | Default resolver for extending MSW naming and path behavior |
+
 ### `@kubb/plugin-client` — v5 migration
 
 `@kubb/plugin-client` has been rewritten to match the v5 plugin architecture. Most options are unchanged, but naming customization and transformation have moved to a new `resolver`/`transformer` pattern.
