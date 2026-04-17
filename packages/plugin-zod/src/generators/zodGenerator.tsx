@@ -99,6 +99,20 @@ export const zodGenerator = defineGenerator<PluginZod>({
       }),
     )
 
+    const responsesWithSchema = node.responses.filter((res) => res.schema)
+    const responseUnionSchema =
+      responsesWithSchema.length > 0
+        ? (() => {
+            const members = responsesWithSchema.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }))
+            const unionNode = members.length === 1 ? members[0]! : ast.createSchema({ type: 'union', members })
+
+            return renderSchemaEntry({
+              schema: unionNode,
+              name: resolver.resolveResponseName(node),
+            })
+          })()
+        : null
+
     const requestSchema = node.requestBody?.schema
       ? renderSchemaEntry({
           schema: {
@@ -121,6 +135,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
         {paramSchemas}
         {responseSchemas}
+        {responseUnionSchema}
         {requestSchema}
       </File>
     )

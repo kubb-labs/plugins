@@ -1,5 +1,5 @@
-import type { UploadFileResponse } from '../../models/ts/petController/UploadFile.ts'
 import { http } from 'msw'
+import type { UploadFileResponse } from '../../models/ts/petController/UploadFile.ts'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   return new Response(JSON.stringify(data), {

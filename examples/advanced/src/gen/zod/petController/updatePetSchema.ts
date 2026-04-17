@@ -23,6 +23,16 @@ export const updatePetStatus405Schema = z.any()
 
 export type UpdatePetStatus405Schema = z.infer<typeof updatePetStatus405Schema>
 
+export const updatePetResponseSchema = z.union([
+  updatePetStatus200Schema,
+  updatePetStatus202Schema,
+  updatePetStatus400Schema,
+  updatePetStatus404Schema,
+  updatePetStatus405Schema,
+])
+
+export type UpdatePetResponseSchema = z.infer<typeof updatePetResponseSchema>
+
 export const updatePetDataSchema = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchema = z.infer<typeof updatePetDataSchema>

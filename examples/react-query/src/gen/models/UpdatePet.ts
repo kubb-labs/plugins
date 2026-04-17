@@ -1,58 +1,58 @@
 // version: 1.0.11
 
-import type { Pet } from "./Pet.ts";
+import type { Pet } from './Pet.ts'
 
 /**
  * @type object
-*/
-export type UpdatePetStatus200 = Pet;
+ */
+export type UpdatePetStatus200 = Pet
 
 /**
  * @type any
-*/
-export type UpdatePetStatus400 = any;
+ */
+export type UpdatePetStatus400 = any
 
 /**
  * @type any
-*/
-export type UpdatePetStatus404 = any;
+ */
+export type UpdatePetStatus404 = any
 
 /**
  * @type any
-*/
-export type UpdatePetStatus405 = any;
+ */
+export type UpdatePetStatus405 = any
 
 /**
  * @description Update an existent pet in the store
  * @type object
-*/
-export type UpdatePetData = Pet;
+ */
+export type UpdatePetData = Pet
 
 /**
  * @type object
-*/
+ */
 export type UpdatePetRequestConfig = {
-    data?: UpdatePetData;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: "/pet";
-};
+  data?: UpdatePetData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet'
+}
 
 /**
  * @type object
-*/
+ */
 export type UpdatePetResponses = {
-    "200": UpdatePetStatus200;
-    "400": UpdatePetStatus400;
-    "404": UpdatePetStatus404;
-    "405": UpdatePetStatus405;
-};
+  '200': UpdatePetStatus200
+  '400': UpdatePetStatus400
+  '404': UpdatePetStatus404
+  '405': UpdatePetStatus405
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type UpdatePetResponse = (UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405);
+ */
+export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405

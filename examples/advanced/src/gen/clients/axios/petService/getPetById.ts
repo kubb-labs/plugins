@@ -1,5 +1,5 @@
-import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import fetch from '../../../../axios-client.ts'
 import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
 import { getPetByIdResponseSchema } from '../../../zod/petController/getPetByIdSchema.ts'
 

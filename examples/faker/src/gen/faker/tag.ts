@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { Tag } from '../models/Tag.ts'
 import { faker } from '@faker-js/faker'
+import type { Tag } from '../models/Tag.ts'
 
 export function tag(data?: Partial<Tag>): Tag {
   return {

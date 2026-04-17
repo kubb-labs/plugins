@@ -9,6 +9,10 @@ export const createUsersWithListInputStatusDefaultSchema = z.any()
 
 export type CreateUsersWithListInputStatusDefaultSchema = z.infer<typeof createUsersWithListInputStatusDefaultSchema>
 
+export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
+
+export type CreateUsersWithListInputResponseSchema = z.infer<typeof createUsersWithListInputResponseSchema>
+
 export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
 export type CreateUsersWithListInputDataSchema = z.infer<typeof createUsersWithListInputDataSchema>

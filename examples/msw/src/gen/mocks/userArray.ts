@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import { faker } from '@faker-js/faker'
 import type { UserArray } from '../models/UserArray.ts'
 import { user } from './user.ts'
-import { faker } from '@faker-js/faker'
 
 export function userArray(data?: UserArray): UserArray {
   faker.seed([220])

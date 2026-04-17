@@ -1,8 +1,8 @@
 import type {
-  FindPetsByTagsQueryTags,
+  FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
-  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsQueryTags,
   FindPetsByTagsResponse,
 } from '../../models/ts/petController/FindPetsByTags.ts'
 

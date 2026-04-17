@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { CreateUsersWithListInputResponse } from '../../../models/CreateUsersWithListInput.ts'
 import { http } from 'msw'
+import type { CreateUsersWithListInputResponse } from '../../../models/CreateUsersWithListInput.ts'
 
 export function createUsersWithListInputHandlerResponse200(data: CreateUsersWithListInputResponse) {
   return new Response(JSON.stringify(data), {

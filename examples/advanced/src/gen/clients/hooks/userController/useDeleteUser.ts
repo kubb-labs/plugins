@@ -1,8 +1,8 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { deleteUser } from '../../axios/userService/deleteUser.ts'
+import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
+import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
+import { deleteUser } from '../../axios/userService/deleteUser.ts'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 

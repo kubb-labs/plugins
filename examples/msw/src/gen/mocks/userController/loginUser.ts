@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { LoginUserResponse } from '../../models/LoginUser.ts'
 import { faker } from '@faker-js/faker'
+import type { LoginUserResponse } from '../../models/LoginUser.ts'
 
 export function loginUserQueryUsername(data?: string): string {
   faker.seed([220])

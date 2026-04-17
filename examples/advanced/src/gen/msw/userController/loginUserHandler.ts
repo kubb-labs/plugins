@@ -1,5 +1,5 @@
-import type { LoginUserResponse, LoginUserStatus400 } from '../../models/ts/userController/LoginUser.ts'
 import { http } from 'msw'
+import type { LoginUserResponse, LoginUserStatus400 } from '../../models/ts/userController/LoginUser.ts'
 
 export function loginUserHandlerResponse200(data: LoginUserResponse) {
   return new Response(JSON.stringify(data), {

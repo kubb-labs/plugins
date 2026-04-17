@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import { faker } from '@faker-js/faker'
 import type { GetPetByIdResponse, GetPetByIdStatus200 } from '../../models/GetPetById.ts'
 import { pet } from '../pet.ts'
-import { faker } from '@faker-js/faker'
 
 export function getPetByIdPathPetId(data?: number): number {
   faker.seed([220])

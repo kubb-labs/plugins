@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import { faker } from '@faker-js/faker'
 import type { OptionsFindPetsByStatusResponse, OptionsFindPetsByStatusStatus200 } from '../../models/OptionsFindPetsByStatus.ts'
 import { pet } from '../pet.ts'
-import { faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

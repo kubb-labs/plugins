@@ -1,5 +1,5 @@
-import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/ts/petController/UpdatePet.ts'
 import { http } from 'msw'
+import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/ts/petController/UpdatePet.ts'
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
   return new Response(JSON.stringify(data), {

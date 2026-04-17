@@ -10,4 +10,6 @@ export const placeOrderPatchStatus200Schema = orderSchema
 
 export const placeOrderPatchStatus405Schema = z.any()
 
+export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
+
 export const placeOrderPatchDataSchema = orderSchema.optional()

@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.js'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
   const res = { method: 'GET', url: `/pet/${petId}` as const }

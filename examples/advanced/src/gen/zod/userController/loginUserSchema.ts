@@ -15,3 +15,7 @@ export type LoginUserStatus200Schema = z.infer<typeof loginUserStatus200Schema>
 export const loginUserStatus400Schema = z.any()
 
 export type LoginUserStatus400Schema = z.infer<typeof loginUserStatus400Schema>
+
+export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])
+
+export type LoginUserResponseSchema = z.infer<typeof loginUserResponseSchema>

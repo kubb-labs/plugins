@@ -1,5 +1,5 @@
-import type { DeleteUserStatus400, DeleteUserStatus404 } from '../../models/ts/userController/DeleteUser.ts'
 import { http } from 'msw'
+import type { DeleteUserStatus400, DeleteUserStatus404 } from '../../models/ts/userController/DeleteUser.ts'
 
 export function deleteUserHandlerResponse400(data?: DeleteUserStatus400) {
   return new Response(JSON.stringify(data), {

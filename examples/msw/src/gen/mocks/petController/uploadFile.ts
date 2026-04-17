@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import { faker } from '@faker-js/faker'
 import type { UploadFileResponse, UploadFileStatus200 } from '../../models/UploadFile.ts'
 import { apiResponse } from '../apiResponse.ts'
-import { faker } from '@faker-js/faker'
 
 export function uploadFilePathPetId(data?: number): number {
   faker.seed([220])

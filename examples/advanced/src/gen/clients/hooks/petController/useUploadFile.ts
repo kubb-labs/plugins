@@ -1,8 +1,8 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { uploadFile } from '../../axios/petService/uploadFile.ts'
+import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
+import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
+import { uploadFile } from '../../axios/petService/uploadFile.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 

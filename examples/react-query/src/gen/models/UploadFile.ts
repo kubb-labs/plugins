@@ -1,61 +1,61 @@
 // version: 1.0.11
 
-import type { ApiResponse } from "./ApiResponse.ts";
+import type { ApiResponse } from './ApiResponse.ts'
 
 /**
  * @description ID of pet to update
  * @type integer
-*/
-export type UploadFilePathPetId = number;
+ */
+export type UploadFilePathPetId = number
 
 /**
  * @description Additional Metadata
  * @type string | undefined
-*/
-export type UploadFileQueryAdditionalMetadata = string | undefined;
+ */
+export type UploadFileQueryAdditionalMetadata = string | undefined
 
 /**
  * @type object
-*/
-export type UploadFileStatus200 = ApiResponse;
+ */
+export type UploadFileStatus200 = ApiResponse
 
 /**
  * @type string | undefined
-*/
-export type UploadFileData = Blob | undefined;
+ */
+export type UploadFileData = Blob | undefined
 
 /**
  * @type object
-*/
+ */
 export type UploadFileRequestConfig = {
-    data?: UploadFileData;
-    /**
-     * @type object
-    */
-    pathParams: {
-        petId: UploadFilePathPetId;
-    };
-    /**
-     * @type object | undefined
-    */
-    queryParams?: {
-        additionalMetadata?: UploadFileQueryAdditionalMetadata;
-    };
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: `/pet/${string}/uploadImage`;
-};
+  data?: UploadFileData
+  /**
+   * @type object
+   */
+  pathParams: {
+    petId: UploadFilePathPetId
+  }
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    additionalMetadata?: UploadFileQueryAdditionalMetadata
+  }
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/pet/${string}/uploadImage`
+}
 
 /**
  * @type object
-*/
+ */
 export type UploadFileResponses = {
-    "200": UploadFileStatus200;
-};
+  '200': UploadFileStatus200
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type UploadFileResponse = UploadFileStatus200;
+ */
+export type UploadFileResponse = UploadFileStatus200

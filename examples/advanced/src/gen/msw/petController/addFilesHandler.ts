@@ -1,5 +1,5 @@
-import type { AddFilesResponse, AddFilesStatus405 } from '../../models/ts/petController/AddFiles.ts'
 import { http } from 'msw'
+import type { AddFilesResponse, AddFilesStatus405 } from '../../models/ts/petController/AddFiles.ts'
 
 export function addFilesHandlerResponse200(data: AddFilesResponse) {
   return new Response(JSON.stringify(data), {

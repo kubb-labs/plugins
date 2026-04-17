@@ -15,3 +15,5 @@ export const findPetsByStatusStatus200Schema = z
   .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
 
 export const findPetsByStatusStatus400Schema = z.any()
+
+export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])

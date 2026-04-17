@@ -11,10 +11,11 @@
   "license": "MIT",
   "author": "stijnvanhulle",
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "clean": "npx rimraf ./dist",
-    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts && bun ./build.ts",
-    "generate:build": "bun ./build.ts",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts && node ./build.ts",
+    "generate:build": "node ./build.ts",
     "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },

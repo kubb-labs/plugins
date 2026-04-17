@@ -1,10 +1,10 @@
+import { faker } from '@faker-js/faker'
 import type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputStatus200,
 } from '../../models/ts/userController/CreateUsersWithListInput.ts'
 import { userFaker } from '../userFaker.ts'
-import { faker } from '@faker-js/faker'
 
 /**
  * @description Successful operation

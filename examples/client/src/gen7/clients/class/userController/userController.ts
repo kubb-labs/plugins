@@ -1,20 +1,19 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import fetch, { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
+import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
 import type {
-  GetUserByNameResponse,
   GetUserByNamePathUsername,
+  GetUserByNameResponse,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from '../../../models/ts/userController/GetUserByName.ts'
-import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
+import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
 import type { LogoutUserResponse } from '../../../models/ts/userController/LogoutUser.ts'
-import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../../models/ts/userController/UpdateUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
+import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.ts'
 
 export class userController {
   #config: Partial<RequestConfig> & { client?: Client }

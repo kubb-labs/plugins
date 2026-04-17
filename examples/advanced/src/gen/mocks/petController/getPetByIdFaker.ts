@@ -1,6 +1,6 @@
+import { faker } from '@faker-js/faker'
 import type { GetPetByIdResponse, GetPetByIdStatus200 } from '../../models/ts/petController/GetPetById.ts'
 import { petFaker } from '../petFaker.ts'
-import { faker } from '@faker-js/faker'
 
 export function getPetByIdPathPetIdFaker(data?: number): number {
   return data ?? faker.number.int()

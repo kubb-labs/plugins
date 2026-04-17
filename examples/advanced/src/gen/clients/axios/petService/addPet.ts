@@ -1,7 +1,7 @@
-import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import fetch from '../../../../axios-client.ts'
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/petController/AddPet.ts'
-import { addPetResponseSchema, addPetDataSchema } from '../../../zod/petController/addPetSchema.ts'
+import { addPetDataSchema, addPetResponseSchema } from '../../../zod/petController/addPetSchema.ts'
 
 export function getAddPetUrl() {
   const res = { method: 'POST', url: 'https://petstore3.swagger.io/api/v3/pet' as const }

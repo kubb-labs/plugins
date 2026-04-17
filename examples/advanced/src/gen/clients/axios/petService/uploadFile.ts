@@ -1,7 +1,7 @@
-import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
-import { uploadFileResponseSchema, uploadFileDataSchema } from '../../../zod/petController/uploadFileSchema.ts'
+import fetch from '../../../../axios-client.ts'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
+import { uploadFileDataSchema, uploadFileResponseSchema } from '../../../zod/petController/uploadFileSchema.ts'
 
 export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}/uploadImage` as const }

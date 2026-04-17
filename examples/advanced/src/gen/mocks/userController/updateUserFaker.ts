@@ -1,6 +1,6 @@
+import { faker } from '@faker-js/faker'
 import type { UpdateUserData } from '../../models/ts/userController/UpdateUser.ts'
 import { userFaker } from '../userFaker.ts'
-import { faker } from '@faker-js/faker'
 
 export function updateUserPathUsernameFaker(data?: string): string {
   return data ?? faker.string.alpha()

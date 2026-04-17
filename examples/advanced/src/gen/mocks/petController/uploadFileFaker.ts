@@ -1,6 +1,6 @@
+import { faker } from '@faker-js/faker'
 import type { UploadFileResponse, UploadFileStatus200 } from '../../models/ts/petController/UploadFile.ts'
 import { apiResponseFaker } from '../apiResponseFaker.ts'
-import { faker } from '@faker-js/faker'
 
 export function uploadFilePathPetIdFaker(data?: number): number {
   return data ?? faker.number.int()

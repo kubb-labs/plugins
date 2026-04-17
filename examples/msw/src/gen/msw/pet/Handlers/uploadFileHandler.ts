@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { UploadFileResponse } from '../../../models/UploadFile.ts'
 import { http } from 'msw'
+import type { UploadFileResponse } from '../../../models/UploadFile.ts'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   return new Response(JSON.stringify(data), {

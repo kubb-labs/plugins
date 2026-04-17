@@ -1,4 +1,4 @@
-import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserResponse } from '../../models/ts/userController/LoginUser.ts'
+import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse } from '../../models/ts/userController/LoginUser.ts'
 
 export function loginUser(
   params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },

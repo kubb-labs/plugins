@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById.ts'
 import { http } from 'msw'
+import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById.ts'
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
   return new Response(JSON.stringify(data), {

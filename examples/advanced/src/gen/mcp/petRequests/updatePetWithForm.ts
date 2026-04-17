@@ -1,4 +1,6 @@
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
@@ -6,8 +8,6 @@ import type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
 } from '../../models/ts/petController/UpdatePetWithForm.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @summary Updates a pet in the store with form data

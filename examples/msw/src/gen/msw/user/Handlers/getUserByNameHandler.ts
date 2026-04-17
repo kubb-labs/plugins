@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../../models/GetUserByName.ts'
 import { http } from 'msw'
+import type { GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../../models/GetUserByName.ts'
 
 export function getUserByNameHandlerResponse200(data: GetUserByNameResponse) {
   return new Response(JSON.stringify(data), {

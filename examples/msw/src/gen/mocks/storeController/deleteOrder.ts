@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { DeleteOrderResponse } from '../../models/DeleteOrder.ts'
 import { faker } from '@faker-js/faker'
+import type { DeleteOrderResponse } from '../../models/DeleteOrder.ts'
 
 export function deleteOrderPathOrderId(data?: number): number {
   faker.seed([220])

@@ -1,10 +1,10 @@
-import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import fetch from '../../../../axios-client.ts'
 import type {
-  FindPetsByTagsQueryTags,
+  FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
-  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsQueryTags,
   FindPetsByTagsResponse,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'

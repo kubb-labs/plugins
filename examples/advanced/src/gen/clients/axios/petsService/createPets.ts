@@ -1,14 +1,14 @@
-import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import fetch from '../../../../axios-client.ts'
 import type {
+  CreatePetsData,
+  CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
-  CreatePetsHeaderXEXAMPLE,
-  CreatePetsData,
   CreatePetsResponse,
 } from '../../../models/ts/petsController/CreatePets.ts'
-import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/petsController/createPetsSchema.ts'
+import { createPetsDataSchema, createPetsResponseSchema } from '../../../zod/petsController/createPetsSchema.ts'
 
 export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathUuid }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${uuid}` as const }

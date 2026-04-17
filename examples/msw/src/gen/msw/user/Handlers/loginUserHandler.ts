@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { LoginUserResponse, LoginUserStatus400 } from '../../../models/LoginUser.ts'
 import { http } from 'msw'
+import type { LoginUserResponse, LoginUserStatus400 } from '../../../models/LoginUser.ts'
 
 export function loginUserHandlerResponse200(data: LoginUserResponse) {
   return new Response(JSON.stringify(data), {

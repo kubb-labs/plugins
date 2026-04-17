@@ -1,7 +1,7 @@
+import { faker } from '@faker-js/faker'
 import type { AddPetData, AddPetResponse, AddPetStatus405, AddPetStatusDefault } from '../../models/ts/petController/AddPet.ts'
 import { addPetRequestFaker } from '../addPetRequestFaker.ts'
 import { petFaker } from '../petFaker.ts'
-import { faker } from '@faker-js/faker'
 
 export function addPetStatus405Faker(data?: Partial<AddPetStatus405>): AddPetStatus405 {
   return {

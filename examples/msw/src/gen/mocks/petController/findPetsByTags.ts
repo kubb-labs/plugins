@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
+import { faker } from '@faker-js/faker'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from '../../models/FindPetsByTags.ts'
 import { pet } from '../pet.ts'
-import { faker } from '@faker-js/faker'
 
 export function findPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
   faker.seed([220])

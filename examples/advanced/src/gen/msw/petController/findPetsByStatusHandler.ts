@@ -1,5 +1,5 @@
-import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/ts/petController/FindPetsByStatus.ts'
 import { http } from 'msw'
+import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/ts/petController/FindPetsByStatus.ts'
 
 export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {
   return new Response(JSON.stringify(data), {

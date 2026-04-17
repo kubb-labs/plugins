@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { DeletePetStatus400 } from '../../../models/DeletePet.ts'
 import { http } from 'msw'
+import type { DeletePetStatus400 } from '../../../models/DeletePet.ts'
 
 export function deletePetHandlerResponse400(data?: DeletePetStatus400) {
   return new Response(JSON.stringify(data), {

@@ -1,7 +1,7 @@
-import fetch from '@kubb/plugin-client/clients/axios'
-import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../models/ts/userController/UpdateUser.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import fetch from '@kubb/plugin-client/clients/axios'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../models/ts/userController/UpdateUser.ts'
 
 /**
  * @description This can only be done by the logged in user.

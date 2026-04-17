@@ -181,9 +181,9 @@ export type {
 } from './models/ts/UpdateUser.js'
 export type { User } from './models/ts/User.js'
 export type { UserArray } from './models/ts/UserArray.js'
-export { addFilesDataSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './zod/addFilesSchema.js'
+export { addFilesDataSchema, addFilesResponseSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './zod/addFilesSchema.js'
 export { addPetRequestSchema } from './zod/addPetRequestSchema.js'
-export { addPetDataSchema, addPetStatus200Schema, addPetStatus405Schema } from './zod/addPetSchema.js'
+export { addPetDataSchema, addPetResponseSchema, addPetStatus200Schema, addPetStatus405Schema } from './zod/addPetSchema.js'
 export { addressSchema } from './zod/addressSchema.js'
 export { apiResponseSchema } from './zod/apiResponseSchema.js'
 export { categorySchema } from './zod/categorySchema.js'
@@ -192,52 +192,80 @@ export {
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
+  createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './zod/createPetsSchema.js'
-export { createUserDataSchema, createUserStatusDefaultSchema } from './zod/createUserSchema.js'
+export { createUserDataSchema, createUserResponseSchema, createUserStatusDefaultSchema } from './zod/createUserSchema.js'
 export {
   createUsersWithListInputDataSchema,
+  createUsersWithListInputResponseSchema,
   createUsersWithListInputStatus200Schema,
   createUsersWithListInputStatusDefaultSchema,
 } from './zod/createUsersWithListInputSchema.js'
 export { customerSchema } from './zod/customerSchema.js'
-export { deleteOrderPathOrderIdSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './zod/deleteOrderSchema.js'
-export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetStatus400Schema } from './zod/deletePetSchema.js'
-export { deleteUserPathUsernameSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './zod/deleteUserSchema.js'
-export { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema } from './zod/findPetsByStatusSchema.js'
+export { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './zod/deleteOrderSchema.js'
+export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './zod/deletePetSchema.js'
+export { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './zod/deleteUserSchema.js'
+export {
+  findPetsByStatusPathStepIdSchema,
+  findPetsByStatusResponseSchema,
+  findPetsByStatusStatus200Schema,
+  findPetsByStatusStatus400Schema,
+} from './zod/findPetsByStatusSchema.js'
 export {
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
   findPetsByTagsQueryTagsSchema,
+  findPetsByTagsResponseSchema,
   findPetsByTagsStatus200Schema,
   findPetsByTagsStatus400Schema,
 } from './zod/findPetsByTagsSchema.js'
-export { getInventoryStatus200Schema } from './zod/getInventorySchema.js'
+export { getInventoryResponseSchema, getInventoryStatus200Schema } from './zod/getInventorySchema.js'
 export {
   getOrderByIdPathOrderIdSchema,
+  getOrderByIdResponseSchema,
   getOrderByIdStatus200Schema,
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
 } from './zod/getOrderByIdSchema.js'
-export { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema } from './zod/getPetByIdSchema.js'
+export {
+  getPetByIdPathPetIdSchema,
+  getPetByIdResponseSchema,
+  getPetByIdStatus200Schema,
+  getPetByIdStatus400Schema,
+  getPetByIdStatus404Schema,
+} from './zod/getPetByIdSchema.js'
 export {
   getUserByNamePathUsernameSchema,
+  getUserByNameResponseSchema,
   getUserByNameStatus200Schema,
   getUserByNameStatus400Schema,
   getUserByNameStatus404Schema,
 } from './zod/getUserByNameSchema.js'
-export { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema, loginUserStatus400Schema } from './zod/loginUserSchema.js'
-export { logoutUserStatusDefaultSchema } from './zod/logoutUserSchema.js'
+export {
+  loginUserQueryPasswordSchema,
+  loginUserQueryUsernameSchema,
+  loginUserResponseSchema,
+  loginUserStatus200Schema,
+  loginUserStatus400Schema,
+} from './zod/loginUserSchema.js'
+export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './zod/logoutUserSchema.js'
 export { orderSchema } from './zod/orderSchema.js'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.js'
 export { petSchema } from './zod/petSchema.js'
-export { placeOrderPatchDataSchema, placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema } from './zod/placeOrderPatchSchema.js'
-export { placeOrderDataSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './zod/placeOrderSchema.js'
+export {
+  placeOrderPatchDataSchema,
+  placeOrderPatchResponseSchema,
+  placeOrderPatchStatus200Schema,
+  placeOrderPatchStatus405Schema,
+} from './zod/placeOrderPatchSchema.js'
+export { placeOrderDataSchema, placeOrderResponseSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './zod/placeOrderSchema.js'
 export { tagTagSchema } from './zod/tag/tagSchema.js'
 export {
   updatePetDataSchema,
+  updatePetResponseSchema,
   updatePetStatus200Schema,
   updatePetStatus202Schema,
   updatePetStatus400Schema,
@@ -248,8 +276,9 @@ export {
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,
+  updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
 } from './zod/updatePetWithFormSchema.js'
-export { updateUserDataSchema, updateUserPathUsernameSchema, updateUserStatusDefaultSchema } from './zod/updateUserSchema.js'
+export { updateUserDataSchema, updateUserPathUsernameSchema, updateUserResponseSchema, updateUserStatusDefaultSchema } from './zod/updateUserSchema.js'
 export { userArraySchema } from './zod/userArraySchema.js'
 export { userSchema } from './zod/userSchema.js'

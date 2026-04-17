@@ -17,3 +17,5 @@ export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']
 export const findPetsByTagsStatus200Schema = z.array(petSchema)
 
 export const findPetsByTagsStatus400Schema = z.any()
+
+export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])

@@ -1,5 +1,5 @@
-import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import fetch from '../../../../axios-client.ts'
 import type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,

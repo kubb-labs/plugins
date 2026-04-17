@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { OptionsFindPetsByStatusResponse } from '../../../models/OptionsFindPetsByStatus.ts'
 import { http } from 'msw'
+import type { OptionsFindPetsByStatusResponse } from '../../../models/OptionsFindPetsByStatus.ts'
 
 export function optionsFindPetsByStatusHandlerResponse200(data: OptionsFindPetsByStatusResponse) {
   return new Response(JSON.stringify(data), {

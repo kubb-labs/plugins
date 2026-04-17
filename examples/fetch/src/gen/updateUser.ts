@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import fetch from '@kubb/plugin-client/clients/fetch'
+import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from './models.ts'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
   const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }

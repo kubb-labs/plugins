@@ -1,8 +1,8 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { createUsersWithListInput } from '../../axios/userService/createUsersWithListInput.ts'
+import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
+import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import { createUsersWithListInput } from '../../axios/userService/createUsersWithListInput.ts'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 

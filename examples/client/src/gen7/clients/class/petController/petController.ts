@@ -1,17 +1,19 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import fetch, { mergeConfig } from '@kubb/plugin-client/clients/fetch'
+import { buildFormData } from '../../../.kubb/config.ts'
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/petController/AddPet.ts'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../../models/ts/petController/DeletePet.ts'
-import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
+import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../../../models/ts/petController/DeletePet.ts'
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
 import type {
-  FindPetsByTagsResponse,
-  FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsResponse,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
-import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
+import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
 import type {
   UpdatePetData,
   UpdatePetResponse,
@@ -20,16 +22,13 @@ import type {
   UpdatePetStatus405,
 } from '../../../models/ts/petController/UpdatePet.ts'
 import type {
-  UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
 } from '../../../models/ts/petController/UpdatePetWithForm.ts'
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { buildFormData } from '../../../.kubb/config.ts'
-import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
 
 export class petController {
   #config: Partial<RequestConfig> & { client?: Client }

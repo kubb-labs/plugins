@@ -1,5 +1,5 @@
-import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/ts/petController/GetPetById.ts'
 import { http } from 'msw'
+import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/ts/petController/GetPetById.ts'
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
   return new Response(JSON.stringify(data), {

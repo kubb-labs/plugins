@@ -1,14 +1,14 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
+import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
-  UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
 } from '../../../models/ts/petController/UpdatePetWithForm.ts'
-import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePetWithForm } from '../../axios/petService/updatePetWithForm.ts'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId:search' }] as const
 

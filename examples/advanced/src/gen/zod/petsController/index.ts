@@ -4,6 +4,7 @@ export type {
   CreatePetsPathUuidSchema,
   CreatePetsQueryBoolParamSchema,
   CreatePetsQueryOffsetSchema,
+  CreatePetsResponseSchema,
   CreatePetsStatus201Schema,
   CreatePetsStatusDefaultSchema,
 } from './createPetsSchema.ts'
@@ -13,6 +14,7 @@ export {
   createPetsPathUuidSchema,
   createPetsQueryBoolParamSchema,
   createPetsQueryOffsetSchema,
+  createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './createPetsSchema.ts'

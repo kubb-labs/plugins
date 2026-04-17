@@ -1,7 +1,7 @@
+import { faker } from '@faker-js/faker'
 import type { Pet } from '../models/ts/Pet.ts'
 import { categoryFaker } from './categoryFaker.ts'
 import { tagTagFaker } from './tag/tagFaker.ts'
-import { faker } from '@faker-js/faker'
 
 export function petFaker(data?: Partial<Pet>): Pet {
   return {

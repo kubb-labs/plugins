@@ -6,3 +6,5 @@
 import * as z from 'zod'
 
 export const logoutUserStatusDefaultSchema = z.any()
+
+export const logoutUserResponseSchema = logoutUserStatusDefaultSchema

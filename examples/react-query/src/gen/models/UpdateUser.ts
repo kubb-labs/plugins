@@ -1,51 +1,51 @@
 // version: 1.0.11
 
-import type { User } from "./User.ts";
+import type { User } from './User.ts'
 
 /**
  * @description name that need to be deleted
  * @type string
-*/
-export type UpdateUserPathUsername = string;
+ */
+export type UpdateUserPathUsername = string
 
 /**
  * @type any
-*/
-export type UpdateUserStatusDefault = any;
+ */
+export type UpdateUserStatusDefault = any
 
 /**
  * @description Update an existent user in the store
  * @type object | undefined
-*/
-export type UpdateUserData = User | undefined;
+ */
+export type UpdateUserData = User | undefined
 
 /**
  * @type object
-*/
+ */
 export type UpdateUserRequestConfig = {
-    data?: UpdateUserData;
-    /**
-     * @type object
-    */
-    pathParams: {
-        username: UpdateUserPathUsername;
-    };
-    queryParams?: never;
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: `/user/${string}`;
-};
+  data?: UpdateUserData
+  /**
+   * @type object
+   */
+  pathParams: {
+    username: UpdateUserPathUsername
+  }
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/user/${string}`
+}
 
 /**
  * @type object
-*/
+ */
 export type UpdateUserResponses = {
-    default: UpdateUserStatusDefault;
-};
+  default: UpdateUserStatusDefault
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type UpdateUserResponse = UpdateUserStatusDefault;
+ */
+export type UpdateUserResponse = UpdateUserStatusDefault
