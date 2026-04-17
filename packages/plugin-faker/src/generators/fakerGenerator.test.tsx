@@ -8,6 +8,7 @@ import { format, matchFiles } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import { resolverFakerLegacy } from '../resolvers/resolverFakerLegacy.ts'
 import type { PluginFaker } from '../types.ts'
+import { aliasConflictingImports, rewriteAliasedImports } from '../utils.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'
 import { fakerGeneratorLegacy } from './fakerGeneratorLegacy.tsx'
 
@@ -256,6 +257,21 @@ describe('fakerGenerator — operation', () => {
 
     await matchFiles(driver.fileManager.files, name)
   })
+
+  test('aliases imported helpers that collide with operation helper names', () => {
+    const { imports, aliases } = aliasConflictingImports(
+      [{ name: 'createWidgetResponse', path: './createWidgetResponse.ts' }],
+      new Set(['createWidgetResponse']),
+    )
+
+    expect(imports).toEqual([
+      {
+        name: [{ propertyName: 'createWidgetResponse', name: 'createWidgetResponseSchema' }],
+        path: './createWidgetResponse.ts',
+      },
+    ])
+    expect(rewriteAliasedImports('return createWidgetResponse(data)', aliases)).toBe('return createWidgetResponseSchema(data)')
+  })
 })
 
 describe('fakerGeneratorLegacy — operation', () => {
@@ -320,6 +336,11 @@ describe('fakerGeneratorLegacy — operation', () => {
     expect(resolverFakerLegacy.resolveResponseStatusName(node, '200')).toBe('createAddFiles200')
     expect(resolverFakerLegacy.resolveDataName(node)).toBe('createAddFilesMutationRequest')
     expect(resolverFakerLegacy.resolveResponseName(node)).toBe('createAddFilesMutationResponse')
+  })
+
+  test('default resolver prefixes reserved identifiers', () => {
+    expect(resolverFaker.resolveName('Eval')).toBe('_eval')
+    expect(resolverFaker.resolvePathName('Eval', 'file')).toBe('eval')
   })
 
   test('custom resolveName also affects filenames', () => {

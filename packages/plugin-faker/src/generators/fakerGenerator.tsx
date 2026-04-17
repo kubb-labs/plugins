@@ -4,7 +4,16 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { buildResponseUnionSchema, canOverrideSchema, filterUsedImports, resolveParamNameByLocation, resolveSchemaRef, resolveTypeReference } from '../utils.ts'
+import {
+  aliasConflictingImports,
+  buildResponseUnionSchema,
+  canOverrideSchema,
+  filterUsedImports,
+  resolveParamNameByLocation,
+  resolveSchemaRef,
+  resolveTypeReference,
+  rewriteAliasedImports,
+} from '../utils.ts'
 
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
@@ -91,6 +100,34 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     }
 
     const params = ast.caseParams(node.parameters, paramsCasing)
+    const paramEntries = params.map((param) => ({
+      param,
+      name: resolveParamNameByLocation(resolver, node, param),
+      typeName: resolveParamNameByLocation(pluginTs.resolver, node, param),
+    }))
+    const responseEntries = node.responses.map((response) => ({
+      response,
+      name: resolver.resolveResponseStatusName(node, response.statusCode),
+      typeName: pluginTs.resolver.resolveResponseStatusName(node, response.statusCode),
+    }))
+    const dataEntry = node.requestBody?.schema
+      ? {
+          schema: {
+            ...node.requestBody.schema,
+            description: node.requestBody.description ?? node.requestBody.schema.description,
+          },
+          name: resolver.resolveDataName(node),
+          typeName: pluginTs.resolver.resolveDataName(node),
+          description: node.requestBody.description ?? node.requestBody.schema.description,
+        }
+      : null
+    const responseName = resolver.resolveResponseName(node)
+    const localHelperNames = new Set([
+      ...paramEntries.map((entry) => entry.name),
+      ...responseEntries.map((entry) => entry.name),
+      ...(dataEntry ? [dataEntry.name] : []),
+      responseName,
+    ])
     const meta = {
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       typeFile: pluginTs.resolver.resolveFile(
@@ -145,7 +182,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         nodes: printer?.nodes,
       })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
-      const imports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
+      const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)
+      const { imports, aliases } = aliasConflictingImports(usedImports, localHelperNames)
+      const rewrittenFakerText = rewriteAliasedImports(fakerText, aliases)
       const typeReference = resolveTypeReference({
         node: schema,
         canOverride,
@@ -166,7 +205,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName={typeReference.typeName}
             description={description}
             node={schema}
-            printer={printerInstance}
+            printer={{ ...printerInstance, print: () => rewrittenFakerText }}
             seed={seed}
             canOverride={canOverride}
           />
@@ -185,37 +224,34 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <File.Import name={['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
-        {params.map((param) =>
+        {paramEntries.map(({ param, name, typeName }) =>
           renderEntry({
             schema: param.schema,
-            name: resolveParamNameByLocation(resolver, node, param),
-            typeName: resolveParamNameByLocation(pluginTs.resolver, node, param),
+            name,
+            typeName,
           }),
         )}
-        {node.responses.map((response) =>
+        {responseEntries.map(({ response, name, typeName }) =>
           renderEntry({
             schema: response.schema,
-            name: resolver.resolveResponseStatusName(node, response.statusCode),
-            typeName: pluginTs.resolver.resolveResponseStatusName(node, response.statusCode),
+            name,
+            typeName,
             description: response.description,
           }),
         )}
-        {node.requestBody?.schema
+        {dataEntry
           ? renderEntry({
-              schema: {
-                ...node.requestBody.schema,
-                description: node.requestBody.description ?? node.requestBody.schema.description,
-              },
-              name: resolver.resolveDataName(node),
-              typeName: pluginTs.resolver.resolveDataName(node),
-              description: node.requestBody.description ?? node.requestBody.schema.description,
+              schema: dataEntry.schema,
+              name: dataEntry.name,
+              typeName: dataEntry.typeName,
+              description: dataEntry.description,
             })
           : null}
         {renderEntry({
           schema: buildResponseUnionSchema(node, resolver),
-          name: resolver.resolveResponseName(node),
+          name: responseName,
           typeName: pluginTs.resolver.resolveResponseName(node),
-          skipImportNames: node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode)),
+          skipImportNames: responseEntries.map(({ name }) => name),
         })}
       </File>
     )

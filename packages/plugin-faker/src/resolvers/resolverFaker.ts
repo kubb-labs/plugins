@@ -2,6 +2,16 @@ import { camelCase } from '@internals/utils'
 import { defaultResolveFile, defineResolver } from '@kubb/core'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
+function isValidStrictIdentifier(name: string): boolean {
+  try {
+    new Function(`"use strict"; const ${name} = 1;`)
+  } catch {
+    return false
+  }
+
+  return true
+}
+
 /**
  * Default resolver for `@kubb/plugin-faker`.
  *
@@ -18,7 +28,13 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     name: 'default',
     pluginName: 'plugin-faker',
     default(name, type) {
-      return camelCase(name, { isFile: type === 'file' })
+      const resolvedName = camelCase(name, { isFile: type === 'file' })
+
+      if (type === 'file' || isValidStrictIdentifier(resolvedName)) {
+        return resolvedName
+      }
+
+      return `_${resolvedName}`
     },
     resolveName(name, type) {
       return this.default(name, type)
