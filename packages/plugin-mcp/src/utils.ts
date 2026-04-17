@@ -20,8 +20,8 @@ export type ZodParam = {
 }
 
 /**
- * Render a group param value — either a legacy group schema name directly,
- * or compose individual schemas into `z.object({ ... })` (v5).
+ * Render a group param value — compose individual schemas into `z.object({ ... })`,
+ * or use a schema name string directly.
  */
 export function zodGroupExpr(entry: string | Array<ZodParam>): string {
   if (typeof entry === 'string') {

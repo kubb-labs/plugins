@@ -2,15 +2,13 @@ import type { Config } from '@kubb/core'
 import { ast, FileProcessor } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { parserTs } from '@kubb/parser-ts'
-import { type PluginTs, resolverTs, resolverTsLegacy } from '@kubb/plugin-ts'
+import { type PluginTs, resolverTs } from '@kubb/plugin-ts'
 import { describe, expect, test } from 'vitest'
 import { format, matchFiles } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
-import { resolverFakerLegacy } from '../resolvers/resolverFakerLegacy.ts'
 import type { PluginFaker } from '../types.ts'
 import { aliasConflictingImports, rewriteAliasedImports } from '../utils.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'
-import { fakerGeneratorLegacy } from './fakerGeneratorLegacy.tsx'
 
 const categorySchema = ast.createSchema({
   type: 'object',
@@ -96,12 +94,6 @@ const defaultTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
   options: { output: { path: 'types' }, group: undefined } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
-})
-
-const legacyTsPlugin = createMockedPlugin<PluginTs>({
-  name: 'plugin-ts',
-  options: { output: { path: 'types' }, group: undefined } as PluginTs['resolvedOptions'],
-  resolver: resolverTsLegacy,
 })
 
 describe('fakerGenerator — schema', () => {
@@ -278,97 +270,9 @@ describe('fakerGenerator — operation', () => {
     ])
     expect(rewriteAliasedImports('return createWidgetResponse(data)', aliases)).toBe('return createWidgetResponseSchema(data)')
   })
-})
-
-describe('fakerGeneratorLegacy — operation', () => {
-  test('legacy naming and grouped params', async () => {
-    const node = ast.createOperation({
-      operationId: 'showPetById',
-      method: 'GET',
-      path: '/pets/{petId}',
-      tags: ['pets'],
-      parameters: [
-        ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
-        ast.createParameter({ name: 'includeDetails', in: 'query', schema: ast.createSchema({ type: 'boolean' }) }),
-      ],
-      responses: [
-        ast.createResponse({
-          statusCode: '200',
-          description: 'Expected response to a valid request',
-          schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
-        }),
-        ast.createResponse({
-          statusCode: 'default',
-          description: 'Unexpected error',
-          schema: ast.createSchema({ type: 'ref', name: 'Error', ref: '#/components/schemas/Error' }),
-        }),
-      ],
-    })
-
-    const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: defaultOptions, resolver: resolverFakerLegacy })
-    const driver = createMockedPluginDriver({
-      name: 'legacyShowPetById',
-      plugin: legacyTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(fakerGeneratorLegacy, node, {
-      config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: {
-          kind: 'Input',
-          schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
-          operations: [],
-          meta: {},
-        },
-      }),
-      driver,
-      plugin,
-      options: defaultOptions,
-      resolver: resolverFakerLegacy,
-    })
-
-    await matchFiles(driver.fileManager.files, 'legacyShowPetById')
-  })
-
-  test('legacy resolver prefixes create for schema and operations', () => {
-    const node = ast.createOperation({
-      operationId: 'addFiles',
-      method: 'POST',
-      path: '/pet/files',
-      tags: ['pets'],
-      responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'string' }) })],
-    })
-
-    expect(resolverFakerLegacy.resolveName('Address')).toBe('createAddress')
-    expect(resolverFakerLegacy.resolvePathName('Address', 'file')).toBe('createAddress')
-    expect(resolverFakerLegacy.resolvePathName('addFiles', 'file')).toBe('createAddFiles')
-    expect(resolverFakerLegacy.resolveResponseStatusName(node, '200')).toBe('createAddFiles200')
-    expect(resolverFakerLegacy.resolveDataName(node)).toBe('createAddFilesMutationRequest')
-    expect(resolverFakerLegacy.resolveResponseName(node)).toBe('createAddFilesMutationResponse')
-  })
 
   test('default resolver prefixes reserved identifiers', () => {
     expect(resolverFaker.resolveName('Eval')).toBe('_eval')
     expect(resolverFaker.resolvePathName('Eval', 'file')).toBe('eval')
-  })
-
-  test('custom resolveName also affects filenames', () => {
-    const resolver = {
-      ...resolverFakerLegacy,
-      resolveName(name: string, type?: 'file' | 'function' | 'type' | 'const') {
-        return `${this.default(name, type)}Faker`
-      },
-    }
-
-    const file = resolver.resolveFile(
-      { name: 'addFiles', extname: '.ts', tag: 'pets', path: '/pet/files' },
-      {
-        root: '.',
-        output: { path: 'mocks' },
-        group: undefined,
-      },
-    )
-
-    expect(file.baseName).toBe('createAddFilesFaker.ts')
   })
 })

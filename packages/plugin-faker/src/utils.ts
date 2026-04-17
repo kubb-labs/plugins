@@ -51,19 +51,6 @@ export function resolveParamNameByLocation(
   }
 }
 
-export function buildGroupedParamsSchema(params: Array<ast.ParameterNode>): ast.SchemaNode {
-  return ast.createSchema({
-    type: 'object',
-    properties: params.map((param) =>
-      ast.createProperty({
-        name: param.name,
-        required: param.required,
-        schema: param.schema,
-      }),
-    ),
-  })
-}
-
 function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
   return new Set<ast.SchemaNode['type']>([
     'any',
@@ -107,30 +94,6 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   return ast.createSchema({
     type: 'union',
     members: responses.map((response) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, response.statusCode) })),
-  })
-}
-
-export function buildLegacyResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
-  const successResponses = node.responses.filter((response) => {
-    const code = Number(response.statusCode)
-    return !Number.isNaN(code) && code >= 200 && code < 300
-  })
-
-  if (!successResponses.length) {
-    return null
-  }
-
-  if (successResponses.length === 1) {
-    if (shouldInlineSingleResponseSchema(successResponses[0]!.schema)) {
-      return successResponses[0]!.schema
-    }
-
-    return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, successResponses[0]!.statusCode) })
-  }
-
-  return ast.createSchema({
-    type: 'union',
-    members: successResponses.map((response) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, response.statusCode) })),
   })
 }
 

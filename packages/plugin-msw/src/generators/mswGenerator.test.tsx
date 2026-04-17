@@ -2,9 +2,9 @@
 import type { Config } from '@kubb/core'
 import { ast } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
-import { pluginFakerName, resolverFakerLegacy } from '@kubb/plugin-faker'
+import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
-import { resolverTsLegacy } from '@kubb/plugin-ts'
+import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { resolverMsw } from '../resolvers/resolverMsw.ts'
@@ -29,13 +29,13 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
   options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
-  resolver: resolverTsLegacy,
+  resolver: resolverTs,
 })
 
 const mockedFakerPlugin = createMockedPlugin<any>({
   name: pluginFakerName,
   options: { output: { path: '.' }, group: undefined },
-  resolver: resolverFakerLegacy,
+  resolver: resolverFaker,
 })
 
 const listPetsNode = ast.createOperation({

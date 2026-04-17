@@ -1,23 +1,7 @@
 import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
-export type LegacyTransformerOperation = ast.OperationNode & {
-  getOperationId: (options?: { friendlyCase?: boolean }) => string
-}
-
-export type LegacyTransformerSchemas = {
-  request?: { name: string }
-  queryParams?: { name: string }
-  pathParams?: { name: string }
-  headerParams?: { name: string }
-}
-
-export type Transformer = (props: {
-  node: ast.OperationNode
-  operation: LegacyTransformerOperation
-  schemas: LegacyTransformerSchemas
-  casing: 'camelcase' | undefined
-}) => unknown[]
+export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => unknown[]
 
 export type ResolverVueQuery = Resolver & {
   resolveName(this: ResolverVueQuery, name: string): string

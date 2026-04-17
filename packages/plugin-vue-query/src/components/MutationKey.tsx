@@ -3,7 +3,7 @@ import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { LegacyTransformerOperation, LegacyTransformerSchemas, Transformer } from '../types.ts'
+import type { Transformer } from '../types.ts'
 
 type Props = {
   name: string
@@ -20,19 +20,6 @@ function getParams(): ast.FunctionParametersNode {
   return ast.createFunctionParameters({ params: [] })
 }
 
-function createLegacyOperation(node: ast.OperationNode): LegacyTransformerOperation {
-  return {
-    ...node,
-    getOperationId() {
-      return node.operationId
-    },
-  }
-}
-
-function createLegacySchemas(): LegacyTransformerSchemas {
-  return {}
-}
-
 const getTransformer: Transformer = ({ node, casing }) => {
   const path = new URLPath(node.path, { casing })
   return [`{ url: '${path.toURLPath()}' }`]
@@ -43,8 +30,6 @@ export function MutationKey({ name, paramsCasing, node, typeName, transformer = 
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({
     node,
-    operation: createLegacyOperation(node),
-    schemas: createLegacySchemas(),
     casing: paramsCasing,
   })
 

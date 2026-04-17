@@ -4,7 +4,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { LegacyTransformerOperation, LegacyTransformerSchemas, Transformer } from '../types.ts'
+import type { Transformer } from '../types.ts'
 import { buildQueryKeyParams } from '../utils.ts'
 
 type Props = {
@@ -55,28 +55,6 @@ function getParams(
   return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
 }
 
-function createLegacyOperation(node: ast.OperationNode): LegacyTransformerOperation {
-  return {
-    ...node,
-    getOperationId() {
-      return node.operationId
-    },
-  }
-}
-
-function createLegacySchemas(node: ast.OperationNode, resolver: PluginTs['resolver']): LegacyTransformerSchemas {
-  const queryParam = node.parameters.find((param) => param.in === 'query')
-  const pathParam = node.parameters.find((param) => param.in === 'path')
-  const headerParam = node.parameters.find((param) => param.in === 'header')
-
-  return {
-    request: node.requestBody?.schema ? { name: resolver.resolveDataName(node) } : undefined,
-    queryParams: queryParam ? { name: resolver.resolveQueryParamsName(node, queryParam) } : undefined,
-    pathParams: pathParam ? { name: resolver.resolvePathParamsName(node, pathParam) } : undefined,
-    headerParams: headerParam ? { name: resolver.resolveHeaderParamsName(node, headerParam) } : undefined,
-  }
-}
-
 const getTransformer: Transformer = ({ node, casing }) => {
   const path = new URLPath(node.path, { casing })
   const hasQueryParams = node.parameters.some((p) => p.in === 'query')
@@ -94,8 +72,6 @@ export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType,
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({
     node,
-    operation: createLegacyOperation(node),
-    schemas: createLegacySchemas(node, tsResolver),
     casing: paramsCasing,
   })
 

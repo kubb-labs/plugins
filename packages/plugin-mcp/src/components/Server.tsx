@@ -40,11 +40,11 @@ type Props = {
     zod: {
       pathParams: Array<ZodParam>
       /**
-       * Query params — either a legacy group schema name or individual schemas to compose in v5.
+       * Query params — individual schemas to compose into `z.object({ ... })`.
        */
       queryParams?: string | Array<ZodParam>
       /**
-       * Header params — either a legacy group schema name or individual schemas to compose in v5.
+       * Header params — individual schemas to compose into `z.object({ ... })`.
        */
       headerParams?: string | Array<ZodParam>
       requestName?: string

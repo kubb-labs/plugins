@@ -237,7 +237,7 @@ export type Options = {
   generators?: Array<Generator<PluginTs>>
   /**
    * Override naming conventions. When a method returns `null` or `undefined`, the preset
-   * resolver (`resolverTs` / `resolverTsLegacy`) is used as fallback.
+   * resolver (`resolverTs`) is used as fallback.
    */
   resolver?: Partial<ResolverTs> & ThisType<ResolverTs>
   /**
