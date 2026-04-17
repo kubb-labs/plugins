@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import type { ShowPetByIdQueryResponse } from './ShowPetById'
 import { http } from 'msw'
 
 export function showPetByIdResponse200(data: ShowPetByIdQueryResponse) {

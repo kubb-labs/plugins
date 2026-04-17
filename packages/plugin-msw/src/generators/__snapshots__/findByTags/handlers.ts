@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
-import { createPets, listPets, showPetById } from './pets/findByTags'
+import { createPetsHandler } from './createPetsHandler'
+import { listPetsHandler } from './listPetsHandler'
+import { showPetByIdHandler } from './showPetByIdHandler'
 
-export const handlers = [listPets(), createPets(), showPetById()] as const
+export const handlers = [listPetsHandler(), createPetsHandler(), showPetByIdHandler()] as const

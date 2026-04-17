@@ -88,9 +88,7 @@
   },
   "dependencies": {
     "@kubb/core": "catalog:",
-    "@kubb/oas": "catalog:",
     "@kubb/plugin-faker": "workspace:*",
-    "@kubb/plugin-oas": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"
   },

@@ -1071,6 +1071,105 @@ pluginMcp({
 | `transformer` | `Visitor` | — | Single AST visitor applied before printing |
 | `paramsCasing` | `'camelcase'` | `undefined` | Apply camelCase to parameter names |
 
+### `@kubb/plugin-msw` — v5 migration
+
+`@kubb/plugin-msw` now uses the v5 hook-style plugin architecture. The core MSW options from v4 still work (`handlers`, `parser`, `baseURL`, `group`, `include`, `exclude`, `override`, and `transformers.name`), but the plugin no longer depends on `@kubb/plugin-oas`.
+
+#### `pluginOas()` no longer required
+
+In v5, `@kubb/plugin-msw` no longer requires `pluginOas()`. Use `adapterOas()` in the root config instead.
+
+::: code-group
+```typescript [Before (v4)]
+import { defineConfig } from '@kubb/core'
+import { pluginOas } from '@kubb/plugin-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginMsw } from '@kubb/plugin-msw'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  plugins: [
+    pluginOas(),
+    pluginTs(),
+    pluginMsw({
+      output: { path: './msw' },
+      handlers: true,
+    }),
+  ],
+})
+```
+
+```typescript [After (v5)]
+import { defineConfig } from '@kubb/core'
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginMsw } from '@kubb/plugin-msw'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  adapter: adapterOas(),
+  plugins: [
+    pluginTs(),
+    pluginMsw({
+      output: { path: './msw' },
+      handlers: true,
+    }),
+  ],
+})
+```
+:::
+
+#### `contentType` moved to the adapter
+
+The `contentType` option has been removed from `@kubb/plugin-msw`. Configure content-type filtering on `adapterOas(...)` instead.
+
+::: code-group
+```typescript [Before (v4)]
+pluginMsw({
+  contentType: 'application/json',
+})
+```
+
+```typescript [After (v5)]
+adapterOas({
+  contentType: 'application/json',
+})
+```
+:::
+
+#### New `resolver` and `transformer` options
+
+Use `resolver` to override naming and file resolution behavior, and `transformer` to apply a single AST `Visitor` before MSW files are rendered.
+
+```typescript
+import { pluginMsw, resolverMsw } from '@kubb/plugin-msw'
+
+pluginMsw({
+  resolver: {
+    ...resolverMsw,
+    resolveName(name) {
+      return `${resolverMsw.resolveName(name)}Mock`
+    },
+  },
+  transformer: {
+    operation(node) {
+      return { ...node, operationId: `mock_${node.operationId}` }
+    },
+  },
+})
+```
+
+### `@kubb/plugin-msw` — new options and exports in v5
+
+| Item | Type | Description |
+|---|---|---|
+| `resolver` | `Partial<ResolverMsw> & ThisType<ResolverMsw>` | Override individual resolver methods |
+| `transformer` | `Visitor` | Single AST visitor applied before printing |
+| `generators` | `Array<Generator<PluginMsw>>` | Register extra generators next to the default MSW generators |
+| `resolverMsw` | export | Default resolver for extending MSW naming and path behavior |
+
 ### `@kubb/plugin-client` — v5 migration
 
 `@kubb/plugin-client` has been rewritten to match the v5 plugin architecture. Most options are unchanged, but naming customization and transformation have moved to a new `resolver`/`transformer` pattern.
@@ -1268,3 +1367,117 @@ Generators have been rewritten from the v4 `createReactGenerator` + `OperationGe
 ### `@kubb/plugin-svelte-query` — removed
 
 `@kubb/plugin-svelte-query` has been removed in v5. The Svelte Query integration is no longer maintained as a first-party plugin. If you depend on Svelte Query hook generation, continue using Kubb v4 or consider migrating to `@kubb/plugin-react-query` and adapting the output for Svelte.
+
+### `@kubb/plugin-vue-query` — v5 migration
+
+`@kubb/plugin-vue-query` has been rewritten to use the v5 plugin architecture. The plugin now uses `definePlugin`, hook-style generators, and the shared `@internals/tanstack-query` package. Most user-facing options remain the same, but naming customization and transformation follow the new `resolver`/`transformer` pattern.
+
+#### `pluginOas()` no longer required
+
+In v5, `@kubb/plugin-vue-query` no longer depends on `@kubb/plugin-oas`. Use `adapterOas()` in the `adapter` field instead.
+
+::: code-group
+```typescript [Before (v4)]
+import { defineConfig } from '@kubb/core'
+import { pluginOas } from '@kubb/plugin-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  plugins: [
+    pluginOas(),
+    pluginTs(),
+    pluginVueQuery({
+      output: { path: './hooks' },
+    }),
+  ],
+})
+```
+
+```typescript [After (v5)]
+import { defineConfig } from '@kubb/core'
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
+
+export default defineConfig({
+  input: { path: './petStore.yaml' },
+  output: { path: './src/gen' },
+  adapter: adapterOas(),
+  plugins: [
+    pluginTs(),
+    pluginVueQuery({
+      output: { path: './hooks' },
+    }),
+  ],
+})
+```
+:::
+
+#### `transformers.name` replaced by `resolver`
+
+The `transformers: { name }` callback has been removed. Use the `resolver` option instead.
+
+::: code-group
+```typescript [Before (v4)]
+pluginVueQuery({
+  transformers: {
+    name: (name, type) => type === 'function' ? `${name}Hook` : name,
+  },
+})
+```
+
+```typescript [After (v5)]
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
+
+pluginVueQuery({
+  resolver: {
+    resolveName(name) {
+      return `${this.default(name)}Hook`
+    },
+  },
+})
+```
+:::
+
+#### New `compatibilityPreset` option
+
+Use `compatibilityPreset: 'kubbV4'` to preserve v4 naming conventions while migrating. This ensures generated file names, function names, and type names match the v4 output.
+
+```typescript
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
+
+pluginVueQuery({ compatibilityPreset: 'kubbV4' })
+```
+
+#### New `transformer` option
+
+Apply an AST `Visitor` to transform operation nodes before they are printed. This replaces the old `transformers` callback approach for structural modifications.
+
+```typescript
+import { pluginVueQuery } from '@kubb/plugin-vue-query'
+
+pluginVueQuery({
+  transformer: {
+    operation(node) {
+      return { ...node, operationId: `api_${node.operationId}` }
+    },
+  },
+})
+```
+
+#### Internal architecture changes
+
+The plugin now uses `@internals/tanstack-query` as a shared package for components and utilities that are common across all TanStack Query framework plugins. This includes shared components like `QueryKey`, `MutationKey`, `QueryOptions`, and `MutationOptions`.
+
+Generators have been rewritten from the v4 `createReactGenerator` + `OperationGenerator` pattern to v5 `defineGenerator` with `operation(node, ctx)` handlers. The `useOas`, `useDriver`, and `useOperationManager` hooks have been replaced by the `ctx` object passed to generator handlers.
+
+### `@kubb/plugin-vue-query` — new options in v5
+
+| New option | Type | Default | Description |
+|---|---|---|---|
+| `compatibilityPreset` | `'default' \| 'kubbV4'` | `'default'` | Naming convention preset |
+| `resolver` | `Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>` | — | Override individual resolver methods |
+| `transformer` | `Visitor` | — | Single AST visitor applied before printing |

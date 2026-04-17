@@ -1,94 +1,78 @@
-import { useDriver } from '@kubb/core/hooks'
+import { defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
-import { createReactGenerator } from '@kubb/plugin-oas/generators'
-import { useOas, useOperationManager } from '@kubb/plugin-oas/hooks'
-import { getBanner, getFooter } from '@kubb/plugin-oas/utils'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
+import { getResponseTypes, getSuccessResponses, resolveFakerMeta, transformName } from '../utils.ts'
 
-export const mswGenerator = createReactGenerator<PluginMsw>({
+export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
-  Operation({ operation, generator, plugin }) {
-    const {
-      options: { output, parser, baseURL },
-    } = plugin
-    const driver = useDriver()
+  renderer: jsxRenderer,
+  operation(node, ctx) {
+    const { driver, resolver, config, root, adapter } = ctx
+    const { output, parser, baseURL, group, transformers } = ctx.options
 
-    const oas = useOas()
-    const { getSchemas, getName, getFile } = useOperationManager(generator)
-
+    const fileName = resolver.resolveName(node.operationId)
     const mock = {
-      name: getName(operation, { type: 'function' }),
-      file: getFile(operation),
+      name: transformName(fileName, 'function', transformers),
+      file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     }
 
-    const faker = {
-      file: getFile(operation, { pluginName: pluginFakerName }),
-      schemas: getSchemas(operation, { pluginName: pluginFakerName, type: 'function' }),
-    }
+    const fakerPlugin = driver.getPlugin(pluginFakerName)
+    const faker =
+      parser === 'faker' && fakerPlugin
+        ? resolveFakerMeta(node, {
+            root,
+            output,
+            group,
+            transformers,
+            fakerOutput: fakerPlugin.options?.output ?? {},
+            fakerGroup: fakerPlugin.options?.group,
+          })
+        : undefined
+
+    const pluginTs = driver.getPlugin(pluginTsName)
+    if (!pluginTs?.resolver) return null
+    const tsResolver = pluginTs.resolver
 
     const type = {
-      file: getFile(operation, { pluginName: pluginTsName }),
-      schemas: getSchemas(operation, { pluginName: pluginTsName, type: 'type' }),
+      file: tsResolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+      ),
+      responseName: tsResolver.resolveResponseName(node),
     }
 
-    const responseStatusCodes = operation.getResponseStatusCodes()
-
-    const types: [statusCode: number | 'default', typeName: string][] = []
-
-    for (const code of responseStatusCodes) {
-      if (code === 'default') {
-        types.push(['default', type.schemas.response.name])
-        continue
-      }
-
-      if (code.startsWith('2')) {
-        types.push([Number(code), type.schemas.response.name])
-        continue
-      }
-
-      const codeType = type.schemas.errors?.find((err) => err.statusCode === Number(code))
-      if (codeType) types.push([Number(code), codeType.name])
-    }
+    const types = getResponseTypes(node, tsResolver)
+    const successResponses = getSuccessResponses(node)
+    const hasSuccessSchema = successResponses.some((response) => !!response.schema)
 
     return (
       <File
         baseName={mock.file.baseName}
         path={mock.file.path}
         meta={mock.file.meta}
-        banner={getBanner({ oas, output, config: driver.config })}
-        footer={getFooter({ oas, output })}
+        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
+        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['ResponseResolver']} isTypeOnly path="msw" />
-        <File.Import
-          name={Array.from(new Set([type.schemas.response.name, ...types.map((t) => t[1])]))}
-          path={type.file.path}
-          root={mock.file.path}
-          isTypeOnly
-        />
-        {parser === 'faker' && faker.file && faker.schemas.response && (
-          <File.Import name={[faker.schemas.response.name]} root={mock.file.path} path={faker.file.path} />
-        )}
+        <File.Import name={Array.from(new Set([type.responseName, ...types.map((t) => t[1])]))} path={type.file.path} root={mock.file.path} isTypeOnly />
+        {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types
           .filter(([code]) => code !== 'default')
-          .map(([code, typeName]) => (
-            <Response typeName={typeName} operation={operation} name={mock.name} statusCode={code as number} />
-          ))}
-        {parser === 'faker' && (
-          <MockWithFaker
-            name={mock.name}
-            typeName={type.schemas.response.name}
-            fakerName={faker.schemas.response.name}
-            operation={operation}
-            baseURL={baseURL}
-          />
-        )}
-        {parser === 'data' && (
-          <Mock name={mock.name} typeName={type.schemas.response.name} fakerName={faker.schemas.response.name} operation={operation} baseURL={baseURL} />
+          .map(([code, typeName]) => {
+            const response = node.responses.find((item) => item.statusCode === String(code))
+            if (!response) return null
+            return <Response typeName={typeName} response={response} name={mock.name} />
+          })}
+
+        {parser === 'faker' && faker && hasSuccessSchema ? (
+          <MockWithFaker name={mock.name} typeName={type.responseName} fakerName={faker.name} node={node} baseURL={baseURL} />
+        ) : (
+          <Mock name={mock.name} typeName={type.responseName} node={node} baseURL={baseURL} />
         )}
       </File>
     )
