@@ -210,11 +210,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
       },
       ref(node) {
-        if (!node.name) {
+        const refName = node.name ?? (node.ref ? ast.extractRefName(node.ref) : undefined) ?? node.schema?.name
+
+        if (!refName) {
           throw new Error('Name not defined for ref node')
         }
-
-        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
 
         if (this.options.schemaName && refName === this.options.schemaName) {
           return 'undefined as any'
