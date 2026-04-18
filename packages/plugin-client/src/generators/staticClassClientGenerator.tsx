@@ -54,7 +54,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     if (!pluginTs) return null
 
     const tsResolver = driver.getResolver(pluginTsName)
-    const tsPluginOptions = pluginTs.options
+    const tsPluginOptions = pluginTs.resolvedOptions
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
 
@@ -64,10 +64,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
         { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },
       )
       const zodFile =
-        zodResolver && pluginZod?.options
+        zodResolver && pluginZod?.resolvedOptions
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group },
+              { root, output: pluginZod.resolvedOptions.output ?? output, group: pluginZod.resolvedOptions.group },
             )
           : undefined
 

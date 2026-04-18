@@ -31,7 +31,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
 
     const typeFile = tsResolver.resolveFile(
       { name: transformedNode.operationId, extname: '.ts', tag: transformedNode.tags[0] ?? 'default', path: transformedNode.path },
-      { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+      { root, output: pluginTs.resolvedOptions.output ?? output, group: pluginTs.resolvedOptions.group },
     )
 
     const requestName = transformedNode.requestBody?.schema ? tsResolver.resolveDataName(transformedNode) : undefined

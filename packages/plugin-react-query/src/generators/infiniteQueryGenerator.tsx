@@ -65,7 +65,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+        { root, output: pluginTs.resolvedOptions.output ?? output, group: pluginTs.resolvedOptions.group },
       ),
     }
 
@@ -88,7 +88,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
+          { root, output: pluginZod?.resolvedOptions?.output ?? output, group: pluginZod?.resolvedOptions?.group },
         )
       : undefined
     const zodSchemaNames =
@@ -106,8 +106,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
           {
             root,
-            output: clientPlugin?.options?.output ?? output,
-            group: clientPlugin?.options?.group,
+            output: clientPlugin?.resolvedOptions?.output ?? output,
+            group: clientPlugin?.resolvedOptions?.group,
           },
         )
       : undefined

@@ -40,8 +40,8 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          output: pluginTs.resolvedOptions.output ?? output,
+          group: pluginTs.resolvedOptions.group,
         },
       ),
     } as const

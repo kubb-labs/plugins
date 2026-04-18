@@ -53,18 +53,18 @@ export const clientGenerator = defineGenerator<PluginClient>({
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          output: pluginTs.resolvedOptions.output ?? output,
+          group: pluginTs.resolvedOptions.group,
         },
       ),
       fileZod:
-        zodResolver && pluginZod?.options
+        zodResolver && pluginZod?.resolvedOptions
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
               {
                 root,
-                output: pluginZod.options.output ?? output,
-                group: pluginZod.options?.group,
+                output: pluginZod.resolvedOptions.output ?? output,
+                group: pluginZod.resolvedOptions.group,
               },
             )
           : undefined,
