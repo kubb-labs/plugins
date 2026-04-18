@@ -1,7 +1,6 @@
 import path from 'node:path'
-
-import { ast, defineGenerator } from '@kubb/core'
 import type { NormalizedPlugin } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { Client, type PluginClient, pluginClientName } from '@kubb/plugin-client'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
@@ -102,7 +101,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const clientPlugin = driver.getPlugin(pluginClientName) as NormalizedPlugin<PluginClient> | undefined
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
-    
 
     const clientFile = shouldUseClientPlugin
       ? clientPlugin?.resolver.resolveFile(

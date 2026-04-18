@@ -1,5 +1,5 @@
-import { defineGenerator } from '@kubb/core'
 import type { NormalizedPlugin } from '@kubb/core'
+import { defineGenerator } from '@kubb/core'
 import { type PluginFaker, pluginFakerName } from '@kubb/plugin-faker'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'

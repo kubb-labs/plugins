@@ -1,16 +1,4 @@
-import type {
-  ast,
-  Exclude,
-  Generator,
-  Group,
-  Include,
-  Output,
-  Override,
-  PluginFactoryOptions,
-  ResolveNameParams,
-  Resolver,
-  UserGroup,
-} from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolveNameParams, Resolver, UserGroup } from '@kubb/core'
 
 export type ResolverMsw = Resolver & {
   resolveName(this: ResolverMsw, name: string): string

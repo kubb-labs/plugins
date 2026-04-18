@@ -1,5 +1,5 @@
-import { ast, defineGenerator } from '@kubb/core'
 import type { NormalizedPlugin } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
