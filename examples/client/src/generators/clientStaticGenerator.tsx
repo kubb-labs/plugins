@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { type Group, defineGenerator } from '@kubb/core'
+import { defineGenerator, type Group } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 import { Client } from '@kubb/plugin-client'
 import type { PluginTs } from '@kubb/plugin-ts'

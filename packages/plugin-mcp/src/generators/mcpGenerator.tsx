@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { type Group, ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator, type Group } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
