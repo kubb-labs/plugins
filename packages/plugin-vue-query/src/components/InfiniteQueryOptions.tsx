@@ -87,7 +87,7 @@ export function InfiniteQueryOptions({
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
 
   const hasNewParams = nextParam !== undefined || previousParam !== undefined
 
@@ -142,7 +142,7 @@ export function InfiniteQueryOptions({
         <Function name={name} export params={paramsSignature}>
           {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
+      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
        ${enabledText}
        queryKey,
        queryFn: async ({ signal, pageParam }) => {
@@ -162,7 +162,7 @@ export function InfiniteQueryOptions({
       <Function name={name} export params={paramsSignature}>
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
+      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
        ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {

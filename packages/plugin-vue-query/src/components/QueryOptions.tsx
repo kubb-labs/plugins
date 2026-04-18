@@ -140,14 +140,14 @@ export function QueryOptions({
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
 
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature}>
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({
+      return queryOptions<${TData}, ${TError}, ${TData}>({
        ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {

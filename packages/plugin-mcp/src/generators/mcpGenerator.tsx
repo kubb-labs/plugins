@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator } from '@kubb/core'
+import { type Group, ast, defineGenerator } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -18,7 +18,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       return null
     }
 
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
 
@@ -43,7 +43,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group as Group | undefined as Group | undefined,
         },
       ),
     } as const

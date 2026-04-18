@@ -1,4 +1,4 @@
-import { defineGenerator } from '@kubb/core'
+import { type Group, defineGenerator } from '@kubb/core'
 import { type PluginFaker, pluginFakerName } from '@kubb/plugin-faker'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -19,25 +19,25 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     }
 
-    const fakerPlugin = (parser === 'faker' ? driver.getPlugin(pluginFakerName) : undefined)
+    const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : undefined
     const faker =
       parser === 'faker' && fakerPlugin
         ? resolveFakerMeta(node, {
             root,
-            fakerResolver: fakerPlugin.resolver,
-            fakerOutput: fakerPlugin.options?.output ?? {},
-            fakerGroup: fakerPlugin.options?.group,
+            fakerResolver: driver.getResolver(pluginFakerName) as PluginFaker['resolver'],
+            fakerOutput: fakerPlugin.options?.output ?? output,
+            fakerGroup: fakerPlugin.options?.group as Group | undefined,
           })
         : undefined
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
 
     const type = {
       file: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group as Group | undefined as Group | undefined },
       ),
       responseName: tsResolver.resolveResponseName(node),
     }
