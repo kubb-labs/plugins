@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { camelCase, pascalCase } from '@internals/utils'
-import type { ast, NormalizedPlugin } from '@kubb/core'
+import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -51,12 +51,12 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, wrapper } = ctx.options
     const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
 
-    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
     const tsResolver = pluginTs.resolver
     const tsPluginOptions = pluginTs.options
-    const pluginZod = (parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined) as NormalizedPlugin<PluginZod> | undefined
+    const pluginZod = (parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined)
     const zodResolver = pluginZod?.resolver
 
     function buildOperationData(node: ast.OperationNode): OperationData {

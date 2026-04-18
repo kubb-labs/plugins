@@ -1,4 +1,3 @@
-import type { NormalizedPlugin } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -12,7 +11,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const { adapter, config, resolver, driver, root } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    const pluginTs = driver.getPlugin(pluginTsName)
 
     if (!pluginTs) {
       return null

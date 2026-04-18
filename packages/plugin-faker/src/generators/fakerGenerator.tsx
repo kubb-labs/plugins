@@ -1,4 +1,3 @@
-import type { NormalizedPlugin } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -22,7 +21,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
-    const pluginTs = ctx.driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!node.name || !pluginTs || !adapter.inputNode) {
       return
@@ -96,7 +95,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
-    const pluginTs = ctx.driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!pluginTs) {
       return

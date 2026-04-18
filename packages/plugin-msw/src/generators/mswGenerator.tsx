@@ -1,4 +1,3 @@
-import type { NormalizedPlugin } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import { type PluginFaker, pluginFakerName } from '@kubb/plugin-faker'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
@@ -20,7 +19,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     }
 
-    const fakerPlugin = (parser === 'faker' ? driver.getPlugin(pluginFakerName) : undefined) as NormalizedPlugin<PluginFaker> | undefined
+    const fakerPlugin = (parser === 'faker' ? driver.getPlugin(pluginFakerName) : undefined)
     const faker =
       parser === 'faker' && fakerPlugin
         ? resolveFakerMeta(node, {
@@ -31,7 +30,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           })
         : undefined
 
-    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = pluginTs.resolver
 
