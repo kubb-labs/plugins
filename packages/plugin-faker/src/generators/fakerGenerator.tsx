@@ -1,4 +1,4 @@
-import { type Group, ast, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator, type Group } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -36,7 +36,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       name: resolver.resolveName(schemaName),
       file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }),
       typeName: tsResolver.resolveTypeName(schemaName),
-      typeFile: tsResolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group as Group | undefined as Group | undefined }),
+      typeFile: tsResolver.resolveFile(
+        { name: schemaName, extname: '.ts' },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group as Group | undefined as Group | undefined },
+      ),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
     const printerInstance = printerFaker({

@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { camelCase, pascalCase } from '@internals/utils'
-import type { Group, ast } from '@kubb/core'
+import type { ast, Group } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'

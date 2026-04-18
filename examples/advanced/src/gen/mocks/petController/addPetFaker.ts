@@ -3,6 +3,9 @@ import type { AddPetData, AddPetResponse, AddPetStatus405, AddPetStatusDefault }
 import { addPetRequestFaker } from '../addPetRequestFaker.ts'
 import { petFaker } from '../petFaker.ts'
 
+/**
+ * @description Pet not found
+ */
 export function addPetStatus405Faker(data?: Partial<AddPetStatus405>): AddPetStatus405 {
   return {
     ...{ code: faker.number.int(), message: faker.string.alpha() },
