@@ -1,9 +1,10 @@
 import path from 'node:path'
 
 import { ast, defineGenerator } from '@kubb/core'
-import { Client, pluginClientName } from '@kubb/plugin-client'
-import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
+import type { NormalizedPlugin } from '@kubb/core'
+import { Client, type PluginClient, pluginClientName } from '@kubb/plugin-client'
+import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
+import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { QueryKey, QueryOptions, SuspenseQuery } from '../components'
@@ -30,8 +31,8 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
       customOptions,
     } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs?.resolver) return null
+    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    if (!pluginTs) return null
     const tsResolver = pluginTs.resolver
 
     // query: false means "this IS a query op" (suspense hooks still generate)
@@ -77,7 +78,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
     ].filter((name): name is string => !!name && name !== queryKeyTypeName)
 
     const pluginZodRaw = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const pluginZod = pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined
+    const pluginZod = (pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined) as NormalizedPlugin<PluginZod> | undefined
     const zodResolver = pluginZod?.resolver
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
@@ -90,12 +91,13 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
         ? [zodResolver.resolveResponseName?.(node), node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
         : []
 
-    const clientPlugin = driver.getPlugin(pluginClientName)
+    const clientPlugin = driver.getPlugin(pluginClientName) as NormalizedPlugin<PluginClient> | undefined
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
+    
 
     const clientFile = shouldUseClientPlugin
-      ? clientPlugin?.resolver?.resolveFile(
+      ? clientPlugin?.resolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
           {
             root,
@@ -105,7 +107,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
         )
       : undefined
 
-    const resolvedClientName = shouldUseClientPlugin ? (clientPlugin?.resolver?.resolveName(node.operationId) ?? clientName) : clientName
+    const resolvedClientName = shouldUseClientPlugin ? (clientPlugin?.resolver.resolveName(node.operationId) ?? clientName) : clientName
 
     return (
       <File

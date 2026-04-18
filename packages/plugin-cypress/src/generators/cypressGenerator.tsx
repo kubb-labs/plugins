@@ -1,5 +1,6 @@
 import { ast, defineGenerator } from '@kubb/core'
-import { pluginTsName } from '@kubb/plugin-ts'
+import type { NormalizedPlugin } from '@kubb/core'
+import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
@@ -11,11 +12,13 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const { adapter, config, resolver, driver, root } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName)
+    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
 
-    if (!pluginTs?.resolver) {
+    if (!pluginTs) {
       return null
     }
+
+    const tsResolver = pluginTs.resolver
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
 
@@ -24,17 +27,17 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const headerParams = casedParams.filter((p) => p.in === 'header')
 
     const importedTypeNames = [
-      ...pathParams.map((p) => pluginTs.resolver.resolvePathParamsName(node, p)),
-      ...queryParams.map((p) => pluginTs.resolver.resolveQueryParamsName(node, p)),
-      ...headerParams.map((p) => pluginTs.resolver.resolveHeaderParamsName(node, p)),
-      node.requestBody?.schema ? pluginTs.resolver.resolveDataName(node) : undefined,
-      pluginTs.resolver.resolveResponseName(node),
+      ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
+      ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
+      ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
+      node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
+      tsResolver.resolveResponseName(node),
     ].filter(Boolean)
 
     const meta = {
       name: resolver.resolveName(node.operationId),
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      fileTs: pluginTs.resolver.resolveFile(
+      fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
@@ -58,7 +61,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         <Request
           name={meta.name}
           node={node}
-          resolver={pluginTs.resolver}
+          resolver={tsResolver}
           dataReturnType={dataReturnType}
           paramsCasing={paramsCasing}
           paramsType={paramsType}

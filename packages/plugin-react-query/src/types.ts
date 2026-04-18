@@ -1,5 +1,5 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver, UserGroup } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
@@ -221,7 +221,7 @@ type ResolvedOptions = {
   transformers: NonNullable<Options['transformers']>
 }
 
-export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, never, ResolvePathOptions, ResolverReactQuery>
+export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, never, object, ResolverReactQuery>
 
 declare global {
   namespace Kubb {

@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver, UserGroup } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 /**
@@ -74,7 +74,7 @@ type ResolvedOptions = {
   resolver: ResolverMcp
 }
 
-export type PluginMcp = PluginFactoryOptions<'plugin-mcp', Options, ResolvedOptions, never, ResolvePathOptions, ResolverMcp>
+export type PluginMcp = PluginFactoryOptions<'plugin-mcp', Options, ResolvedOptions, never, object, ResolverMcp>
 
 declare global {
   namespace Kubb {

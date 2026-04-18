@@ -1,4 +1,5 @@
 import { ast, defineGenerator } from '@kubb/core'
+import type { NormalizedPlugin } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -21,11 +22,13 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
-    const pluginTs = ctx.driver.getPlugin<PluginTs>(pluginTsName)
+    const pluginTs = ctx.driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
 
-    if (!node.name || !pluginTs?.resolver || !adapter.inputNode) {
+    if (!node.name || !pluginTs || !adapter.inputNode) {
       return
     }
+
+    const tsResolver = pluginTs.resolver
 
     const schemaNode = resolveSchemaRef(node, adapter.inputNode.schemas)
     const schemaName = schemaNode.name ?? node.name
@@ -33,8 +36,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const meta = {
       name: resolver.resolveName(schemaName),
       file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }),
-      typeName: pluginTs.resolver.resolveTypeName(schemaName),
-      typeFile: pluginTs.resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output: pluginTs.options.output, group: pluginTs.options.group }),
+      typeName: tsResolver.resolveTypeName(schemaName),
+      typeFile: tsResolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output: pluginTs.options?.output, group: pluginTs.options?.group }),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
     const printerInstance = printerFaker({
@@ -93,22 +96,24 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
-    const pluginTs = ctx.driver.getPlugin<PluginTs>(pluginTsName)
+    const pluginTs = ctx.driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
 
-    if (!pluginTs?.resolver) {
+    if (!pluginTs) {
       return
     }
+
+    const tsResolver = pluginTs.resolver
 
     const params = ast.caseParams(node.parameters, paramsCasing)
     const paramEntries = params.map((param) => ({
       param,
       name: resolveParamNameByLocation(resolver, node, param),
-      typeName: resolveParamNameByLocation(pluginTs.resolver, node, param),
+      typeName: resolveParamNameByLocation(tsResolver, node, param),
     }))
     const responseEntries = node.responses.map((response) => ({
       response,
       name: resolver.resolveResponseStatusName(node, response.statusCode),
-      typeName: pluginTs.resolver.resolveResponseStatusName(node, response.statusCode),
+      typeName: tsResolver.resolveResponseStatusName(node, response.statusCode),
     }))
     const dataEntry = node.requestBody?.schema
       ? {
@@ -117,7 +122,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             description: node.requestBody.description ?? node.requestBody.schema.description,
           },
           name: resolver.resolveDataName(node),
-          typeName: pluginTs.resolver.resolveDataName(node),
+          typeName: tsResolver.resolveDataName(node),
           description: node.requestBody.description ?? node.requestBody.schema.description,
         }
       : null
@@ -130,7 +135,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     ])
     const meta = {
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      typeFile: pluginTs.resolver.resolveFile(
+      typeFile: tsResolver.resolveFile(
         {
           name: node.operationId,
           extname: '.ts',
@@ -139,8 +144,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         },
         {
           root,
-          output: pluginTs.options.output,
-          group: pluginTs.options.group,
+          output: pluginTs.options?.output,
+          group: pluginTs.options?.group,
         },
       ),
     } as const
@@ -250,7 +255,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {renderEntry({
           schema: buildResponseUnionSchema(node, resolver),
           name: responseName,
-          typeName: pluginTs.resolver.resolveResponseName(node),
+          typeName: tsResolver.resolveResponseName(node),
           skipImportNames: responseEntries.map(({ name }) => name),
         })}
       </File>

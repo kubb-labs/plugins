@@ -1,7 +1,8 @@
 import path from 'node:path'
 
 import { ast, defineGenerator } from '@kubb/core'
-import { pluginZodName } from '@kubb/plugin-zod'
+import type { NormalizedPlugin } from '@kubb/core'
+import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
@@ -21,11 +22,13 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const { adapter, config, resolver, plugin, driver, root } = ctx
     const { output, paramsCasing, group } = ctx.options
 
-    const pluginZod = driver.getPlugin(pluginZodName)
+    const pluginZod = driver.getPlugin(pluginZodName) as NormalizedPlugin<PluginZod> | undefined
 
-    if (!pluginZod?.resolver) {
+    if (!pluginZod) {
       return
     }
+
+    const zodResolver = pluginZod.resolver
 
     const name = 'server'
     const serverFilePath = path.resolve(root, output.path, 'server.ts')
@@ -50,7 +53,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
 
       const mcpFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group })
 
-      const zodFile = pluginZod.resolver.resolveFile(
+      const zodFile = zodResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
@@ -59,11 +62,11 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         },
       )
 
-      const requestName = node.requestBody?.schema ? pluginZod.resolver.resolveDataName(node) : undefined
+      const requestName = node.requestBody?.schema ? zodResolver.resolveDataName(node) : undefined
       const successStatus = findSuccessStatusCode(node.responses)
-      const responseName = successStatus ? pluginZod.resolver.resolveResponseStatusName(node, successStatus) : undefined
+      const responseName = successStatus ? zodResolver.resolveResponseStatusName(node, successStatus) : undefined
 
-      const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: pluginZod.resolver.resolveParamName(node, p) }))
+      const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.resolveParamName(node, p) }))
 
       return {
         tool: {

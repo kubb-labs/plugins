@@ -1,8 +1,9 @@
 import path from 'node:path'
 
 import { ast, defineGenerator } from '@kubb/core'
-import { pluginTsName } from '@kubb/plugin-ts'
-import { pluginZodName } from '@kubb/plugin-zod'
+import type { NormalizedPlugin } from '@kubb/core'
+import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
+import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
@@ -16,15 +17,15 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
 
-    const pluginTs = driver.getPlugin(pluginTsName)
+    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
 
-    if (!pluginTs?.resolver) {
+    if (!pluginTs) {
       return null
     }
 
     const tsResolver = pluginTs.resolver
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
+    const pluginZod = (parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined) as NormalizedPlugin<PluginZod> | undefined
     const zodResolver = pluginZod?.resolver
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)

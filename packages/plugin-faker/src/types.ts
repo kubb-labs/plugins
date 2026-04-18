@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver, UserGroup } from '@kubb/core'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -143,7 +143,7 @@ type ResolvedOptions = {
   printer: Options['printer']
 }
 
-export type PluginFaker = PluginFactoryOptions<'plugin-faker', Options, ResolvedOptions, never, ResolvePathOptions, ResolverFaker>
+export type PluginFaker = PluginFactoryOptions<'plugin-faker', Options, ResolvedOptions, never, object, ResolverFaker>
 
 declare global {
   namespace Kubb {

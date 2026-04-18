@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver, UserGroup } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => unknown[]
@@ -183,7 +183,7 @@ type ResolvedOptions = {
   transformers: NonNullable<Options['transformers']>
 }
 
-export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, never, ResolvePathOptions, ResolverVueQuery>
+export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, never, object, ResolverVueQuery>
 
 declare global {
   namespace Kubb {

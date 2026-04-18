@@ -8,7 +8,6 @@ import type {
   Override,
   PluginFactoryOptions,
   ResolveNameParams,
-  ResolvePathOptions,
   Resolver,
   UserGroup,
 } from '@kubb/core'
@@ -85,7 +84,7 @@ type ResolvedOptions = {
   resolver: ResolverMsw
 }
 
-export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, ResolvePathOptions, ResolverMsw>
+export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, object, ResolverMsw>
 
 declare global {
   namespace Kubb {
