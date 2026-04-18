@@ -11,7 +11,7 @@ export const orderSchema = z.object({
   quantity: z.optional(z.int()),
   shipDate: z.optional(z.string()),
   status: z.optional(z.enum(['placed', 'approved', 'delivered'])),
-  http_status: z.optional(z.union([z.literal(200), z.literal(400)])),
+  http_status: z.optional(z.union([z.literal(200), z.literal(400), z.literal(500)])),
   value: z.optional(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(3.5), z.literal(4)])),
   complete: z.optional(z.boolean()),
 })
