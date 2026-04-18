@@ -1,7 +1,9 @@
 import path from 'node:path'
+import type { NormalizedPlugin } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 import { Client } from '@kubb/plugin-client'
+import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 
@@ -15,13 +17,13 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
     const { output, importPath, dataReturnType, pathParamsType, paramsType, paramsCasing, parser } = ctx.options
     const baseURL = adapter.inputNode?.meta?.baseURL
 
-    const pluginTs = driver.getPlugin(pluginTsName)
+    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
     if (!pluginTs?.resolver) return null
 
     const tsResolver = pluginTs.resolver
     const root = path.resolve(config.root, config.output.path)
 
-    const transformedNode = plugin.transformer ? node : node
+    const transformedNode = node
     const name = resolver.resolveName(transformedNode.operationId)
 
     const clientFile = resolver.resolveFile(
