@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator } from '@kubb/core'
+import { type Group, ast, defineGenerator } from '@kubb/core'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
 import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -21,10 +21,10 @@ export const clientGenerator = defineGenerator<PluginClient>({
       return null
     }
 
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
 
-    const pluginZod = (parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined)
-    const zodResolver = pluginZod?.resolver
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
+    const zodResolver = pluginZod ? (driver.getResolver(pluginZodName) as PluginZod['resolver']) : undefined
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
     const pathParams = casedParams.filter((p) => p.in === 'path')
@@ -54,7 +54,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group as Group | undefined as Group | undefined,
         },
       ),
       fileZod:
@@ -64,7 +64,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
               {
                 root,
                 output: pluginZod.options.output ?? output,
-                group: pluginZod.options.group,
+                group: pluginZod.options.group as Group | undefined,
               },
             )
           : undefined,

@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator } from '@kubb/core'
+import { type Group, ast, defineGenerator } from '@kubb/core'
 import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -26,7 +26,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       return
     }
 
-    const zodResolver = pluginZod.resolver
+    const zodResolver = driver.getResolver(pluginZodName) as PluginZod['resolver']
 
     const name = 'server'
     const serverFilePath = path.resolve(root, output.path, 'server.ts')
@@ -56,7 +56,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         {
           root,
           output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group,
+          group: pluginZod.options?.group as Group | undefined as Group | undefined,
         },
       )
 

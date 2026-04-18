@@ -41,7 +41,7 @@ export function loginUserQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = loginUserQueryKey(params)
-  return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse, typeof queryKey>({
+  return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse>({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUser(toValue(params), { ...config, signal: config.signal ?? signal })

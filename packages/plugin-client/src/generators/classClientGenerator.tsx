@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { camelCase, pascalCase } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import type { Group, ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -54,21 +54,21 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
     const tsPluginOptions = pluginTs.options
-    const pluginZod = (parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined)
-    const zodResolver = pluginZod?.resolver
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
+    const zodResolver = pluginZod ? (driver.getResolver(pluginZodName) as PluginZod['resolver']) : undefined
 
     function buildOperationData(node: ast.OperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },
+        { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group as Group | undefined },
       )
       const zodFile =
         zodResolver && pluginZod?.options
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options.output ?? output, group: pluginZod.options.group },
+              { root, output: pluginZod.options.output ?? output, group: pluginZod.options.group as Group | undefined },
             )
           : undefined
 
