@@ -1,5 +1,4 @@
 import path from 'node:path'
-import type { NormalizedPlugin } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -21,7 +20,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const { adapter, config, resolver, plugin, driver, root } = ctx
     const { output, paramsCasing, group } = ctx.options
 
-    const pluginZod = driver.getPlugin(pluginZodName) as NormalizedPlugin<PluginZod> | undefined
+    const pluginZod = driver.getPlugin(pluginZodName)
 
     if (!pluginZod) {
       return

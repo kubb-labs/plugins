@@ -1,5 +1,4 @@
 import path from 'node:path'
-import type { NormalizedPlugin } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import { Client, type PluginClient, pluginClientName } from '@kubb/plugin-client'
 import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
@@ -17,7 +16,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const { adapter, config, driver, resolver, root } = ctx
     const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, transformers, customOptions } = ctx.options
 
-    const pluginTs = driver.getPlugin(pluginTsName) as NormalizedPlugin<PluginTs> | undefined
+    const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
     const tsResolver = pluginTs.resolver
 
@@ -62,7 +61,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     ].filter((name): name is string => !!name)
 
     const pluginZodRaw = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const pluginZod = (pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined) as NormalizedPlugin<PluginZod> | undefined
+    const pluginZod = (pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined)
     const zodResolver = pluginZod?.resolver
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
@@ -75,7 +74,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
         ? [zodResolver.resolveResponseName?.(node), node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
         : []
 
-    const clientPlugin = driver.getPlugin(pluginClientName) as NormalizedPlugin<PluginClient> | undefined
+    const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
 
