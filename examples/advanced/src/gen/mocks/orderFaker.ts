@@ -12,7 +12,7 @@ export function orderFaker(data?: Partial<Order>): Order {
       type: faker.string.alpha(),
       shipDate: faker.date.anytime().toISOString(),
       status: faker.helpers.arrayElement<any>(['working', 'idle']),
-      http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400]),
+      http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
       complete: faker.datatype.boolean(),
     },
     ...(data || {}),

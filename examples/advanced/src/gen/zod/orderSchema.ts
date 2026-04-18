@@ -15,7 +15,7 @@ export const orderSchema = z.object({
   shipDate: z.iso.datetime({ offset: true }).optional(),
   status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
   http_status: z
-    .union([z.literal(200), z.literal(400)])
+    .union([z.literal(200), z.literal(400), z.literal(500)])
     .optional()
     .describe('HTTP Status'),
   complete: z.boolean().optional(),
