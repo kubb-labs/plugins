@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator, type Group } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -43,7 +43,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group as Group | undefined as Group | undefined,
+          group: pluginTs.options?.group,
         },
       ),
     } as const

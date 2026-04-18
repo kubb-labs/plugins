@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator, type Group } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -56,7 +56,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         {
           root,
           output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group as Group | undefined as Group | undefined,
+          group: pluginZod.options?.group,
         },
       )
 

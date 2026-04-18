@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { camelCase, pascalCase } from '@internals/utils'
-import type { ast, Group } from '@kubb/core'
+import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -62,13 +62,13 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     function buildOperationData(node: ast.OperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group as Group | undefined },
+        { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },
       )
       const zodFile =
         zodResolver && pluginZod?.options
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options.output ?? output, group: pluginZod.options.group as Group | undefined },
+              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group },
             )
           : undefined
 

@@ -1,4 +1,4 @@
-import { defineGenerator, type Group } from '@kubb/core'
+import { defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -26,7 +26,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
             root,
             fakerResolver: driver.getResolver(pluginFakerName),
             fakerOutput: fakerPlugin.options?.output ?? output,
-            fakerGroup: fakerPlugin.options?.group as Group | undefined,
+            fakerGroup: fakerPlugin.options?.group,
           })
         : undefined
 
@@ -37,7 +37,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const type = {
       file: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group as Group | undefined as Group | undefined },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
       ),
       responseName: tsResolver.resolveResponseName(node),
     }

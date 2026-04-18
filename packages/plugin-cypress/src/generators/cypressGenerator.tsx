@@ -1,4 +1,4 @@
-import { ast, defineGenerator, type Group } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
@@ -41,7 +41,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group as Group | undefined as Group | undefined,
+          group: pluginTs.options?.group,
         },
       ),
     } as const

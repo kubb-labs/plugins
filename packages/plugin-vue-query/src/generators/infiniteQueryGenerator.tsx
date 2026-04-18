@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator, type Group } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -52,7 +52,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group as Group | undefined as Group | undefined },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
       ),
     }
 
@@ -75,7 +75,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group as Group | undefined as Group | undefined },
+          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
         )
       : undefined
     const zodSchemaNames =
@@ -94,7 +94,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           {
             root,
             output: clientPlugin?.options?.output ?? output,
-            group: clientPlugin?.options?.group as Group | undefined as Group | undefined,
+            group: clientPlugin?.options?.group,
           },
         )
       : undefined

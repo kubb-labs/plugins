@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { ast, defineGenerator, type Group } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -54,7 +54,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group as Group | undefined as Group | undefined,
+          group: pluginTs.options?.group,
         },
       ),
       fileZod:
@@ -64,7 +64,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
               {
                 root,
                 output: pluginZod.options.output ?? output,
-                group: pluginZod.options.group as Group | undefined,
+                group: pluginZod.options?.group,
               },
             )
           : undefined,
