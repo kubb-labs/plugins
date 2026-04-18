@@ -25,7 +25,7 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "^10.4.0",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
@@ -38,9 +38,9 @@
     "@tanstack/query-core": "^5.99.0",
     "@tanstack/react-query": "^5.99.0",
     "@tanstack/vue-query": "^5.99.0",
-    "@types/react": "^19.2.14",
+    "@types/react": "catalog:",
     "axios": "^1.15.0",
-    "cypress": "~14.3.3",
+    "cypress": "^15.14.0",
     "msw": "^2.13.4",
     "react": "^19.2.5",
     "solid-js": "^1.9.12",
@@ -54,7 +54,7 @@
     "@kubb/agent": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:",
-    "typescript": "^5.9.3"
+    "typescript": "catalog:"
   },
   "packageManager": "pnpm@10.30.1",
   "engines": {
