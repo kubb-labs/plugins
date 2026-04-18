@@ -4,7 +4,10 @@
 */
 
 import { resultSchema } from "./resultSchema.ts";
+import { typeARequestSchema } from "./typeARequestSchema.ts";
 
 export const createReturnTypeAStatus200Schema = resultSchema
 
 export const createReturnTypeAResponseSchema = createReturnTypeAStatus200Schema
+
+export const createReturnTypeADataSchema = typeARequestSchema

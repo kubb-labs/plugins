@@ -7,6 +7,7 @@ import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from 
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
+import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsQueryKey = (params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize }) =>
@@ -24,6 +25,8 @@ export async function findPetsByTags(
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+
+  return { ...res, data: FindPetsByTagsResponse.parse(res.data) }
 }
 
 export function findPetsByTagsQueryOptions(

@@ -1,5 +1,5 @@
 import { ast, defineGenerator, type Group } from '@kubb/core'
-import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
@@ -27,7 +27,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return
     }
 
-    const tsResolver = ctx.driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = ctx.driver.getResolver(pluginTsName)
 
     const schemaNode = resolveSchemaRef(node, adapter.inputNode.schemas)
     const schemaName = schemaNode.name ?? node.name
@@ -104,7 +104,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return
     }
 
-    const tsResolver = ctx.driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = ctx.driver.getResolver(pluginTsName)
 
     const params = ast.caseParams(node.parameters, paramsCasing)
     const paramEntries = params.map((param) => ({

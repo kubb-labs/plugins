@@ -7,6 +7,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
+import { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from './CreateUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const createUsersWithListInputQueryKey = (data?: CreateUsersWithListInputData) => [{ url: '/user/createWithList' }, ...(data ? [data] : [])] as const
@@ -22,7 +23,7 @@ export async function createUsersWithListInput(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
+  const requestData = CreateUsersWithListInputData.parse(data)
 
   const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
@@ -30,6 +31,8 @@ export async function createUsersWithListInput(
     data: requestData,
     ...requestConfig,
   })
+
+  return CreateUsersWithListInputResponse.parse(res.data)
 }
 
 export function createUsersWithListInputQueryOptions(

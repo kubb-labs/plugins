@@ -1,8 +1,8 @@
 import path from 'node:path'
 import { ast, defineGenerator, type Group } from '@kubb/core'
-import { Client, type PluginClient, pluginClientName } from '@kubb/plugin-client'
-import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
-import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
+import { Client, pluginClientName } from '@kubb/plugin-client'
+import { pluginTsName } from '@kubb/plugin-ts'
+import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
@@ -31,7 +31,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
-    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
     const isMutation =
@@ -84,7 +84,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     ].filter((name): name is string => !!name && name !== queryKeyTypeName)
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? (driver.getResolver(pluginZodName) as PluginZod['resolver']) : undefined
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
@@ -99,7 +99,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
-    const clientResolver = shouldUseClientPlugin ? (driver.getResolver(pluginClientName) as PluginClient['resolver']) : undefined
+    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : undefined
 
     const clientFile = shouldUseClientPlugin
       ? clientResolver?.resolveFile(

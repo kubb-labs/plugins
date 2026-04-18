@@ -7,6 +7,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
 import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400 } from './GetPetById'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
+import { GetPetByIdResponse } from './GetPetById'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const getPetByIdQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
@@ -20,6 +21,8 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
+
+  return GetPetByIdResponse.parse(res.data)
 }
 
 export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {

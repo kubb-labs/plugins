@@ -120,6 +120,12 @@ describe('mswGenerator operation', () => {
       return undefined
     }) as typeof driver.getPlugin
 
+    driver.getResolver = ((pluginName: string) => {
+      if (pluginName === 'plugin-ts') return mockedTsPlugin.resolver
+      if (pluginName === pluginFakerName) return mockedFakerPlugin.resolver
+      return undefined
+    }) as typeof driver.getResolver
+
     await renderGeneratorOperation(mswGenerator, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),

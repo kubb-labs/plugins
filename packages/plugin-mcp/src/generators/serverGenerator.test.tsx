@@ -65,6 +65,11 @@ describe('serverGenerator — Operations', () => {
       return originalGetPlugin(pluginName)
     }
 
+    driver.getResolver = ((pluginName: string) => {
+      if (pluginName === 'plugin-zod') return mockedZodPlugin.resolver
+      return mockedTsPlugin.resolver
+    }) as typeof driver.getResolver
+
     await renderGeneratorOperations(serverGenerator, nodes, {
       config: testConfig,
       adapter: createMockedAdapter(),

@@ -1,6 +1,6 @@
 import { defineGenerator, type Group } from '@kubb/core'
-import { type PluginFaker, pluginFakerName } from '@kubb/plugin-faker'
-import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
+import { pluginFakerName } from '@kubb/plugin-faker'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
@@ -24,7 +24,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       parser === 'faker' && fakerPlugin
         ? resolveFakerMeta(node, {
             root,
-            fakerResolver: driver.getResolver(pluginFakerName) as PluginFaker['resolver'],
+            fakerResolver: driver.getResolver(pluginFakerName),
             fakerOutput: fakerPlugin.options?.output ?? output,
             fakerGroup: fakerPlugin.options?.group as Group | undefined,
           })
@@ -32,7 +32,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
-    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
       file: tsResolver.resolveFile(

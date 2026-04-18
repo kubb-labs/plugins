@@ -1,5 +1,5 @@
 import { ast, defineGenerator, type Group } from '@kubb/core'
-import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
+import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
@@ -17,7 +17,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
       return null
     }
 
-    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
 

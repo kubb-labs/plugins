@@ -7,6 +7,7 @@ import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from 
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
+import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsInfiniteQueryKey = (params: {
@@ -27,6 +28,8 @@ export async function findPetsByTagsInfinite(
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+
+  return { ...res, data: FindPetsByTagsResponse.parse(res.data) }
 }
 
 export function findPetsByTagsInfiniteQueryOptions(

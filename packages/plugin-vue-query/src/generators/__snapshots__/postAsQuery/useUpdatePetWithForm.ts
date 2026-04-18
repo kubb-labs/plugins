@@ -8,6 +8,7 @@ import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFor
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { fetch } from './.kubb/fetch'
+import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
@@ -30,7 +31,7 @@ export async function updatePetWithForm(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
+  const requestData = UpdatePetWithFormData.parse(data)
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
@@ -39,6 +40,8 @@ export async function updatePetWithForm(
     data: requestData,
     ...requestConfig,
   })
+
+  return UpdatePetWithFormResponse.parse(res.data)
 }
 
 export function updatePetWithFormQueryOptions(
@@ -48,8 +51,8 @@ export function updatePetWithFormQueryOptions(
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const queryKey = updatePetWithFormQueryKey(petId, data, params)
-  return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormResponse, typeof queryKey>({
-    enabled: !!petId,
+  return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormResponse>({
+    enabled: () => !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
       return updatePetWithForm(toValue(petId), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })

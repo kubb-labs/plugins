@@ -34,8 +34,8 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
 export function getOrderByIdQueryOptions(orderId: MaybeRefOrGetter<GetOrderByIdPathOrderId>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getOrderByIdQueryKey(orderId)
-        return queryOptions<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdResponse, typeof queryKey>({
-         enabled: !!(orderId),
+        return queryOptions<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdResponse>({
+         enabled: () => !!(orderId),
          queryKey,
          queryFn: async ({ signal }) => {
             return getOrderById(toValue(orderId), { ...config, signal: config.signal ?? signal })

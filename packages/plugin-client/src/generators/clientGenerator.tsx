@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { ast, defineGenerator, type Group } from '@kubb/core'
-import { type PluginTs, pluginTsName } from '@kubb/plugin-ts'
-import { type PluginZod, pluginZodName } from '@kubb/plugin-zod'
+import { pluginTsName } from '@kubb/plugin-ts'
+import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
@@ -21,10 +21,10 @@ export const clientGenerator = defineGenerator<PluginClient>({
       return null
     }
 
-    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? (driver.getResolver(pluginZodName) as PluginZod['resolver']) : undefined
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
     const pathParams = casedParams.filter((p) => p.in === 'path')

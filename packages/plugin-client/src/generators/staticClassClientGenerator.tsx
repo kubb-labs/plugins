@@ -53,10 +53,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
-    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = driver.getResolver(pluginTsName)
     const tsPluginOptions = pluginTs.options
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? (driver.getResolver(pluginZodName) as PluginZod['resolver']) : undefined
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
 
     function buildOperationData(node: ast.OperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(

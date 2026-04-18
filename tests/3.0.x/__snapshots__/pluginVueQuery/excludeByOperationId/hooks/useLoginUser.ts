@@ -33,7 +33,7 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
 export function loginUserQueryOptions(params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = loginUserQueryKey(params)
-        return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse, typeof queryKey>({
+        return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse>({
 
          queryKey,
          queryFn: async ({ signal }) => {
