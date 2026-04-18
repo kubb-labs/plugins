@@ -1,8 +1,7 @@
 import path from 'node:path'
-import { defineGenerator, type Group } from '@kubb/core'
+import { defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 import { Client } from '@kubb/plugin-client'
-import type { PluginTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 
@@ -19,7 +18,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
-    const tsResolver = driver.getResolver(pluginTsName) as PluginTs['resolver']
+    const tsResolver = driver.getResolver(pluginTsName)
     const root = path.resolve(config.root, config.output.path)
 
     const transformedNode = node
@@ -32,7 +31,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
 
     const typeFile = tsResolver.resolveFile(
       { name: transformedNode.operationId, extname: '.ts', tag: transformedNode.tags[0] ?? 'default', path: transformedNode.path },
-      { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group as Group | undefined as Group | undefined },
+      { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
     )
 
     const requestName = transformedNode.requestBody?.schema ? tsResolver.resolveDataName(transformedNode) : undefined
