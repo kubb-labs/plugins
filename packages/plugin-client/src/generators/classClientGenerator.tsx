@@ -2,9 +2,9 @@ import path from 'node:path'
 import { camelCase, pascalCase } from '@internals/utils'
 import type { ast, Group } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
-import type { PluginZod } from '@kubb/plugin-zod'
+import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { ClassClient } from '../components/ClassClient'
@@ -14,8 +14,8 @@ import type { PluginClient } from '../types'
 type OperationData = {
   node: ast.OperationNode
   name: string
-  tsResolver: PluginTs['resolver']
-  zodResolver: PluginZod['resolver'] | undefined
+  tsResolver: ResolverTs
+  zodResolver: ResolverZod | undefined
   typeFile: ast.FileNode
   zodFile: ast.FileNode | undefined
 }
@@ -26,7 +26,7 @@ type Controller = {
   operations: Array<OperationData>
 }
 
-function resolveTypeImportNames(node: ast.OperationNode, tsResolver: PluginTs['resolver']): Array<string> {
+function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const names: Array<string | undefined> = [
     node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
     tsResolver.resolveResponseName(node),
@@ -38,7 +38,7 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: PluginTs['r
   return names.filter((n): n is string => Boolean(n))
 }
 
-function resolveZodImportNames(node: ast.OperationNode, zodResolver: PluginZod['resolver']): Array<string> {
+function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
   const names: Array<string | undefined> = [zodResolver.resolveResponseName?.(node), node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined]
   return names.filter((n): n is string => Boolean(n))
 }

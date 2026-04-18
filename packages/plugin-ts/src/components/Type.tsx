@@ -2,7 +2,7 @@ import { ast } from '@kubb/core'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
-import type { PluginTs } from '../types.ts'
+import type { PluginTs, ResolverTs } from '../types.ts'
 import { Enum, getEnumNames } from './Enum.tsx'
 
 type Props = {
@@ -16,7 +16,7 @@ type Props = {
   enumType: PluginTs['resolvedOptions']['enumType']
   enumTypeSuffix: PluginTs['resolvedOptions']['enumTypeSuffix']
   enumKeyCasing: PluginTs['resolvedOptions']['enumKeyCasing']
-  resolver: PluginTs['resolver']
+  resolver: ResolverTs
 }
 
 export function Type({ name, node, printer, enumType, enumTypeSuffix, enumKeyCasing, resolver }: Props): KubbReactNode {

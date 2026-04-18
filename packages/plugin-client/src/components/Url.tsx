@@ -1,6 +1,6 @@
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -17,7 +17,7 @@ type Props = {
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
 }
 
 type GetParamsProps = {
@@ -25,7 +25,7 @@ type GetParamsProps = {
   paramsType: PluginClient['resolvedOptions']['paramsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })

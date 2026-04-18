@@ -1,7 +1,7 @@
 import { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
-import type { PluginZod } from '@kubb/plugin-zod'
+import type { ResolverTs } from '@kubb/plugin-ts'
+import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
@@ -37,7 +37,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
   ].filter(Boolean) as Array<string>
 }
 
-export function buildGenerics(node: ast.OperationNode, tsResolver: PluginTs['resolver']): Array<string> {
+export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const responseName = tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
@@ -56,7 +56,7 @@ export function buildClassClientParams({
   node: ast.OperationNode
   path: URLPath
   baseURL: string | undefined
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
   isFormData: boolean
   headers: Array<string>
 }) {
@@ -107,7 +107,7 @@ export function buildRequestDataLine({
 }: {
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  zodResolver?: PluginZod['resolver']
+  zodResolver?: ResolverZod
 }): string {
   const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined
   if (parser === 'zod' && zodRequestName) {
@@ -132,7 +132,7 @@ export function buildReturnStatement({
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  zodResolver?: PluginZod['resolver']
+  zodResolver?: ResolverZod
 }): string {
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : undefined
   if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {

@@ -1,6 +1,6 @@
 import { URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -11,7 +11,7 @@ type Props = {
   name: string
   typeName: string
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'
   transformer: Transformer | undefined
@@ -58,7 +58,7 @@ function printType(typeNode: ast.ParamsTypeNode | undefined): string {
 
 function getParams(
   node: ast.OperationNode,
-  options: { pathParamsType: 'object' | 'inline'; paramsCasing: 'camelcase' | undefined; resolver: PluginTs['resolver'] },
+  options: { pathParamsType: 'object' | 'inline'; paramsCasing: 'camelcase' | undefined; resolver: ResolverTs },
 ): ast.FunctionParametersNode {
   return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
 }

@@ -1,5 +1,5 @@
 import { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -12,7 +12,7 @@ type Props = {
   clientName: string
   queryKeyName: string
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
   paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginVueQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
@@ -28,7 +28,7 @@ export function getQueryOptionsParams(
     paramsType: PluginVueQuery['resolvedOptions']['paramsType']
     paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
-    resolver: PluginTs['resolver']
+    resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
   const { paramsType, paramsCasing, pathParamsType, resolver } = options
