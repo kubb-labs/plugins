@@ -55,8 +55,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
-          output: pluginZod.resolvedOptions.output ?? output,
-          group: pluginZod.resolvedOptions.group,
+          output: pluginZod.options?.output ?? output,
+          group: pluginZod.options?.group,
         },
       )
 

@@ -42,8 +42,8 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
-          output: pluginTs.resolvedOptions.output ?? output,
-          group: pluginTs.resolvedOptions.group,
+          output: pluginTs.options?.output ?? output,
+          group: pluginTs.options?.group,
         },
       ),
     } as const

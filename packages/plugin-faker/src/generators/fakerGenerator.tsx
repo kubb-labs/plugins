@@ -38,7 +38,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeName: tsResolver.resolveTypeName(schemaName),
       typeFile: tsResolver.resolveFile(
         { name: schemaName, extname: '.ts' },
-        { root, output: pluginTs.resolvedOptions.output ?? output, group: pluginTs.resolvedOptions.group },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
       ),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
@@ -146,8 +146,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         },
         {
           root,
-          output: pluginTs.resolvedOptions.output ?? output,
-          group: pluginTs.resolvedOptions.group,
+          output: pluginTs.options?.output ?? output,
+          group: pluginTs.options?.group,
         },
       ),
     } as const
