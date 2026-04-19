@@ -19,7 +19,7 @@ module.exports = defineConfig(() => {
       },
       adapter: adapterOas(),
       hooks: {
-        done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
+        done: ['npm run typecheck'],
       },
       plugins: [
         pluginTs({
@@ -53,7 +53,7 @@ module.exports = defineConfig(() => {
       },
       adapter: adapterOas(),
       hooks: {
-        done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
+        done: ['npm run typecheck'],
       },
       plugins: [
         pluginTs({

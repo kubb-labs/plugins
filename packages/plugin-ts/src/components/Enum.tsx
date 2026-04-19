@@ -13,6 +13,7 @@ type Props = {
   enumTypeSuffix: PluginTs['resolvedOptions']['enumTypeSuffix']
   enumKeyCasing: PluginTs['resolvedOptions']['enumKeyCasing']
   resolver: ResolverTs
+  key?: string | number | null
 }
 
 /**

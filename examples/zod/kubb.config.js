@@ -13,9 +13,7 @@ export default defineConfig([
       path: './src/zod',
       clean: true,
     },
-    hooks: {
-      // done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
-    },
+    hooks: {},
     plugins: [
       pluginTs({
         output: {

@@ -20,7 +20,6 @@ export default defineConfig([
         '.ts': '',
       },
       format: 'auto',
-      lint: 'auto',
     },
     hooks: {
       done: ['npm run typecheck'],
