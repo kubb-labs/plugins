@@ -1,13 +1,13 @@
 definitions:
   Nullable:
-    type: ["object", "null"]
+    type: ['object', 'null']
     properties:
       foo:
-        type: ["string", "null"]
+        type: ['string', 'null']
 openapi: 3.1.0
 info:
   title: test
-  version: "1.0.0"
+  version: '1.0.0'
 paths:
   /names:
     get:
@@ -17,11 +17,11 @@ paths:
         200:
           description: Success
           schema:
-            $ref: "#/definitions/Nullable"
+            $ref: '#/definitions/Nullable'
 components:
   schemas:
     Nullable:
-      type: ["object", "null"]
+      type: ['object', 'null']
       properties:
         foo:
-          type: ["string", "null"]
+          type: ['string', 'null']

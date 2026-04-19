@@ -3,9 +3,9 @@ openapi: 3.0.1
 info:
   title: Example Schema
 servers:
-- url: http://localhost/
+  - url: http://localhost/
 paths:
-  "/example":
+  '/example':
     get:
       responses:
         '200':
@@ -13,11 +13,11 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Example"
+                '$ref': '#/components/schemas/Example'
 components:
   schemas:
     Example:
       type: object
       properties:
         nestedExamples:
-          "$ref": "#/components/schemas/Example"
+          '$ref': '#/components/schemas/Example'

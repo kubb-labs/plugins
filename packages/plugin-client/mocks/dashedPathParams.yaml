@@ -18,9 +18,9 @@ paths:
           schema:
             type: string
             format: uuid
-            example: "1397bb88-7985-4ed1-8b97-9bf05470a31c"
+            example: '1397bb88-7985-4ed1-8b97-9bf05470a31c'
       responses:
-        "200":
+        '200':
           description: Successful response
           content:
             application/json:
@@ -34,11 +34,11 @@ paths:
                   status:
                     type: string
                     description: Status of the request
-                    example: "success"
+                    example: 'success'
                   message:
                     type: string
                     description: Descriptive message about the result
-                    example: "Request was successful."
+                    example: 'Request was successful.'
                   data:
                     type: object
                     required:
@@ -49,8 +49,8 @@ paths:
                         type: string
                         description: Unique identifier for the organization
                         format: uuid
-                        example: "bef6d36f-6e75-414f-8f1e-29f853dfd045"
+                        example: 'bef6d36f-6e75-414f-8f1e-29f853dfd045'
                       name:
                         type: string
                         description: Name of the organization
-                        example: "Organization name"
+                        example: 'Organization name'

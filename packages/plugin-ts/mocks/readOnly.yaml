@@ -17,7 +17,7 @@ components:
         attribute_writeOnly:
           description: not required
           type: integer
-          writeOnly:  true
+          writeOnly: true
         attribute_with_ref:
           $ref: '#/components/schemas/attribute_readonly'
         attribute_with_ref_readonly:

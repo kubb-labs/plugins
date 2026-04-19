@@ -1,18 +1,18 @@
 openapi: 3.1.0
 info:
   title: test
-  version: "1.0.0"
+  version: '1.0.0'
 
 components:
   schemas:
     enumNullable:
       type:
-       - "string"
-       - "null"
+        - 'string'
+        - 'null'
       enum:
-      - Pending
-      - Received
-      - null
+        - Pending
+        - Received
+        - null
     enumBooleanLiteral:
       type: boolean
       enum:
@@ -27,7 +27,7 @@ paths:
   /var-names:
     get:
       consumes:
-      - application/json
+        - application/json
       responses:
         200:
           description: Success

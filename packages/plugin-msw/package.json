@@ -3,47 +3,41 @@
   "version": "5.0.0-alpha.35",
   "description": "Mock Service Worker (MSW) handlers generator plugin for Kubb, creating API mocks from OpenAPI specifications for frontend development and testing.",
   "keywords": [
-    "msw",
-    "mock-service-worker",
     "api-mocking",
-    "mocking",
-    "mocks",
-    "testing",
-    "development",
-    "interceptor",
-    "typescript",
-    "openapi",
-    "swagger",
-    "oas",
     "code-generator",
     "codegen",
+    "development",
+    "interceptor",
+    "kubb",
+    "mock-service-worker",
+    "mocking",
+    "mocks",
+    "msw",
+    "oas",
+    "openapi",
     "plugins",
-    "kubb"
+    "swagger",
+    "testing",
+    "typescript"
   ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kubb-labs/kubb.git",
     "directory": "packages/plugin-msw"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "sideEffects": false,
+  "files": [
+    "src",
+    "dist",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./components": {
-      "import": "./dist/components.js",
-      "require": "./dist/components.cjs"
-    },
-    "./generators": {
-      "import": "./dist/generators.js",
-      "require": "./dist/generators.cjs"
-    },
-    "./package.json": "./package.json"
-  },
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
@@ -61,20 +55,25 @@
       ]
     }
   },
-  "files": [
-    "src",
-    "dist",
-    "!/**/**.test.**",
-    "!/**/__tests__/**",
-    "!/**/__snapshots__/**"
-  ],
-  "size-limit": [
-    {
-      "path": "./dist/*.js",
-      "limit": "510 KiB",
-      "gzip": true
-    }
-  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./components": {
+      "import": "./dist/components.js",
+      "require": "./dist/components.cjs"
+    },
+    "./generators": {
+      "import": "./dist/generators.js",
+      "require": "./dist/generators.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsdown && size-limit",
     "clean": "npx rimraf ./dist",
@@ -95,16 +94,17 @@
   "devDependencies": {
     "@internals/utils": "workspace:*"
   },
-  "engines": {
-    "node": ">=22"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:"
+  },
+  "size-limit": [
+    {
+      "path": "./dist/*.js",
+      "limit": "510 KiB",
+      "gzip": true
+    }
+  ],
+  "engines": {
+    "node": ">=22"
   }
 }

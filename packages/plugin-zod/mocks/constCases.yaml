@@ -11,15 +11,15 @@ components:
     NullableString:
       type:
         - string
-        - "null"
+        - 'null'
     NullableStringWithAnyOf:
       anyOf:
         - type: string
-        - type: "null"
+        - type: 'null'
     NullableStringUuid:
       type:
         - string
-        - "null"
+        - 'null'
       format: uuid
     NullConst:
       required: true
@@ -34,7 +34,7 @@ components:
         - foobar
       properties:
         foobar:
-          const: "foobar"
+          const: 'foobar'
     NumberValueConst:
       description: its value is equal to the value of the keyword
       required:
@@ -45,8 +45,8 @@ components:
     MixedValueTypeConst:
       description: This probably should fail miserably
       required:
-      - foobar
+        - foobar
       properties:
         foobar:
-          const: "foobar"
+          const: 'foobar'
           type: number

@@ -11,7 +11,7 @@ components:
           title: File
           type: string
       required:
-      - file
+        - file
       title: Body_upload_file_api_assets_post
       type: object
       $comment: |
@@ -49,4 +49,3 @@ components:
       format: uuid
       title: UUID
       type: string
-

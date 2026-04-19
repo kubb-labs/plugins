@@ -1,34 +1,21 @@
 {
   "name": "@internals/tanstack-query",
   "version": "0.0.0",
+  "private": true,
   "description": "Shared components and types for Kubb TanStack Query plugins (react-query, solid-query, svelte-query, vue-query, swr).",
   "keywords": [
-    "kubb",
+    "codegen",
     "internal",
+    "kubb",
     "query",
-    "typescript",
-    "codegen"
+    "typescript"
   ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kubb-labs/kubb.git",
     "directory": "internals/tanstack-query"
-  },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "private": true,
-  "sideEffects": false,
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {}
   },
   "files": [
     "src",
@@ -37,6 +24,21 @@
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"
   ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {}
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "build": "tsdown",
     "clean": "npx rimraf ./dist",
@@ -52,14 +54,12 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"
   },
-  "peerDependencies": {
-    "@kubb/renderer-jsx": "catalog:"
-  },
   "devDependencies": {
     "@types/node": "catalog:"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "peerDependencies": {
+    "@kubb/renderer-jsx": "catalog:"
+  },
   "engines": {
     "node": ">=22"
   }

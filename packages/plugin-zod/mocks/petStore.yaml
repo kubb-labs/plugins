@@ -186,7 +186,7 @@ components:
           format: email
         pattern:
           type: string
-          pattern: "^[a-zA-Z0-9]{3}$"
+          pattern: '^[a-zA-Z0-9]{3}$'
         tag:
           type: string
           maxLength: 100
@@ -238,11 +238,12 @@ components:
             - type: string
     Pets:
       type: array
-      items: {
-        type: 'object',
-        required: ['id', 'name'],
-        properties: { id: { type: 'integer', format: 'int64' }, name: { type: 'string' }, tag: { type: 'string' } },
-      }
+      items:
+        {
+          type: 'object',
+          required: ['id', 'name'],
+          properties: { id: { type: 'integer', format: 'int64' }, name: { type: 'string' }, tag: { type: 'string' } },
+        }
 
     Image:
       example: linode/debian10

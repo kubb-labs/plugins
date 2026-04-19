@@ -14,15 +14,15 @@ components:
         exclusiveMax:
           type: number
           exclusiveMaximum: 10
-        exclusiveRange: 
+        exclusiveRange:
           type: number
           exclusiveMaximum: 9.99
           exclusiveMinimum: 0.01
-        strictMinExclusiveMaxRange: 
+        strictMinExclusiveMaxRange:
           type: number
           exclusiveMaximum: 1000
           minimum: 0
-        strictMaxExclusiveMinRange: 
+        strictMaxExclusiveMinRange:
           type: number
           maximum: 1000
           exclusiveMinimum: 0

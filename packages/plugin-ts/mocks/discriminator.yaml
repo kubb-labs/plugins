@@ -48,8 +48,8 @@ components:
             - createdAt
             - isSeen
         - oneOf:
-            - $ref: "#/components/schemas/DocumentDisapprovedNotification"
-            - $ref: "#/components/schemas/DocumentApprovedNotification"
+            - $ref: '#/components/schemas/DocumentDisapprovedNotification'
+            - $ref: '#/components/schemas/DocumentApprovedNotification'
           discriminator:
             propertyName: notificationType
 
@@ -59,10 +59,10 @@ components:
         - type
       type: object
       oneOf:
-        - $ref: "#/components/schemas/EnumerationValueSpecificationDto"
-        - $ref: "#/components/schemas/RangeValueSpecificationDto"
-        - $ref: "#/components/schemas/RegexValueSpecificationDto"
-        - $ref: "#/components/schemas/SliderValueSpecificationDto"
+        - $ref: '#/components/schemas/EnumerationValueSpecificationDto'
+        - $ref: '#/components/schemas/RangeValueSpecificationDto'
+        - $ref: '#/components/schemas/RegexValueSpecificationDto'
+        - $ref: '#/components/schemas/SliderValueSpecificationDto'
       properties:
         type:
           type: string
@@ -77,10 +77,10 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          enum: "#/components/schemas/EnumerationValueSpecificationDto"
-          range: "#/components/schemas/RangeValueSpecificationDto"
-          regex: "#/components/schemas/RegexValueSpecificationDto"
-          slider: "#/components/schemas/SliderValueSpecificationDto"
+          enum: '#/components/schemas/EnumerationValueSpecificationDto'
+          range: '#/components/schemas/RangeValueSpecificationDto'
+          regex: '#/components/schemas/RegexValueSpecificationDto'
+          slider: '#/components/schemas/SliderValueSpecificationDto'
 
     EnumerationValueSpecificationDto:
       title: EnumerationValueSpecification
@@ -149,9 +149,9 @@ components:
           minLength: 1
           readOnly: true
         left_text:
-          $ref: "#/components/schemas/LocalizedTextDto"
+          $ref: '#/components/schemas/LocalizedTextDto'
         right_text:
-          $ref: "#/components/schemas/LocalizedTextDto"
+          $ref: '#/components/schemas/LocalizedTextDto'
         max_value:
           type: integer
           format: int32
@@ -177,7 +177,7 @@ components:
       type: object
       properties:
         withoutValue:
-          type: "null"
+          type: 'null'
           const: null
       required:
         - withoutValue
@@ -188,7 +188,7 @@ components:
       properties:
         foobar:
           type: string
-          const: "foobar"
+          const: 'foobar'
       required:
         - foobar
 
@@ -253,20 +253,20 @@ components:
     CatDog:
       title: CatDog
       oneOf:
-        - $ref: "#/components/schemas/Cat"
-        - $ref: "#/components/schemas/Dog"
+        - $ref: '#/components/schemas/Cat'
+        - $ref: '#/components/schemas/Dog'
       discriminator:
         propertyName: type
         mapping:
-          Cat: "#/components/schemas/Cat"
-          Dog: "#/components/schemas/Dog"
-          Bulldog: "#/components/schemas/Dog"
+          Cat: '#/components/schemas/Cat'
+          Dog: '#/components/schemas/Dog'
+          Bulldog: '#/components/schemas/Dog'
 
     CatDogWithoutMapping:
       title: CatDogWithoutMapping
       oneOf:
-        - $ref: "#/components/schemas/Cat"
-        - $ref: "#/components/schemas/Dog"
+        - $ref: '#/components/schemas/Cat'
+        - $ref: '#/components/schemas/Dog'
       discriminator:
         propertyName: type
 
@@ -311,7 +311,7 @@ components:
 
     Vehicle:
       type: object
-      required: [ type ]
+      required: [type]
       properties:
         type:
           type: string
@@ -327,7 +327,7 @@ components:
       properties:
         doors:
           type: integer
-      required: [ type ]
+      required: [type]
 
     # Issue #2072: Circular discriminator pattern (parent has oneOf referencing children, children extend parent via allOf)
     PaymentDetailsTypeResponse:
