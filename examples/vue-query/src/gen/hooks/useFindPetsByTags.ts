@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { QueryClient, QueryKey, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus400 } from '../models/FindPetsByTags.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
-import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../models/FindPetsByTags.ts'
 
 export const findPetsByTagsQueryKey = (params?: MaybeRefOrGetter<{ tags?: FindPetsByTagsQueryTags }>) =>
   [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
@@ -26,7 +26,7 @@ export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByTags',
+    url: `/pet/findByTags`,
     params,
     ...requestConfig,
   })

@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { QueryClient, QueryKey, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
-import { queryOptions, useQuery } from '@tanstack/vue-query'
+import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../models/LoginUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
-import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from '../models/LoginUser.ts'
 
 export const loginUserQueryKey = (params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>) =>
   [{ url: '/user/login' }, ...(params ? [params] : [])] as const
@@ -28,7 +28,7 @@ export async function loginUser(
 
   const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
-    url: '/user/login',
+    url: `/user/login`,
     params,
     ...requestConfig,
   })

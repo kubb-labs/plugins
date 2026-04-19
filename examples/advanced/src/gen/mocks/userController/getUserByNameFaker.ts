@@ -1,6 +1,6 @@
-import { faker } from '@faker-js/faker'
 import type { GetUserByNameResponse, GetUserByNameStatus200 } from '../../models/ts/userController/GetUserByName.ts'
 import { userFaker } from '../userFaker.ts'
+import { faker } from '@faker-js/faker'
 
 export function getUserByNamePathUsernameFaker(data?: string): string {
   return data ?? faker.string.alpha()

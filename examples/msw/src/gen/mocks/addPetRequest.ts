@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { AddPetRequest } from '../models/AddPetRequest.ts'
 import { category } from './category.ts'
 import { tag } from './tag.ts'
+import { faker } from '@faker-js/faker'
 
 export function addPetRequest(data?: Partial<AddPetRequest>): AddPetRequest {
   faker.seed([220])

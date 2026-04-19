@@ -1,6 +1,5 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type {
   UpdatePetData,
@@ -9,9 +8,10 @@ import type {
   UpdatePetStatus404,
   UpdatePetStatus405,
 } from '../../../models/ts/petController/UpdatePet.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdatePetUrl() {
-  const res = { method: 'PUT', url: '/pet' as const }
+  const res = { method: 'PUT', url: `/pet` as const }
 
   return res
 }

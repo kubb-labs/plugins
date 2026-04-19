@@ -1,7 +1,7 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type { GetInventoryResponse } from '../models/ts/GetInventory.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Returns a map of status codes to quantities
@@ -11,8 +11,8 @@ import type { GetInventoryResponse } from '../models/ts/GetInventory.js'
 export async function getInventoryHandler(): Promise<Promise<CallToolResult>> {
   const res = await fetch<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
-    url: '/store/inventory',
-    baseURL: 'https://petstore.swagger.io/v2',
+    url: `/store/inventory`,
+    baseURL: `https://petstore.swagger.io/v2`,
   })
 
   return {

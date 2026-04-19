@@ -1,5 +1,5 @@
-import { http } from 'msw'
 import type { DeleteUserStatus400, DeleteUserStatus404 } from '../../models/ts/userController/DeleteUser.ts'
+import { http } from 'msw'
 
 export function deleteUserHandlerResponse400(data?: DeleteUserStatus400) {
   return new Response(JSON.stringify(data), {
@@ -16,7 +16,7 @@ export function deleteUserHandlerResponse404(data?: DeleteUserStatus404) {
 export function deleteUserHandler(
   data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Response | Promise<Response>),
 ) {
-  return http.delete('/user/:username', function handler(info) {
+  return http.delete(`/user/:username`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

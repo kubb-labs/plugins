@@ -1,5 +1,5 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
   UpdatePetData,
   UpdatePetResponse,
@@ -7,10 +7,10 @@ import type {
   UpdatePetStatus404,
   UpdatePetStatus405,
 } from '../../../models/ts/petController/UpdatePet.ts'
-import { updatePetDataSchema, updatePetResponseSchema } from '../../../zod/petController/updatePetSchema.ts'
+import { updatePetResponseSchema, updatePetDataSchema } from '../../../zod/petController/updatePetSchema.ts'
 
 export function getUpdatePetUrl() {
-  const res = { method: 'PUT', url: 'https://petstore3.swagger.io/api/v3/pet' as const }
+  const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/pet` as const }
 
   return res
 }

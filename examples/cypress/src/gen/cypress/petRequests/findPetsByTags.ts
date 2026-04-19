@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsQueryPage, FindPetsByTagsQueryPageSize, FindPetsByTagsQueryTags, FindPetsByTagsResponse } from '../../models.ts'
+import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryPage, FindPetsByTagsQueryPageSize, FindPetsByTagsResponse } from '../../models.ts'
 
 export function findPetsByTags(
   params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
@@ -12,7 +12,7 @@ export function findPetsByTags(
   return cy
     .request<FindPetsByTagsResponse>({
       method: 'GET',
-      url: 'http://localhost:3000/pet/findByTags',
+      url: `http://localhost:3000/pet/findByTags`,
       qs: params,
       ...options,
     })

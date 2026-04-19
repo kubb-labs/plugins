@@ -1,7 +1,7 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../models/ts/CreateUsersWithListInput.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Creates list of users with given input array
@@ -13,8 +13,8 @@ export async function createUsersWithListInputHandler({ data }: { data?: CreateU
 
   const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
-    url: '/user/createWithList',
-    baseURL: 'https://petstore.swagger.io/v2',
+    url: `/user/createWithList`,
+    baseURL: `https://petstore.swagger.io/v2`,
     data: requestData,
   })
 

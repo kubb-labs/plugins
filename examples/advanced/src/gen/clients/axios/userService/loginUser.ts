@@ -1,10 +1,10 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
-import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserResponse, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
 import { loginUserResponseSchema } from '../../../zod/userController/loginUserSchema.ts'
 
 export function getLoginUserUrl() {
-  const res = { method: 'GET', url: 'https://petstore3.swagger.io/api/v3/user/login' as const }
+  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/login` as const }
 
   return res
 }

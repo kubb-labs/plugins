@@ -1,6 +1,4 @@
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type {
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
@@ -9,6 +7,8 @@ import type {
   CreatePetsQueryOffset,
   CreatePetsResponse,
 } from '../../models/ts/petsController/CreatePets.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @summary Create a pet
@@ -34,7 +34,7 @@ export async function createPetsHandler({
   const res = await fetch<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: `/pets/${uuid}`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
     params: mappedParams,
     data: requestData,
     headers: { ...mappedHeaders },

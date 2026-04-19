@@ -4,7 +4,7 @@ export function placeOrderPatch(data?: PlaceOrderPatchData, options: Partial<Cyp
   return cy
     .request<PlaceOrderPatchResponse>({
       method: 'PATCH',
-      url: '/store/order',
+      url: `/store/order`,
       body: data,
       ...options,
     })

@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { http } from 'msw'
 import type { GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../../models/GetUserByName.ts'
+import { http } from 'msw'
 
 export function getUserByNameHandlerResponse200(data: GetUserByNameResponse) {
   return new Response(JSON.stringify(data), {
@@ -28,7 +28,7 @@ export function getUserByNameHandlerResponse404(data?: GetUserByNameStatus404) {
 }
 
 export function getUserByNameHandler(data?: GetUserByNameResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get('http://localhost:3000/user/:username', function handler(info) {
+  return http.get(`http://localhost:3000/user/:username`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

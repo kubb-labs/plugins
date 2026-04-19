@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../models.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../models.ts'
 
 export function uploadFile(
   petId: UploadFilePathPetId,

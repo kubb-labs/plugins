@@ -4,7 +4,7 @@ export function createUser(data?: CreateUserData, options: Partial<Cypress.Reque
   return cy
     .request<CreateUserResponse>({
       method: 'POST',
-      url: '/user',
+      url: `/user`,
       body: data,
       ...options,
     })
