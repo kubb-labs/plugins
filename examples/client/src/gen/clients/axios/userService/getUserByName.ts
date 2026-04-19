@@ -1,6 +1,5 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type {
   GetUserByNamePathUsername,
@@ -8,6 +7,7 @@ import type {
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from '../../../models/ts/userController/GetUserByName.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetUserByNameUrl({ username }: { username: GetUserByNamePathUsername }) {
   const res = { method: 'GET', url: `/user/${username}` as const }

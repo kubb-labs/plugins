@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse } from '../models.ts'
+import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse } from '../models.ts'
 
 export function deletePet(
   petId: DeletePetPathPetId,

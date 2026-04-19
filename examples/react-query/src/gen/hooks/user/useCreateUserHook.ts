@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import { fetch } from '../../.kubb/fetch.ts'
 import type { CreateUserData, CreateUserResponse } from '../../models/CreateUser.ts'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { fetch } from '../../.kubb/fetch.ts'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -24,7 +24,7 @@ export async function createUserHook(data?: CreateUserData, config: Partial<Requ
 
   const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
     method: 'POST',
-    url: '/user',
+    url: `/user`,
     data: requestData,
     ...requestConfig,
   })

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../models.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../models.ts'
 
 export function updateUser(
   username: UpdateUserPathUsername,

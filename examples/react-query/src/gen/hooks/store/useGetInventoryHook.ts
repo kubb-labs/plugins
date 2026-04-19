@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import { queryOptions } from '@tanstack/react-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import { fetch } from '../../.kubb/fetch.ts'
 import type { GetInventoryResponse } from '../../models/GetInventory.ts'
+import { fetch } from '../../.kubb/fetch.ts'
+import { queryOptions } from '@tanstack/react-query'
 
 export const getInventoryQueryKey = () => ['v5', { url: '/store/inventory' }] as const
 
@@ -20,7 +20,7 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export async function getInventoryHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: '/store/inventory', ...requestConfig })
+  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }

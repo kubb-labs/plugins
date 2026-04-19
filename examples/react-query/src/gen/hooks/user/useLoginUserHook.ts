@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { QueryClient, QueryKey, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { queryOptions, useQuery } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
+import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../models/LoginUser.ts'
+import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { fetch } from '../../.kubb/fetch.ts'
-import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from '../../models/LoginUser.ts'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
   ['v5', { url: '/user/login' }, ...(params ? [params] : [])] as const
@@ -27,7 +27,7 @@ export async function loginUserHook(
 
   const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
-    url: '/user/login',
+    url: `/user/login`,
     params,
     ...requestConfig,
   })

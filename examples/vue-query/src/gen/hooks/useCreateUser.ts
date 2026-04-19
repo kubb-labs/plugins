@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { useMutation } from '@tanstack/vue-query'
-import type { MaybeRefOrGetter } from 'vue'
 import type { CreateUserData, CreateUserResponse } from '../models/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import { useMutation } from '@tanstack/vue-query'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -24,7 +24,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 
   const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
     method: 'POST',
-    url: '/user',
+    url: `/user`,
     data: requestData,
     ...requestConfig,
   })

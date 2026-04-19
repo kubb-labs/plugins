@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
 import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/storeController/DeleteOrder.ts'
 import type { GetInventoryResponse } from './models/ts/storeController/GetInventory.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/storeController/GetOrderById.ts'
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from './models/ts/storeController/PlaceOrder.ts'
 import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models/ts/storeController/PlaceOrderPatch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getGetInventoryUrl() {
-  const res = { method: 'GET', url: '/store/inventory' as const }
+  const res = { method: 'GET', url: `/store/inventory` as const }
 
   return res
 }
@@ -35,7 +35,7 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
 }
 
 function getPlaceOrderUrl() {
-  const res = { method: 'POST', url: '/store/order' as const }
+  const res = { method: 'POST', url: `/store/order` as const }
 
   return res
 }
@@ -61,7 +61,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 }
 
 function getPlaceOrderPatchUrl() {
-  const res = { method: 'PATCH', url: '/store/order' as const }
+  const res = { method: 'PATCH', url: `/store/order` as const }
 
   return res
 }

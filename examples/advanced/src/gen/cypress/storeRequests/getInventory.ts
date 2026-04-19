@@ -4,7 +4,7 @@ export function getInventory(options: Partial<Cypress.RequestOptions> = {}): Cyp
   return cy
     .request<GetInventoryResponse>({
       method: 'GET',
-      url: '/store/inventory',
+      url: `/store/inventory`,
       ...options,
     })
     .then((res) => res.body)

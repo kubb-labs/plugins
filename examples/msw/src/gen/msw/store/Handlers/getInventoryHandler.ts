@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { http } from 'msw'
 import type { GetInventoryResponse } from '../../../models/GetInventory.ts'
+import { http } from 'msw'
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {
   return new Response(JSON.stringify(data), {
@@ -16,7 +16,7 @@ export function getInventoryHandlerResponse200(data: GetInventoryResponse) {
 }
 
 export function getInventoryHandler(data?: GetInventoryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get('http://localhost:3000/store/inventory', function handler(info) {
+  return http.get(`http://localhost:3000/store/inventory`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

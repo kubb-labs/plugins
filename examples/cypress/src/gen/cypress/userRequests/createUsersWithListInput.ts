@@ -12,7 +12,7 @@ export function createUsersWithListInput(
   return cy
     .request<CreateUsersWithListInputResponse>({
       method: 'POST',
-      url: 'http://localhost:3000/user/createWithList',
+      url: `http://localhost:3000/user/createWithList`,
       body: data,
       ...options,
     })

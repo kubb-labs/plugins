@@ -4,7 +4,7 @@ export function updatePet(data: UpdatePetData, options: Partial<Cypress.RequestO
   return cy
     .request<UpdatePetResponse>({
       method: 'PUT',
-      url: '/pet',
+      url: `/pet`,
       body: data,
       ...options,
     })

@@ -1,8 +1,8 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
-import { buildFormData } from '../.kubb/config.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../models/ts/AddFiles.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import { buildFormData } from '../.kubb/config.js'
 
 /**
  * @description Place a new file in the store
@@ -16,8 +16,8 @@ export async function addFilesHandler({ data }: { data?: AddFilesData } = {}): P
 
   const res = await fetch<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
     method: 'POST',
-    url: '/pet/files',
-    baseURL: 'https://petstore.swagger.io/v2',
+    url: `/pet/files`,
+    baseURL: `https://petstore.swagger.io/v2`,
     data: formData as FormData,
   })
 

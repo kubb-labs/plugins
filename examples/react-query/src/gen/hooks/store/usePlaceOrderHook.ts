@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import { fetch } from '../../.kubb/fetch.ts'
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../models/PlaceOrder.ts'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { fetch } from '../../.kubb/fetch.ts'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -24,7 +24,7 @@ export async function placeOrderHook(data?: PlaceOrderData, config: Partial<Requ
 
   const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
-    url: '/store/order',
+    url: `/store/order`,
     data: requestData,
     ...requestConfig,
   })

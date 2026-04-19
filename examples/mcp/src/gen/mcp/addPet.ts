@@ -1,7 +1,7 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../models/ts/AddPet.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Add a new pet to the store
@@ -13,8 +13,8 @@ export async function addPetHandler({ data }: { data: AddPetData }): Promise<Pro
 
   const res = await fetch<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
-    url: '/pet',
-    baseURL: 'https://petstore.swagger.io/v2',
+    url: `/pet`,
+    baseURL: `https://petstore.swagger.io/v2`,
     data: requestData,
   })
 

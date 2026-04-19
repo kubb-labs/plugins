@@ -1,17 +1,18 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import fetch, { mergeConfig } from '@kubb/plugin-client/clients/fetch'
-import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models/ts/storeController/DeleteOrder.ts'
+import fetch from '@kubb/plugin-client/clients/fetch'
+import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models/ts/storeController/DeleteOrder.ts'
 import type { GetInventoryResponse } from '../../../models/ts/storeController/GetInventory.ts'
 import type {
-  GetOrderByIdPathOrderId,
   GetOrderByIdResponse,
+  GetOrderByIdPathOrderId,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from '../../../models/ts/storeController/GetOrderById.ts'
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../../models/ts/storeController/PlaceOrder.ts'
 import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/ts/storeController/PlaceOrderPatch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class storeController {
   #config: Partial<RequestConfig> & { client?: Client }
@@ -27,7 +28,7 @@ export class storeController {
    */
   async getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: '/store/inventory' })
+    const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/store/inventory` })
     return res.data
   }
 
@@ -42,7 +43,7 @@ export class storeController {
     const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
       ...requestConfig,
       method: 'POST',
-      url: '/store/order',
+      url: `/store/order`,
       data: requestData,
     })
     return res.data
@@ -59,7 +60,7 @@ export class storeController {
     const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
       ...requestConfig,
       method: 'PATCH',
-      url: '/store/order',
+      url: `/store/order`,
       data: requestData,
     })
     return res.data

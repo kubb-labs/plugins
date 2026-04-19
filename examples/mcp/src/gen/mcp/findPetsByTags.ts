@@ -1,6 +1,5 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
@@ -9,6 +8,7 @@ import type {
   FindPetsByTagsResponse,
   FindPetsByTagsStatus400,
 } from '../models/ts/FindPetsByTags.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -24,8 +24,8 @@ export async function findPetsByTagsHandler({
 }): Promise<Promise<CallToolResult>> {
   const res = await fetch<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByTags',
-    baseURL: 'https://petstore.swagger.io/v2',
+    url: `/pet/findByTags`,
+    baseURL: `https://petstore.swagger.io/v2`,
     params,
     headers: { ...headers },
   })

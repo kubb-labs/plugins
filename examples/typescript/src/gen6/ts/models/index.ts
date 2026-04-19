@@ -1,6 +1,5 @@
 export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './AddPet.ts'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.ts'
-export { addPetRequestStatusEnum } from './AddPetRequest.ts'
 export type { Address } from './Address.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Cat } from './Cat.ts'
@@ -15,7 +14,6 @@ export type {
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.ts'
 export type { Customer, CustomerParamsStatusEnumKey } from './Customer.ts'
-export { customerParamsStatusEnum } from './Customer.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -101,9 +99,7 @@ export type {
 } from './LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderParamsStatusEnumKey } from './Order.ts'
-export { orderHttpStatusEnum, orderParamsStatusEnum } from './Order.ts'
 export type { Pet, PetStatusEnumKey, PetTypeEnumKey } from './Pet.ts'
-export { petStatusEnum, petTypeEnum } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
 export type {
   PlaceOrderData,
@@ -161,3 +157,7 @@ export type {
 } from './UploadFile.ts'
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
+export { addPetRequestStatusEnum } from './AddPetRequest.ts'
+export { customerParamsStatusEnum } from './Customer.ts'
+export { orderHttpStatusEnum, orderParamsStatusEnum } from './Order.ts'
+export { petStatusEnum, petTypeEnum } from './Pet.ts'

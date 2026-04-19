@@ -1,7 +1,6 @@
 export type { AddFilesData, AddFilesRequestConfig, AddFilesResponse, AddFilesResponses, AddFilesStatus200, AddFilesStatus405 } from './AddFiles.js'
 export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './AddPet.js'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.js'
-export { addPetRequestStatusEnum } from './AddPetRequest.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
@@ -108,9 +107,7 @@ export type {
 } from './LoginUser.js'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.js'
 export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderStatusEnumKey } from './Order.js'
-export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
 export type { Pet, PetStatusEnumKey } from './Pet.js'
-export { petStatusEnum } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type {
   PlaceOrderData,
@@ -128,7 +125,6 @@ export type {
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
 } from './PlaceOrderPatch.js'
-export type { TagTag } from './tag/Tag.js'
 export type {
   UpdatePetData,
   UpdatePetRequestConfig,
@@ -159,3 +155,7 @@ export type {
 } from './UpdateUser.js'
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
+export type { TagTag } from './tag/Tag.js'
+export { addPetRequestStatusEnum } from './AddPetRequest.js'
+export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
+export { petStatusEnum } from './Pet.js'

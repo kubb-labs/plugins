@@ -3,89 +3,89 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type {
-  QueryClient,
-  QueryKey,
-  QueryObserverOptions,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryResult,
-  UseSuspenseQueryOptions,
-  UseSuspenseQueryResult,
-} from '@tanstack/react-query'
-import { mutationOptions, queryOptions, useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import type {
   AddPetData,
   AddPetResponse,
   AddPetStatus405,
-  CreateUserData,
-  CreateUserResponse,
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputResponse,
-  DeleteOrderPathOrderId,
-  DeleteOrderResponse,
-  DeleteOrderStatus400,
-  DeleteOrderStatus404,
-  DeletePetHeaderApiKey,
-  DeletePetPathPetId,
-  DeletePetResponse,
-  DeletePetStatus400,
-  DeleteUserPathUsername,
-  DeleteUserResponse,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-  FindPetsByStatusQueryStatus,
-  FindPetsByStatusResponse,
-  FindPetsByStatusStatus400,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsResponse,
-  FindPetsByTagsStatus400,
-  GetInventoryResponse,
-  GetOrderByIdPathOrderId,
-  GetOrderByIdResponse,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
-  GetPetByIdPathPetId,
-  GetPetByIdResponse,
-  GetPetByIdStatus400,
-  GetPetByIdStatus404,
-  GetUserByNamePathUsername,
-  GetUserByNameResponse,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserResponse,
-  LoginUserStatus400,
-  LogoutUserResponse,
-  PlaceOrderData,
-  PlaceOrderPatchData,
-  PlaceOrderPatchResponse,
-  PlaceOrderPatchStatus405,
-  PlaceOrderResponse,
-  PlaceOrderStatus405,
   UpdatePetData,
   UpdatePetResponse,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  FindPetsByStatusResponse,
+  FindPetsByStatusQueryStatus,
+  FindPetsByStatusStatus400,
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus400,
+  GetPetByIdResponse,
+  GetPetByIdPathPetId,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+  UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
-  UpdateUserData,
-  UpdateUserPathUsername,
-  UpdateUserResponse,
+  DeletePetResponse,
+  DeletePetPathPetId,
+  DeletePetHeaderApiKey,
+  DeletePetStatus400,
   UploadFileData,
+  UploadFileResponse,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
-  UploadFileResponse,
+  GetInventoryResponse,
+  PlaceOrderData,
+  PlaceOrderResponse,
+  PlaceOrderStatus405,
+  PlaceOrderPatchData,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchStatus405,
+  GetOrderByIdResponse,
+  GetOrderByIdPathOrderId,
+  GetOrderByIdStatus400,
+  GetOrderByIdStatus404,
+  DeleteOrderResponse,
+  DeleteOrderPathOrderId,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+  CreateUserData,
+  CreateUserResponse,
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputResponse,
+  LoginUserResponse,
+  LoginUserQueryUsername,
+  LoginUserQueryPassword,
+  LoginUserStatus400,
+  LogoutUserResponse,
+  GetUserByNameResponse,
+  GetUserByNamePathUsername,
+  GetUserByNameStatus400,
+  GetUserByNameStatus404,
+  UpdateUserData,
+  UpdateUserResponse,
+  UpdateUserPathUsername,
+  DeleteUserResponse,
+  DeleteUserPathUsername,
+  DeleteUserStatus400,
+  DeleteUserStatus404,
 } from './models'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type {
+  QueryKey,
+  QueryClient,
+  QueryObserverOptions,
+  UseQueryResult,
+  UseMutationOptions,
+  UseMutationResult,
+  UseSuspenseQueryOptions,
+  UseSuspenseQueryResult,
+} from '@tanstack/react-query'
+import { mutationOptions, useMutation, queryOptions, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -101,7 +101,7 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 
   const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
-    url: '/pet',
+    url: `/pet`,
     data: requestData,
     ...requestConfig,
   })
@@ -180,7 +180,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
-    url: '/pet',
+    url: `/pet`,
     data: requestData,
     ...requestConfig,
   })
@@ -240,7 +240,7 @@ export async function findPetsByStatus(params?: { status?: FindPetsByStatusQuery
 
   const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByStatus',
+    url: `/pet/findByStatus`,
     params,
     ...requestConfig,
   })
@@ -309,7 +309,7 @@ export async function findPetsByStatusSuspense(params?: { status?: FindPetsBySta
 
   const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByStatus',
+    url: `/pet/findByStatus`,
     params,
     ...requestConfig,
   })
@@ -380,7 +380,7 @@ export async function findPetsByTags(
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByTags',
+    url: `/pet/findByTags`,
     params,
     ...requestConfig,
   })
@@ -454,7 +454,7 @@ export async function findPetsByTagsSuspense(
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByTags',
+    url: `/pet/findByTags`,
     params,
     ...requestConfig,
   })
@@ -904,7 +904,7 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: '/store/inventory', ...requestConfig })
+  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }
@@ -960,7 +960,7 @@ type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryK
 export async function getInventorySuspense(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: '/store/inventory', ...requestConfig })
+  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }
@@ -1018,7 +1018,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
-    url: '/store/order',
+    url: `/store/order`,
     data: requestData,
     ...requestConfig,
   })
@@ -1082,7 +1082,7 @@ export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partia
 
   const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
-    url: '/store/order',
+    url: `/store/order`,
     data: requestData,
     ...requestConfig,
   })
@@ -1342,7 +1342,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 
   const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
     method: 'POST',
-    url: '/user',
+    url: `/user`,
     data: requestData,
     ...requestConfig,
   })
@@ -1409,7 +1409,7 @@ export async function createUsersWithListInput(
 
   const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
-    url: '/user/createWithList',
+    url: `/user/createWithList`,
     data: requestData,
     ...requestConfig,
   })
@@ -1480,7 +1480,7 @@ export async function loginUser(
 
   const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
-    url: '/user/login',
+    url: `/user/login`,
     params,
     ...requestConfig,
   })
@@ -1547,7 +1547,7 @@ export async function loginUserSuspense(
 
   const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
-    url: '/user/login',
+    url: `/user/login`,
     params,
     ...requestConfig,
   })
@@ -1608,7 +1608,7 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: '/user/logout', ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
   return res.data
 }
@@ -1662,7 +1662,7 @@ type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
 export async function logoutUserSuspense(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: '/user/logout', ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
   return res.data
 }

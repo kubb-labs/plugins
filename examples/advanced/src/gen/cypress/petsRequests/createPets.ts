@@ -1,9 +1,9 @@
 import type {
-  CreatePetsData,
-  CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
+  CreatePetsHeaderXEXAMPLE,
+  CreatePetsData,
   CreatePetsResponse,
 } from '../../models/ts/petsController/CreatePets.ts'
 

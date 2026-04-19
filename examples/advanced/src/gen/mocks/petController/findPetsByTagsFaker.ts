@@ -1,4 +1,3 @@
-import { faker } from '@faker-js/faker'
 import type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryTags,
@@ -6,6 +5,7 @@ import type {
   FindPetsByTagsStatus200,
 } from '../../models/ts/petController/FindPetsByTags.ts'
 import { petFaker } from '../petFaker.ts'
+import { faker } from '@faker-js/faker'
 
 export function findPetsByTagsQueryTagsFaker(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
   return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || [])]

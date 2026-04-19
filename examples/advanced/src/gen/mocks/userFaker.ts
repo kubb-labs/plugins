@@ -1,6 +1,6 @@
-import { faker } from '@faker-js/faker'
 import type { User } from '../models/ts/User.ts'
 import { tagTagFaker } from './tag/tagFaker.ts'
+import { faker } from '@faker-js/faker'
 
 export function userFaker(data?: Partial<User>): User {
   return {

@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
-import type { InfiniteData, QueryClient, QueryKey, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
-import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../.kubb/fetch.ts'
 import type {
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsResponse,
   FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags.ts'
+import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { fetch } from '../../.kubb/fetch.ts'
+import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsSuspenseInfiniteQueryKey = (params?: {
   tags?: FindPetsByTagsQueryTags
@@ -37,7 +37,7 @@ export async function findPetsByTagsSuspenseInfiniteHook(
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
-    url: '/pet/findByTags',
+    url: `/pet/findByTags`,
     params,
     ...requestConfig,
   })

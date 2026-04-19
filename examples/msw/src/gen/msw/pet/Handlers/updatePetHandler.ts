@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { http } from 'msw'
 import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../../models/UpdatePet.ts'
+import { http } from 'msw'
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
   return new Response(JSON.stringify(data), {
@@ -34,7 +34,7 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
 }
 
 export function updatePetHandler(data?: UpdatePetResponse | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Response | Promise<Response>)) {
-  return http.put('http://localhost:3000/pet', function handler(info) {
+  return http.put(`http://localhost:3000/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

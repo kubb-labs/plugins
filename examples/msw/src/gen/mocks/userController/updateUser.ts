@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { UpdateUserData } from '../../models/UpdateUser.ts'
 import { user } from '../user.ts'
+import { faker } from '@faker-js/faker'
 
 export function updateUserPathUsername(data?: string): string {
   faker.seed([220])
