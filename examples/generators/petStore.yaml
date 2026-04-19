@@ -70,7 +70,7 @@ paths:
                       - code
                     properties:
                       name:
-                        $ref: "#/components/schemas/ErrorCode"
+                        $ref: '#/components/schemas/ErrorCode'
         '201':
           description: Null response
           content:
@@ -83,7 +83,7 @@ paths:
                       - code
                     properties:
                       name:
-                        $ref: "#/components/schemas/ErrorCode"
+                        $ref: '#/components/schemas/ErrorCode'
         default:
           description: unexpected error
           content:
@@ -142,11 +142,12 @@ components:
           $ref: 'https://petstore3.swagger.io/api/v3/openapi.json#/components/schemas/Category'
     Pets:
       type: array
-      items: {
-        type: 'object',
-        required: ['id', 'name'],
-        properties: { id: { type: 'integer', format: 'int64' }, name: { type: 'string' }, tag: { type: 'string' } },
-      }
+      items:
+        {
+          type: 'object',
+          required: ['id', 'name'],
+          properties: { id: { type: 'integer', format: 'int64' }, name: { type: 'string' }, tag: { type: 'string' } },
+        }
     Error:
       type: object
       required:

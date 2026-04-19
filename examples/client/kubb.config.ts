@@ -142,7 +142,7 @@ export default defineConfig([
     input,
     output: { path: './src/gen7', clean: true },
     hooks: {
-      done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
+      done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [

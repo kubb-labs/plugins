@@ -22,4 +22,3 @@ export default defineComponent({
 <template>
   <Pets :status="status" @setStatus="setStatus" />
 </template>
-

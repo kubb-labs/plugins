@@ -41,7 +41,7 @@ export default defineConfig([
     adapter: adapterOas({ validate: false }),
     output: { path: './src/gen3' },
     hooks: {
-      done: ['npm run typecheck', 'biome format --write ./', 'biome lint --fix --unsafe ./src'],
+      done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },
     plugins: [
       pluginClient({

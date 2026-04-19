@@ -892,7 +892,7 @@ components:
       schema:
         type: number
   responses:
-     PetNotFound:
+    PetNotFound:
       content:
         application/json:
           schema:
@@ -903,4 +903,3 @@ components:
               message:
                 type: string
       description: Pet not found
-

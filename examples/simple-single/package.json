@@ -3,15 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "description": "Simple single PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "https://github.com/kubb-labs/kubb.git",
     "directory": "examples/single-single"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.js -l info",
     "generate:bun": "bun node_modules/@kubb/cli/bin/kubb.js generate --config kubb.config.js",

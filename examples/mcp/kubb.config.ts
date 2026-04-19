@@ -14,7 +14,7 @@ export default defineConfig(() => {
     },
     adapter: adapterOas({ validate: false }),
     hooks: {
-      done: ['npm run typecheck', 'biome format --write ./', 'biome check --fix --unsafe ./src'],
+      done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },
     output: {
       path: './src/gen',

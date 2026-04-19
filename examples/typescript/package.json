@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "description": "TypeScript PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "https://github.com/kubb-labs/kubb.git",
     "directory": "examples/typescript"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
   "sideEffects": false,
   "scripts": {
     "clean": "npx rimraf ./dist",
@@ -28,11 +28,11 @@
   "devDependencies": {
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@10.30.1",
   "engines": {
     "node": ">=22",
     "pnpm": ">=10.0.0"
   },
+  "packageManager": "pnpm@10.30.1",
   "msw": {
     "workerDirectory": "public"
   }
