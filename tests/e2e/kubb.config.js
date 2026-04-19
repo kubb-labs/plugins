@@ -46,7 +46,6 @@ const baseConfig = {
   output: {
     path: './gen',
     clean: true,
-    lint: 'auto',
     format: 'auto',
   },
   plugins: [
