@@ -29,7 +29,7 @@
     "postgenerate": "pnpm run lint:fix && pnpm run format",
     "graph": "npx nx graph ",
     "lint": "oxlint -c oxlint.config.ts ./packages ./examples",
-    "lint:fix": "oxlint -c oxlint.config.ts --fix ./packages ./examples && manypkg fix",
+    "lint:fix": "oxlint -c oxlint.config.ts --fix ./packages ./examples",
     "lint:spell": "cspell \"**/*.{ts,md}\" --config ./cspell.json --no-progress",
     "release": "changeset publish",
     "release:canary": "changeset publish --no-git-tag",
@@ -42,11 +42,6 @@
     "version": "changeset version",
     "version:canary": "changeset version --snapshot canary"
   },
-  "manypkg": {
-    "ignoredRules": [
-      "EXTERNAL_MISMATCH"
-    ]
-  },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",
     "@changesets/cli": "^2.31.0",
@@ -56,7 +51,6 @@
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@manypkg/cli": "^0.25.1",
     "@size-limit/file": "catalog:",
     "@types/node": "catalog:",
     "@vitest/coverage-v8": "^4.1.4",
