@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 /**
@@ -34,7 +34,7 @@ export type Options = {
   /**
    * Group the MCP requests based on the provided name.
    */
-  group?: UserGroup
+  group?: Group
   /**
    * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
    */

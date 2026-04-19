@@ -1,5 +1,5 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
@@ -113,7 +113,7 @@ export type Options = {
   /**
    * Group the @tanstack/query hooks based on the provided name.
    */
-  group?: UserGroup
+  group?: Group
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
    * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
