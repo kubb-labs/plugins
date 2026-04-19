@@ -155,7 +155,7 @@ Want to contribute to a plugin or add a new one? Here's how:
 2. **Use the same tooling conventions**:
    - `tsdown` for building
    - `vitest` for testing
-   - `biome` for linting/formatting
+   - `oxlint` for linting/formatting
    - Extend `../../tsconfig.json` in your `tsconfig.json`
 
 3. **Add an example** under `examples/` that demonstrates your plugin.
