@@ -1,7 +1,7 @@
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../models/ts/petController/UploadFile.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @summary uploads an image
@@ -21,7 +21,7 @@ export async function uploadFileHandler({
   const res = await fetch<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
     params,
     data: requestData,
     headers: { 'Content-Type': 'application/octet-stream' },

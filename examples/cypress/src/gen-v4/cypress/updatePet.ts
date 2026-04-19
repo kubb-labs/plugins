@@ -9,7 +9,7 @@ export function updatePet(data: UpdatePetData, options: Partial<Cypress.RequestO
   return cy
     .request<UpdatePetResponse>({
       method: 'PUT',
-      url: 'http://localhost:3000/pet',
+      url: `http://localhost:3000/pet`,
       body: data,
       ...options,
     })

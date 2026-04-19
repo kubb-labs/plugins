@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
+import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../models/UploadFile.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { useMutation } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../models/UploadFile.ts'
+import { useMutation } from '@tanstack/vue-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 

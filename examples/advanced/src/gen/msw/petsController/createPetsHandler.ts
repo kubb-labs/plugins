@@ -1,5 +1,5 @@
-import { http } from 'msw'
 import type { CreatePetsResponse } from '../../models/ts/petsController/CreatePets.ts'
+import { http } from 'msw'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   return new Response(JSON.stringify(data), {
@@ -10,7 +10,7 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
 export function createPetsHandler(
   data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
 ) {
-  return http.post('/pets/:uuid', function handler(info) {
+  return http.post(`/pets/:uuid`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

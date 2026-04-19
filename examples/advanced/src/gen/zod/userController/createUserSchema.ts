@@ -1,4 +1,4 @@
-import type * as z from 'zod'
+import * as z from 'zod'
 import { userSchema } from '../userSchema.ts'
 
 export const createUserStatusDefaultSchema = userSchema

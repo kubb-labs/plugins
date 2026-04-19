@@ -1,6 +1,4 @@
-import type { QueryClient, UseMutationOptions, UseMutationResult } from '@tanstack/react-query'
-import { mutationOptions, useMutation } from '@tanstack/react-query'
-import type { Client, RequestConfig, ResponseConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type {
   UpdatePetData,
   UpdatePetResponse,
@@ -8,7 +6,9 @@ import type {
   UpdatePetStatus404,
   UpdatePetStatus405,
 } from '../../../models/ts/petController/UpdatePet.ts'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../../axios/petService/updatePet.ts'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 

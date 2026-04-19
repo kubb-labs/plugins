@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { QueryClient, QueryKey, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
+import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
+import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { fetch } from '../../.kubb/fetch.ts'
-import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getPetByIdSuspenseQueryKey = ({ pet_id }: { pet_id: GetPetByIdPathPetId }) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }] as const
 

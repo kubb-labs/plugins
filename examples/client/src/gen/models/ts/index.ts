@@ -1,14 +1,14 @@
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.js'
-export { addPetRequestStatusEnum } from './AddPetRequest.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
 export type { Customer } from './Customer.js'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './Order.js'
-export { orderHttpStatusEnum, orderStatusEnum } from './Order.js'
 export type { Pet, PetStatusEnumKey } from './Pet.js'
-export { petStatusEnum } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
+export type { Tag } from './Tag.js'
+export type { User } from './User.js'
+export type { UserArray } from './UserArray.js'
 export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './petController/AddPet.js'
 export type {
   DeletePetHeaderApiKey,
@@ -107,9 +107,6 @@ export type {
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
 } from './storeController/PlaceOrderPatch.js'
-export type { Tag } from './Tag.js'
-export type { User } from './User.js'
-export type { UserArray } from './UserArray.js'
 export type { CreateUserData, CreateUserRequestConfig, CreateUserResponse, CreateUserResponses, CreateUserStatusDefault } from './userController/CreateUser.js'
 export type {
   CreateUsersWithListInputData,
@@ -154,3 +151,6 @@ export type {
   UpdateUserResponses,
   UpdateUserStatusDefault,
 } from './userController/UpdateUser.js'
+export { addPetRequestStatusEnum } from './AddPetRequest.js'
+export { orderHttpStatusEnum, orderStatusEnum } from './Order.js'
+export { petStatusEnum } from './Pet.js'

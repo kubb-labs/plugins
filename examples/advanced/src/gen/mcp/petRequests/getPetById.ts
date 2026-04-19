@@ -1,7 +1,7 @@
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/ts/petController/GetPetById.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Returns a single pet
@@ -12,7 +12,7 @@ export async function getPetByIdHandler({ petId }: { petId: GetPetByIdPathPetId 
   const res = await fetch<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
     url: `/pet/${petId}:search`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
   })
 
   return {

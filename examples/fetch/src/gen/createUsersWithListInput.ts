@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from './models.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getCreateUsersWithListInputUrl() {
-  const res = { method: 'POST', url: 'https://petstore3.swagger.io/api/v3/user/createWithList' as const }
+  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/user/createWithList` as const }
 
   return res
 }

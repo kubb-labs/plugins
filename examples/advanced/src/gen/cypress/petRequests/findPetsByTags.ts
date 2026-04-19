@@ -1,8 +1,8 @@
 import type {
-  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
+  FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsResponse,
 } from '../../models/ts/petController/FindPetsByTags.ts'
 
@@ -14,7 +14,7 @@ export function findPetsByTags(
   return cy
     .request<FindPetsByTagsResponse>({
       method: 'GET',
-      url: '/pet/findByTags',
+      url: `/pet/findByTags`,
       qs: params,
       headers: headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined,
       ...options,

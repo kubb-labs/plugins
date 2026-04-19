@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from './models.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getAddPetUrl() {
-  const res = { method: 'POST', url: 'https://petstore3.swagger.io/api/v3/pet' as const }
+  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet` as const }
 
   return res
 }

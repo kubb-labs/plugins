@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker'
 import type { LoginUserResponse } from '../../models/ts/userController/LoginUser.ts'
+import { faker } from '@faker-js/faker'
 
 export function loginUserQueryUsernameFaker(data?: string): string {
   return data ?? faker.string.alpha()

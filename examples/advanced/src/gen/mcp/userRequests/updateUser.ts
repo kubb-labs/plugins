@@ -1,7 +1,7 @@
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../models/ts/userController/UpdateUser.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description This can only be done by the logged in user.
@@ -14,7 +14,7 @@ export async function updateUserHandler({ username, data }: { username: UpdateUs
   const res = await fetch<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
     method: 'PUT',
     url: `/user/${username}`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
     data: requestData,
   })
 

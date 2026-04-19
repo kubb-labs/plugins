@@ -1,7 +1,7 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type { GetUserByNamePathUsername, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../models/ts/GetUserByName.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @summary Get user by user name
@@ -11,7 +11,7 @@ export async function getUserByNameHandler({ username }: { username: GetUserByNa
   const res = await fetch<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',
     url: `/user/${username}`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
   })
 
   return {

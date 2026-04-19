@@ -1,5 +1,5 @@
-import { faker } from '@faker-js/faker'
 import type { DeleteUserResponse } from '../../models/ts/userController/DeleteUser.ts'
+import { faker } from '@faker-js/faker'
 
 export function deleteUserPathUsernameFaker(data?: string): string {
   return data ?? faker.string.alpha()

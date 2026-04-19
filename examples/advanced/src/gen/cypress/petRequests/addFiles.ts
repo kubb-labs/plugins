@@ -4,7 +4,7 @@ export function addFiles(data: AddFilesData, options: Partial<Cypress.RequestOpt
   return cy
     .request<AddFilesResponse>({
       method: 'POST',
-      url: '/pet/files',
+      url: `/pet/files`,
       body: data,
       ...options,
     })

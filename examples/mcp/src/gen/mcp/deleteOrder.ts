@@ -1,7 +1,7 @@
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
-import type { ResponseErrorConfig } from '../../client.js'
 import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
 import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../models/ts/DeleteOrder.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
@@ -12,7 +12,7 @@ export async function deleteOrderHandler({ orderId }: { orderId: DeleteOrderPath
   const res = await fetch<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',
     url: `/store/order/${orderId}`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
   })
 
   return {

@@ -1,5 +1,5 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import fetch from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
 import { deleteUserResponseSchema } from '../../../zod/userController/deleteUserSchema.ts'
 

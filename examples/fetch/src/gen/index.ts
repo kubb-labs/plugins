@@ -1,17 +1,3 @@
-export { addPet } from './addPet.ts'
-export { createUser } from './createUser.ts'
-export { createUsersWithListInput } from './createUsersWithListInput.ts'
-export { deleteOrder } from './deleteOrder.ts'
-export { deletePet } from './deletePet.ts'
-export { deleteUser } from './deleteUser.ts'
-export { findPetsByStatus } from './findPetsByStatus.ts'
-export { findPetsByTags } from './findPetsByTags.ts'
-export { getInventory } from './getInventory.ts'
-export { getOrderById } from './getOrderById.ts'
-export { getPetById } from './getPetById.ts'
-export { getUserByName } from './getUserByName.ts'
-export { loginUser } from './loginUser.ts'
-export { logoutUser } from './logoutUser.ts'
 export type {
   AddPetData,
   AddPetRequest,
@@ -154,6 +140,20 @@ export type {
   User,
   UserArray,
 } from './models.ts'
+export { addPet } from './addPet.ts'
+export { createUser } from './createUser.ts'
+export { createUsersWithListInput } from './createUsersWithListInput.ts'
+export { deleteOrder } from './deleteOrder.ts'
+export { deletePet } from './deletePet.ts'
+export { deleteUser } from './deleteUser.ts'
+export { findPetsByStatus } from './findPetsByStatus.ts'
+export { findPetsByTags } from './findPetsByTags.ts'
+export { getInventory } from './getInventory.ts'
+export { getOrderById } from './getOrderById.ts'
+export { getPetById } from './getPetById.ts'
+export { getUserByName } from './getUserByName.ts'
+export { loginUser } from './loginUser.ts'
+export { logoutUser } from './logoutUser.ts'
 export { addPetRequestStatusEnum, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
 export { placeOrder } from './placeOrder.ts'
 export { placeOrderPatch } from './placeOrderPatch.ts'

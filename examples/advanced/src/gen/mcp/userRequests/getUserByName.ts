@@ -1,12 +1,12 @@
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type {
   GetUserByNamePathUsername,
   GetUserByNameResponse,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from '../../models/ts/userController/GetUserByName.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @summary Get user by user name
@@ -16,7 +16,7 @@ export async function getUserByNameHandler({ username }: { username: GetUserByNa
   const res = await fetch<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',
     url: `/user/${username}`,
-    baseURL: 'https://petstore.swagger.io/v2',
+    baseURL: `https://petstore.swagger.io/v2`,
   })
 
   return {

@@ -1,17 +1,17 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type {
+  FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
   FindPetsByTagsResponse,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getFindPetsByTagsUrl() {
-  const res = { method: 'GET', url: '/pet/findByTags' as const }
+  const res = { method: 'GET', url: `/pet/findByTags` as const }
 
   return res
 }

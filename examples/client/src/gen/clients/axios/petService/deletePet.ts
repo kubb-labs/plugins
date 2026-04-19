@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../../../models/ts/petController/DeletePet.js'
+import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, DeletePetStatus400 } from '../../../models/ts/petController/DeletePet.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
   const res = { method: 'DELETE', url: `/pet/${petId}` as const }

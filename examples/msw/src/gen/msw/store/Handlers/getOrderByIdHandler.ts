@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { http } from 'msw'
 import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById.ts'
+import { http } from 'msw'
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
   return new Response(JSON.stringify(data), {
@@ -28,7 +28,7 @@ export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
 }
 
 export function getOrderByIdHandler(data?: GetOrderByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
-  return http.get('http://localhost:3000/store/order/:orderId', function handler(info) {
+  return http.get(`http://localhost:3000/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

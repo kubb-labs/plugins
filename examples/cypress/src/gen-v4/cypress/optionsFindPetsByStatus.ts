@@ -9,7 +9,7 @@ export function optionsFindPetsByStatus(options: Partial<Cypress.RequestOptions>
   return cy
     .request<OptionsFindPetsByStatusResponse>({
       method: 'OPTIONS',
-      url: 'http://localhost:3000/pet/findByStatus',
+      url: `http://localhost:3000/pet/findByStatus`,
       ...options,
     })
     .then((res) => res.body)

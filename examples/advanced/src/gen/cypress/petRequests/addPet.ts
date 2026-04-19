@@ -4,7 +4,7 @@ export function addPet(data: AddPetData, options: Partial<Cypress.RequestOptions
   return cy
     .request<AddPetResponse>({
       method: 'POST',
-      url: '/pet',
+      url: `/pet`,
       body: data,
       ...options,
     })

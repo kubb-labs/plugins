@@ -9,7 +9,7 @@ export function logoutUser(options: Partial<Cypress.RequestOptions> = {}): Cypre
   return cy
     .request<LogoutUserResponse>({
       method: 'GET',
-      url: 'http://localhost:3000/user/logout',
+      url: `http://localhost:3000/user/logout`,
       ...options,
     })
     .then((res) => res.body)

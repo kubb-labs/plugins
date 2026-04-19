@@ -3,18 +3,18 @@
  * Do not edit manually.
  */
 
-import type { QueryClient, QueryKey, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import { fetch } from '../../.kubb/fetch.ts'
 import type {
+  UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
 } from '../../models/UpdatePetWithForm.ts'
+import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { fetch } from '../../.kubb/fetch.ts'
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const updatePetWithFormSuspenseQueryKey = (
   pet_id: UpdatePetWithFormPathPetId,

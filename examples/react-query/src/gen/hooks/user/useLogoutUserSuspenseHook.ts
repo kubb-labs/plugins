@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { QueryClient, QueryKey, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
-import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import { fetch } from '../../.kubb/fetch.ts'
 import type { LogoutUserResponse } from '../../models/LogoutUser.ts'
+import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { fetch } from '../../.kubb/fetch.ts'
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const logoutUserSuspenseQueryKey = () => ['v5', { url: '/user/logout' }] as const
 
@@ -21,7 +21,7 @@ type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
 export async function logoutUserSuspenseHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: '/user/logout', ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
   return res.data
 }
