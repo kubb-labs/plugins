@@ -1,7 +1,7 @@
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/ts/petController/UpdatePet.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Update an existing pet by Id
@@ -13,8 +13,8 @@ export async function updatePetHandler({ data }: { data: UpdatePetData }): Promi
 
   const res = await fetch<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
-    url: '/pet',
-    baseURL: 'https://petstore.swagger.io/v2',
+    url: `/pet`,
+    baseURL: `https://petstore.swagger.io/v2`,
     data: requestData,
   })
 

@@ -1,14 +1,14 @@
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/ts/AddPetRequest.ts'
-export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.ts'
 export type { Address } from './models/ts/Address.ts'
 export type { ApiResponse } from './models/ts/ApiResponse.ts'
 export type { Category } from './models/ts/Category.ts'
 export type { Customer } from './models/ts/Customer.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/ts/Order.ts'
-export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.ts'
 export type { Pet, PetStatusEnumKey } from './models/ts/Pet.ts'
-export { petStatusEnum } from './models/ts/Pet.ts'
 export type { PetNotFound } from './models/ts/PetNotFound.ts'
+export type { Tag } from './models/ts/Tag.ts'
+export type { User } from './models/ts/User.ts'
+export type { UserArray } from './models/ts/UserArray.ts'
 export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './models/ts/petController/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -107,9 +107,6 @@ export type {
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
 } from './models/ts/storeController/PlaceOrderPatch.ts'
-export type { Tag } from './models/ts/Tag.ts'
-export type { User } from './models/ts/User.ts'
-export type { UserArray } from './models/ts/UserArray.ts'
 export type {
   CreateUserData,
   CreateUserRequestConfig,
@@ -160,3 +157,6 @@ export type {
   UpdateUserResponses,
   UpdateUserStatusDefault,
 } from './models/ts/userController/UpdateUser.ts'
+export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.ts'
+export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.ts'
+export { petStatusEnum } from './models/ts/Pet.ts'

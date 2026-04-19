@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-export enum OrderParamsStatusEnum {
+export const enum OrderParamsStatusEnum {
   placed = 'placed',
   approved = 'approved',
   delivered = 'delivered',
 }
 
-export enum OrderHttpStatusEnum {
+export const enum OrderHttpStatusEnum {
   OrderHttpStatusEnum_200 = 200,
   OrderHttpStatusEnum_400 = 400,
   OrderHttpStatusEnum_500 = 500,
@@ -98,7 +98,7 @@ export type Address = {
   zip?: string
 }
 
-export enum CustomerParamsStatusEnum {
+export const enum CustomerParamsStatusEnum {
   placed = 'placed',
   approved = 'approved',
   delivered = 'delivered',
@@ -264,12 +264,12 @@ export type Cat = {
   name?: string
 }
 
-export enum PetTypeEnum {
+export const enum PetTypeEnum {
   dog = 'dog',
   cat = 'cat',
 }
 
-export enum PetStatusEnum {
+export const enum PetStatusEnum {
   available = 'available',
   pending = 'pending',
   sold = 'sold',
@@ -333,7 +333,7 @@ export type FullAddress = Address & {
   streetName: string
 }
 
-export enum AddPetRequestStatusEnum {
+export const enum AddPetRequestStatusEnum {
   available = 'available',
   pending = 'pending',
   sold = 'sold',

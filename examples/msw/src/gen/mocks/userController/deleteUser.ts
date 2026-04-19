@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { DeleteUserResponse } from '../../models/DeleteUser.ts'
+import { faker } from '@faker-js/faker'
 
 export function deleteUserPathUsername(data?: string): string {
   faker.seed([220])

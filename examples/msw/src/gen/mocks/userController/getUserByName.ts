@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { GetUserByNameResponse, GetUserByNameStatus200 } from '../../models/GetUserByName.ts'
 import { user } from '../user.ts'
+import { faker } from '@faker-js/faker'
 
 export function getUserByNamePathUsername(data?: string): string {
   faker.seed([220])

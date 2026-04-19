@@ -7,7 +7,7 @@ export function createUsersWithListInput(
   return cy
     .request<CreateUsersWithListInputResponse>({
       method: 'POST',
-      url: '/user/createWithList',
+      url: `/user/createWithList`,
       body: data,
       ...options,
     })

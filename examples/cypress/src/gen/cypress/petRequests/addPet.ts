@@ -9,7 +9,7 @@ export function addPet(data: AddPetData, options: Partial<Cypress.RequestOptions
   return cy
     .request<AddPetResponse>({
       method: 'POST',
-      url: 'http://localhost:3000/pet',
+      url: `http://localhost:3000/pet`,
       body: data,
       ...options,
     })

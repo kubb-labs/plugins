@@ -9,7 +9,7 @@ export function placeOrder(data?: PlaceOrderData, options: Partial<Cypress.Reque
   return cy
     .request<PlaceOrderResponse>({
       method: 'POST',
-      url: 'http://localhost:3000/store/order',
+      url: `http://localhost:3000/store/order`,
       body: data,
       ...options,
     })

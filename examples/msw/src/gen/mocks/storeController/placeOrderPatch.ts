@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
 import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus200 } from '../../models/PlaceOrderPatch.ts'
 import { order } from '../order.ts'
+import { faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

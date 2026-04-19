@@ -12,7 +12,7 @@ export function findPetsByStatus(
   return cy
     .request<FindPetsByStatusResponse>({
       method: 'GET',
-      url: 'http://localhost:3000/pet/findByStatus',
+      url: `http://localhost:3000/pet/findByStatus`,
       qs: params,
       ...options,
     })
