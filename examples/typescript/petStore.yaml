@@ -279,17 +279,17 @@ paths:
             format: int64
       responses:
         '200':
-           description: items
-           content:
-             "application/json":
-               schema:
+          description: items
+          content:
+            'application/json':
+              schema:
                 type: array
                 items:
-                   type: string
-                   enum:
-                     - TYPE1
-                     - TYPE2
-                     - TYPE3
+                  type: string
+                  enum:
+                    - TYPE1
+                    - TYPE2
+                    - TYPE3
         '400':
           description: Invalid pet value
       security:
@@ -365,7 +365,7 @@ paths:
           application/json:
             schema:
               description: Order description
-              pattern: "^[a-zA-Z0-9]{1,13}$"
+              pattern: '^[a-zA-Z0-9]{1,13}$'
               $ref: '#/components/schemas/Order'
           application/xml:
             schema:
@@ -902,7 +902,7 @@ components:
         streetName:
           type: string
       allOf:
-        - $ref: "#/components/schemas/Address"
+        - $ref: '#/components/schemas/Address'
       required:
         - streetName
         - streetNumber
@@ -1004,7 +1004,7 @@ components:
       schema:
         type: string
   responses:
-     PetNotFound:
+    PetNotFound:
       content:
         application/json:
           schema:
@@ -1015,4 +1015,3 @@ components:
               message:
                 type: string
       description: Pet not found
-

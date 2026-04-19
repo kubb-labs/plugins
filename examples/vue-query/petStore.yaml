@@ -670,10 +670,10 @@ components:
             - type: string
               description: Description
             - enum:
-                - "NW"
-                - "NE"
-                - "SW"
-                - "SE"
+                - 'NW'
+                - 'NE'
+                - 'SW'
+                - 'SE'
               description: Wind direction
       xml:
         name: address

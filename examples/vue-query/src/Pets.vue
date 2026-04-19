@@ -58,10 +58,9 @@ export default defineComponent({
   <div class="pets" v-if="pets">
     <h1>Pets: {{ status }}</h1>
     <ul v-for="pet in pets" :key="pet.id">
-      <li :key="pet.id">{{pet.name}}</li>
+      <li :key="pet.id">{{ pet.name }}</li>
     </ul>
   </div>
-  <button @click="$emit('setStatus', 'available')" >Available</button>
-  <button @click="$emit('setStatus', 'pending')" >Pending</button>
+  <button @click="$emit('setStatus', 'available')">Available</button>
+  <button @click="$emit('setStatus', 'pending')">Pending</button>
 </template>
-

@@ -15,6 +15,7 @@ export default defineConfig({
     '**/.next/**',
     '**/.output/**',
     '**/.nitro/**',
+    '**/src/gen/**',
   ],
   rules: {
     'no-shadow-restricted-names': 'off',

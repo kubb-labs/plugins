@@ -11,7 +11,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { config, plugin, driver, resolver, adapter } = ctx
+    const { config, plugin: _plugin, driver, resolver, adapter } = ctx
     const { output, importPath, dataReturnType, pathParamsType, paramsType, paramsCasing, parser } = ctx.options
     const baseURL = adapter.inputNode?.meta?.baseURL
 

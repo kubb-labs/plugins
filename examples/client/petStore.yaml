@@ -912,4 +912,3 @@ components:
               message:
                 type: string
       description: Pet not found
-
