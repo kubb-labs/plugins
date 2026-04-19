@@ -26,8 +26,7 @@ export default defineConfig({
     clean: true,
     barrelType: 'named',
     defaultBanner: false,
-    lint: 'biome',
-    format: 'biome',
+    format: 'oxfmt',
   },
   hooks: {
     done: ['npm run typecheck'],
