@@ -114,11 +114,17 @@ describe('mswGenerator operation', () => {
     const plugin = createMockedPlugin<PluginMsw>({ name: 'plugin-msw', options, resolver: resolverMsw })
     const driver = createMockedPluginDriver({ name: props.name })
 
-    driver.getPlugin = ((pluginName: string) => {
-      if (pluginName === 'plugin-ts') return mockedTsPlugin
+    driver.getPlugin = (pluginName: string) => {
+      if (pluginName === 'plugin-ts') return mockedTsPlugin as any
       if (pluginName === pluginFakerName) return mockedFakerPlugin
       return undefined
-    }) as typeof driver.getPlugin
+    }
+
+    driver.getResolver = (pluginName: string) => {
+      if (pluginName === 'plugin-ts') return mockedTsPlugin.resolver as any
+      if (pluginName === pluginFakerName) return mockedFakerPlugin.resolver
+      return undefined
+    }
 
     await renderGeneratorOperation(mswGenerator, props.node, {
       config: testConfig,

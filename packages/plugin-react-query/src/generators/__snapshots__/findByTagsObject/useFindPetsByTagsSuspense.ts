@@ -7,6 +7,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
+import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsSuspenseQueryKey = (params: {
@@ -27,6 +28,8 @@ export async function findPetsByTagsSuspense(
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+
+  return FindPetsByTagsResponse.parse(res.data)
 }
 
 export function findPetsByTagsSuspenseQueryOptions(

@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * The concrete resolver type for `@kubb/plugin-cypress`.
@@ -78,7 +78,7 @@ export type Options = {
   /**
    * Group the Cypress requests based on the provided name.
    */
-  group?: UserGroup
+  group?: Group
   /**
    * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
    */
@@ -121,7 +121,7 @@ type ResolvedOptions = {
   resolver: ResolverCypress
 }
 
-export type PluginCypress = PluginFactoryOptions<'plugin-cypress', Options, ResolvedOptions, never, ResolvePathOptions, ResolverCypress>
+export type PluginCypress = PluginFactoryOptions<'plugin-cypress', Options, ResolvedOptions, never, object, ResolverCypress>
 
 declare global {
   namespace Kubb {

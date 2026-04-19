@@ -1,8 +1,8 @@
 import { buildJSDoc, URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import type { PluginZod } from '@kubb/plugin-zod'
+import type { ResolverZod } from '@kubb/plugin-zod'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginClient } from '../types.ts'
@@ -12,8 +12,8 @@ import { Client } from './Client.tsx'
 type OperationData = {
   node: ast.OperationNode
   name: string
-  tsResolver: PluginTs['resolver']
-  zodResolver?: PluginZod['resolver']
+  tsResolver: ResolverTs
+  zodResolver?: ResolverZod
 }
 
 type Props = {
@@ -33,8 +33,8 @@ type Props = {
 type GenerateMethodProps = {
   node: ast.OperationNode
   name: string
-  tsResolver: PluginTs['resolver']
-  zodResolver?: PluginZod['resolver']
+  tsResolver: ResolverTs
+  zodResolver?: ResolverZod
   baseURL: string | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined

@@ -8,6 +8,7 @@
     "sourceMap": true,
     "strictNullChecks": true,
     "jsx": "react-jsx",
+    "types": ["node"],
     "outDir": "es",
     "experimentalDecorators": true,
     "skipLibCheck": true,

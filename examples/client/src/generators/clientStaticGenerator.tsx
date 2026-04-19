@@ -16,12 +16,12 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
     const baseURL = adapter.inputNode?.meta?.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs?.resolver) return null
+    if (!pluginTs) return null
 
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName)
     const root = path.resolve(config.root, config.output.path)
 
-    const transformedNode = plugin.transformer ? node : node
+    const transformedNode = node
     const name = resolver.resolveName(transformedNode.operationId)
 
     const clientFile = resolver.resolveFile(

@@ -1,5 +1,6 @@
 import type { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverFaker } from '@kubb/plugin-faker'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import type { PluginMsw } from './types.ts'
 
 export function transformName(name: string, type: 'function' | 'type' | 'file' | 'const', transformers?: PluginMsw['resolvedOptions']['transformers']): string {
@@ -31,7 +32,7 @@ function getResponseContentType(response: ast.ResponseNode | undefined): string 
   return typeof value === 'string' && value.length > 0 ? value : undefined
 }
 
-export function getResponseTypes(node: ast.OperationNode, tsResolver: PluginTs['resolver']): Array<[statusCode: number | 'default', typeName: string]> {
+export function getResponseTypes(node: ast.OperationNode, tsResolver: ResolverTs): Array<[statusCode: number | 'default', typeName: string]> {
   const types: Array<[number | 'default', string]> = []
 
   for (const response of node.responses) {
@@ -66,13 +67,7 @@ export function resolveFakerMeta(
   node: ast.OperationNode,
   options: {
     root: string
-    fakerResolver: {
-      resolveResponseName(node: ast.OperationNode): string
-      resolveFile(
-        params: { name: string; extname: '.ts'; tag: string; path: string },
-        options: { root: string; output: PluginMsw['resolvedOptions']['output']; group: PluginMsw['resolvedOptions']['group'] },
-      ): { path: string }
-    }
+    fakerResolver: ResolverFaker
     fakerOutput: PluginMsw['resolvedOptions']['output']
     fakerGroup: PluginMsw['resolvedOptions']['group']
   },

@@ -2,9 +2,9 @@ import path from 'node:path'
 import { camelCase, pascalCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
-import type { PluginZod } from '@kubb/plugin-zod'
+import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { StaticClassClient } from '../components/StaticClassClient'
@@ -13,8 +13,8 @@ import type { PluginClient } from '../types'
 type OperationData = {
   node: ast.OperationNode
   name: string
-  tsResolver: PluginTs['resolver']
-  zodResolver: PluginZod['resolver'] | undefined
+  tsResolver: ResolverTs
+  zodResolver: ResolverZod | undefined
   typeFile: ast.FileNode
   zodFile: ast.FileNode | undefined
 }
@@ -25,7 +25,7 @@ type Controller = {
   operations: Array<OperationData>
 }
 
-function resolveTypeImportNames(node: ast.OperationNode, tsResolver: PluginTs['resolver']): Array<string> {
+function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const names: Array<string | undefined> = [
     node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
     tsResolver.resolveResponseName(node),
@@ -37,7 +37,7 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: PluginTs['r
   return names.filter((n): n is string => Boolean(n))
 }
 
-function resolveZodImportNames(node: ast.OperationNode, zodResolver: PluginZod['resolver']): Array<string> {
+function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
   const names: Array<string | undefined> = [zodResolver.resolveResponseName?.(node), node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined]
   return names.filter((n): n is string => Boolean(n))
 }
@@ -51,12 +51,12 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs?.resolver) return null
+    if (!pluginTs) return null
 
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName)
     const tsPluginOptions = pluginTs.options
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod?.resolver
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
 
     function buildOperationData(node: ast.OperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(
@@ -67,7 +67,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
         zodResolver && pluginZod?.options
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options.output ?? output, group: pluginZod.options.group },
+              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group },
             )
           : undefined
 

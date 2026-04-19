@@ -7,6 +7,7 @@ import fetch from 'axios'
 import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId } from './UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
+import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -21,7 +22,7 @@ export async function updatePetWithForm(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
+  const requestData = UpdatePetWithFormData.parse(data)
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
@@ -29,6 +30,8 @@ export async function updatePetWithForm(
     data: requestData,
     ...requestConfig,
   })
+
+  return UpdatePetWithFormResponse.parse(res.data)
 }
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {}) {

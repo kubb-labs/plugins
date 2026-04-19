@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -189,7 +189,7 @@ export type Options = {
   /**
    * Group the clients based on the provided name.
    */
-  group?: UserGroup
+  group?: Group
   /**
    * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
    */
@@ -295,7 +295,7 @@ type ResolvedOptions = {
   printer: Options['printer']
 }
 
-export type PluginTs = PluginFactoryOptions<'plugin-ts', Options, ResolvedOptions, never, ResolvePathOptions, ResolverTs>
+export type PluginTs = PluginFactoryOptions<'plugin-ts', Options, ResolvedOptions, never, object, ResolverTs>
 
 declare global {
   namespace Kubb {

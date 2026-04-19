@@ -18,7 +18,7 @@ export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKe
 export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = findPetsByStatusQueryKey(params)
-        return queryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusResponse, typeof queryKey>({
+        return queryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusResponse>({
 
          queryKey,
          queryFn: async ({ signal }) => {

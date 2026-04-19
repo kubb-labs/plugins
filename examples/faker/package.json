@@ -22,14 +22,14 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.1",
+    "@faker-js/faker": "^10.4.0",
     "@kubb/adapter-oas": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "dayjs": "^1.11.20",
     "kubb": "catalog:",
-    "react": "^18.3.1"
+    "react": "^19.2.5"
   },
   "devDependencies": {
     "typescript": "catalog:"

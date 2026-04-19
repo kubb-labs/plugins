@@ -18,8 +18,8 @@ export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 export function getUserByNameQueryOptions(username: MaybeRefOrGetter<GetUserByNamePathUsername>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getUserByNameQueryKey(username)
-        return queryOptions<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameResponse, typeof queryKey>({
-         enabled: !!(username),
+        return queryOptions<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameResponse>({
+         enabled: () => !!(username),
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByName(toValue(username), { ...config, signal: config.signal ?? signal })

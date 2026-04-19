@@ -1,5 +1,4 @@
 import path from 'node:path'
-
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -18,14 +17,14 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const pluginTs = driver.getPlugin(pluginTsName)
 
-    if (!pluginTs?.resolver) {
+    if (!pluginTs) {
       return null
     }
 
-    const tsResolver = pluginTs.resolver
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod?.resolver
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
     const pathParams = casedParams.filter((p) => p.in === 'path')
@@ -65,7 +64,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
               {
                 root,
                 output: pluginZod.options.output ?? output,
-                group: pluginZod.options.group,
+                group: pluginZod.options?.group,
               },
             )
           : undefined,

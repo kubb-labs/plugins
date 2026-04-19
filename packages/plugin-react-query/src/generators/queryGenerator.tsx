@@ -1,5 +1,4 @@
 import path from 'node:path'
-
 import { ast, defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -18,8 +17,8 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, transformers, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs?.resolver) return null
-    const tsResolver = pluginTs.resolver
+    if (!pluginTs) return null
+    const tsResolver = driver.getResolver(pluginTsName)
 
     // query: false means "this IS a query op, but skip the useQuery hook"
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
@@ -62,9 +61,8 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
       ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
     ].filter((name): name is string => !!name && name !== queryKeyTypeName)
 
-    const pluginZodRaw = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const pluginZod = pluginZodRaw?.name === pluginZodName ? pluginZodRaw : undefined
-    const zodResolver = pluginZod?.resolver
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
@@ -79,9 +77,10 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
+    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : undefined
 
     const clientFile = shouldUseClientPlugin
-      ? clientPlugin?.resolver?.resolveFile(
+      ? clientResolver?.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
           {
             root,
@@ -91,7 +90,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
         )
       : undefined
 
-    const resolvedClientName = shouldUseClientPlugin ? (clientPlugin?.resolver?.resolveName(node.operationId) ?? clientName) : clientName
+    const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientName) : clientName
 
     return (
       <File

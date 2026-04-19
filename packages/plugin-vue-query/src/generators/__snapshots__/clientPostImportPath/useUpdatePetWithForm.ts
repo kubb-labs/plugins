@@ -8,6 +8,7 @@ import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFor
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import type { MaybeRefOrGetter } from 'vue'
+import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { useMutation } from '@tanstack/vue-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -22,7 +23,7 @@ export async function updatePetWithForm(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
+  const requestData = UpdatePetWithFormData.parse(data)
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
@@ -30,6 +31,8 @@ export async function updatePetWithForm(
     data: requestData,
     ...requestConfig,
   })
+
+  return UpdatePetWithFormResponse.parse(res.data)
 }
 
 /**

@@ -38,8 +38,8 @@ export function getOrderByIdQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ orderId })
-  return queryOptions<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdResponse, typeof queryKey>({
-    enabled: !!orderId,
+  return queryOptions<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdResponse>({
+    enabled: () => !!orderId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderById({ orderId: toValue(orderId) }, { ...config, signal: config.signal ?? signal })

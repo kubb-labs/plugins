@@ -19,20 +19,20 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     }
 
-    const fakerPlugin = driver.getPlugin(pluginFakerName)
+    const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : undefined
     const faker =
-      parser === 'faker' && fakerPlugin?.resolver
+      parser === 'faker' && fakerPlugin
         ? resolveFakerMeta(node, {
             root,
-            fakerResolver: fakerPlugin.resolver,
-            fakerOutput: fakerPlugin.options?.output ?? {},
+            fakerResolver: driver.getResolver(pluginFakerName),
+            fakerOutput: fakerPlugin.options?.output ?? output,
             fakerGroup: fakerPlugin.options?.group,
           })
         : undefined
 
     const pluginTs = driver.getPlugin(pluginTsName)
-    if (!pluginTs?.resolver) return null
-    const tsResolver = pluginTs.resolver
+    if (!pluginTs) return null
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const type = {
       file: tsResolver.resolveFile(

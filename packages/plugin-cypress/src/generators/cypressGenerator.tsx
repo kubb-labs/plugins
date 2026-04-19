@@ -13,9 +13,11 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const pluginTs = driver.getPlugin(pluginTsName)
 
-    if (!pluginTs?.resolver) {
+    if (!pluginTs) {
       return null
     }
+
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const casedParams = ast.caseParams(node.parameters, paramsCasing)
 
@@ -24,17 +26,17 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     const headerParams = casedParams.filter((p) => p.in === 'header')
 
     const importedTypeNames = [
-      ...pathParams.map((p) => pluginTs.resolver.resolvePathParamsName(node, p)),
-      ...queryParams.map((p) => pluginTs.resolver.resolveQueryParamsName(node, p)),
-      ...headerParams.map((p) => pluginTs.resolver.resolveHeaderParamsName(node, p)),
-      node.requestBody?.schema ? pluginTs.resolver.resolveDataName(node) : undefined,
-      pluginTs.resolver.resolveResponseName(node),
+      ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
+      ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
+      ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
+      node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
+      tsResolver.resolveResponseName(node),
     ].filter(Boolean)
 
     const meta = {
       name: resolver.resolveName(node.operationId),
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      fileTs: pluginTs.resolver.resolveFile(
+      fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
@@ -58,7 +60,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         <Request
           name={meta.name}
           node={node}
-          resolver={pluginTs.resolver}
+          resolver={tsResolver}
           dataReturnType={dataReturnType}
           paramsCasing={paramsCasing}
           paramsType={paramsType}

@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQueries } from '@tanstack/react-query'
 import { useState } from 'react'
 import { findPetsByStatusQueryOptionsHook, useFindPetsByStatusHook, useFindPetsByTagsInfiniteHook, useUpdatePetWithFormHook } from './gen/hooks/index.ts'
-import type { FindPetsByStatusQueryStatus } from './gen/models'
+import type { FindPetsByStatusQueryStatus, Pet } from './gen/models'
 
 const queryClient = new QueryClient()
 
@@ -91,7 +91,7 @@ function Pets() {
     <>
       <h1>Pets: {status}</h1>
       <ul>
-        {pets?.map((pet) => (
+        {(pets as Pet[] | undefined)?.map((pet) => (
           <li key={pet.id}>{pet.name}</li>
         ))}
       </ul>

@@ -8,6 +8,7 @@ import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQue
 import type { InfiniteData, QueryKey, QueryClient, UseInfiniteQueryOptions, UseInfiniteQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { fetch } from './.kubb/fetch'
+import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
@@ -26,6 +27,8 @@ export async function findPetsByTagsInfinite(
   const { client: request = fetch, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+
+  return FindPetsByTagsResponse.parse(res.data)
 }
 
 export function findPetsByTagsInfiniteQueryOptions(
@@ -33,8 +36,8 @@ export function findPetsByTagsInfiniteQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
-  return infiniteQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsResponse>, typeof queryKey, number>({
-    enabled: !!params,
+  return infiniteQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsResponse>, QueryKey, number>({
+    enabled: () => !!params,
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTagsInfinite(toValue(params), { ...config, signal: config.signal ?? signal })

@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolvePathOptions, Resolver, UserGroup } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * The concrete resolver type for `@kubb/plugin-client`.
@@ -94,7 +94,7 @@ export type Options = {
   /**
    * Group the clients based on the provided name.
    */
-  group?: UserGroup
+  group?: Group
   /**
    * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
    */
@@ -206,7 +206,7 @@ type ResolvedOptions = {
   resolver: ResolverClient
 }
 
-export type PluginClient = PluginFactoryOptions<'plugin-client', Options, ResolvedOptions, never, ResolvePathOptions, ResolverClient>
+export type PluginClient = PluginFactoryOptions<'plugin-client', Options, ResolvedOptions, never, object, ResolverClient>
 
 declare global {
   namespace Kubb {

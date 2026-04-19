@@ -1,17 +1,4 @@
-import type {
-  ast,
-  Exclude,
-  Generator,
-  Group,
-  Include,
-  Output,
-  Override,
-  PluginFactoryOptions,
-  ResolveNameParams,
-  ResolvePathOptions,
-  Resolver,
-  UserGroup,
-} from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolveNameParams, Resolver } from '@kubb/core'
 
 export type ResolverMsw = Resolver & {
   resolveName(this: ResolverMsw, name: string): string
@@ -27,7 +14,7 @@ export type Options = {
   /**
    * Group the MSW mocks based on the provided name.
    */
-  group?: UserGroup
+  group?: Group
   /**
    * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
    */
@@ -85,7 +72,7 @@ type ResolvedOptions = {
   resolver: ResolverMsw
 }
 
-export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, ResolvePathOptions, ResolverMsw>
+export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, object, ResolverMsw>
 
 declare global {
   namespace Kubb {

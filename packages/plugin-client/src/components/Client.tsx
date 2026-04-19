@@ -1,8 +1,8 @@
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
-import type { PluginZod } from '@kubb/plugin-zod'
+import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
@@ -25,8 +25,8 @@ type Props = {
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
-  zodResolver?: PluginZod['resolver']
+  tsResolver: ResolverTs
+  zodResolver?: ResolverZod
   children?: KubbReactNode
 }
 
@@ -35,7 +35,7 @@ type GetParamsProps = {
   paramsType: PluginClient['resolvedOptions']['paramsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
-  tsResolver: PluginTs['resolver']
+  tsResolver: ResolverTs
   isConfigurable: boolean
 }
 
