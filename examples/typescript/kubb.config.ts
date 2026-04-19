@@ -12,7 +12,6 @@ export default defineConfig([
       path: './src/legacy',
       clean: true,
       format: 'oxfmt',
-      lint: 'oxlint',
     },
     adapter: adapterOas({
       validate: false,
@@ -43,7 +42,6 @@ export default defineConfig([
       path: './src/gen',
       clean: true,
       format: 'oxfmt',
-      lint: 'oxlint',
     },
     adapter: adapterOas({
       validate: false,
@@ -64,7 +62,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen2', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen2', clean: true, format: 'oxfmt' },
     adapter: adapterOas({
       validate: false,
     }),
@@ -82,7 +80,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen3', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen3', clean: true, format: 'oxfmt' },
     adapter: adapterOas({
       validate: false,
     }),
@@ -99,7 +97,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen4', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen4', clean: true, format: 'oxfmt' },
     adapter: adapterOas({
       validate: false,
     }),
@@ -116,7 +114,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen5', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen5', clean: true, format: 'oxfmt' },
     adapter: adapterOas({
       validate: false,
     }),
@@ -133,7 +131,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen6', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen6', clean: true, format: 'oxfmt' },
     hooks: {
       done: ['npm run typecheck'],
     },
@@ -151,7 +149,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen7', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen7', clean: true, format: 'oxfmt' },
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
@@ -163,7 +161,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen8', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen8', clean: true, format: 'oxfmt' },
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
@@ -176,7 +174,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen9', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen9', clean: true, format: 'oxfmt' },
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
@@ -189,7 +187,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen10', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen10', clean: true, format: 'oxfmt' },
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
@@ -203,7 +201,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen11', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen11', clean: true, format: 'oxfmt' },
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
@@ -216,7 +214,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen12', clean: true, format: 'oxfmt', lint: 'oxlint' },
+    output: { path: './src/gen12', clean: true, format: 'oxfmt' },
     hooks: {
       done: ['npm run typecheck'],
     },
