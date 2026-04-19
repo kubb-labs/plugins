@@ -47,7 +47,9 @@ export function Type({ name, node, printer, enumType, enumTypeSuffix, enumKeyCas
   return (
     <>
       {shouldExportEnums &&
-        enums.map(({ node }) => <Enum key={node.name} node={node} enumType={enumType} enumTypeSuffix={enumTypeSuffix} enumKeyCasing={enumKeyCasing} resolver={resolver} />)}
+        enums.map(({ node }) => (
+          <Enum key={node.name} node={node} enumType={enumType} enumTypeSuffix={enumTypeSuffix} enumKeyCasing={enumKeyCasing} resolver={resolver} />
+        ))}
       {shouldExportType && (
         <File.Source name={name} isTypeOnly isExportable isIndexable>
           {output}
