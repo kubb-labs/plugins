@@ -1,5 +1,33 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-alpha.36
+
+### Major Changes
+
+- [#7](https://github.com/kubb-labs/plugins/pull/7) [`a943315`](https://github.com/kubb-labs/plugins/commit/a943315c7122945f0678d837d95e34f72d87a419) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Rewrite to v5 architecture.
+  - Plugin rewritten to use `definePlugin`, hook-style generators, and shared `@internals/tanstack-query` package
+  - No longer depends on `pluginOas()` — use `adapterOas()` in the `adapter` field instead
+  - `transformers.name` callback replaced by `resolver` option
+
+  Add `compatibilityPreset` option:
+  - `'default'` — new v5 naming conventions
+  - `'kubbV4'` — preserve v4 naming conventions
+
+  Add `resolver` option to override individual resolver methods without replacing the entire naming strategy.
+
+  Add `transformer` option to apply an AST visitor before printing.
+
+### Patch Changes
+
+- [#7](https://github.com/kubb-labs/plugins/pull/7) [`cb028a7`](https://github.com/kubb-labs/plugins/commit/cb028a709d0720496b7a8626b7165f01f6eba992) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Restore v4-style `queryKey` and `mutationKey` transformer compatibility in `@kubb/plugin-vue-query`.
+
+  Custom key transformers now receive the v5 `node` field and a v4-compatible `{ operation, schemas }` shape so existing callbacks using `props.operation.getOperationId()` and `QueryKey.getTransformer(props)` continue to work during migration.
+
+- Updated dependencies []:
+  - @kubb/plugin-client@5.0.0-alpha.36
+  - @kubb/plugin-ts@5.0.0-alpha.36
+  - @kubb/plugin-zod@5.0.0-alpha.36
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes

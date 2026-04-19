@@ -1,5 +1,22 @@
 # @kubb/plugin-msw
 
+## 5.0.0-alpha.36
+
+### Major Changes
+
+- [#8](https://github.com/kubb-labs/plugins/pull/8) [`f52adb9`](https://github.com/kubb-labs/plugins/commit/f52adb9bfe559e7b53b928972b7bbc2c0eee18f2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Upgrade `@kubb/plugin-msw` to the v5 plugin architecture.
+  - Remove the `@kubb/plugin-oas` and `@kubb/oas` runtime dependency from the plugin
+  - Move `contentType` filtering to `adapterOas(...)`
+  - Keep existing MSW options like `handlers`, `parser`, `baseURL`, `group`, `include`, `exclude`, `override`, and `transformers.name`
+  - Add `resolver`, `transformer`, and `generators` options for v5 customization
+  - Export `resolverMsw` from `@kubb/plugin-msw`
+
+### Patch Changes
+
+- Updated dependencies [[`75e5951`](https://github.com/kubb-labs/plugins/commit/75e5951b626e231fa371fe502912560b377b788d)]:
+  - @kubb/plugin-faker@5.0.0-alpha.36
+  - @kubb/plugin-ts@5.0.0-alpha.36
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes

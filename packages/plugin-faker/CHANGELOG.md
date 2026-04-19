@@ -1,5 +1,26 @@
 # @kubb/plugin-faker
 
+## 5.0.0-alpha.36
+
+### Major Changes
+
+- [#10](https://github.com/kubb-labs/plugins/pull/10) [`75e5951`](https://github.com/kubb-labs/plugins/commit/75e5951b626e231fa371fe502912560b377b788d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rewrite `@kubb/plugin-faker` for the v5 AST-based plugin architecture.
+
+  **Breaking changes:**
+  - Remove `contentType`, `dateType`, `unknownType`, and `emptySchemaType` options
+  - Replace `transformers: { name }` with `resolver`
+  - Replace `transformers` with a single `transformer` visitor
+  - Remove the `@kubb/plugin-oas` / `@kubb/oas` dependency; use `adapterOas()` in config instead
+
+  **New options and exports:**
+  - Add `compatibilityPreset`, `resolver`, `transformer`, `printer`, and `paramsCasing`
+  - Export `resolverFaker`, `resolverFakerLegacy`, and `printerFaker`
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-alpha.36
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes
