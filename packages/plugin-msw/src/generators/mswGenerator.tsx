@@ -64,7 +64,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           .map(([code, typeName]) => {
             const response = node.responses.find((item) => item.statusCode === String(code))
             if (!response) return null
-            return <Response typeName={typeName} response={response} name={mock.name} />
+            return <Response key={typeName} typeName={typeName} response={response} name={mock.name} />
           })}
 
         {parser === 'faker' && faker && hasSuccessSchema ? (

@@ -1,13 +1,12 @@
-
-swagger: "2.0"
+swagger: '2.0'
 info:
   title: test
-  version: "1.0.0"
+  version: '1.0.0'
 paths:
   /var-names:
     get:
       consumes:
-      - application/json
+        - application/json
       responses:
         200:
           description: Success
@@ -16,7 +15,7 @@ paths:
   /names:
     get:
       consumes:
-      - application/json
+        - application/json
       responses:
         200:
           description: Success
@@ -25,16 +24,16 @@ paths:
 definitions:
   enumVarNames.Type:
     enum:
-    - 0
-    - 1
+      - 0
+      - 1
     type: integer
     x-enum-varnames:
-    - Pending
-    - Received
+      - Pending
+      - Received
   enumNames.Type:
     enum:
-    - 0
-    - 1
+      - 0
+      - 1
     x-enumNames:
       - Pending
       - Received

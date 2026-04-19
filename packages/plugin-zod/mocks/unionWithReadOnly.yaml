@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost/
 paths:
-  "/items":
+  '/items':
     post:
       operationId: createItem
       summary: Create an item
@@ -16,14 +16,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Item"
+              $ref: '#/components/schemas/Item'
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+                $ref: '#/components/schemas/Item'
     put:
       operationId: updateItem
       summary: Update an item
@@ -33,14 +33,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Item"
+              $ref: '#/components/schemas/Item'
       responses:
-        "200":
+        '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Item"
+                $ref: '#/components/schemas/Item'
 components:
   schemas:
     Item:
@@ -49,13 +49,13 @@ components:
         - name
         - type
       oneOf:
-        - $ref: "#/components/schemas/ItemTypeA"
-        - $ref: "#/components/schemas/ItemTypeB"
+        - $ref: '#/components/schemas/ItemTypeA'
+        - $ref: '#/components/schemas/ItemTypeB'
       discriminator:
         propertyName: type
         mapping:
-          typeA: "#/components/schemas/ItemTypeA"
-          typeB: "#/components/schemas/ItemTypeB"
+          typeA: '#/components/schemas/ItemTypeA'
+          typeB: '#/components/schemas/ItemTypeB'
       properties:
         id:
           type: integer

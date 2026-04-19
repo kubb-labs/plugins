@@ -3,41 +3,30 @@
   "version": "5.0.0-alpha.35",
   "description": "Cypress test generator plugin for Kubb, creating end-to-end tests from OpenAPI specifications for automated API testing.",
   "keywords": [
+    "api-testing",
+    "code-generator",
+    "codegen",
     "cypress",
     "e2e-testing",
     "end-to-end",
-    "testing",
-    "test-generation",
-    "api-testing",
-    "test-automation",
     "integration-testing",
-    "typescript",
-    "openapi",
-    "swagger",
+    "kubb",
     "oas",
-    "code-generator",
-    "codegen",
+    "openapi",
     "plugins",
-    "kubb"
+    "swagger",
+    "test-automation",
+    "test-generation",
+    "testing",
+    "typescript"
   ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kubb-labs/kubb.git",
     "directory": "packages/plugin-cypress"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "sideEffects": false,
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "types": "./dist/index.d.ts",
-  "typesVersions": {},
   "files": [
     "src",
     "dist",
@@ -45,13 +34,23 @@
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"
   ],
-  "size-limit": [
-    {
-      "path": "./dist/*.js",
-      "limit": "510 KiB",
-      "gzip": true
-    }
-  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {},
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsdown && size-limit",
     "clean": "npx rimraf ./dist",
@@ -68,19 +67,20 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"
   },
-  "engines": {
-    "node": ">=22"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
   "devDependencies": {
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:"
+  },
+  "size-limit": [
+    {
+      "path": "./dist/*.js",
+      "limit": "510 KiB",
+      "gzip": true
+    }
+  ],
+  "engines": {
+    "node": ">=22"
   }
 }

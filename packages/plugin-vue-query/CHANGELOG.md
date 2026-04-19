@@ -15,13 +15,13 @@
   ```ts
   // Before
   pluginClient({
-    pre: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
-  });
+    pre: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
+  })
 
   // After
   pluginClient({
-    dependencies: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
-  });
+    dependencies: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
+  })
   ```
 
   All built-in plugins have been updated automatically. If you were setting `pre` or `post` directly on a custom plugin, update them to use `dependencies` instead.
@@ -99,14 +99,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from "@kubb/core";
+  import { defineGenerator } from '@kubb/core'
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this; // always present, no null-check needed
+      const { adapter, rootNode } = this // always present, no null-check needed
       // ...
     },
-  });
+  })
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -114,25 +114,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from "@kubb/core";
+  import { mergeGenerators } from '@kubb/core'
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB];
-    const mergedGenerator = mergeGenerators(generators);
+    const generators = [generatorA, generatorB]
+    const mergedGenerator = mergeGenerators(generators)
 
     return {
-      name: "my-plugin",
+      name: 'my-plugin',
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts);
+        return mergedGenerator.schema?.call(this, node, opts)
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts);
+        return mergedGenerator.operation?.call(this, node, opts)
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts);
+        return mergedGenerator.operations?.call(this, nodes, opts)
       },
-    };
-  });
+    }
+  })
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -140,7 +140,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin("plugin-ts");
+  const tsPlugin = context.getPlugin('plugin-ts')
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -1181,20 +1181,20 @@
   **Usage:**
 
   ```typescript
-  import { defineConfig } from "@kubb/core";
-  import { pluginTs } from "@kubb/plugin-ts";
-  import { pluginClient } from "@kubb/plugin-client";
+  import { defineConfig } from '@kubb/core'
+  import { pluginTs } from '@kubb/plugin-ts'
+  import { pluginClient } from '@kubb/plugin-client'
 
   export default defineConfig({
     plugins: [
       pluginTs({
-        paramsCasing: "camelcase", // Transform types
+        paramsCasing: 'camelcase', // Transform types
       }),
       pluginClient({
-        paramsCasing: "camelcase", // Transform client code
+        paramsCasing: 'camelcase', // Transform client code
       }),
     ],
-  });
+  })
   ```
 
   **Example:**
@@ -1891,7 +1891,7 @@
   pluginReactQuery({
     mutation: false, // Now properly prevents mutation hook generation
     query: true, // Only generates queryOptions
-  });
+  })
   ```
 
 - Updated dependencies []:

@@ -171,8 +171,8 @@ components:
           type: string
           pattern: \b[1-9]\b
         shipDate:
-            type: string
-            format: date
+          type: string
+          format: date
         shipTime:
           type: string
           format: time
@@ -182,9 +182,9 @@ components:
             animal:
               type: string
               enum:
-              - dog
-              - cat
-              - ant
+                - dog
+                - cat
+                - ant
     Pets:
       type: array
       items:

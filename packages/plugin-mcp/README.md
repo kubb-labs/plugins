@@ -4,12 +4,12 @@
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
 
-
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
 [![Coverage][coverage-src]][coverage-href]
 [![License][license-src]][license-href]
 [![Sponsors][sponsors-src]][sponsors-href]
+
 <h4>
 <a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
 <span> · </span>
@@ -21,9 +21,7 @@
 </h4>
 </div>
 
-
 Swagger integration to create MCP helpers.
-
 
 ## Supporting Kubb
 
@@ -36,7 +34,6 @@ Kubb uses an MIT-licensed open source project with its ongoing development made 
     <img src="https://raw.githubusercontent.com/stijnvanhulle/sponsors/main/sponsors.svg" alt="My sponsors" />
   </a>
 </p>
-
 
 <!-- Badges -->
 

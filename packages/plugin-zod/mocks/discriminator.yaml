@@ -3,9 +3,9 @@ openapi: 3.0.1
 info:
   title: Example Schema
 servers:
-- url: http://localhost/
+  - url: http://localhost/
 paths:
-  "/example":
+  '/example':
     get:
       responses:
         '200':
@@ -13,7 +13,7 @@ paths:
           content:
             application/json:
               schema:
-                "$ref": "#/components/schemas/Advanced"
+                '$ref': '#/components/schemas/Advanced'
 components:
   schemas:
     Advanced:
@@ -22,10 +22,10 @@ components:
         - type
       type: object
       oneOf:
-        - $ref: "#/components/schemas/EnumerationValueSpecificationDto"
-        - $ref: "#/components/schemas/RangeValueSpecificationDto"
-        - $ref: "#/components/schemas/RegexValueSpecificationDto"
-        - $ref: "#/components/schemas/SliderValueSpecificationDto"
+        - $ref: '#/components/schemas/EnumerationValueSpecificationDto'
+        - $ref: '#/components/schemas/RangeValueSpecificationDto'
+        - $ref: '#/components/schemas/RegexValueSpecificationDto'
+        - $ref: '#/components/schemas/SliderValueSpecificationDto'
       properties:
         type:
           minLength: 1
@@ -40,10 +40,10 @@ components:
       discriminator:
         propertyName: type
         mapping:
-          enum: "#/components/schemas/EnumerationValueSpecificationDto"
-          range: "#/components/schemas/RangeValueSpecificationDto"
-          regex: "#/components/schemas/RegexValueSpecificationDto"
-          slider: "#/components/schemas/SliderValueSpecificationDto"
+          enum: '#/components/schemas/EnumerationValueSpecificationDto'
+          range: '#/components/schemas/RangeValueSpecificationDto'
+          regex: '#/components/schemas/RegexValueSpecificationDto'
+          slider: '#/components/schemas/SliderValueSpecificationDto'
     EnumerationValueSpecificationDto:
       title: EnumerationValueSpecification
       required:
@@ -57,7 +57,7 @@ components:
           readOnly: true
         enumeration:
           type: array
-          items: { }
+          items: {}
       additionalProperties: false
 
     RangeValueSpecificationDto:
@@ -96,7 +96,6 @@ components:
           type: string
       additionalProperties: false
 
-
     SliderValueSpecificationDto:
       title: SliderValueSpecification
       required:
@@ -111,9 +110,9 @@ components:
           type: string
           readOnly: true
         left_text:
-          $ref: "#/components/schemas/LocalizedTextDto"
+          $ref: '#/components/schemas/LocalizedTextDto'
         right_text:
-          $ref: "#/components/schemas/LocalizedTextDto"
+          $ref: '#/components/schemas/LocalizedTextDto'
         max_value:
           type: integer
           format: int32

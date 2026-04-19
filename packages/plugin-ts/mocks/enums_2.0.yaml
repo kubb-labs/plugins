@@ -10,14 +10,14 @@ definitions:
           - type: string
             description: Description
           - enum:
-              - "NW"
-              - "NE"
-              - "SW"
-              - "SE"
+              - 'NW'
+              - 'NE'
+              - 'SW'
+              - 'SE'
             description: Wind direction
 
-swagger: "2.0"
+swagger: '2.0'
 info:
   title: test
-  version: "1.0.0"
+  version: '1.0.0'
 paths: {}

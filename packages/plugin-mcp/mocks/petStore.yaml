@@ -22,7 +22,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: A paged array of pets
           headers:
             x-next:
@@ -32,13 +32,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Pets"
+                $ref: '#/components/schemas/Pets'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
     post:
       summary: Create a pet
       description: >
@@ -59,22 +59,22 @@ paths:
             schema:
               type: object
               required:
-                - "name"
-                - "tag"
+                - 'name'
+                - 'tag'
               properties:
                 name:
                   type: string
                 tag:
                   type: string
       responses:
-        "201":
+        '201':
           description: Null response
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
   /pets/{petId}:
     get:
       summary: Info for a specific pet
@@ -95,18 +95,18 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        '200':
           description: Expected response to a valid request
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Pet"
+                $ref: '#/components/schemas/Pet'
         default:
           description: unexpected error
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Error"
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Pet:
@@ -125,7 +125,7 @@ components:
     Pets:
       type: array
       items:
-        $ref: "#/components/schemas/Pet"
+        $ref: '#/components/schemas/Pet'
     Error:
       type: object
       required:

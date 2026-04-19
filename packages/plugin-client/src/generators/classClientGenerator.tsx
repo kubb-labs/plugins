@@ -82,39 +82,36 @@ export const classClientGenerator = defineGenerator<PluginClient>({
       }
     }
 
-    const controllers = nodes.reduce(
-      (acc, operationNode) => {
-        const tag = operationNode.tags[0]
-        const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? pascalCase(tag)) : 'Client'
+    const controllers = nodes.reduce((acc, operationNode) => {
+      const tag = operationNode.tags[0]
+      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? pascalCase(tag)) : 'Client'
 
-        if (!tag && !group) {
-          const name = 'ApiClient'
-          const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
-          const operationData = buildOperationData(operationNode)
-          const previous = acc.find((item) => item.file.path === file.path)
+      if (!tag && !group) {
+        const name = 'ApiClient'
+        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
+        const operationData = buildOperationData(operationNode)
+        const previous = acc.find((item) => item.file.path === file.path)
 
-          if (previous) {
-            previous.operations.push(operationData)
-          } else {
-            acc.push({ name, file, operations: [operationData] })
-          }
-        } else if (tag) {
-          const name = groupName
-          const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
-          const operationData = buildOperationData(operationNode)
-          const previous = acc.find((item) => item.file.path === file.path)
-
-          if (previous) {
-            previous.operations.push(operationData)
-          } else {
-            acc.push({ name, file, operations: [operationData] })
-          }
+        if (previous) {
+          previous.operations.push(operationData)
+        } else {
+          acc.push({ name, file, operations: [operationData] })
         }
+      } else if (tag) {
+        const name = groupName
+        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
+        const operationData = buildOperationData(operationNode)
+        const previous = acc.find((item) => item.file.path === file.path)
 
-        return acc
-      },
-      [] as Array<Controller>,
-    )
+        if (previous) {
+          previous.operations.push(operationData)
+        } else {
+          acc.push({ name, file, operations: [operationData] })
+        }
+      }
+
+      return acc
+    }, [] as Array<Controller>)
 
     function collectTypeImports(ops: Array<OperationData>) {
       const typeImportsByFile = new Map<string, Set<string>>()

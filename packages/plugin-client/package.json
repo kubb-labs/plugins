@@ -4,31 +4,63 @@
   "description": "API client generator plugin for Kubb, creating type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.",
   "keywords": [
     "api-client",
-    "http-client",
-    "sdk-generator",
     "axios",
-    "fetch",
-    "rest-api",
-    "typescript",
-    "type-safety",
-    "type-safe",
-    "openapi",
-    "swagger",
-    "oas",
     "code-generator",
     "codegen",
+    "fetch",
+    "http-client",
+    "kubb",
+    "oas",
+    "openapi",
     "plugins",
-    "kubb"
+    "rest-api",
+    "sdk-generator",
+    "swagger",
+    "type-safe",
+    "type-safety",
+    "typescript"
   ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kubb-labs/kubb.git",
     "directory": "packages/plugin-client"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "sideEffects": false,
+  "files": [
+    "src",
+    "dist",
+    "templates",
+    "*.d.ts",
+    "*.d.cts",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
   "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "clients/axios": [
+        "./dist/clients/axios.d.ts"
+      ],
+      "clients/fetch": [
+        "./dist/clients/fetch.d.ts"
+      ],
+      "templates/config.source": [
+        "./dist/templates/config.source.d.ts"
+      ],
+      "templates/clients/axios.source": [
+        "./dist/templates/clients/axios.source.d.ts"
+      ],
+      "templates/clients/fetch.source": [
+        "./dist/templates/clients/fetch.source.d.ts"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",
@@ -56,43 +88,10 @@
     },
     "./package.json": "./package.json"
   },
-  "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "clients/axios": [
-        "./dist/clients/axios.d.ts"
-      ],
-      "clients/fetch": [
-        "./dist/clients/fetch.d.ts"
-      ],
-      "templates/config.source": [
-        "./dist/templates/config.source.d.ts"
-      ],
-      "templates/clients/axios.source": [
-        "./dist/templates/clients/axios.source.d.ts"
-      ],
-      "templates/clients/fetch.source": [
-        "./dist/templates/clients/fetch.source.d.ts"
-      ]
-    }
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
-  "files": [
-    "src",
-    "dist",
-    "templates",
-    "*.d.ts",
-    "*.d.cts",
-    "!/**/**.test.**",
-    "!/**/__tests__/**",
-    "!/**/__snapshots__/**"
-  ],
-  "size-limit": [
-    {
-      "path": "./dist/*.js",
-      "limit": "510 KiB",
-      "gzip": true
-    }
-  ],
   "scripts": {
     "build": "tsdown && size-limit",
     "clean": "npx rimraf ./dist",
@@ -123,13 +122,14 @@
       "optional": true
     }
   },
+  "size-limit": [
+    {
+      "path": "./dist/*.js",
+      "limit": "510 KiB",
+      "gzip": true
+    }
+  ],
   "engines": {
     "node": ">=22"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js"
+  }
 }

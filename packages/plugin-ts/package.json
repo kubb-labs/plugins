@@ -3,37 +3,27 @@
   "version": "5.0.0-alpha.35",
   "description": "TypeScript code generation plugin for Kubb, transforming OpenAPI schemas into TypeScript interfaces, types, and utility functions.",
   "keywords": [
-    "typescript",
-    "types",
-    "type-generation",
-    "interfaces",
-    "type-definitions",
-    "type-safe",
-    "openapi",
-    "swagger",
-    "oas",
     "code-generator",
     "codegen",
+    "interfaces",
+    "kubb",
+    "oas",
+    "openapi",
     "plugins",
-    "kubb"
+    "swagger",
+    "type-definitions",
+    "type-generation",
+    "type-safe",
+    "types",
+    "typescript"
   ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kubb-labs/kubb.git",
     "directory": "packages/plugin-ts"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "sideEffects": false,
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./package.json": "./package.json"
-  },
-  "types": "./dist/index.d.ts",
   "files": [
     "src",
     "dist",
@@ -41,13 +31,22 @@
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"
   ],
-  "size-limit": [
-    {
-      "path": "./dist/*.js",
-      "limit": "510 KiB",
-      "gzip": true
-    }
-  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsdown && size-limit",
     "clean": "npx rimraf ./dist",
@@ -66,19 +65,20 @@
     "remeda": "catalog:",
     "typescript": "catalog:"
   },
+  "devDependencies": {
+    "@internals/utils": "workspace:*"
+  },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:"
   },
+  "size-limit": [
+    {
+      "path": "./dist/*.js",
+      "limit": "510 KiB",
+      "gzip": true
+    }
+  ],
   "engines": {
     "node": ">=22"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "devDependencies": {
-    "@internals/utils": "workspace:*"
   }
 }
