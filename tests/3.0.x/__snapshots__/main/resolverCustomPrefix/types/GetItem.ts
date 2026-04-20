@@ -3,24 +3,24 @@
 /**
  * @type integer
 */
-export type CustomGetItemPathId = number;
+export type GetItemPathId = number;
 
 /**
  * @description A simple item
  * @type object
 */
-export type CustomGetItemStatus200 = Item;
+export type GetItemStatus200 = Item;
 
 /**
  * @type object
 */
-export type CustomGetItemRequestConfig = {
+export type GetItemRequestConfig = {
     data?: never;
     /**
      * @type object
     */
     pathParams: {
-        id: CustomGetItemPathId;
+        id: GetItemPathId;
     };
     queryParams?: never;
     headerParams?: never;
@@ -33,11 +33,11 @@ export type CustomGetItemRequestConfig = {
 /**
  * @type object
 */
-export type CustomGetItemResponses = {
-    "200": CustomGetItemStatus200;
+export type GetItemResponses = {
+    "200": GetItemStatus200;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type CustomGetItemResponse = CustomGetItemStatus200;
+export type GetItemResponse = GetItemStatus200;
