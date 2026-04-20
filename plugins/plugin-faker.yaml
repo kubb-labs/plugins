@@ -1,0 +1,123 @@
+$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+id: plugin-faker
+name: Faker
+description: Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.
+category: testing
+type: official
+version: 5.0.0-alpha.51
+npmPackage: "@kubb/plugin-faker"
+docsPath: /plugins/plugin-faker
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - faker
+  - mock-data
+  - mocks
+  - fixtures
+  - testing
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts
+resources:
+  documentation: https://kubb.dev/plugins/plugin-faker
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-faker/CHANGELOG.md
+icon: 🎭
+featured: false
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'mocks', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: group
+    type: Group
+    required: false
+    description: Group the Faker mocks based on the provided name (e.g. by tag).
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: dateParser
+    type: "'faker' | 'dayjs' | 'moment' | string"
+    required: false
+    default: "'faker'"
+    description: Which parser to use when date/time values are represented as strings.
+  - name: regexGenerator
+    type: "'faker' | 'randexp'"
+    required: false
+    default: "'faker'"
+    description: Choose which generator to use when using RegExp patterns.
+  - name: mapper
+    type: "Record<string, string>"
+    required: false
+    description: Provide per-property faker expressions keyed by property name.
+  - name: seed
+    type: "number | number[]"
+    required: false
+    description: Seed faker for deterministic output.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase for path, query, and header params.
+  - name: generators
+    type: "Array<Generator<PluginFaker>>"
+    required: false
+    description: Define additional generators next to the faker generators.
+  - name: resolver
+    type: "Partial<ResolverFaker>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: Single AST visitor applied to each node before rendering.
+  - name: printer
+    type: "{ nodes?: PrinterFakerNodes }"
+    required: false
+    description: Override individual faker printer node handlers to customize rendering.
+fullExample: |
+  import { defineConfig } from 'kubb'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginTs } from '@kubb/plugin-ts'
+  import { pluginFaker } from '@kubb/plugin-faker'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginTs(),
+      pluginFaker({
+        output: { path: 'mocks', barrelType: 'named' },
+        dateParser: 'faker',
+        regexGenerator: 'faker',
+        paramsCasing: 'camelcase',
+      }),
+    ],
+  })

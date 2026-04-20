@@ -1,0 +1,219 @@
+$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+id: plugin-vue-query
+name: Vue Query
+description: Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.
+category: framework
+type: official
+version: 5.0.0-alpha.51
+npmPackage: "@kubb/plugin-vue-query"
+docsPath: /plugins/plugin-vue-query
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - vue-query
+  - tanstack-query
+  - vue
+  - composables
+  - data-fetching
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts
+  - plugin-client
+resources:
+  documentation: https://kubb.dev/plugins/plugin-vue-query
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-vue-query/CHANGELOG.md
+icon: 💚
+featured: false
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'hooks', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: group
+    type: Group
+    required: false
+    description: Group the composables based on the provided name (e.g. by tag).
+  - name: client
+    type: "ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }"
+    required: false
+    description: Client configuration for HTTP request generation.
+    properties:
+      - name: client
+        type: "'axios' | 'fetch'"
+        required: false
+        default: "'axios'"
+        description: Which HTTP client preset to use.
+      - name: importPath
+        type: string
+        required: false
+        description: Custom client import path. Mutually exclusive with client.
+      - name: clientType
+        type: "'function' | 'class' | 'staticClass'"
+        required: false
+        default: "'function'"
+        description: How to generate the client code.
+      - name: dataReturnType
+        type: "'data' | 'full'"
+        required: false
+        default: "'data'"
+        description: Return type when calling the client.
+      - name: baseURL
+        type: string
+        required: false
+        description: Custom base URL for all generated calls.
+      - name: bundle
+        type: boolean
+        required: false
+        default: "false"
+        description: Bundle the selected client into the generated .kubb directory.
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase for path, query, and header params.
+  - name: paramsType
+    type: "'object' | 'inline'"
+    required: false
+    default: "'inline'"
+    description: How to pass your params. 'object' merges all params into a single object, 'inline' uses separate arguments.
+  - name: pathParamsType
+    type: "'object' | 'inline'"
+    required: false
+    default: "'inline'"
+    description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
+  - name: infinite
+    type: "Partial<Infinite> | false"
+    required: false
+    description: When set, an infiniteQuery composable is added.
+    properties:
+      - name: queryParam
+        type: string
+        required: true
+        default: "'id'"
+        description: Specify the params key used for pageParam.
+      - name: initialPageParam
+        type: unknown
+        required: true
+        default: "0"
+        description: The initial value of the first page.
+      - name: nextParam
+        type: "string | string[] | undefined"
+        required: false
+        description: Which field of the data is used to get the cursor for the next page.
+      - name: previousParam
+        type: "string | string[] | undefined"
+        required: false
+        description: Which field of the data is used to get the cursor for the previous page.
+  - name: query
+    type: "Partial<Query> | false"
+    required: false
+    description: Override some useQuery behaviors.
+    properties:
+      - name: methods
+        type: "Array<string>"
+        required: false
+        default: "['get']"
+        description: Define which HTTP methods can be used for queries.
+      - name: importPath
+        type: string
+        required: false
+        default: "'@tanstack/vue-query'"
+        description: Path to the useQuery composable import.
+  - name: mutation
+    type: "Partial<Mutation> | false"
+    required: false
+    description: Override some useMutation behaviors.
+    properties:
+      - name: methods
+        type: "Array<string>"
+        required: false
+        default: "['post', 'put', 'delete']"
+        description: Define which HTTP methods can be used for mutations.
+      - name: importPath
+        type: string
+        required: false
+        default: "'@tanstack/vue-query'"
+        description: Path to the useMutation composable import.
+  - name: queryKey
+    type: QueryKey
+    required: false
+    description: Customize the queryKey transformer.
+  - name: mutationKey
+    type: MutationKey
+    required: false
+    description: Customize the mutationKey transformer.
+  - name: parser
+    type: "'client' | 'zod'"
+    required: false
+    default: "'client'"
+    description: Which parser to use before returning the data to @tanstack/query. 'zod' uses @kubb/plugin-zod.
+  - name: transformers
+    type: "{ name?: (name: string, type?: string) => string }"
+    required: false
+    description: Customize the generated names based on the type provided by the plugin.
+  - name: resolver
+    type: "Partial<ResolverVueQuery>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: Single AST visitor applied to each node before printing.
+  - name: generators
+    type: "Array<Generator<PluginVueQuery>>"
+    required: false
+    description: Define additional generators next to the vue-query generators.
+fullExample: |
+  import { defineConfig } from 'kubb'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginTs } from '@kubb/plugin-ts'
+  import { pluginClient } from '@kubb/plugin-client'
+  import { pluginVueQuery } from '@kubb/plugin-vue-query'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginTs(),
+      pluginClient(),
+      pluginVueQuery({
+        output: { path: 'hooks', barrelType: 'named' },
+        client: { client: 'axios', dataReturnType: 'data' },
+        paramsCasing: 'camelcase',
+        paramsType: 'inline',
+        query: { methods: ['get'] },
+        mutation: { methods: ['post', 'put', 'delete'] },
+      }),
+    ],
+  })

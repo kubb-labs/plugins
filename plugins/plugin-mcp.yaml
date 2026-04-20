@@ -1,0 +1,143 @@
+$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+id: plugin-mcp
+name: MCP
+description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications to enable AI assistants to interact with your API.
+category: ai
+type: official
+version: 5.0.0-alpha.51
+npmPackage: "@kubb/plugin-mcp"
+docsPath: /plugins/plugin-mcp
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - mcp
+  - model-context-protocol
+  - ai
+  - claude
+  - llm
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts
+  - plugin-client
+  - plugin-zod
+resources:
+  documentation: https://kubb.dev/plugins/plugin-mcp
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-mcp/CHANGELOG.md
+icon: 🤖
+featured: false
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'mcp', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: client
+    type: "ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }"
+    required: false
+    description: Client configuration for HTTP request generation, including client type, data return type, base URL, and bundling options.
+    properties:
+      - name: client
+        type: "'axios' | 'fetch'"
+        required: false
+        default: "'axios'"
+        description: Which HTTP client preset to use.
+      - name: importPath
+        type: string
+        required: false
+        description: Custom client import path. Mutually exclusive with client.
+      - name: clientType
+        type: "'function' | 'class' | 'staticClass'"
+        required: false
+        default: "'function'"
+        description: How to generate the client code.
+      - name: dataReturnType
+        type: "'data' | 'full'"
+        required: false
+        default: "'data'"
+        description: Return type when calling the client.
+      - name: baseURL
+        type: string
+        required: false
+        description: Custom base URL for all generated calls.
+      - name: bundle
+        type: boolean
+        required: false
+        default: "false"
+        description: Bundle the selected client into the generated .kubb directory.
+      - name: paramsCasing
+        type: "'camelcase'"
+        required: false
+        description: Transform parameter names to camelCase.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase for path, query, and header params.
+  - name: group
+    type: Group
+    required: false
+    description: Group the MCP handlers based on the provided name (e.g. by tag).
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: resolver
+    type: "Partial<ResolverMcp>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: Single AST visitor applied before printing.
+  - name: generators
+    type: "Array<Generator<PluginMcp>>"
+    required: false
+    description: Define additional generators next to the default MCP generators.
+fullExample: |
+  import { defineConfig } from 'kubb'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginTs } from '@kubb/plugin-ts'
+  import { pluginClient } from '@kubb/plugin-client'
+  import { pluginZod } from '@kubb/plugin-zod'
+  import { pluginMcp } from '@kubb/plugin-mcp'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginTs(),
+      pluginClient(),
+      pluginZod(),
+      pluginMcp({
+        output: { path: 'mcp', barrelType: 'named' },
+        client: { client: 'fetch', dataReturnType: 'data' },
+        paramsCasing: 'camelcase',
+      }),
+    ],
+  })

@@ -1,0 +1,145 @@
+$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+id: plugin-zod
+name: Zod
+description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
+category: utility
+type: official
+version: 5.0.0-alpha.51
+npmPackage: "@kubb/plugin-zod"
+docsPath: /plugins/plugin-zod
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - zod
+  - validation
+  - schema
+  - runtime-validation
+  - codegen
+  - openapi
+dependencies: []
+resources:
+  documentation: https://kubb.dev/plugins/plugin-zod
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-zod/CHANGELOG.md
+icon: 🛡️
+featured: true
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'zod', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: group
+    type: Group
+    required: false
+    description: Group the Zod schemas based on the provided name (e.g. by tag).
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: importPath
+    type: "'zod' | 'zod/mini' | string"
+    required: false
+    default: "'zod'"
+    description: Path to Zod, used as `import { z } from '${importPath}'`. Use 'zod/mini' for the functional API.
+  - name: dateType
+    type: "false | 'string' | 'stringOffset' | 'stringLocal' | 'date'"
+    required: false
+    default: "'string'"
+    description: Choose how date/datetime values are represented. 'string' uses z.string().datetime(), 'date' uses z.date().
+  - name: typed
+    type: boolean
+    required: false
+    description: Use TypeScript (@kubb/plugin-ts) to add type annotation to generated schemas.
+  - name: inferred
+    type: boolean
+    required: false
+    description: Return Zod generated schema as type with z.infer<TYPE>.
+  - name: coercion
+    type: "boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }"
+    required: false
+    description: Use z.coerce.string() instead of z.string(). Can be an object to enable coercion selectively.
+  - name: operations
+    type: boolean
+    required: false
+    description: Generate operation-level schemas grouped by operationId.
+  - name: guidType
+    type: "'uuid' | 'guid'"
+    required: false
+    default: "'uuid'"
+    description: Which Zod GUID validator to use for OpenAPI format uuid.
+  - name: mini
+    type: boolean
+    required: false
+    default: "false"
+    description: Use Zod Mini's functional API for better tree-shaking. When true, importPath defaults to 'zod/mini'.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase for path, query, and header params.
+  - name: generators
+    type: "Array<Generator<PluginZod>>"
+    required: false
+    description: Define additional generators next to the Zod generators.
+  - name: resolver
+    type: "Partial<ResolverZod>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: printer
+    type: "{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }"
+    required: false
+    description: Override individual printer node handlers to customize rendering of specific schema types.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: Single AST visitor applied to each schema/operation node before printing.
+  - name: wrapOutput
+    type: "(arg: { output: string; schema: ast.SchemaNode }) => string | undefined"
+    required: false
+    description: Callback function to wrap the output of the generated zod schema (e.g. adding .openapi() metadata).
+fullExample: |
+  import { defineConfig } from 'kubb'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginZod } from '@kubb/plugin-zod'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginZod({
+        output: { path: 'zod', barrelType: 'named' },
+        importPath: 'zod',
+        dateType: 'string',
+        typed: true,
+        coercion: false,
+        guidType: 'uuid',
+        mini: false,
+        paramsCasing: 'camelcase',
+      }),
+    ],
+  })
