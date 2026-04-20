@@ -1,0 +1,24 @@
+$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+id: plugin-redoc
+name: Redoc
+description: Generate beautiful, interactive API documentation using Redoc from OpenAPI specifications.
+category: documentation
+type: official
+version: 5.0.0-alpha.51
+npmPackage: "@kubb/plugin-redoc"
+docsPath: /plugins/plugin-redoc
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - redoc
+  - api-docs
+  - documentation
+  - interactive-docs
+  - codegen
+  - openapi
+dependencies: []
