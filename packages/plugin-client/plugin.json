@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
+  "name": "@kubb/plugin-client",
+  "description": "Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.",
+  "category": "Client",
+  "tags": [
+    "api-client",
+    "axios",
+    "fetch",
+    "http-client",
+    "codegen",
+    "openapi"
+  ],
+  "links": {
+    "npm": "https://www.npmjs.com/package/@kubb/plugin-client",
+    "docs": "/plugins/plugin-client"
+  },
+  "kubbPlugins": [
+    "@kubb/plugin-ts"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
+  "name": "@kubb/plugin-mcp",
+  "description": "Generate Model Context Protocol (MCP) servers from OpenAPI specifications to enable AI assistants to interact with your API.",
+  "category": "AI",
+  "tags": [
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "claude",
+    "llm",
+    "codegen",
+    "openapi"
+  ],
+  "links": {
+    "npm": "https://www.npmjs.com/package/@kubb/plugin-mcp",
+    "docs": "/plugins/plugin-mcp"
+  },
+  "kubbPlugins": [
+    "@kubb/plugin-ts",
+    "@kubb/plugin-client",
+    "@kubb/plugin-zod"
+  ]
+}

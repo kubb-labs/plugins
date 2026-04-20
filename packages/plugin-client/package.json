@@ -31,6 +31,7 @@
     "src",
     "dist",
     "templates",
+    "plugin.json",
     "*.d.ts",
     "*.d.cts",
     "!/**/**.test.**",
@@ -86,10 +87,9 @@
       "import": "./dist/templates/config.source.js",
       "require": "./dist/templates/config.source.cjs"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./plugin.json": "./plugin.json"
   },
-  "publishConfig": {
-    "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
+  "name": "@kubb/plugin-msw",
+  "description": "Generate Mock Service Worker (MSW) handlers from OpenAPI specifications for frontend development and testing.",
+  "category": "Mocking",
+  "tags": [
+    "msw",
+    "mock-service-worker",
+    "api-mocking",
+    "mocks",
+    "testing",
+    "codegen",
+    "openapi"
+  ],
+  "links": {
+    "npm": "https://www.npmjs.com/package/@kubb/plugin-msw",
+    "docs": "/plugins/plugin-msw"
+  },
+  "kubbPlugins": [
+    "@kubb/plugin-ts",
+    "@kubb/plugin-faker"
+  ]
+}

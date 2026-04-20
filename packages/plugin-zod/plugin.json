@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
+  "name": "@kubb/plugin-zod",
+  "description": "Generate Zod validation schemas from OpenAPI specifications for runtime data validation.",
+  "category": "Validation",
+  "tags": [
+    "zod",
+    "validation",
+    "schema",
+    "runtime-validation",
+    "codegen",
+    "openapi"
+  ],
+  "links": {
+    "npm": "https://www.npmjs.com/package/@kubb/plugin-zod",
+    "docs": "/plugins/plugin-zod"
+  },
+  "kubbPlugins": []
+}

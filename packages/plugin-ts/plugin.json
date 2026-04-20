@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
+  "name": "@kubb/plugin-ts",
+  "description": "Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.",
+  "category": "TypeScript",
+  "tags": [
+    "typescript",
+    "types",
+    "interfaces",
+    "codegen",
+    "openapi"
+  ],
+  "links": {
+    "npm": "https://www.npmjs.com/package/@kubb/plugin-ts",
+    "docs": "/plugins/plugin-ts"
+  },
+  "kubbPlugins": []
+}
