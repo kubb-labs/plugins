@@ -1,24 +1,12 @@
-export { createUserDataFaker, createUserResponseFaker, createUserStatusDefaultFaker } from './createUserFaker.ts'
+export { createUserData, createUserResponse, createUserStatusDefault } from './createUser.ts'
 export {
-  createUsersWithListInputDataFaker,
-  createUsersWithListInputResponseFaker,
-  createUsersWithListInputStatus200Faker,
-  createUsersWithListInputStatusDefaultFaker,
-} from './createUsersWithListInputFaker.ts'
-export { deleteUserPathUsernameFaker, deleteUserResponseFaker, deleteUserStatus400Faker, deleteUserStatus404Faker } from './deleteUserFaker.ts'
-export {
-  getUserByNamePathUsernameFaker,
-  getUserByNameResponseFaker,
-  getUserByNameStatus200Faker,
-  getUserByNameStatus400Faker,
-  getUserByNameStatus404Faker,
-} from './getUserByNameFaker.ts'
-export {
-  loginUserQueryPasswordFaker,
-  loginUserQueryUsernameFaker,
-  loginUserResponseFaker,
-  loginUserStatus200Faker,
-  loginUserStatus400Faker,
-} from './loginUserFaker.ts'
-export { logoutUserResponseFaker, logoutUserStatusDefaultFaker } from './logoutUserFaker.ts'
-export { updateUserDataFaker, updateUserPathUsernameFaker, updateUserResponseFaker, updateUserStatusDefaultFaker } from './updateUserFaker.ts'
+  createUsersWithListInputData,
+  createUsersWithListInputResponse,
+  createUsersWithListInputStatus200,
+  createUsersWithListInputStatusDefault,
+} from './createUsersWithListInput.ts'
+export { deleteUserPathUsername, deleteUserResponse, deleteUserStatus400, deleteUserStatus404 } from './deleteUser.ts'
+export { getUserByNamePathUsername, getUserByNameResponse, getUserByNameStatus200, getUserByNameStatus400, getUserByNameStatus404 } from './getUserByName.ts'
+export { loginUserQueryPassword, loginUserQueryUsername, loginUserResponse, loginUserStatus200, loginUserStatus400 } from './loginUser.ts'
+export { logoutUserResponse, logoutUserStatusDefault } from './logoutUser.ts'
+export { updateUserData, updateUserPathUsername, updateUserResponse, updateUserStatusDefault } from './updateUser.ts'
