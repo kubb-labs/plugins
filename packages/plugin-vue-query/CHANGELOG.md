@@ -1,5 +1,32 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-alpha.52
+
+### Major Changes
+
+- [#7](https://github.com/kubb-labs/plugins/pull/7) [`a943315`](https://github.com/kubb-labs/plugins/commit/a943315c7122945f0678d837d95e34f72d87a419) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Rewrite to v5 architecture.
+  - Plugin rewritten to use `definePlugin`, hook-style generators, and shared `@internals/tanstack-query` package
+  - No longer depends on `pluginOas()` — use `adapterOas()` in the `adapter` field instead
+  - `transformers.name` callback replaced by `resolver` option
+
+  Add `resolver` option:
+  - Use `resolver` for custom naming conventions
+
+  Add `resolver` option to override individual resolver methods without replacing the entire naming strategy.
+
+  Add `transformer` option to apply an AST visitor before printing.
+
+### Patch Changes
+
+- [#7](https://github.com/kubb-labs/plugins/pull/7) [`cb028a7`](https://github.com/kubb-labs/plugins/commit/cb028a709d0720496b7a8626b7165f01f6eba992) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Restore v4-style `queryKey` and `mutationKey` transformer compatibility in `@kubb/plugin-vue-query`.
+
+  Custom key transformers now receive the v5 `node` field and a v4-compatible `{ operation, schemas }` shape so existing callbacks using `props.operation.getOperationId()` and `QueryKey.getTransformer(props)` continue to work during migration.
+
+- Updated dependencies []:
+  - @kubb/plugin-client@5.0.0-alpha.52
+  - @kubb/plugin-ts@5.0.0-alpha.52
+  - @kubb/plugin-zod@5.0.0-alpha.52
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes
@@ -15,13 +42,13 @@
   ```ts
   // Before
   pluginClient({
-    pre: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    pre: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
 
   // After
   pluginClient({
-    dependencies: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    dependencies: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
   ```
 
   All built-in plugins have been updated automatically. If you were setting `pre` or `post` directly on a custom plugin, update them to use `dependencies` instead.
@@ -99,14 +126,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -114,25 +141,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -140,7 +167,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -1181,20 +1208,20 @@
   **Usage:**
 
   ```typescript
-  import { defineConfig } from '@kubb/core'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
+  import { defineConfig } from "@kubb/core";
+  import { pluginTs } from "@kubb/plugin-ts";
+  import { pluginClient } from "@kubb/plugin-client";
 
   export default defineConfig({
     plugins: [
       pluginTs({
-        paramsCasing: 'camelcase', // Transform types
+        paramsCasing: "camelcase", // Transform types
       }),
       pluginClient({
-        paramsCasing: 'camelcase', // Transform client code
+        paramsCasing: "camelcase", // Transform client code
       }),
     ],
-  })
+  });
   ```
 
   **Example:**
@@ -1891,7 +1918,7 @@
   pluginReactQuery({
     mutation: false, // Now properly prevents mutation hook generation
     query: true, // Only generates queryOptions
-  })
+  });
   ```
 
 - Updated dependencies []:

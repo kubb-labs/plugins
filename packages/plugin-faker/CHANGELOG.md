@@ -1,5 +1,26 @@
 # @kubb/plugin-faker
 
+## 5.0.0-alpha.52
+
+### Major Changes
+
+- [#10](https://github.com/kubb-labs/plugins/pull/10) [`75e5951`](https://github.com/kubb-labs/plugins/commit/75e5951b626e231fa371fe502912560b377b788d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rewrite `@kubb/plugin-faker` for the v5 AST-based plugin architecture.
+
+  **Breaking changes:**
+  - Remove `contentType`, `dateType`, `unknownType`, and `emptySchemaType` options
+  - Replace `transformers: { name }` with `resolver`
+  - Replace `transformers` with a single `transformer` visitor
+  - Remove the `@kubb/plugin-oas` / `@kubb/oas` dependency; use `adapterOas()` in config instead
+
+  **New options and exports:**
+  - Add `resolver`, `transformer`, `printer`, and `paramsCasing`
+  - Export `resolverFaker`, `resolverFakerLegacy`, and `printerFaker`
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-alpha.52
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes
@@ -15,13 +36,13 @@
   ```ts
   // Before
   pluginClient({
-    pre: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    pre: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
 
   // After
   pluginClient({
-    dependencies: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    dependencies: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
   ```
 
   All built-in plugins have been updated automatically. If you were setting `pre` or `post` directly on a custom plugin, update them to use `dependencies` instead.
@@ -86,14 +107,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -101,25 +122,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -127,7 +148,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -996,20 +1017,20 @@
   **Usage:**
 
   ```typescript
-  import { defineConfig } from '@kubb/core'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
+  import { defineConfig } from "@kubb/core";
+  import { pluginTs } from "@kubb/plugin-ts";
+  import { pluginClient } from "@kubb/plugin-client";
 
   export default defineConfig({
     plugins: [
       pluginTs({
-        paramsCasing: 'camelcase', // Transform types
+        paramsCasing: "camelcase", // Transform types
       }),
       pluginClient({
-        paramsCasing: 'camelcase', // Transform client code
+        paramsCasing: "camelcase", // Transform client code
       }),
     ],
-  })
+  });
   ```
 
   **Example:**
@@ -1171,7 +1192,7 @@
   ```typescript
   pluginOas({
     collisionDetection: true, // Recommended - prevents all collision types
-  })
+  });
   ```
 
 - Updated dependencies [[`996f3b2`](https://github.com/kubb-labs/kubb/commit/996f3b26d8c2167c3e77b734275c204e6c1b159c)]:
@@ -1239,7 +1260,7 @@
 
   ```typescript
   // Generated code (correct)
-  category: createIssueCategory()
+  category: createIssueCategory();
   ```
 
 - Updated dependencies []:
