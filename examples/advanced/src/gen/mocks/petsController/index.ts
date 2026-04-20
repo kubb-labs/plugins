@@ -1,10 +1,10 @@
 export {
-  createPetsDataFaker,
-  createPetsHeaderXEXAMPLEFaker,
-  createPetsPathUuidFaker,
-  createPetsQueryBoolParamFaker,
-  createPetsQueryOffsetFaker,
-  createPetsResponseFaker,
-  createPetsStatus201Faker,
-  createPetsStatusDefaultFaker,
-} from './createPetsFaker.ts'
+  createPetsData,
+  createPetsHeaderXEXAMPLE,
+  createPetsPathUuid,
+  createPetsQueryBoolParam,
+  createPetsQueryOffset,
+  createPetsResponse,
+  createPetsStatus201,
+  createPetsStatusDefault,
+} from './createPets.ts'

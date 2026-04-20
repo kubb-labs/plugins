@@ -1,5 +1,5 @@
 import type { Customer } from '../models/ts/Customer.ts'
-import { addressFaker } from './addressFaker.ts'
+import { addressFaker } from './address.ts'
 import { faker } from '@faker-js/faker'
 
 export function customerFaker(data?: Partial<Customer>): Customer {
