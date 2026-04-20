@@ -44,4 +44,4 @@ export default pluginExample
 
 | Skill                                                              | Use For                                       |
 |--------------------------------------------------------------------|-----------------------------------------------|
-| **[../components-generators/SKILL.md](../components-generators/SKILL.md)** | Guidance for writing `@kubb/react-fabric` components and generators |
+| **[../components-generators/SKILL.md](../components-generators/SKILL.md)** | Guidance for writing `@kubb/renderer-jsx` components and generators |

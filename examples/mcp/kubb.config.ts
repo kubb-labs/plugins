@@ -5,8 +5,6 @@ import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
 
 export default defineConfig(() => {
-  // openDevtools()
-
   return {
     root: '.',
     input: {

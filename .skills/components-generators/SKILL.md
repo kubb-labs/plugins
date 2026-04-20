@@ -1,11 +1,11 @@
 ---
 name: components-generators
-description: Guidance for writing `@kubb/react-fabric` components and generators (React-based and function-based).
+description: Guidance for writing `@kubb/renderer-jsx` components and generators (React-based and function-based).
 ---
 
 # Components & Generators Skill
 
-This skill helps agents answer questions about authoring components and generators using `@kubb/react-fabric`.
+This skill helps agents answer questions about authoring components and generators using `@kubb/renderer-jsx`.
 
 ## When to Use
 
@@ -14,14 +14,14 @@ This skill helps agents answer questions about authoring components and generato
 
 ## What It Does
 
-- Lists common `react-fabric` components and where to place them
+- Lists common `renderer-jsx` components and where to place them
 - Explains generator types and recommended patterns
 - Provides a small conceptual example for authors
 
 ## Conceptual Example
 
 ```tsx
-import { File, Function } from '@kubb/react-fabric'
+import { File, Function } from '@kubb/renderer-jsx'
 export function Query({ name }: Props): FabricReactNode {
   return (
     <File.Source name={name} isExportable isIndexable>
