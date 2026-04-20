@@ -1,12 +1,24 @@
 {
-  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
-  "name": "@kubb/plugin-react-query",
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json",
+  "id": "plugin-react-query",
+  "name": "React Query",
   "description": "Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications for type-safe data fetching in React applications.",
-  "category": "Query",
-  "tags": ["react-query", "tanstack-query", "react", "hooks", "data-fetching", "codegen", "openapi"],
-  "links": {
-    "npm": "https://www.npmjs.com/package/@kubb/plugin-react-query",
-    "docs": "/plugins/plugin-react-query"
+  "category": "framework",
+  "type": "official",
+  "version": "5.0.0-alpha.51",
+  "npmPackage": "@kubb/plugin-react-query",
+  "docsPath": "/plugins/plugin-react-query",
+  "repo": "https://github.com/kubb-labs/plugins",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.0.0",
+    "node": ">=22"
   },
-  "kubbPlugins": ["@kubb/plugin-ts", "@kubb/plugin-client"]
+  "tags": ["react-query", "tanstack-query", "react", "hooks", "data-fetching", "codegen", "openapi"],
+  "dependencies": ["plugin-ts", "plugin-client"]
 }

@@ -1,12 +1,24 @@
 {
-  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
-  "name": "@kubb/plugin-faker",
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json",
+  "id": "plugin-faker",
+  "name": "Faker",
   "description": "Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.",
-  "category": "Mocking",
-  "tags": ["faker", "mock-data", "mocks", "fixtures", "testing", "codegen", "openapi"],
-  "links": {
-    "npm": "https://www.npmjs.com/package/@kubb/plugin-faker",
-    "docs": "/plugins/plugin-faker"
+  "category": "testing",
+  "type": "official",
+  "version": "5.0.0-alpha.51",
+  "npmPackage": "@kubb/plugin-faker",
+  "docsPath": "/plugins/plugin-faker",
+  "repo": "https://github.com/kubb-labs/plugins",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.0.0",
+    "node": ">=22"
   },
-  "kubbPlugins": ["@kubb/plugin-ts"]
+  "tags": ["faker", "mock-data", "mocks", "fixtures", "testing", "codegen", "openapi"],
+  "dependencies": ["plugin-ts"]
 }

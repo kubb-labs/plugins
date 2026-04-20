@@ -1,12 +1,24 @@
 {
-  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
-  "name": "@kubb/plugin-vue-query",
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json",
+  "id": "plugin-vue-query",
+  "name": "Vue Query",
   "description": "Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.",
-  "category": "Query",
-  "tags": ["vue-query", "tanstack-query", "vue", "composables", "data-fetching", "codegen", "openapi"],
-  "links": {
-    "npm": "https://www.npmjs.com/package/@kubb/plugin-vue-query",
-    "docs": "/plugins/plugin-vue-query"
+  "category": "framework",
+  "type": "official",
+  "version": "5.0.0-alpha.51",
+  "npmPackage": "@kubb/plugin-vue-query",
+  "docsPath": "/plugins/plugin-vue-query",
+  "repo": "https://github.com/kubb-labs/plugins",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.0.0",
+    "node": ">=22"
   },
-  "kubbPlugins": ["@kubb/plugin-ts", "@kubb/plugin-client"]
+  "tags": ["vue-query", "tanstack-query", "vue", "composables", "data-fetching", "codegen", "openapi"],
+  "dependencies": ["plugin-ts", "plugin-client"]
 }

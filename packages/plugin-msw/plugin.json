@@ -1,12 +1,24 @@
 {
-  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb.dev/main/schemas/plugin/schema.json",
-  "name": "@kubb/plugin-msw",
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json",
+  "id": "plugin-msw",
+  "name": "MSW",
   "description": "Generate Mock Service Worker (MSW) handlers from OpenAPI specifications for frontend development and testing.",
-  "category": "Mocking",
-  "tags": ["msw", "mock-service-worker", "api-mocking", "mocks", "testing", "codegen", "openapi"],
-  "links": {
-    "npm": "https://www.npmjs.com/package/@kubb/plugin-msw",
-    "docs": "/plugins/plugin-msw"
+  "category": "testing",
+  "type": "official",
+  "version": "5.0.0-alpha.51",
+  "npmPackage": "@kubb/plugin-msw",
+  "docsPath": "/plugins/plugin-msw",
+  "repo": "https://github.com/kubb-labs/plugins",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.0.0",
+    "node": ">=22"
   },
-  "kubbPlugins": ["@kubb/plugin-ts", "@kubb/plugin-faker"]
+  "tags": ["msw", "mock-service-worker", "api-mocking", "mocks", "testing", "codegen", "openapi"],
+  "dependencies": ["plugin-ts", "plugin-faker"]
 }
