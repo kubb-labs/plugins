@@ -27,7 +27,7 @@
     "@kubb/plugin-vue-query": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@tanstack/vue-query": "^5.99.2",
-    "axios": "^1.15.0",
+    "axios": "^1.15.1",
     "unplugin-kubb": "catalog:",
     "vue": "^3.5.32"
   },
@@ -35,7 +35,7 @@
     "@vitejs/plugin-vue": "^6.0.6",
     "msw": "^2.13.4",
     "typescript": "catalog:",
-    "vite": "^8.0.8"
+    "vite": "^8.0.9"
   },
   "engines": {
     "node": ">=22",
