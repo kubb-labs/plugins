@@ -25,7 +25,7 @@ function isValidStrictIdentifier(name: string): boolean {
  * resolverFaker.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'
  * ```
  */
-export const resolverFaker = defineResolver<PluginFaker>(() => {
+export const resolverFaker = defineResolver<PluginFaker>((ctx) => {
   return {
     name: 'default',
     pluginName: 'plugin-faker',
@@ -39,15 +39,15 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
       return `_${resolvedName}`
     },
     resolveName(name, type) {
-      return this.default(name, type)
+      return ctx.default(name, type)
     },
     resolvePathName(name, type) {
-      return this.default(name, type)
+      return ctx.default(name, type)
     },
     resolveFile({ name, extname, tag, path: groupPath }, context) {
       const pathMode = PluginDriver.getMode(path.resolve(context.root, context.output.path))
-      const baseName = `${pathMode === 'single' ? '' : this.resolveName(name, 'file')}${extname}` as `${string}.${string}`
-      const filePath = this.resolvePath(
+      const baseName = `${pathMode === 'single' ? '' : ctx.resolveName(name, 'file')}${extname}` as `${string}.${string}`
+      const filePath = ctx.resolvePath(
         {
           baseName,
           pathMode,
@@ -64,32 +64,32 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
         path: filePath,
         baseName,
         extname,
-        meta: { pluginName: this.pluginName },
+        meta: { pluginName: ctx.pluginName },
         sources: [],
         imports: [],
         exports: [],
       }
     },
     resolveParamName(node, param) {
-      return this.resolveName(`${node.operationId} ${param.in} ${param.name}`)
+      return ctx.resolveName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveDataName(node) {
-      return this.resolveName(`${node.operationId} Data`)
+      return ctx.resolveName(`${node.operationId} Data`)
     },
     resolveResponseStatusName(node, statusCode) {
-      return this.resolveName(`${node.operationId} Status ${statusCode}`)
+      return ctx.resolveName(`${node.operationId} Status ${statusCode}`)
     },
     resolveResponseName(node) {
-      return this.resolveName(`${node.operationId} Response`)
+      return ctx.resolveName(`${node.operationId} Response`)
     },
     resolvePathParamsName(node, param) {
-      return this.resolveParamName(node, param)
+      return ctx.resolveParamName(node, param)
     },
     resolveQueryParamsName(node, param) {
-      return this.resolveParamName(node, param)
+      return ctx.resolveParamName(node, param)
     },
     resolveHeaderParamsName(node, param) {
-      return this.resolveParamName(node, param)
+      return ctx.resolveParamName(node, param)
     },
   }
 })

@@ -14,13 +14,13 @@ import type { PluginReactQuery } from '../types.ts'
  * resolverReactQuery.resolveName('show pet by id')    // -> 'showPetById'
  * ```
  */
-export const resolverReactQuery = defineResolver<PluginReactQuery>(() => ({
+export const resolverReactQuery = defineResolver<PluginReactQuery>((ctx) => ({
   name: 'default',
   pluginName: 'plugin-react-query',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return ctx.default(name, 'function')
   },
 }))

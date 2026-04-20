@@ -2,7 +2,7 @@ import { camelCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginMsw } from '../types.ts'
 
-export const resolverMsw = defineResolver<PluginMsw>(() => ({
+export const resolverMsw = defineResolver<PluginMsw>((_ctx) => ({
   name: 'default',
   pluginName: 'plugin-msw',
   default(name, type) {

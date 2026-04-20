@@ -14,13 +14,13 @@ import type { PluginClient } from '../types.ts'
  * resolverClient.resolveName('show pet by id')    // -> 'showPetById'
  * ```
  */
-export const resolverClient = defineResolver<PluginClient>(() => ({
+export const resolverClient = defineResolver<PluginClient>((ctx) => ({
   name: 'default',
   pluginName: 'plugin-client',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return ctx.default(name, 'function')
   },
 }))

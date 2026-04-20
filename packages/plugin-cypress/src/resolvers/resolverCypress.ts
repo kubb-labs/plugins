@@ -14,13 +14,13 @@ import type { PluginCypress } from '../types.ts'
  * resolverCypress.resolveName('show pet by id')    // -> 'showPetById'
  * ```
  */
-export const resolverCypress = defineResolver<PluginCypress>(() => ({
+export const resolverCypress = defineResolver<PluginCypress>((ctx) => ({
   name: 'default',
   pluginName: 'plugin-cypress',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return ctx.default(name, 'function')
   },
 }))
