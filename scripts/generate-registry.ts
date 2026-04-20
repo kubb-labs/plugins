@@ -50,6 +50,9 @@ function pluginToYamlLines(plugin: PluginMeta, indent = ''): string[] {
     for (const m of plugin.maintainers) {
       lines.push(`${i}  - name: ${m.name}`)
       lines.push(`${i}    github: ${m.github}`)
+      if (m.avatar) {
+        lines.push(`${i}    avatar: ${m.avatar}`)
+      }
     }
   }
 
@@ -108,8 +111,11 @@ for (const dir of pluginDirs) {
     const raw = readFileSync(pluginJsonPath, 'utf-8')
     const meta = JSON.parse(raw) as PluginMeta
     plugins.push(meta)
-  } catch {
-    // skip packages without plugin.json
+  } catch (err) {
+    const isNotFound = err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'ENOENT'
+    if (!isNotFound) {
+      console.error(`Error reading ${pluginJsonPath}:`, err)
+    }
   }
 }
 

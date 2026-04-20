@@ -1,0 +1,42 @@
+name: Sync Plugin Registry
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/*/plugin.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-registry:
+    name: Sync plugin registry files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v6
+
+      - name: Setup Tools
+        uses: kubb-labs/config/.github/setup@main
+        with:
+          node-version: '22'
+
+      - name: Regenerate registry
+        run: pnpm registry
+
+      - name: Open PR with updated registry
+        uses: peter-evans/create-pull-request@v7
+        with:
+          base: main
+          branch: chore/sync-plugin-registry
+          delete-branch: true
+          title: "chore: sync plugin registry"
+          commit-message: "chore(registry): sync plugins/*.yaml and registry.yaml"
+          body: |
+            Automated update of `plugins/*.yaml` and `registry.yaml` from `packages/*/plugin.json`.
+
+            This PR was automatically created to keep the plugin registry in sync.
