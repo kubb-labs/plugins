@@ -1,25 +1,25 @@
 import type { UpdateUserData } from '../../models/ts/userController/UpdateUser.ts'
-import { userFaker } from '../userFaker.ts'
+import { userFaker } from '../user.ts'
 import { faker } from '@faker-js/faker'
 
-export function updateUserPathUsernameFaker(data?: string): string {
+export function updateUserPathUsername(data?: string): string {
   return data ?? faker.string.alpha()
 }
 
 /**
  * @description successful operation
  */
-export function updateUserStatusDefaultFaker() {
+export function updateUserStatusDefault() {
   return undefined
 }
 
 /**
  * @description Update an existent user in the store
  */
-export function updateUserDataFaker(data?: Partial<UpdateUserData>): UpdateUserData {
+export function updateUserData(data?: Partial<UpdateUserData>): UpdateUserData {
   return userFaker(data)
 }
 
-export function updateUserResponseFaker() {
+export function updateUserResponse() {
   return undefined
 }
