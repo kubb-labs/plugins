@@ -67,6 +67,8 @@
     "./package.json": "./package.json",
     "./plugin.json": "./plugin.json"
   },
+  "publishConfig": {
+    "access": "public",
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {

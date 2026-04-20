@@ -69,6 +69,14 @@
     "./package.json": "./package.json",
     "./plugin.json": "./plugin.json"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown && size-limit",
+    "clean": "npx rimraf ./dist",
+    "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "release": "pnpm publish --no-git-check",
     "release:canary": "bash ../../.github/canary.sh && node ../../scripts/build.js canary && pnpm publish --no-git-check",

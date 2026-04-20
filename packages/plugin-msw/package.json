@@ -72,6 +72,11 @@
     "./package.json": "./package.json",
     "./plugin.json": "./plugin.json"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
     "build": "tsdown && size-limit",
     "clean": "npx rimraf ./dist",
     "lint": "oxlint .",
