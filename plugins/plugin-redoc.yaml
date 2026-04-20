@@ -22,3 +22,36 @@ tags:
   - codegen
   - openapi
 dependencies: []
+resources:
+  documentation: https://kubb.dev/plugins/plugin-redoc
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-redoc/CHANGELOG.md
+icon: 📖
+featured: false
+skills: []
+options:
+  - name: output
+    type: "{ path: string }"
+    required: false
+    description: Specify the output path for the generated documentation HTML file.
+    properties:
+      - name: path
+        type: string
+        required: true
+        default: "'docs.html'"
+        description: Output path for the generated Redoc documentation HTML file.
+fullExample: |
+  import { defineConfig } from '@kubb/core'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginRedoc } from '@kubb/plugin-redoc'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginRedoc({
+        output: { path: 'docs.html' },
+      }),
+    ],
+  })

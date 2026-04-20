@@ -23,3 +23,97 @@ tags:
   - openapi
 dependencies:
   - plugin-ts
+resources:
+  documentation: https://kubb.dev/plugins/plugin-cypress
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-cypress/CHANGELOG.md
+icon: 🌲
+featured: false
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'cypress', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: dataReturnType
+    type: "'data' | 'full'"
+    required: false
+    default: "'data'"
+    description: Return type when calling cy.request. 'data' returns ResponseConfig[data], 'full' returns ResponseConfig.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase for path, query, and header params.
+  - name: baseURL
+    type: string
+    required: false
+    description: Base URL prepended to every generated request URL.
+  - name: group
+    type: Group
+    required: false
+    description: Group the Cypress requests based on the provided name (e.g. by tag).
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: paramsType
+    type: "'object' | 'inline'"
+    required: false
+    default: "'inline'"
+    description: How to pass your params. 'object' merges all params into a single object, 'inline' uses separate arguments.
+  - name: pathParamsType
+    type: "'object' | 'inline'"
+    required: false
+    default: "'inline'"
+    description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
+  - name: resolver
+    type: "Partial<ResolverCypress>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: Single AST visitor applied before printing.
+  - name: generators
+    type: "Array<Generator<PluginCypress>>"
+    required: false
+    description: Define additional generators next to the default generators.
+fullExample: |
+  import { defineConfig } from '@kubb/core'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginTs } from '@kubb/plugin-ts'
+  import { pluginCypress } from '@kubb/plugin-cypress'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginTs(),
+      pluginCypress({
+        output: { path: 'cypress', barrelType: 'named' },
+        dataReturnType: 'data',
+        paramsCasing: 'camelcase',
+        paramsType: 'inline',
+      }),
+    ],
+  })

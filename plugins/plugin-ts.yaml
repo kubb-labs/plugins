@@ -21,3 +21,117 @@ tags:
   - codegen
   - openapi
 dependencies: []
+resources:
+  documentation: https://kubb.dev/plugins/plugin-ts
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-ts/CHANGELOG.md
+icon: 🔷
+featured: true
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'types', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: group
+    type: Group
+    required: false
+    description: Group the generated types based on the provided name (e.g. by tag).
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: syntaxType
+    type: "'type' | 'interface'"
+    required: false
+    default: "'type'"
+    description: Switch between type alias or interface for creating TypeScript types.
+  - name: optionalType
+    type: "'questionToken' | 'undefined' | 'questionTokenAndUndefined'"
+    required: false
+    default: "'questionToken'"
+    description: Choose what to use as mode for an optional value.
+  - name: arrayType
+    type: "'generic' | 'array'"
+    required: false
+    default: "'array'"
+    description: "Choose between Array<string> or string[] for array types."
+  - name: enumType
+    type: "'asConst' | 'asPascalConst' | 'enum' | 'constEnum' | 'literal' | 'inlineLiteral'"
+    required: false
+    default: "'asConst'"
+    description: Choose how enums are generated. asConst/asPascalConst emit const objects, enum/constEnum emit TypeScript enums, literal/inlineLiteral emit union literals.
+  - name: enumTypeSuffix
+    type: string
+    required: false
+    default: "'Key'"
+    description: Suffix appended to the generated type alias name for asConst/asPascalConst enum types.
+  - name: enumKeyCasing
+    type: "'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'"
+    required: false
+    default: "'none'"
+    description: Choose the casing for enum key names. Only applies to asConst, asPascalConst, enum, and constEnum types.
+  - name: contentType
+    type: "'application/json' | string"
+    required: false
+    description: Define which contentType should be used. By default uses the first valid JSON media type.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase for path, query, and header params.
+  - name: generators
+    type: "Array<Generator<PluginTs>>"
+    required: false
+    description: Define additional generators next to the TypeScript generators.
+  - name: resolver
+    type: "Partial<ResolverTs>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: AST visitor applied to each schema/operation node before printing.
+  - name: printer
+    type: "{ nodes?: PrinterTsNodes }"
+    required: false
+    description: Override individual printer node handlers to customize rendering of specific schema types.
+fullExample: |
+  import { defineConfig } from '@kubb/core'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginTs } from '@kubb/plugin-ts'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginTs({
+        output: { path: 'types', barrelType: 'named' },
+        syntaxType: 'type',
+        enumType: 'asConst',
+        enumKeyCasing: 'none',
+        optionalType: 'questionToken',
+        arrayType: 'array',
+        paramsCasing: 'camelcase',
+      }),
+    ],
+  })

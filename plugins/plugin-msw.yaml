@@ -25,3 +25,93 @@ tags:
 dependencies:
   - plugin-ts
   - plugin-faker
+resources:
+  documentation: https://kubb.dev/plugins/plugin-msw
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-msw/CHANGELOG.md
+icon: 🎯
+featured: false
+skills: []
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'handlers', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory for generated files, relative to the global output path.
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Controls how index.ts barrel files are generated.
+  - name: baseURL
+    type: string
+    required: false
+    description: Base URL prepended to every generated handler URL path.
+  - name: group
+    type: Group
+    required: false
+    description: Group the MSW handlers based on the provided name (e.g. by tag).
+  - name: exclude
+    type: "Array<Exclude>"
+    required: false
+    description: Array containing exclude parameters to skip tags/operations/methods/paths.
+  - name: include
+    type: "Array<Include>"
+    required: false
+    description: Array containing include parameters to include tags/operations/methods/paths.
+  - name: override
+    type: "Array<Override>"
+    required: false
+    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+  - name: handlers
+    type: boolean
+    required: false
+    default: "false"
+    description: Create a handlers.ts file with all handlers grouped by methods.
+  - name: parser
+    type: "'data' | 'faker'"
+    required: false
+    default: "'data'"
+    description: Which parser to use for generating response data. 'faker' uses @kubb/plugin-faker.
+  - name: transformers
+    type: "{ name?: (name: string, type?: string) => string }"
+    required: false
+    description: Customize the generated names based on the type provided by the plugin.
+  - name: resolver
+    type: "Partial<ResolverMsw>"
+    required: false
+    description: Override individual resolver methods to customize naming conventions.
+  - name: transformer
+    type: ast.Visitor
+    required: false
+    description: Single AST visitor applied before printing.
+  - name: generators
+    type: "Array<Generator<PluginMsw>>"
+    required: false
+    description: Define additional generators next to the MSW generators.
+fullExample: |
+  import { defineConfig } from '@kubb/core'
+  import { adapterOas } from '@kubb/adapter-oas'
+  import { pluginTs } from '@kubb/plugin-ts'
+  import { pluginFaker } from '@kubb/plugin-faker'
+  import { pluginMsw } from '@kubb/plugin-msw'
+
+  export default defineConfig({
+    input: { path: './petStore.yaml' },
+    output: { path: './src/gen' },
+    plugins: [
+      pluginTs(),
+      pluginFaker(),
+      pluginMsw({
+        output: { path: 'handlers', barrelType: 'named' },
+        parser: 'faker',
+        handlers: false,
+      }),
+    ],
+  })
