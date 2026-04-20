@@ -30,6 +30,7 @@
   "files": [
     "src",
     "dist",
+    "plugin.json",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"
@@ -68,7 +69,8 @@
       "import": "./dist/generators.js",
       "require": "./dist/generators.cjs"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./plugin.json": "./plugin.json"
   },
   "publishConfig": {
     "access": "public",

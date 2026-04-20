@@ -27,6 +27,7 @@
   "files": [
     "src",
     "dist",
+    "plugin.json",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"
@@ -41,7 +42,8 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./plugin.json": "./plugin.json"
   },
   "publishConfig": {
     "access": "public",

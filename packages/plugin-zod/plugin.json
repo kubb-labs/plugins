@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json",
+  "id": "plugin-zod",
+  "name": "Zod",
+  "description": "Generate Zod validation schemas from OpenAPI specifications for runtime data validation.",
+  "category": "utility",
+  "type": "official",
+  "version": "5.0.0-alpha.51",
+  "npmPackage": "@kubb/plugin-zod",
+  "docsPath": "/plugins/plugin-zod",
+  "repo": "https://github.com/kubb-labs/plugins",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.0.0",
+    "node": ">=22"
+  },
+  "tags": ["zod", "validation", "schema", "runtime-validation", "codegen", "openapi"],
+  "dependencies": []
+}

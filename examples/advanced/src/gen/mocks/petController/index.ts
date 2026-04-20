@@ -1,48 +1,31 @@
-export { addFilesDataFaker, addFilesResponseFaker, addFilesStatus200Faker, addFilesStatus405Faker } from './addFilesFaker.ts'
-export { addPetDataFaker, addPetResponseFaker, addPetStatus405Faker, addPetStatusDefaultFaker } from './addPetFaker.ts'
-export { deletePetHeaderApiKeyFaker, deletePetPathPetIdFaker, deletePetResponseFaker, deletePetStatus400Faker } from './deletePetFaker.ts'
+export { addFilesData, addFilesResponse, addFilesStatus200, addFilesStatus405 } from './addFiles.ts'
+export { addPetData, addPetResponse, addPetStatus405, addPetStatusDefault } from './addPet.ts'
+export { deletePetHeaderApiKey, deletePetPathPetId, deletePetResponse, deletePetStatus400 } from './deletePet.ts'
+export { findPetsByStatusPathStepId, findPetsByStatusResponse, findPetsByStatusStatus200, findPetsByStatusStatus400 } from './findPetsByStatus.ts'
 export {
-  findPetsByStatusPathStepIdFaker,
-  findPetsByStatusResponseFaker,
-  findPetsByStatusStatus200Faker,
-  findPetsByStatusStatus400Faker,
-} from './findPetsByStatusFaker.ts'
+  findPetsByTagsHeaderXEXAMPLE,
+  findPetsByTagsQueryPage,
+  findPetsByTagsQueryPageSize,
+  findPetsByTagsQueryTags,
+  findPetsByTagsResponse,
+  findPetsByTagsStatus200,
+  findPetsByTagsStatus400,
+} from './findPetsByTags.ts'
+export { getPetByIdPathPetId, getPetByIdResponse, getPetByIdStatus200, getPetByIdStatus400, getPetByIdStatus404 } from './getPetById.ts'
 export {
-  findPetsByTagsHeaderXEXAMPLEFaker,
-  findPetsByTagsQueryPageFaker,
-  findPetsByTagsQueryPageSizeFaker,
-  findPetsByTagsQueryTagsFaker,
-  findPetsByTagsResponseFaker,
-  findPetsByTagsStatus200Faker,
-  findPetsByTagsStatus400Faker,
-} from './findPetsByTagsFaker.ts'
+  updatePetData,
+  updatePetResponse,
+  updatePetStatus200,
+  updatePetStatus202,
+  updatePetStatus400,
+  updatePetStatus404,
+  updatePetStatus405,
+} from './updatePet.ts'
 export {
-  getPetByIdPathPetIdFaker,
-  getPetByIdResponseFaker,
-  getPetByIdStatus200Faker,
-  getPetByIdStatus400Faker,
-  getPetByIdStatus404Faker,
-} from './getPetByIdFaker.ts'
-export {
-  updatePetDataFaker,
-  updatePetResponseFaker,
-  updatePetStatus200Faker,
-  updatePetStatus202Faker,
-  updatePetStatus400Faker,
-  updatePetStatus404Faker,
-  updatePetStatus405Faker,
-} from './updatePetFaker.ts'
-export {
-  updatePetWithFormPathPetIdFaker,
-  updatePetWithFormQueryNameFaker,
-  updatePetWithFormQueryStatusFaker,
-  updatePetWithFormResponseFaker,
-  updatePetWithFormStatus405Faker,
-} from './updatePetWithFormFaker.ts'
-export {
-  uploadFileDataFaker,
-  uploadFilePathPetIdFaker,
-  uploadFileQueryAdditionalMetadataFaker,
-  uploadFileResponseFaker,
-  uploadFileStatus200Faker,
-} from './uploadFileFaker.ts'
+  updatePetWithFormPathPetId,
+  updatePetWithFormQueryName,
+  updatePetWithFormQueryStatus,
+  updatePetWithFormResponse,
+  updatePetWithFormStatus405,
+} from './updatePetWithForm.ts'
+export { uploadFileData, uploadFilePathPetId, uploadFileQueryAdditionalMetadata, uploadFileResponse, uploadFileStatus200 } from './uploadFile.ts'
