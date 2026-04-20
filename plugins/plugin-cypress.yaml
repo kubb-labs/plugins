@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+id: plugin-cypress
+name: Cypress
+description: Generate Cypress end-to-end tests from OpenAPI specifications for automated API testing.
+category: testing
+type: official
+version: 5.0.0-alpha.51
+npmPackage: '@kubb/plugin-cypress'
+docsPath: /plugins/plugin-cypress
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: '>=5.0.0'
+  node: '>=22'
+tags:
+  - cypress
+  - e2e-testing
+  - api-testing
+  - test-generation
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts

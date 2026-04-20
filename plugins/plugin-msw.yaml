@@ -1,0 +1,27 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+id: plugin-msw
+name: MSW
+description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications for frontend development and testing.
+category: testing
+type: official
+version: 5.0.0-alpha.51
+npmPackage: '@kubb/plugin-msw'
+docsPath: /plugins/plugin-msw
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: '>=5.0.0'
+  node: '>=22'
+tags:
+  - msw
+  - mock-service-worker
+  - api-mocking
+  - mocks
+  - testing
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts
+  - plugin-faker

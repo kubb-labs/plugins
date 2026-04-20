@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+id: plugin-client
+name: Client
+description: Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.
+category: utility
+type: official
+version: 5.0.0-alpha.51
+npmPackage: '@kubb/plugin-client'
+docsPath: /plugins/plugin-client
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: '>=5.0.0'
+  node: '>=22'
+tags:
+  - api-client
+  - axios
+  - fetch
+  - http-client
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts

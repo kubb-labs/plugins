@@ -1,9 +1,12 @@
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const REPO_ROOT = new URL('..', import.meta.url).pathname
+const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url))
 const PACKAGES_DIR = join(REPO_ROOT, 'packages')
+const PLUGINS_DIR = join(REPO_ROOT, 'plugins')
 const REGISTRY_FILE = join(REPO_ROOT, 'registry.yaml')
+const PLUGIN_SCHEMA = 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 const REGISTRY_HEADER = `# yaml-language-server: $schema=https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/registry.yaml\nversion: '1'\nplugins:\n`
 
 type PluginMeta = {
@@ -22,61 +25,74 @@ type PluginMeta = {
   dependencies?: string[]
 }
 
-function toYaml(plugin: PluginMeta): string {
-  const lines: string[] = [`  - id: ${plugin.id}`]
+function pluginToYamlLines(plugin: PluginMeta, indent = ''): string[] {
+  const i = indent
+  const lines: string[] = []
 
-  lines.push(`    name: ${plugin.name}`)
-  lines.push(`    description: ${plugin.description}`)
-  lines.push(`    category: ${plugin.category}`)
-  lines.push(`    type: ${plugin.type}`)
-  lines.push(`    version: ${plugin.version}`)
-  lines.push(`    npmPackage: '${plugin.npmPackage}'`)
+  lines.push(`${i}id: ${plugin.id}`)
+  lines.push(`${i}name: ${plugin.name}`)
+  lines.push(`${i}description: ${plugin.description}`)
+  lines.push(`${i}category: ${plugin.category}`)
+  lines.push(`${i}type: ${plugin.type}`)
+  lines.push(`${i}version: ${plugin.version}`)
+  lines.push(`${i}npmPackage: '${plugin.npmPackage}'`)
 
   if (plugin.docsPath) {
-    lines.push(`    docsPath: ${plugin.docsPath}`)
+    lines.push(`${i}docsPath: ${plugin.docsPath}`)
   }
 
   if (plugin.repo) {
-    lines.push(`    repo: ${plugin.repo}`)
+    lines.push(`${i}repo: ${plugin.repo}`)
   }
 
   if (plugin.maintainers?.length) {
-    lines.push('    maintainers:')
+    lines.push(`${i}maintainers:`)
     for (const m of plugin.maintainers) {
-      lines.push(`      - name: ${m.name}`)
-      lines.push(`        github: ${m.github}`)
+      lines.push(`${i}  - name: ${m.name}`)
+      lines.push(`${i}    github: ${m.github}`)
     }
   }
 
   if (plugin.compatibility) {
-    lines.push('    compatibility:')
+    lines.push(`${i}compatibility:`)
     if (plugin.compatibility.kubb) {
-      lines.push(`      kubb: '${plugin.compatibility.kubb}'`)
+      lines.push(`${i}  kubb: '${plugin.compatibility.kubb}'`)
     }
     if (plugin.compatibility.node) {
-      lines.push(`      node: '${plugin.compatibility.node}'`)
+      lines.push(`${i}  node: '${plugin.compatibility.node}'`)
     }
   }
 
   if (plugin.tags?.length) {
-    lines.push('    tags:')
+    lines.push(`${i}tags:`)
     for (const tag of plugin.tags) {
-      lines.push(`      - ${tag}`)
+      lines.push(`${i}  - ${tag}`)
     }
   }
 
   if (plugin.dependencies !== undefined) {
     if (plugin.dependencies.length === 0) {
-      lines.push('    dependencies: []')
+      lines.push(`${i}dependencies: []`)
     } else {
-      lines.push('    dependencies:')
+      lines.push(`${i}dependencies:`)
       for (const dep of plugin.dependencies) {
-        lines.push(`      - ${dep}`)
+        lines.push(`${i}  - ${dep}`)
       }
     }
   }
 
-  return lines.join('\n')
+  return lines
+}
+
+function toRegistryEntry(plugin: PluginMeta): string {
+  // Registry entries are list items indented by 2 spaces; inner fields by 4.
+  const inner = pluginToYamlLines(plugin, '    ').join('\n')
+  return `  - ${inner.trimStart()}`
+}
+
+function toPluginFile(plugin: PluginMeta): string {
+  const header = `# yaml-language-server: $schema=${PLUGIN_SCHEMA}\n`
+  return header + pluginToYamlLines(plugin).join('\n') + '\n'
 }
 
 const pluginDirs = readdirSync(PACKAGES_DIR, { withFileTypes: true })
@@ -97,7 +113,15 @@ for (const dir of pluginDirs) {
   }
 }
 
-const yaml = REGISTRY_HEADER + plugins.map(toYaml).join('\n\n') + '\n'
-writeFileSync(REGISTRY_FILE, yaml, 'utf-8')
-
+// Write registry.yaml
+const registryYaml = REGISTRY_HEADER + plugins.map(toRegistryEntry).join('\n\n') + '\n'
+writeFileSync(REGISTRY_FILE, registryYaml, 'utf-8')
 console.log(`Generated registry.yaml with ${plugins.length} plugins`)
+
+// Write plugins/<id>.yaml
+mkdirSync(PLUGINS_DIR, { recursive: true })
+for (const plugin of plugins) {
+  const dest = join(PLUGINS_DIR, `${plugin.id}.yaml`)
+  writeFileSync(dest, toPluginFile(plugin), 'utf-8')
+  console.log(`  wrote plugins/${plugin.id}.yaml`)
+}
