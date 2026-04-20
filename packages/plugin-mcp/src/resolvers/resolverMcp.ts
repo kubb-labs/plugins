@@ -14,7 +14,7 @@ import type { PluginMcp } from '../types.ts'
  * resolverMcp.resolveName('show pet by id')  // -> 'showPetByIdHandler'
  * ```
  */
-export const resolverMcp = defineResolver<PluginMcp>(() => ({
+export const resolverMcp = defineResolver<PluginMcp>((ctx) => ({
   name: 'default',
   pluginName: 'plugin-mcp',
   default(name, type) {
@@ -24,6 +24,6 @@ export const resolverMcp = defineResolver<PluginMcp>(() => ({
     return camelCase(name, { suffix: 'handler' })
   },
   resolveName(name) {
-    return this.default(name, 'function')
+    return ctx.default(name, 'function')
   },
 }))
