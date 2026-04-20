@@ -3,13 +3,7 @@
   "name": "@kubb/plugin-ts",
   "description": "Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.",
   "category": "TypeScript",
-  "tags": [
-    "typescript",
-    "types",
-    "interfaces",
-    "codegen",
-    "openapi"
-  ],
+  "tags": ["typescript", "types", "interfaces", "codegen", "openapi"],
   "links": {
     "npm": "https://www.npmjs.com/package/@kubb/plugin-ts",
     "docs": "/plugins/plugin-ts"

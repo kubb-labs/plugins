@@ -3,20 +3,10 @@
   "name": "@kubb/plugin-faker",
   "description": "Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.",
   "category": "Mocking",
-  "tags": [
-    "faker",
-    "mock-data",
-    "mocks",
-    "fixtures",
-    "testing",
-    "codegen",
-    "openapi"
-  ],
+  "tags": ["faker", "mock-data", "mocks", "fixtures", "testing", "codegen", "openapi"],
   "links": {
     "npm": "https://www.npmjs.com/package/@kubb/plugin-faker",
     "docs": "/plugins/plugin-faker"
   },
-  "kubbPlugins": [
-    "@kubb/plugin-ts"
-  ]
+  "kubbPlugins": ["@kubb/plugin-ts"]
 }

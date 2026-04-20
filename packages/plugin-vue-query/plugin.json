@@ -3,21 +3,10 @@
   "name": "@kubb/plugin-vue-query",
   "description": "Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.",
   "category": "Query",
-  "tags": [
-    "vue-query",
-    "tanstack-query",
-    "vue",
-    "composables",
-    "data-fetching",
-    "codegen",
-    "openapi"
-  ],
+  "tags": ["vue-query", "tanstack-query", "vue", "composables", "data-fetching", "codegen", "openapi"],
   "links": {
     "npm": "https://www.npmjs.com/package/@kubb/plugin-vue-query",
     "docs": "/plugins/plugin-vue-query"
   },
-  "kubbPlugins": [
-    "@kubb/plugin-ts",
-    "@kubb/plugin-client"
-  ]
+  "kubbPlugins": ["@kubb/plugin-ts", "@kubb/plugin-client"]
 }

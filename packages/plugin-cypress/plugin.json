@@ -3,19 +3,10 @@
   "name": "@kubb/plugin-cypress",
   "description": "Generate Cypress end-to-end tests from OpenAPI specifications for automated API testing.",
   "category": "Testing",
-  "tags": [
-    "cypress",
-    "e2e-testing",
-    "api-testing",
-    "test-generation",
-    "codegen",
-    "openapi"
-  ],
+  "tags": ["cypress", "e2e-testing", "api-testing", "test-generation", "codegen", "openapi"],
   "links": {
     "npm": "https://www.npmjs.com/package/@kubb/plugin-cypress",
     "docs": "/plugins/plugin-cypress"
   },
-  "kubbPlugins": [
-    "@kubb/plugin-ts"
-  ]
+  "kubbPlugins": ["@kubb/plugin-ts"]
 }

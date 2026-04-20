@@ -3,21 +3,10 @@
   "name": "@kubb/plugin-react-query",
   "description": "Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications for type-safe data fetching in React applications.",
   "category": "Query",
-  "tags": [
-    "react-query",
-    "tanstack-query",
-    "react",
-    "hooks",
-    "data-fetching",
-    "codegen",
-    "openapi"
-  ],
+  "tags": ["react-query", "tanstack-query", "react", "hooks", "data-fetching", "codegen", "openapi"],
   "links": {
     "npm": "https://www.npmjs.com/package/@kubb/plugin-react-query",
     "docs": "/plugins/plugin-react-query"
   },
-  "kubbPlugins": [
-    "@kubb/plugin-ts",
-    "@kubb/plugin-client"
-  ]
+  "kubbPlugins": ["@kubb/plugin-ts", "@kubb/plugin-client"]
 }

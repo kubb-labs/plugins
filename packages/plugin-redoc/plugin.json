@@ -3,14 +3,7 @@
   "name": "@kubb/plugin-redoc",
   "description": "Generate beautiful, interactive API documentation using Redoc from OpenAPI specifications.",
   "category": "Documentation",
-  "tags": [
-    "redoc",
-    "api-docs",
-    "documentation",
-    "interactive-docs",
-    "codegen",
-    "openapi"
-  ],
+  "tags": ["redoc", "api-docs", "documentation", "interactive-docs", "codegen", "openapi"],
   "links": {
     "npm": "https://www.npmjs.com/package/@kubb/plugin-redoc",
     "docs": "/plugins/plugin-redoc"
