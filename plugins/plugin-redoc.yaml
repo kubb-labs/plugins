@@ -42,7 +42,7 @@ options:
         default: "'docs.html'"
         description: Output path for the generated Redoc documentation HTML file.
 fullExample: |
-  import { defineConfig } from '@kubb/core'
+  import { defineConfig } from 'kubb'
   import { adapterOas } from '@kubb/adapter-oas'
   import { pluginRedoc } from '@kubb/plugin-redoc'
 

@@ -103,7 +103,7 @@ options:
     required: false
     description: Override individual faker printer node handlers to customize rendering.
 fullExample: |
-  import { defineConfig } from '@kubb/core'
+  import { defineConfig } from 'kubb'
   import { adapterOas } from '@kubb/adapter-oas'
   import { pluginTs } from '@kubb/plugin-ts'
   import { pluginFaker } from '@kubb/plugin-faker'

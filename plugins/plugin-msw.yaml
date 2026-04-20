@@ -96,7 +96,7 @@ options:
     required: false
     description: Define additional generators next to the MSW generators.
 fullExample: |
-  import { defineConfig } from '@kubb/core'
+  import { defineConfig } from 'kubb'
   import { adapterOas } from '@kubb/adapter-oas'
   import { pluginTs } from '@kubb/plugin-ts'
   import { pluginFaker } from '@kubb/plugin-faker'

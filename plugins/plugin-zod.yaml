@@ -123,7 +123,7 @@ options:
     required: false
     description: Callback function to wrap the output of the generated zod schema (e.g. adding .openapi() metadata).
 fullExample: |
-  import { defineConfig } from '@kubb/core'
+  import { defineConfig } from 'kubb'
   import { adapterOas } from '@kubb/adapter-oas'
   import { pluginZod } from '@kubb/plugin-zod'
 

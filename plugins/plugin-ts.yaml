@@ -116,7 +116,7 @@ options:
     required: false
     description: Override individual printer node handlers to customize rendering of specific schema types.
 fullExample: |
-  import { defineConfig } from '@kubb/core'
+  import { defineConfig } from 'kubb'
   import { adapterOas } from '@kubb/adapter-oas'
   import { pluginTs } from '@kubb/plugin-ts'
 
