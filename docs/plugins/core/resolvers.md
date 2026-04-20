@@ -31,4 +31,4 @@ pluginTs({
 ```
 
 > [!TIP]
-> `compatibilityPreset: 'kubbV4'` is a shorthand for switching to the legacy resolver. Use `resolver` for fine-grained control on top of the active preset.
+> Use `resolver` for fine-grained control over naming conventions.

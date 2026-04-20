@@ -11,5 +11,5 @@ Rewrite `@kubb/plugin-faker` for the v5 AST-based plugin architecture.
 - Remove the `@kubb/plugin-oas` / `@kubb/oas` dependency; use `adapterOas()` in config instead
 
 **New options and exports:**
-- Add `compatibilityPreset`, `resolver`, `transformer`, `printer`, and `paramsCasing`
+- Add `resolver`, `transformer`, `printer`, and `paramsCasing`
 - Export `resolverFaker`, `resolverFakerLegacy`, and `printerFaker`

@@ -13,7 +13,6 @@ Rewrite to v5 AST-based architecture. The plugin no longer depends on `@kubb/plu
 
 **New options:**
 - `paramsCasing?: 'camelcase'`
-- `compatibilityPreset?: 'default' | 'kubbV4'`
 - `resolver`, `transformer`, `printer`
 
 **New exports:** `resolverZod`, `resolverZodLegacy`, `printerZod`, `printerZodMini`
