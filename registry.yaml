@@ -1,0 +1,258 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/registry.yaml
+version: '1'
+plugins:
+  - id: plugin-client
+    name: Client
+    description: Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.
+    category: utility
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-client'
+    docsPath: /plugins/plugin-client
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - api-client
+      - axios
+      - fetch
+      - http-client
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+
+  - id: plugin-cypress
+    name: Cypress
+    description: Generate Cypress end-to-end tests from OpenAPI specifications for automated API testing.
+    category: testing
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-cypress'
+    docsPath: /plugins/plugin-cypress
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - cypress
+      - e2e-testing
+      - api-testing
+      - test-generation
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+
+  - id: plugin-faker
+    name: Faker
+    description: Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.
+    category: testing
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-faker'
+    docsPath: /plugins/plugin-faker
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - faker
+      - mock-data
+      - mocks
+      - fixtures
+      - testing
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+
+  - id: plugin-mcp
+    name: MCP
+    description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications to enable AI assistants to interact with your API.
+    category: ai
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-mcp'
+    docsPath: /plugins/plugin-mcp
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - mcp
+      - model-context-protocol
+      - ai
+      - claude
+      - llm
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+      - plugin-client
+      - plugin-zod
+
+  - id: plugin-msw
+    name: MSW
+    description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications for frontend development and testing.
+    category: testing
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-msw'
+    docsPath: /plugins/plugin-msw
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - msw
+      - mock-service-worker
+      - api-mocking
+      - mocks
+      - testing
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+      - plugin-faker
+
+  - id: plugin-react-query
+    name: React Query
+    description: Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications for type-safe data fetching in React applications.
+    category: framework
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-react-query'
+    docsPath: /plugins/plugin-react-query
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - react-query
+      - tanstack-query
+      - react
+      - hooks
+      - data-fetching
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+      - plugin-client
+
+  - id: plugin-redoc
+    name: Redoc
+    description: Generate beautiful, interactive API documentation using Redoc from OpenAPI specifications.
+    category: documentation
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-redoc'
+    docsPath: /plugins/plugin-redoc
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - redoc
+      - api-docs
+      - documentation
+      - interactive-docs
+      - codegen
+      - openapi
+    dependencies: []
+
+  - id: plugin-ts
+    name: TypeScript
+    description: Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.
+    category: utility
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-ts'
+    docsPath: /plugins/plugin-ts
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - typescript
+      - types
+      - interfaces
+      - codegen
+      - openapi
+    dependencies: []
+
+  - id: plugin-vue-query
+    name: Vue Query
+    description: Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.
+    category: framework
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-vue-query'
+    docsPath: /plugins/plugin-vue-query
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - vue-query
+      - tanstack-query
+      - vue
+      - composables
+      - data-fetching
+      - codegen
+      - openapi
+    dependencies:
+      - plugin-ts
+      - plugin-client
+
+  - id: plugin-zod
+    name: Zod
+    description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
+    category: utility
+    type: official
+    version: 5.0.0-alpha.51
+    npmPackage: '@kubb/plugin-zod'
+    docsPath: /plugins/plugin-zod
+    repo: https://github.com/kubb-labs/plugins
+    maintainers:
+      - name: Stijn Van Hulle
+        github: stijnvanhulle
+    compatibility:
+      kubb: '>=5.0.0'
+      node: '>=22'
+    tags:
+      - zod
+      - validation
+      - schema
+      - runtime-validation
+      - codegen
+      - openapi
+    dependencies: []

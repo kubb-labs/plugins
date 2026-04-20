@@ -38,6 +38,7 @@
     "test:watch": "vitest --config ./configs/vitest.config.ts",
     "typecheck": "turbo run typecheck --continue --filter='./packages/*' --filter='./tests/**'",
     "typecheck:examples": "turbo run typecheck --continue --filter='./examples/*'",
+    "registry": "node --experimental-strip-types scripts/generate-registry.ts",
     "upgrade": "npx taze -r -w --exclude pnpm",
     "version": "changeset version",
     "version:canary": "changeset version --snapshot canary"
