@@ -68,6 +68,15 @@ options:
     required: false
     default: "'axios'"
     description: Which HTTP client to use. Use importPath instead to provide a custom client.
+    values:
+      - name: "'axios'"
+        description: Generates client code using Axios for HTTP requests.
+        example: |
+          import client from '@kubb/plugin-client/clients/axios'
+      - name: "'fetch'"
+        description: Generates client code using the native Fetch API.
+        example: |
+          import client from '@kubb/plugin-client/clients/fetch'
   - name: importPath
     type: string
     required: false
@@ -91,6 +100,21 @@ options:
     required: false
     default: "'data'"
     description: Return type when calling the client. 'data' returns ResponseConfig[data], 'full' returns ResponseConfig.
+    values:
+      - name: "'data'"
+        description: Returns only the data property of the response.
+        example: |
+          export async function getPets(config: Partial<RequestConfig> = {}) {
+            const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+            return data
+          }
+      - name: "'full'"
+        description: Returns the full response object including status, headers and data.
+        example: |
+          export async function getPets(config: Partial<RequestConfig> = {}) {
+            const response = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+            return response
+          }
   - name: paramsCasing
     type: "'camelcase'"
     required: false
@@ -100,11 +124,49 @@ options:
     required: false
     default: "'client'"
     description: Which parser to use before returning the data. 'zod' uses @kubb/plugin-zod for validation.
+    values:
+      - name: "'client'"
+        description: Returns data as-is without additional validation.
+        example: |
+          export async function getPets(config: Partial<RequestConfig> = {}) {
+            const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+            return data
+          }
+      - name: "'zod'"
+        description: Validates the response data against the generated Zod schema before returning.
+        example: |
+          export async function getPets(config: Partial<RequestConfig> = {}) {
+            const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+            return getPetsQueryResponseSchema.parse(data)
+          }
   - name: clientType
     type: "'function' | 'class' | 'staticClass'"
     required: false
     default: "'function'"
     description: How to generate the client code. 'function' generates standalone functions, 'class' generates a class, 'staticClass' generates a class with static methods.
+    values:
+      - name: "'function'"
+        description: Generates each operation as a standalone exported async function.
+        example: |
+          export async function getPets(config: Partial<RequestConfig> = {}) {
+            return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+          }
+      - name: "'class'"
+        description: Groups all operations into a class with instance methods.
+        example: |
+          export class PetsClient {
+            async getPets(config: Partial<RequestConfig> = {}) {
+              return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+            }
+          }
+      - name: "'staticClass'"
+        description: Groups all operations into a class with static methods.
+        example: |
+          export class PetsClient {
+            static async getPets(config: Partial<RequestConfig> = {}) {
+              return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+            }
+          }
   - name: bundle
     type: boolean
     required: false
@@ -115,11 +177,49 @@ options:
     required: false
     default: "'inline'"
     description: How to pass your params. 'object' merges all params into a single object, 'inline' uses separate function arguments.
+    tip: When `paramsType` is `'object'`, `pathParamsType` is also forced to `'object'`.
+    values:
+      - name: "'object'"
+        description: Merges all params into a single destructured object argument.
+        example: |
+          export async function deletePet(
+            { petId, headers }: {
+              petId: DeletePetPathParams['petId']
+              headers?: DeletePetHeaderParams
+            },
+            config: Partial<RequestConfig> = {},
+          ) { ... }
+      - name: "'inline'"
+        description: Passes each parameter as a separate function argument.
+        example: |
+          export async function deletePet(
+            petId: DeletePetPathParams['petId'],
+            headers?: DeletePetHeaderParams,
+            config: Partial<RequestConfig> = {},
+          ) { ... }
   - name: pathParamsType
     type: "'object' | 'inline'"
     required: false
     default: "'inline'"
     description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
+    tip: Only applies when `paramsType` is `'inline'`. When `paramsType` is `'object'`, this option is ignored.
+    values:
+      - name: "'object'"
+        description: Wraps all path parameters into a single destructured object argument.
+        example: |
+          export async function getPetById(
+            { petId }: { petId: GetPetByIdPathParams['petId'] },
+            headers?: GetPetByIdHeaderParams,
+            config: Partial<RequestConfig> = {},
+          ) { ... }
+      - name: "'inline'"
+        description: Spreads each path parameter as an individual function argument.
+        example: |
+          export async function getPetById(
+            petId: GetPetByIdPathParams['petId'],
+            headers?: GetPetByIdHeaderParams,
+            config: Partial<RequestConfig> = {},
+          ) { ... }
   - name: wrapper
     type: '{ className: string }'
     required: false

@@ -66,21 +66,115 @@ options:
     required: false
     default: "'type'"
     description: Switch between type alias or interface for creating TypeScript types.
+    values:
+      - name: "'type'"
+        description: Generates TypeScript type aliases.
+        example: |
+          export type Pet = {
+            id: number
+            name: string
+            status?: 'available' | 'pending' | 'sold'
+          }
+      - name: "'interface'"
+        description: Generates TypeScript interfaces.
+        example: |
+          export interface Pet {
+            id: number
+            name: string
+            status?: 'available' | 'pending' | 'sold'
+          }
   - name: optionalType
     type: "'questionToken' | 'undefined' | 'questionTokenAndUndefined'"
     required: false
     default: "'questionToken'"
     description: Choose what to use as mode for an optional value.
+    values:
+      - name: "'questionToken'"
+        description: Marks optional properties with `?`.
+        example: |
+          export type Pet = {
+            name?: string
+            tag?: string
+          }
+      - name: "'undefined'"
+        description: Adds `| undefined` to the type of optional properties.
+        example: |
+          export type Pet = {
+            name: string | undefined
+            tag: string | undefined
+          }
+      - name: "'questionTokenAndUndefined'"
+        description: Combines both `?` and `| undefined` for optional properties.
+        example: |
+          export type Pet = {
+            name?: string | undefined
+            tag?: string | undefined
+          }
   - name: arrayType
     type: "'generic' | 'array'"
     required: false
     default: "'array'"
     description: 'Choose between Array<string> or string[] for array types.'
+    values:
+      - name: "'generic'"
+        description: Uses the generic `Array<T>` syntax.
+        example: |
+          export type Pets = Array<Pet>
+      - name: "'array'"
+        description: Uses the shorthand `T[]` syntax.
+        example: |
+          export type Pets = Pet[]
   - name: enumType
     type: "'asConst' | 'asPascalConst' | 'enum' | 'constEnum' | 'literal' | 'inlineLiteral'"
     required: false
     default: "'asConst'"
     description: Choose how enums are generated. asConst/asPascalConst emit const objects, enum/constEnum emit TypeScript enums, literal/inlineLiteral emit union literals.
+    tip: Prefer `'asConst'` or `'literal'` for better tree-shaking compared to TypeScript `enum`.
+    values:
+      - name: "'asConst'"
+        description: Emits a camelCase `as const` object with a companion union type.
+        example: |
+          export const petStatus = {
+            available: 'available',
+            pending: 'pending',
+            sold: 'sold',
+          } as const
+          export type PetStatus = (typeof petStatus)[keyof typeof petStatus]
+      - name: "'asPascalConst'"
+        description: Emits a PascalCase-keyed `as const` object with a companion union type.
+        example: |
+          export const PetStatus = {
+            Available: 'available',
+            Pending: 'pending',
+            Sold: 'sold',
+          } as const
+          export type PetStatusType = (typeof PetStatus)[keyof typeof PetStatus]
+      - name: "'enum'"
+        description: Emits a standard TypeScript `enum`.
+        example: |
+          export enum PetStatus {
+            available = 'available',
+            pending = 'pending',
+            sold = 'sold',
+          }
+      - name: "'constEnum'"
+        description: Emits a `const enum` (inlined by the TypeScript compiler).
+        example: |
+          export const enum PetStatus {
+            available = 'available',
+            pending = 'pending',
+            sold = 'sold',
+          }
+      - name: "'literal'"
+        description: Emits a union of string literals as a named type alias.
+        example: |
+          export type PetStatus = 'available' | 'pending' | 'sold'
+      - name: "'inlineLiteral'"
+        description: Inlines the union of string literals directly into the parent type without a separate alias.
+        example: |
+          export type Pet = {
+            status: 'available' | 'pending' | 'sold'
+          }
   - name: enumTypeSuffix
     type: string
     required: false
@@ -91,6 +185,42 @@ options:
     required: false
     default: "'none'"
     description: Choose the casing for enum key names. Only applies to asConst, asPascalConst, enum, and constEnum types.
+    values:
+      - name: "'screamingSnakeCase'"
+        description: Converts enum keys to SCREAMING_SNAKE_CASE.
+        example: |
+          export const petStatus = {
+            AVAILABLE: 'available',
+            PENDING_REVIEW: 'pendingReview',
+          } as const
+      - name: "'snakeCase'"
+        description: Converts enum keys to snake_case.
+        example: |
+          export const petStatus = {
+            available: 'available',
+            pending_review: 'pendingReview',
+          } as const
+      - name: "'pascalCase'"
+        description: Converts enum keys to PascalCase.
+        example: |
+          export const petStatus = {
+            Available: 'available',
+            PendingReview: 'pendingReview',
+          } as const
+      - name: "'camelCase'"
+        description: Converts enum keys to camelCase.
+        example: |
+          export const petStatus = {
+            available: 'available',
+            pendingReview: 'pendingReview',
+          } as const
+      - name: "'none'"
+        description: Keeps enum keys exactly as they appear in the OpenAPI schema.
+        example: |
+          export const petStatus = {
+            available: 'available',
+            'pending-review': 'pending-review',
+          } as const
   - name: contentType
     type: "'application/json' | string"
     required: false

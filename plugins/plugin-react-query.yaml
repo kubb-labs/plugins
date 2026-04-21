@@ -72,11 +72,45 @@ options:
         required: false
         default: "'function'"
         description: How to generate the client code.
+        values:
+          - name: "'function'"
+            description: Generates each operation as a standalone exported async function.
+            example: |
+              export async function getPets(config: Partial<RequestConfig> = {}) {
+                return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+              }
+          - name: "'class'"
+            description: Groups all operations into a class with instance methods.
+            example: |
+              export class PetsClient {
+                async getPets(config: Partial<RequestConfig> = {}) {
+                  return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+                }
+              }
+          - name: "'staticClass'"
+            description: Groups all operations into a class with static methods.
+            example: |
+              export class PetsClient {
+                static async getPets(config: Partial<RequestConfig> = {}) {
+                  return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
+                }
+              }
       - name: dataReturnType
         type: "'data' | 'full'"
         required: false
         default: "'data'"
         description: Return type when calling the client.
+        values:
+          - name: "'data'"
+            description: Returns only the data property of the response.
+            example: |
+              const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets' })
+              return data
+          - name: "'full'"
+            description: Returns the full response object including status, headers and data.
+            example: |
+              const response = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets' })
+              return response
       - name: baseURL
         type: string
         required: false
@@ -107,11 +141,47 @@ options:
     required: false
     default: "'inline'"
     description: How to pass your params. 'object' merges all params into a single object, 'inline' uses separate arguments.
+    tip: When `paramsType` is `'object'`, `pathParamsType` is also forced to `'object'`.
+    values:
+      - name: "'object'"
+        description: Merges all params into a single destructured object argument.
+        example: |
+          export function useDeletePetHook() {
+            return ({ petId, headers }: {
+              petId: DeletePetPathParams['petId']
+              headers?: DeletePetHeaderParams
+            }) => deletePet({ petId, headers })
+          }
+      - name: "'inline'"
+        description: Passes each parameter as a separate function argument.
+        example: |
+          export function useDeletePetHook() {
+            return (
+              petId: DeletePetPathParams['petId'],
+              headers?: DeletePetHeaderParams,
+            ) => deletePet(petId, headers)
+          }
   - name: pathParamsType
     type: "'object' | 'inline'"
     required: false
     default: "'inline'"
     description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
+    tip: Only applies when `paramsType` is `'inline'`. When `paramsType` is `'object'`, this option is ignored.
+    values:
+      - name: "'object'"
+        description: Wraps all path parameters into a single destructured object argument.
+        example: |
+          export function useGetPetByIdHook() {
+            return ({ petId }: { petId: GetPetByIdPathParams['petId'] }) =>
+              getPetById({ petId })
+          }
+      - name: "'inline'"
+        description: Spreads each path parameter as an individual function argument.
+        example: |
+          export function useGetPetByIdHook() {
+            return (petId: GetPetByIdPathParams['petId']) =>
+              getPetById(petId)
+          }
   - name: infinite
     type: 'Partial<Infinite> | false'
     required: false
@@ -196,6 +266,17 @@ options:
     required: false
     default: "'client'"
     description: Which parser to use before returning the data to @tanstack/query. 'zod' uses @kubb/plugin-zod.
+    values:
+      - name: "'client'"
+        description: Returns data as-is without additional validation.
+        example: |
+          const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets' })
+          return data
+      - name: "'zod'"
+        description: Validates the response data against the generated Zod schema before returning.
+        example: |
+          const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets' })
+          return getPetsQueryResponseSchema.parse(data)
   - name: transformers
     type: '{ name?: (name: string, type?: string) => string }'
     required: false

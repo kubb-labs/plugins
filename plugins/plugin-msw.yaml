@@ -79,6 +79,23 @@ options:
     required: false
     default: "'data'"
     description: Which parser to use for generating response data. 'faker' uses @kubb/plugin-faker.
+    values:
+      - name: "'data'"
+        description: Returns an empty/null response body without generating mock data.
+        example: |
+          export const getPetsHandler = http.get('/pets', function () {
+            return new Response(JSON.stringify(null), {
+              headers: { 'Content-Type': 'application/json' },
+            })
+          })
+      - name: "'faker'"
+        description: Uses @kubb/plugin-faker to generate realistic mock response data.
+        example: |
+          export const getPetsHandler = http.get('/pets', function () {
+            return new Response(JSON.stringify(createPets()), {
+              headers: { 'Content-Type': 'application/json' },
+            })
+          })
   - name: transformers
     type: '{ name?: (name: string, type?: string) => string }'
     required: false

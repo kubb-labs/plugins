@@ -69,11 +69,33 @@ options:
     required: false
     default: "'faker'"
     description: Which parser to use when date/time values are represented as strings.
+    values:
+      - name: "'faker'"
+        description: Uses Faker.js built-in date helpers.
+        example: |
+          faker.date.anytime().toISOString()
+      - name: "'dayjs'"
+        description: Uses the Day.js library to generate date strings.
+        example: |
+          dayjs().format()
+      - name: "'moment'"
+        description: Uses the Moment.js library to generate date strings.
+        example: |
+          moment().format()
   - name: regexGenerator
     type: "'faker' | 'randexp'"
     required: false
     default: "'faker'"
     description: Choose which generator to use when using RegExp patterns.
+    values:
+      - name: "'faker'"
+        description: Uses `faker.helpers.fromRegExp` to generate strings matching a regex pattern.
+        example: |
+          faker.helpers.fromRegExp(/^[a-z]{3}$/)
+      - name: "'randexp'"
+        description: Uses the `randexp` library to generate strings matching a regex pattern.
+        example: |
+          new RandExp(/^[a-z]{3}$/).gen()
   - name: mapper
     type: 'Record<string, string>'
     required: false
