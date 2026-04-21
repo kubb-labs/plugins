@@ -67,11 +67,42 @@ options:
     required: false
     default: "'zod'"
     description: Path to Zod, used as `import { z } from '${importPath}'`. Use 'zod/mini' for the functional API.
+    tip: "Use `'zod/mini'` for smaller bundle sizes. You can also set `mini: true` which automatically defaults `importPath` to `'zod/mini'`."
+    values:
+      - name: "'zod'"
+        description: Imports from the standard Zod package.
+        example: |
+          import { z } from 'zod'
+      - name: "'zod/mini'"
+        description: Imports from the tree-shakeable Zod Mini functional API.
+        example: |
+          import { z } from 'zod/mini'
   - name: dateType
     type: "false | 'string' | 'stringOffset' | 'stringLocal' | 'date'"
     required: false
     default: "'string'"
     description: Choose how date/datetime values are represented. 'string' uses z.string().datetime(), 'date' uses z.date().
+    values:
+      - name: 'false'
+        description: No date format validation; treated as a plain string schema.
+        example: |
+          z.string()
+      - name: "'string'"
+        description: Validates as an ISO 8601 datetime string.
+        example: |
+          z.string().datetime()
+      - name: "'stringOffset'"
+        description: Validates as an ISO 8601 datetime string with timezone offset.
+        example: |
+          z.string().datetime({ offset: true })
+      - name: "'stringLocal'"
+        description: Validates as a local ISO 8601 datetime string without timezone offset.
+        example: |
+          z.string().datetime({ local: true })
+      - name: "'date'"
+        description: Validates as a JavaScript `Date` object.
+        example: |
+          z.date()
   - name: typed
     type: boolean
     required: false
@@ -93,6 +124,15 @@ options:
     required: false
     default: "'uuid'"
     description: Which Zod GUID validator to use for OpenAPI format uuid.
+    values:
+      - name: "'uuid'"
+        description: Uses the `z.string().uuid()` validator.
+        example: |
+          z.string().uuid()
+      - name: "'guid'"
+        description: Uses the `z.string().guid()` validator (Zod v4+).
+        example: |
+          z.string().guid()
   - name: mini
     type: boolean
     required: false
