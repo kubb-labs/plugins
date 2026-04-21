@@ -28,7 +28,7 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-redoc/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/kubb/feature/openapi.svg'
+iconLight: 'https://kubb.dev/feature/openapi.svg'
 skills: []
 options:
   - name: output

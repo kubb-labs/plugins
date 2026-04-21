@@ -31,7 +31,7 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-vue-query/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/kubb/feature/tanstack.svg'
+iconLight: 'https://kubb.dev/feature/tanstack.svg'
 skills: []
 options:
   - name: output

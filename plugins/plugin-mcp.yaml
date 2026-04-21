@@ -32,8 +32,8 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-mcp/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/kubb/feature/mcp-light.svg'
-iconDark: 'https://kubb.dev/kubb/feature/mcp-dark.svg'
+iconLight: 'https://kubb.dev/feature/mcp-light.svg'
+iconDark: 'https://kubb.dev/feature/mcp-dark.svg'
 skills: []
 options:
   - name: output

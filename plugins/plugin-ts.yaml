@@ -2,7 +2,7 @@ $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/
 id: plugin-ts
 name: TypeScript
 description: Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.
-category: utility
+category: types
 type: official
 version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-ts'
@@ -27,7 +27,7 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-ts/CHANGELOG.md
 featured: true
-iconLight: 'https://kubb.dev/kubb/feature/typescript.svg'
+iconLight: 'https://kubb.dev/feature/typescript.svg'
 skills: []
 options:
   - name: output

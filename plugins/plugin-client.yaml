@@ -2,7 +2,7 @@ $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/
 id: plugin-client
 name: Client
 description: Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.
-category: utility
+category: client
 type: official
 version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-client'
@@ -29,7 +29,7 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-client/CHANGELOG.md
 featured: true
-iconLight: 'https://kubb.dev/kubb/feature/axios.svg'
+iconLight: 'https://kubb.dev/feature/axios.svg'
 skills: []
 options:
   - name: output

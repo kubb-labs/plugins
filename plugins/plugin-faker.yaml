@@ -2,7 +2,7 @@ $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/
 id: plugin-faker
 name: Faker
 description: Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.
-category: testing
+category: mocks
 type: official
 version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-faker'
@@ -30,7 +30,7 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-faker/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/kubb/feature/faker.svg'
+iconLight: 'https://kubb.dev/feature/faker.svg'
 skills: []
 options:
   - name: output
