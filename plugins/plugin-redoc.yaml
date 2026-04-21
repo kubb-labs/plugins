@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-redoc
 name: Redoc
 description: Generate beautiful, interactive API documentation using Redoc from OpenAPI specifications.
 category: documentation
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-redoc"
+npmPackage: '@kubb/plugin-redoc'
 docsPath: /plugins/plugin-redoc
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - redoc
   - api-docs
@@ -27,12 +27,12 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-redoc/CHANGELOG.md
-icon: 📖
 featured: false
+iconLight: 'https://kubb.dev/kubb/feature/openapi.svg'
 skills: []
 options:
   - name: output
-    type: "{ path: string }"
+    type: '{ path: string }'
     required: false
     description: Specify the output path for the generated documentation HTML file.
     properties:

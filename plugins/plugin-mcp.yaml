@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-mcp
 name: MCP
 description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications to enable AI assistants to interact with your API.
 category: ai
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-mcp"
+npmPackage: '@kubb/plugin-mcp'
 docsPath: /plugins/plugin-mcp
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - mcp
   - model-context-protocol
@@ -31,8 +31,9 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-mcp/CHANGELOG.md
-icon: 🤖
 featured: false
+iconLight: 'https://kubb.dev/kubb/feature/mcp-light.svg'
+iconDark: 'https://kubb.dev/kubb/feature/mcp-dark.svg'
 skills: []
 options:
   - name: output
@@ -51,7 +52,7 @@ options:
         default: "'named'"
         description: Controls how index.ts barrel files are generated.
   - name: client
-    type: "ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }"
+    type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
     required: false
     description: Client configuration for HTTP request generation, including client type, data return type, base URL, and bundling options.
     properties:
@@ -81,7 +82,7 @@ options:
       - name: bundle
         type: boolean
         required: false
-        default: "false"
+        default: 'false'
         description: Bundle the selected client into the generated .kubb directory.
       - name: paramsCasing
         type: "'camelcase'"
@@ -96,19 +97,19 @@ options:
     required: false
     description: Group the MCP handlers based on the provided name (e.g. by tag).
   - name: exclude
-    type: "Array<Exclude>"
+    type: 'Array<Exclude>'
     required: false
     description: Array containing exclude parameters to skip tags/operations/methods/paths.
   - name: include
-    type: "Array<Include>"
+    type: 'Array<Include>'
     required: false
     description: Array containing include parameters to include tags/operations/methods/paths.
   - name: override
-    type: "Array<Override>"
+    type: 'Array<Override>'
     required: false
     description: Array containing override parameters to override options based on tags/operations/methods/paths.
   - name: resolver
-    type: "Partial<ResolverMcp>"
+    type: 'Partial<ResolverMcp>'
     required: false
     description: Override individual resolver methods to customize naming conventions.
   - name: transformer
@@ -116,7 +117,7 @@ options:
     required: false
     description: Single AST visitor applied before printing.
   - name: generators
-    type: "Array<Generator<PluginMcp>>"
+    type: 'Array<Generator<PluginMcp>>'
     required: false
     description: Define additional generators next to the default MCP generators.
 fullExample: |

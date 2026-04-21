@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-client
 name: Client
 description: Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.
 category: utility
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-client"
+npmPackage: '@kubb/plugin-client'
 docsPath: /plugins/plugin-client
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - api-client
   - axios
@@ -28,8 +28,8 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-client/CHANGELOG.md
-icon: 🌐
 featured: true
+iconLight: 'https://kubb.dev/kubb/feature/axios.svg'
 skills: []
 options:
   - name: output
@@ -52,15 +52,15 @@ options:
     required: false
     description: Group the clients based on the provided name (e.g. by tag).
   - name: exclude
-    type: "Array<Exclude>"
+    type: 'Array<Exclude>'
     required: false
     description: Array containing exclude parameters to skip tags/operations/methods/paths.
   - name: include
-    type: "Array<Include>"
+    type: 'Array<Include>'
     required: false
     description: Array containing include parameters to include tags/operations/methods/paths.
   - name: override
-    type: "Array<Override>"
+    type: 'Array<Override>'
     required: false
     description: Array containing override parameters to override options based on tags/operations/methods/paths.
   - name: client
@@ -75,12 +75,12 @@ options:
   - name: operations
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Create an operations.ts file with all operations grouped by methods.
   - name: urlType
     type: "'export' | false"
     required: false
-    default: "false"
+    default: 'false'
     description: Export URLs used by each operation. 'export' makes them part of your barrel file.
   - name: baseURL
     type: string
@@ -108,7 +108,7 @@ options:
   - name: bundle
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Bundle the selected client into the generated .kubb directory.
   - name: paramsType
     type: "'object' | 'inline'"
@@ -121,11 +121,11 @@ options:
     default: "'inline'"
     description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
   - name: wrapper
-    type: "{ className: string }"
+    type: '{ className: string }'
     required: false
     description: Generate a wrapper class that composes all tag-based client classes into a single entry point.
   - name: resolver
-    type: "Partial<ResolverClient>"
+    type: 'Partial<ResolverClient>'
     required: false
     description: Override individual resolver methods to customize naming conventions.
   - name: transformer
@@ -133,7 +133,7 @@ options:
     required: false
     description: Single AST visitor applied to each node before printing.
   - name: generators
-    type: "Array<Generator<PluginClient>>"
+    type: 'Array<Generator<PluginClient>>'
     required: false
     description: Define additional generators next to the client generators.
 fullExample: |

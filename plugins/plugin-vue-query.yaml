@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-vue-query
 name: Vue Query
 description: Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.
 category: framework
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-vue-query"
+npmPackage: '@kubb/plugin-vue-query'
 docsPath: /plugins/plugin-vue-query
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - vue-query
   - tanstack-query
@@ -30,8 +30,8 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-vue-query/CHANGELOG.md
-icon: 💚
 featured: false
+iconLight: 'https://kubb.dev/kubb/feature/tanstack.svg'
 skills: []
 options:
   - name: output
@@ -54,7 +54,7 @@ options:
     required: false
     description: Group the composables based on the provided name (e.g. by tag).
   - name: client
-    type: "ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }"
+    type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
     required: false
     description: Client configuration for HTTP request generation.
     properties:
@@ -84,18 +84,18 @@ options:
       - name: bundle
         type: boolean
         required: false
-        default: "false"
+        default: 'false'
         description: Bundle the selected client into the generated .kubb directory.
   - name: exclude
-    type: "Array<Exclude>"
+    type: 'Array<Exclude>'
     required: false
     description: Array containing exclude parameters to skip tags/operations/methods/paths.
   - name: include
-    type: "Array<Include>"
+    type: 'Array<Include>'
     required: false
     description: Array containing include parameters to include tags/operations/methods/paths.
   - name: override
-    type: "Array<Override>"
+    type: 'Array<Override>'
     required: false
     description: Array containing override parameters to override options based on tags/operations/methods/paths.
   - name: paramsCasing
@@ -113,7 +113,7 @@ options:
     default: "'inline'"
     description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
   - name: infinite
-    type: "Partial<Infinite> | false"
+    type: 'Partial<Infinite> | false'
     required: false
     description: When set, an infiniteQuery composable is added.
     properties:
@@ -125,23 +125,23 @@ options:
       - name: initialPageParam
         type: unknown
         required: true
-        default: "0"
+        default: '0'
         description: The initial value of the first page.
       - name: nextParam
-        type: "string | string[] | undefined"
+        type: 'string | string[] | undefined'
         required: false
         description: Which field of the data is used to get the cursor for the next page.
       - name: previousParam
-        type: "string | string[] | undefined"
+        type: 'string | string[] | undefined'
         required: false
         description: Which field of the data is used to get the cursor for the previous page.
   - name: query
-    type: "Partial<Query> | false"
+    type: 'Partial<Query> | false'
     required: false
     description: Override some useQuery behaviors.
     properties:
       - name: methods
-        type: "Array<string>"
+        type: 'Array<string>'
         required: false
         default: "['get']"
         description: Define which HTTP methods can be used for queries.
@@ -151,12 +151,12 @@ options:
         default: "'@tanstack/vue-query'"
         description: Path to the useQuery composable import.
   - name: mutation
-    type: "Partial<Mutation> | false"
+    type: 'Partial<Mutation> | false'
     required: false
     description: Override some useMutation behaviors.
     properties:
       - name: methods
-        type: "Array<string>"
+        type: 'Array<string>'
         required: false
         default: "['post', 'put', 'delete']"
         description: Define which HTTP methods can be used for mutations.
@@ -179,11 +179,11 @@ options:
     default: "'client'"
     description: Which parser to use before returning the data to @tanstack/query. 'zod' uses @kubb/plugin-zod.
   - name: transformers
-    type: "{ name?: (name: string, type?: string) => string }"
+    type: '{ name?: (name: string, type?: string) => string }'
     required: false
     description: Customize the generated names based on the type provided by the plugin.
   - name: resolver
-    type: "Partial<ResolverVueQuery>"
+    type: 'Partial<ResolverVueQuery>'
     required: false
     description: Override individual resolver methods to customize naming conventions.
   - name: transformer
@@ -191,7 +191,7 @@ options:
     required: false
     description: Single AST visitor applied to each node before printing.
   - name: generators
-    type: "Array<Generator<PluginVueQuery>>"
+    type: 'Array<Generator<PluginVueQuery>>'
     required: false
     description: Define additional generators next to the vue-query generators.
 fullExample: |

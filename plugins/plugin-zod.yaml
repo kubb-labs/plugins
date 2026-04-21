@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-zod
 name: Zod
 description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
 category: utility
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-zod"
+npmPackage: '@kubb/plugin-zod'
 docsPath: /plugins/plugin-zod
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - zod
   - validation
@@ -27,8 +27,8 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-zod/CHANGELOG.md
-icon: 🛡️
 featured: true
+iconLight: 'https://kubb.dev/kubb/feature/zod.svg'
 skills: []
 options:
   - name: output
@@ -51,15 +51,15 @@ options:
     required: false
     description: Group the Zod schemas based on the provided name (e.g. by tag).
   - name: exclude
-    type: "Array<Exclude>"
+    type: 'Array<Exclude>'
     required: false
     description: Array containing exclude parameters to skip tags/operations/methods/paths.
   - name: include
-    type: "Array<Include>"
+    type: 'Array<Include>'
     required: false
     description: Array containing include parameters to include tags/operations/methods/paths.
   - name: override
-    type: "Array<Override>"
+    type: 'Array<Override>'
     required: false
     description: Array containing override parameters to override options based on tags/operations/methods/paths.
   - name: importPath
@@ -81,7 +81,7 @@ options:
     required: false
     description: Return Zod generated schema as type with z.infer<TYPE>.
   - name: coercion
-    type: "boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }"
+    type: 'boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }'
     required: false
     description: Use z.coerce.string() instead of z.string(). Can be an object to enable coercion selectively.
   - name: operations
@@ -96,22 +96,22 @@ options:
   - name: mini
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Use Zod Mini's functional API for better tree-shaking. When true, importPath defaults to 'zod/mini'.
   - name: paramsCasing
     type: "'camelcase'"
     required: false
     description: Transform parameter names to camelCase for path, query, and header params.
   - name: generators
-    type: "Array<Generator<PluginZod>>"
+    type: 'Array<Generator<PluginZod>>'
     required: false
     description: Define additional generators next to the Zod generators.
   - name: resolver
-    type: "Partial<ResolverZod>"
+    type: 'Partial<ResolverZod>'
     required: false
     description: Override individual resolver methods to customize naming conventions.
   - name: printer
-    type: "{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }"
+    type: '{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }'
     required: false
     description: Override individual printer node handlers to customize rendering of specific schema types.
   - name: transformer
@@ -119,7 +119,7 @@ options:
     required: false
     description: Single AST visitor applied to each schema/operation node before printing.
   - name: wrapOutput
-    type: "(arg: { output: string; schema: ast.SchemaNode }) => string | undefined"
+    type: '(arg: { output: string; schema: ast.SchemaNode }) => string | undefined'
     required: false
     description: Callback function to wrap the output of the generated zod schema (e.g. adding .openapi() metadata).
 fullExample: |

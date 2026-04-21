@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-faker
 name: Faker
 description: Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.
 category: testing
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-faker"
+npmPackage: '@kubb/plugin-faker'
 docsPath: /plugins/plugin-faker
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - faker
   - mock-data
@@ -29,8 +29,8 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-faker/CHANGELOG.md
-icon: 🎭
 featured: false
+iconLight: 'https://kubb.dev/kubb/feature/faker.svg'
 skills: []
 options:
   - name: output
@@ -53,15 +53,15 @@ options:
     required: false
     description: Group the Faker mocks based on the provided name (e.g. by tag).
   - name: exclude
-    type: "Array<Exclude>"
+    type: 'Array<Exclude>'
     required: false
     description: Array containing exclude parameters to skip tags/operations/methods/paths.
   - name: include
-    type: "Array<Include>"
+    type: 'Array<Include>'
     required: false
     description: Array containing include parameters to include tags/operations/methods/paths.
   - name: override
-    type: "Array<Override>"
+    type: 'Array<Override>'
     required: false
     description: Array containing override parameters to override options based on tags/operations/methods/paths.
   - name: dateParser
@@ -75,11 +75,11 @@ options:
     default: "'faker'"
     description: Choose which generator to use when using RegExp patterns.
   - name: mapper
-    type: "Record<string, string>"
+    type: 'Record<string, string>'
     required: false
     description: Provide per-property faker expressions keyed by property name.
   - name: seed
-    type: "number | number[]"
+    type: 'number | number[]'
     required: false
     description: Seed faker for deterministic output.
   - name: paramsCasing
@@ -87,11 +87,11 @@ options:
     required: false
     description: Transform parameter names to camelCase for path, query, and header params.
   - name: generators
-    type: "Array<Generator<PluginFaker>>"
+    type: 'Array<Generator<PluginFaker>>'
     required: false
     description: Define additional generators next to the faker generators.
   - name: resolver
-    type: "Partial<ResolverFaker>"
+    type: 'Partial<ResolverFaker>'
     required: false
     description: Override individual resolver methods to customize naming conventions.
   - name: transformer
@@ -99,7 +99,7 @@ options:
     required: false
     description: Single AST visitor applied to each node before rendering.
   - name: printer
-    type: "{ nodes?: PrinterFakerNodes }"
+    type: '{ nodes?: PrinterFakerNodes }'
     required: false
     description: Override individual faker printer node handlers to customize rendering.
 fullExample: |

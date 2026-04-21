@@ -1,19 +1,19 @@
-$schema: "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json"
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-msw
 name: MSW
 description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications for frontend development and testing.
 category: testing
 type: official
 version: 5.0.0-alpha.51
-npmPackage: "@kubb/plugin-msw"
+npmPackage: '@kubb/plugin-msw'
 docsPath: /plugins/plugin-msw
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - msw
   - mock-service-worker
@@ -30,8 +30,8 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-msw/CHANGELOG.md
-icon: 🎯
 featured: false
+iconLight: 'https://kubb.dev/kubb/feature/msw.svg'
 skills: []
 options:
   - name: output
@@ -58,21 +58,21 @@ options:
     required: false
     description: Group the MSW handlers based on the provided name (e.g. by tag).
   - name: exclude
-    type: "Array<Exclude>"
+    type: 'Array<Exclude>'
     required: false
     description: Array containing exclude parameters to skip tags/operations/methods/paths.
   - name: include
-    type: "Array<Include>"
+    type: 'Array<Include>'
     required: false
     description: Array containing include parameters to include tags/operations/methods/paths.
   - name: override
-    type: "Array<Override>"
+    type: 'Array<Override>'
     required: false
     description: Array containing override parameters to override options based on tags/operations/methods/paths.
   - name: handlers
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Create a handlers.ts file with all handlers grouped by methods.
   - name: parser
     type: "'data' | 'faker'"
@@ -80,11 +80,11 @@ options:
     default: "'data'"
     description: Which parser to use for generating response data. 'faker' uses @kubb/plugin-faker.
   - name: transformers
-    type: "{ name?: (name: string, type?: string) => string }"
+    type: '{ name?: (name: string, type?: string) => string }'
     required: false
     description: Customize the generated names based on the type provided by the plugin.
   - name: resolver
-    type: "Partial<ResolverMsw>"
+    type: 'Partial<ResolverMsw>'
     required: false
     description: Override individual resolver methods to customize naming conventions.
   - name: transformer
@@ -92,7 +92,7 @@ options:
     required: false
     description: Single AST visitor applied before printing.
   - name: generators
-    type: "Array<Generator<PluginMsw>>"
+    type: 'Array<Generator<PluginMsw>>'
     required: false
     description: Define additional generators next to the MSW generators.
 fullExample: |
