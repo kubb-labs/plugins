@@ -28,7 +28,7 @@
     "react": "^19.2.5"
   },
   "devDependencies": {
-    "cypress": "^15.14.0",
+    "cypress": "^15.14.1",
     "typescript": "catalog:"
   },
   "engines": {
