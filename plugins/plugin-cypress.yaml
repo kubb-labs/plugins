@@ -4,7 +4,6 @@ name: Cypress
 description: Generate Cypress end-to-end tests from OpenAPI specifications for automated API testing.
 category: testing
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-cypress'
 docsPath: /plugins/plugin-cypress
 repo: https://github.com/kubb-labs/plugins

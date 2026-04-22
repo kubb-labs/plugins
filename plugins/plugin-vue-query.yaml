@@ -4,7 +4,6 @@ name: Vue Query
 description: Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.
 category: framework
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-vue-query'
 docsPath: /plugins/plugin-vue-query
 repo: https://github.com/kubb-labs/plugins

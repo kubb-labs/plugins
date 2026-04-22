@@ -4,7 +4,6 @@ name: Zod
 description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
 category: validation
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-zod'
 docsPath: /plugins/plugin-zod
 repo: https://github.com/kubb-labs/plugins

@@ -4,7 +4,6 @@ name: MCP
 description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications to enable AI assistants to interact with your API.
 category: ai
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-mcp'
 docsPath: /plugins/plugin-mcp
 repo: https://github.com/kubb-labs/plugins

@@ -4,7 +4,6 @@ name: Faker
 description: Generate realistic mock data using Faker.js from OpenAPI specifications for development and testing.
 category: mocks
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-faker'
 docsPath: /plugins/plugin-faker
 repo: https://github.com/kubb-labs/plugins

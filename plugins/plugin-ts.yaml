@@ -4,7 +4,6 @@ name: TypeScript
 description: Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.
 category: types
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-ts'
 docsPath: /plugins/plugin-ts
 repo: https://github.com/kubb-labs/plugins

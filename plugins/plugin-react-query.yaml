@@ -4,7 +4,6 @@ name: React Query
 description: Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications for type-safe data fetching in React applications.
 category: framework
 type: official
-version: 5.0.0-alpha.51
 npmPackage: '@kubb/plugin-react-query'
 docsPath: /plugins/plugin-react-query
 repo: https://github.com/kubb-labs/plugins
