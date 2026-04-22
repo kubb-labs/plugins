@@ -82,4 +82,4 @@ examples:
           })
         twoslash: true
 tip: |
-  Learn more about defining a custom client [here](/guide/base-url#use-of-custom-client).
+  Learn more about defining a custom client [here](https://kubb.dev/plugins/plugin-client#importpath).

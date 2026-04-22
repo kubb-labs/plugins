@@ -53,7 +53,7 @@ intro: |
 notes:
   - type: tip
     body: |
-      See [Setup Claude with Kubb](/guide/claude) for configuration instructions.
+      See [Setup Claude with Kubb](https://modelcontextprotocol.io/docs/tools/claude-desktop) for configuration instructions.
 
 options:
   - name: output

@@ -36,7 +36,7 @@ intro: |
 
   Generate API client code for handling API requests.
 
-  By default, this plugin uses [Axios](https://axios-http.com/docs/intro), but you can add your own client. See [Use of Fetch](/guide/fetch) for an example.
+  By default, this plugin uses [Axios](https://axios-http.com/docs/intro), but you can add your own client. See [Use of Fetch](https://kubb.dev/plugins/plugin-client#importpath) for an example.
 
 options:
   - name: output

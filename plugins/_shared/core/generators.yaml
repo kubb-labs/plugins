@@ -9,4 +9,4 @@ experimental: true
 description: |
   Define additional generators next to the built-in generators.
 
-  See [Generators](/guide/generators) for more information on how to use generators.
+  See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.

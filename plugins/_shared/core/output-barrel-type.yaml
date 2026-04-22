@@ -7,7 +7,7 @@ required: false
 default: "'named'"
 description: Specify what to export and optionally disable barrel-file generation.
 tip: |
-  Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](/getting-started/configure#output-barreltype) to export the specific function or type.
+  Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
 examples:
   - name: all
     files:
