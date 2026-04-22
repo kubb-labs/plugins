@@ -18,7 +18,7 @@ type ResolveOptions = {
   override: Array<Override<ResolveOptions>>
 }
 
-export type PluginRedoc = PluginFactoryOptions<'plugin-redoc', Options, ResolveOptions, never>
+export type PluginRedoc = PluginFactoryOptions<'plugin-redoc', Options, ResolveOptions>
 
 declare global {
   namespace Kubb {

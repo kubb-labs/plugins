@@ -121,7 +121,7 @@ type ResolvedOptions = {
   resolver: ResolverCypress
 }
 
-export type PluginCypress = PluginFactoryOptions<'plugin-cypress', Options, ResolvedOptions, never, object, ResolverCypress>
+export type PluginCypress = PluginFactoryOptions<'plugin-cypress', Options, ResolvedOptions, ResolverCypress>
 
 declare global {
   namespace Kubb {

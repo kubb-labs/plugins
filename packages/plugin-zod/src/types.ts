@@ -222,7 +222,7 @@ type ResolvedOptions = {
   printer: Options['printer']
 }
 
-export type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, never, object, ResolverZod>
+export type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, ResolverZod>
 
 declare global {
   namespace Kubb {

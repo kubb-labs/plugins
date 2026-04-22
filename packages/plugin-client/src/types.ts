@@ -206,7 +206,7 @@ type ResolvedOptions = {
   resolver: ResolverClient
 }
 
-export type PluginClient = PluginFactoryOptions<'plugin-client', Options, ResolvedOptions, never, object, ResolverClient>
+export type PluginClient = PluginFactoryOptions<'plugin-client', Options, ResolvedOptions, ResolverClient>
 
 declare global {
   namespace Kubb {

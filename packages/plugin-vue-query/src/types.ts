@@ -183,7 +183,7 @@ type ResolvedOptions = {
   transformers: NonNullable<Options['transformers']>
 }
 
-export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, never, object, ResolverVueQuery>
+export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, ResolverVueQuery>
 
 declare global {
   namespace Kubb {

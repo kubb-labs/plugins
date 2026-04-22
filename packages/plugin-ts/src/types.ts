@@ -295,7 +295,7 @@ type ResolvedOptions = {
   printer: Options['printer']
 }
 
-export type PluginTs = PluginFactoryOptions<'plugin-ts', Options, ResolvedOptions, never, object, ResolverTs>
+export type PluginTs = PluginFactoryOptions<'plugin-ts', Options, ResolvedOptions, ResolverTs>
 
 declare global {
   namespace Kubb {
