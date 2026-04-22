@@ -72,7 +72,7 @@ type ResolvedOptions = {
   resolver: ResolverMsw
 }
 
-export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, never, object, ResolverMsw>
+export type PluginMsw = PluginFactoryOptions<'plugin-msw', Options, ResolvedOptions, ResolverMsw>
 
 declare global {
   namespace Kubb {

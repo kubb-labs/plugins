@@ -221,7 +221,7 @@ type ResolvedOptions = {
   transformers: NonNullable<Options['transformers']>
 }
 
-export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, never, object, ResolverReactQuery>
+export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, ResolverReactQuery>
 
 declare global {
   namespace Kubb {

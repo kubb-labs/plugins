@@ -143,7 +143,7 @@ type ResolvedOptions = {
   printer: Options['printer']
 }
 
-export type PluginFaker = PluginFactoryOptions<'plugin-faker', Options, ResolvedOptions, never, object, ResolverFaker>
+export type PluginFaker = PluginFactoryOptions<'plugin-faker', Options, ResolvedOptions, ResolverFaker>
 
 declare global {
   namespace Kubb {

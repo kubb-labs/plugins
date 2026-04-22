@@ -74,7 +74,7 @@ type ResolvedOptions = {
   resolver: ResolverMcp
 }
 
-export type PluginMcp = PluginFactoryOptions<'plugin-mcp', Options, ResolvedOptions, never, object, ResolverMcp>
+export type PluginMcp = PluginFactoryOptions<'plugin-mcp', Options, ResolvedOptions, ResolverMcp>
 
 declare global {
   namespace Kubb {
