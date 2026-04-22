@@ -1,5 +1,58 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-alpha.52
+
+### Minor Changes
+
+- [#51](https://github.com/kubb-labs/plugins/pull/51) [`ad69c52`](https://github.com/kubb-labs/plugins/commit/ad69c52cfb1a1f0c15aecd771af9ae883d617133) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove unused `TContext` and `TResolvePathOptions` generics from each plugin's `PluginFactoryOptions` type alias.
+
+  Follows the `@kubb/core` cleanup — all plugins previously passed `never, object` for those positions.
+
+  **Before**
+
+  ```ts
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    never,
+    object,
+    ResolverZod
+  >;
+  ```
+
+  **After**
+
+  ```ts
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    ResolverZod
+  >;
+  ```
+
+### Patch Changes
+
+- [#49](https://github.com/kubb-labs/plugins/pull/49) [`af627c2`](https://github.com/kubb-labs/plugins/commit/af627c21674dcf9afe2c3b9e74dee092cb9a2ae5) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add `tip` and `values` metadata to union-typed options in all plugin YAML descriptors.
+
+  Each option with a `'foo' | 'bar'` type now ships a `values` array documenting what each literal value does, along with a TypeScript code example showing the generated output. Options whose behaviour depends on another option (e.g. `paramsType`/`pathParamsType`) also include a `tip` callout explaining the relationship.
+
+  Affected options per plugin:
+  - **plugin-client**: `client`, `clientType`, `dataReturnType`, `parser`, `paramsType`, `pathParamsType`
+  - **plugin-ts**: `syntaxType`, `optionalType`, `arrayType`, `enumType`, `enumKeyCasing`
+  - **plugin-react-query**: `paramsType`, `pathParamsType`, `parser`, `client.clientType`, `client.dataReturnType`
+  - **plugin-vue-query**: `paramsType`, `pathParamsType`, `parser`, `client.clientType`, `client.dataReturnType`
+  - **plugin-msw**: `parser`
+  - **plugin-cypress**: `dataReturnType`, `paramsType`, `pathParamsType`
+  - **plugin-faker**: `dateParser`, `regexGenerator`
+  - **plugin-zod**: `importPath`, `dateType`, `guidType`
+
+- Updated dependencies [[`af627c2`](https://github.com/kubb-labs/plugins/commit/af627c21674dcf9afe2c3b9e74dee092cb9a2ae5), [`ad69c52`](https://github.com/kubb-labs/plugins/commit/ad69c52cfb1a1f0c15aecd771af9ae883d617133)]:
+  - @kubb/plugin-client@5.0.0-alpha.52
+  - @kubb/plugin-ts@5.0.0-alpha.52
+  - @kubb/plugin-zod@5.0.0-alpha.52
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes
@@ -15,13 +68,13 @@
   ```ts
   // Before
   pluginClient({
-    pre: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    pre: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
 
   // After
   pluginClient({
-    dependencies: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    dependencies: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
   ```
 
   All built-in plugins have been updated automatically. If you were setting `pre` or `post` directly on a custom plugin, update them to use `dependencies` instead.
@@ -99,14 +152,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -114,25 +167,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -140,7 +193,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -1181,20 +1234,20 @@
   **Usage:**
 
   ```typescript
-  import { defineConfig } from '@kubb/core'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
+  import { defineConfig } from "@kubb/core";
+  import { pluginTs } from "@kubb/plugin-ts";
+  import { pluginClient } from "@kubb/plugin-client";
 
   export default defineConfig({
     plugins: [
       pluginTs({
-        paramsCasing: 'camelcase', // Transform types
+        paramsCasing: "camelcase", // Transform types
       }),
       pluginClient({
-        paramsCasing: 'camelcase', // Transform client code
+        paramsCasing: "camelcase", // Transform client code
       }),
     ],
-  })
+  });
   ```
 
   **Example:**
@@ -1897,7 +1950,7 @@
   pluginReactQuery({
     mutation: false, // Now properly prevents mutation hook generation
     query: true, // Only generates queryOptions
-  })
+  });
   ```
 
 - Updated dependencies []:
@@ -2108,11 +2161,11 @@
   pluginReactQuery({
     suspense: {},
     infinite: {
-      queryParam: 'pageSize',
+      queryParam: "pageSize",
       initialPageParam: 0,
-      cursorParam: 'nextCursor', // optional
+      cursorParam: "nextCursor", // optional
     },
-  })
+  });
   ```
 
   This will generate hooks like `useFindPetsByTagsSuspenseInfinite` alongside the existing query hooks.
