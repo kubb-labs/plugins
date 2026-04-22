@@ -1,0 +1,34 @@
+# Shared option: client/data-return-type
+
+# ────────────────────────── client.dataReturnType ──────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: dataReturnType
+type: "'data' | 'full'"
+required: false
+default: "'data'"
+description: |
+  Return type used when calling the client.
+
+  - `'data'` returns `ResponseConfig['data']`.
+  - `'full'` returns the full `ResponseConfig`.
+examples:
+  - name: data
+    files:
+      - lang: typescript
+        code: |
+          export async function getPetById<TData>(
+            petId: GetPetByIdPathParams,
+          ): Promise<ResponseConfig<TData>['data']> {
+            ...
+          }
+        twoslash: true
+  - name: full
+    files:
+      - lang: typescript
+        code: |
+          export async function getPetById<TData>(
+            petId: GetPetByIdPathParams,
+          ): Promise<ResponseConfig<TData>> {
+            ...
+          }
+        twoslash: true

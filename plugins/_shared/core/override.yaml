@@ -1,0 +1,16 @@
+# Shared option: core/override
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: override
+type: 'Array<Override>'
+required: false
+description: Array containing override parameters to override `options` based on tags, operations, methods, paths, or content types.
+codeBlock:
+  lang: typescript
+  title: Override
+  code: |
+    export type Override = {
+      type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+      pattern: string | RegExp
+      options: PluginOptions
+    }

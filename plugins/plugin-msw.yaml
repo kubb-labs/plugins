@@ -31,8 +31,14 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-msw/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/feature/msw.svg'
-skills: []
+icon:
+  light: 'https://kubb.dev/feature/msw.svg'
+
+intro: |
+  # @kubb/plugin-msw
+
+  Generate [MSW](https://mswjs.io/) API mock handlers from your OpenAPI schema.
+
 options:
   - name: output
     type: Output
@@ -40,95 +46,92 @@ options:
     default: "{ path: 'handlers', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - name: path
-        type: string
-        required: true
-        description: Output directory for generated files, relative to the global output path.
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
-        required: false
-        default: "'named'"
-        description: Controls how index.ts barrel files are generated.
-  - name: baseURL
-    type: string
-    required: false
-    description: Base URL prepended to every generated handler URL path.
-  - name: group
-    type: Group
-    required: false
-    description: Group the MSW handlers based on the provided name (e.g. by tag).
-  - name: exclude
-    type: 'Array<Exclude>'
-    required: false
-    description: Array containing exclude parameters to skip tags/operations/methods/paths.
-  - name: include
-    type: 'Array<Include>'
-    required: false
-    description: Array containing include parameters to include tags/operations/methods/paths.
-  - name: override
-    type: 'Array<Override>'
-    required: false
-    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+      - extends: ./_shared/core/output-path.yaml
+        default: "'handlers'"
+      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-banner.yaml
+      - extends: ./_shared/core/output-footer.yaml
+      - extends: ./_shared/core/output-override.yaml
+
   - name: handlers
     type: boolean
     required: false
     default: 'false'
-    description: Create a handlers.ts file with all handlers grouped by methods.
+    description: Create a `handlers.ts` file with all handlers grouped by methods.
+
+  - extends: ./_shared/core/content-type.yaml
+
+  - extends: ./_shared/client/base-url.yaml
+
+  - extends: ./_shared/core/group.yaml
+    properties:
+      - extends: ./_shared/core/group-type.yaml
+      - name: name
+        type: '(context: GroupContext) => string'
+        required: false
+        default: "(ctx) => `${ctx.group}Controller`"
+        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+
   - name: parser
     type: "'data' | 'faker'"
     required: false
     default: "'data'"
-    description: Which parser to use for generating response data. 'faker' uses @kubb/plugin-faker.
-    values:
-      - name: "'data'"
-        description: Returns an empty/null response body without generating mock data.
-        example: |
-          export const getPetsHandler = http.get('/pets', function () {
-            return new Response(JSON.stringify(null), {
-              headers: { 'Content-Type': 'application/json' },
-            })
-          })
-      - name: "'faker'"
-        description: Uses @kubb/plugin-faker to generate realistic mock response data.
-        example: |
-          export const getPetsHandler = http.get('/pets', function () {
-            return new Response(JSON.stringify(createPets()), {
-              headers: { 'Content-Type': 'application/json' },
-            })
-          })
+    description: Which parser should be used before returning the data to the `Response` of MSW.
+    body: |
+      - `'faker'` will use `@kubb/plugin-faker` to generate the data for the response.
+      - `'data'` will use your custom data to generate the data for the response.
+
+  - extends: ./_shared/core/include.yaml
+  - extends: ./_shared/core/exclude.yaml
+  - extends: ./_shared/core/override.yaml
+
+  - extends: ./_shared/core/generators.yaml
+    type: 'Array<Generator<PluginMsw>>'
+
   - name: transformers
-    type: '{ name?: (name: string, type?: string) => string }'
+    type: object
     required: false
     description: Customize the generated names based on the type provided by the plugin.
-  - name: resolver
-    type: 'Partial<ResolverMsw>'
-    required: false
-    description: Override individual resolver methods to customize naming conventions.
-  - name: transformer
-    type: ast.Visitor
-    required: false
-    description: Single AST visitor applied before printing.
-  - name: generators
-    type: 'Array<Generator<PluginMsw>>'
-    required: false
-    description: Define additional generators next to the MSW generators.
-fullExample: |
-  import { defineConfig } from 'kubb'
-  import { adapterOas } from '@kubb/adapter-oas'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginFaker } from '@kubb/plugin-faker'
-  import { pluginMsw } from '@kubb/plugin-msw'
+    properties:
+      - name: name
+        type: '(name: string, type?: ResolveType) => string'
+        required: false
+        description: Customize the names based on the type that is provided by the plugin.
+        codeBlock:
+          lang: typescript
+          code: |
+            type ResolveType = 'file' | 'function' | 'type' | 'const'
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginMsw } from '@kubb/plugin-msw'
+          import { pluginTs } from '@kubb/plugin-ts'
 
-  export default defineConfig({
-    input: { path: './petStore.yaml' },
-    output: { path: './src/gen' },
-    plugins: [
-      pluginTs(),
-      pluginFaker(),
-      pluginMsw({
-        output: { path: 'handlers', barrelType: 'named' },
-        parser: 'faker',
-        handlers: false,
-      }),
-    ],
-  })
+          export default defineConfig({
+            input: {
+              path: './petStore.yaml',
+            },
+            output: {
+              path: './src/gen',
+            },
+            plugins: [
+              pluginTs(),
+              pluginMsw({
+                output: {
+                  path: './mocks',
+                  barrelType: 'named',
+                  banner: '/* eslint-disable no-alert, no-console */',
+                  footer: '',
+                },
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Service`,
+                },
+                handlers: true,
+              }),
+            ],
+          })
+        twoslash: true

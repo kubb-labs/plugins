@@ -1,0 +1,37 @@
+# Shared option: core/group
+
+# ─────────────────────────── group.* ───────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: group
+type: Group
+required: false
+description: |
+  Grouping combines files in a folder based on a specific `type`.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          group: {
+            type: 'tag',
+            name({ group }) {
+              return `${group}Controller`
+            }
+          }
+        twoslash: true
+body: |
+  With the configuration above, the generator emits:
+
+  ```text
+  .
+  ├── src/
+  │   └── petController/
+  │   │   ├── addPet.ts
+  │   │   └── getPet.ts
+  │   └── storeController/
+  │       ├── createStore.ts
+  │       └── getStoreById.ts
+  ├── petStore.yaml
+  ├── kubb.config.ts
+  └── package.json
+  ```

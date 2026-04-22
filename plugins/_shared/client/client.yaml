@@ -1,0 +1,12 @@
+# Shared option: client/client
+
+# ────────────────────────── client.client ──────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: client
+type: "'axios' | 'fetch'"
+required: false
+default: "'axios'"
+description: Client used for HTTP calls.
+body: |
+  - `'axios'` uses `@kubb/plugin-client/templates/axios` to fetch data.
+  - `'fetch'` uses `@kubb/plugin-client/templates/fetch` to fetch data.

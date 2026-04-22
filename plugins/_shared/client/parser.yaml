@@ -1,0 +1,12 @@
+# Shared option: client/parser
+
+# ────────────────────────── client.parser ──────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: parser
+type: "'client' | 'zod'"
+required: false
+default: "'client'"
+description: Parser used before returning data.
+body: |
+  - `'zod'` uses `@kubb/plugin-zod` to parse data.
+  - `'client'` returns data without parsing.

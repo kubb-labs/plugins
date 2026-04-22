@@ -1,0 +1,11 @@
+# Shared option: core/content-type
+
+# ───────────────────────── content-type ─────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: contentType
+type: "'application/json' | (string & {})"
+required: false
+description: |
+  Define which content type to use.
+
+  By default, Kubb uses the first JSON-valid media type.

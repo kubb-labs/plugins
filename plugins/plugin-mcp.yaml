@@ -32,9 +32,30 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-mcp/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/feature/mcp-light.svg'
-iconDark: 'https://kubb.dev/feature/mcp-dark.svg'
-skills: []
+icon:
+  light: 'https://kubb.dev/feature/mcp-light.svg'
+  dark: 'https://kubb.dev/feature/mcp-dark.svg'
+
+intro: |
+  # @kubb/plugin-mcp
+
+  Generate [Model Context Protocol](https://modelcontextprotocol.io/introduction) servers that enable AI models to interact with your API.
+
+  This plugin creates an MCP server that tools like Claude or ChatGPT can use to call your API endpoints through text or voice commands.
+
+  ```mermaid
+  graph TD
+    A[Kubb<br/>Generates code from OpenAPI] --> B[MCP Server<br/>Handles tool calls]
+    B --> C[Claude<br/>Conversational AI]
+    C -->|Sends tool request| B
+    B -->|Uses generated code| A
+  ```
+
+notes:
+  - type: tip
+    body: |
+      See [Setup Claude with Kubb](/guide/claude) for configuration instructions.
+
 options:
   - name: output
     type: Output
@@ -42,103 +63,149 @@ options:
     default: "{ path: 'mcp', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - name: path
-        type: string
-        required: true
-        description: Output directory for generated files, relative to the global output path.
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
+      - extends: ./_shared/core/output-path.yaml
+        default: "'mcp'"
+      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-banner.yaml
+      - extends: ./_shared/core/output-footer.yaml
+      - extends: ./_shared/core/output-override.yaml
+
+  - name: resolver
+    type: 'Partial<ResolverMcp> & ThisType<ResolverMcp>'
+    required: false
+    description: |
+      A single resolver that overrides the naming and path-resolution conventions. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the resolver's result is used as the fallback, so you only need to supply the methods you want to change.
+
+      `this` inside each method is bound to the **full** resolver, so you can call other resolver methods (e.g. `this.default(name, 'function')`) without losing context.
+    body: |
+      Each plugin ships a built-in resolver:
+
+      | Plugin | Default resolver |
+      | --- | --- |
+      | `@kubb/plugin-ts` | `resolverTs` |
+      | `@kubb/plugin-zod` | `resolverZod` |
+      | `@kubb/plugin-cypress` | `resolverCypress` |
+      | `@kubb/plugin-mcp` | `resolverMcp` |
+    codeBlock:
+      lang: typescript
+      title: Custom resolver (plugin-mcp example)
+      code: |
+        import { pluginMcp } from '@kubb/plugin-mcp'
+
+        pluginMcp({
+          resolver: {
+            resolveName(name) {
+              return `Mcp${this.default(name, 'function')}`
+            },
+          },
+        })
+    tip: |
+      Use `resolver` for fine-grained control over naming conventions.
+
+  - extends: ./_shared/core/group.yaml
+    properties:
+      - extends: ./_shared/core/group-type.yaml
+      - name: name
+        type: '(context: GroupContext) => string'
         required: false
-        default: "'named'"
-        description: Controls how index.ts barrel files are generated.
+        default: "(ctx) => `${ctx.group}Requests`"
+        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to a specific casing format for path, query, and header parameters in generated MCP handlers.
+    important: |
+      When using `paramsCasing`, ensure that `@kubb/plugin-ts` also has the same `paramsCasing` setting. This option automatically maps transformed parameter names back to their original API names in HTTP requests.
+    body: |
+      - `'camelcase'` transforms parameter names to camelCase.
+    examples:
+      - name: With paramsCasing camelcase
+        files:
+          - lang: typescript
+            code: |
+              // Handler uses camelCase parameters
+              export async function findPetsByStatusHandler({
+                stepId  // ✓ camelCase
+              }: {
+                stepId: FindPetsByStatusPathParams['stepId']
+              }): Promise<Promise<CallToolResult>> {
+                // Automatically maps back to original name
+                const step_id = stepId
+
+                const res = await fetch({
+                  method: 'GET',
+                  url: `/pet/findByStatus/${step_id}`,  // Uses original API name
+                  ...
+                })
+                ...
+              }
+            twoslash: true
+      - name: Without paramsCasing
+        files:
+          - lang: typescript
+            code: |
+              // Handler uses original API naming
+              export async function findPetsByStatusHandler({
+                step_id  // Original naming
+              }: {
+                step_id: FindPetsByStatusPathParams['step_id']
+              }): Promise<Promise<CallToolResult>> {
+                const res = await fetch({
+                  method: 'GET',
+                  url: `/pet/findByStatus/${step_id}`,
+                  ...
+                })
+                ...
+              }
+            twoslash: true
+
   - name: client
     type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
     required: false
     description: Client configuration for HTTP request generation, including client type, data return type, base URL, and bundling options.
     properties:
-      - name: client
-        type: "'axios' | 'fetch'"
-        required: false
-        default: "'axios'"
-        description: Which HTTP client preset to use.
-      - name: importPath
-        type: string
-        required: false
-        description: Custom client import path. Mutually exclusive with client.
-      - name: clientType
-        type: "'function' | 'class' | 'staticClass'"
-        required: false
-        default: "'function'"
-        description: How to generate the client code.
-      - name: dataReturnType
-        type: "'data' | 'full'"
-        required: false
-        default: "'data'"
-        description: Return type when calling the client.
-      - name: baseURL
-        type: string
-        required: false
-        description: Custom base URL for all generated calls.
-      - name: bundle
-        type: boolean
-        required: false
-        default: 'false'
-        description: Bundle the selected client into the generated .kubb directory.
-      - name: paramsCasing
-        type: "'camelcase'"
-        required: false
-        description: Transform parameter names to camelCase.
-  - name: paramsCasing
-    type: "'camelcase'"
-    required: false
-    description: Transform parameter names to camelCase for path, query, and header params.
-  - name: group
-    type: Group
-    required: false
-    description: Group the MCP handlers based on the provided name (e.g. by tag).
-  - name: exclude
-    type: 'Array<Exclude>'
-    required: false
-    description: Array containing exclude parameters to skip tags/operations/methods/paths.
-  - name: include
-    type: 'Array<Include>'
-    required: false
-    description: Array containing include parameters to include tags/operations/methods/paths.
-  - name: override
-    type: 'Array<Override>'
-    required: false
-    description: Array containing override parameters to override options based on tags/operations/methods/paths.
-  - name: resolver
-    type: 'Partial<ResolverMcp>'
-    required: false
-    description: Override individual resolver methods to customize naming conventions.
-  - name: transformer
-    type: ast.Visitor
-    required: false
-    description: Single AST visitor applied before printing.
-  - name: generators
-    type: 'Array<Generator<PluginMcp>>'
-    required: false
-    description: Define additional generators next to the default MCP generators.
-fullExample: |
-  import { defineConfig } from 'kubb'
-  import { adapterOas } from '@kubb/adapter-oas'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
-  import { pluginZod } from '@kubb/plugin-zod'
-  import { pluginMcp } from '@kubb/plugin-mcp'
+      - extends: ./_shared/client/import-path.yaml
+      - extends: ./_shared/client/data-return-type.yaml
+      - extends: ./_shared/client/base-url.yaml
 
-  export default defineConfig({
-    input: { path: './petStore.yaml' },
-    output: { path: './src/gen' },
-    plugins: [
-      pluginTs(),
-      pluginClient(),
-      pluginZod(),
-      pluginMcp({
-        output: { path: 'mcp', barrelType: 'named' },
-        client: { client: 'fetch', dataReturnType: 'data' },
-        paramsCasing: 'camelcase',
-      }),
-    ],
-  })
+  - extends: ./_shared/core/include.yaml
+  - extends: ./_shared/core/exclude.yaml
+  - extends: ./_shared/core/override.yaml
+
+  - extends: ./_shared/core/generators.yaml
+    type: 'Array<Generator<PluginMcp>>'
+
+  - extends: ./_shared/core/transformer.yaml
+    name: transformer
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginClient } from '@kubb/plugin-client'
+          import { pluginZod } from '@kubb/plugin-zod'
+          import { pluginMcp } from '@kubb/plugin-mcp'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs(),
+              pluginClient(),
+              pluginZod(),
+              pluginMcp({
+                output: { path: 'mcp', barrelType: 'named' },
+                client: {
+                  baseURL: 'https://petstore.swagger.io/v2',
+                },
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Handlers`,
+                },
+              }),
+            ],
+          })
+        twoslash: true

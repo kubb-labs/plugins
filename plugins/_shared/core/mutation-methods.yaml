@@ -1,0 +1,8 @@
+# Shared option: core/mutation-methods
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: mutationMethods
+type: 'Array<HttpMethod>'
+required: false
+default: "['post', 'put', 'delete']"
+description: Define which HttpMethods can be used for mutations.

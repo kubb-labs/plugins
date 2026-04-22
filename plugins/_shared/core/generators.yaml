@@ -1,0 +1,12 @@
+# Shared option: core/generators
+
+# ──────────────────────── generators / methods ────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: generators
+type: 'Array<Generator<PluginOptions>>'
+required: false
+experimental: true
+description: |
+  Define additional generators next to the built-in generators.
+
+  See [Generators](/guide/generators) for more information on how to use generators.

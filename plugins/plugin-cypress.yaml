@@ -29,8 +29,14 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-cypress/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/feature/cypress.svg'
-skills: []
+icon:
+  light: 'https://kubb.dev/feature/cypress.svg'
+
+intro: |
+  # @kubb/plugin-cypress
+
+  The `@kubb/plugin-cypress` plugin generates typed `cy.request()` wrappers from your OpenAPI schema. Each API operation becomes a reusable function that you can call inside Cypress tests, with full TypeScript support.
+
 options:
   - name: output
     type: Output
@@ -38,130 +44,68 @@ options:
     default: "{ path: 'cypress', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - name: path
-        type: string
-        required: true
-        description: Output directory for generated files, relative to the global output path.
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
-        required: false
-        default: "'named'"
-        description: Controls how index.ts barrel files are generated.
-  - name: dataReturnType
-    type: "'data' | 'full'"
-    required: false
-    default: "'data'"
-    description: Return type when calling cy.request. 'data' returns ResponseConfig[data], 'full' returns ResponseConfig.
-    values:
-      - name: "'data'"
-        description: Returns only the data property of the response.
-        example: |
-          cy.request({ method: 'GET', url: '/pets' }).its('body').then((data) => {
-            return data as GetPetsQueryResponse
-          })
-      - name: "'full'"
-        description: Returns the full Cypress response object including status, headers and body.
-        example: |
-          cy.request({ method: 'GET', url: '/pets' }).then((response) => {
-            return response
-          })
-  - name: paramsCasing
-    type: "'camelcase'"
-    required: false
-    description: Transform parameter names to camelCase for path, query, and header params.
-  - name: baseURL
-    type: string
-    required: false
-    description: Base URL prepended to every generated request URL.
-  - name: group
-    type: Group
-    required: false
-    description: Group the Cypress requests based on the provided name (e.g. by tag).
-  - name: exclude
-    type: 'Array<Exclude>'
-    required: false
-    description: Array containing exclude parameters to skip tags/operations/methods/paths.
-  - name: include
-    type: 'Array<Include>'
-    required: false
-    description: Array containing include parameters to include tags/operations/methods/paths.
-  - name: override
-    type: 'Array<Override>'
-    required: false
-    description: Array containing override parameters to override options based on tags/operations/methods/paths.
-  - name: paramsType
-    type: "'object' | 'inline'"
-    required: false
-    default: "'inline'"
-    description: How to pass your params. 'object' merges all params into a single object, 'inline' uses separate arguments.
-    tip: When `paramsType` is `'object'`, `pathParamsType` is also forced to `'object'`.
-    values:
-      - name: "'object'"
-        description: Merges all params into a single destructured object argument.
-        example: |
-          export function deletePet({
-            petId,
-            headers,
-          }: {
-            petId: DeletePetPathParams['petId']
-            headers?: DeletePetHeaderParams
-          }) { ... }
-      - name: "'inline'"
-        description: Passes each parameter as a separate function argument.
-        example: |
-          export function deletePet(
-            petId: DeletePetPathParams['petId'],
-            headers?: DeletePetHeaderParams,
-          ) { ... }
-  - name: pathParamsType
-    type: "'object' | 'inline'"
-    required: false
-    default: "'inline'"
-    description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
-    tip: Only applies when `paramsType` is `'inline'`. When `paramsType` is `'object'`, this option is ignored.
-    values:
-      - name: "'object'"
-        description: Wraps all path parameters into a single destructured object argument.
-        example: |
-          export function getPetById({
-            petId,
-          }: {
-            petId: GetPetByIdPathParams['petId']
-          }) { ... }
-      - name: "'inline'"
-        description: Spreads each path parameter as an individual function argument.
-        example: |
-          export function getPetById(
-            petId: GetPetByIdPathParams['petId'],
-          ) { ... }
-  - name: resolver
-    type: 'Partial<ResolverCypress>'
-    required: false
-    description: Override individual resolver methods to customize naming conventions.
-  - name: transformer
-    type: ast.Visitor
-    required: false
-    description: Single AST visitor applied before printing.
-  - name: generators
-    type: 'Array<Generator<PluginCypress>>'
-    required: false
-    description: Define additional generators next to the default generators.
-fullExample: |
-  import { defineConfig } from 'kubb'
-  import { adapterOas } from '@kubb/adapter-oas'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginCypress } from '@kubb/plugin-cypress'
+      - extends: ./_shared/core/output-path.yaml
+        default: "'cypress'"
+      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-banner.yaml
+      - extends: ./_shared/core/output-footer.yaml
+      - extends: ./_shared/core/output-override.yaml
 
-  export default defineConfig({
-    input: { path: './petStore.yaml' },
-    output: { path: './src/gen' },
-    plugins: [
-      pluginTs(),
-      pluginCypress({
-        output: { path: 'cypress', barrelType: 'named' },
-        dataReturnType: 'data',
-        paramsCasing: 'camelcase',
-        paramsType: 'inline',
-      }),
-    ],
-  })
+  - extends: ./_shared/core/resolver.yaml
+    type: 'Partial<ResolverCypress> & ThisType<ResolverCypress>'
+
+  - extends: ./_shared/client/params-type.yaml
+  - extends: ./_shared/client/params-casing.yaml
+  - extends: ./_shared/client/path-params-type.yaml
+  - extends: ./_shared/client/data-return-type.yaml
+  - extends: ./_shared/client/base-url.yaml
+
+  - extends: ./_shared/core/group.yaml
+    properties:
+      - extends: ./_shared/core/group-type.yaml
+      - name: name
+        type: '(context: GroupContext) => string'
+        required: false
+        default: "(ctx) => `${ctx.group}Requests`"
+        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+
+  - extends: ./_shared/core/include.yaml
+  - extends: ./_shared/core/exclude.yaml
+  - extends: ./_shared/core/override.yaml
+
+  - extends: ./_shared/core/generators.yaml
+    type: 'Array<Generator<PluginCypress>>'
+
+  - extends: ./_shared/core/transformer.yaml
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginCypress } from '@kubb/plugin-cypress'
+
+          export default defineConfig({
+            input: {
+              path: './petStore.yaml',
+            },
+            output: {
+              path: './src/gen',
+            },
+            plugins: [
+              pluginTs(),
+              pluginCypress({
+                output: {
+                  path: './cypress',
+                  barrelType: 'named',
+                  banner: '/* eslint-disable no-alert, no-console */',
+                },
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Requests`,
+                },
+              }),
+            ],
+          })
+        twoslash: true

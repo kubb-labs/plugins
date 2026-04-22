@@ -1,0 +1,11 @@
+# Shared option: core/client-client-type
+
+# ───────────────────────── clientClientType ─────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: clientType
+type: "'function' | 'class'"
+required: false
+default: "'function'"
+description: Specify whether to use function-based or class-based clients.
+warning: |
+  This plugin is only compatible with `clientType: 'function'` (the default). If `clientType: 'class'` is detected, the plugin will automatically generate its own inline function-based client instead of importing from `@kubb/plugin-client`.

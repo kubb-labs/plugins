@@ -29,8 +29,16 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-client/CHANGELOG.md
 featured: true
-iconLight: 'https://kubb.dev/feature/axios.svg'
-skills: []
+icon:
+  light: 'https://kubb.dev/feature/axios.svg'
+
+intro: |
+  # @kubb/plugin-client
+
+  Generate API client code for handling API requests.
+
+  By default, this plugin uses [Axios](https://axios-http.com/docs/intro), but you can add your own client. See [Use of Fetch](/guide/fetch) for an example.
+
 options:
   - name: output
     type: Output
@@ -38,223 +46,139 @@ options:
     default: "{ path: 'clients', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - name: path
-        type: string
-        required: true
-        description: Output directory for generated files, relative to the global output path.
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
+      - extends: ./_shared/core/output-path.yaml
+        default: "'clients'"
+      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-banner.yaml
+      - extends: ./_shared/core/output-footer.yaml
+      - extends: ./_shared/core/output-override.yaml
+
+  - extends: ./_shared/core/content-type.yaml
+
+  - extends: ./_shared/core/group.yaml
+    properties:
+      - extends: ./_shared/core/group-type.yaml
+      - name: name
+        type: '(context: GroupContext) => string'
         required: false
-        default: "'named'"
-        description: Controls how index.ts barrel files are generated.
-  - name: group
-    type: Group
-    required: false
-    description: Group the clients based on the provided name (e.g. by tag).
-  - name: exclude
-    type: 'Array<Exclude>'
-    required: false
-    description: Array containing exclude parameters to skip tags/operations/methods/paths.
-  - name: include
-    type: 'Array<Include>'
-    required: false
-    description: Array containing include parameters to include tags/operations/methods/paths.
-  - name: override
-    type: 'Array<Override>'
-    required: false
-    description: Array containing override parameters to override options based on tags/operations/methods/paths.
-  - name: client
-    type: "'axios' | 'fetch'"
-    required: false
-    default: "'axios'"
-    description: Which HTTP client to use. Use importPath instead to provide a custom client.
-    values:
-      - name: "'axios'"
-        description: Generates client code using Axios for HTTP requests.
-        example: |
-          import client from '@kubb/plugin-client/clients/axios'
-      - name: "'fetch'"
-        description: Generates client code using the native Fetch API.
-        example: |
-          import client from '@kubb/plugin-client/clients/fetch'
-  - name: importPath
-    type: string
-    required: false
-    description: Custom client import path used as `import client from '${importPath}'`. Mutually exclusive with client.
+        default: "(ctx) => `${ctx.group}Controller`"
+        description: Return the name of a group based on the group name. Used for the file and identifier generation.
+
+  - extends: ./_shared/client/import-path.yaml
+
   - name: operations
     type: boolean
     required: false
     default: 'false'
-    description: Create an operations.ts file with all operations grouped by methods.
+    description: Create an `operations.ts` file with all operations grouped by methods.
+
+  - extends: ./_shared/client/data-return-type.yaml
+
   - name: urlType
     type: "'export' | false"
     required: false
     default: 'false'
-    description: Export URLs used by each operation. 'export' makes them part of your barrel file.
-  - name: baseURL
-    type: string
-    required: false
-    description: Custom base URL for all generated calls.
-  - name: dataReturnType
-    type: "'data' | 'full'"
-    required: false
-    default: "'data'"
-    description: Return type when calling the client. 'data' returns ResponseConfig[data], 'full' returns ResponseConfig.
-    values:
-      - name: "'data'"
-        description: Returns only the data property of the response.
-        example: |
-          export async function getPets(config: Partial<RequestConfig> = {}) {
-            const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-            return data
-          }
-      - name: "'full'"
-        description: Returns the full response object including status, headers and data.
-        example: |
-          export async function getPets(config: Partial<RequestConfig> = {}) {
-            const response = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-            return response
-          }
-  - name: paramsCasing
-    type: "'camelcase'"
-    required: false
-    description: Transform parameter names to camelCase for path, query, and header params.
-  - name: parser
-    type: "'client' | 'zod'"
-    required: false
-    default: "'client'"
-    description: Which parser to use before returning the data. 'zod' uses @kubb/plugin-zod for validation.
-    values:
-      - name: "'client'"
-        description: Returns data as-is without additional validation.
-        example: |
-          export async function getPets(config: Partial<RequestConfig> = {}) {
-            const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-            return data
-          }
-      - name: "'zod'"
-        description: Validates the response data against the generated Zod schema before returning.
-        example: |
-          export async function getPets(config: Partial<RequestConfig> = {}) {
-            const { data } = await client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-            return getPetsQueryResponseSchema.parse(data)
-          }
-  - name: clientType
-    type: "'function' | 'class' | 'staticClass'"
-    required: false
-    default: "'function'"
-    description: How to generate the client code. 'function' generates standalone functions, 'class' generates a class, 'staticClass' generates a class with static methods.
-    values:
-      - name: "'function'"
-        description: Generates each operation as a standalone exported async function.
-        example: |
-          export async function getPets(config: Partial<RequestConfig> = {}) {
-            return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-          }
-      - name: "'class'"
-        description: Groups all operations into a class with instance methods.
-        example: |
-          export class PetsClient {
-            async getPets(config: Partial<RequestConfig> = {}) {
-              return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-            }
-          }
-      - name: "'staticClass'"
-        description: Groups all operations into a class with static methods.
-        example: |
-          export class PetsClient {
-            static async getPets(config: Partial<RequestConfig> = {}) {
-              return client<GetPetsQueryResponse>({ method: 'get', url: '/pets', ...config })
-            }
-          }
-  - name: bundle
-    type: boolean
-    required: false
-    default: 'false'
-    description: Bundle the selected client into the generated .kubb directory.
-  - name: paramsType
-    type: "'object' | 'inline'"
-    required: false
-    default: "'inline'"
-    description: How to pass your params. 'object' merges all params into a single object, 'inline' uses separate function arguments.
-    tip: When `paramsType` is `'object'`, `pathParamsType` is also forced to `'object'`.
-    values:
-      - name: "'object'"
-        description: Merges all params into a single destructured object argument.
-        example: |
-          export async function deletePet(
-            { petId, headers }: {
-              petId: DeletePetPathParams['petId']
-              headers?: DeletePetHeaderParams
-            },
-            config: Partial<RequestConfig> = {},
-          ) { ... }
-      - name: "'inline'"
-        description: Passes each parameter as a separate function argument.
-        example: |
-          export async function deletePet(
-            petId: DeletePetPathParams['petId'],
-            headers?: DeletePetHeaderParams,
-            config: Partial<RequestConfig> = {},
-          ) { ... }
-  - name: pathParamsType
-    type: "'object' | 'inline'"
-    required: false
-    default: "'inline'"
-    description: How path parameters are arranged within the inline argument list. Only applies when paramsType is 'inline'.
-    tip: Only applies when `paramsType` is `'inline'`. When `paramsType` is `'object'`, this option is ignored.
-    values:
-      - name: "'object'"
-        description: Wraps all path parameters into a single destructured object argument.
-        example: |
-          export async function getPetById(
-            { petId }: { petId: GetPetByIdPathParams['petId'] },
-            headers?: GetPetByIdHeaderParams,
-            config: Partial<RequestConfig> = {},
-          ) { ... }
-      - name: "'inline'"
-        description: Spreads each path parameter as an individual function argument.
-        example: |
-          export async function getPetById(
-            petId: GetPetByIdPathParams['petId'],
-            headers?: GetPetByIdHeaderParams,
-            config: Partial<RequestConfig> = {},
-          ) { ... }
-  - name: wrapper
-    type: '{ className: string }'
-    required: false
-    description: Generate a wrapper class that composes all tag-based client classes into a single entry point.
-  - name: resolver
-    type: 'Partial<ResolverClient>'
-    required: false
-    description: Override individual resolver methods to customize naming conventions.
-  - name: transformer
-    type: ast.Visitor
-    required: false
-    description: Single AST visitor applied to each node before printing.
-  - name: generators
-    type: 'Array<Generator<PluginClient>>'
-    required: false
-    description: Define additional generators next to the client generators.
-fullExample: |
-  import { defineConfig } from 'kubb'
-  import { adapterOas } from '@kubb/adapter-oas'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
+    description: Export URLs that are used by every operation.
+    body: |
+      - `'export'` will make them part of your barrel file.
+      - `false` will not make them exportable.
+    codeBlock:
+      lang: typescript
+      code: |
+        export function getGetPetByIdUrl(petId: GetPetByIdPathParams['petId']) {
+          return `/pet/${petId}` as const
+        }
 
-  export default defineConfig({
-    input: { path: './petStore.yaml' },
-    output: { path: './src/gen' },
-    plugins: [
-      pluginTs(),
-      pluginClient({
-        output: { path: 'clients', barrelType: 'named' },
-        client: 'axios',
-        dataReturnType: 'data',
-        clientType: 'function',
-        paramsCasing: 'camelcase',
-        parser: 'client',
-        operations: false,
-      }),
-    ],
-  })
+  - extends: ./_shared/client/params-type.yaml
+  - extends: ./_shared/client/params-casing.yaml
+  - extends: ./_shared/client/path-params-type.yaml
+  - extends: ./_shared/client/parser.yaml
+  - extends: ./_shared/client/client.yaml
+  - extends: ./_shared/client/client-type.yaml
+  - extends: ./_shared/client/wrapper.yaml
+  - extends: ./_shared/client/bundle.yaml
+  - extends: ./_shared/client/base-url.yaml
+  - extends: ./_shared/core/include.yaml
+  - extends: ./_shared/core/exclude.yaml
+  - extends: ./_shared/core/override.yaml
+
+  - extends: ./_shared/core/generators.yaml
+    type: 'Array<Generator<PluginClient>>'
+
+  - extends: ./_shared/core/transformer.yaml
+    name: transformers
+
+  - name: resolver
+    type: 'Partial<ResolverClient> & ThisType<ResolverClient>'
+    required: false
+    description: Override individual resolver methods to customize generated names. Any method you omit falls back to the preset resolver. Use `this.default(...)` to call the preset's implementation.
+    codeBlock:
+      lang: typescript
+      code: |
+        import { pluginClient } from '@kubb/plugin-client'
+
+        pluginClient({
+          resolver: {
+            resolveName(name) {
+              return `${this.default(name)}Client`
+            },
+          },
+        })
+
+  - name: transformer
+    type: Visitor
+    required: false
+    experimental: true
+    description: Apply an AST `Visitor` to transform operation nodes before they are printed.
+    codeBlock:
+      lang: typescript
+      code: |
+        import { pluginClient } from '@kubb/plugin-client'
+
+        pluginClient({
+          transformer: {
+            operation(node) {
+              return { ...node, operationId: `api_${node.operationId}` }
+            },
+          },
+        })
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginClient } from '@kubb/plugin-client'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs(),
+              pluginClient({
+                output: {
+                  path: './clients/axios',
+                  barrelType: 'named',
+                  banner: '/* eslint-disable no-alert, no-console */',
+                  footer: '',
+                },
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Service`,
+                },
+                resolver: {
+                  resolveName(name) {
+                    return `${this.default(name)}Client`
+                  },
+                },
+                operations: true,
+                parser: 'client',
+                exclude: [{ type: 'tag', pattern: 'store' }],
+                pathParamsType: 'object',
+                dataReturnType: 'full',
+                client: 'axios',
+              }),
+            ],
+          })
+        twoslash: true

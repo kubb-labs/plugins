@@ -1,0 +1,7 @@
+# Shared option: core/output-banner
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: banner
+type: 'string | ((node: RootNode) => string)'
+required: false
+description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.

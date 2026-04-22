@@ -28,30 +28,37 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-redoc/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/feature/openapi.svg'
-skills: []
+icon:
+  light: 'https://kubb.dev/feature/openapi.svg'
+intro: |
+  Generate API documentation using [Redoc](https://redocly.com/).
 options:
   - name: output
     type: '{ path: string }'
     required: false
     description: Specify the output path for the generated documentation HTML file.
     properties:
-      - name: path
-        type: string
-        required: true
+      - extends: ./_shared/core/output-path.yaml
         default: "'docs.html'"
-        description: Output path for the generated Redoc documentation HTML file.
-fullExample: |
-  import { defineConfig } from 'kubb'
-  import { adapterOas } from '@kubb/adapter-oas'
-  import { pluginRedoc } from '@kubb/plugin-redoc'
+        description: |
+          The output location for the generated documentation.
 
-  export default defineConfig({
-    input: { path: './petStore.yaml' },
-    output: { path: './src/gen' },
-    plugins: [
-      pluginRedoc({
-        output: { path: 'docs.html' },
-      }),
-    ],
-  })
+          This plugin uses [Redocly](https://redocly.com/) for HTML generation.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginRedoc } from '@kubb/plugin-redoc'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginRedoc({
+                output: { path: 'docs.html' },
+              }),
+            ],
+          })
+        twoslash: true

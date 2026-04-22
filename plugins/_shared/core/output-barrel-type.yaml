@@ -1,0 +1,33 @@
+# Shared option: core/output-barrel-type
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: barrelType
+type: "'all' | 'named' | 'propagate' | false"
+required: false
+default: "'named'"
+description: Specify what to export and optionally disable barrel-file generation.
+tip: |
+  Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](/getting-started/configure#output-barreltype) to export the specific function or type.
+examples:
+  - name: all
+    files:
+      - lang: typescript
+        code: |
+          export * from './gen/petService.ts'
+        twoslash: true
+  - name: named
+    files:
+      - lang: typescript
+        code: |
+          export { PetService } from './gen/petService.ts'
+        twoslash: true
+  - name: propagate
+    files:
+      - lang: typescript
+        code: ''
+        twoslash: true
+  - name: 'false'
+    files:
+      - lang: typescript
+        code: ''
+        twoslash: true

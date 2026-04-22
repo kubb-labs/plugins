@@ -1,0 +1,9 @@
+# Shared option: core/output-path
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: path
+type: string
+required: true
+description: Output directory or file for the generated code, relative to the global `output.path`.
+tip: |
+  if `output.path` is a file, `group` cannot be used.

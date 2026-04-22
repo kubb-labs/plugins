@@ -1,0 +1,33 @@
+# Shared option: client/path-params-type
+
+# ────────────────────────── client.pathParamsType ──────────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: pathParamsType
+type: "'object' | 'inline'"
+required: false
+default: "'inline'"
+description: Defines how pathParams are passed to generated functions.
+body: |
+  - `'object'` returns pathParams as an object.
+  - `'inline'` returns pathParams as comma-separated params.
+examples:
+  - name: object
+    files:
+      - lang: typescript
+        code: |
+          export async function getPetById(
+            { petId }: GetPetByIdPathParams,
+          ) {
+            ...
+          }
+        twoslash: true
+  - name: inline
+    files:
+      - lang: typescript
+        code: |
+          export async function getPetById(
+            petId: GetPetByIdPathParams,
+          ) {
+            ...
+          }
+        twoslash: true

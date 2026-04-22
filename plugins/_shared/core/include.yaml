@@ -1,0 +1,16 @@
+# Shared option: core/include
+
+# ────────────────────── include / exclude / override ──────────────────────
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: include
+type: 'Array<Include>'
+required: false
+description: Array containing include parameters to include tags, operations, methods, paths, or content types.
+codeBlock:
+  lang: typescript
+  title: Include
+  code: |
+    export type Include = {
+      type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+      pattern: string | RegExp
+    }

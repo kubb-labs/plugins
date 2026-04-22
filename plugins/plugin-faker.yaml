@@ -30,8 +30,14 @@ resources:
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-faker/CHANGELOG.md
 featured: false
-iconLight: 'https://kubb.dev/feature/faker.svg'
-skills: []
+icon:
+  light: 'https://kubb.dev/feature/faker.svg'
+
+intro: |
+  # @kubb/plugin-faker
+
+  Generate mock data helpers with [Faker](https://fakerjs.dev/).
+
 options:
   - name: output
     type: Output
@@ -39,107 +45,193 @@ options:
     default: "{ path: 'mocks', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - name: path
-        type: string
-        required: true
-        description: Output directory for generated files, relative to the global output path.
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
+      - extends: ./_shared/core/output-path.yaml
+        default: "'mocks'"
+      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-banner.yaml
+      - extends: ./_shared/core/output-footer.yaml
+      - extends: ./_shared/core/output-override.yaml
+
+  - extends: ./_shared/core/group.yaml
+    properties:
+      - extends: ./_shared/core/group-type.yaml
+      - name: name
+        type: '(context: GroupContext) => string'
         required: false
-        default: "'named'"
-        description: Controls how index.ts barrel files are generated.
-  - name: group
-    type: Group
-    required: false
-    description: Group the Faker mocks based on the provided name (e.g. by tag).
-  - name: exclude
-    type: 'Array<Exclude>'
-    required: false
-    description: Array containing exclude parameters to skip tags/operations/methods/paths.
-  - name: include
-    type: 'Array<Include>'
-    required: false
-    description: Array containing include parameters to include tags/operations/methods/paths.
-  - name: override
-    type: 'Array<Override>'
-    required: false
-    description: Array containing override parameters to override options based on tags/operations/methods/paths.
+        default: "(ctx) => `${ctx.group}Controller`"
+        description: Return the name of a group based on the group name. This is used for file and helper name generation.
+
   - name: dateParser
     type: "'faker' | 'dayjs' | 'moment' | string"
     required: false
     default: "'faker'"
-    description: Which parser to use when date/time values are represented as strings.
-    values:
+    description: Choose which formatter to use when `date`, `time`, or `datetime` schema nodes are represented as strings.
+    tip: |
+      You can use another library that exposes a default export. Kubb adds the import automatically.
+    examples:
       - name: "'faker'"
-        description: Uses Faker.js built-in date helpers.
-        example: |
-          faker.date.anytime().toISOString()
+        files:
+          - lang: ts
+            code: |
+              faker.date.anytime().toISOString().substring(0, 10)
       - name: "'dayjs'"
-        description: Uses the Day.js library to generate date strings.
-        example: |
-          dayjs().format()
+        files:
+          - lang: ts
+            code: |
+              dayjs(faker.date.anytime()).format('YYYY-MM-DD')
       - name: "'moment'"
-        description: Uses the Moment.js library to generate date strings.
-        example: |
-          moment().format()
+        files:
+          - lang: ts
+            code: |
+              moment(faker.date.anytime()).format('YYYY-MM-DD')
+
+  - name: mapper
+    type: 'Record<string, string>'
+    required: false
+    description: Override individual object properties with custom faker expressions.
+
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform path, query, and header parameter property names in generated mocks.
+    important: |
+      Use the same `paramsCasing` value in `@kubb/plugin-ts` so the generated mock objects stay compatible with the generated types.
+
   - name: regexGenerator
     type: "'faker' | 'randexp'"
     required: false
     default: "'faker'"
-    description: Choose which generator to use when using RegExp patterns.
-    values:
+    description: Choose which generator to use for regex-backed string schemas.
+    examples:
       - name: "'faker'"
-        description: Uses `faker.helpers.fromRegExp` to generate strings matching a regex pattern.
-        example: |
-          faker.helpers.fromRegExp(/^[a-z]{3}$/)
+        files:
+          - lang: ts
+            code: |
+              faker.helpers.fromRegExp('^[A-Z]+$')
       - name: "'randexp'"
-        description: Uses the `randexp` library to generate strings matching a regex pattern.
-        example: |
-          new RandExp(/^[a-z]{3}$/).gen()
-  - name: mapper
-    type: 'Record<string, string>'
-    required: false
-    description: Provide per-property faker expressions keyed by property name.
+        files:
+          - lang: ts
+            code: |
+              new RandExp(/^[A-Z]+$/).gen()
+
   - name: seed
     type: 'number | number[]'
     required: false
     description: Seed faker for deterministic output.
-  - name: paramsCasing
-    type: "'camelcase'"
-    required: false
-    description: Transform parameter names to camelCase for path, query, and header params.
-  - name: generators
+
+  - extends: ./_shared/core/include.yaml
+
+  - extends: ./_shared/core/exclude.yaml
+
+  - extends: ./_shared/core/override.yaml
+
+  - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginFaker>>'
-    required: false
-    description: Define additional generators next to the faker generators.
+
   - name: resolver
     type: 'Partial<ResolverFaker>'
     required: false
-    description: Override individual resolver methods to customize naming conventions.
+    description: Customize helper naming on top of the active compatibility preset.
+    codeBlock:
+      lang: typescript
+      code: |
+        pluginFaker({
+          resolver: {
+            resolveName(name) {
+              return `${this.default(name)}Mock`
+            },
+          },
+        })
+
   - name: transformer
     type: ast.Visitor
     required: false
-    description: Single AST visitor applied to each node before rendering.
+    description: Apply a single AST visitor before the faker helpers are rendered.
+    codeBlock:
+      lang: typescript
+      code: |
+        pluginFaker({
+          transformer: {
+            schema(node) {
+              return { ...node, description: undefined }
+            },
+          },
+        })
+
   - name: printer
     type: '{ nodes?: PrinterFakerNodes }'
     required: false
-    description: Override individual faker printer node handlers to customize rendering.
-fullExample: |
-  import { defineConfig } from 'kubb'
-  import { adapterOas } from '@kubb/adapter-oas'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginFaker } from '@kubb/plugin-faker'
+    description: |
+      Override individual printer node handlers to customize how specific schema types are rendered.
 
-  export default defineConfig({
-    input: { path: './petStore.yaml' },
-    output: { path: './src/gen' },
-    plugins: [
-      pluginTs(),
-      pluginFaker({
-        output: { path: 'mocks', barrelType: 'named' },
-        dateParser: 'faker',
-        regexGenerator: 'faker',
-        paramsCasing: 'camelcase',
-      }),
-    ],
-  })
+      Each key is a `SchemaType` (for example `'integer'`, `'date'`, or `'ref'`). The function you provide replaces the built-in handler for that type. Use `this.transform` to recurse into nested schema nodes and `this.options` to read printer options.
+    examples:
+      - name: Override integer to float()
+        files:
+          - lang: typescript
+            code: |
+              import { pluginFaker } from '@kubb/plugin-faker'
+
+              pluginFaker({
+                printer: {
+                  nodes: {
+                    integer() {
+                      return 'faker.number.float()'
+                    },
+                  },
+                },
+              })
+            twoslash: true
+      - name: Override date strings
+        files:
+          - lang: typescript
+            code: |
+              import { pluginFaker } from '@kubb/plugin-faker'
+
+              pluginFaker({
+                printer: {
+                  nodes: {
+                    date(node) {
+                      if (node.representation === 'string') {
+                        return 'new Date().toISOString().substring(0, 10)'
+                      }
+
+                      return 'new Date()'
+                    },
+                  },
+                },
+              })
+            twoslash: true
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginFaker } from '@kubb/plugin-faker'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: {
+              path: './petStore.yaml',
+            },
+            output: {
+              path: './src/gen',
+            },
+            plugins: [
+              pluginTs({
+                output: {
+                  path: './types',
+                },
+              }),
+              pluginFaker({
+                output: {
+                  path: './mocks',
+                  barrelType: 'named',
+                },
+                seed: [100],
+                paramsCasing: 'camelcase',
+              }),
+            ],
+          })
+        twoslash: true

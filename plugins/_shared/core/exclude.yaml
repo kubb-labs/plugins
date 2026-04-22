@@ -1,0 +1,15 @@
+# Shared option: core/exclude
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: exclude
+type: 'Array<Exclude>'
+required: false
+description: Array containing exclude parameters to exclude or skip tags, operations, methods, paths, or content types.
+codeBlock:
+  lang: typescript
+  title: Exclude
+  code: |
+    export type Exclude = {
+      type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+      pattern: string | RegExp
+    }

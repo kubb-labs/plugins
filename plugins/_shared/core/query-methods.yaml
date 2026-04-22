@@ -1,0 +1,8 @@
+# Shared option: core/query-methods
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: queryMethods
+type: 'Array<HttpMethod>'
+required: false
+default: "['get']"
+description: Define which HttpMethods can be used for queries.

@@ -1,0 +1,8 @@
+# Shared option: core/output-override
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: override
+type: boolean
+required: false
+default: 'false'
+description: Whether Kubb overrides existing external files that can be generated if they already exist.
