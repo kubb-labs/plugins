@@ -1,5 +1,37 @@
 # @kubb/plugin-redoc
 
+## 5.0.0-alpha.52
+
+### Minor Changes
+
+- [#51](https://github.com/kubb-labs/plugins/pull/51) [`ad69c52`](https://github.com/kubb-labs/plugins/commit/ad69c52cfb1a1f0c15aecd771af9ae883d617133) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove unused `TContext` and `TResolvePathOptions` generics from each plugin's `PluginFactoryOptions` type alias.
+
+  Follows the `@kubb/core` cleanup — all plugins previously passed `never, object` for those positions.
+
+  **Before**
+
+  ```ts
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    never,
+    object,
+    ResolverZod
+  >;
+  ```
+
+  **After**
+
+  ```ts
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    ResolverZod
+  >;
+  ```
+
 ## 5.0.0-alpha.35
 
 ### Patch Changes
@@ -54,14 +86,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -69,25 +101,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -95,7 +127,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
