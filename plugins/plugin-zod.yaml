@@ -341,6 +341,7 @@ options:
         };
 examples:
   - name: kubb.config.ts
+    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/zod
     files:
       - lang: typescript
         code: |

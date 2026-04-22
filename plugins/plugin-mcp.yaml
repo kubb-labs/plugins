@@ -179,6 +179,7 @@ options:
     name: transformer
 examples:
   - name: kubb.config.ts
+    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/mcp
     files:
       - lang: typescript
         code: |

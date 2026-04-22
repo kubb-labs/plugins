@@ -78,6 +78,7 @@ options:
   - extends: ./_shared/core/transformer.yaml
 examples:
   - name: kubb.config.ts
+    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/cypress
     files:
       - lang: typescript
         code: |

@@ -349,6 +349,7 @@ options:
     description: Single AST visitor applied to each node before printing.
 examples:
   - name: kubb.config.ts
+    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/vue-query
     files:
       - lang: typescript
         code: |

@@ -45,6 +45,7 @@ options:
           This plugin uses [Redocly](https://redocly.com/) for HTML generation.
 examples:
   - name: kubb.config.ts
+    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/simple-single
     files:
       - lang: typescript
         code: |
