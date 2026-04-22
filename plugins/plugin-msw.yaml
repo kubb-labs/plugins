@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-msw'
 docsPath: /plugins/plugin-msw
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/msw
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle

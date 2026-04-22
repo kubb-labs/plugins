@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-mcp'
 docsPath: /plugins/plugin-mcp
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/mcp
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
