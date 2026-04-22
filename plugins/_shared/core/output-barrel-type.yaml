@@ -14,20 +14,20 @@ examples:
       - lang: typescript
         code: |
           export * from './gen/petService.ts'
-        twoslash: true
+        twoslash: false
   - name: named
     files:
       - lang: typescript
         code: |
           export { PetService } from './gen/petService.ts'
-        twoslash: true
+        twoslash: false
   - name: propagate
     files:
       - lang: typescript
         code: ''
-        twoslash: true
+        twoslash: false
   - name: 'false'
     files:
       - lang: typescript
         code: ''
-        twoslash: true
+        twoslash: false

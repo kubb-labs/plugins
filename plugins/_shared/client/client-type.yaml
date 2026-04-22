@@ -36,7 +36,7 @@ examples:
               }),
             ],
           })
-        twoslash: true
+        twoslash: false
       - name: Pet.ts
         lang: typescript
         code: |
@@ -67,14 +67,14 @@ examples:
               return res.data
             }
           }
-        twoslash: true
+        twoslash: false
       - name: usage.ts
         lang: typescript
         code: |
           import { Pet } from './gen/clients/Pet'
 
           const pet = await Pet.getPetById({ petId: 1 })
-        twoslash: true
+        twoslash: false
   - name: class
     files:
       - name: kubb.config.ts
@@ -96,7 +96,7 @@ examples:
               }),
             ],
           })
-        twoslash: true
+        twoslash: false
       - name: Pet.ts
         lang: typescript
         code: |
@@ -124,7 +124,7 @@ examples:
               return res.data
             }
           }
-        twoslash: true
+        twoslash: false
       - name: usage.ts
         lang: typescript
         code: |
@@ -132,4 +132,4 @@ examples:
 
           const petClient = new Pet()
           const pet = await petClient.getPetById({ petId: 1 })
-        twoslash: true
+        twoslash: false

@@ -20,7 +20,7 @@ examples:
           ) {
             ...
           }
-        twoslash: true
+        twoslash: false
   - name: inline
     files:
       - lang: typescript
@@ -30,4 +30,4 @@ examples:
           ) {
             ...
           }
-        twoslash: true
+        twoslash: false

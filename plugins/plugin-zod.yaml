@@ -112,31 +112,31 @@ options:
           - lang: typescript
             code: |
               z.string();
-            twoslash: true
+            twoslash: false
       - name: "'string'"
         files:
           - lang: typescript
             code: |
               z.string().datetime();
-            twoslash: true
+            twoslash: false
       - name: "'stringOffset'"
         files:
           - lang: typescript
             code: |
               z.string().datetime({ offset: true });
-            twoslash: true
+            twoslash: false
       - name: "'stringLocal'"
         files:
           - lang: typescript
             code: |
               z.string().datetime({ local: true });
-            twoslash: true
+            twoslash: false
       - name: "'date'"
         files:
           - lang: typescript
             code: |
               z.date();
-            twoslash: true
+            twoslash: false
 
   - name: integerType
     warning: |
@@ -163,7 +163,7 @@ options:
               z.coerce.string();
               z.coerce.date();
               z.coerce.number();
-            twoslash: true
+            twoslash: false
       - name: 'false'
         files:
           - lang: typescript
@@ -171,7 +171,7 @@ options:
               z.string();
               z.date();
               z.number();
-            twoslash: true
+            twoslash: false
       - name: '{numbers: true, strings: false, dates: false}'
         files:
           - lang: typescript
@@ -179,7 +179,7 @@ options:
               z.string();
               z.date();
               z.coerce.number();
-            twoslash: true
+            twoslash: false
 
   - name: operations
     type: boolean
@@ -217,13 +217,13 @@ options:
           - lang: typescript
             code: |
               z.uuid()
-            twoslash: true
+            twoslash: false
       - name: "'guid'"
         files:
           - lang: typescript
             code: |
               z.guid()
-            twoslash: true
+            twoslash: false
 
   - name: mini
     type: boolean
@@ -254,7 +254,7 @@ options:
               z.optional(z.string())
               z.nullable(z.number())
               z.array(z.string()).check(z.minLength(1), z.maxLength(10))
-            twoslash: true
+            twoslash: false
       - name: 'mini: false (default)'
         files:
           - lang: typescript
@@ -266,7 +266,7 @@ options:
               z.string().optional()
               z.number().nullable()
               z.array(z.string()).min(1).max(10)
-            twoslash: true
+            twoslash: false
 
   - extends: ./_shared/core/include.yaml
   - extends: ./_shared/core/exclude.yaml
@@ -300,7 +300,7 @@ options:
                   },
                 },
               })
-            twoslash: true
+            twoslash: false
       - name: Override date to z.string().date()
         files:
           - lang: typescript
@@ -316,7 +316,7 @@ options:
                   },
                 },
               })
-            twoslash: true
+            twoslash: false
 
   - name: wrapOutput
     type: '(arg: { output: string; schema: SchemaNode }) => string | undefined'
@@ -368,4 +368,4 @@ examples:
               }),
             ],
           });
-        twoslash: true
+        twoslash: false

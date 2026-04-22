@@ -507,4 +507,4 @@ examples:
               }),
             ],
           })
-        twoslash: true
+        twoslash: false

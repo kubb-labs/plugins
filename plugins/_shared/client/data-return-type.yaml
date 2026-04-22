@@ -21,7 +21,7 @@ examples:
           ): Promise<ResponseConfig<TData>['data']> {
             ...
           }
-        twoslash: true
+        twoslash: false
   - name: full
     files:
       - lang: typescript
@@ -31,4 +31,4 @@ examples:
           ): Promise<ResponseConfig<TData>> {
             ...
           }
-        twoslash: true
+        twoslash: false

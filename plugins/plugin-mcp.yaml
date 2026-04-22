@@ -139,7 +139,7 @@ options:
                 })
                 ...
               }
-            twoslash: true
+            twoslash: false
       - name: Without paramsCasing
         files:
           - lang: typescript
@@ -157,7 +157,7 @@ options:
                 })
                 ...
               }
-            twoslash: true
+            twoslash: false
 
   - name: client
     type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
@@ -207,4 +207,4 @@ examples:
               }),
             ],
           })
-        twoslash: true
+        twoslash: false

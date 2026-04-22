@@ -80,6 +80,6 @@ examples:
               }),
             ],
           })
-        twoslash: true
+        twoslash: false
 tip: |
   Learn more about defining a custom client [here](https://kubb.dev/plugins/plugin-client#importpath).

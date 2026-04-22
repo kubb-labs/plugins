@@ -83,7 +83,7 @@ options:
                 Dog = 'dog',
                 Cat = 'cat',
               }
-            twoslash: true
+            twoslash: false
       - name: "'asConst'"
         files:
           - lang: typescript
@@ -92,7 +92,7 @@ options:
                 Dog: 'dog',
                 Cat: 'cat',
               } as const;
-            twoslash: true
+            twoslash: false
       - name: "'asPascalConst'"
         files:
           - lang: typescript
@@ -101,7 +101,7 @@ options:
                 Dog: 'dog',
                 Cat: 'cat',
               } as const;
-            twoslash: true
+            twoslash: false
       - name: "'constEnum'"
         files:
           - lang: typescript
@@ -110,13 +110,13 @@ options:
                 Dog = 'dog',
                 Cat = 'cat',
               }
-            twoslash: true
+            twoslash: false
       - name: "'literal'"
         files:
           - lang: typescript
             code: |
               type PetType = 'dog' | 'cat';
-            twoslash: true
+            twoslash: false
       - name: "'inlineLiteral'"
         files:
           - lang: typescript
@@ -125,7 +125,7 @@ options:
               export interface Pet {
                 status?: 'available' | 'pending' | 'sold';
               }
-            twoslash: true
+            twoslash: false
     body: |
       > [!TIP]
       > Consider `'inlineLiteral'` for the most idiomatic output — enum values are inlined directly into the property type instead of creating a separate named type.
@@ -155,7 +155,7 @@ options:
               } as const;
 
               export type PetTypeKey = (typeof petType)[keyof typeof petType];
-            twoslash: true
+            twoslash: false
       - name: "'Value'"
         files:
           - lang: typescript
@@ -167,7 +167,7 @@ options:
               } as const;
 
               export type PetTypeValue = (typeof petType)[keyof typeof petType];
-            twoslash: true
+            twoslash: false
       - name: "'' (no suffix)"
         files:
           - lang: typescript
@@ -179,7 +179,7 @@ options:
               } as const;
 
               export type PetType = (typeof petType)[keyof typeof petType];
-            twoslash: true
+            twoslash: false
 
   - name: enumKeyCasing
     type: "'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'"
@@ -220,7 +220,7 @@ options:
               type Pet = {
                 name: string;
               };
-            twoslash: true
+            twoslash: false
       - name: "'interface'"
         files:
           - lang: typescript
@@ -228,7 +228,7 @@ options:
               interface Pet {
                 name: string;
               }
-            twoslash: true
+            twoslash: false
 
   - name: unknownType
     required: false
@@ -255,7 +255,7 @@ options:
               type Pet = {
                 type?: string;
               };
-            twoslash: true
+            twoslash: false
       - name: "'undefined'"
         files:
           - lang: typescript
@@ -263,7 +263,7 @@ options:
               type Pet = {
                 type: string | undefined;
               };
-            twoslash: true
+            twoslash: false
       - name: "'questionTokenAndUndefined'"
         files:
           - lang: typescript
@@ -271,7 +271,7 @@ options:
               type Pet = {
                 type?: string | undefined;
               };
-            twoslash: true
+            twoslash: false
 
   - name: arrayType
     type: "'array' | 'generic'"
@@ -286,7 +286,7 @@ options:
               type Pet = {
                 tags: string[];
               };
-            twoslash: true
+            twoslash: false
       - name: "'generic'"
         files:
           - lang: typescript
@@ -294,7 +294,7 @@ options:
               type Pet = {
                 tags: Array<string>;
               };
-            twoslash: true
+            twoslash: false
 
   - name: paramsCasing
     type: "'camelcase'"
@@ -324,7 +324,7 @@ options:
               type FindPetsByStatusHeaderParams = {
                 'X-Custom-Header'?: string;
               };
-            twoslash: true
+            twoslash: false
       - name: "With paramsCasing: 'camelcase'"
         files:
           - lang: typescript
@@ -342,7 +342,7 @@ options:
               type FindPetsByStatusHeaderParams = {
                 xCustomHeader?: string;  // ✓ camelCase
               };
-            twoslash: true
+            twoslash: false
 
   - extends: ./_shared/core/resolver.yaml
     type: 'Partial<ResolverTs> & ThisType<ResolverTs>'
@@ -360,7 +360,7 @@ options:
                   },
                 },
               })
-            twoslash: true
+            twoslash: false
 
   - extends: ./_shared/core/include.yaml
   - extends: ./_shared/core/exclude.yaml
@@ -397,7 +397,7 @@ options:
                   },
                 },
               })
-            twoslash: true
+            twoslash: false
       - name: Override integer to bigint
         files:
           - lang: typescript
@@ -414,7 +414,7 @@ options:
                   },
                 },
               })
-            twoslash: true
+            twoslash: false
 examples:
   - name: kubb.config.ts
     files:
@@ -451,4 +451,4 @@ examples:
               }),
             ],
           })
-        twoslash: true
+        twoslash: false

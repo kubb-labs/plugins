@@ -23,7 +23,7 @@ examples:
               },
             },
           })
-        twoslash: true
+        twoslash: false
   - name: Prefix every operationId
     files:
       - lang: typescript
@@ -37,6 +37,6 @@ examples:
               },
             },
           })
-        twoslash: true
+        twoslash: false
 tip: |
   Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.

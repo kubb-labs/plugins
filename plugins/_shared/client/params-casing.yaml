@@ -30,7 +30,7 @@ examples:
               ...
             })
           }
-        twoslash: true
+        twoslash: false
   - name: Without paramsCasing
     files:
       - lang: typescript
@@ -47,6 +47,6 @@ examples:
               ...
             })
           }
-        twoslash: true
+        twoslash: false
 tip: |
   The client automatically generates mapping code to convert camelCase parameter names back to the original API format. You write code with developer-friendly camelCase names, but HTTP requests use the exact parameter names from your OpenAPI specification.

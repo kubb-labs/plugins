@@ -18,7 +18,7 @@ examples:
               return `${group}Controller`
             }
           }
-        twoslash: true
+        twoslash: false
 body: |
   With the configuration above, the generator emits:
 
