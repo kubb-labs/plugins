@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-client'
 docsPath: /plugins/plugin-client
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/client
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -143,7 +144,6 @@ options:
         })
 examples:
   - name: kubb.config.ts
-    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/client
     files:
       - lang: typescript
         code: |

@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-faker'
 docsPath: /plugins/plugin-faker
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/faker
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -203,7 +204,6 @@ options:
             twoslash: false
 examples:
   - name: kubb.config.ts
-    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/faker
     files:
       - lang: typescript
         code: |

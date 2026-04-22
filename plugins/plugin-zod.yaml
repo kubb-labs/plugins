@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-zod'
 docsPath: /plugins/plugin-zod
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/zod
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -341,7 +342,6 @@ options:
         };
 examples:
   - name: kubb.config.ts
-    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/zod
     files:
       - lang: typescript
         code: |

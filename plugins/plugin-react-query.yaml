@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-react-query'
 docsPath: /plugins/plugin-react-query
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/react-query
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -463,7 +464,6 @@ notes:
       See [Tanstack Query](https://tanstack.com/query) for more information about React Query.
 examples:
   - name: kubb.config.ts
-    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/react-query
     files:
       - lang: typescript
         code: |

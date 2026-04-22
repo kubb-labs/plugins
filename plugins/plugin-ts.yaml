@@ -7,6 +7,7 @@ type: official
 npmPackage: '@kubb/plugin-ts'
 docsPath: /plugins/plugin-ts
 repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/typescript
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -417,7 +418,6 @@ options:
             twoslash: false
 examples:
   - name: kubb.config.ts
-    codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/typescript
     files:
       - lang: typescript
         code: |
