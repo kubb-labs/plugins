@@ -1,14 +1,14 @@
 export const listPets = {
   method: 'GET',
-  url: '/pets',
+  url: '/pets'
 }
 
 export const createPets = {
   method: 'POST',
-  url: '/pets',
+  url: '/pets'
 }
 
 export const showPetById = {
   method: 'GET',
-  url: '/pets/:petId',
+  url: '/pets/:petId'
 }

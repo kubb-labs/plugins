@@ -1,8 +1,8 @@
-import * as z from 'zod'
+import * as z from "zod";
 
 export const petNotFoundSchema = z.object({
-  code: z.int().optional(),
-  message: z.string().optional(),
-})
+    "code": z.int().optional(),
+    "message": z.string().optional()
+    })
 
 export type PetNotFoundSchema = z.infer<typeof petNotFoundSchema>
