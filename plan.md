@@ -1,5 +1,8 @@
 # Bug Fix Plan: `$ref` requestBody not parsed in `@kubb/adapter-oas` ≥ alpha.54
 
+> **Status: FIXED in `@kubb/adapter-oas@5.0.0-alpha.57`** — this repo is now on alpha.57 and all
+> tests pass with the correct snapshots restored.
+
 ## Problem
 
 Since `@kubb/adapter-oas@5.0.0-alpha.54`, operations whose `requestBody` is a `$ref`
