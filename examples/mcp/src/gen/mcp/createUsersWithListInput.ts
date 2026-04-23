@@ -1,7 +1,7 @@
-import fetch from "../../client.js";
-import type { ResponseErrorConfig } from "../../client.js";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../models/ts/CreateUsersWithListInput.js";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
+import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../models/ts/CreateUsersWithListInput.js'
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Creates list of users with given input array
@@ -9,20 +9,22 @@ import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInputHandler({ data }: { data?: CreateUsersWithListInputData } = {}): Promise<Promise<CallToolResult>> {
-
-
   const requestData = data
 
-
-  const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, baseURL: `https://petstore.swagger.io/v2`, data: requestData })
+  const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+    method: 'POST',
+    url: `/user/createWithList`,
+    baseURL: `https://petstore.swagger.io/v2`,
+    data: requestData,
+  })
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data),
+      },
+    ],
+    structuredContent: { data: res.data },
+  }
 }

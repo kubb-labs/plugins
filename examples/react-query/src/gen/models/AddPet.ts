@@ -1,56 +1,56 @@
 // version: 1.0.11
 
-import type { AddPetRequest } from "./AddPetRequest.ts";
-import type { Pet } from "./Pet.ts";
+import type { AddPetRequest } from './AddPetRequest.ts'
+import type { Pet } from './Pet.ts'
 
 /**
  * @type object
-*/
-export type AddPetStatus200 = Pet;
+ */
+export type AddPetStatus200 = Pet
 
 /**
  * @type object
-*/
+ */
 export type AddPetStatus405 = {
-    /**
-     * @type integer | undefined
-    */
-    code?: number;
-    /**
-     * @type string | undefined
-    */
-    message?: string;
-};
+  /**
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
 
 /**
  * @description Create a new pet in the store
  * @type object
-*/
-export type AddPetData = AddPetRequest;
+ */
+export type AddPetData = AddPetRequest
 
 /**
  * @type object
-*/
+ */
 export type AddPetRequestConfig = {
-    data?: AddPetData;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: "/pet";
-};
+  data?: AddPetData
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/pet'
+}
 
 /**
  * @type object
-*/
+ */
 export type AddPetResponses = {
-    "200": AddPetStatus200;
-    "405": AddPetStatus405;
-};
+  '200': AddPetStatus200
+  '405': AddPetStatus405
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type AddPetResponse = (AddPetStatus200 | AddPetStatus405);
+ */
+export type AddPetResponse = AddPetStatus200 | AddPetStatus405

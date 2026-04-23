@@ -1,57 +1,57 @@
 // version: 1.0.11
 
-import type { Pet } from "./Pet.ts";
+import type { Pet } from './Pet.ts'
 
 /**
  * @description ID of pet to return
  * @type integer
-*/
-export type GetPetByIdPathPetId = number;
+ */
+export type GetPetByIdPathPetId = number
 
 /**
  * @type object
-*/
-export type GetPetByIdStatus200 = Pet;
+ */
+export type GetPetByIdStatus200 = Pet
 
 /**
  * @type any
-*/
-export type GetPetByIdStatus400 = any;
+ */
+export type GetPetByIdStatus400 = any
 
 /**
  * @type any
-*/
-export type GetPetByIdStatus404 = any;
+ */
+export type GetPetByIdStatus404 = any
 
 /**
  * @type object
-*/
+ */
 export type GetPetByIdRequestConfig = {
-    data?: never;
-    /**
-     * @type object
-    */
-    pathParams: {
-        pet_id: GetPetByIdPathPetId;
-    };
-    queryParams?: never;
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: `/pet/${string}`;
-};
+  data?: never
+  /**
+   * @type object
+   */
+  pathParams: {
+    pet_id: GetPetByIdPathPetId
+  }
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: `/pet/${string}`
+}
 
 /**
  * @type object
-*/
+ */
 export type GetPetByIdResponses = {
-    "200": GetPetByIdStatus200;
-    "400": GetPetByIdStatus400;
-    "404": GetPetByIdStatus404;
-};
+  '200': GetPetByIdStatus200
+  '400': GetPetByIdStatus400
+  '404': GetPetByIdStatus404
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type GetPetByIdResponse = (GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404);
+ */
+export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
