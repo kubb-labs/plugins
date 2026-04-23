@@ -55,7 +55,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     client = 'axios',
     importPath,
     bundle = false,
-    wrapper = options.sdk,
+    sdk,
     baseURL,
     resolver: userResolver,
     transformer: userTransformer,
@@ -110,7 +110,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           paramsCasing,
           pathParamsType,
           urlType,
-          wrapper,
+          sdk,
           resolver,
         })
         ctx.setResolver(resolver)
