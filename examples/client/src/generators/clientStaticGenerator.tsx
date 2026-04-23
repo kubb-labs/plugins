@@ -34,7 +34,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
       { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
     )
 
-    const requestName = transformedNode.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(transformedNode) : undefined
+    const requestName = transformedNode.requestBody?.schema ? tsResolver.resolveDataName(transformedNode) : undefined
     const responseName = tsResolver.resolveResponseName(transformedNode)
     const pathParamsName =
       transformedNode.parameters.filter((p) => p.in === 'path').length > 0
