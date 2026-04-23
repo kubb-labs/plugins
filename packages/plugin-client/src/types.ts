@@ -160,7 +160,30 @@ export type Options = {
    */
   bundle?: boolean
   /**
+   * Generate an SDK facade class that composes all tag-based client classes into a single entry point.
+   * Setting this option automatically enables `clientType: 'class'`.
+   * @example
+   * ```ts
+   * pluginClient({
+   *   sdk: { className: 'PetStoreSDK' },
+   * })
+   * // Generates a class with a shared constructor config and one property per tag:
+   * // class PetStoreSDK {
+   * //   readonly pet: petController
+   * //   readonly store: storeController
+   * //   constructor(config = {}) { ... }
+   * // }
+   * ```
+   */
+  sdk?: {
+    /**
+     * Name of the generated SDK facade class.
+     */
+    className: string
+  }
+  /**
    * Generate a wrapper class that composes all tag-based client classes into a single entry point.
+   * @deprecated Use `sdk` instead.
    */
   wrapper?: {
     /**

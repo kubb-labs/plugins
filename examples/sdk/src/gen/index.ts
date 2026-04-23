@@ -33,5 +33,6 @@ export { addPetRequestStatusEnum } from "./models/AddPetRequest.ts";
 export { orderHttpStatusEnum, orderStatusEnum } from "./models/Order.ts";
 export { petStatusEnum } from "./models/Pet.ts";
 export { petController } from "./sdk/petController/petController.ts";
+export { PetStoreSDK } from "./sdk/petStoreSDK.ts";
 export { storeController } from "./sdk/storeController/storeController.ts";
 export { userController } from "./sdk/userController/userController.ts";

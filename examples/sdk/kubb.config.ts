@@ -27,9 +27,9 @@ export default defineConfig({
         barrelType: 'propagate',
       },
       client: 'fetch',
-      clientType: 'class',
       group: { type: 'tag' },
       pathParamsType: 'object',
+      sdk: { className: 'PetStoreSDK' },
     }),
   ],
 })
