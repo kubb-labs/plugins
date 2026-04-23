@@ -67,7 +67,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
     properties: [
       ast.createProperty({
         name: 'data',
-        schema: node.requestBody?.schema
+        schema: node.requestBody?.content?.[0]?.schema
           ? ast.createSchema({ type: 'ref', name: resolver.resolveDataName(node), optional: true })
           : ast.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),

@@ -38,7 +38,7 @@ function getParams(
 ): ast.FunctionParametersNode {
   const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`

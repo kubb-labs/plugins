@@ -92,7 +92,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
     }
   }
 
-  if (node.requestBody?.schema) {
+  if (node.requestBody?.content?.[0]?.schema) {
     requestOptions.push('body: data')
   }
 

@@ -30,7 +30,7 @@ function getParams(
 const getTransformer: Transformer = ({ node, casing }) => {
   const path = new URLPath(node.path, { casing })
   const hasQueryParams = node.parameters.some((p) => p.in === 'query')
-  const hasRequestBody = !!node.requestBody?.schema
+  const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
 
   return [
     path.toObject({ type: 'path', stringify: true }),

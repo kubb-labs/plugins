@@ -58,7 +58,7 @@ function generateMethod({
   pathParamsType,
 }: GenerateMethodProps): string {
   const path = new URLPath(node.path, { casing: paramsCasing })
-  const contentType = node.requestBody?.contentType ?? 'application/json'
+  const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'
   const isFormData = contentType === 'multipart/form-data'
   const headerParamsName =
     node.parameters.filter((p) => p.in === 'header').length > 0
@@ -72,7 +72,7 @@ function generateMethod({
   const jsdoc = buildJSDoc(getComments(node))
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
-  const formDataLine = buildFormDataLine(isFormData, !!node.requestBody?.schema)
+  const formDataLine = buildFormDataLine(isFormData, !!node.requestBody?.content?.[0]?.schema)
   const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
 
   const methodBody = [

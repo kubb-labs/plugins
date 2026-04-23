@@ -39,7 +39,7 @@ export function buildSchemaNames(node: ast.OperationNode, { params, resolver }: 
   responses['default'] = resolver.resolveResponseName(node)
 
   return {
-    request: node.requestBody?.schema ? resolver.resolveDataName(node) : undefined,
+    request: node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined,
     parameters: {
       path: pathParam ? resolver.resolvePathParamsName(node, pathParam) : undefined,
       query: queryParam ? resolver.resolveQueryParamsName(node, queryParam) : undefined,

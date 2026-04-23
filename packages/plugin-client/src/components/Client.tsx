@@ -42,7 +42,7 @@ type GetParamsProps = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
-  const requestName = node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
 
   return ast.createOperationParams(node, {
     paramsType,
@@ -83,7 +83,7 @@ export function Client({
   isConfigurable = true,
 }: Props): KubbReactNode {
   const path = new URLPath(node.path)
-  const contentType = node.requestBody?.contentType ?? 'application/json'
+  const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'
   const isFormData = contentType === 'multipart/form-data'
 
   const originalPathParams = node.parameters.filter((p) => p.in === 'path')
@@ -97,13 +97,13 @@ export function Client({
   const queryParamsMapping = paramsCasing ? buildParamsMapping(originalQueryParams, casedQueryParams) : undefined
   const headerParamsMapping = paramsCasing ? buildParamsMapping(originalHeaderParams, casedHeaderParams) : undefined
 
-  const requestName = node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
   const responseName = tsResolver.resolveResponseName(node)
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : undefined
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : undefined
 
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : undefined
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined
+  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined
 
   const errorNames = node.responses
     .filter((r) => {

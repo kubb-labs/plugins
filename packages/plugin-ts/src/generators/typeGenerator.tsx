@@ -148,14 +148,14 @@ export const typeGenerator = defineGenerator<PluginTs>({
       }),
     )
 
-    const requestType = node.requestBody?.schema
+    const requestType = node.requestBody?.content?.[0]?.schema
       ? renderSchemaType({
           schema: {
-            ...node.requestBody.schema,
-            description: node.requestBody.description ?? node.requestBody.schema.description,
+            ...node.requestBody.content![0]!.schema!,
+            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
           },
           name: resolver.resolveDataName(node),
-          keysToOmit: node.requestBody.keysToOmit,
+          keysToOmit: node.requestBody.content![0]!.keysToOmit,
         })
       : null
 

@@ -51,7 +51,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function McpHandler({ name, node, resolver, baseURL, dataReturnType, paramsCasing }: Props): KubbReactNode {
   const urlPath = new URLPath(node.path)
-  const contentType = node.requestBody?.contentType
+  const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
   const casedParams = ast.caseParams(node.parameters, paramsCasing)
@@ -63,7 +63,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   const originalQueryParams = node.parameters.filter((p) => p.in === 'query')
   const originalHeaderParams = node.parameters.filter((p) => p.in === 'header')
 
-  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const responseName = resolver.resolveResponseName(node)
 
   const errorResponses = node.responses.filter((r) => Number(r.statusCode) >= 400).map((r) => resolver.resolveResponseStatusName(node, r.statusCode))

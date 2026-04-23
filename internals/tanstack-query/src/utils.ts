@@ -128,7 +128,7 @@ export function buildQueryKeyParams(
 
   const queryGroupType = resolveQueryGroupType(node, queryParams, resolver)
 
-  const bodyType = node.requestBody?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
+  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
   const bodyRequired = node.requestBody?.required ?? false
 
   const params: Array<ast.FunctionParameterNode | ast.ParameterGroupNode> = []
@@ -178,7 +178,7 @@ export function buildMutationArgParams(
   const queryGroupType = resolveQueryGroupType(node, queryParams, resolver)
   const headerGroupType = resolveHeaderGroupType(node, headerParams, resolver)
 
-  const bodyType = node.requestBody?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
+  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
   const bodyRequired = node.requestBody?.required ?? false
 
   const params: Array<ast.FunctionParameterNode | ast.ParameterGroupNode> = []
