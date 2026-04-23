@@ -24,7 +24,7 @@ export default defineConfig({
   output: {
     path: './src/gen',
     clean: true,
-    barrelType: 'named',
+    barrelType: false,
     defaultBanner: false,
     format: 'oxfmt',
   },
