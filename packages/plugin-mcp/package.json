@@ -42,8 +42,7 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./package.json": "./package.json",
-    "./plugin.json": "./plugin.json"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",

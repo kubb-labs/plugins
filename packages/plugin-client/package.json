@@ -87,8 +87,7 @@
       "import": "./dist/templates/config.source.js",
       "require": "./dist/templates/config.source.cjs"
     },
-    "./package.json": "./package.json",
-    "./plugin.json": "./plugin.json"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",

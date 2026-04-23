@@ -492,6 +492,25 @@ importers:
         specifier: ^8.0.9
         version: 8.0.9(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3)
 
+  examples/sdk:
+    dependencies:
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.52(@kubb/renderer-jsx@5.0.0-alpha.52)
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../../packages/plugin-client
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ts
+      kubb:
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.52(@kubb/renderer-jsx@5.0.0-alpha.52)(typescript@6.0.3)
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   examples/simple-single:
     dependencies:
       '@kubb/adapter-oas':

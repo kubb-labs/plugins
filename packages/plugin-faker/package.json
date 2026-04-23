@@ -64,8 +64,7 @@
       "import": "./dist/generators.js",
       "require": "./dist/generators.cjs"
     },
-    "./package.json": "./package.json",
-    "./plugin.json": "./plugin.json"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
