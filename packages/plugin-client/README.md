@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main//examples/sdk" target="_blank">View SDK Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/sdk" target="_blank">View SDK Demo</a>
 <span> · </span>
-<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main//examples/client" target="_blank">View Client Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/client" target="_blank">View Client Demo</a>
 <span> · </span>
 <a href="https://kubb.dev/" target="_blank">Documentation</a>
 <span> · </span>
