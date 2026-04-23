@@ -48,7 +48,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { adapter, config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, wrapper } = ctx.options
+    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
     const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -214,29 +214,29 @@ export const classClientGenerator = defineGenerator<PluginClient>({
       )
     })
 
-    if (wrapper) {
-      const wrapperFile = resolver.resolveFile({ name: wrapper.className, extname: '.ts' }, { root, output, group })
+    if (sdk) {
+      const sdkFile = resolver.resolveFile({ name: sdk.className, extname: '.ts' }, { root, output, group })
 
       files.push(
         <File
-          key={wrapperFile.path}
-          baseName={wrapperFile.baseName}
-          path={wrapperFile.path}
-          meta={wrapperFile.meta}
+          key={sdkFile.path}
+          baseName={sdkFile.baseName}
+          path={sdkFile.path}
+          meta={sdkFile.meta}
           banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
           footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
         >
           {importPath ? (
             <File.Import name={['Client', 'RequestConfig']} path={importPath} isTypeOnly />
           ) : (
-            <File.Import name={['Client', 'RequestConfig']} root={wrapperFile.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+            <File.Import name={['Client', 'RequestConfig']} root={sdkFile.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
           )}
 
           {controllers.map(({ name, file }) => (
-            <File.Import key={name} name={[name]} root={wrapperFile.path} path={file.path} />
+            <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
           ))}
 
-          <WrapperClient name={wrapper.className} classNames={controllers.map(({ name }) => name)} />
+          <WrapperClient name={sdk.className} classNames={controllers.map(({ name }) => name)} />
         </File>,
       )
     }

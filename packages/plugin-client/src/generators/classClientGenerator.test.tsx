@@ -29,7 +29,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   override: [],
   group: undefined,
   urlType: 'export',
-  wrapper: undefined,
+  sdk: undefined,
   baseURL: undefined,
   resolver: resolverClient,
 }
@@ -88,7 +88,7 @@ describe('classClientGenerator operations', () => {
           type: 'tag' as const,
           name: ({ group }: { group: string }) => `${group}Service`,
         },
-        wrapper: {
+        sdk: {
           className: 'PetStoreClient',
         },
       } as Partial<PluginClient['resolvedOptions']>,

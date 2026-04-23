@@ -182,16 +182,6 @@ export type Options = {
     className: string
   }
   /**
-   * Generate a wrapper class that composes all tag-based client classes into a single entry point.
-   * @deprecated Use `sdk` instead.
-   */
-  wrapper?: {
-    /**
-     * Name of the wrapper class.
-     */
-    className: string
-  }
-  /**
    * Override individual resolver methods. Any method you omit falls back to the
    * preset resolver's implementation. Use `this.default(...)` to call it.
    */
@@ -225,7 +215,7 @@ type ResolvedOptions = {
   pathParamsType: NonNullable<NonNullable<Options['pathParamsType']>>
   paramsType: NonNullable<Options['paramsType']>
   paramsCasing: Options['paramsCasing']
-  wrapper: Options['wrapper']
+  sdk: Options['sdk']
   resolver: ResolverClient
 }
 
