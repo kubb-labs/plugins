@@ -1,201 +1,209 @@
-export type { AddPetRequestSchema } from './addPetRequestSchema.ts'
-export type { AddressSchema } from './addressSchema.ts'
-export type { AnimalSchema } from './animalSchema.ts'
-export type { ApiResponseSchema } from './apiResponseSchema.ts'
-export type { CatSchema } from './catSchema.ts'
-export type { CategorySchema } from './categorySchema.ts'
-export type { CustomerSchema } from './customerSchema.ts'
-export type { DogSchema } from './dogSchema.ts'
-export type { ImageSchema } from './imageSchema.ts'
-export type { OrderSchema } from './orderSchema.ts'
-export type { AddFilesResponseSchema, AddFilesStatus200Schema, AddFilesStatus405Schema } from './petController/addFilesSchema.ts'
-export type { AddPetResponseSchema, AddPetStatus405Schema, AddPetStatusDefaultSchema } from './petController/addPetSchema.ts'
-export type {
+export { addPetRequestSchema, AddPetRequestSchema } from './addPetRequestSchema.ts'
+export { addressSchema, AddressSchema } from './addressSchema.ts'
+export { animalSchema, AnimalSchema } from './animalSchema.ts'
+export { apiResponseSchema, ApiResponseSchema } from './apiResponseSchema.ts'
+export { catSchema, CatSchema } from './catSchema.ts'
+export { categorySchema, CategorySchema } from './categorySchema.ts'
+export { customerSchema, CustomerSchema } from './customerSchema.ts'
+export { dogSchema, DogSchema } from './dogSchema.ts'
+export { imageSchema, ImageSchema } from './imageSchema.ts'
+export { orderSchema, OrderSchema } from './orderSchema.ts'
+export {
+  addFilesStatus200Schema,
+  AddFilesStatus200Schema,
+  addFilesStatus405Schema,
+  AddFilesStatus405Schema,
+  addFilesResponseSchema,
+  AddFilesResponseSchema,
+  addFilesDataSchema,
+  AddFilesDataSchema,
+} from './petController/addFilesSchema.ts'
+export {
+  addPetStatus405Schema,
+  AddPetStatus405Schema,
+  addPetStatusDefaultSchema,
+  AddPetStatusDefaultSchema,
+  addPetResponseSchema,
+  AddPetResponseSchema,
+  addPetDataSchema,
+  AddPetDataSchema,
+} from './petController/addPetSchema.ts'
+export {
+  deletePetHeaderApiKeySchema,
   DeletePetHeaderApiKeySchema,
+  deletePetPathPetIdSchema,
   DeletePetPathPetIdSchema,
-  DeletePetResponseSchema,
+  deletePetStatus400Schema,
   DeletePetStatus400Schema,
+  deletePetResponseSchema,
+  DeletePetResponseSchema,
 } from './petController/deletePetSchema.ts'
-export type {
-  FindPetsByStatusPathStepIdSchema,
-  FindPetsByStatusResponseSchema,
-  FindPetsByStatusStatus200Schema,
-  FindPetsByStatusStatus400Schema,
-} from './petController/findPetsByStatusSchema.ts'
-export type {
-  FindPetsByTagsHeaderXEXAMPLESchema,
-  FindPetsByTagsQueryPageSchema,
-  FindPetsByTagsQueryPageSizeSchema,
-  FindPetsByTagsQueryTagsSchema,
-  FindPetsByTagsResponseSchema,
-  FindPetsByTagsStatus200Schema,
-  FindPetsByTagsStatus400Schema,
-} from './petController/findPetsByTagsSchema.ts'
-export type {
-  GetPetByIdPathPetIdSchema,
-  GetPetByIdResponseSchema,
-  GetPetByIdStatus200Schema,
-  GetPetByIdStatus400Schema,
-  GetPetByIdStatus404Schema,
-} from './petController/getPetByIdSchema.ts'
-export type {
-  UpdatePetResponseSchema,
-  UpdatePetStatus200Schema,
-  UpdatePetStatus202Schema,
-  UpdatePetStatus400Schema,
-  UpdatePetStatus404Schema,
-  UpdatePetStatus405Schema,
-} from './petController/updatePetSchema.ts'
-export type {
-  UpdatePetWithFormPathPetIdSchema,
-  UpdatePetWithFormQueryNameSchema,
-  UpdatePetWithFormQueryStatusSchema,
-  UpdatePetWithFormResponseSchema,
-  UpdatePetWithFormStatus405Schema,
-} from './petController/updatePetWithFormSchema.ts'
-export type {
-  UploadFilePathPetIdSchema,
-  UploadFileQueryAdditionalMetadataSchema,
-  UploadFileResponseSchema,
-  UploadFileStatus200Schema,
-} from './petController/uploadFileSchema.ts'
-export type { PetNotFoundSchema } from './petNotFoundSchema.ts'
-export type { PetSchema } from './petSchema.ts'
-export type {
-  CreatePetsHeaderXEXAMPLESchema,
-  CreatePetsPathUuidSchema,
-  CreatePetsQueryBoolParamSchema,
-  CreatePetsQueryOffsetSchema,
-  CreatePetsResponseSchema,
-  CreatePetsStatus201Schema,
-  CreatePetsStatusDefaultSchema,
-} from './petsController/createPetsSchema.ts'
-export type { TagTagSchema } from './tag/tagSchema.ts'
-export type { UserArraySchema } from './userArraySchema.ts'
-export type { CreateUserResponseSchema, CreateUserStatusDefaultSchema } from './userController/createUserSchema.ts'
-export type {
-  CreateUsersWithListInputResponseSchema,
-  CreateUsersWithListInputStatus200Schema,
-  CreateUsersWithListInputStatusDefaultSchema,
-} from './userController/createUsersWithListInputSchema.ts'
-export type {
-  DeleteUserPathUsernameSchema,
-  DeleteUserResponseSchema,
-  DeleteUserStatus400Schema,
-  DeleteUserStatus404Schema,
-} from './userController/deleteUserSchema.ts'
-export type {
-  GetUserByNamePathUsernameSchema,
-  GetUserByNameResponseSchema,
-  GetUserByNameStatus200Schema,
-  GetUserByNameStatus400Schema,
-  GetUserByNameStatus404Schema,
-} from './userController/getUserByNameSchema.ts'
-export type {
-  LoginUserQueryPasswordSchema,
-  LoginUserQueryUsernameSchema,
-  LoginUserResponseSchema,
-  LoginUserStatus200Schema,
-  LoginUserStatus400Schema,
-} from './userController/loginUserSchema.ts'
-export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './userController/logoutUserSchema.ts'
-export type { UpdateUserPathUsernameSchema, UpdateUserResponseSchema, UpdateUserStatusDefaultSchema } from './userController/updateUserSchema.ts'
-export type { UserSchema } from './userSchema.ts'
-export { addPetRequestSchema } from './addPetRequestSchema.ts'
-export { addressSchema } from './addressSchema.ts'
-export { animalSchema } from './animalSchema.ts'
-export { apiResponseSchema } from './apiResponseSchema.ts'
-export { catSchema } from './catSchema.ts'
-export { categorySchema } from './categorySchema.ts'
-export { customerSchema } from './customerSchema.ts'
-export { dogSchema } from './dogSchema.ts'
-export { imageSchema } from './imageSchema.ts'
-export { orderSchema } from './orderSchema.ts'
-export { addFilesResponseSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './petController/addFilesSchema.ts'
-export { addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from './petController/addPetSchema.ts'
-export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './petController/deletePetSchema.ts'
 export {
   findPetsByStatusPathStepIdSchema,
-  findPetsByStatusResponseSchema,
+  FindPetsByStatusPathStepIdSchema,
   findPetsByStatusStatus200Schema,
+  FindPetsByStatusStatus200Schema,
   findPetsByStatusStatus400Schema,
+  FindPetsByStatusStatus400Schema,
+  findPetsByStatusResponseSchema,
+  FindPetsByStatusResponseSchema,
 } from './petController/findPetsByStatusSchema.ts'
 export {
-  findPetsByTagsHeaderXEXAMPLESchema,
-  findPetsByTagsQueryPageSchema,
-  findPetsByTagsQueryPageSizeSchema,
   findPetsByTagsQueryTagsSchema,
-  findPetsByTagsResponseSchema,
+  FindPetsByTagsQueryTagsSchema,
+  findPetsByTagsQueryPageSchema,
+  FindPetsByTagsQueryPageSchema,
+  findPetsByTagsQueryPageSizeSchema,
+  FindPetsByTagsQueryPageSizeSchema,
+  findPetsByTagsHeaderXEXAMPLESchema,
+  FindPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsStatus200Schema,
+  FindPetsByTagsStatus200Schema,
   findPetsByTagsStatus400Schema,
+  FindPetsByTagsStatus400Schema,
+  findPetsByTagsResponseSchema,
+  FindPetsByTagsResponseSchema,
 } from './petController/findPetsByTagsSchema.ts'
 export {
   getPetByIdPathPetIdSchema,
-  getPetByIdResponseSchema,
+  GetPetByIdPathPetIdSchema,
   getPetByIdStatus200Schema,
+  GetPetByIdStatus200Schema,
   getPetByIdStatus400Schema,
+  GetPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
+  GetPetByIdStatus404Schema,
+  getPetByIdResponseSchema,
+  GetPetByIdResponseSchema,
 } from './petController/getPetByIdSchema.ts'
 export {
-  updatePetResponseSchema,
   updatePetStatus200Schema,
+  UpdatePetStatus200Schema,
   updatePetStatus202Schema,
+  UpdatePetStatus202Schema,
   updatePetStatus400Schema,
+  UpdatePetStatus400Schema,
   updatePetStatus404Schema,
+  UpdatePetStatus404Schema,
   updatePetStatus405Schema,
+  UpdatePetStatus405Schema,
+  updatePetResponseSchema,
+  UpdatePetResponseSchema,
+  updatePetDataSchema,
+  UpdatePetDataSchema,
 } from './petController/updatePetSchema.ts'
 export {
   updatePetWithFormPathPetIdSchema,
+  UpdatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
+  UpdatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,
-  updatePetWithFormResponseSchema,
+  UpdatePetWithFormQueryStatusSchema,
   updatePetWithFormStatus405Schema,
+  UpdatePetWithFormStatus405Schema,
+  updatePetWithFormResponseSchema,
+  UpdatePetWithFormResponseSchema,
 } from './petController/updatePetWithFormSchema.ts'
 export {
   uploadFilePathPetIdSchema,
+  UploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
-  uploadFileResponseSchema,
+  UploadFileQueryAdditionalMetadataSchema,
   uploadFileStatus200Schema,
+  UploadFileStatus200Schema,
+  uploadFileResponseSchema,
+  UploadFileResponseSchema,
+  uploadFileDataSchema,
+  UploadFileDataSchema,
 } from './petController/uploadFileSchema.ts'
-export { petNotFoundSchema } from './petNotFoundSchema.ts'
-export { petSchema } from './petSchema.ts'
+export { petNotFoundSchema, PetNotFoundSchema } from './petNotFoundSchema.ts'
+export { petSchema, PetSchema } from './petSchema.ts'
 export {
-  createPetsHeaderXEXAMPLESchema,
-  createPetsPathUuidSchema,
   createPetsQueryBoolParamSchema,
+  CreatePetsQueryBoolParamSchema,
+  createPetsPathUuidSchema,
+  CreatePetsPathUuidSchema,
   createPetsQueryOffsetSchema,
-  createPetsResponseSchema,
+  CreatePetsQueryOffsetSchema,
+  createPetsHeaderXEXAMPLESchema,
+  CreatePetsHeaderXEXAMPLESchema,
   createPetsStatus201Schema,
+  CreatePetsStatus201Schema,
   createPetsStatusDefaultSchema,
+  CreatePetsStatusDefaultSchema,
+  createPetsResponseSchema,
+  CreatePetsResponseSchema,
+  createPetsDataSchema,
+  CreatePetsDataSchema,
 } from './petsController/createPetsSchema.ts'
-export { tagTagSchema } from './tag/tagSchema.ts'
-export { userArraySchema } from './userArraySchema.ts'
-export { createUserResponseSchema, createUserStatusDefaultSchema } from './userController/createUserSchema.ts'
+export { tagTagSchema, TagTagSchema } from './tag/tagSchema.ts'
+export { userArraySchema, UserArraySchema } from './userArraySchema.ts'
 export {
-  createUsersWithListInputResponseSchema,
+  createUserStatusDefaultSchema,
+  CreateUserStatusDefaultSchema,
+  createUserResponseSchema,
+  CreateUserResponseSchema,
+  createUserDataSchema,
+  CreateUserDataSchema,
+} from './userController/createUserSchema.ts'
+export {
   createUsersWithListInputStatus200Schema,
+  CreateUsersWithListInputStatus200Schema,
   createUsersWithListInputStatusDefaultSchema,
+  CreateUsersWithListInputStatusDefaultSchema,
+  createUsersWithListInputResponseSchema,
+  CreateUsersWithListInputResponseSchema,
+  createUsersWithListInputDataSchema,
+  CreateUsersWithListInputDataSchema,
 } from './userController/createUsersWithListInputSchema.ts'
 export {
   deleteUserPathUsernameSchema,
-  deleteUserResponseSchema,
+  DeleteUserPathUsernameSchema,
   deleteUserStatus400Schema,
+  DeleteUserStatus400Schema,
   deleteUserStatus404Schema,
+  DeleteUserStatus404Schema,
+  deleteUserResponseSchema,
+  DeleteUserResponseSchema,
 } from './userController/deleteUserSchema.ts'
 export {
   getUserByNamePathUsernameSchema,
-  getUserByNameResponseSchema,
+  GetUserByNamePathUsernameSchema,
   getUserByNameStatus200Schema,
+  GetUserByNameStatus200Schema,
   getUserByNameStatus400Schema,
+  GetUserByNameStatus400Schema,
   getUserByNameStatus404Schema,
+  GetUserByNameStatus404Schema,
+  getUserByNameResponseSchema,
+  GetUserByNameResponseSchema,
 } from './userController/getUserByNameSchema.ts'
 export {
-  loginUserQueryPasswordSchema,
   loginUserQueryUsernameSchema,
-  loginUserResponseSchema,
+  LoginUserQueryUsernameSchema,
+  loginUserQueryPasswordSchema,
+  LoginUserQueryPasswordSchema,
   loginUserStatus200Schema,
+  LoginUserStatus200Schema,
   loginUserStatus400Schema,
+  LoginUserStatus400Schema,
+  loginUserResponseSchema,
+  LoginUserResponseSchema,
 } from './userController/loginUserSchema.ts'
-export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './userController/logoutUserSchema.ts'
-export { updateUserPathUsernameSchema, updateUserResponseSchema, updateUserStatusDefaultSchema } from './userController/updateUserSchema.ts'
-export { userSchema } from './userSchema.ts'
+export {
+  logoutUserStatusDefaultSchema,
+  LogoutUserStatusDefaultSchema,
+  logoutUserResponseSchema,
+  LogoutUserResponseSchema,
+} from './userController/logoutUserSchema.ts'
+export {
+  updateUserPathUsernameSchema,
+  UpdateUserPathUsernameSchema,
+  updateUserStatusDefaultSchema,
+  UpdateUserStatusDefaultSchema,
+  updateUserResponseSchema,
+  UpdateUserResponseSchema,
+  updateUserDataSchema,
+  UpdateUserDataSchema,
+} from './userController/updateUserSchema.ts'
+export { userSchema, UserSchema } from './userSchema.ts'

@@ -25,3 +25,5 @@ export const updatePetResponseSchema = z.union([
   updatePetStatus404Schema,
   updatePetStatus405Schema,
 ])
+
+export const updatePetDataSchema = petSchema.omit({ id: true }).describe('Update an existent pet in the store')

@@ -1,7 +1,7 @@
 import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
-import { createUsersWithListInputResponseSchema } from '../../../zod/userController/createUsersWithListInputSchema.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../../../zod/userController/createUsersWithListInputSchema.ts'
 
 export function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/user/createWithList` as const }
@@ -16,13 +16,16 @@ export function getCreateUsersWithListInputUrl() {
  */
 export async function createUsersWithListInput(
   { data }: { data?: CreateUsersWithListInputData } = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, unknown>({
+  const requestData = createUsersWithListInputDataSchema.parse(data)
+
+  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: getCreateUsersWithListInputUrl().url.toString(),
+    data: requestData,
     ...requestConfig,
   })
 

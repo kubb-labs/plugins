@@ -1,4 +1,4 @@
-import type { AddFilesResponse, AddFilesStatus200 } from '../../models/ts/petController/AddFiles.ts'
+import type { AddFilesData, AddFilesResponse, AddFilesStatus200 } from '../../models/ts/petController/AddFiles.ts'
 import { petFaker } from '../pet.ts'
 import { faker } from '@faker-js/faker'
 
@@ -14,6 +14,10 @@ export function addFilesStatus200(data?: Partial<AddFilesStatus200>): AddFilesSt
  */
 export function addFilesStatus405() {
   return undefined
+}
+
+export function addFilesData(data?: Partial<AddFilesData>): AddFilesData {
+  return petFaker(data)
 }
 
 export function addFilesResponse(_data?: AddFilesResponse): AddFilesResponse {

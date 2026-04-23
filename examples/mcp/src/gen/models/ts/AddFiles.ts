@@ -16,10 +16,15 @@ export type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
 export type AddFilesStatus405 = any
 
 /**
+ * @type object | undefined
+ */
+export type AddFilesData = Omit<NonNullable<Pet>, 'id'> | undefined
+
+/**
  * @type object
  */
 export type AddFilesRequestConfig = {
-  data?: never
+  data?: AddFilesData
   pathParams?: never
   queryParams?: never
   headerParams?: never
