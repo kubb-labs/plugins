@@ -1,4 +1,4 @@
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../models/ts/userController/UpdateUser.ts'
+import type { UpdateUserPathUsername, UpdateUserResponse } from '../../models/ts/userController/UpdateUser.ts'
 
 export function updateUser(
   username: UpdateUserPathUsername,
@@ -9,7 +9,6 @@ export function updateUser(
     .request<UpdateUserResponse>({
       method: 'PUT',
       url: `/user/${username}`,
-      body: data,
       ...options,
     })
     .then((res) => res.body)

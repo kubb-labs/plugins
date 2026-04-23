@@ -17,8 +17,3 @@ export const createPetsStatus201Schema = z.any()
 export const createPetsStatusDefaultSchema = petNotFoundSchema
 
 export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
-
-export const createPetsDataSchema = z.object({
-  name: z.string(),
-  tag: z.string(),
-})

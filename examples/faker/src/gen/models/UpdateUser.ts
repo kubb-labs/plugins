@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import type { User } from './User.ts'
-
 /**
  * @description name that need to be deleted
  * @type string
@@ -17,16 +15,10 @@ export type UpdateUserPathUsername = string
 export type UpdateUserStatusDefault = any
 
 /**
- * @description Update an existent user in the store
- * @type object | undefined
- */
-export type UpdateUserData = User | undefined
-
-/**
  * @type object
  */
 export type UpdateUserRequestConfig = {
-  data?: UpdateUserData
+  data?: never
   /**
    * @type object
    */

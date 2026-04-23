@@ -3,11 +3,8 @@
  * Do not edit manually.
  */
 
-import * as z from 'zod/mini'
 import { userSchema } from './userSchema.ts'
 
 export const createUserStatusDefaultSchema = userSchema
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
-
-export const createUserDataSchema = z.optional(userSchema)

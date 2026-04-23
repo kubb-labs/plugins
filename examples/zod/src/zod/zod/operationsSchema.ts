@@ -4,21 +4,16 @@
  */
 
 import type { z } from '../../zod.ts'
-import { addPetDataSchema, addPetResponseSchema, addPetStatus200Schema, addPetStatus405Schema } from './addPetSchema.ts'
+import { addPetResponseSchema, addPetStatus200Schema, addPetStatus405Schema } from './addPetSchema.ts'
 import {
-  createPetsDataSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
   createPetsResponseSchema,
   createPetsStatus201Schema,
 } from './createPetsSchema.ts'
-import { createUserDataSchema, createUserResponseSchema } from './createUserSchema.ts'
-import {
-  createUsersWithListInputDataSchema,
-  createUsersWithListInputResponseSchema,
-  createUsersWithListInputStatus200Schema,
-} from './createUsersWithListInputSchema.ts'
+import { createUserResponseSchema } from './createUserSchema.ts'
+import { createUsersWithListInputResponseSchema, createUsersWithListInputStatus200Schema } from './createUsersWithListInputSchema.ts'
 import { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './deleteOrderSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './deletePetSchema.ts'
 import { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './deleteUserSchema.ts'
@@ -60,15 +55,9 @@ import {
 } from './getUserByNameSchema.ts'
 import { loginUserQueryUsernameSchema, loginUserResponseSchema, loginUserStatus200Schema, loginUserStatus400Schema } from './loginUserSchema.ts'
 import { logoutUserResponseSchema } from './logoutUserSchema.ts'
+import { placeOrderPatchResponseSchema, placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema } from './placeOrderPatchSchema.ts'
+import { placeOrderResponseSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './placeOrderSchema.ts'
 import {
-  placeOrderPatchDataSchema,
-  placeOrderPatchResponseSchema,
-  placeOrderPatchStatus200Schema,
-  placeOrderPatchStatus405Schema,
-} from './placeOrderPatchSchema.ts'
-import { placeOrderDataSchema, placeOrderResponseSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './placeOrderSchema.ts'
-import {
-  updatePetDataSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
   updatePetStatus400Schema,
@@ -81,14 +70,8 @@ import {
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.ts'
-import { updateUserDataSchema, updateUserPathUsernameSchema, updateUserResponseSchema } from './updateUserSchema.ts'
-import {
-  uploadFileDataSchema,
-  uploadFilePathPetIdSchema,
-  uploadFileQueryAdditionalMetadataSchema,
-  uploadFileResponseSchema,
-  uploadFileStatus200Schema,
-} from './uploadFileSchema.ts'
+import { updateUserPathUsernameSchema, updateUserResponseSchema } from './updateUserSchema.ts'
+import { uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileResponseSchema, uploadFileStatus200Schema } from './uploadFileSchema.ts'
 
 export type OperationSchema = {
   readonly request: z.ZodTypeAny | undefined
@@ -123,7 +106,7 @@ export const operations = {
     errors: {},
   },
   createPets: {
-    request: createPetsDataSchema,
+    request: undefined,
     parameters: {
       path: createPetsPathUuidSchema,
       query: createPetsQueryOffsetSchema,
@@ -136,7 +119,7 @@ export const operations = {
     errors: {},
   },
   updatePet: {
-    request: updatePetDataSchema,
+    request: undefined,
     parameters: {
       path: undefined,
       query: undefined,
@@ -156,7 +139,7 @@ export const operations = {
     },
   },
   addPet: {
-    request: addPetDataSchema,
+    request: undefined,
     parameters: {
       path: undefined,
       query: undefined,
@@ -252,7 +235,7 @@ export const operations = {
     },
   },
   uploadFile: {
-    request: uploadFileDataSchema,
+    request: undefined,
     parameters: {
       path: uploadFilePathPetIdSchema,
       query: uploadFileQueryAdditionalMetadataSchema,
@@ -278,7 +261,7 @@ export const operations = {
     errors: {},
   },
   placeOrder: {
-    request: placeOrderDataSchema,
+    request: undefined,
     parameters: {
       path: undefined,
       query: undefined,
@@ -294,7 +277,7 @@ export const operations = {
     },
   },
   placeOrderPatch: {
-    request: placeOrderPatchDataSchema,
+    request: undefined,
     parameters: {
       path: undefined,
       query: undefined,
@@ -345,7 +328,7 @@ export const operations = {
     },
   },
   createUser: {
-    request: createUserDataSchema,
+    request: undefined,
     parameters: {
       path: undefined,
       query: undefined,
@@ -357,7 +340,7 @@ export const operations = {
     errors: {},
   },
   createUsersWithListInput: {
-    request: createUsersWithListInputDataSchema,
+    request: undefined,
     parameters: {
       path: undefined,
       query: undefined,
@@ -416,7 +399,7 @@ export const operations = {
     },
   },
   updateUser: {
-    request: updateUserDataSchema,
+    request: undefined,
     parameters: {
       path: updateUserPathUsernameSchema,
       query: undefined,

@@ -1,6 +1,6 @@
 import fetch from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../models/ts/PlaceOrderPatch.js'
+import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../models/ts/PlaceOrderPatch.js'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
@@ -9,13 +9,10 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
  * {@link /store/order}
  */
 export async function placeOrderPatchHandler({ data }: { data?: PlaceOrderPatchData } = {}): Promise<Promise<CallToolResult>> {
-  const requestData = data
-
-  const res = await fetch<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
+  const res = await fetch<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, unknown>({
     method: 'PATCH',
     url: `/store/order`,
     baseURL: `https://petstore.swagger.io/v2`,
-    data: requestData,
   })
 
   return {

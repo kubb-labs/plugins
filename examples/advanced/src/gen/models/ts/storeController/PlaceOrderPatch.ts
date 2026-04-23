@@ -11,15 +11,10 @@ export type PlaceOrderPatchStatus200 = Order
 export type PlaceOrderPatchStatus405 = any
 
 /**
- * @type object | undefined
- */
-export type PlaceOrderPatchData = Order | undefined
-
-/**
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  data?: PlaceOrderPatchData
+  data?: never
   pathParams?: never
   queryParams?: never
   headerParams?: never

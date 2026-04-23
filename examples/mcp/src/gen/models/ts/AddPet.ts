@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { AddPetRequest } from './AddPetRequest.js'
 import type { Pet } from './Pet.js'
 
 /**
@@ -26,16 +25,10 @@ export type AddPetStatus405 = {
 }
 
 /**
- * @description Create a new pet in the store
- * @type object
- */
-export type AddPetData = AddPetRequest
-
-/**
  * @type object
  */
 export type AddPetRequestConfig = {
-  data?: AddPetData
+  data?: never
   pathParams?: never
   queryParams?: never
   headerParams?: never

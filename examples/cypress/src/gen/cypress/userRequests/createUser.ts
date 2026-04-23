@@ -3,14 +3,13 @@
  * Do not edit manually.
  */
 
-import type { CreateUserData, CreateUserResponse } from '../../models.ts'
+import type { CreateUserResponse } from '../../models.ts'
 
 export function createUser(data?: CreateUserData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateUserResponse> {
   return cy
     .request<CreateUserResponse>({
       method: 'POST',
       url: `http://localhost:3000/user`,
-      body: data,
       ...options,
     })
     .then((res) => res.body)

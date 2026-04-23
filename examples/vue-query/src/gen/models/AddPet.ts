@@ -16,16 +16,10 @@ export type AddPetStatus200 = Pet
 export type AddPetStatus405 = any
 
 /**
- * @description Create a new pet in the store
- * @type object
- */
-export type AddPetData = Pet
-
-/**
  * @type object
  */
 export type AddPetRequestConfig = {
-  data?: AddPetData
+  data?: never
   pathParams?: never
   queryParams?: never
   headerParams?: never

@@ -99,8 +99,6 @@ export const updatePetStatus405Schema = z.any()
 
 export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetDataSchema = petSchema.describe('Update an existent pet in the store')
-
 export const addPetStatus200Schema = petSchema
 
 export const addPetStatus405Schema = z.object({
@@ -109,8 +107,6 @@ export const addPetStatus405Schema = z.object({
 })
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
-
-export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
 
 export const findPetsByStatusQueryStatusSchema = z
   .enum(['available', 'pending', 'sold'])
@@ -172,8 +168,6 @@ export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
-export const uploadFileDataSchema = z.instanceof(File).optional()
-
 export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema
@@ -184,15 +178,11 @@ export const placeOrderStatus405Schema = z.any()
 
 export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
-export const placeOrderDataSchema = orderSchema.optional()
-
 export const placeOrderPatchStatus200Schema = orderSchema
 
 export const placeOrderPatchStatus405Schema = z.any()
 
 export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
-
-export const placeOrderPatchDataSchema = orderSchema.optional()
 
 export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
 
@@ -216,15 +206,11 @@ export const createUserStatusDefaultSchema = userSchema
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export const createUserDataSchema = userSchema.optional().describe('Created user object')
-
 export const createUsersWithListInputStatus200Schema = userSchema
 
 export const createUsersWithListInputStatusDefaultSchema = z.any()
 
 export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
-
-export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
 export const loginUserQueryUsernameSchema = z.string().optional().describe('The user name for login')
 
@@ -255,8 +241,6 @@ export const updateUserPathUsernameSchema = z.string().describe('name that need 
 export const updateUserStatusDefaultSchema = z.any()
 
 export const updateUserResponseSchema = updateUserStatusDefaultSchema
-
-export const updateUserDataSchema = userSchema.optional().describe('Update an existent user in the store')
 
 export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
 

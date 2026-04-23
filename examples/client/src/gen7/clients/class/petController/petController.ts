@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/petController/AddPet.ts'
+import type { AddPetResponse, AddPetStatus405 } from '../../../models/ts/petController/AddPet.ts'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../../models/ts/petController/DeletePet.ts'
 import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
 import type {
@@ -12,13 +12,7 @@ import type {
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
 import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
-import type {
-  UpdatePetData,
-  UpdatePetResponse,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../../../models/ts/petController/UpdatePet.ts'
+import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../../models/ts/petController/UpdatePet.ts'
 import type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
@@ -26,9 +20,8 @@ import type {
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormStatus405,
 } from '../../../models/ts/petController/UpdatePetWithForm.ts'
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
+import type { UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { buildFormData } from '../../../.kubb/config.ts'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class petController {
@@ -43,14 +36,12 @@ export class petController {
    * @summary Update an existing pet
    * {@link /pet}
    */
-  async updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+  async updatePet(data: UpdatePetData, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+    const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, unknown>({
       ...requestConfig,
       method: 'PUT',
       url: `/pet`,
-      data: requestData,
     })
     return res.data
   }
@@ -60,15 +51,9 @@ export class petController {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  async addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+  async addPet(data: AddPetData, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/pet`,
-      data: requestData,
-    })
+    const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, unknown>({ ...requestConfig, method: 'POST', url: `/pet` })
     return res.data
   }
 
@@ -169,17 +154,14 @@ export class petController {
     { petId }: { petId: UploadFilePathPetId },
     data: UploadFileData,
     params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
-    config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
+    config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const formData = buildFormData(requestData)
-    const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
+    const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, unknown>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}/uploadImage`,
       params,
-      data: formData as FormData,
     })
     return res.data
   }

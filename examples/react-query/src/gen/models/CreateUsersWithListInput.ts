@@ -13,15 +13,10 @@ export type CreateUsersWithListInputStatus200 = User
 export type CreateUsersWithListInputStatusDefault = any
 
 /**
- * @type array | undefined
- */
-export type CreateUsersWithListInputData = User[] | undefined
-
-/**
  * @type object
  */
 export type CreateUsersWithListInputRequestConfig = {
-  data?: CreateUsersWithListInputData
+  data?: never
   pathParams?: never
   queryParams?: never
   headerParams?: never

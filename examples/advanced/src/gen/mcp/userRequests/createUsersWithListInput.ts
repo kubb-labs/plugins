@@ -1,5 +1,5 @@
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputResponse } from '../../models/ts/userController/CreateUsersWithListInput.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
@@ -9,13 +9,10 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInputHandler({ data }: { data?: CreateUsersWithListInputData } = {}): Promise<Promise<CallToolResult>> {
-  const requestData = data
-
-  const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'POST',
     url: `/user/createWithList`,
     baseURL: `https://petstore.swagger.io/v2`,
-    data: requestData,
   })
 
   return {
