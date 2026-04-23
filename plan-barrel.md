@@ -136,6 +136,63 @@ output: { path: './src/gen', barrelType: 'named' },
 
 ---
 
+### Bug 5 — Barrel export paths don't get `output.extension` applied
+
+**Where**: `@kubb/middleware-barrel` → `utils/getBarrelFiles.ts`, `toRelativeModulePath()`
+
+**Symptom**: When `output.extension = { '.ts': '.js' }` is set (ESM output), regular generated files correctly use `.js` imports (e.g., `import ... from "../models/ts/AddFiles.js"`), but barrel export paths have no extension (e.g., `export { addFilesHandler } from "./addFiles"` instead of `"./addFiles.js"`).
+
+**Root cause**:
+
+`toRelativeModulePath` strips the source extension entirely:
+```ts
+return `./${relative.replace(/\.[^/.]+$/, '')}` // strips .ts → no extension left
+```
+
+`@kubb/parser-ts` applies the `extNames` mapping only when `hasExtname` is true:
+```ts
+const hasExtname = !!/\.[^/.]+$/.exec(exportPath) // false for "./addFiles"
+path: options?.extname && hasExtname
+  ? `${trimExtName(item.path)}${options.extname}`   // skipped when hasExtname=false
+  : trimExtName(item.path)                           // returns "./addFiles" unchanged
+```
+
+Since the barrel export path `"./addFiles"` has no extension, `hasExtname` is false, the mapping is never applied, and the output is missing the required `.js` extension.
+
+**Why it accidentally works for `extension: { '.ts': '' }`** (like `simple-single`): `"./addFiles"` (extensionless) is the correct final output when the target extension is empty, so stripping in the barrel and skipping the mapping both produce the same result.
+
+**Affected examples**:
+- `examples/mcp/src/gen/mcp/index.ts`: all exports missing `.js` extension (e.g., `export { addFilesHandler } from "./addFiles"` should be `"./addFiles.js"`)
+
+**Fix in `@kubb/middleware-barrel`**:
+
+Change `toRelativeModulePath` to **preserve** the source extension so `@kubb/parser-ts` can apply the `extNames` mapping:
+```ts
+// Before (strips extension — breaks extNames mapping):
+function toRelativeModulePath(fromDir: string, filePath: string): string {
+  const relative = filePath.slice(fromDir.length).replace(/^[/\\]/g, '')
+  return `./${relative.replace(/\.[^/.]+$/, '')}`   // ← removes .ts
+}
+
+// After (preserve extension — parser-ts can apply extNames):
+function toRelativeModulePath(fromDir: string, filePath: string): string {
+  const relative = filePath.slice(fromDir.length).replace(/^[/\\]/g, '')
+  return `./${relative}`   // ← keep .ts so parser-ts converts to .js / '' / etc.
+}
+```
+
+**Resulting behaviour by `output.extension` value**:
+
+| `output.extension` | path in barrel `ExportNode` | `@kubb/parser-ts` output |
+|---|---|---|
+| `{ '.ts': '.js' }` | `./addFiles.ts` | `./addFiles.js` ✓ |
+| `{ '.ts': '' }` | `./addFiles.ts` | `./addFiles` ✓ |
+| `{ '.ts': '.ts' }` (default) | `./addFiles.ts` | `./addFiles.ts` ✓ |
+
+**Interaction with Bug 1**: This fix must be combined with the Bug 1 extension filter. Without the filter, non-TS filenames like `.mcp.json` would produce `toRelativeModulePath` output `./.mcp.json`, and parser-ts would strip `.json` and append `.js` → `./.mcp.js` (still malformed). The two fixes work together: Bug 1 excludes non-TS files before they reach `toRelativeModulePath`; Bug 5 preserves `.ts` so parser-ts can apply `extNames`.
+
+---
+
 ## Summary Table
 
 | # | Issue | Location | Fix needed in |
@@ -144,9 +201,10 @@ output: { path: './src/gen', barrelType: 'named' },
 | 2 | `isIndexable: false` files still barrel-exported as `export *` | `@kubb/middleware-barrel` `getBarrelFiles.ts` | `@kubb/middleware-barrel` |
 | 3 | Missing `barrelType` in react-query config → no barrels generated | `examples/react-query/kubb.config.ts` | This repo |
 | 4 | Missing root `barrelType` in sdk config → no root barrel | `examples/sdk/kubb.config.ts` | This repo |
+| 5 | `toRelativeModulePath` strips `.ts` extension → `output.extension` mapping never applied to barrel exports | `@kubb/middleware-barrel` `getBarrelFiles.ts` | `@kubb/middleware-barrel` |
 
 ## No changes needed in `@kubb/core`
 
 The core's `FileProcessor` correctly applies extension conversion at write time.  
 The barrel middleware's interaction with `ctx.files` (via `kubb:plugins:end`) is correct.  
-The bugs are isolated to the barrel middleware's file-selection and skip logic, and the example configs missing `barrelType` values.
+The bugs are isolated to the barrel middleware's file-selection, skip logic, and `toRelativeModulePath` stripping, plus the example configs missing `barrelType` values.
