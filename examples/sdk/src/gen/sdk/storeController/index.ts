@@ -1,1 +1,1 @@
-export * from "./storeController.ts";
+export * from './storeController.ts'

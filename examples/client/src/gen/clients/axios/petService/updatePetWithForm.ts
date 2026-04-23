@@ -1,8 +1,14 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from "../../../models/ts/petController/UpdatePetWithForm.js";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import fetch from '@kubb/plugin-client/clients/fetch'
+import type {
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryName,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormStatus405,
+} from '../../../models/ts/petController/UpdatePetWithForm.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
   const res = { method: 'POST', url: `/pet/${petId}` as const }
@@ -14,13 +20,19 @@ function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId 
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm({ petId }: { petId: UpdatePetWithFormPathPetId }, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function updatePetWithForm(
+  { petId }: { petId: UpdatePetWithFormPathPetId },
+  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
-
-
-
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: "POST", url: getUpdatePetWithFormUrl({ petId }).url.toString(), params, ...requestConfig })
+  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
+    method: 'POST',
+    url: getUpdatePetWithFormUrl({ petId }).url.toString(),
+    params,
+    ...requestConfig,
+  })
 
   return res.data
 }

@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from "@kubb/plugin-client/clients/fetch";
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from "../../../models/ts/userController/UpdateUser.js";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/fetch";
+import fetch from '@kubb/plugin-client/clients/fetch'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
   const res = { method: 'PUT', url: `/user/${username}` as const }
@@ -15,14 +15,21 @@ function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser({ username }: { username: UpdateUserPathUsername }, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export async function updateUser(
+  { username }: { username: UpdateUserPathUsername },
+  data?: UpdateUserData,
+  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
-
 
   const requestData = data
 
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: getUpdateUserUrl({ username }).url.toString(), data: requestData, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
+    method: 'PUT',
+    url: getUpdateUserUrl({ username }).url.toString(),
+    data: requestData,
+    ...requestConfig,
+  })
 
   return res.data
 }

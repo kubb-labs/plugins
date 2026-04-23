@@ -3,54 +3,54 @@
 /**
  * @description The user name for login
  * @type string | undefined
-*/
-export type LoginUserQueryUsername = string | undefined;
+ */
+export type LoginUserQueryUsername = string | undefined
 
 /**
  * @description The password for login in clear text
  * @type string | undefined
-*/
-export type LoginUserQueryPassword = string | undefined;
+ */
+export type LoginUserQueryPassword = string | undefined
 
 /**
  * @type string
-*/
-export type LoginUserStatus200 = string;
+ */
+export type LoginUserStatus200 = string
 
 /**
  * @type any
-*/
-export type LoginUserStatus400 = any;
+ */
+export type LoginUserStatus400 = any
 
 /**
  * @type object
-*/
+ */
 export type LoginUserRequestConfig = {
-    data?: never;
-    pathParams?: never;
-    /**
-     * @type object | undefined
-    */
-    queryParams?: {
-        username?: LoginUserQueryUsername;
-        password?: LoginUserQueryPassword;
-    };
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: "/user/login";
-};
+  data?: never
+  pathParams?: never
+  /**
+   * @type object | undefined
+   */
+  queryParams?: {
+    username?: LoginUserQueryUsername
+    password?: LoginUserQueryPassword
+  }
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/user/login'
+}
 
 /**
  * @type object
-*/
+ */
 export type LoginUserResponses = {
-    "200": LoginUserStatus200;
-    "400": LoginUserStatus400;
-};
+  '200': LoginUserStatus200
+  '400': LoginUserStatus400
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type LoginUserResponse = (LoginUserStatus200 | LoginUserStatus400);
+ */
+export type LoginUserResponse = LoginUserStatus200 | LoginUserStatus400
