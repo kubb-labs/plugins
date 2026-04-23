@@ -1,0 +1,35 @@
+{
+  "name": "sdk-pet-store",
+  "version": "0.0.1",
+  "private": true,
+  "description": "SDK PetStore example using clientType: 'class'",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/kubb.git",
+    "directory": "examples/sdk"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "clean": "npx rimraf ./dist",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
+    "test": "vitest",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
+    "kubb": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.30.1"
+}
