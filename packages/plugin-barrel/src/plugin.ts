@@ -1,4 +1,4 @@
-import type { ast} from '@kubb/core';
+import type { ast } from '@kubb/core'
 import { definePlugin, type KubbBuildStartContext, type NormalizedPlugin } from '@kubb/core'
 import type { PluginBarrel, PluginBarrelOptions } from './types.ts'
 import { generatePerPluginBarrel, generateRootBarrel } from './utils.ts'
