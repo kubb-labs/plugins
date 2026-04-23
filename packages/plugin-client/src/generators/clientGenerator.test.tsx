@@ -67,7 +67,7 @@ const updatePetByIdNode = ast.createOperation({
   path: '/pet/{petId}',
   tags: ['pet'],
   parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
@@ -89,7 +89,7 @@ const uploadFileNode = ast.createOperation({
   path: '/pet/{petId}/uploadImage',
   tags: ['pet'],
   parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  requestBody: { contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object', properties: [] }) },
+  requestBody: { content: [{ contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
@@ -109,7 +109,7 @@ const requiredOneOfRequestBodyNode = ast.createOperation({
   tags: ['store'],
   requestBody: {
     required: true,
-    schema: ast.createSchema({ type: 'union', schemas: [ast.createSchema({ type: 'object', properties: [] }), ast.createSchema({ type: 'string' })] }),
+    content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'union', schemas: [ast.createSchema({ type: 'object', properties: [] }), ast.createSchema({ type: 'string' })] }) }],
   },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })

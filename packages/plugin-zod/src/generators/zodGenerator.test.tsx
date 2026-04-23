@@ -139,11 +139,16 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.createOperation({
     ast.createParameter({ name: 'include_deleted', in: 'query', schema: ast.createSchema({ type: 'boolean' }) }),
   ],
   requestBody: {
-    schema: ast.createSchema({
-      type: 'object',
-      primitive: 'object',
-      properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
-    }),
+    content: [
+      {
+        contentType: 'application/json',
+        schema: ast.createSchema({
+          type: 'object',
+          primitive: 'object',
+          properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+        }),
+      },
+    ],
   },
   responses: [
     ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }), description: 'Success' }),
@@ -295,7 +300,7 @@ describe('zodGenerator — Operation', () => {
         method: 'POST',
         path: '/pet',
         tags: ['pet'],
-        requestBody: { schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }) },
+        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }) }] },
         responses: [
           ast.createResponse({
             statusCode: '200',
@@ -352,7 +357,7 @@ describe('zodGenerator — Operation', () => {
         path: '/store/order/:orderId',
         tags: ['store'],
         parameters: [ast.createParameter({ name: 'orderId', in: 'path', schema: ast.createSchema({ type: 'integer' }), required: true })],
-        requestBody: { schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [], description: 'Order payload' }) },
+        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [], description: 'Order payload' }) }] },
         responses: [
           ast.createResponse({
             statusCode: '200',
@@ -403,11 +408,16 @@ describe('zodGenerator — Operation', () => {
         path: '/pet',
         tags: ['pet'],
         requestBody: {
-          schema: ast.createSchema({
-            type: 'object',
-            primitive: 'object',
-            properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
-          }),
+          content: [
+            {
+              contentType: 'application/json',
+              schema: ast.createSchema({
+                type: 'object',
+                primitive: 'object',
+                properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+              }),
+            },
+          ],
         },
         responses: [
           ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }), description: 'Created' }),
@@ -441,14 +451,19 @@ describe('zodGenerator — Operation', () => {
         path: '/pets',
         tags: ['pets'],
         requestBody: {
-          schema: ast.createSchema({
-            type: 'object',
-            primitive: 'object',
-            properties: [
-              ast.createProperty({ name: 'age', required: true, schema: ast.createSchema({ type: 'number' }) }),
-              ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
-            ],
-          }),
+          content: [
+            {
+              contentType: 'application/json',
+              schema: ast.createSchema({
+                type: 'object',
+                primitive: 'object',
+                properties: [
+                  ast.createProperty({ name: 'age', required: true, schema: ast.createSchema({ type: 'number' }) }),
+                  ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
+                ],
+              }),
+            },
+          ],
         },
         responses: [
           ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }), description: 'Created' }),

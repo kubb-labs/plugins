@@ -78,7 +78,7 @@ const updatePetWithFormNode = ast.createOperation({
     ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
     ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
   ],
-  requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 

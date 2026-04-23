@@ -208,16 +208,21 @@ describe('fakerGenerator — operation', () => {
         tags: ['pets'],
         requestBody: {
           description: 'Pet to add',
-          schema: ast.createSchema({
-            type: 'object',
-            properties: [
-              ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
-              ast.createProperty({
-                name: 'category',
-                schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+          content: [
+            {
+              contentType: 'application/json',
+              schema: ast.createSchema({
+                type: 'object',
+                properties: [
+                  ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
+                  ast.createProperty({
+                    name: 'category',
+                    schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+                  }),
+                ],
               }),
-            ],
-          }),
+            },
+          ],
         },
         responses: [
           ast.createResponse({

@@ -79,7 +79,7 @@ const createPetsNode = ast.createOperation({
   method: 'POST',
   path: '/pets',
   tags: ['pets'],
-  requestBody: { required: true, schema: ast.createSchema({ type: 'object', properties: [] }) },
+  requestBody: { required: true, content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
   responses: [
     ast.createResponse({ statusCode: '201', description: 'Null response', schema: ast.createSchema({ type: 'void' }) }),
     ast.createResponse({ statusCode: 'default', description: 'unexpected error', schema: ast.createSchema({ type: 'object', properties: [] }) }),

@@ -41,7 +41,7 @@ const operationNodes: Array<ast.OperationNode> = [
     method: 'POST',
     path: '/pets',
     tags: ['pets'],
-    requestBody: { required: true, schema: ast.createSchema({ type: 'object', properties: [] }) },
+    requestBody: { required: true, content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
     responses: [ast.createResponse({ statusCode: '201', description: 'created', schema: ast.createSchema({ type: 'void' }) })],
   }),
   ast.createOperation({
