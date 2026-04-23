@@ -1,1 +1,1 @@
-export * from "./petController";
+export * from "./petController.ts";
