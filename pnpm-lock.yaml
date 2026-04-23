@@ -496,7 +496,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.52(@kubb/renderer-jsx@5.0.0-alpha.52)
+        version: 5.0.0-alpha.53(@kubb/renderer-jsx@5.0.0-alpha.53)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -505,7 +505,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.52(@kubb/renderer-jsx@5.0.0-alpha.52)(typescript@6.0.3)
+        version: 5.0.0-alpha.53(@kubb/renderer-jsx@5.0.0-alpha.53)(typescript@6.0.3)
     devDependencies:
       typescript:
         specifier: 'catalog:'
