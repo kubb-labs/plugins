@@ -98,7 +98,7 @@ const createUsersWithListInputNode = ast.createOperation({
   method: 'POST',
   path: '/user/createWithList',
   tags: ['user'],
-  requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 

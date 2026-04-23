@@ -64,10 +64,15 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.createOperation({
     ast.createParameter({ name: 'request_source', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
   ],
   requestBody: {
-    schema: ast.createSchema({
-      type: 'object',
-      properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
-    }),
+    content: [
+      {
+        contentType: 'application/json',
+        schema: ast.createSchema({
+          type: 'object',
+          properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+        }),
+      },
+    ],
   },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
 })
@@ -128,7 +133,7 @@ describe('typeGenerator — Operation', () => {
         method: 'POST',
         path: '/pet',
         tags: ['pet'],
-        requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
         responses: [
           ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' }),
           ast.createResponse({ statusCode: '405', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
@@ -161,7 +166,7 @@ describe('typeGenerator — Operation', () => {
         path: '/store/order/:orderId',
         tags: ['store'],
         parameters: [ast.createParameter({ name: 'orderId', in: 'path', schema: ast.createSchema({ type: 'integer' }), required: true })],
-        requestBody: { schema: ast.createSchema({ type: 'object', properties: [], description: 'Order payload' }) },
+        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [], description: 'Order payload' }) }] },
         responses: [
           ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' }),
           ast.createResponse({ statusCode: '405', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),

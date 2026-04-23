@@ -66,7 +66,7 @@ describe('cypressGenerator — Operation', () => {
         method: 'POST',
         path: '/pets',
         tags: ['pets'],
-        requestBody: { description: 'Pet to add', schema: ast.createSchema({ type: 'object', properties: [] }) },
+        requestBody: { description: 'Pet to add', content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
         responses: [ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Null response' })],
       }),
     },
@@ -78,7 +78,7 @@ describe('cypressGenerator — Operation', () => {
         path: '/pets/{petId}',
         tags: ['pets'],
         parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-        requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
         responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' })],
       }),
     },
@@ -174,7 +174,7 @@ describe('cypressGenerator — paramsType', () => {
       ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
       ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
     ],
-    requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+    requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
     responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' })],
   })
 
@@ -422,7 +422,7 @@ describe('cypressGenerator — transformers', () => {
       method: 'POST',
       path: '/pets',
       tags: ['pets'],
-      requestBody: { schema: ast.createSchema({ type: 'object', properties: [] }) },
+      requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
       responses: [ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Null response' })],
     })
 

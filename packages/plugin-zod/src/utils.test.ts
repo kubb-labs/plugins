@@ -385,7 +385,7 @@ describe('buildSchemaNames', () => {
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
-      requestBody: { schema: ast.createSchema({ type: 'object' }) },
+      requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object' }) }] },
     })
     const result = buildSchemaNames(nodeWithBody, { params: [], resolver: resolverZod })
 
