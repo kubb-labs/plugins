@@ -7,8 +7,8 @@ import fetch from "@kubb/plugin-client/clients/axios";
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "./models/ts/storeController/DeleteOrder.ts";
 import type { GetInventoryResponse } from "./models/ts/storeController/GetInventory.ts";
 import type { GetOrderByIdResponse, GetOrderByIdPathOrderId, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "./models/ts/storeController/GetOrderById.ts";
-import type { PlaceOrderResponse, PlaceOrderStatus405 } from "./models/ts/storeController/PlaceOrder.ts";
-import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from "./models/ts/storeController/PlaceOrderPatch.ts";
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "./models/ts/storeController/PlaceOrder.ts";
+import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from "./models/ts/storeController/PlaceOrderPatch.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 /**
@@ -55,7 +55,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 placeOrder.method = "POST" as const
 placeOrder.url = "/store/order" as const
 placeOrder.operationId = "placeOrder" as const
-placeOrder.request = {} as never
+placeOrder.request = {} as PlaceOrderData
 placeOrder.response = {} as PlaceOrderResponse
 placeOrder.pathParams = {} as never
 placeOrder.queryParams = {} as never
@@ -80,7 +80,7 @@ export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partia
 placeOrderPatch.method = "PATCH" as const
 placeOrderPatch.url = "/store/order" as const
 placeOrderPatch.operationId = "placeOrderPatch" as const
-placeOrderPatch.request = {} as never
+placeOrderPatch.request = {} as PlaceOrderPatchData
 placeOrderPatch.response = {} as PlaceOrderPatchResponse
 placeOrderPatch.pathParams = {} as never
 placeOrderPatch.queryParams = {} as never
