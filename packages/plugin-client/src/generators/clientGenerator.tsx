@@ -97,7 +97,9 @@ export const clientGenerator = defineGenerator<PluginClient>({
           </>
         )}
 
-        {isFormData && node.requestBody?.content?.[0]?.schema && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
+        {isFormData && node.requestBody?.content?.[0]?.schema && (
+          <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
+        )}
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as string[]} root={meta.file.path} path={meta.fileZod.path} />}
 

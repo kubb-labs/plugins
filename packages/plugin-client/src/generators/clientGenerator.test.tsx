@@ -109,7 +109,12 @@ const requiredOneOfRequestBodyNode = ast.createOperation({
   tags: ['store'],
   requestBody: {
     required: true,
-    content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'union', schemas: [ast.createSchema({ type: 'object', properties: [] }), ast.createSchema({ type: 'string' })] }) }],
+    content: [
+      {
+        contentType: 'application/json',
+        schema: ast.createSchema({ type: 'union', schemas: [ast.createSchema({ type: 'object', properties: [] }), ast.createSchema({ type: 'string' })] }),
+      },
+    ],
   },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })

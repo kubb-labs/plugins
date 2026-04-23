@@ -1,9 +1,8 @@
-import type { GetPetByIdResponse, GetPetByIdStatus200 } from "../../models/ts/petController/GetPetById.ts";
-import { petFaker } from "../pet.ts";
-import { faker } from "@faker-js/faker";
+import type { GetPetByIdResponse, GetPetByIdStatus200 } from '../../models/ts/petController/GetPetById.ts'
+import { petFaker } from '../pet.ts'
+import { faker } from '@faker-js/faker'
 
 export function getPetByIdPathPetId(data?: number): number {
-
   return data ?? faker.number.int()
 }
 
@@ -11,7 +10,6 @@ export function getPetByIdPathPetId(data?: number): number {
  * @description successful operation
  */
 export function getPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
-
   return petFaker(data)
 }
 
@@ -19,7 +17,6 @@ export function getPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPet
  * @description Invalid ID supplied
  */
 export function getPetByIdStatus400() {
-
   return undefined
 }
 
@@ -27,11 +24,9 @@ export function getPetByIdStatus400() {
  * @description Pet not found
  */
 export function getPetByIdStatus404() {
-
   return undefined
 }
 
 export function getPetByIdResponse(_data?: GetPetByIdResponse): GetPetByIdResponse {
-
   return faker.helpers.arrayElement<any>([getPetByIdStatus200(), getPetByIdStatus400(), getPetByIdStatus404()])
 }

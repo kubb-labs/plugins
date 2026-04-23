@@ -38,7 +38,10 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
-  const names: Array<string | undefined> = [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined]
+  const names: Array<string | undefined> = [
+    zodResolver.resolveResponseName?.(node),
+    node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined,
+  ]
   return names.filter((n): n is string => Boolean(n))
 }
 

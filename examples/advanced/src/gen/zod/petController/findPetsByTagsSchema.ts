@@ -1,19 +1,19 @@
-import * as z from "zod";
-import { petSchema } from "../petSchema.ts";
+import * as z from 'zod'
+import { petSchema } from '../petSchema.ts'
 
-export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe("Tags to filter by")
+export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
 export type FindPetsByTagsQueryTagsSchema = z.infer<typeof findPetsByTagsQueryTagsSchema>
 
-export const findPetsByTagsQueryPageSchema = z.string().optional().describe("to request with required page number or pagination")
+export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
 export type FindPetsByTagsQueryPageSchema = z.infer<typeof findPetsByTagsQueryPageSchema>
 
-export const findPetsByTagsQueryPageSizeSchema = z.number().optional().describe("to request with required page size")
+export const findPetsByTagsQueryPageSizeSchema = z.number().optional().describe('to request with required page size')
 
 export type FindPetsByTagsQueryPageSizeSchema = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
 
-export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(["ONE", "TWO", "THREE"]).describe("Header parameters")
+export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
 export type FindPetsByTagsHeaderXEXAMPLESchema = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
 

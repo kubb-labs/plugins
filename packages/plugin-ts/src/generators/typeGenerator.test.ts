@@ -166,7 +166,9 @@ describe('typeGenerator — Operation', () => {
         path: '/store/order/:orderId',
         tags: ['store'],
         parameters: [ast.createParameter({ name: 'orderId', in: 'path', schema: ast.createSchema({ type: 'integer' }), required: true })],
-        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [], description: 'Order payload' }) }] },
+        requestBody: {
+          content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [], description: 'Order payload' }) }],
+        },
         responses: [
           ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' }),
           ast.createResponse({ statusCode: '405', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
