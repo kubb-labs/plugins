@@ -1,7 +1,7 @@
-import fetch from '@kubb/plugin-client/clients/axios'
-import type { FindPetsByStatusPathStepId, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/ts/petController/FindPetsByStatus.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import fetch from "@kubb/plugin-client/clients/axios";
+import type { FindPetsByStatusPathStepId, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from "../../models/ts/petController/FindPetsByStatus.ts";
+import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -9,21 +9,22 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
  * {@link /pet/findByStatus/:step_id}
  */
 export async function findPetsByStatusHandler({ stepId }: { stepId: FindPetsByStatusPathStepId }): Promise<Promise<CallToolResult>> {
+
+
   const step_id = stepId
 
-  const res = await fetch<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByStatus/${step_id}`,
-    baseURL: `https://petstore.swagger.io/v2`,
-  })
+
+
+
+  const res = await fetch<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: `/pet/findByStatus/${step_id}`, baseURL: `https://petstore.swagger.io/v2` })
 
   return {
-    content: [
-      {
-        type: 'text',
-        text: JSON.stringify(res.data),
-      },
-    ],
-    structuredContent: { data: res.data },
-  }
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(res.data)
+                }
+              ],
+              structuredContent: { data: res.data }
+             }
 }

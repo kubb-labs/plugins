@@ -1,28 +1,24 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { FindPetsByStatusResponse, FindPetsByStatusPathStepId, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
-import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
-import { findPetsByStatus } from '../../axios/petService/findPetsByStatus.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from "../../../../axios-client.ts";
+import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "../../../../tanstack-query-hook";
+import type { FindPetsByStatusResponse, FindPetsByStatusPathStepId, FindPetsByStatusStatus400 } from "../../../models/ts/petController/FindPetsByStatus.ts";
+import { queryOptions, useQuery } from "../../../../tanstack-query-hook";
+import { findPetsByStatus } from "../../axios/petService/findPetsByStatus.ts";
 
-export const findPetsByStatusQueryKey = ({ stepId }: { stepId: FindPetsByStatusPathStepId }) =>
-  [{ url: '/pet/findByStatus/:step_id', params: { stepId: stepId } }] as const
+export const findPetsByStatusQueryKey = ({ stepId }: { stepId: FindPetsByStatusPathStepId }) => [{ url: '/pet/findByStatus/:step_id', params: {stepId:stepId} }] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
 export function findPetsByStatusQueryOptions({ stepId }: { stepId: FindPetsByStatusPathStepId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const queryKey = findPetsByStatusQueryKey({ stepId })
-  return queryOptions<
-    ResponseConfig<FindPetsByStatusResponse>,
-    ResponseErrorConfig<FindPetsByStatusStatus400>,
-    ResponseConfig<FindPetsByStatusResponse>,
-    typeof queryKey
-  >({
-    enabled: !!stepId,
-    queryKey,
-    queryFn: async ({ signal }) => {
-      return findPetsByStatus({ stepId }, { ...config, signal: config.signal ?? signal })
-    },
-  })
+
+        const queryKey = findPetsByStatusQueryKey({ stepId })
+        return queryOptions<ResponseConfig<FindPetsByStatusResponse>, ResponseErrorConfig<FindPetsByStatusStatus400>, ResponseConfig<FindPetsByStatusResponse>, typeof queryKey>({
+         enabled: !!(stepId),
+         queryKey,
+         queryFn: async ({ signal }) => {
+            return findPetsByStatus({ stepId }, { ...config, signal: config.signal ?? signal })
+         },
+        })
+
 }
 
 /**
@@ -30,33 +26,24 @@ export function findPetsByStatusQueryOptions({ stepId }: { stepId: FindPetsBySta
  * @summary Finds Pets by status
  * {@link /pet/findByStatus/:step_id}
  */
-export function useFindPetsByStatus<
-  TData = ResponseConfig<FindPetsByStatusResponse>,
-  TQueryData = ResponseConfig<FindPetsByStatusResponse>,
-  TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
->(
-  { stepId }: { stepId: FindPetsByStatusPathStepId },
-  options: {
-    query?: Partial<
-      QueryObserverOptions<ResponseConfig<FindPetsByStatusResponse>, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>
-    > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
-  } = {},
-) {
-  const { query: queryConfig = {}, client: config = {} } = options ?? {}
-  const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ stepId })
+export function useFindPetsByStatus<TData = ResponseConfig<FindPetsByStatusResponse>, TQueryData = ResponseConfig<FindPetsByStatusResponse>, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ stepId }: { stepId: FindPetsByStatusPathStepId }, options: {
+  query?: Partial<QueryObserverOptions<ResponseConfig<FindPetsByStatusResponse>, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+  client?: Partial<RequestConfig> & { client?: Client }
+} = {}) {
 
-  const query = useQuery(
-    {
-      ...findPetsByStatusQueryOptions({ stepId }, config),
-      ...resolvedOptions,
-      queryKey,
-    } as unknown as QueryObserverOptions,
-    queryClient,
-  ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
+         const { query: queryConfig = {}, client: config = {} } = options ?? {}
+         const { client: queryClient, ...resolvedOptions } = queryConfig
+         const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ stepId })
 
-  query.queryKey = queryKey as TQueryKey
 
-  return query
+         const query = useQuery({
+          ...findPetsByStatusQueryOptions({ stepId }, config),
+          ...resolvedOptions,
+          queryKey,
+         } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
+
+         query.queryKey = queryKey as TQueryKey
+
+         return query
+
 }
