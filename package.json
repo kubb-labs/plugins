@@ -47,6 +47,7 @@
     "@changesets/cli": "^2.31.0",
     "@kubb/adapter-oas": "catalog:",
     "@kubb/core": "catalog:",
+    "@kubb/middleware-barrel": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",

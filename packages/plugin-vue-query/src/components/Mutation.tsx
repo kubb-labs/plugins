@@ -34,7 +34,7 @@ function getParams(
 ): ast.FunctionParametersNode {
   const { paramsCasing, dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
@@ -122,7 +122,7 @@ export function Mutation({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: node.requestBody?.schema
+          name: node.requestBody?.content?.[0]?.schema
             ? `Partial<RequestConfig<${tsResolver.resolveDataName(node)}>> & { client?: Client }`
             : 'Partial<RequestConfig> & { client?: Client }',
         }),

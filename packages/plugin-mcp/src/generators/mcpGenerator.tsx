@@ -30,7 +30,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
       ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
       ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-      node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
+      node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
       tsResolver.resolveResponseName(node),
       ...node.responses.filter((r) => Number(r.statusCode) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode)),
     ].filter(Boolean)

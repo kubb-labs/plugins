@@ -117,15 +117,15 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       name: resolver.resolveResponseStatusName(node, response.statusCode),
       typeName: tsResolver.resolveResponseStatusName(node, response.statusCode),
     }))
-    const dataEntry = node.requestBody?.schema
+    const dataEntry = node.requestBody?.content?.[0]?.schema
       ? {
           schema: {
-            ...node.requestBody.schema,
-            description: node.requestBody.description ?? node.requestBody.schema.description,
+            ...node.requestBody.content![0]!.schema!,
+            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
           },
           name: resolver.resolveDataName(node),
           typeName: tsResolver.resolveDataName(node),
-          description: node.requestBody.description ?? node.requestBody.schema.description,
+          description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
         }
       : null
     const responseName = resolver.resolveResponseName(node)

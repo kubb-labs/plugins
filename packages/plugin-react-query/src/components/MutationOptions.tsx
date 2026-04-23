@@ -23,7 +23,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
 function getConfigParam(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
-  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   return ast.createFunctionParameters({
     params: [
       ast.createFunctionParameter({
@@ -73,7 +73,7 @@ export function MutationOptions({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: node.requestBody?.schema
+          name: node.requestBody?.content?.[0]?.schema
             ? `Partial<RequestConfig<${tsResolver.resolveDataName(node)}>> & { client?: Client }`
             : 'Partial<RequestConfig> & { client?: Client }',
         }),

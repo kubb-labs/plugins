@@ -39,7 +39,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 
 export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const responseName = tsResolver.resolveResponseName(node)
-  const requestName = node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   return [responseName, TError, requestName || 'unknown'].filter(Boolean)
@@ -64,7 +64,7 @@ export function buildClassClientParams({
     node.parameters.filter((p) => p.in === 'query').length > 0
       ? tsResolver.resolveQueryParamsName(node, node.parameters.filter((p) => p.in === 'query')[0]!)
       : undefined
-  const requestName = node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
 
   return createFunctionParams({
     config: {
@@ -109,11 +109,11 @@ export function buildRequestDataLine({
   node: ast.OperationNode
   zodResolver?: ResolverZod
 }): string {
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined
+  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined
   if (parser === 'zod' && zodRequestName) {
     return `const requestData = ${zodRequestName}.parse(data)`
   }
-  if (node.requestBody?.schema) {
+  if (node.requestBody?.content?.[0]?.schema) {
     return 'const requestData = data'
   }
   return ''

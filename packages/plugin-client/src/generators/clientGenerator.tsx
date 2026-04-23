@@ -35,14 +35,14 @@ export const clientGenerator = defineGenerator<PluginClient>({
       ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
       ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
       ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-      node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
+      node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
       tsResolver.resolveResponseName(node),
       ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
     ].filter(Boolean)
 
     const importedZodNames =
       zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
+        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
         : []
 
     const meta = {
@@ -70,7 +70,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           : undefined,
     } as const
 
-    const isFormData = node.requestBody?.contentType === 'multipart/form-data'
+    const isFormData = node.requestBody?.content?.[0]?.contentType === 'multipart/form-data'
 
     return (
       <File
@@ -97,7 +97,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           </>
         )}
 
-        {isFormData && node.requestBody?.schema && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
+        {isFormData && node.requestBody?.content?.[0]?.schema && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as string[]} root={meta.file.path} path={meta.fileZod.path} />}
 

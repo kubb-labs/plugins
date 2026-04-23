@@ -51,7 +51,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
     const headerParams = casedParams.filter((p) => p.in === 'header')
 
     const importedTypeNames = [
-      node.requestBody?.schema ? tsResolver.resolveDataName(node) : undefined,
+      node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
       tsResolver.resolveResponseName(node),
       ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
       ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
@@ -69,7 +69,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
       : undefined
     const zodSchemaNames =
       zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
+        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
         : []
 
     const clientPlugin = driver.getPlugin(pluginClientName)

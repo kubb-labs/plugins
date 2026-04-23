@@ -39,7 +39,7 @@ function getParams(
   },
 ): ast.FunctionParametersNode {
   const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
-  const requestName = node.requestBody?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
