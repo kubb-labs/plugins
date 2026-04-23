@@ -357,7 +357,14 @@ describe('zodGenerator — Operation', () => {
         path: '/store/order/:orderId',
         tags: ['store'],
         parameters: [ast.createParameter({ name: 'orderId', in: 'path', schema: ast.createSchema({ type: 'integer' }), required: true })],
-        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [], description: 'Order payload' }) }] },
+        requestBody: {
+          content: [
+            {
+              contentType: 'application/json',
+              schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [], description: 'Order payload' }),
+            },
+          ],
+        },
         responses: [
           ast.createResponse({
             statusCode: '200',

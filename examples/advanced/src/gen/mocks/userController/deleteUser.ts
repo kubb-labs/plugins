@@ -1,8 +1,7 @@
-import type { DeleteUserResponse } from "../../models/ts/userController/DeleteUser.ts";
-import { faker } from "@faker-js/faker";
+import type { DeleteUserResponse } from '../../models/ts/userController/DeleteUser.ts'
+import { faker } from '@faker-js/faker'
 
 export function deleteUserPathUsername(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
@@ -10,7 +9,6 @@ export function deleteUserPathUsername(data?: string): string {
  * @description Invalid username supplied
  */
 export function deleteUserStatus400() {
-
   return undefined
 }
 
@@ -18,11 +16,9 @@ export function deleteUserStatus400() {
  * @description User not found
  */
 export function deleteUserStatus404() {
-
   return undefined
 }
 
 export function deleteUserResponse(_data?: DeleteUserResponse): DeleteUserResponse {
-
   return faker.helpers.arrayElement<any>([deleteUserStatus400(), deleteUserStatus404()])
 }

@@ -66,7 +66,10 @@ describe('cypressGenerator — Operation', () => {
         method: 'POST',
         path: '/pets',
         tags: ['pets'],
-        requestBody: { description: 'Pet to add', content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
+        requestBody: {
+          description: 'Pet to add',
+          content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }],
+        },
         responses: [ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Null response' })],
       }),
     },
