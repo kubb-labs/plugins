@@ -1,7 +1,7 @@
 import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
-import { uploadFileResponseSchema } from '../../../zod/petController/uploadFileSchema.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
+import { uploadFileResponseSchema, uploadFileDataSchema } from '../../../zod/petController/uploadFileSchema.ts'
 
 export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}/uploadImage` as const }
@@ -15,15 +15,19 @@ export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
  */
 export async function uploadFile(
   { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, unknown>({
+  const requestData = uploadFileDataSchema.parse(data)
+
+  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl({ petId }).url.toString(),
     params,
+    data: requestData,
     ...requestConfig,
+    headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })
 
   return { ...res, data: uploadFileResponseSchema.parse(res.data) }

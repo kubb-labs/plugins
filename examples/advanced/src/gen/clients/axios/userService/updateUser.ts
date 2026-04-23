@@ -1,7 +1,7 @@
 import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UpdateUserPathUsername, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.ts'
-import { updateUserResponseSchema } from '../../../zod/userController/updateUserSchema.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.ts'
+import { updateUserResponseSchema, updateUserDataSchema } from '../../../zod/userController/updateUserSchema.ts'
 
 export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
   const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }
@@ -16,13 +16,16 @@ export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsernam
  */
 export async function updateUser(
   { username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData },
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, unknown>({
+  const requestData = updateUserDataSchema.parse(data)
+
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
     method: 'PUT',
     url: getUpdateUserUrl({ username }).url.toString(),
+    data: requestData,
     ...requestConfig,
   })
 

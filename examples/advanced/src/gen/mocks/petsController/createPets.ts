@@ -1,4 +1,5 @@
 import type {
+  CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsQueryBoolParam,
   CreatePetsResponse,
@@ -35,6 +36,13 @@ export function createPetsStatus201() {
  */
 export function createPetsStatusDefault(data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
   return petNotFoundFaker(data)
+}
+
+export function createPetsData(data?: Partial<CreatePetsData>): CreatePetsData {
+  return {
+    ...{ name: faker.string.alpha(), tag: faker.string.alpha() },
+    ...(data || {}),
+  }
 }
 
 export function createPetsResponse(_data?: CreatePetsResponse): CreatePetsResponse {

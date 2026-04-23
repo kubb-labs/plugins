@@ -1,4 +1,5 @@
-import type { AddPetResponse, AddPetStatus405, AddPetStatusDefault } from '../../models/ts/petController/AddPet.ts'
+import type { AddPetData, AddPetResponse, AddPetStatus405, AddPetStatusDefault } from '../../models/ts/petController/AddPet.ts'
+import { addPetRequestFaker } from '../addPetRequest.ts'
 import { petFaker } from '../pet.ts'
 import { faker } from '@faker-js/faker'
 
@@ -17,6 +18,13 @@ export function addPetStatus405(data?: Partial<AddPetStatus405>): AddPetStatus40
  */
 export function addPetStatusDefault(data?: Partial<AddPetStatusDefault>): AddPetStatusDefault {
   return petFaker(data)
+}
+
+/**
+ * @description Create a new pet in the store
+ */
+export function addPetData(data?: Partial<AddPetData>): AddPetData {
+  return addPetRequestFaker(data)
 }
 
 export function addPetResponse(_data?: AddPetResponse): AddPetResponse {

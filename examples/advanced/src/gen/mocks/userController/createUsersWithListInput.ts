@@ -1,4 +1,8 @@
-import type { CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from '../../models/ts/userController/CreateUsersWithListInput.ts'
+import type {
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputResponse,
+  CreateUsersWithListInputStatus200,
+} from '../../models/ts/userController/CreateUsersWithListInput.ts'
 import { userFaker } from '../user.ts'
 import { faker } from '@faker-js/faker'
 
@@ -14,6 +18,10 @@ export function createUsersWithListInputStatus200(data?: Partial<CreateUsersWith
  */
 export function createUsersWithListInputStatusDefault() {
   return undefined
+}
+
+export function createUsersWithListInputData(data?: CreateUsersWithListInputData): CreateUsersWithListInputData {
+  return [...faker.helpers.multiple(() => userFaker()), ...(data || [])]
 }
 
 export function createUsersWithListInputResponse(_data?: CreateUsersWithListInputResponse): CreateUsersWithListInputResponse {
