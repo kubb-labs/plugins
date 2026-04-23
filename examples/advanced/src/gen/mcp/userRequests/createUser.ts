@@ -1,5 +1,5 @@
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { CreateUserData, CreateUserResponse } from '../../models/ts/userController/CreateUser.ts'
+import type { CreateUserResponse } from '../../models/ts/userController/CreateUser.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
@@ -9,14 +9,7 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
  * {@link /user}
  */
 export async function createUserHandler({ data }: { data?: CreateUserData } = {}): Promise<Promise<CallToolResult>> {
-  const requestData = data
-
-  const res = await fetch<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
-    method: 'POST',
-    url: `/user`,
-    baseURL: `https://petstore.swagger.io/v2`,
-    data: requestData,
-  })
+  const res = await fetch<CreateUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'POST', url: `/user`, baseURL: `https://petstore.swagger.io/v2` })
 
   return {
     content: [

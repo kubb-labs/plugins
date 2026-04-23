@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200 } from '../models/PlaceOrder.ts'
+import type { PlaceOrderResponse, PlaceOrderStatus200 } from '../models/PlaceOrder.ts'
 import { order } from './order.ts'
 import { faker } from '@faker-js/faker'
 
@@ -19,10 +19,6 @@ export function placeOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceO
  */
 export function placeOrderStatus405() {
   return undefined
-}
-
-export function placeOrderData(data?: Partial<PlaceOrderData>): PlaceOrderData {
-  return order(data)
 }
 
 export function placeOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {

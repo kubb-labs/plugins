@@ -29,10 +29,3 @@ export type CreatePetsStatusDefaultSchema = z.infer<typeof createPetsStatusDefau
 export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
 
 export type CreatePetsResponseSchema = z.infer<typeof createPetsResponseSchema>
-
-export const createPetsDataSchema = z.object({
-  name: z.string(),
-  tag: z.string(),
-})
-
-export type CreatePetsDataSchema = z.infer<typeof createPetsDataSchema>

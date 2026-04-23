@@ -4,7 +4,6 @@
  */
 
 import * as z from 'zod/mini'
-import { addPetRequestSchema } from './addPetRequestSchema.ts'
 import { petSchema } from './petSchema.ts'
 
 export const addPetStatus200Schema = petSchema
@@ -15,5 +14,3 @@ export const addPetStatus405Schema = z.object({
 })
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
-
-export const addPetDataSchema = addPetRequestSchema

@@ -4,12 +4,9 @@
  */
 
 import * as z from 'zod'
-import { userSchema } from './userSchema.js'
 
 export const updateUserPathUsernameSchema = z.string().describe('name that need to be deleted')
 
 export const updateUserStatusDefaultSchema = z.any()
 
 export const updateUserResponseSchema = updateUserStatusDefaultSchema
-
-export const updateUserDataSchema = userSchema.optional().describe('Update an existent user in the store')

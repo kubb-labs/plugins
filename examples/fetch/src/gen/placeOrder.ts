@@ -4,7 +4,7 @@
  */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from './models.ts'
+import type { PlaceOrderResponse, PlaceOrderStatus405 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getPlaceOrderUrl() {
@@ -18,15 +18,12 @@ function getPlaceOrderUrl() {
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, unknown>({
     method: 'POST',
     url: getPlaceOrderUrl().url.toString(),
-    data: requestData,
     ...requestConfig,
   })
 

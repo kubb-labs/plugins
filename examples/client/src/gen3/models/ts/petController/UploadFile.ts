@@ -25,18 +25,8 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @type object
  */
-export type UploadFileData = {
-  /**
-   * @type string
-   */
-  file: Blob
-}
-
-/**
- * @type object
- */
 export type UploadFileRequestConfig = {
-  data?: UploadFileData
+  data?: never
   /**
    * @type object
    */

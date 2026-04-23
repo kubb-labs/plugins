@@ -6,16 +6,10 @@ import type { User } from '../User.ts'
 export type CreateUserStatusDefault = User
 
 /**
- * @description Created user object
- * @type object | undefined
- */
-export type CreateUserData = User | undefined
-
-/**
  * @type object
  */
 export type CreateUserRequestConfig = {
-  data?: CreateUserData
+  data?: never
   pathParams?: never
   queryParams?: never
   headerParams?: never
