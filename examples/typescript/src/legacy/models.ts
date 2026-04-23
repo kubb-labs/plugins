@@ -300,6 +300,9 @@ export type Pet = (((Dog & {
      * @type string
     */
     name: string;
+    /**
+     * @type object | undefined
+    */
     category?: Category;
     /**
      * @type array
