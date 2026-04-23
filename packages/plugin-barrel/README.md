@@ -46,9 +46,7 @@ export default defineConfig({
     }),
     pluginBarrel({
       root: { barrelType: 'named' },
-      plugins: [
-        { name: 'plugin-ts', barrelType: 'named' },
-      ],
+      plugins: [{ name: 'plugin-ts', barrelType: 'named' }],
     }),
   ],
 })

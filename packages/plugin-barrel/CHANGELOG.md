@@ -9,7 +9,6 @@
   Generates barrel (`index.ts`) files at the root and per-plugin output level so every plugin's generated code is importable through a single entry point.
 
   **Features**
-
   - Per-plugin barrel generation based on each plugin's `output.barrelType` setting.
   - Root barrel generation with `root.barrelType` option.
   - Runs as a `post`-enforced plugin so all other plugins finish writing files before barrels are created.
