@@ -11,25 +11,10 @@ import type { Order } from "./Order.ts";
 export type CreateOrderStatus201 = Order;
 
 /**
- * @description Order request body
- * @type object | undefined
-*/
-export type CreateOrderData = {
-    /**
-     * @type string | undefined
-    */
-    userId?: string;
-    /**
-     * @type array | undefined
-    */
-    productIds?: string[];
-} | undefined;
-
-/**
  * @type object
 */
 export type CreateOrderRequestConfig = {
-    data?: CreateOrderData;
+    data?: never;
     pathParams?: never;
     queryParams?: never;
     headerParams?: never;
