@@ -16,7 +16,7 @@ export default defineConfig(() => {
     output: {
       path: './src/gen',
       clean: true,
-      barrelType: 'all',
+      barrelType: 'named',
     },
     adapter: adapterOas({ serverIndex: 0 }),
     plugins: [

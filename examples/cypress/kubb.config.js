@@ -10,7 +10,7 @@ export default defineConfig([
     output: {
       path: './src/gen',
       clean: true,
-      barrelType: 'all',
+      barrelType: 'named',
     },
     plugins: [
       pluginTs({
