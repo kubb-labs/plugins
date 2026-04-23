@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0-alpha.52",
+  "version": "5.0.0-alpha.53",
   "description": "Cypress test generator plugin for Kubb, creating end-to-end tests from OpenAPI specifications for automated API testing.",
   "keywords": [
     "api-testing",
@@ -46,8 +46,7 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./package.json": "./package.json",
-    "./plugin.json": "./plugin.json"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
