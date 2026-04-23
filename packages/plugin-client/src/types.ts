@@ -169,8 +169,8 @@ export type Options = {
    * })
    * // Generates a class with a shared constructor config and one property per tag:
    * // class PetStoreSDK {
-   * //   readonly pet: petController
-   * //   readonly store: storeController
+   * //   readonly petController: petController
+   * //   readonly storeController: storeController
    * //   constructor(config = {}) { ... }
    * // }
    * ```
