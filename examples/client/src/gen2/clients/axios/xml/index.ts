@@ -1,1 +1,1 @@
-export * from "./uploadFile";
+export * from "./uploadFile.ts";
