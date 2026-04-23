@@ -225,14 +225,14 @@ function buildDirectoryTree(files: Array<ast.FileNode>, rootFolder = ''): Direct
 
       if (!existingNode) {
         if (index === parts.length - 1) {
-          // If its the last part, its a file
+          // If it's the last part, it's a file
           existingNode = {
             name: part,
             file,
             path: currentPath,
           } as DirectoryTree
         } else {
-          // Otherwise, its a folder
+          // Otherwise, it's a folder
           existingNode = {
             name: part,
             path: currentPath,
@@ -242,7 +242,7 @@ function buildDirectoryTree(files: Array<ast.FileNode>, rootFolder = ''): Direct
         currentLevel.push(existingNode)
       }
 
-      // Move to the next level if its a folder
+      // Move to the next level if it's a folder
       if (!existingNode.file) {
         currentLevel = existingNode.children
       }
