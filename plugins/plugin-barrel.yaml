@@ -1,0 +1,92 @@
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
+id: plugin-barrel
+name: Barrel
+description: Generate barrel (index.ts) files at the root and per-plugin level to simplify imports across your generated code.
+category: utility
+type: official
+npmPackage: '@kubb/plugin-barrel'
+docsPath: /plugins/plugin-barrel
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: '>=5.0.0'
+  node: '>=22'
+tags:
+  - barrel
+  - index
+  - codegen
+  - typescript
+dependencies: []
+resources:
+  documentation: https://kubb.dev/plugins/plugin-barrel
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-barrel/CHANGELOG.md
+featured: false
+
+intro: |
+  # @kubb/plugin-barrel
+
+  Automatically generate barrel (`index.ts`) files for your generated code. This plugin runs after all other plugins and creates per-plugin barrel files based on each plugin's `output.barrelType` setting, as well as an optional root barrel that re-exports from every plugin.
+
+options:
+  - name: root
+    type: "{ barrelType: 'all' | 'named' | false }"
+    required: false
+    description: |
+      Configuration for the root barrel file (e.g. `src/gen/index.ts`).
+      When omitted, no root barrel is generated.
+    properties:
+      - name: barrelType
+        type: "'all' | 'named' | false"
+        required: true
+        description: |
+          How to generate the root `index.ts` barrel file.
+          - `'all'` — wildcard re-exports (`export * from`)
+          - `'named'` — named exports only
+          - `false` — disable root barrel generation
+
+  - name: plugins
+    type: 'Array<{ name: string; barrelType: BarrelType | false }>'
+    required: false
+    description: |
+      Per-plugin barrel configuration.
+      Each entry controls whether and how an `index.ts` is created inside that plugin's output directory.
+      Plugins not listed here fall back to the `barrelType` declared in their own `output.barrelType` option.
+
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginZod } from '@kubb/plugin-zod'
+          import { pluginBarrel } from '@kubb/plugin-barrel'
+
+          export default defineConfig({
+            input: {
+              path: './petStore.yaml',
+            },
+            output: {
+              path: './src/gen',
+            },
+            plugins: [
+              pluginTs({
+                output: { path: 'types', barrelType: 'named' },
+              }),
+              pluginZod({
+                output: { path: 'zod', barrelType: 'all' },
+              }),
+              pluginBarrel({
+                root: { barrelType: 'named' },
+                plugins: [
+                  { name: 'plugin-ts', barrelType: 'named' },
+                  { name: 'plugin-zod', barrelType: 'all' },
+                ],
+              }),
+            ],
+          })
+        twoslash: false

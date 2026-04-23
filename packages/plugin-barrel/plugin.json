@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json",
+  "id": "plugin-barrel",
+  "name": "Barrel",
+  "description": "Generate barrel (index.ts) files at the root and per-plugin level to simplify imports across your generated code.",
+  "category": "utility",
+  "type": "official",
+  "version": "5.0.0-alpha.53",
+  "npmPackage": "@kubb/plugin-barrel",
+  "docsPath": "/plugins/plugin-barrel",
+  "repo": "https://github.com/kubb-labs/plugins",
+  "maintainers": [
+    {
+      "name": "Stijn Van Hulle",
+      "github": "stijnvanhulle"
+    }
+  ],
+  "compatibility": {
+    "kubb": ">=5.0.0",
+    "node": ">=22"
+  },
+  "tags": ["barrel", "index", "codegen", "typescript"],
+  "dependencies": []
+}
