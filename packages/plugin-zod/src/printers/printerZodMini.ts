@@ -263,7 +263,14 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
         // Mirror printerTs `nonNullable: true`: when omitting keys, the resulting
         // schema is a new non-nullable object type — skip optional/nullable/nullish.
         // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
-        base = `${base}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+
+        // If this is a lazy reference, apply omit inside the lazy function
+        const lazyMatch = base.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
+        if (lazyMatch) {
+          base = `z.lazy(() => ${lazyMatch[1]}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }))`
+        } else {
+          base = `${base}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+        }
       }
 
       return applyMiniModifiers({
