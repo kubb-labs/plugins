@@ -2057,8 +2057,8 @@ packages:
   '@redocly/config@0.48.1':
     resolution: {integrity: sha512-vq8GM3e0KiglqkwE5Lb9XayrmZY4dHCs21BsvV92yAZN68f1N9cZUuwY1SwnztPbH06dn9uLzubBl/JNfImqfA==}
 
-  '@redocly/openapi-core@2.29.2':
-    resolution: {integrity: sha512-je4yu+QgSOSx+wN5IcpCaoZwNAAnaLnmSeN8GDC6lX2l51ukyQBFjZ+/LeCrVgOrUA3aRZRRHgZoRtcemIfm+A==}
+  '@redocly/openapi-core@2.30.0':
+    resolution: {integrity: sha512-ZwsTS/BHzfzmadf4qPcpBcYDQm78XoinmLTGQWzDKOpgnjNOV62YId79611ulHpYXndRG8vcVm5LJdvXqGp8Yw==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/binding-android-arm64@1.0.0-rc.17':
@@ -5834,7 +5834,7 @@ snapshots:
   '@kubb/adapter-oas@5.0.0-alpha.67(@kubb/renderer-jsx@5.0.0-alpha.67)':
     dependencies:
       '@kubb/core': 5.0.0-alpha.67(@kubb/renderer-jsx@5.0.0-alpha.67)
-      '@redocly/openapi-core': 2.29.2
+      '@redocly/openapi-core': 2.30.0
       oas: 32.1.17
       oas-normalize: 16.0.4
       swagger2openapi: 7.0.8
@@ -6233,7 +6233,7 @@ snapshots:
     dependencies:
       json-schema-to-ts: 2.7.2
 
-  '@redocly/openapi-core@2.29.2':
+  '@redocly/openapi-core@2.30.0':
     dependencies:
       '@redocly/ajv': 8.18.3
       '@redocly/config': 0.48.1

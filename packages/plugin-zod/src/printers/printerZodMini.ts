@@ -2,7 +2,7 @@ import { stringify } from '@internals/utils'
 
 import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyMiniModifiers, containsSelfRef, formatLiteral, lengthChecksMini, numberChecksMini } from '../utils.ts'
+import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -31,11 +31,17 @@ export type PrinterZodMiniOptions = {
   guidType?: PluginZod['resolvedOptions']['guidType']
   wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
   resolver?: ResolverZod
-  schemaName?: string
   /**
    * Property keys to exclude from the generated object schema via `.omit({ key: true })`.
    */
   keysToOmit?: Array<string>
+  /**
+   * Names of schemas (raw OAS names) that participate in a circular dependency
+   * chain (direct self-loops or indirect cycles such as Pet → Cat → Pet).
+   * Properties whose schema transitively references one of these are emitted
+   * as lazy getters and refs to them are wrapped in `z.lazy(() => …)`.
+   */
+  cyclicSchemas?: ReadonlySet<string>
   /**
    * Partial map of node-type overrides. Each entry replaces the built-in handler for that node type.
    */
@@ -58,6 +64,10 @@ export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', Printe
  * ```
  */
 export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options) => {
+  // When true, the `ref` handler skips `z.lazy()` wrapping because we are
+  // already inside a getter which provides deferred evaluation.
+  let _skipLazy = false
+
   return {
     name: 'zod-mini',
     options,
@@ -131,9 +141,8 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
         if (!node.name) return undefined
         const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
         const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
-        const isSelfRef = node.ref && this.options.schemaName != null && resolvedName === this.options.schemaName
 
-        if (isSelfRef) {
+        if (!_skipLazy && node.ref && this.options.cyclicSchemas?.has(refName)) {
           return `z.lazy(() => ${resolvedName})`
         }
 
@@ -150,13 +159,12 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
             const isOptional = schema.optional
             const isNullish = schema.nullish
 
-            const hasSelfRef =
-              this.options.schemaName != null && containsSelfRef(schema, { schemaName: this.options.schemaName, resolver: this.options.resolver })
+            const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
+            _skipLazy = hasSelfRef
             const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
-            // Strip z.lazy() wrappers inside object getters — the getter itself provides deferred evaluation
-            const resolvedOutput = hasSelfRef ? baseOutput.replaceAll(`z.lazy(() => ${this.options.schemaName})`, this.options.schemaName!) : baseOutput
+            _skipLazy = false
 
-            const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: resolvedOutput, schema }) || resolvedOutput : resolvedOutput
+            const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
 
             const value = applyMiniModifiers({
               value: wrappedOutput,

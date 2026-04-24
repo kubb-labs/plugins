@@ -188,40 +188,6 @@ export function applyMiniModifiers({ value, nullable, optional, nullish, default
   return result
 }
 
-/**
- * Returns true when the schema tree contains a self-referential `$ref`
- * whose resolved name matches `schemaName`.
- *
- * A `visited` set prevents infinite recursion on circular schema graphs.
- */
-export function containsSelfRef(
-  node: ast.SchemaNode,
-  { schemaName, resolver, visited = new Set() }: { schemaName: string; resolver: ResolverZod | undefined; visited?: Set<ast.SchemaNode> },
-): boolean {
-  if (visited.has(node)) return false
-  visited.add(node)
-
-  if (node.type === 'ref' && node.ref) {
-    const rawName = ast.extractRefName(node.ref) ?? node.name
-    const resolved = rawName ? (resolver?.default(rawName, 'function') ?? rawName) : node.name
-    return resolved === schemaName
-  }
-  if (node.type === 'object') {
-    if (node.properties?.some((p) => containsSelfRef(p.schema, { schemaName, resolver, visited }))) return true
-    if (node.additionalProperties && node.additionalProperties !== true) {
-      return containsSelfRef(node.additionalProperties, { schemaName, resolver, visited })
-    }
-    return false
-  }
-  if (node.type === 'array' || node.type === 'tuple') {
-    return node.items?.some((item) => containsSelfRef(item, { schemaName, resolver, visited })) ?? false
-  }
-  if (node.type === 'union' || node.type === 'intersection') {
-    return node.members?.some((m) => containsSelfRef(m, { schemaName, resolver, visited })) ?? false
-  }
-  return false
-}
-
 type BuildGroupedParamsSchemaOptions = {
   params: Array<ast.ParameterNode>
   optional?: boolean

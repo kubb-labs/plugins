@@ -67,6 +67,62 @@ const treeNodeSchema = ast.createSchema({
   ],
 })
 
+// Indirect/polymorphic circular reference scenario from issue #3172:
+// Pet (union) → Cat → Pet → ... causes runtime stack overflow without lazy
+// getter support. Cat/Dog reference Pet via array and union members.
+const petPolySchema = ast.createSchema({
+  type: 'union',
+  name: 'Pet',
+  members: [
+    ast.createSchema({ type: 'ref', name: 'Cat', ref: '#/components/schemas/Cat' }),
+    ast.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
+  ],
+})
+
+const catSchema = ast.createSchema({
+  type: 'object',
+  name: 'Cat',
+  properties: [
+    ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
+    ast.createProperty({
+      name: 'archEnemy',
+      schema: ast.createSchema({
+        type: 'union',
+        members: [ast.createSchema({ type: 'null' }), ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+      }),
+    }),
+    ast.createProperty({
+      name: 'friends',
+      schema: ast.createSchema({
+        type: 'array',
+        items: [ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+      }),
+    }),
+  ],
+})
+
+const dogSchema = ast.createSchema({
+  type: 'object',
+  name: 'Dog',
+  properties: [
+    ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
+    ast.createProperty({
+      name: 'archEnemy',
+      schema: ast.createSchema({
+        type: 'union',
+        members: [ast.createSchema({ type: 'null' }), ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+      }),
+    }),
+    ast.createProperty({
+      name: 'friends',
+      schema: ast.createSchema({
+        type: 'array',
+        items: [ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+      }),
+    }),
+  ],
+})
+
 const testConfig: Config = {
   root: '.',
   input: { path: '' },
@@ -111,6 +167,7 @@ describe('fakerGenerator — schema', () => {
       },
     },
     { name: 'treeNode', node: treeNodeSchema, options: {} },
+    { name: 'catCycle', node: catSchema, options: {} },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })
@@ -124,7 +181,7 @@ describe('fakerGenerator — schema', () => {
       adapter: createMockedAdapter({
         inputNode: {
           kind: 'Input',
-          schemas: [categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema],
+          schemas: [categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema],
           operations: [],
           meta: {},
         },
