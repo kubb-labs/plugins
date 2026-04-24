@@ -14,7 +14,7 @@ export const findPetsByTagsQueryPageSizeSchema = z.optional(z.string())
 
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
-export const findPetsByTagsStatus200Schema = z.array(z.lazy(() => petSchema))
+export const findPetsByTagsStatus200Schema = z.array(petSchema)
 
 export const findPetsByTagsStatus400Schema = z.any()
 

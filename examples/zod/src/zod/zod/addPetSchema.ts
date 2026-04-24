@@ -7,7 +7,7 @@ import { z } from '../../zod.ts'
 import { addPetRequestSchema } from './addPetRequestSchema.ts'
 import { petSchema } from './petSchema.ts'
 
-export const addPetStatus200Schema = z.lazy(() => petSchema)
+export const addPetStatus200Schema = petSchema
 
 export type AddPetStatus200Schema = z.infer<typeof addPetStatus200Schema>
 

@@ -7,7 +7,7 @@ import * as z from 'zod/mini'
 import { addPetRequestSchema } from './addPetRequestSchema.ts'
 import { petSchema } from './petSchema.ts'
 
-export const addPetStatus200Schema = z.lazy(() => petSchema)
+export const addPetStatus200Schema = petSchema
 
 export const addPetStatus405Schema = z.object({
   code: z.optional(z.int()),
