@@ -29,9 +29,11 @@
     "zod-pet-store": "0.0.1",
     "tests-3.0.x": "0.0.1-alpha.0",
     "e2e": "0.0.0",
-    "performance": "0.0.1-alpha.0"
+    "performance": "0.0.1-alpha.0",
+    "sdk-pet-store": "0.0.1"
   },
   "changesets": [
+    "circular-schema-detection-shared",
     "oas-ts-resolve-options",
     "plugin-client-params-casing-unused-var",
     "plugin-client-v5-migration",

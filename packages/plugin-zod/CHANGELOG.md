@@ -1,5 +1,19 @@
 # @kubb/plugin-zod
 
+## 5.0.0-alpha.54
+
+### Minor Changes
+
+- [#71](https://github.com/kubb-labs/plugins/pull/71) [`825007c`](https://github.com/kubb-labs/plugins/commit/825007cf4e79baa63d846f59859587a233d5f1d4) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix stack overflows on indirect circular schemas (e.g. `Dog → Pet → Dog`) reported in kubb-labs/kubb#3172.
+
+  Both plugins now use shared helpers from `@kubb/ast`:
+  - `findCircularSchemas(schemas)` — detects all schemas involved in a cycle (direct or indirect)
+  - `containsCircularRef(node, { circularSchemas, excludeName? })` — checks whether a property transitively references a cyclic schema
+
+  **`plugin-faker`**: emits lazy getter syntax (`get archEnemy() { return fakePet() }`) for properties that reference an indirect cycle, preventing stack overflows at construction time. Direct self-references continue to emit `undefined as any`.
+
+  **`plugin-zod`**: wraps cyclic `$ref`s in `z.lazy(() => …)` and emits object properties as getters when the property schema references a cyclic schema. The getter body is generated without redundant `z.lazy()` wrappers — eliminated via a closure-level flag rather than post-processing string replacement.
+
 ## 5.0.0-alpha.52
 
 ### Minor Changes
@@ -11,13 +25,25 @@
   **Before**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, never, object, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    never,
+    object,
+    ResolverZod
+  >;
   ```
 
   **After**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    ResolverZod
+  >;
   ```
 
 ### Patch Changes
@@ -89,14 +115,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -104,25 +130,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -130,7 +156,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -218,22 +244,22 @@
   pluginTs({
     resolver: {
       resolveName(name) {
-        return `Custom${this.default(name, 'function')}`
+        return `Custom${this.default(name, "function")}`;
       },
     },
     transformer: {
       schema(node) {
-        return { ...node, description: undefined }
+        return { ...node, description: undefined };
       },
     },
     printer: {
       nodes: {
         integer() {
-          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword);
         },
       },
     },
-  })
+  });
   ```
 
   ### `@kubb/plugin-zod`
@@ -245,22 +271,22 @@
   pluginZod({
     resolver: {
       resolveName(name) {
-        return `${this.default(name, 'function')}Schema`
+        return `${this.default(name, "function")}Schema`;
       },
     },
     transformer: {
       schema(node) {
-        return { ...node, description: undefined }
+        return { ...node, description: undefined };
       },
     },
     printer: {
       nodes: {
         integer() {
-          return 'z.number()'
+          return "z.number()";
         },
       },
     },
-  })
+  });
   ```
 
   ### `@kubb/plugin-cypress`
@@ -1186,7 +1212,7 @@
   ```typescript
   export const postApiExampleMutationRequestSchema = z.object({
     email: z.string().nullish(), // ❌ Error: .nullish() doesn't exist in Zod Mini
-  })
+  });
   ```
 
   **After** (this fix):
@@ -1194,7 +1220,7 @@
   ```typescript
   export const postApiExampleMutationRequestSchema = z.object({
     email: z.nullish(z.string()), // ✅ Correct functional wrapper
-  })
+  });
   ```
 
   This fix ensures consistency with how `optional` and `nullable` modifiers were already being handled in mini mode.
@@ -1267,7 +1293,7 @@
   ```typescript
   pluginOas({
     collisionDetection: true, // Recommended - prevents all collision types
-  })
+  });
   ```
 
 - Updated dependencies [[`996f3b2`](https://github.com/kubb-labs/kubb/commit/996f3b26d8c2167c3e77b734275c204e6c1b159c)]:
