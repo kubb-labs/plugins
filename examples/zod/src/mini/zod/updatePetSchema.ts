@@ -6,7 +6,7 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema.ts'
 
-export const updatePetStatus200Schema = petSchema
+export const updatePetStatus200Schema = z.lazy(() => petSchema)
 
 export const updatePetStatus400Schema = z.any()
 
@@ -16,4 +16,4 @@ export const updatePetStatus405Schema = z.any()
 
 export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetDataSchema = petSchema
+export const updatePetDataSchema = z.lazy(() => petSchema)

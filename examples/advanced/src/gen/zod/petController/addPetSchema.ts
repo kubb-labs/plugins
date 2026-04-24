@@ -9,7 +9,7 @@ export const addPetStatus405Schema = z.object({
 
 export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
 
-export const addPetStatusDefaultSchema = petSchema.omit({ name: true })
+export const addPetStatusDefaultSchema = z.lazy(() => petSchema.omit({ name: true }))
 
 export type AddPetStatusDefaultSchema = z.infer<typeof addPetStatusDefaultSchema>
 

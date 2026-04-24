@@ -1,7 +1,7 @@
 import * as z from 'zod'
 import { petSchema } from '../petSchema.ts'
 
-export const addFilesStatus200Schema = petSchema.omit({ name: true })
+export const addFilesStatus200Schema = z.lazy(() => petSchema.omit({ name: true }))
 
 export type AddFilesStatus200Schema = z.infer<typeof addFilesStatus200Schema>
 
@@ -13,6 +13,6 @@ export const addFilesResponseSchema = z.union([addFilesStatus200Schema, addFiles
 
 export type AddFilesResponseSchema = z.infer<typeof addFilesResponseSchema>
 
-export const addFilesDataSchema = petSchema.omit({ id: true })
+export const addFilesDataSchema = z.lazy(() => petSchema.omit({ id: true }))
 
 export type AddFilesDataSchema = z.infer<typeof addFilesDataSchema>
