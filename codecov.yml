@@ -85,18 +85,6 @@ component_management:
       name: '@kubb/plugin-redoc'
       paths:
         - packages/plugin-redoc/**
-    - component_id: plugin-solid-query
-      name: '@kubb/plugin-solid-query'
-      paths:
-        - packages/plugin-solid-query/**
-    - component_id: plugin-svelte-query
-      name:  '@kubb/plugin-svelte-query'
-      paths:
-        - packages/plugin-svelte-query/**
-    - component_id: plugin-swr
-      name: '@kubb/plugin-swr'
-      paths:
-        - packages/plugin-swr/**
     - component_id: plugin-ts
       name: '@kubb/plugin-ts'
       paths:

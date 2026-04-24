@@ -1,11 +1,5 @@
 'docs':
-  - any:
-      [
-        'docs/**',
-        '!docs/**/package.json',
-        'examples/**',
-        '!examples/**/package.json',
-      ]
+  - any: ['docs/**', '!docs/**/package.json', 'examples/**', '!examples/**/package.json']
 
 '@kubb/cli':
   - any: ['packages/cli/**', '!packages/cli/package.json']
@@ -46,15 +40,6 @@
 '@kubb/plugin-redoc':
   - any: ['packages/plugin-redoc/**', '!packages/plugin-redoc/package.json']
 
-'@kubb/plugin-solid-query':
-  - any: ['packages/plugin-solid-query/**', '!packages/plugin-solid-query/package.json']
-
-'@kubb/plugin-svelte-query':
-  - any: ['packages/plugin-svelte-query/**', '!packages/plugin-svelte-query/package.json']
-
-'@kubb/plugin-swr':
-  - any: ['packages/plugin-swr/**', '!packages/plugin-swr/package.json']
-
 '@kubb/plugin-ts':
   - any: ['packages/plugin-ts/**', '!packages/plugin-ts/package.json']
 
@@ -71,4 +56,4 @@ feature:
   - head-branch: ['^feat', 'feat']
 
 bug:
-  - head-branch: [ '^bug', 'bug', '^fix', 'fix', ]
+  - head-branch: ['^bug', 'bug', '^fix', 'fix']

@@ -34,7 +34,7 @@ details:
         import type { RequestConfig, ResponseErrorConfig } from '${client.importPath}'
         // ... rest of generated file
 important: |
-  When using `importPath` with query plugins such as `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-svelte-query`, `@kubb/plugin-solid-query`, or `@kubb/plugin-swr`, the generated hooks also import a `Client` type alongside `RequestConfig` and `ResponseErrorConfig` from the custom module. Your custom client module **must** export all three types — if any is missing, TypeScript will report an unresolvable import error.
+  When using `importPath` with query plugins such as `@kubb/plugin-react-query` or `@kubb/plugin-vue-query`, the generated hooks also import a `Client` type alongside `RequestConfig` and `ResponseErrorConfig` from the custom module. Your custom client module **must** export all three types — if any is missing, TypeScript will report an unresolvable import error.
 codeBlock:
   lang: typescript
   title: client.ts
