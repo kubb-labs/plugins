@@ -10,7 +10,5 @@ export const catSchema = z.object({
   get archEnemy() {
     return z.union([z.null(), petSchema]).optional()
   },
-  get friends() {
-    return z.array(petSchema).optional()
-  },
+  friends: z.array(petSchema).optional(),
 })
