@@ -89,7 +89,7 @@ export async function createPath(
   },
   config = {},
 ) {
-  const formData = buildFormData(data)
+  const formData = buildFormData(data)  // buildFormData creates the FormData instance; `as FormData` is a type assertion only
   const res = await fetch<CreatePathResponse, ResponseErrorConfig<Error>, CreatePathData>({
     method: 'POST',
     url: '/path',
@@ -177,12 +177,33 @@ const isFormData = node.requestBody?.content?.[0]?.contentType === 'multipart/fo
 const hasFormData = node.requestBody?.content?.some(e => e.contentType === 'multipart/form-data') ?? false
 ```
 
-And `classClientGenerator.tsx` / `staticClassClientGenerator.tsx` lines 162–163 — same
-`hasFormData` fix.
+`classClientGenerator.tsx` line 162 and `staticClassClientGenerator.tsx` line 163 already use
+`hasFormData` with `.some()`, but still narrow to `content?.[0]?...`. Update to check all
+entries:
+```ts
+// before (already uses hasFormData but wrong — checks only content[0])
+const hasFormData = ops.some((op) => op.node.requestBody?.content?.[0]?.contentType === 'multipart/form-data')
+
+// after — checks all declared content types per operation
+const hasFormData = ops.some((op) => op.node.requestBody?.content?.some(e => e.contentType === 'multipart/form-data'))
+```
 
 ### Step 3 — `plugin-react-query` mutationGenerator
 
 **File:** `packages/plugin-react-query/src/generators/mutationGenerator.tsx`
+
+**Also fix unconditional `buildFormData` import** (line 126): currently `buildFormData` is always
+imported when `!shouldUseClientPlugin`, regardless of whether the operation has any
+`multipart/form-data` content. Make it conditional:
+```ts
+// before
+{!shouldUseClientPlugin && <File.Import name={['buildFormData']} ... />}
+
+// after — only import when actually needed
+{!shouldUseClientPlugin && node.requestBody?.content?.some(e => e.contentType === 'multipart/form-data') && (
+  <File.Import name={['buildFormData']} ... />
+)}
+```
 
 When `node.requestBody?.content?.length > 1`:
 
