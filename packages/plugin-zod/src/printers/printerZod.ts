@@ -66,10 +66,6 @@ export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptio
  * ```
  */
 export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
-  // When true, the `ref` handler skips `z.lazy()` wrapping because we are
-  // already inside a getter which provides deferred evaluation.
-  let _skipLazy = false
-
   return {
     name: 'zod',
     options,
@@ -155,7 +151,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
         const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
 
-        if (!_skipLazy && node.ref && this.options.cyclicSchemas?.has(refName)) {
+        if (node.ref && this.options.cyclicSchemas?.has(refName)) {
           return `z.lazy(() => ${resolvedName})`
         }
 
@@ -173,9 +169,11 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
             const isNullish = schema.nullish
 
             const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
-            _skipLazy = hasSelfRef
+            // Inside a getter the getter itself defers evaluation, so suppress
+            // z.lazy() wrapping on nested refs by temporarily clearing cyclicSchemas.
+            if (hasSelfRef) this.options.cyclicSchemas = undefined
             const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
-            _skipLazy = false
+            if (hasSelfRef) this.options.cyclicSchemas = options.cyclicSchemas
 
             const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
 
