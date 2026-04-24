@@ -8,7 +8,7 @@ import { petSchema } from './petSchema.ts'
 
 export const findPetsByStatusQueryStatusSchema = z._default(z.optional(z.enum(['available', 'pending', 'sold'])), 'available')
 
-export const findPetsByStatusStatus200Schema = z.array(petSchema)
+export const findPetsByStatusStatus200Schema = z.array(z.lazy(() => petSchema))
 
 export const findPetsByStatusStatus400Schema = z.any()
 

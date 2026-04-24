@@ -10,7 +10,7 @@ export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
 export type GetPetByIdPathPetIdSchema = z.infer<typeof getPetByIdPathPetIdSchema>
 
-export const getPetByIdStatus200Schema = petSchema
+export const getPetByIdStatus200Schema = z.lazy(() => petSchema)
 
 export type GetPetByIdStatus200Schema = z.infer<typeof getPetByIdStatus200Schema>
 
