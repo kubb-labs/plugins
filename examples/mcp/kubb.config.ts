@@ -24,7 +24,7 @@ export default defineConfig(() => {
     },
     plugins: [
       pluginTs({
-        output: { path: 'models/ts' },
+        output: { path: 'models/ts', barrelType: 'named' },
       }),
       pluginZod({}),
       pluginMcp({
