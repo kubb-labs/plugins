@@ -285,6 +285,7 @@ jobs:
           KUBB_DISABLE_TELEMETRY: "1"
         run: |
           pnpm run generate:petstore
+          pnpm run typecheck
 
       - name: Run E2E tests
         working-directory: ./tests/e2e
