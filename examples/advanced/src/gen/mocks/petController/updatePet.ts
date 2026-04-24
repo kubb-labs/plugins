@@ -1,4 +1,4 @@
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus202 } from '../../models/ts/petController/UpdatePet.ts'
+import type { UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus202 } from '../../models/ts/petController/UpdatePet.ts'
 import { petFaker } from '../pet.ts'
 import { faker } from '@faker-js/faker'
 
@@ -38,13 +38,6 @@ export function updatePetStatus404() {
  */
 export function updatePetStatus405() {
   return undefined
-}
-
-/**
- * @description Update an existent pet in the store
- */
-export function updatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
-  return petFaker(data)
 }
 
 export function updatePetResponse(_data?: UpdatePetResponse): UpdatePetResponse {

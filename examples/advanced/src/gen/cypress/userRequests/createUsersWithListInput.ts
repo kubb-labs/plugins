@@ -1,4 +1,4 @@
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputResponse } from '../../models/ts/userController/CreateUsersWithListInput.ts'
 
 export function createUsersWithListInput(
   data?: CreateUsersWithListInputData,
@@ -8,7 +8,6 @@ export function createUsersWithListInput(
     .request<CreateUsersWithListInputResponse>({
       method: 'POST',
       url: `/user/createWithList`,
-      body: data,
       ...options,
     })
     .then((res) => res.body)

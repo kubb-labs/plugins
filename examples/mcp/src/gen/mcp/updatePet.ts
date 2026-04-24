@@ -1,6 +1,6 @@
 import fetch from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../models/ts/UpdatePet.js'
+import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../models/ts/UpdatePet.js'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
 
 /**
@@ -9,13 +9,10 @@ import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
  * {@link /pet}
  */
 export async function updatePetHandler({ data }: { data: UpdatePetData }): Promise<Promise<CallToolResult>> {
-  const requestData = data
-
-  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, unknown>({
     method: 'PUT',
     url: `/pet`,
     baseURL: `https://petstore.swagger.io/v2`,
-    data: requestData,
   })
 
   return {

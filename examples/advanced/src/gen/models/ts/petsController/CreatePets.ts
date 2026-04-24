@@ -37,22 +37,8 @@ export type CreatePetsStatusDefault = PetNotFound
 /**
  * @type object
  */
-export type CreatePetsData = {
-  /**
-   * @type string
-   */
-  name: string
-  /**
-   * @type string
-   */
-  tag: string
-}
-
-/**
- * @type object
- */
 export type CreatePetsRequestConfig = {
-  data?: CreatePetsData
+  data?: never
   /**
    * @type object
    */

@@ -5,10 +5,8 @@
 
 import fetch from '@kubb/plugin-client/clients/axios'
 import type {
-  AddPetData,
   AddPetResponse,
   AddPetStatus405,
-  UpdatePetData,
   UpdatePetResponse,
   UpdatePetStatus400,
   UpdatePetStatus404,
@@ -34,15 +32,12 @@ import type {
   DeletePetPathPetId,
   DeletePetHeaderApiKey,
   DeletePetStatus400,
-  UploadFileData,
   UploadFileResponse,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   GetInventoryResponse,
-  PlaceOrderData,
   PlaceOrderResponse,
   PlaceOrderStatus405,
-  PlaceOrderPatchData,
   PlaceOrderPatchResponse,
   PlaceOrderPatchStatus405,
   GetOrderByIdResponse,
@@ -53,9 +48,7 @@ import type {
   DeleteOrderPathOrderId,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-  CreateUserData,
   CreateUserResponse,
-  CreateUsersWithListInputData,
   CreateUsersWithListInputResponse,
   LoginUserResponse,
   LoginUserQueryUsername,
@@ -66,7 +59,6 @@ import type {
   GetUserByNamePathUsername,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-  UpdateUserData,
   UpdateUserResponse,
   UpdateUserPathUsername,
   DeleteUserResponse,
@@ -94,31 +86,23 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export async function updatePet(data: UpdatePetData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, unknown>({
     method: 'PUT',
     url: `/pet`,
-    data: requestData,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = updatePetMutationKey()
-  return mutationOptions<
-    UpdatePetResponse,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
-    TContext
-  >({
+  return mutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, void, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
+    mutationFn: async (_) => {
       return updatePet(data, config)
     },
   })
@@ -131,13 +115,10 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
  */
 export function useUpdatePet<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      UpdatePetResponse,
-      ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      { data: UpdatePetData },
-      TContext
-    > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client }
+    mutation?: UseMutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, void, TContext> & {
+      client?: QueryClient
+    }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -147,23 +128,18 @@ export function useUpdatePet<TContext>(
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
     UpdatePetResponse,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
+    void,
     TContext
   >
 
-  return useMutation<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, { data: UpdatePetData }, TContext>(
+  return useMutation<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, void, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    UpdatePetResponse,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
-    TContext
-  >
+  ) as UseMutationResult<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, void, TContext>
 }
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
@@ -173,26 +149,19 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export async function addPet(data: AddPetData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
-    method: 'POST',
-    url: `/pet`,
-    data: requestData,
-    ...requestConfig,
-  })
+  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, unknown>({ method: 'POST', url: `/pet`, ...requestConfig })
 
   return res.data
 }
 
-export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>({
+  return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, void, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
+    mutationFn: async (_) => {
       return addPet(data, config)
     },
   })
@@ -205,24 +174,24 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<AddPetData>> & { client?: Client }
+    mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, void, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
-  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>
+  const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, void, TContext>
 
-  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
+  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, void, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>
+  ) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, void, TContext>
 }
 
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
@@ -813,34 +782,30 @@ export async function uploadFile(
   petId: UploadFilePathPetId,
   data?: UploadFileData,
   params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
-  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
+  config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     params,
-    data: requestData,
     ...requestConfig,
-    headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })
 
   return res.data
 }
 
-export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<
     UploadFileResponse,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
+    { petId: UploadFilePathPetId; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ petId, data, params }) => {
+    mutationFn: async ({ petId, params }) => {
       return uploadFile(petId, data, params, config)
     },
   })
@@ -855,10 +820,10 @@ export function useUploadFile<TContext>(
     mutation?: UseMutationOptions<
       UploadFileResponse,
       ResponseErrorConfig<Error>,
-      { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
+      { petId: UploadFilePathPetId; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UploadFileData>> & { client?: Client }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -868,14 +833,14 @@ export function useUploadFile<TContext>(
   const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
     UploadFileResponse,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
+    { petId: UploadFilePathPetId; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >
 
   return useMutation<
     UploadFileResponse,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
+    { petId: UploadFilePathPetId; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >(
     {
@@ -887,7 +852,7 @@ export function useUploadFile<TContext>(
   ) as UseMutationResult<
     UploadFileResponse,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
+    { petId: UploadFilePathPetId; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >
 }
@@ -1011,26 +976,19 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
-    method: 'POST',
-    url: `/store/order`,
-    data: requestData,
-    ...requestConfig,
-  })
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, unknown>({ method: 'POST', url: `/store/order`, ...requestConfig })
 
   return res.data
 }
 
-export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = placeOrderMutationKey()
-  return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>({
+  return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, void, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
+    mutationFn: async (_) => {
       return placeOrder(data, config)
     },
   })
@@ -1043,29 +1001,24 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function usePlaceOrder<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client }
+    mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, void, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
 
-  const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<
-    PlaceOrderResponse,
-    ResponseErrorConfig<PlaceOrderStatus405>,
-    { data?: PlaceOrderData },
-    TContext
-  >
+  const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, void, TContext>
 
-  return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>(
+  return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, void, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>
+  ) as UseMutationResult<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, void, TContext>
 }
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
@@ -1075,26 +1028,23 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
+export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
+  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, unknown>({
     method: 'PATCH',
     url: `/store/order`,
-    data: requestData,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function placeOrderPatchMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
+export function placeOrderPatchMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
+  return mutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, void, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
+    mutationFn: async (_) => {
       return placeOrderPatch(data, config)
     },
   })
@@ -1107,10 +1057,8 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(config: Parti
  */
 export function usePlaceOrderPatch<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client }
+    mutation?: UseMutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, void, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1120,18 +1068,18 @@ export function usePlaceOrderPatch<TContext>(
   const baseOptions = placeOrderPatchMutationOptions(config) as UseMutationOptions<
     PlaceOrderPatchResponse,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    { data?: PlaceOrderPatchData },
+    void,
     TContext
   >
 
-  return useMutation<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>(
+  return useMutation<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, void, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>
+  ) as UseMutationResult<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, void, TContext>
 }
 
 export const getOrderByIdQueryKey = (orderId: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: { orderId: orderId } }] as const
@@ -1335,26 +1283,19 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  * @summary Create user
  * {@link /user}
  */
-export async function createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+export async function createUser(data?: CreateUserData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
-    method: 'POST',
-    url: `/user`,
-    data: requestData,
-    ...requestConfig,
-  })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'POST', url: `/user`, ...requestConfig })
 
   return res.data
 }
 
-export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = createUserMutationKey()
-  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>({
+  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, void, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
+    mutationFn: async (_) => {
       return createUser(data, config)
     },
   })
@@ -1367,29 +1308,24 @@ export function createUserMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function useCreateUser<TContext>(
   options: {
-    mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<CreateUserData>> & { client?: Client }
+    mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, void, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? createUserMutationKey()
 
-  const baseOptions = createUserMutationOptions(config) as UseMutationOptions<
-    CreateUserResponse,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUserData },
-    TContext
-  >
+  const baseOptions = createUserMutationOptions(config) as UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, void, TContext>
 
-  return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>(
+  return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, void, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>
+  ) as UseMutationResult<CreateUserResponse, ResponseErrorConfig<Error>, void, TContext>
 }
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
@@ -1399,31 +1335,23 @@ export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWi
  * @summary Creates list of users with given input array
  * {@link /user/createWithList}
  */
-export async function createUsersWithListInput(
-  data?: CreateUsersWithListInputData,
-  config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
-) {
+export async function createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'POST',
     url: `/user/createWithList`,
-    data: requestData,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function createUsersWithListInputMutationOptions<TContext = unknown>(
-  config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
-) {
+export function createUsersWithListInputMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = createUsersWithListInputMutationKey()
-  return mutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>({
+  return mutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, void, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
+    mutationFn: async (_) => {
       return createUsersWithListInput(data, config)
     },
   })
@@ -1436,10 +1364,8 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
  */
 export function useCreateUsersWithListInput<TContext>(
   options: {
-    mutation?: UseMutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client }
+    mutation?: UseMutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, void, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1449,18 +1375,18 @@ export function useCreateUsersWithListInput<TContext>(
   const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<
     CreateUsersWithListInputResponse,
     ResponseErrorConfig<Error>,
-    { data?: CreateUsersWithListInputData },
+    void,
     TContext
   >
 
-  return useMutation<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>(
+  return useMutation<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, void, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>
+  ) as UseMutationResult<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, void, TContext>
 }
 
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
@@ -1836,30 +1762,19 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser(
-  username: UpdateUserPathUsername,
-  data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
-) {
+export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
-    method: 'PUT',
-    url: `/user/${username}`,
-    data: requestData,
-    ...requestConfig,
-  })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'PUT', url: `/user/${username}`, ...requestConfig })
 
   return res.data
 }
 
-export function updateUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export function updateUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = updateUserMutationKey()
-  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>({
+  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>({
     mutationKey,
-    mutationFn: async ({ username, data }) => {
+    mutationFn: async ({ username }) => {
       return updateUser(username, data, config)
     },
   })
@@ -1872,10 +1787,8 @@ export function updateUserMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function useUpdateUser<TContext>(
   options: {
-    mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext> & {
-      client?: QueryClient
-    }
-    client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
+    mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext> & { client?: QueryClient }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1885,18 +1798,18 @@ export function useUpdateUser<TContext>(
   const baseOptions = updateUserMutationOptions(config) as UseMutationOptions<
     UpdateUserResponse,
     ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername; data?: UpdateUserData },
+    { username: UpdateUserPathUsername },
     TContext
   >
 
-  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>(
+  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>
+  ) as UseMutationResult<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>
 }
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const

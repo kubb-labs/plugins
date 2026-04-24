@@ -4,7 +4,7 @@
  */
 
 import fetch from '@kubb/plugin-client/clients/axios'
-import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../models/UpdateUser.ts'
+import type { UpdateUserResponse, UpdateUserPathUsername } from '../models/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
@@ -20,18 +20,11 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function updateUser(
   { username }: { username: UpdateUserPathUsername },
   data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+  config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
-    method: 'PUT',
-    url: `/user/${username}`,
-    data: requestData,
-    ...requestConfig,
-  })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'PUT', url: `/user/${username}`, ...requestConfig })
 
   return res.data
 }
@@ -43,22 +36,19 @@ export async function updateUser(
  */
 export function useUpdateUser<TContext>(
   options: {
-    mutation?: MutationObserverOptions<
-      UpdateUserResponse,
-      ResponseErrorConfig<Error>,
-      { username: MaybeRefOrGetter<UpdateUserPathUsername>; data?: MaybeRefOrGetter<UpdateUserData> },
-      TContext
-    > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
+    mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: MaybeRefOrGetter<UpdateUserPathUsername> }, TContext> & {
+      client?: QueryClient
+    }
+    client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updateUserMutationKey()
 
-  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>(
+  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>(
     {
-      mutationFn: async ({ username, data }) => {
+      mutationFn: async ({ username }) => {
         return updateUser({ username }, data, config)
       },
       mutationKey,

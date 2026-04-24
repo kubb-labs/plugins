@@ -20,15 +20,10 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 export type UploadFileStatus200 = ApiResponse
 
 /**
- * @type string | undefined
- */
-export type UploadFileData = Blob | undefined
-
-/**
  * @type object
  */
 export type UploadFileRequestConfig = {
-  data?: UploadFileData
+  data?: never
   /**
    * @type object
    */
