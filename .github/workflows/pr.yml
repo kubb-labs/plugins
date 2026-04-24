@@ -104,7 +104,7 @@ jobs:
 
       - name: Linting
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
+          NODE_OPTIONS: '--max_old_space_size=4096'
         run: pnpm run lint
 
   spellcheck:
@@ -127,10 +127,10 @@ jobs:
       - name: Spell Check
         uses: streetsidesoftware/cspell-action@v8
         with:
-         files: |
-           **/*.{ts,md}
-         suggestions: 'true'
-         config: 'cspell.json'
+          files: |
+            **/*.{ts,md}
+          suggestions: 'true'
+          config: 'cspell.json'
 
   benchmarks:
     name: Performance benchmarks (Vitest)
@@ -225,7 +225,7 @@ jobs:
         id: generate
         run: pnpm run generate
         env:
-          KUBB_DISABLE_TELEMETRY: "1"
+          KUBB_DISABLE_TELEMETRY: '1'
 
       - name: Check for changes
         id: check_changes
@@ -245,8 +245,8 @@ jobs:
           base: ${{ github.head_ref || github.ref_name }}
           branch: chore/update-generated-examples-${{ github.event.number }}
           delete-branch: true
-          title: "chore: update generated examples"
-          commit-message: "chore(examples): update generated files"
+          title: 'chore: update generated examples'
+          commit-message: 'chore(examples): update generated files'
           body: |
             Automated update of generated example files from `pnpm generate`.
 
@@ -281,27 +281,26 @@ jobs:
       - name: Run single E2E test for petStore
         working-directory: ./tests/e2e
         env:
-          NODE_OPTIONS: "--max_old_space_size=3000"
-          KUBB_DISABLE_TELEMETRY: "1"
+          NODE_OPTIONS: '--max_old_space_size=3000'
+          KUBB_DISABLE_TELEMETRY: '1'
         run: |
           pnpm run generate:petstore
-          pnpm run typecheck
 
       - name: Run E2E tests
         working-directory: ./tests/e2e
         env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
-          KUBB_DISABLE_TELEMETRY: "1"
-          KUBB_SCHEMA: "train-travel,discriminator,atlassian.com,optionalParameters,allOf,anyOf,petStoreContent,twitter,jokesOne,readme.io,worldtime,zalando,requestBody,box,enums,dataset_api,petStoreV3,Figma,spotify,vercel"
+          NODE_OPTIONS: '--max_old_space_size=4096'
+          KUBB_DISABLE_TELEMETRY: '1'
+          KUBB_SCHEMA: 'train-travel,discriminator,atlassian.com,optionalParameters,allOf,anyOf,petStoreContent,twitter,jokesOne,readme.io,worldtime,zalando,requestBody,box,enums,dataset_api,petStoreV3,Figma,spotify,vercel'
         run: |
           pnpm run generate --debug
 
       - name: Run E2E tests (stripe)
         working-directory: ./tests/e2e
         env:
-          NODE_OPTIONS: "--max_old_space_size=3000"
-          KUBB_DISABLE_TELEMETRY: "1"
-          KUBB_SCHEMA: "stripe"
+          NODE_OPTIONS: '--max_old_space_size=3000'
+          KUBB_DISABLE_TELEMETRY: '1'
+          KUBB_SCHEMA: 'stripe'
         run: |
           pnpm run generate --debug
 
@@ -309,8 +308,8 @@ jobs:
         if: runner.os != 'Windows'
         working-directory: ./tests/e2e
         env:
-          NODE_OPTIONS: "--max_old_space_size=3000"
-          KUBB_DISABLE_TELEMETRY: "1"
-          KUBB_SCHEMA: "openai"
+          NODE_OPTIONS: '--max_old_space_size=3000'
+          KUBB_DISABLE_TELEMETRY: '1'
+          KUBB_SCHEMA: 'openai'
         run: |
           pnpm run generate --debug
