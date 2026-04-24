@@ -88,8 +88,5 @@ export default defineConfig(() => {
         group: { type: 'tag' },
       }),
     ],
-    hooks: {
-      done: ['npm run typecheck'],
-    },
   }
 })
