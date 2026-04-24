@@ -1,5 +1,15 @@
 # vue-query-pet-store
 
+## 0.0.2-alpha.1
+
+### Patch Changes
+
+- Updated dependencies [[`825007c`](https://github.com/kubb-labs/plugins/commit/825007cf4e79baa63d846f59859587a233d5f1d4)]:
+  - @kubb/plugin-zod@5.0.0-alpha.54
+  - @kubb/plugin-client@5.0.0-alpha.54
+  - @kubb/plugin-vue-query@5.0.0-alpha.54
+  - @kubb/plugin-ts@5.0.0-alpha.54
+
 ## 0.0.2-alpha.0
 
 ### Patch Changes
