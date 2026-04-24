@@ -5,18 +5,18 @@ packages:
   - tests/**
 
 catalog:
-  "@kubb/adapter-oas": 5.0.0-alpha.58
-  "@kubb/agent": 5.0.0-alpha.58
-  "@kubb/core": 5.0.0-alpha.58
-  "@kubb/middleware-barrel": 5.0.0-alpha.58
-  "@kubb/parser-ts": 5.0.0-alpha.58
-  "@kubb/renderer-jsx": 5.0.0-alpha.58
-  kubb: 5.0.0-alpha.58
-  unplugin-kubb: 5.0.0-alpha.58
-  "@types/node": ^22.19.17
-  "@types/react": ^19.2.14
-  "@size-limit/file": ^12.1.0
-  "size-limit": ^12.1.0
+  '@kubb/adapter-oas': 5.0.0-alpha.62
+  '@kubb/agent': 5.0.0-alpha.62
+  '@kubb/core': 5.0.0-alpha.62
+  '@kubb/middleware-barrel': 5.0.0-alpha.62
+  '@kubb/parser-ts': 5.0.0-alpha.62
+  '@kubb/renderer-jsx': 5.0.0-alpha.62
+  kubb: 5.0.0-alpha.62
+  unplugin-kubb: 5.0.0-alpha.62
+  '@types/node': ^22.19.17
+  '@types/react': ^19.2.14
+  '@size-limit/file': ^12.1.0
+  'size-limit': ^12.1.0
   remeda: ^2.33.7
   tsdown: ^0.21.10
   typescript: ^6.0.3
