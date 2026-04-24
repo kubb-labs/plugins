@@ -6,7 +6,6 @@ import {
   applyModifiers,
   buildGroupedParamsSchema,
   buildSchemaNames,
-  containsSelfRef,
   formatDefault,
   formatLiteral,
   lengthChecksMini,
@@ -261,75 +260,6 @@ describe('applyMiniModifiers', () => {
 
   test('default value (object)', () => {
     expect(applyMiniModifiers({ value: 'z.object({})', defaultValue: {} })).toBe('z._default(z.object({}), {})')
-  })
-})
-
-describe('containsSelfRef', () => {
-  const resolver = undefined
-
-  test('returns false for non-ref node', () => {
-    const node = ast.createSchema({ type: 'string' })
-
-    expect(containsSelfRef(node, { schemaName: 'mySchema', resolver })).toBe(false)
-  })
-
-  test('returns true when ref name matches schema name', () => {
-    const node = ast.createSchema({ type: 'ref', ref: '#/components/schemas/Node', name: 'Node' })
-
-    expect(containsSelfRef(node, { schemaName: 'Node', resolver })).toBe(true)
-  })
-
-  test('returns false when ref name does not match', () => {
-    const node = ast.createSchema({ type: 'ref', ref: '#/components/schemas/Other', name: 'Other' })
-
-    expect(containsSelfRef(node, { schemaName: 'Node', resolver })).toBe(false)
-  })
-
-  test('finds self-ref inside object property', () => {
-    const refNode = ast.createSchema({ type: 'ref', ref: '#/components/schemas/Tree', name: 'Tree' })
-    const node = ast.createSchema({
-      type: 'object',
-      properties: [ast.createProperty({ name: 'child', required: false, schema: refNode })],
-    })
-
-    expect(containsSelfRef(node, { schemaName: 'Tree', resolver })).toBe(true)
-  })
-
-  test('returns false when object has no self-ref', () => {
-    const node = ast.createSchema({
-      type: 'object',
-      properties: [ast.createProperty({ name: 'label', required: true, schema: ast.createSchema({ type: 'string' }) })],
-    })
-
-    expect(containsSelfRef(node, { schemaName: 'Tree', resolver })).toBe(false)
-  })
-
-  test('finds self-ref inside array items', () => {
-    const refNode = ast.createSchema({ type: 'ref', ref: '#/components/schemas/List', name: 'List' })
-    const node = ast.createSchema({ type: 'array', items: [refNode] })
-
-    expect(containsSelfRef(node, { schemaName: 'List', resolver })).toBe(true)
-  })
-
-  test('finds self-ref inside union member', () => {
-    const refNode = ast.createSchema({ type: 'ref', ref: '#/components/schemas/Value', name: 'Value' })
-    const node = ast.createSchema({ type: 'union', members: [ast.createSchema({ type: 'string' }), refNode] })
-
-    expect(containsSelfRef(node, { schemaName: 'Value', resolver })).toBe(true)
-  })
-
-  test('finds self-ref inside intersection member', () => {
-    const refNode = ast.createSchema({ type: 'ref', ref: '#/components/schemas/Base', name: 'Base' })
-    const node = ast.createSchema({ type: 'intersection', members: [ast.createSchema({ type: 'object' }), refNode] })
-
-    expect(containsSelfRef(node, { schemaName: 'Base', resolver })).toBe(true)
-  })
-
-  test('does not infinitely recurse on circular graph', () => {
-    const node = ast.createSchema({ type: 'object', name: 'Circular' })
-    const visited = new Set([node])
-
-    expect(containsSelfRef(node, { schemaName: 'Circular', resolver, visited })).toBe(false)
   })
 })
 

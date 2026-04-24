@@ -229,6 +229,39 @@ describe('zodGenerator — Schema', () => {
     { name: 'mini wrapOutput', node: stringSchema, options: { mini: true, importPath: 'zod/mini', wrapOutput: ({ output }) => `${output}.openapi('test')` } },
   ]
 
+  // Indirect/polymorphic circular reference scenario from issue #3172:
+  // Pet (union) → Cat → Pet → ... causes runtime stack overflow without lazy getter support.
+  const petPolySchema = ast.createSchema({
+    type: 'union',
+    name: 'Pet',
+    members: [
+      ast.createSchema({ type: 'ref', name: 'Cat', ref: '#/components/schemas/Cat' }),
+      ast.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
+    ],
+  })
+
+  const catCycleSchema = ast.createSchema({
+    type: 'object',
+    name: 'Cat',
+    properties: [
+      ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
+      ast.createProperty({
+        name: 'archEnemy',
+        schema: ast.createSchema({
+          type: 'union',
+          members: [ast.createSchema({ type: 'null' }), ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+        }),
+      }),
+      ast.createProperty({
+        name: 'friends',
+        schema: ast.createSchema({
+          type: 'array',
+          items: [ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+        }),
+      }),
+    ],
+  })
+
   test.each(schemas)('$name', async (props) => {
     const options: PluginZod['resolvedOptions'] = { ...defaultOptions, ...props.options }
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
@@ -244,6 +277,29 @@ describe('zodGenerator — Schema', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+
+  test('catCycle — indirect circular ref uses getter syntax (issue #3172)', async () => {
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod })
+    const driver = createMockedPluginDriver({ name: 'catCycle' })
+
+    await renderGeneratorSchema(zodGenerator, catCycleSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter({
+        inputNode: {
+          kind: 'Input',
+          schemas: [petPolySchema, catCycleSchema],
+          operations: [],
+          meta: {},
+        },
+      }),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverZod,
+    })
+
+    await matchFiles(driver.fileManager.files, 'catCycle')
   })
 })
 

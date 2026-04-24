@@ -42,6 +42,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
+    const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
     const printerInstance = printerFaker({
       resolver,
       schemaName,
@@ -50,6 +51,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       regexGenerator,
       mapper,
       nodes: printer?.nodes,
+      cyclicSchemas,
     })
     const fakerText = printerInstance.print(schemaNode) ?? 'undefined'
     const typeReference = resolveTypeReference({
@@ -179,6 +181,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }
 
       const canOverride = canOverrideSchema(schema)
+      const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
       const printerInstance = printerFaker({
         resolver,
         schemaName: name,
@@ -187,6 +190,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         regexGenerator,
         mapper,
         nodes: printer?.nodes,
+        cyclicSchemas,
       })
       const fakerText = printerInstance.print(schema) ?? 'undefined'
       const usedImports = filterUsedImports(resolveMockImports(schema), fakerText, skipImportNames)

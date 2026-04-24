@@ -1,7 +1,7 @@
 import * as z from 'zod'
 import { petSchema } from '../petSchema.ts'
 
-export const updatePetStatus200Schema = petSchema.omit({ name: true })
+export const updatePetStatus200Schema = z.lazy(() => petSchema.omit({ name: true }))
 
 export type UpdatePetStatus200Schema = z.infer<typeof updatePetStatus200Schema>
 
@@ -33,6 +33,6 @@ export const updatePetResponseSchema = z.union([
 
 export type UpdatePetResponseSchema = z.infer<typeof updatePetResponseSchema>
 
-export const updatePetDataSchema = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+export const updatePetDataSchema = z.lazy(() => petSchema.omit({ id: true })).describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchema = z.infer<typeof updatePetDataSchema>

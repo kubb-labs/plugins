@@ -244,7 +244,7 @@ describe('printerZodMini', () => {
     })
 
     test('self-ref wraps in z.lazy()', () => {
-      const p = printerZodMini({ schemaName: 'TreeNode' })
+      const p = printerZodMini({ cyclicSchemas: new Set(['TreeNode']) })
       const node = ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
 
       expect(p.print(node)).toBe('z.lazy(() => TreeNode)')
@@ -268,7 +268,7 @@ describe('printerZodMini', () => {
     })
 
     test('object self-ref property uses getter with bare name', () => {
-      const p = printerZodMini({ schemaName: 'TreeNode' })
+      const p = printerZodMini({ cyclicSchemas: new Set(['TreeNode']) })
       const node = ast.createSchema({
         type: 'object',
         primitive: 'object',
@@ -283,6 +283,26 @@ describe('printerZodMini', () => {
       })
 
       expect(p.print(node)).toBe('z.object({\n    get "children"() { return z.optional(TreeNode) },\n    "name": z.string()\n    })')
+    })
+
+    test('object indirect-cycle property uses getter with bare schema name (no double z.lazy)', () => {
+      // Cat → Pet → Cat: Cat is not self-referencing but Pet is cyclic, so archEnemy should be a getter
+      const p = printerZodMini({ cyclicSchemas: new Set(['Cat', 'Pet']) })
+      const node = ast.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [
+          ast.createProperty({
+            name: 'archEnemy',
+            required: false,
+            schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          }),
+          ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
+        ],
+      })
+
+      // z.lazy() should be stripped inside getter (getter already defers evaluation)
+      expect(p.print(node)).toBe('z.object({\n    get "archEnemy"() { return z.optional(Pet) },\n    "name": z.string()\n    })')
     })
   })
 

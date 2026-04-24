@@ -44,13 +44,26 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 
+  // The printer emits `get prop() { ... }` for properties whose value would
+  // recurse through a circular dependency. Using object spread here would
+  // invoke those getters during construction (per ECMAScript spread semantics)
+  // and reintroduce the recursion we just deferred. Use `Object.assign` instead
+  // so the getters survive on the result object and a user override via `data`
+  // replaces them as plain data properties before they're ever read.
+  const hasGetters = /\bget\s+\w+\s*\(\s*\)\s*\{/.test(fakerText)
+
   let fakerTextWithOverride = fakerText
+  let useObjectAssignShape = false
 
   if (canOverride && isObject) {
-    fakerTextWithOverride = `{
+    if (hasGetters) {
+      useObjectAssignShape = true
+    } else {
+      fakerTextWithOverride = `{
   ...${fakerText},
   ...(data || {})
 }`
+    }
   }
 
   if (canOverride && isTuple) {
@@ -70,7 +83,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  const usesData = /\bdata\b/.test(fakerTextWithOverride)
+  const usesData = useObjectAssignShape || /\bdata\b/.test(fakerTextWithOverride)
   const dataParamName = usesData ? 'data' : '_data'
   const params = ast.createFunctionParameters({
     params: [
@@ -85,6 +98,12 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const returnType = resolvedReturnType
 
+  const body = useObjectAssignShape
+    ? `const result: ${returnType} = ${fakerText}
+if (data) Object.assign(result, data)
+return result`
+    : `return ${fakerTextWithOverride}`
+
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function
@@ -96,7 +115,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
       >
         {seed ? `faker.seed(${JSON.stringify(seed)})` : undefined}
         <br />
-        {`return ${fakerTextWithOverride}`}
+        {body}
       </Function>
     </File.Source>
   )

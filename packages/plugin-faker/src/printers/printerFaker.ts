@@ -13,6 +13,13 @@ export type PrinterFakerOptions = {
   schemaName?: string
   nestedInObject?: boolean
   nodes?: PrinterFakerNodes
+  /**
+   * Names of schemas that participate in a circular dependency chain.
+   * Properties whose schema transitively references one of these are emitted
+   * as lazy getters so that user overrides via the `data` parameter prevent
+   * the recursive faker call from ever executing (avoiding stack overflow).
+   */
+  cyclicSchemas?: ReadonlySet<string>
 }
 
 export type PrinterFakerFactory = ast.PrinterFactoryOptions<'faker', PrinterFakerOptions, string, string>
@@ -284,6 +291,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.tuple(items)
       },
       object(node): string {
+        const cyclicSchemas = this.options.cyclicSchemas
         const properties = (node.properties ?? [])
           .map((property): string => {
             if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
@@ -295,6 +303,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
                 typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
                 nestedInObject: true,
               }) ?? 'undefined'
+
+            // When the property's schema transitively references a schema that is
+            // part of a circular dependency (other than the current schema itself),
+            // emit a lazy getter. This delays the recursive faker call so a user
+            // override via `Object.assign(result, data)` can prevent it entirely.
+            if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+              return `get ${property.name}() { return ${value} }`
+            }
 
             return `"${property.name}": ${value}`
           })
