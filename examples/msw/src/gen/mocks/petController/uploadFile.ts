@@ -28,6 +28,12 @@ export function uploadFileStatus200(data?: Partial<UploadFileStatus200>): Upload
   return apiResponse(data)
 }
 
+export function uploadFileData(data?: Blob): Blob {
+  faker.seed([220])
+
+  return data ?? (faker.image.url() as unknown as Blob)
+}
+
 export function uploadFileResponse(data?: Partial<UploadFileResponse>): UploadFileResponse {
   faker.seed([220])
 

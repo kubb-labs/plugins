@@ -15,7 +15,8 @@ import { getUserByNameHandler } from './userRequests/getUserByName.ts'
 import { loginUserHandler } from './userRequests/loginUser.ts'
 import { logoutUserHandler } from './userRequests/logoutUser.ts'
 import { updateUserHandler } from './userRequests/updateUser.ts'
-import { addFilesStatus200Schema } from '../zod/petController/addFilesSchema.ts'
+import { addFilesDataSchema, addFilesStatus200Schema } from '../zod/petController/addFilesSchema.ts'
+import { addPetDataSchema } from '../zod/petController/addPetSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/petController/deletePetSchema.ts'
 import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/petController/findPetsByStatusSchema.ts'
 import {
@@ -26,25 +27,32 @@ import {
   findPetsByTagsStatus200Schema,
 } from '../zod/petController/findPetsByTagsSchema.ts'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/petController/getPetByIdSchema.ts'
-import { updatePetStatus200Schema } from '../zod/petController/updatePetSchema.ts'
+import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/petController/updatePetSchema.ts'
 import {
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,
 } from '../zod/petController/updatePetWithFormSchema.ts'
-import { uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/petController/uploadFileSchema.ts'
 import {
+  uploadFileDataSchema,
+  uploadFilePathPetIdSchema,
+  uploadFileQueryAdditionalMetadataSchema,
+  uploadFileStatus200Schema,
+} from '../zod/petController/uploadFileSchema.ts'
+import {
+  createPetsDataSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryBoolParamSchema,
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
 } from '../zod/petsController/createPetsSchema.ts'
-import { createUsersWithListInputStatus200Schema } from '../zod/userController/createUsersWithListInputSchema.ts'
+import { createUserDataSchema } from '../zod/userController/createUserSchema.ts'
+import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from '../zod/userController/createUsersWithListInputSchema.ts'
 import { deleteUserPathUsernameSchema } from '../zod/userController/deleteUserSchema.ts'
 import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from '../zod/userController/getUserByNameSchema.ts'
 import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from '../zod/userController/loginUserSchema.ts'
-import { updateUserPathUsernameSchema } from '../zod/userController/updateUserSchema.ts'
+import { updateUserDataSchema, updateUserPathUsernameSchema } from '../zod/userController/updateUserSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -62,12 +70,13 @@ server.registerTool(
     outputSchema: { data: createPetsStatus201Schema },
     inputSchema: {
       uuid: createPetsPathUuidSchema,
+      data: createPetsDataSchema,
       headers: z.object({ xEXAMPLE: createPetsHeaderXEXAMPLESchema }),
       params: z.object({ boolParam: createPetsQueryBoolParamSchema, offset: createPetsQueryOffsetSchema }),
     },
   },
-  async ({ uuid, headers, params }) => {
-    return createPetsHandler({ uuid, headers, params })
+  async ({ uuid, data, headers, params }) => {
+    return createPetsHandler({ uuid, data, headers, params })
   },
 )
 
@@ -77,9 +86,10 @@ server.registerTool(
     title: 'Update an existing pet',
     description: 'Update an existing pet by Id',
     outputSchema: { data: updatePetStatus200Schema },
+    inputSchema: { data: updatePetDataSchema },
   },
-  async () => {
-    return updatePetHandler()
+  async ({ data }) => {
+    return updatePetHandler({ data })
   },
 )
 
@@ -88,9 +98,10 @@ server.registerTool(
   {
     title: 'Add a new pet to the store',
     description: 'Add a new pet to the store',
+    inputSchema: { data: addPetDataSchema },
   },
-  async () => {
-    return addPetHandler()
+  async ({ data }) => {
+    return addPetHandler({ data })
   },
 )
 
@@ -169,9 +180,10 @@ server.registerTool(
     title: 'Place an file for a pet',
     description: 'Place a new file in the store',
     outputSchema: { data: addFilesStatus200Schema },
+    inputSchema: { data: addFilesDataSchema },
   },
-  async () => {
-    return addFilesHandler()
+  async ({ data }) => {
+    return addFilesHandler({ data })
   },
 )
 
@@ -181,10 +193,14 @@ server.registerTool(
     title: 'uploads an image',
     description: 'Make a POST request to /pet/{petId}/uploadImage',
     outputSchema: { data: uploadFileStatus200Schema },
-    inputSchema: { petId: uploadFilePathPetIdSchema, params: z.object({ additionalMetadata: uploadFileQueryAdditionalMetadataSchema }) },
+    inputSchema: {
+      petId: uploadFilePathPetIdSchema,
+      data: uploadFileDataSchema,
+      params: z.object({ additionalMetadata: uploadFileQueryAdditionalMetadataSchema }),
+    },
   },
-  async ({ petId, params }) => {
-    return uploadFileHandler({ petId, params })
+  async ({ petId, data, params }) => {
+    return uploadFileHandler({ petId, data, params })
   },
 )
 
@@ -193,9 +209,10 @@ server.registerTool(
   {
     title: 'Create user',
     description: 'This can only be done by the logged in user.',
+    inputSchema: { data: createUserDataSchema },
   },
-  async () => {
-    return createUserHandler()
+  async ({ data }) => {
+    return createUserHandler({ data })
   },
 )
 
@@ -205,9 +222,10 @@ server.registerTool(
     title: 'Creates list of users with given input array',
     description: 'Creates list of users with given input array',
     outputSchema: { data: createUsersWithListInputStatus200Schema },
+    inputSchema: { data: createUsersWithListInputDataSchema },
   },
-  async () => {
-    return createUsersWithListInputHandler()
+  async ({ data }) => {
+    return createUsersWithListInputHandler({ data })
   },
 )
 
@@ -253,10 +271,10 @@ server.registerTool(
   {
     title: 'Update user',
     description: 'This can only be done by the logged in user.',
-    inputSchema: { username: updateUserPathUsernameSchema },
+    inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
   },
-  async ({ username }) => {
-    return updateUserHandler({ username })
+  async ({ username, data }) => {
+    return updateUserHandler({ username, data })
   },
 )
 

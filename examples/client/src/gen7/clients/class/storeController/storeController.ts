@@ -9,8 +9,8 @@ import type {
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from '../../../models/ts/storeController/GetOrderById.ts'
-import type { PlaceOrderResponse, PlaceOrderStatus405 } from '../../../models/ts/storeController/PlaceOrder.ts'
-import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/ts/storeController/PlaceOrderPatch.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../../models/ts/storeController/PlaceOrder.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/ts/storeController/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
@@ -37,9 +37,15 @@ export class storeController {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-  async placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, unknown>({ ...requestConfig, method: 'POST', url: `/store/order` })
+    const requestData = data
+    const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
+      ...requestConfig,
+      method: 'POST',
+      url: `/store/order`,
+      data: requestData,
+    })
     return res.data
   }
 
@@ -48,12 +54,14 @@ export class storeController {
    * @summary Place an order for a pet with patch
    * {@link /store/order}
    */
-  async placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, unknown>({
+    const requestData = data
+    const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
       ...requestConfig,
       method: 'PATCH',
       url: `/store/order`,
+      data: requestData,
     })
     return res.data
   }

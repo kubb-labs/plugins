@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { UpdateUserResponse, UpdateUserPathUsername } from '../../models/UpdateUser.ts'
+import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../models/UpdateUser.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { fetch } from '../../.kubb/fetch.ts'
@@ -20,20 +20,27 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function updateUserHook(
   { username }: { username: UpdateUserPathUsername },
   data?: UpdateUserData,
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'PUT', url: `/user/${username}`, ...requestConfig })
+  const requestData = data
+
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
+    method: 'PUT',
+    url: `/user/${username}`,
+    data: requestData,
+    ...requestConfig,
+  })
 
   return res.data
 }
 
-export function updateUserMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function updateUserMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
   const mutationKey = updateUserMutationKey()
-  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>({
+  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>({
     mutationKey,
-    mutationFn: async ({ username }) => {
+    mutationFn: async ({ username, data }) => {
       return updateUserHook({ username }, data, config)
     },
   })
@@ -46,8 +53,10 @@ export function updateUserMutationOptionsHook<TContext = unknown>(config: Partia
  */
 export function useUpdateUserHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext> & {
+      client?: QueryClient
+    }
+    client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -57,17 +66,17 @@ export function useUpdateUserHook<TContext>(
   const baseOptions = updateUserMutationOptionsHook(config) as UseMutationOptions<
     UpdateUserResponse,
     ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername },
+    { username: UpdateUserPathUsername; data?: UpdateUserData },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useUpdateUserHook', operationId: 'updateUser' }) as UseMutationOptions<
     UpdateUserResponse,
     ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername },
+    { username: UpdateUserPathUsername; data?: UpdateUserData },
     TContext
   >
 
-  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>(
+  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -75,5 +84,5 @@ export function useUpdateUserHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername }, TContext>
+  ) as UseMutationResult<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>
 }

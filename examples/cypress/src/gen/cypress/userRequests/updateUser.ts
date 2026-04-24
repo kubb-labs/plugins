@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdateUserPathUsername, UpdateUserResponse } from '../../models.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../models.ts'
 
 export function updateUser(
   username: UpdateUserPathUsername,
@@ -14,6 +14,7 @@ export function updateUser(
     .request<UpdateUserResponse>({
       method: 'PUT',
       url: `http://localhost:3000/user/${username}`,
+      body: data,
       ...options,
     })
     .then((res) => res.body)

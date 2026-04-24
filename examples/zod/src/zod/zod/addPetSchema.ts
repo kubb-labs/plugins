@@ -4,6 +4,7 @@
  */
 
 import { z } from '../../zod.ts'
+import { addPetRequestSchema } from './addPetRequestSchema.ts'
 import { petSchema } from './petSchema.ts'
 
 export const addPetStatus200Schema = petSchema
@@ -20,3 +21,7 @@ export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
 export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
+
+export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
+
+export type AddPetDataSchema = z.infer<typeof addPetDataSchema>

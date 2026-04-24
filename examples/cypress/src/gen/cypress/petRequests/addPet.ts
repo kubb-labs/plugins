@@ -3,13 +3,14 @@
  * Do not edit manually.
  */
 
-import type { AddPetResponse } from '../../models.ts'
+import type { AddPetData, AddPetResponse } from '../../models.ts'
 
 export function addPet(data: AddPetData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetResponse> {
   return cy
     .request<AddPetResponse>({
       method: 'POST',
       url: `http://localhost:3000/pet`,
+      body: data,
       ...options,
     })
     .then((res) => res.body)

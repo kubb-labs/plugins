@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { userSchema } from '../userSchema.ts'
 
 export const updateUserPathUsernameSchema = z.string().describe('name that need to be deleted')
 
@@ -11,3 +12,7 @@ export type UpdateUserStatusDefaultSchema = z.infer<typeof updateUserStatusDefau
 export const updateUserResponseSchema = updateUserStatusDefaultSchema
 
 export type UpdateUserResponseSchema = z.infer<typeof updateUserResponseSchema>
+
+export const updateUserDataSchema = userSchema.optional().describe('Update an existent user in the store')
+
+export type UpdateUserDataSchema = z.infer<typeof updateUserDataSchema>

@@ -3,7 +3,11 @@
  * Do not edit manually.
  */
 
-import type { CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from '../../models/CreateUsersWithListInput.ts'
+import type {
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputResponse,
+  CreateUsersWithListInputStatus200,
+} from '../../models/CreateUsersWithListInput.ts'
 import { user } from '../user.ts'
 import { faker } from '@faker-js/faker'
 
@@ -23,6 +27,12 @@ export function createUsersWithListInputStatusDefault() {
   faker.seed([220])
 
   return undefined
+}
+
+export function createUsersWithListInputData(data?: CreateUsersWithListInputData): CreateUsersWithListInputData {
+  faker.seed([220])
+
+  return [...faker.helpers.multiple(() => user()), ...(data || [])]
 }
 
 export function createUsersWithListInputResponse(_data?: CreateUsersWithListInputResponse): CreateUsersWithListInputResponse {

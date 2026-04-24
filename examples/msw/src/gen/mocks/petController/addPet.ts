@@ -3,7 +3,8 @@
  * Do not edit manually.
  */
 
-import type { AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
+import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
+import { addPetRequest } from '../addPetRequest.ts'
 import { pet } from '../pet.ts'
 import { faker } from '@faker-js/faker'
 
@@ -26,6 +27,15 @@ export function addPetStatus405(data?: Partial<AddPetStatus405>): AddPetStatus40
     ...{ code: faker.number.int(), message: faker.string.alpha() },
     ...(data || {}),
   }
+}
+
+/**
+ * @description Create a new pet in the store
+ */
+export function addPetData(data?: Partial<AddPetData>): AddPetData {
+  faker.seed([220])
+
+  return addPetRequest(data)
 }
 
 export function addPetResponse(_data?: AddPetResponse): AddPetResponse {

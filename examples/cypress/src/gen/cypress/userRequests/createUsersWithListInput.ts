@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreateUsersWithListInputResponse } from '../../models.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../models.ts'
 
 export function createUsersWithListInput(
   data?: CreateUsersWithListInputData,
@@ -13,6 +13,7 @@ export function createUsersWithListInput(
     .request<CreateUsersWithListInputResponse>({
       method: 'POST',
       url: `http://localhost:3000/user/createWithList`,
+      body: data,
       ...options,
     })
     .then((res) => res.body)

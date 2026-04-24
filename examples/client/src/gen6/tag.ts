@@ -7,8 +7,8 @@ import fetch from '@kubb/plugin-client/clients/axios'
 import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/storeController/DeleteOrder.ts'
 import type { GetInventoryResponse } from './models/ts/storeController/GetInventory.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/storeController/GetOrderById.ts'
-import type { PlaceOrderResponse, PlaceOrderStatus405 } from './models/ts/storeController/PlaceOrder.ts'
-import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models/ts/storeController/PlaceOrderPatch.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from './models/ts/storeController/PlaceOrder.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models/ts/storeController/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getGetInventoryUrl() {
@@ -45,12 +45,15 @@ function getPlaceOrderUrl() {
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, unknown>({
+  const requestData = data
+
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: getPlaceOrderUrl().url.toString(),
+    data: requestData,
     ...requestConfig,
   })
 
@@ -68,12 +71,15 @@ function getPlaceOrderPatchUrl() {
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, unknown>({
+  const requestData = data
+
+  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: getPlaceOrderPatchUrl().url.toString(),
+    data: requestData,
     ...requestConfig,
   })
 

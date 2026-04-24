@@ -1,4 +1,4 @@
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../models/ts/petController/UploadFile.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../models/ts/petController/UploadFile.ts'
 
 export function uploadFile(
   petId: UploadFilePathPetId,
@@ -11,6 +11,7 @@ export function uploadFile(
       method: 'POST',
       url: `/pet/${petId}/uploadImage`,
       qs: params,
+      body: data,
       ...options,
     })
     .then((res) => res.body)

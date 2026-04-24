@@ -8,3 +8,5 @@ import { userSchema } from './userSchema.js'
 export const createUserStatusDefaultSchema = userSchema
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
+
+export const createUserDataSchema = userSchema.optional().describe('Created user object')
