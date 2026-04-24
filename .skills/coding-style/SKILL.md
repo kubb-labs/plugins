@@ -48,7 +48,7 @@ Follow the PR checklist and run the commands above in the same order: **format â
 
 - **Monorepo**: Managed by pnpm workspaces and Turborepo
 - **Module system**: ESM-only (`type: "module"` across repo)
-- **Node version**: 20
+- **Node version**: 22
 - **Testing Library**: Vitest
 - **Versioning**: Changesets for versioning and publishing
 - **CI/CD**: GitHub Actions
@@ -63,12 +63,12 @@ Follow the PR checklist and run the commands above in the same order: **format â
 
 ### Naming Conventions
 
-| Element / Context       | Naming convention |
-| ----------------------: | :---------------- |
-| File / directory names  | `camelCase`       |
-| Variables / functions   | `camelCase`       |
-| Types / Interfaces      | `PascalCase`      |
-| React components        | `PascalCase`      |
+|      Element / Context | Naming convention |
+| ---------------------: | :---------------- |
+| File / directory names | `camelCase`       |
+|  Variables / functions | `camelCase`       |
+|     Types / Interfaces | `PascalCase`      |
+|       React components | `PascalCase`      |
 
 ### TypeScript Conventions
 
@@ -102,9 +102,11 @@ Follow the PR checklist and run the commands above in the same order: **format â
 Follow these steps when creating a PR:
 
 1. Make sure that the following commands pass locally:
-  - `pnpm format && pnpm lint`
-  - `pnpm typecheck`
-  - `pnpm test`
+
+- `pnpm format && pnpm lint`
+- `pnpm typecheck`
+- `pnpm test`
+
 2. Create a git commit with **Title format**: `[<plugin-name>] <Title>`
 3. Push your branch and open a PR against `main`
 4. Fill out the PR template completely
@@ -115,6 +117,6 @@ Follow these steps when creating a PR:
 
 ## Related Skills
 
-| Skill                                   | Use For             |
-|-----------------------------------------|---------------------|
+| Skill                                              | Use For                                                                |
+| -------------------------------------------------- | ---------------------------------------------------------------------- |
 | **[../changelog/SKILL.md](../changelog/SKILL.md)** | Update changelogs, **Mandatory for all PRs that include code changes** |
