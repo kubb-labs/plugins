@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetResponse, UpdatePetStatus200 } from '../../models/UpdatePet.ts'
+import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200 } from '../../models/UpdatePet.ts'
 import { pet } from '../pet.ts'
 import { faker } from '@faker-js/faker'
 
@@ -41,6 +41,15 @@ export function updatePetStatus405() {
   faker.seed([220])
 
   return undefined
+}
+
+/**
+ * @description Update an existent pet in the store
+ */
+export function updatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
+  faker.seed([220])
+
+  return pet(data)
 }
 
 export function updatePetResponse(_data?: UpdatePetResponse): UpdatePetResponse {

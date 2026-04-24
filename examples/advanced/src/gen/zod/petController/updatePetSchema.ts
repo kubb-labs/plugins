@@ -32,3 +32,7 @@ export const updatePetResponseSchema = z.union([
 ])
 
 export type UpdatePetResponseSchema = z.infer<typeof updatePetResponseSchema>
+
+export const updatePetDataSchema = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+
+export type UpdatePetDataSchema = z.infer<typeof updatePetDataSchema>

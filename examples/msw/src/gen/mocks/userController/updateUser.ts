@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
+import type { UpdateUserData } from '../../models/UpdateUser.ts'
+import { user } from '../user.ts'
 import { faker } from '@faker-js/faker'
 
 export function updateUserPathUsername(data?: string): string {
@@ -18,6 +20,15 @@ export function updateUserStatusDefault() {
   faker.seed([220])
 
   return undefined
+}
+
+/**
+ * @description Update an existent user in the store
+ */
+export function updateUserData(data?: Partial<UpdateUserData>): UpdateUserData {
+  faker.seed([220])
+
+  return user(data)
 }
 
 export function updateUserResponse() {

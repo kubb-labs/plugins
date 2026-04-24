@@ -330,10 +330,16 @@ export type UpdatePetStatus404 = any
 export type UpdatePetStatus405 = any
 
 /**
+ * @description Update an existent pet in the store
+ * @type object
+ */
+export type UpdatePetData = Pet
+
+/**
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  data?: never
+  data?: UpdatePetData
   pathParams?: never
   queryParams?: never
   headerParams?: never
@@ -378,10 +384,16 @@ export type AddPetStatus405 = {
 }
 
 /**
+ * @description Create a new pet in the store
+ * @type object
+ */
+export type AddPetData = AddPetRequest
+
+/**
  * @type object
  */
 export type AddPetRequestConfig = {
-  data?: never
+  data?: AddPetData
   pathParams?: never
   queryParams?: never
   headerParams?: never
@@ -699,10 +711,15 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 export type UploadFileStatus200 = ApiResponse
 
 /**
+ * @type string | undefined
+ */
+export type UploadFileData = Blob | undefined
+
+/**
  * @type object
  */
 export type UploadFileRequestConfig = {
-  data?: never
+  data?: UploadFileData
   /**
    * @type object
    */
@@ -778,10 +795,15 @@ export type PlaceOrderStatus200 = Order
 export type PlaceOrderStatus405 = any
 
 /**
+ * @type object | undefined
+ */
+export type PlaceOrderData = Order | undefined
+
+/**
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  data?: never
+  data?: PlaceOrderData
   pathParams?: never
   queryParams?: never
   headerParams?: never
@@ -815,10 +837,15 @@ export type PlaceOrderPatchStatus200 = Order
 export type PlaceOrderPatchStatus405 = any
 
 /**
+ * @type object | undefined
+ */
+export type PlaceOrderPatchData = Order | undefined
+
+/**
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  data?: never
+  data?: PlaceOrderPatchData
   pathParams?: never
   queryParams?: never
   headerParams?: never
@@ -946,10 +973,15 @@ export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
 export type CreateUserStatusDefault = User
 
 /**
+ * @description Created user object
+ */
+export type CreateUserData = User | undefined
+
+/**
  * @type object
  */
 export type CreateUserRequestConfig = {
-  data?: never
+  data?: CreateUserData
   pathParams?: never
   queryParams?: never
   headerParams?: never
@@ -979,10 +1011,15 @@ export type CreateUsersWithListInputStatus200 = User
 export type CreateUsersWithListInputStatusDefault = any
 
 /**
+ * @type array | undefined
+ */
+export type CreateUsersWithListInputData = User[] | undefined
+
+/**
  * @type object
  */
 export type CreateUsersWithListInputRequestConfig = {
-  data?: never
+  data?: CreateUsersWithListInputData
   pathParams?: never
   queryParams?: never
   headerParams?: never
@@ -1154,10 +1191,15 @@ export type UpdateUserPathUsername = string
 export type UpdateUserStatusDefault = any
 
 /**
+ * @description Update an existent user in the store
+ */
+export type UpdateUserData = User | undefined
+
+/**
  * @type object
  */
 export type UpdateUserRequestConfig = {
-  data?: never
+  data?: UpdateUserData
   /**
    * @type object
    */

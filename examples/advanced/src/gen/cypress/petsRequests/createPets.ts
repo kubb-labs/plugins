@@ -3,6 +3,7 @@ import type {
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
   CreatePetsHeaderXEXAMPLE,
+  CreatePetsData,
   CreatePetsResponse,
 } from '../../models/ts/petsController/CreatePets.ts'
 
@@ -19,6 +20,7 @@ export function createPets(
       url: `/pets/${uuid}`,
       qs: params ? { bool_param: params.boolParam, offset: params.offset } : undefined,
       headers: headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined,
+      body: data,
       ...options,
     })
     .then((res) => res.body)

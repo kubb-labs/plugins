@@ -11,3 +11,5 @@ export const addFilesStatus200Schema = petSchema.omit({ name: true })
 export const addFilesStatus405Schema = z.any()
 
 export const addFilesResponseSchema = z.union([addFilesStatus200Schema, addFilesStatus405Schema])
+
+export const addFilesDataSchema = petSchema.omit({ id: true }).optional()

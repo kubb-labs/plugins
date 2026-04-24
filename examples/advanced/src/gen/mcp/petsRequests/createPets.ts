@@ -1,5 +1,6 @@
 import fetch from '@kubb/plugin-client/clients/axios'
 import type {
+  CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
@@ -28,11 +29,14 @@ export async function createPetsHandler({
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await fetch<CreatePetsResponse, ResponseErrorConfig<Error>, unknown>({
+  const requestData = data
+
+  const res = await fetch<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: `/pets/${uuid}`,
     baseURL: `https://petstore.swagger.io/v2`,
     params: mappedParams,
+    data: requestData,
     headers: { ...mappedHeaders },
   })
 

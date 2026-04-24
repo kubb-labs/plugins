@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderResponse, PlaceOrderStatus200 } from '../../models/PlaceOrder.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200 } from '../../models/PlaceOrder.ts'
 import { order } from '../order.ts'
 import { faker } from '@faker-js/faker'
 
@@ -23,6 +23,12 @@ export function placeOrderStatus405() {
   faker.seed([220])
 
   return undefined
+}
+
+export function placeOrderData(data?: Partial<PlaceOrderData>): PlaceOrderData {
+  faker.seed([220])
+
+  return order(data)
 }
 
 export function placeOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {

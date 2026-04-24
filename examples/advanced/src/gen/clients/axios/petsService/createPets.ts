@@ -5,9 +5,10 @@ import type {
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
   CreatePetsHeaderXEXAMPLE,
+  CreatePetsData,
   CreatePetsResponse,
 } from '../../../models/ts/petsController/CreatePets.ts'
-import { createPetsResponseSchema } from '../../../zod/petsController/createPetsSchema.ts'
+import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/petsController/createPetsSchema.ts'
 
 export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathUuid }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${uuid}` as const }
@@ -31,7 +32,7 @@ export async function createPets(
     headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
     params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
   },
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
@@ -39,10 +40,13 @@ export async function createPets(
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await request<CreatePetsResponse, ResponseErrorConfig<Error>, unknown>({
+  const requestData = createPetsDataSchema.parse(data)
+
+  const res = await request<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,
+    data: requestData,
     ...requestConfig,
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })

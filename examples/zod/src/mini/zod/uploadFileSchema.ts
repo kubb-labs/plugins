@@ -13,3 +13,5 @@ export const uploadFileQueryAdditionalMetadataSchema = z.optional(z.string())
 export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
+
+export const uploadFileDataSchema = z.optional(z.instanceof(File))

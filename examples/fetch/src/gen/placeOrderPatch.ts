@@ -4,7 +4,7 @@
  */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getPlaceOrderPatchUrl() {
@@ -18,12 +18,15 @@ function getPlaceOrderPatchUrl() {
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, unknown>({
+  const requestData = data
+
+  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: getPlaceOrderPatchUrl().url.toString(),
+    data: requestData,
     ...requestConfig,
   })
 
