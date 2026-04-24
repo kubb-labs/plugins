@@ -7,8 +7,8 @@ import fetch from '@kubb/plugin-client/clients/axios'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/storeController/DeleteOrder.ts'
 import type { GetInventoryResponse } from './models/ts/storeController/GetInventory.ts'
 import type { GetOrderByIdResponse, GetOrderByIdPathOrderId, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/storeController/GetOrderById.ts'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from './models/ts/storeController/PlaceOrder.ts'
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models/ts/storeController/PlaceOrderPatch.ts'
+import type { PlaceOrderResponse, PlaceOrderStatus405 } from './models/ts/storeController/PlaceOrder.ts'
+import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from './models/ts/storeController/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 /**
@@ -37,17 +37,10 @@ getInventory.queryParams = {} as never
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
-    method: 'POST',
-    url: `/store/order`,
-    data: requestData,
-    ...requestConfig,
-  })
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, unknown>({ method: 'POST', url: `/store/order`, ...requestConfig })
 
   return res
 }
@@ -55,7 +48,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 placeOrder.method = 'POST' as const
 placeOrder.url = '/store/order' as const
 placeOrder.operationId = 'placeOrder' as const
-placeOrder.request = {} as PlaceOrderData
+placeOrder.request = {} as never
 placeOrder.response = {} as PlaceOrderResponse
 placeOrder.pathParams = {} as never
 placeOrder.queryParams = {} as never
@@ -65,15 +58,12 @@ placeOrder.queryParams = {} as never
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
+export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
+  const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, unknown>({
     method: 'PATCH',
     url: `/store/order`,
-    data: requestData,
     ...requestConfig,
   })
 
@@ -83,7 +73,7 @@ export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partia
 placeOrderPatch.method = 'PATCH' as const
 placeOrderPatch.url = '/store/order' as const
 placeOrderPatch.operationId = 'placeOrderPatch' as const
-placeOrderPatch.request = {} as PlaceOrderPatchData
+placeOrderPatch.request = {} as never
 placeOrderPatch.response = {} as PlaceOrderPatchResponse
 placeOrderPatch.pathParams = {} as never
 placeOrderPatch.queryParams = {} as never

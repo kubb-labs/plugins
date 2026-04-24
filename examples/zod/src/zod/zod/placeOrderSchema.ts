@@ -17,7 +17,3 @@ export type PlaceOrderStatus405Schema = z.infer<typeof placeOrderStatus405Schema
 export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
 export type PlaceOrderResponseSchema = z.infer<typeof placeOrderResponseSchema>
-
-export const placeOrderDataSchema = orderSchema.optional()
-
-export type PlaceOrderDataSchema = z.infer<typeof placeOrderDataSchema>

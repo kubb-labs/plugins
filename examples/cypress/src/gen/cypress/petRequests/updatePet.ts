@@ -3,14 +3,13 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetData, UpdatePetResponse } from '../../models.ts'
+import type { UpdatePetResponse } from '../../models.ts'
 
 export function updatePet(data: UpdatePetData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
   return cy
     .request<UpdatePetResponse>({
       method: 'PUT',
       url: `http://localhost:3000/pet`,
-      body: data,
       ...options,
     })
     .then((res) => res.body)

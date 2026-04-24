@@ -8,7 +8,3 @@ export type CreateUserStatusDefaultSchema = z.infer<typeof createUserStatusDefau
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
 export type CreateUserResponseSchema = z.infer<typeof createUserResponseSchema>
-
-export const createUserDataSchema = userSchema.optional().describe('Created user object')
-
-export type CreateUserDataSchema = z.infer<typeof createUserDataSchema>

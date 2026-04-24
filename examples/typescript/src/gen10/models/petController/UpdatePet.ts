@@ -23,15 +23,10 @@ export type UpdatePetStatus404 = any
 export type UpdatePetStatus405 = any
 
 /**
- * @description Update an existent pet in the store
- */
-export type UpdatePetData = Omit<NonNullable<Pet>, 'type' | 'tags'>
-
-/**
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  data?: UpdatePetData
+  data?: never
   pathParams?: never
   queryParams?: never
   headerParams?: never

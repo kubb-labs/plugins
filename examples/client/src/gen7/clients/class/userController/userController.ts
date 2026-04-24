@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
+import type { CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
 import type {
   GetUserByNameResponse,
@@ -12,7 +12,7 @@ import type {
 } from '../../../models/ts/userController/GetUserByName.ts'
 import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
 import type { LogoutUserResponse } from '../../../models/ts/userController/LogoutUser.ts'
-import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../../models/ts/userController/UpdateUser.ts'
+import type { UpdateUserResponse, UpdateUserPathUsername } from '../../../models/ts/userController/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
@@ -28,15 +28,9 @@ export class userController {
    * @summary Create user
    * {@link /user}
    */
-  async createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+  async createUser(data?: CreateUserData, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/user`,
-      data: requestData,
-    })
+    const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'POST', url: `/user` })
     return res.data
   }
 
@@ -45,14 +39,12 @@ export class userController {
    * @summary Creates list of users with given input array
    * {@link /user/createWithList}
    */
-  async createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
+  async createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+    const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, unknown>({
       ...requestConfig,
       method: 'POST',
       url: `/user/createWithList`,
-      data: requestData,
     })
     return res.data
   }
@@ -104,19 +96,9 @@ export class userController {
    * @summary Update user
    * {@link /user/:username}
    */
-  async updateUser(
-    { username }: { username: UpdateUserPathUsername },
-    data?: UpdateUserData,
-    config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
-  ) {
+  async updateUser({ username }: { username: UpdateUserPathUsername }, data?: UpdateUserData, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
-      ...requestConfig,
-      method: 'PUT',
-      url: `/user/${username}`,
-      data: requestData,
-    })
+    const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'PUT', url: `/user/${username}` })
     return res.data
   }
 

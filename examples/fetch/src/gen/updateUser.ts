@@ -4,7 +4,7 @@
  */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from './models.ts'
+import type { UpdateUserPathUsername, UpdateUserResponse } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
@@ -18,19 +18,12 @@ function getUpdateUserUrl(username: UpdateUserPathUsername) {
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser(
-  username: UpdateUserPathUsername,
-  data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
-) {
+export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const requestData = data
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'PUT',
     url: getUpdateUserUrl(username).url.toString(),
-    data: requestData,
     ...requestConfig,
   })
 
