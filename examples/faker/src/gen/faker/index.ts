@@ -1,12 +1,18 @@
-export * from './address.ts'
-export * from './apiResponse.ts'
-export * from './category.ts'
-export * from './customer.ts'
-export * from './item.ts'
-export * from './order.ts'
-export * from './pet.ts'
-export * from './tag.ts'
-export * from './updatePet.ts'
-export * from './updatePetWithForm.ts'
-export * from './user.ts'
-export * from './userArray.ts'
+export { address } from './address.ts'
+export { apiResponse } from './apiResponse.ts'
+export { category } from './category.ts'
+export { customer } from './customer.ts'
+export { item } from './item.ts'
+export { order } from './order.ts'
+export { pet } from './pet.ts'
+export { tag } from './tag.ts'
+export { updatePetStatus200, updatePetStatus400, updatePetStatus404, updatePetStatus405, updatePetData, updatePetResponse } from './updatePet.ts'
+export {
+  updatePetWithFormPathPetId,
+  updatePetWithFormQueryName,
+  updatePetWithFormQueryStatus,
+  updatePetWithFormStatus405,
+  updatePetWithFormResponse,
+} from './updatePetWithForm.ts'
+export { user } from './user.ts'
+export { userArray } from './userArray.ts'
