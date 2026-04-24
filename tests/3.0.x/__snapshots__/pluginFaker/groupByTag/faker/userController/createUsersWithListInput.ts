@@ -19,7 +19,6 @@ export function createUsersWithListInputStatus200(data?: Partial<CreateUsersWith
  * @description successful operation
  */
 export function createUsersWithListInputStatusDefault() {
-
   return undefined
 }
 

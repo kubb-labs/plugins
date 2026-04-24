@@ -5,9 +5,8 @@
 
 import { faker } from '@faker-js/faker'
 
-export function node(data?: Partial<Node>): Node {
-  return {
-    ...{ id: faker.string.alpha(), children: faker.helpers.multiple(() => undefined as any) },
-    ...(data || {}),
-  }
+export function node(data?: Partial<Node>): typeof _defaults & Omit<Node, keyof typeof _defaults> {
+  const _defaults = { id: faker.string.alpha(), children: faker.helpers.multiple(() => undefined as any) }
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Node, keyof typeof _defaults>
+  return result
 }

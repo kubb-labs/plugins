@@ -19,7 +19,6 @@ export function placeOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceO
  * @description Invalid input
  */
 export function placeOrderStatus405() {
-
   return undefined
 }
 

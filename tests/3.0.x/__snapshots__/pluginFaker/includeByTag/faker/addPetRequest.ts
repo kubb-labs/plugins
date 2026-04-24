@@ -8,10 +8,8 @@ import { category } from "./category.ts";
 import { tag } from "./tag.ts";
 import { faker } from "@faker-js/faker";
 
-export function addPetRequest(data?: Partial<AddPetRequest>): AddPetRequest {
-
-  return {
-    ...{"id": faker.number.int(),"name": faker.string.alpha(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])},
-    ...(data || {})
-  }
+export function addPetRequest(data?: Partial<AddPetRequest>): typeof _defaults & Omit<AddPetRequest, keyof typeof _defaults> {
+  const _defaults = {"id": faker.number.int(),"name": faker.string.alpha(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])}
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<AddPetRequest, keyof typeof _defaults>
+  return result
 }

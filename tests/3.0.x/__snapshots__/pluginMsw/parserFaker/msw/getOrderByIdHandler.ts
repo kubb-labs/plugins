@@ -8,7 +8,6 @@ import { getOrderByIdResponse } from "../faker/getOrderById.ts";
 import { http } from "msw";
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
-
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -18,7 +17,6 @@ export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
 }
 
 export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
-
       return new Response(JSON.stringify(data), {
         status: 400,
 
@@ -26,7 +24,6 @@ export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
 }
 
 export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
-
       return new Response(JSON.stringify(data), {
         status: 404,
 

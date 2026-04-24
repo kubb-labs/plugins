@@ -24,11 +24,9 @@ export function updatePetWithFormQueryStatus(data?: string): string {
  * @description Invalid input
  */
 export function updatePetWithFormStatus405() {
-
   return undefined
 }
 
 export function updatePetWithFormResponse() {
-
   return undefined
 }

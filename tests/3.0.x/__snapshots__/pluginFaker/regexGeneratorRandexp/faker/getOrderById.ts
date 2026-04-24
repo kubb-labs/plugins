@@ -24,7 +24,6 @@ export function getOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): Ge
  * @description Invalid ID supplied
  */
 export function getOrderByIdStatus400() {
-
   return undefined
 }
 
@@ -32,7 +31,6 @@ export function getOrderByIdStatus400() {
  * @description Order not found
  */
 export function getOrderByIdStatus404() {
-
   return undefined
 }
 

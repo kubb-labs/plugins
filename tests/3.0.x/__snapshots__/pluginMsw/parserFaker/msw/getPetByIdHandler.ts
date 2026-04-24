@@ -8,7 +8,6 @@ import { getPetByIdResponse } from "../faker/getPetById.ts";
 import { http } from "msw";
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
-
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -18,7 +17,6 @@ export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
 }
 
 export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
-
       return new Response(JSON.stringify(data), {
         status: 400,
 
@@ -26,7 +24,6 @@ export function getPetByIdHandlerResponse400(data?: GetPetByIdStatus400) {
 }
 
 export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
-
       return new Response(JSON.stringify(data), {
         status: 404,
 

@@ -24,7 +24,6 @@ export function getPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPet
  * @description Invalid ID supplied
  */
 export function getPetByIdStatus400() {
-
   return undefined
 }
 
@@ -32,7 +31,6 @@ export function getPetByIdStatus400() {
  * @description Pet not found
  */
 export function getPetByIdStatus404() {
-
   return undefined
 }
 

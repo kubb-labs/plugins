@@ -8,7 +8,6 @@ import { createUsersWithListInputResponse } from "../faker/createUsersWithListIn
 import { http } from "msw";
 
 export function createUsersWithListInputHandlerResponse200(data: CreateUsersWithListInputResponse) {
-
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {

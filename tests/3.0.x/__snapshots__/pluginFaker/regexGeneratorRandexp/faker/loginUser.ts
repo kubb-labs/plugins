@@ -28,7 +28,6 @@ export function loginUserStatus200(data?: string): string {
  * @description Invalid username/password supplied
  */
 export function loginUserStatus400() {
-
   return undefined
 }
 

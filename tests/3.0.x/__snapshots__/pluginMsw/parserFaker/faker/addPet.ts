@@ -20,7 +20,6 @@ export function addPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus20
  * @description Invalid input
  */
 export function addPetStatus405() {
-
   return undefined
 }
 

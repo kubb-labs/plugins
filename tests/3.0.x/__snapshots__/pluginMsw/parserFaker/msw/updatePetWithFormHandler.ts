@@ -7,7 +7,6 @@ import type { UpdatePetWithFormStatus405 } from "../types/UpdatePetWithForm.ts";
 import { http } from "msw";
 
 export function updatePetWithFormHandlerResponse405(data?: UpdatePetWithFormStatus405) {
-
       return new Response(JSON.stringify(data), {
         status: 405,
 

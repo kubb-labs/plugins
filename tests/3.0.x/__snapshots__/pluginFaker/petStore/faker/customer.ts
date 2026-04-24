@@ -7,10 +7,8 @@ import type { Customer } from "../types/Customer.ts";
 import { address } from "./address.ts";
 import { faker } from "@faker-js/faker";
 
-export function customer(data?: Partial<Customer>): Customer {
-
-  return {
-    ...{"id": faker.number.int(),"username": faker.string.alpha(),"address": faker.helpers.multiple(() => (address()))},
-    ...(data || {})
-  }
+export function customer(data?: Partial<Customer>): typeof _defaults & Omit<Customer, keyof typeof _defaults> {
+  const _defaults = {"id": faker.number.int(),"username": faker.string.alpha(),"address": faker.helpers.multiple(() => (address()))}
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Customer, keyof typeof _defaults>
+  return result
 }

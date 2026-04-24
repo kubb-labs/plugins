@@ -6,10 +6,8 @@
 import type { ApiResponse } from "../types/ApiResponse.ts";
 import { faker } from "@faker-js/faker";
 
-export function apiResponse(data?: Partial<ApiResponse>): ApiResponse {
-
-  return {
-    ...{"code": faker.number.int(),"type": faker.string.alpha(),"message": faker.string.alpha()},
-    ...(data || {})
-  }
+export function apiResponse(data?: Partial<ApiResponse>): typeof _defaults & Omit<ApiResponse, keyof typeof _defaults> {
+  const _defaults = {"code": faker.number.int(),"type": faker.string.alpha(),"message": faker.string.alpha()}
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<ApiResponse, keyof typeof _defaults>
+  return result
 }

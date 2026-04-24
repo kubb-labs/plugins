@@ -8,7 +8,6 @@ import { getUserByNameResponse } from "../faker/getUserByName.ts";
 import { http } from "msw";
 
 export function getUserByNameHandlerResponse200(data: GetUserByNameResponse) {
-
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -18,7 +17,6 @@ export function getUserByNameHandlerResponse200(data: GetUserByNameResponse) {
 }
 
 export function getUserByNameHandlerResponse400(data?: GetUserByNameStatus400) {
-
       return new Response(JSON.stringify(data), {
         status: 400,
 
@@ -26,7 +24,6 @@ export function getUserByNameHandlerResponse400(data?: GetUserByNameStatus400) {
 }
 
 export function getUserByNameHandlerResponse404(data?: GetUserByNameStatus404) {
-
       return new Response(JSON.stringify(data), {
         status: 404,
 

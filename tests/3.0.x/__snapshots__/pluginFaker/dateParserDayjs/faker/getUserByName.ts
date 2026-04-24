@@ -24,7 +24,6 @@ export function getUserByNameStatus200(data?: Partial<GetUserByNameStatus200>): 
  * @description Invalid username supplied
  */
 export function getUserByNameStatus400() {
-
   return undefined
 }
 
@@ -32,7 +31,6 @@ export function getUserByNameStatus400() {
  * @description User not found
  */
 export function getUserByNameStatus404() {
-
   return undefined
 }
 

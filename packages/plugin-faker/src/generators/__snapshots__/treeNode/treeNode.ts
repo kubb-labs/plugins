@@ -6,9 +6,8 @@
 import type { TreeNode } from './types/TreeNode'
 import { faker } from '@faker-js/faker'
 
-export function treeNode(data?: Partial<TreeNode>): TreeNode {
-  return {
-    ...{ value: faker.string.alpha(), left: undefined as any, right: undefined as any },
-    ...(data || {}),
-  }
+export function treeNode(data?: Partial<TreeNode>): typeof _defaults & Omit<TreeNode, keyof typeof _defaults> {
+  const _defaults = { value: faker.string.alpha(), left: undefined as any, right: undefined as any }
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<TreeNode, keyof typeof _defaults>
+  return result
 }

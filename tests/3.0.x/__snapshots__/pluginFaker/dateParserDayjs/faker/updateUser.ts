@@ -16,7 +16,6 @@ export function updateUserPathUsername(data?: string): string {
  * @description successful operation
  */
 export function updateUserStatusDefault() {
-
   return undefined
 }
 
@@ -29,6 +28,5 @@ export function updateUserData(data?: Partial<UpdateUserData>): UpdateUserData {
 }
 
 export function updateUserResponse() {
-
   return undefined
 }

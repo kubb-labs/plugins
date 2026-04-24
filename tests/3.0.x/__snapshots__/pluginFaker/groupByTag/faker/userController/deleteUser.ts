@@ -15,7 +15,6 @@ export function deleteUserPathUsername(data?: string): string {
  * @description Invalid username supplied
  */
 export function deleteUserStatus400() {
-
   return undefined
 }
 
@@ -23,7 +22,6 @@ export function deleteUserStatus400() {
  * @description User not found
  */
 export function deleteUserStatus404() {
-
   return undefined
 }
 

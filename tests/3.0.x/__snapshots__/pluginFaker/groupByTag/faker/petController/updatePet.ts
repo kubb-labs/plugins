@@ -19,7 +19,6 @@ export function updatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePe
  * @description Invalid ID supplied
  */
 export function updatePetStatus400() {
-
   return undefined
 }
 
@@ -27,7 +26,6 @@ export function updatePetStatus400() {
  * @description Pet not found
  */
 export function updatePetStatus404() {
-
   return undefined
 }
 
@@ -35,7 +33,6 @@ export function updatePetStatus404() {
  * @description Validation exception
  */
 export function updatePetStatus405() {
-
   return undefined
 }
 

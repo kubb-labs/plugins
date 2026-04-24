@@ -6,9 +6,8 @@
 import RandExp from 'randexp'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Pet {
-  return {
-    ...{
+export function pet(data?: Partial<Pet>): typeof _defaults & Omit<Pet, keyof typeof _defaults> {
+  const _defaults = {
       id: faker.number.int(),
       name: faker.string.alpha(),
       tag: faker.string.alpha(),
@@ -16,7 +15,7 @@ export function pet(data?: Partial<Pet>): Pet {
       shipDate: faker.date.anytime(),
       shipTime: faker.date.anytime(),
       info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
-    },
-    ...(data || {}),
-  }
+    }
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Pet, keyof typeof _defaults>
+  return result
 }

@@ -15,7 +15,6 @@ export function deleteOrderPathOrderId(data?: number): number {
  * @description Invalid ID supplied
  */
 export function deleteOrderStatus400() {
-
   return undefined
 }
 
@@ -23,7 +22,6 @@ export function deleteOrderStatus400() {
  * @description Order not found
  */
 export function deleteOrderStatus404() {
-
   return undefined
 }
 

@@ -8,12 +8,10 @@ import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetIn
 /**
  * @description successful operation
  */
-export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
-
-  return {
-    ...{},
-    ...(data || {})
-  }
+export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): typeof _defaults & Omit<GetInventoryStatus200, keyof typeof _defaults> {
+  const _defaults = {}
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<GetInventoryStatus200, keyof typeof _defaults>
+  return result
 }
 
 export function getInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {

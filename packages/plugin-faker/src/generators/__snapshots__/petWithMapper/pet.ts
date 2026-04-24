@@ -6,16 +6,15 @@
 import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Pet {
-  return {
-    ...{
-      id: faker.number.int(),
-      name: faker.string.fromCharacters('abc'),
-      code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
-      shipDate: faker.date.anytime().toISOString().substring(0, 10),
-      category: category(),
-      status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
-    },
-    ...(data || {}),
+export function pet(data?: Partial<Pet>): typeof _defaults & Omit<Pet, keyof typeof _defaults> {
+  const _defaults = {
+    id: faker.number.int(),
+    name: faker.string.fromCharacters('abc'),
+    code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
+    shipDate: faker.date.anytime().toISOString().substring(0, 10),
+    category: category(),
+    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
   }
+  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Pet, keyof typeof _defaults>
+  return result
 }

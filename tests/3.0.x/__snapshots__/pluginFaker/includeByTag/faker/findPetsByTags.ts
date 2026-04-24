@@ -30,7 +30,6 @@ export function findPetsByTagsStatus200(data?: FindPetsByTagsStatus200): FindPet
  * @description Invalid tag value
  */
 export function findPetsByTagsStatus400() {
-
   return undefined
 }
 

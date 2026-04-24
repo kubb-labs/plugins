@@ -19,11 +19,9 @@ export function deletePetPathPetId(data?: number): number {
  * @description Invalid pet value
  */
 export function deletePetStatus400() {
-
   return undefined
 }
 
 export function deletePetResponse() {
-
   return undefined
 }

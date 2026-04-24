@@ -27,7 +27,6 @@ export function findPetsByStatusStatus200(data?: FindPetsByStatusStatus200): Fin
  * @description Invalid status value
  */
 export function findPetsByStatusStatus400() {
-
   return undefined
 }
 
