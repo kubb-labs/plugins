@@ -1,36 +1,180 @@
-export * from './AddPet.ts'
-export * from './AddPetRequest.ts'
-export * from './Address.ts'
-export * from './ApiResponse.ts'
-export * from './Category.ts'
-export * from './CreatePets.ts'
-export * from './CreateUser.ts'
-export * from './CreateUsersWithListInput.ts'
-export * from './Customer.ts'
-export * from './DeleteOrder.ts'
-export * from './DeletePet.ts'
-export * from './DeleteUser.ts'
-export * from './FindPetsByStatus.ts'
-export * from './FindPetsByTags.ts'
-export * from './GetInventory.ts'
-export * from './GetOrderById.ts'
-export * from './GetPetById.ts'
-export * from './GetThings.ts'
-export * from './GetUserByName.ts'
-export * from './LoginUser.ts'
-export * from './LogoutUser.ts'
-export * from './Order.ts'
-export * from './Pet.ts'
-export * from './PetNotFound.ts'
-export * from './PhoneNumber.ts'
-export * from './PhoneWithMaxLength.ts'
-export * from './PhoneWithMaxLengthExplicit.ts'
-export * from './PlaceOrder.ts'
-export * from './PlaceOrderPatch.ts'
-export * from './Tag.ts'
-export * from './UpdatePet.ts'
-export * from './UpdatePetWithForm.ts'
-export * from './UpdateUser.ts'
-export * from './UploadFile.ts'
-export * from './User.ts'
-export * from './UserArray.ts'
+export type { AddPetStatus200, AddPetStatus405, AddPetData, AddPetRequestConfig, AddPetResponses, AddPetResponse } from './AddPet.ts'
+export type { AddPetRequestStatusEnumKey, AddPetRequest } from './AddPetRequest.ts'
+export type { Address } from './Address.ts'
+export type { ApiResponse } from './ApiResponse.ts'
+export type { Category } from './Category.ts'
+export type {
+  CreatePetsPathUuid,
+  CreatePetsQueryOffset,
+  CreatePetsHeaderXEXAMPLE,
+  CreatePetsStatus201,
+  CreatePetsStatusDefault,
+  CreatePetsData,
+  CreatePetsRequestConfig,
+  CreatePetsResponses,
+  CreatePetsResponse,
+} from './CreatePets.ts'
+export type { CreateUserStatusDefault, CreateUserData, CreateUserRequestConfig, CreateUserResponses, CreateUserResponse } from './CreateUser.ts'
+export type {
+  CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatusDefault,
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputRequestConfig,
+  CreateUsersWithListInputResponses,
+  CreateUsersWithListInputResponse,
+} from './CreateUsersWithListInput.ts'
+export type { Customer } from './Customer.ts'
+export type {
+  DeleteOrderPathOrderId,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+  DeleteOrderRequestConfig,
+  DeleteOrderResponses,
+  DeleteOrderResponse,
+} from './DeleteOrder.ts'
+export type {
+  DeletePetHeaderApiKey,
+  DeletePetPathPetId,
+  DeletePetStatus400,
+  DeletePetRequestConfig,
+  DeletePetResponses,
+  DeletePetResponse,
+} from './DeletePet.ts'
+export type {
+  DeleteUserPathUsername,
+  DeleteUserStatus400,
+  DeleteUserStatus404,
+  DeleteUserRequestConfig,
+  DeleteUserResponses,
+  DeleteUserResponse,
+} from './DeleteUser.ts'
+export type {
+  FindPetsByStatusQueryStatus,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus400,
+  FindPetsByStatusRequestConfig,
+  FindPetsByStatusResponses,
+  FindPetsByStatusResponse,
+} from './FindPetsByStatus.ts'
+export type {
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryPage,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus400,
+  FindPetsByTagsRequestConfig,
+  FindPetsByTagsResponses,
+  FindPetsByTagsResponse,
+} from './FindPetsByTags.ts'
+export type { GetInventoryStatus200, GetInventoryRequestConfig, GetInventoryResponses, GetInventoryResponse } from './GetInventory.ts'
+export type {
+  GetOrderByIdPathOrderId,
+  GetOrderByIdStatus200,
+  GetOrderByIdStatus400,
+  GetOrderByIdStatus404,
+  GetOrderByIdRequestConfig,
+  GetOrderByIdResponses,
+  GetOrderByIdResponse,
+} from './GetOrderById.ts'
+export type {
+  GetPetByIdPathPetId,
+  GetPetByIdStatus200,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+  GetPetByIdRequestConfig,
+  GetPetByIdResponses,
+  GetPetByIdResponse,
+} from './GetPetById.ts'
+export type {
+  GetThingsQueryLimit,
+  GetThingsQuerySkip,
+  GetThingsStatus201,
+  GetThingsStatusDefault,
+  GetThingsRequestConfig,
+  GetThingsResponses,
+  GetThingsResponse,
+} from './GetThings.ts'
+export type {
+  GetUserByNamePathUsername,
+  GetUserByNameStatus200,
+  GetUserByNameStatus400,
+  GetUserByNameStatus404,
+  GetUserByNameRequestConfig,
+  GetUserByNameResponses,
+  GetUserByNameResponse,
+} from './GetUserByName.ts'
+export type {
+  LoginUserQueryUsername,
+  LoginUserQueryPassword,
+  LoginUserStatus200,
+  LoginUserStatus400,
+  LoginUserRequestConfig,
+  LoginUserResponses,
+  LoginUserResponse,
+} from './LoginUser.ts'
+export type { LogoutUserStatusDefault, LogoutUserRequestConfig, LogoutUserResponses, LogoutUserResponse } from './LogoutUser.ts'
+export type { OrderStatusEnumKey, OrderHttpStatusEnumKey, OrderValueEnumKey, Order } from './Order.ts'
+export type { PetStatusEnumKey, Pet } from './Pet.ts'
+export type { PetNotFound } from './PetNotFound.ts'
+export type { PhoneNumber } from './PhoneNumber.ts'
+export type { PhoneWithMaxLength } from './PhoneWithMaxLength.ts'
+export type { PhoneWithMaxLengthExplicit } from './PhoneWithMaxLengthExplicit.ts'
+export type {
+  PlaceOrderStatus200,
+  PlaceOrderStatus405,
+  PlaceOrderData,
+  PlaceOrderRequestConfig,
+  PlaceOrderResponses,
+  PlaceOrderResponse,
+} from './PlaceOrder.ts'
+export type {
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
+  PlaceOrderPatchData,
+  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchResponses,
+  PlaceOrderPatchResponse,
+} from './PlaceOrderPatch.ts'
+export type { Tag } from './Tag.ts'
+export type {
+  UpdatePetStatus200,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
+  UpdatePetData,
+  UpdatePetRequestConfig,
+  UpdatePetResponses,
+  UpdatePetResponse,
+} from './UpdatePet.ts'
+export type {
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryName,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormStatus405,
+  UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormResponses,
+  UpdatePetWithFormResponse,
+} from './UpdatePetWithForm.ts'
+export type {
+  UpdateUserPathUsername,
+  UpdateUserStatusDefault,
+  UpdateUserData,
+  UpdateUserRequestConfig,
+  UpdateUserResponses,
+  UpdateUserResponse,
+} from './UpdateUser.ts'
+export type {
+  UploadFilePathPetId,
+  UploadFileQueryAdditionalMetadata,
+  UploadFileStatus200,
+  UploadFileData,
+  UploadFileRequestConfig,
+  UploadFileResponses,
+  UploadFileResponse,
+} from './UploadFile.ts'
+export type { User } from './User.ts'
+export type { UserArray } from './UserArray.ts'
+export { addPetRequestStatusEnum } from './AddPetRequest.ts'
+export { orderStatusEnum, orderHttpStatusEnum, orderValueEnum } from './Order.ts'
+export { petStatusEnum } from './Pet.ts'
