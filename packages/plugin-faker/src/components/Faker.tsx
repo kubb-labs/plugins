@@ -92,13 +92,9 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const paramsSignature = declarationPrinter.print(params) ?? ''
 
   // For objects with overrides, use Required<> to mark all generated properties as required
-  const returnType = useObjectAssign
-    ? `Required<${typeName}>`
-    : resolvedReturnType
+  const returnType = useObjectAssign ? `Required<${typeName}>` : resolvedReturnType
 
-  const body = useObjectAssign
-    ? `return Object.assign({} as ${returnType}, ${fakerText}, data)`
-    : `return ${fakerTextWithOverride}`
+  const body = useObjectAssign ? `return Object.assign({} as ${returnType}, ${fakerText}, data)` : `return ${fakerTextWithOverride}`
 
   return (
     <File.Source name={name} isExportable isIndexable>
