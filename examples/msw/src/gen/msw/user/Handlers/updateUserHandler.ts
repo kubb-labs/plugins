@@ -4,11 +4,10 @@
  */
 
 import type { UpdateUserData } from '../../../models/UpdateUser.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function updateUserHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<(typeof http)['put']<Record<string, string>, UpdateUserData, any>>[1]>[0]) => Response | Promise<Response>),
-) {
+export function updateUserHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, UpdateUserData, any>) {
   return http.put<Record<string, string>, UpdateUserData, any>(`http://localhost:3000/user/:username`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

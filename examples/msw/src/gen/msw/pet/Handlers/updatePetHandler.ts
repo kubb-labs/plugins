@@ -4,6 +4,7 @@
  */
 
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../../models/UpdatePet.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
@@ -33,7 +34,7 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | ((info: Parameters<Parameters<(typeof http)['put']<Record<string, string>, UpdatePetData, any>>[1]>[0]) => Response | Promise<Response>)) {
+export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetData, any>) {
   return http.put<Record<string, string>, UpdatePetData, any>(`http://localhost:3000/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

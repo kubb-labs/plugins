@@ -3,7 +3,8 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsData, CreatePetsResponse } from './CreatePets'
+import type { CreatePetsResponse, CreatePetsData } from './CreatePets'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
@@ -12,9 +13,7 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
-export function createPetsHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<(typeof http)['post']<Record<string, string>, CreatePetsData, any>>[1]>[0]) => Response | Promise<Response>),
-) {
+export function createPetsHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsData, any>) {
   return http.post<Record<string, string>, CreatePetsData, any>(`/pets`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
