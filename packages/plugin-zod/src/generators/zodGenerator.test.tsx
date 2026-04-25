@@ -86,6 +86,16 @@ const unionSchema = ast.createSchema({
   members: [ast.createSchema({ type: 'string' }), ast.createSchema({ type: 'number' })],
 })
 
+const discriminatedUnionSchema = ast.createSchema({
+  type: 'union',
+  name: 'Payment',
+  discriminatorPropertyName: 'method',
+  members: [
+    ast.createSchema({ type: 'ref', name: 'CardPayment', ref: '#/components/schemas/CardPayment' }),
+    ast.createSchema({ type: 'ref', name: 'WalletPayment', ref: '#/components/schemas/WalletPayment' }),
+  ],
+})
+
 const intersectionSchema = ast.createSchema({
   type: 'intersection',
   name: 'PetAndOwner',
@@ -212,6 +222,7 @@ describe('zodGenerator — Schema', () => {
     { name: 'nullish', node: nullishSchema },
     // composite schemas
     { name: 'union', node: unionSchema },
+    { name: 'discriminatedUnion', node: discriminatedUnionSchema },
     { name: 'intersection', node: intersectionSchema },
     // schema with description
     { name: 'description', node: schemaWithDescription },
@@ -226,6 +237,7 @@ describe('zodGenerator — Schema', () => {
     { name: 'dateType stringLocal', node: ast.createSchema({ type: 'datetime', name: 'DatetimeLocal', local: true }) },
     // mini — additional schema types
     { name: 'mini union', node: unionSchema, options: { mini: true, importPath: 'zod/mini' } },
+    { name: 'mini discriminatedUnion', node: discriminatedUnionSchema, options: { mini: true, importPath: 'zod/mini' } },
     { name: 'mini wrapOutput', node: stringSchema, options: { mini: true, importPath: 'zod/mini', wrapOutput: ({ output }) => `${output}.openapi('test')` } },
   ]
 
