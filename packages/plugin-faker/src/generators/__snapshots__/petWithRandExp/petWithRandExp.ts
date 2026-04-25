@@ -6,17 +6,18 @@
 import RandExp from 'randexp'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Required<Pet> {
+export function pet<TOverwriteData extends Partial<Pet> = {}>(data?: TOverwriteData): Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData {
+  const defaultFakeData = {
+    id: faker.number.int(),
+    name: faker.string.alpha(),
+    tag: faker.string.alpha(),
+    code: new RandExp('\\b[1-9]\\b').gen(),
+    shipDate: faker.date.anytime(),
+    shipTime: faker.date.anytime(),
+    info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
+  }
   return {
-    ...{
-      id: faker.number.int(),
-      name: faker.string.alpha(),
-      tag: faker.string.alpha(),
-      code: new RandExp('\\b[1-9]\\b').gen(),
-      shipDate: faker.date.anytime(),
-      shipTime: faker.date.anytime(),
-      info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
-    },
-    ...data,
-  } as Required<Pet>
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData
 }

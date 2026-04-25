@@ -45,12 +45,10 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const isScalar = SCALAR_TYPES.has(node.type)
 
   let fakerTextWithOverride = fakerText
-  let useObjectAssign = false
+  let useGenericOverride = false
 
   if (canOverride && isObject) {
-    // Always use Object.assign for objects to ensure proper type precision
-    // Required<> marks all properties as required, reflecting that the faker generates all of them
-    useObjectAssign = true
+    useGenericOverride = true
   }
 
   if (canOverride && isTuple) {
@@ -70,41 +68,62 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  const usesData = useObjectAssign || /\bdata\b/.test(fakerTextWithOverride)
-  const dataParamName = usesData ? 'data' : '_data'
-  const params = ast.createFunctionParameters({
-    params: [
-      ast.createFunctionParameter({
-        name: dataParamName,
-        type: ast.createParamsType({ variant: 'reference', name: dataType }),
-        optional: true,
-      }),
-    ],
-  })
-  const paramsSignature = declarationPrinter.print(params) ?? ''
+  let functionSignature = ''
+  let functionBody = ''
 
-  // For objects with overrides, use Required<> to mark all generated properties as required
-  const returnType = useObjectAssign ? `Required<${typeName}>` : resolvedReturnType
+  if (useGenericOverride) {
+    // Generate generic function with precise type inference
+    const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
+    functionSignature = `${jsdoc}export function ${name}<TOverwriteData extends Partial<${typeName}> = {}>(data?: TOverwriteData): Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData`
 
-  const body = useObjectAssign ? `return { ...${fakerText}, ...data } as ${returnType}` : `return ${fakerTextWithOverride}`
+    const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
+    functionBody = `{
+  ${seedCode}const defaultFakeData = ${fakerText}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData
+}`
+  } else {
+    const usesData = /\bdata\b/.test(fakerTextWithOverride)
+    const dataParamName = usesData ? 'data' : '_data'
+    const params = ast.createFunctionParameters({
+      params: [
+        ast.createFunctionParameter({
+          name: dataParamName,
+          type: ast.createParamsType({ variant: 'reference', name: dataType }),
+          optional: true,
+        }),
+      ],
+    })
+    const paramsSignature = declarationPrinter.print(params) ?? ''
+    const returnType = resolvedReturnType
+
+    return (
+      <File.Source name={name} isExportable isIndexable>
+        <Function
+          export
+          name={name}
+          JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
+          params={canOverride ? paramsSignature : undefined}
+          returnType={returnType}
+        >
+          {seed ? (
+            <>
+              {`faker.seed(${JSON.stringify(seed)})`}
+              <br />
+            </>
+          ) : undefined}
+          {`return ${fakerTextWithOverride}`}
+        </Function>
+      </File.Source>
+    )
+  }
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      <Function
-        export
-        name={name}
-        JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
-        params={canOverride ? paramsSignature : undefined}
-        returnType={returnType}
-      >
-        {seed ? (
-          <>
-            {`faker.seed(${JSON.stringify(seed)})`}
-            <br />
-          </>
-        ) : undefined}
-        {body}
-      </Function>
+      {functionSignature}
+      {functionBody}
     </File.Source>
   )
 }

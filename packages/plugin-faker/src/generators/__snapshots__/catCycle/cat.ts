@@ -6,17 +6,18 @@
 import type { Cat } from './types/Cat'
 import { faker } from '@faker-js/faker'
 
-export function cat(data?: Partial<Cat>): Required<Cat> {
-  return {
-    ...{
-      id: faker.number.int(),
-      get archEnemy() {
-        return faker.helpers.arrayElement<any>([null, pet()])
-      },
-      get friends() {
-        return faker.helpers.multiple(() => pet())
-      },
+export function cat<TOverwriteData extends Partial<Cat> = {}>(data?: TOverwriteData): Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData {
+  const defaultFakeData = {
+    id: faker.number.int(),
+    get archEnemy() {
+      return faker.helpers.arrayElement<any>([null, pet()])
     },
-    ...data,
-  } as Required<Cat>
+    get friends() {
+      return faker.helpers.multiple(() => pet())
+    },
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData
 }

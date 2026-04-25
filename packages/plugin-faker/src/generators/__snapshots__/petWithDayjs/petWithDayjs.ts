@@ -6,17 +6,18 @@
 import dayjs from 'dayjs'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Required<Pet> {
+export function pet<TOverwriteData extends Partial<Pet> = {}>(data?: TOverwriteData): Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData {
+  const defaultFakeData = {
+    id: faker.number.int(),
+    name: faker.string.alpha(),
+    tag: faker.string.alpha(),
+    code: faker.helpers.fromRegExp('\b[1-9]\b'),
+    shipDate: dayjs(faker.date.anytime()).format('YYYY-MM-DD'),
+    shipTime: dayjs(faker.date.anytime()).format('HH:mm:ss'),
+    info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
+  }
   return {
-    ...{
-      id: faker.number.int(),
-      name: faker.string.alpha(),
-      tag: faker.string.alpha(),
-      code: faker.helpers.fromRegExp('\b[1-9]\b'),
-      shipDate: dayjs(faker.date.anytime()).format('YYYY-MM-DD'),
-      shipTime: dayjs(faker.date.anytime()).format('HH:mm:ss'),
-      info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
-    },
-    ...data,
-  } as Required<Pet>
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData
 }

@@ -6,16 +6,17 @@
 import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Required<Pet> {
+export function pet<TOverwriteData extends Partial<Pet> = {}>(data?: TOverwriteData): Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData {
+  const defaultFakeData = {
+    id: faker.number.int(),
+    name: faker.string.fromCharacters('abc'),
+    code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
+    shipDate: faker.date.anytime().toISOString().substring(0, 10),
+    category: category(),
+    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+  }
   return {
-    ...{
-      id: faker.number.int(),
-      name: faker.string.fromCharacters('abc'),
-      code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
-      shipDate: faker.date.anytime().toISOString().substring(0, 10),
-      category: category(),
-      status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
-    },
-    ...data,
-  } as Required<Pet>
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TOverwriteData> & TOverwriteData
 }
