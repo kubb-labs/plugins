@@ -1,5 +1,13 @@
 # cypress-pet-store
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-cypress@5.0.0-alpha.55
+  - @kubb/plugin-ts@5.0.0-alpha.55
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes

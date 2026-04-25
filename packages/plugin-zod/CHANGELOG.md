@@ -1,5 +1,15 @@
 # @kubb/plugin-zod
 
+## 5.0.0-alpha.55
+
+### Patch Changes
+
+- [#79](https://github.com/kubb-labs/plugins/pull/79) [`dd9c91a`](https://github.com/kubb-labs/plugins/commit/dd9c91a7c4deba02b6751e9965455674bfacc703) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix unreachable code in getter when discriminator property overrides external schema with description.
+
+  When a discriminator property references an external schema with a description and is overridden with a literal/enum value, the printer now correctly skips applying the description from the original ref to the overridden value. This prevents generating unreachable code after return statements in getters.
+
+  Fixes [#15](https://github.com/kubb-labs/plugins/issues/15)
+
 ## 5.0.0-alpha.54
 
 ### Minor Changes
@@ -25,13 +35,25 @@
   **Before**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, never, object, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    never,
+    object,
+    ResolverZod
+  >;
   ```
 
   **After**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    ResolverZod
+  >;
   ```
 
 ### Patch Changes
@@ -103,14 +125,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -118,25 +140,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -144,7 +166,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -232,22 +254,22 @@
   pluginTs({
     resolver: {
       resolveName(name) {
-        return `Custom${this.default(name, 'function')}`
+        return `Custom${this.default(name, "function")}`;
       },
     },
     transformer: {
       schema(node) {
-        return { ...node, description: undefined }
+        return { ...node, description: undefined };
       },
     },
     printer: {
       nodes: {
         integer() {
-          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword);
         },
       },
     },
-  })
+  });
   ```
 
   ### `@kubb/plugin-zod`
@@ -259,22 +281,22 @@
   pluginZod({
     resolver: {
       resolveName(name) {
-        return `${this.default(name, 'function')}Schema`
+        return `${this.default(name, "function")}Schema`;
       },
     },
     transformer: {
       schema(node) {
-        return { ...node, description: undefined }
+        return { ...node, description: undefined };
       },
     },
     printer: {
       nodes: {
         integer() {
-          return 'z.number()'
+          return "z.number()";
         },
       },
     },
-  })
+  });
   ```
 
   ### `@kubb/plugin-cypress`
@@ -1200,7 +1222,7 @@
   ```typescript
   export const postApiExampleMutationRequestSchema = z.object({
     email: z.string().nullish(), // ❌ Error: .nullish() doesn't exist in Zod Mini
-  })
+  });
   ```
 
   **After** (this fix):
@@ -1208,7 +1230,7 @@
   ```typescript
   export const postApiExampleMutationRequestSchema = z.object({
     email: z.nullish(z.string()), // ✅ Correct functional wrapper
-  })
+  });
   ```
 
   This fix ensures consistency with how `optional` and `nullable` modifiers were already being handled in mini mode.
@@ -1281,7 +1303,7 @@
   ```typescript
   pluginOas({
     collisionDetection: true, // Recommended - prevents all collision types
-  })
+  });
   ```
 
 - Updated dependencies [[`996f3b2`](https://github.com/kubb-labs/kubb/commit/996f3b26d8c2167c3e77b734275c204e6c1b159c)]:

@@ -1,5 +1,14 @@
 # zod-pet-store
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- Updated dependencies [[`dd9c91a`](https://github.com/kubb-labs/plugins/commit/dd9c91a7c4deba02b6751e9965455674bfacc703)]:
+  - @kubb/plugin-zod@5.0.0-alpha.55
+  - @kubb/plugin-client@5.0.0-alpha.55
+  - @kubb/plugin-ts@5.0.0-alpha.55
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # advanced-pet-store
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- Updated dependencies [[`f655948`](https://github.com/kubb-labs/plugins/commit/f655948eb85409180a8930ad46a6dc57a55445a0), [`dd9c91a`](https://github.com/kubb-labs/plugins/commit/dd9c91a7c4deba02b6751e9965455674bfacc703)]:
+  - @kubb/plugin-faker@5.0.0-alpha.55
+  - @kubb/plugin-zod@5.0.0-alpha.55
+  - @kubb/plugin-msw@5.0.0-alpha.55
+  - @kubb/plugin-client@5.0.0-alpha.55
+  - @kubb/plugin-mcp@5.0.0-alpha.55
+  - @kubb/plugin-react-query@5.0.0-alpha.55
+  - @kubb/plugin-cypress@5.0.0-alpha.55
+  - @kubb/plugin-redoc@5.0.0-alpha.55
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes
