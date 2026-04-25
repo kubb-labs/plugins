@@ -25,9 +25,9 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
 
-  const infoType = requestTypeName
-    ? `Parameters<Parameters<(typeof http)['${method}']<Record<string, string>, ${requestTypeName}, any>>[1]>[0]`
-    : `Parameters<Parameters<typeof http.${method}>[1]>[0]`
+  const callbackType = requestTypeName
+    ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}, any>`
+    : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = declarationPrinter.print(
     ast.createFunctionParameters({
@@ -36,7 +36,7 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
           name: 'data',
           type: ast.createParamsType({
             variant: 'reference',
-            name: `${typeName} | ((info: ${infoType}) => Response | Promise<Response>)`,
+            name: `${typeName} | ${callbackType}`,
           }),
           optional: true,
         }),

@@ -4,6 +4,7 @@
  */
 
 import type { UploadFileData, UploadFileResponse } from '../../../models/UploadFile.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
@@ -15,7 +16,7 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | ((info: Parameters<Parameters<(typeof http)['post']<Record<string, string>, UploadFileData, any>>[1]>[0]) => Response | Promise<Response>)) {
+export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {
   return http.post<Record<string, string>, UploadFileData, any>(`http://localhost:3000/pet/:petId/uploadImage`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

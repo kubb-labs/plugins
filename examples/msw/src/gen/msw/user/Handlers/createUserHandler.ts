@@ -4,11 +4,10 @@
  */
 
 import type { CreateUserData } from '../../../models/CreateUser.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function createUserHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<(typeof http)['post']<Record<string, string>, CreateUserData, any>>[1]>[0]) => Response | Promise<Response>),
-) {
+export function createUserHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreateUserData, any>) {
   return http.post<Record<string, string>, CreateUserData, any>(`http://localhost:3000/user`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

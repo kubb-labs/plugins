@@ -4,6 +4,7 @@
  */
 
 import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
@@ -21,9 +22,7 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
   })
 }
 
-export function placeOrderPatchHandler(
-  data?: PlaceOrderPatchResponse | ((info: Parameters<Parameters<(typeof http)['patch']<Record<string, string>, PlaceOrderPatchData, any>>[1]>[0]) => Response | Promise<Response>),
-) {
+export function placeOrderPatchHandler(data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchData, any>) {
   return http.patch<Record<string, string>, PlaceOrderPatchData, any>(`http://localhost:3000/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

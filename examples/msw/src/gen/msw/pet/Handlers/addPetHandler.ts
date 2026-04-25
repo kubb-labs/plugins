@@ -4,6 +4,7 @@
  */
 
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/AddPet.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function addPetHandlerResponse200(data: AddPetResponse) {
@@ -24,7 +25,7 @@ export function addPetHandlerResponse405(data: AddPetStatus405) {
   })
 }
 
-export function addPetHandler(data?: AddPetResponse | ((info: Parameters<Parameters<(typeof http)['post']<Record<string, string>, AddPetData, any>>[1]>[0]) => Response | Promise<Response>)) {
+export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetData, any>) {
   return http.post<Record<string, string>, AddPetData, any>(`http://localhost:3000/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

@@ -26,9 +26,9 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
 
-  const infoType = requestTypeName
-    ? `Parameters<Parameters<(typeof http)['${method}']<Record<string, string>, ${requestTypeName}, any>>[1]>[0]`
-    : `Parameters<Parameters<typeof http.${method}>[1]>[0]`
+  const callbackType = requestTypeName
+    ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}, any>`
+    : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = declarationPrinter.print(
     ast.createFunctionParameters({
@@ -37,7 +37,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
           name: 'data',
           type: ast.createParamsType({
             variant: 'reference',
-            name: `${dataType} | ((info: ${infoType}) => Response | Promise<Response>)`,
+            name: `${dataType} | ${callbackType}`,
           }),
           optional: true,
         }),
