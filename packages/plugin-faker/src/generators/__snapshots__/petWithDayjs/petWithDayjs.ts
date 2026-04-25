@@ -18,6 +18,6 @@ export function pet(data?: Partial<Pet>): Required<Pet> {
       shipTime: dayjs(faker.date.anytime()).format('HH:mm:ss'),
       info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
     },
-    data
+    data,
   )
 }

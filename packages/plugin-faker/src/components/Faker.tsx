@@ -44,14 +44,6 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 
-  // The printer emits `get prop() { ... }` for properties whose value would
-  // recurse through a circular dependency. Using object spread here would
-  // invoke those getters during construction (per ECMAScript spread semantics)
-  // and reintroduce the recursion we just deferred. Use `Object.assign` instead
-  // so the getters survive on the result object and a user override via `data`
-  // replaces them as plain data properties before they're ever read.
-  const hasGetters = /\bget\s+\w+\s*\(\s*\)\s*\{/.test(fakerText)
-
   let fakerTextWithOverride = fakerText
   let useObjectAssign = false
 
@@ -101,7 +93,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
       <Function
         export
         name={name}
-        JSDoc={{ comments: [description ? `@description ${jsStringEscape(description)}` : undefined].filter(Boolean) }}
+        JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
         params={canOverride ? paramsSignature : undefined}
         returnType={returnType}
       >

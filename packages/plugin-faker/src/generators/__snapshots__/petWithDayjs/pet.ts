@@ -17,7 +17,7 @@ export function pet(data?: Partial<Pet>): Required<Pet> {
       shipDate: dayjs(faker.date.anytime()).format('YYYY-MM-DD'),
       category: category(),
       status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
-  },
-    data
+    },
+    data,
   )
 }

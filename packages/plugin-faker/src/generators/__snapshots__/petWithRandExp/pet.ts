@@ -17,7 +17,7 @@ export function pet(data?: Partial<Pet>): Required<Pet> {
       shipDate: faker.date.anytime().toISOString().substring(0, 10),
       category: category(),
       status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
-  },
-    data
+    },
+    data,
   )
 }

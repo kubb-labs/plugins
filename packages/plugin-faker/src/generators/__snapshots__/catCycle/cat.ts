@@ -6,16 +6,18 @@
 import type { Cat } from './types/Cat'
 import { faker } from '@faker-js/faker'
 
-export function cat(data?: Partial<Cat>): Cat {
-  const result: Cat = {
-    id: faker.number.int(),
-    get archEnemy() {
-      return faker.helpers.arrayElement<any>([null, pet()])
+export function cat(data?: Partial<Cat>): Required<Cat> {
+  return Object.assign(
+    {} as Required<Cat>,
+    {
+      id: faker.number.int(),
+      get archEnemy() {
+        return faker.helpers.arrayElement<any>([null, pet()])
+      },
+      get friends() {
+        return faker.helpers.multiple(() => pet())
+      },
     },
-    get friends() {
-      return faker.helpers.multiple(() => pet())
-    },
-  }
-  if (data) Object.assign(result, data)
-  return result
+    data,
+  )
 }
