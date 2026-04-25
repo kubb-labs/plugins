@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UploadFileResponse } from '../../../models/UploadFile.ts'
+import type { UploadFileData, UploadFileResponse } from '../../../models/UploadFile.ts'
 import { http } from 'msw'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
@@ -15,8 +15,8 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>)) {
-  return http.post(`http://localhost:3000/pet/:petId/uploadImage`, function handler(info) {
+export function uploadFileHandler(data?: UploadFileResponse | ((info: Parameters<Parameters<(typeof http)['post']<Record<string, string>, UploadFileData, any>>[1]>[0]) => Response | Promise<Response>)) {
+  return http.post<Record<string, string>, UploadFileData, any>(`http://localhost:3000/pet/:petId/uploadImage`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

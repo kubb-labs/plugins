@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch.ts'
 import { http } from 'msw'
 
 export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
@@ -22,9 +22,9 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
 }
 
 export function placeOrderPatchHandler(
-  data?: PlaceOrderPatchResponse | ((info: Parameters<Parameters<typeof http.patch>[1]>[0]) => Response | Promise<Response>),
+  data?: PlaceOrderPatchResponse | ((info: Parameters<Parameters<(typeof http)['patch']<Record<string, string>, PlaceOrderPatchData, any>>[1]>[0]) => Response | Promise<Response>),
 ) {
-  return http.patch(`http://localhost:3000/store/order`, function handler(info) {
+  return http.patch<Record<string, string>, PlaceOrderPatchData, any>(`http://localhost:3000/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

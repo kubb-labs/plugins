@@ -8,6 +8,7 @@ import { getContentType, getMswMethod, getMswUrl, getPrimarySuccessResponse } fr
 type Props = {
   name: string
   typeName: string
+  requestTypeName?: string
   fakerName: string
   baseURL: string | undefined
   node: ast.OperationNode
@@ -15,7 +16,7 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function MockWithFaker({ baseURL = '', name, fakerName, typeName, node }: Props): KubbReactNode {
+export function MockWithFaker({ baseURL = '', name, fakerName, typeName, requestTypeName, node }: Props): KubbReactNode {
   const method = getMswMethod(node)
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
@@ -24,6 +25,10 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, node }:
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
 
+  const infoType = requestTypeName
+    ? `Parameters<Parameters<(typeof http)['${method}']<Record<string, string>, ${requestTypeName}, any>>[1]>[0]`
+    : `Parameters<Parameters<typeof http.${method}>[1]>[0]`
+
   const params = declarationPrinter.print(
     ast.createFunctionParameters({
       params: [
@@ -31,7 +36,7 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, node }:
           name: 'data',
           type: ast.createParamsType({
             variant: 'reference',
-            name: `${typeName} | ((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`,
+            name: `${typeName} | ((info: ${infoType}) => Response | Promise<Response>)`,
           }),
           optional: true,
         }),
@@ -39,10 +44,14 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, node }:
     }),
   )
 
+  const httpCall = requestTypeName
+    ? `http.${method}<Record<string, string>, ${requestTypeName}, any>`
+    : `http.${method}`
+
   return (
     <File.Source name={name} isIndexable isExportable>
       <Function name={name} export params={params ?? ''}>
-        {`return http.${method}('${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}', function handler(info) {
+        {`return ${httpCall}('${baseURL}${url.replace(/([^/]):/g, '$1\\\\:')}', function handler(info) {
     if(typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data || ${fakerName}(data)), {
