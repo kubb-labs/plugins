@@ -16,6 +16,8 @@ components:
           $ref: '#/components/schemas/NotificationType'
         message:
           type: string
+        relatedNotification:
+          $ref: '#/components/schemas/SendNotificationRequest'
       required:
         - notificationType
         - message
