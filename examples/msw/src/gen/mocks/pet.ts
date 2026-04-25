@@ -8,11 +8,12 @@ import { category } from './category.ts'
 import { tag } from './tag.ts'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Pet {
+export function pet(data?: Partial<Pet>): Required<Pet> {
   faker.seed([220])
 
-  return {
-    ...{
+  return Object.assign(
+    {} as Required<Pet>,
+    {
       id: faker.number.int(),
       name: faker.string.alpha(),
       category: category(),
@@ -20,6 +21,6 @@ export function pet(data?: Partial<Pet>): Pet {
       tags: faker.helpers.multiple(() => tag()),
       status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
     },
-    ...(data || {}),
-  }
+    data,
+  )
 }

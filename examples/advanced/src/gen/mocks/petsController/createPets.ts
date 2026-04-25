@@ -38,11 +38,8 @@ export function createPetsStatusDefault(data?: Partial<CreatePetsStatusDefault>)
   return petNotFoundFaker(data)
 }
 
-export function createPetsData(data?: Partial<CreatePetsData>): CreatePetsData {
-  return {
-    ...{ name: faker.string.alpha(), tag: faker.string.alpha() },
-    ...(data || {}),
-  }
+export function createPetsData(data?: Partial<CreatePetsData>): Required<CreatePetsData> {
+  return Object.assign({} as Required<CreatePetsData>, { name: faker.string.alpha(), tag: faker.string.alpha() }, data)
 }
 
 export function createPetsResponse(_data?: CreatePetsResponse): CreatePetsResponse {

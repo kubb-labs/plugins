@@ -6,9 +6,6 @@
 import type { Item } from '../models/Item.ts'
 import { faker } from '@faker-js/faker'
 
-export function item(data?: Partial<Item>): Item {
-  return {
-    ...{ name: faker.string.alpha({ length: { min: 3, max: 25 } }), price: faker.number.float({ min: 5 }) },
-    ...(data || {}),
-  }
+export function item(data?: Partial<Item>): Required<Item> {
+  return Object.assign({} as Required<Item>, { name: faker.string.alpha({ length: { min: 3, max: 25 } }), price: faker.number.float({ min: 5 }) }, data)
 }
