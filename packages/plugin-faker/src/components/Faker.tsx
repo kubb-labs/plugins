@@ -97,9 +97,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const paramsSignature = declarationPrinter.print(params) ?? ''
 
   // For objects with overrides, we need a more precise return type that marks generated properties as required
-  const returnType = useSpreadWithTypeAssertion
-    ? `typeof _defaults & Omit<${typeName}, keyof typeof _defaults>`
-    : resolvedReturnType
+  const returnType = useSpreadWithTypeAssertion ? `typeof _defaults & Omit<${typeName}, keyof typeof _defaults>` : resolvedReturnType
 
   const body = useObjectAssignShape
     ? `const result: ${resolvedReturnType} = ${fakerText}
