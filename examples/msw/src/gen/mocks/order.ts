@@ -8,18 +8,17 @@ import { faker } from '@faker-js/faker'
 
 export function order(data?: Partial<Order>): Required<Order> {
   faker.seed([220])
-
-  return Object.assign(
-    {} as Required<Order>,
-    {
-      id: faker.number.int(),
-      petId: faker.number.int(),
-      quantity: faker.number.int(),
-      shipDate: faker.date.anytime().toISOString(),
-      status: faker.helpers.arrayElement<NonNullable<Order>['status']>(['placed', 'approved', 'delivered']),
-      http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
-      complete: faker.datatype.boolean(),
-    },
-    data,
-  )
+  const defaultFakeData = {
+    id: faker.number.int(),
+    petId: faker.number.int(),
+    quantity: faker.number.int(),
+    shipDate: faker.date.anytime().toISOString(),
+    status: faker.helpers.arrayElement<NonNullable<Order>['status']>(['placed', 'approved', 'delivered']),
+    http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
+    complete: faker.datatype.boolean(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Order>
 }

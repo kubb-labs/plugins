@@ -8,6 +8,9 @@ import { faker } from '@faker-js/faker'
 
 export function category(data?: Partial<Category>): Required<Category> {
   faker.seed([220])
-
-  return Object.assign({} as Required<Category>, { id: faker.number.int(), name: faker.string.alpha() }, data)
+  const defaultFakeData = { id: faker.number.int(), name: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Category>
 }

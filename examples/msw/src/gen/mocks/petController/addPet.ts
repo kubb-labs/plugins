@@ -22,8 +22,11 @@ export function addPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus20
  */
 export function addPetStatus405(data?: Partial<AddPetStatus405>): Required<AddPetStatus405> {
   faker.seed([220])
-
-  return Object.assign({} as Required<AddPetStatus405>, { code: faker.number.int(), message: faker.string.alpha() }, data)
+  const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<AddPetStatus405>
 }
 
 /**

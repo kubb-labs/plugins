@@ -8,6 +8,9 @@ import { faker } from '@faker-js/faker'
 
 export function petNotFound(data?: Partial<PetNotFound>): Required<PetNotFound> {
   faker.seed([220])
-
-  return Object.assign({} as Required<PetNotFound>, { code: faker.number.int(), message: faker.string.alpha() }, data)
+  const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<PetNotFound>
 }

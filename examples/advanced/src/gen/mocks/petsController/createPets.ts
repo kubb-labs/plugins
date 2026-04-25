@@ -39,7 +39,11 @@ export function createPetsStatusDefault(data?: Partial<CreatePetsStatusDefault>)
 }
 
 export function createPetsData(data?: Partial<CreatePetsData>): Required<CreatePetsData> {
-  return Object.assign({} as Required<CreatePetsData>, { name: faker.string.alpha(), tag: faker.string.alpha() }, data)
+  const defaultFakeData = { name: faker.string.alpha(), tag: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<CreatePetsData>
 }
 
 export function createPetsResponse(_data?: CreatePetsResponse): CreatePetsResponse {

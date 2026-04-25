@@ -11,8 +11,11 @@ import { faker } from '@faker-js/faker'
  */
 export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200> {
   faker.seed([220])
-
-  return Object.assign({} as Required<GetInventoryStatus200>, {}, data)
+  const defaultFakeData = {}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<GetInventoryStatus200>
 }
 
 export function getInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {

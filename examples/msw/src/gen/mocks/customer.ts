@@ -9,10 +9,9 @@ import { faker } from '@faker-js/faker'
 
 export function customer(data?: Partial<Customer>): Required<Customer> {
   faker.seed([220])
-
-  return Object.assign(
-    {} as Required<Customer>,
-    { id: faker.number.int(), username: faker.string.alpha(), address: faker.helpers.multiple(() => address()) },
-    data,
-  )
+  const defaultFakeData = { id: faker.number.int(), username: faker.string.alpha(), address: faker.helpers.multiple(() => address()) }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Customer>
 }

@@ -7,7 +7,11 @@ import { faker } from '@faker-js/faker'
  * @description Pet not found
  */
 export function addPetStatus405(data?: Partial<AddPetStatus405>): Required<AddPetStatus405> {
-  return Object.assign({} as Required<AddPetStatus405>, { code: faker.number.int(), message: faker.string.alpha() }, data)
+  const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<AddPetStatus405>
 }
 
 /**

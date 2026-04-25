@@ -8,19 +8,18 @@ import { faker } from '@faker-js/faker'
 
 export function user(data?: Partial<User>): Required<User> {
   faker.seed([220])
-
-  return Object.assign(
-    {} as Required<User>,
-    {
-      id: faker.number.int(),
-      username: faker.string.alpha(),
-      firstName: faker.string.alpha(),
-      lastName: faker.string.alpha(),
-      email: faker.string.alpha(),
-      password: faker.string.alpha(),
-      phone: faker.string.alpha(),
-      userStatus: faker.number.int(),
-    },
-    data,
-  )
+  const defaultFakeData = {
+    id: faker.number.int(),
+    username: faker.string.alpha(),
+    firstName: faker.string.alpha(),
+    lastName: faker.string.alpha(),
+    email: faker.string.alpha(),
+    password: faker.string.alpha(),
+    phone: faker.string.alpha(),
+    userStatus: faker.number.int(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<User>
 }
