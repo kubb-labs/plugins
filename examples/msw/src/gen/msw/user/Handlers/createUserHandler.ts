@@ -3,12 +3,13 @@
  * Do not edit manually.
  */
 
+import type { CreateUserData } from '../../../models/CreateUser.ts'
 import { http } from 'msw'
 
 export function createUserHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
+  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<(typeof http)['post']<Record<string, string>, CreateUserData, any>>[1]>[0]) => Response | Promise<Response>),
 ) {
-  return http.post(`http://localhost:3000/user`, function handler(info) {
+  return http.post<Record<string, string>, CreateUserData, any>(`http://localhost:3000/user`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

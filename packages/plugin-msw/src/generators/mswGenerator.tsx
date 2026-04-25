@@ -46,6 +46,8 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const successResponses = getSuccessResponses(node)
     const hasSuccessSchema = successResponses.some((response) => !!response.schema)
 
+    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+
     return (
       <File
         baseName={mock.file.baseName}
@@ -56,7 +58,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['ResponseResolver']} isTypeOnly path="msw" />
-        <File.Import name={Array.from(new Set([type.responseName, ...types.map((t) => t[1])]))} path={type.file.path} root={mock.file.path} isTypeOnly />
+        <File.Import name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))} path={type.file.path} root={mock.file.path} isTypeOnly />
         {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types
@@ -68,9 +70,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
           })}
 
         {parser === 'faker' && faker && hasSuccessSchema ? (
-          <MockWithFaker name={mock.name} typeName={type.responseName} fakerName={faker.name} node={node} baseURL={baseURL} />
+          <MockWithFaker name={mock.name} typeName={type.responseName} requestTypeName={requestName} fakerName={faker.name} node={node} baseURL={baseURL} />
         ) : (
-          <Mock name={mock.name} typeName={type.responseName} node={node} baseURL={baseURL} />
+          <Mock name={mock.name} typeName={type.responseName} requestTypeName={requestName} node={node} baseURL={baseURL} />
         )}
       </File>
     )
