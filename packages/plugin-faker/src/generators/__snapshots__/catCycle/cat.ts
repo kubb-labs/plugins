@@ -6,7 +6,7 @@
 import type { Cat } from './types/Cat'
 import { faker } from '@faker-js/faker'
 
-export function cat<TOverwriteData extends Partial<Cat> = {}>(data?: TOverwriteData): Required<Cat> {
+export function cat(data?: Partial<Cat>): Required<Cat> {
   const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {

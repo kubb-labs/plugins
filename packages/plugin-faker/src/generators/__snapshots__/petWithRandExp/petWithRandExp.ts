@@ -6,7 +6,7 @@
 import RandExp from 'randexp'
 import { faker } from '@faker-js/faker'
 
-export function pet<TOverwriteData extends Partial<Pet> = {}>(data?: TOverwriteData): Required<Pet> {
+export function pet(data?: Partial<Pet>): Required<Pet> {
   const defaultFakeData = {
     id: faker.number.int(),
     name: faker.string.alpha(),

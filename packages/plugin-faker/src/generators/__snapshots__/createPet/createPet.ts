@@ -16,7 +16,7 @@ export function createPetStatus201(data?: Partial<CreatePetStatus201>): CreatePe
 /**
  * @description Pet to add
  */
-export function createPetData<TOverwriteData extends Partial<CreatePetData> = {}>(data?: TOverwriteData): Required<CreatePetData> {
+export function createPetData(data?: Partial<CreatePetData>): Required<CreatePetData> {
   const defaultFakeData = { name: faker.string.alpha(), category: category() }
   return {
     ...defaultFakeData,

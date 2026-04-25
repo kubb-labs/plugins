@@ -7,7 +7,7 @@ import dayjs from 'dayjs'
 import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
-export function pet<TOverwriteData extends Partial<Pet> = {}>(data?: TOverwriteData): Required<Pet> {
+export function pet(data?: Partial<Pet>): Required<Pet> {
   const defaultFakeData = {
     id: faker.number.int(),
     name: faker.string.alpha(),

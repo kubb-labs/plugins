@@ -72,9 +72,9 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   let functionBody = ''
 
   if (useGenericOverride) {
-    // Generate generic function with precise type inference
+    // Generate function with defaultFakeData structure
     const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
-    functionSignature = `${jsdoc}export function ${name}<TOverwriteData extends Partial<${typeName}> = {}>(data?: TOverwriteData): Required<${typeName}>`
+    functionSignature = `${jsdoc}export function ${name}(data?: Partial<${typeName}>): Required<${typeName}>`
 
     const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
     functionBody = `{

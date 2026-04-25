@@ -5,7 +5,7 @@
 
 import { faker } from '@faker-js/faker'
 
-export function pet<TOverwriteData extends Partial<Pet> = {}>(data?: TOverwriteData): Required<Pet> {
+export function pet(data?: Partial<Pet>): Required<Pet> {
   const defaultFakeData = {
     id: faker.string.fromCharacters('abc'),
     name: faker.string.alpha({ casing: 'lower' }),
