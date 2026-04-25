@@ -1,5 +1,7 @@
 # @kubb/plugin-ts
 
+## 5.0.0-alpha.55
+
 ## 5.0.0-alpha.54
 
 ## 5.0.0-alpha.52
@@ -13,13 +15,25 @@
   **Before**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, never, object, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    never,
+    object,
+    ResolverZod
+  >;
   ```
 
   **After**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    ResolverZod
+  >;
   ```
 
 ### Patch Changes
@@ -121,14 +135,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -136,25 +150,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -162,7 +176,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -265,22 +279,22 @@
   pluginTs({
     resolver: {
       resolveName(name) {
-        return `Custom${this.default(name, 'function')}`
+        return `Custom${this.default(name, "function")}`;
       },
     },
     transformer: {
       schema(node) {
-        return { ...node, description: undefined }
+        return { ...node, description: undefined };
       },
     },
     printer: {
       nodes: {
         integer() {
-          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword);
         },
       },
     },
-  })
+  });
   ```
 
   ### `@kubb/plugin-zod`
@@ -292,22 +306,22 @@
   pluginZod({
     resolver: {
       resolveName(name) {
-        return `${this.default(name, 'function')}Schema`
+        return `${this.default(name, "function")}Schema`;
       },
     },
     transformer: {
       schema(node) {
-        return { ...node, description: undefined }
+        return { ...node, description: undefined };
       },
     },
     printer: {
       nodes: {
         integer() {
-          return 'z.number()'
+          return "z.number()";
         },
       },
     },
-  })
+  });
   ```
 
   ### `@kubb/plugin-cypress`
@@ -386,9 +400,9 @@
 
   ```typescript
   pluginTs({
-    enumType: 'asConst',
-    enumTypeSuffix: 'Value', // → export type PetTypeValue = …
-  })
+    enumType: "asConst",
+    enumTypeSuffix: "Value", // → export type PetTypeValue = …
+  });
   ```
 
   Set `enumTypeSuffix: ''` to suppress the suffix entirely and use only the base type name.
@@ -533,13 +547,13 @@
 
   ```ts
   // Before — only individual param types
-  export type ListPetsQueryLimit = number
+  export type ListPetsQueryLimit = number;
 
   // After — grouped type added
-  export type ListPetsQueryLimit = number
+  export type ListPetsQueryLimit = number;
   export type ListPetsQueryParams = {
-    limit?: ListPetsQueryLimit
-  }
+    limit?: ListPetsQueryLimit;
+  };
   ```
 
 - [#2854](https://github.com/kubb-labs/kubb/pull/2854) [`68a3bdd`](https://github.com/kubb-labs/kubb/commit/68a3bdd2eb85b3bd78e278ba9e4a0b691b580c7e) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
@@ -1055,8 +1069,8 @@
 
   ```typescript
   pluginTs({
-    integerType: 'number', // 'number' | 'bigint', default: 'bigint'
-  })
+    integerType: "number", // 'number' | 'bigint', default: 'bigint'
+  });
   ```
 
 ### Patch Changes
@@ -1284,20 +1298,20 @@
   **Usage:**
 
   ```typescript
-  import { defineConfig } from '@kubb/core'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
+  import { defineConfig } from "@kubb/core";
+  import { pluginTs } from "@kubb/plugin-ts";
+  import { pluginClient } from "@kubb/plugin-client";
 
   export default defineConfig({
     plugins: [
       pluginTs({
-        paramsCasing: 'camelcase', // Transform types
+        paramsCasing: "camelcase", // Transform types
       }),
       pluginClient({
-        paramsCasing: 'camelcase', // Transform client code
+        paramsCasing: "camelcase", // Transform client code
       }),
     ],
-  })
+  });
   ```
 
   **Example:**
@@ -1453,7 +1467,7 @@
   ```typescript
   pluginOas({
     collisionDetection: true, // Recommended - prevents all collision types
-  })
+  });
   ```
 
 - Updated dependencies [[`996f3b2`](https://github.com/kubb-labs/kubb/commit/996f3b26d8c2167c3e77b734275c204e6c1b159c)]:
@@ -1574,28 +1588,28 @@
   export default {
     plugins: [
       pluginTs({
-        enumKeyCasing: 'screamingSnakeCase',
+        enumKeyCasing: "screamingSnakeCase",
       }),
     ],
-  }
+  };
   ```
 
   Before:
 
   ```typescript
   export const enumStringEnum = {
-    'created at': 'created at',
-    'FILE.UPLOADED': 'FILE.UPLOADED',
-  } as const
+    "created at": "created at",
+    "FILE.UPLOADED": "FILE.UPLOADED",
+  } as const;
   ```
 
   After:
 
   ```typescript
   export const enumStringEnum = {
-    CREATED_AT: 'created at',
-    FILE_UPLOADED: 'FILE.UPLOADED',
-  } as const
+    CREATED_AT: "created at",
+    FILE_UPLOADED: "FILE.UPLOADED",
+  } as const;
   ```
 
   **Additional improvements:**
@@ -1637,20 +1651,20 @@
 
   ```typescript
   export type QueryParams = {
-    include?: 'author' | 'tags' // TS2411: not assignable to string
-    page?: { number?: number } // TS2411: not assignable to string
-    [key: string]: string
-  }
+    include?: "author" | "tags"; // TS2411: not assignable to string
+    page?: { number?: number }; // TS2411: not assignable to string
+    [key: string]: string;
+  };
   ```
 
   **After:**
 
   ```typescript
   export type QueryParams = {
-    include?: 'author' | 'tags'
-    page?: { number?: number }
-    [key: string]: unknown // All properties compatible
-  }
+    include?: "author" | "tags";
+    page?: { number?: number };
+    [key: string]: unknown; // All properties compatible
+  };
   ```
 
 - Updated dependencies []:
@@ -1688,23 +1702,24 @@
 
   ```typescript
   pluginTs({
-    enumType: 'inlineLiteral',
-  })
+    enumType: "inlineLiteral",
+  });
   ```
 
   **Before (enumType: 'asConst' - default):**
 
   ```typescript
   export const petStatusEnum = {
-    available: 'available',
-    pending: 'pending',
-    sold: 'sold',
-  } as const
+    available: "available",
+    pending: "pending",
+    sold: "sold",
+  } as const;
 
-  export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
+  export type PetStatusEnumKey =
+    (typeof petStatusEnum)[keyof typeof petStatusEnum];
 
   export interface Pet {
-    status?: PetStatusEnumKey
+    status?: PetStatusEnumKey;
   }
   ```
 
@@ -1712,7 +1727,7 @@
 
   ```typescript
   export interface Pet {
-    status?: 'available' | 'pending' | 'sold'
+    status?: "available" | "pending" | "sold";
   }
   ```
 

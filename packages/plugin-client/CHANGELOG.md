@@ -1,5 +1,13 @@
 # @kubb/plugin-client
 
+## 5.0.0-alpha.55
+
+### Patch Changes
+
+- Updated dependencies [[`dd9c91a`](https://github.com/kubb-labs/plugins/commit/dd9c91a7c4deba02b6751e9965455674bfacc703)]:
+  - @kubb/plugin-zod@5.0.0-alpha.55
+  - @kubb/plugin-ts@5.0.0-alpha.55
+
 ## 5.0.0-alpha.54
 
 ### Patch Changes
@@ -19,13 +27,25 @@
   **Before**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, never, object, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    never,
+    object,
+    ResolverZod
+  >;
   ```
 
   **After**
 
   ```ts
-  type PluginZod = PluginFactoryOptions<'plugin-zod', Options, ResolvedOptions, ResolverZod>
+  type PluginZod = PluginFactoryOptions<
+    "plugin-zod",
+    Options,
+    ResolvedOptions,
+    ResolverZod
+  >;
   ```
 
 ### Patch Changes
@@ -63,13 +83,13 @@
   ```ts
   // Before
   pluginClient({
-    pre: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    pre: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
 
   // After
   pluginClient({
-    dependencies: ['@kubb/plugin-ts', '@kubb/plugin-zod'],
-  })
+    dependencies: ["@kubb/plugin-ts", "@kubb/plugin-zod"],
+  });
   ```
 
   All built-in plugins have been updated automatically. If you were setting `pre` or `post` directly on a custom plugin, update them to use `dependencies` instead.
@@ -159,14 +179,14 @@
   Generators now receive a typed `this` context that guarantees `adapter` and `rootNode` are always present (non-optional). Use it instead of the raw `PluginContext` to avoid null-checks in every hook:
 
   ```ts
-  import { defineGenerator } from '@kubb/core'
+  import { defineGenerator } from "@kubb/core";
 
   export const myGenerator = defineGenerator<PluginMyPlugin>({
     async schema(node, options) {
-      const { adapter, rootNode } = this // always present, no null-check needed
+      const { adapter, rootNode } = this; // always present, no null-check needed
       // ...
     },
-  })
+  });
   ```
 
   ### New: `mergeGenerators(generators)`
@@ -174,25 +194,25 @@
   Combines an array of generators into a single merged generator. Each hook runs in sequence and applies its result via `applyHookResult`. Use this inside plugin hooks to delegate to all generators in the preset:
 
   ```ts
-  import { mergeGenerators } from '@kubb/core'
+  import { mergeGenerators } from "@kubb/core";
 
   export const myPlugin = createPlugin<MyPlugin>((options) => {
-    const generators = [generatorA, generatorB]
-    const mergedGenerator = mergeGenerators(generators)
+    const generators = [generatorA, generatorB];
+    const mergedGenerator = mergeGenerators(generators);
 
     return {
-      name: 'my-plugin',
+      name: "my-plugin",
       async schema(node, opts) {
-        return mergedGenerator.schema?.call(this, node, opts)
+        return mergedGenerator.schema?.call(this, node, opts);
       },
       async operation(node, opts) {
-        return mergedGenerator.operation?.call(this, node, opts)
+        return mergedGenerator.operation?.call(this, node, opts);
       },
       async operations(nodes, opts) {
-        return mergedGenerator.operations?.call(this, nodes, opts)
+        return mergedGenerator.operations?.call(this, nodes, opts);
       },
-    }
-  })
+    };
+  });
   ```
 
   ### New: `PluginRegistry` augmentation
@@ -200,7 +220,7 @@
   Every plugin now augments the global `Kubb.PluginRegistry` interface, enabling automatic typing for `getPlugin` and `requirePlugin`:
 
   ```ts
-  const tsPlugin = context.getPlugin('plugin-ts')
+  const tsPlugin = context.getPlugin("plugin-ts");
   // tsPlugin is typed as PluginTs automatically
   ```
 
@@ -257,7 +277,7 @@
   Use `compatibilityPreset: 'kubbV4'` to preserve v4 naming conventions during migration. The default `'default'` preset uses the new v5 naming conventions.
 
   ```typescript
-  pluginClient({ compatibilityPreset: 'kubbV4' })
+  pluginClient({ compatibilityPreset: "kubbV4" });
   ```
 
   #### New `resolver` option
@@ -268,10 +288,10 @@
   pluginClient({
     resolver: {
       resolveName(name) {
-        return `${this.default(name)}Client`
+        return `${this.default(name)}Client`;
       },
     },
-  })
+  });
   ```
 
   #### New `transformer` option
@@ -279,15 +299,15 @@
   Apply an AST `Visitor` to transform schema and operation nodes before they are printed. This replaces the old `transformers` callback approach.
 
   ```typescript
-  import { pluginClient } from '@kubb/plugin-client'
+  import { pluginClient } from "@kubb/plugin-client";
 
   pluginClient({
     transformer: {
       operation(node) {
-        return { ...node, operationId: `api_${node.operationId}` }
+        return { ...node, operationId: `api_${node.operationId}` };
       },
     },
-  })
+  });
   ```
 
   #### `transformers.name` replaced by `resolver`
@@ -299,19 +319,19 @@
   ```typescript [Before (v4)]
   pluginClient({
     transformers: {
-      name: (name, type) => (type === 'function' ? `${name}Client` : name),
+      name: (name, type) => (type === "function" ? `${name}Client` : name),
     },
-  })
+  });
   ```
 
   ```typescript [After (v5)]
   pluginClient({
     resolver: {
       resolveName(name) {
-        return `${this.default(name)}Client`
+        return `${this.default(name)}Client`;
       },
     },
-  })
+  });
   ```
 
   :::
@@ -1255,20 +1275,20 @@
   **Usage:**
 
   ```typescript
-  import { defineConfig } from '@kubb/core'
-  import { pluginTs } from '@kubb/plugin-ts'
-  import { pluginClient } from '@kubb/plugin-client'
+  import { defineConfig } from "@kubb/core";
+  import { pluginTs } from "@kubb/plugin-ts";
+  import { pluginClient } from "@kubb/plugin-client";
 
   export default defineConfig({
     plugins: [
       pluginTs({
-        paramsCasing: 'camelcase', // Transform types
+        paramsCasing: "camelcase", // Transform types
       }),
       pluginClient({
-        paramsCasing: 'camelcase', // Transform client code
+        paramsCasing: "camelcase", // Transform client code
       }),
     ],
-  })
+  });
   ```
 
   **Example:**
@@ -1942,13 +1962,13 @@
   ```ts
   pluginClient({
     output: {
-      path: './clients/class',
+      path: "./clients/class",
     },
-    clientType: 'class',
+    clientType: "class",
     group: {
-      type: 'tag',
+      type: "tag",
     },
-  })
+  });
   ```
 
   This will generate classes like `Pet`, `Store`, `User` with methods for each operation.

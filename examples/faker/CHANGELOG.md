@@ -1,5 +1,14 @@
 # faker-pet-store
 
+## 0.0.2-alpha.2
+
+### Patch Changes
+
+- Updated dependencies [[`f655948`](https://github.com/kubb-labs/plugins/commit/f655948eb85409180a8930ad46a6dc57a55445a0)]:
+  - @kubb/plugin-faker@5.0.0-alpha.55
+  - @kubb/plugin-client@5.0.0-alpha.55
+  - @kubb/plugin-ts@5.0.0-alpha.55
+
 ## 0.0.2-alpha.1
 
 ### Patch Changes
