@@ -6,8 +6,6 @@
 import type { Tag } from "../types/Tag.ts";
 import { faker } from "@faker-js/faker";
 
-export function tag(data?: Partial<Tag>): typeof _defaults & Omit<Tag, keyof typeof _defaults> {
-  const _defaults = {"id": faker.number.int(),"name": faker.string.alpha()}
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Tag, keyof typeof _defaults>
-  return result
+export function tag(data?: Partial<Tag>): Required<Tag> {
+  return Object.assign({} as Required<Tag>, {"id": faker.number.int(),"name": faker.string.alpha()}, data)
 }

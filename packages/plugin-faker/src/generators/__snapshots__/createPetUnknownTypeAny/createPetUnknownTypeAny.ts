@@ -20,10 +20,12 @@ export function createPetsError(data?: Partial<CreatePetsError>): CreatePetsErro
   return error(data)
 }
 
-export function createPetsMutationRequest(data?: Partial<CreatePetsMutationRequest>): typeof _defaults & Omit<CreatePetsMutationRequest, keyof typeof _defaults> {
-  const _defaults = { name: faker.string.alpha(), tag: faker.string.alpha() }
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<CreatePetsMutationRequest, keyof typeof _defaults>
-  return result
+export function createPetsMutationRequest(data?: Partial<CreatePetsMutationRequest>): Required<CreatePetsMutationRequest> {
+  return Object.assign(
+    {} as Required<CreatePetsMutationRequest>,
+    { name: faker.string.alpha(), tag: faker.string.alpha() },
+    data
+  )
 }
 
 export function createPetsMutationResponse(data?: Partial<CreatePetsMutationResponse>): CreatePetsMutationResponse {

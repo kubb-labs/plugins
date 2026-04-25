@@ -16,10 +16,12 @@ export function createPetStatus201(data?: Partial<CreatePetStatus201>): CreatePe
 /**
  * @description Pet to add
  */
-export function createPetData(data?: Partial<CreatePetData>): typeof _defaults & Omit<CreatePetData, keyof typeof _defaults> {
-  const _defaults = { name: faker.string.alpha(), category: category() }
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<CreatePetData, keyof typeof _defaults>
-  return result
+export function createPetData(data?: Partial<CreatePetData>): Required<CreatePetData> {
+  return Object.assign(
+    {} as Required<CreatePetData>,
+    { name: faker.string.alpha(), category: category() },
+    data
+  )
 }
 
 export function createPetResponse(data?: Partial<CreatePetResponse>): CreatePetResponse {

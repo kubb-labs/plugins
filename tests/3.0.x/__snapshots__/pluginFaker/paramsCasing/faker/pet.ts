@@ -6,8 +6,6 @@
 import type { Pet } from "../types/Pet.ts";
 import { faker } from "@faker-js/faker";
 
-export function pet(data?: Partial<Pet>): typeof _defaults & Omit<Pet, keyof typeof _defaults> {
-  const _defaults = {"id": faker.string.alpha(),"name": faker.string.alpha()}
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Pet, keyof typeof _defaults>
-  return result
+export function pet(data?: Partial<Pet>): Required<Pet> {
+  return Object.assign({} as Required<Pet>, {"id": faker.string.alpha(),"name": faker.string.alpha()}, data)
 }

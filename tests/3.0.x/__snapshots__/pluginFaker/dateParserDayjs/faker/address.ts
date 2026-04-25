@@ -6,8 +6,6 @@
 import type { Address } from "../types/Address.ts";
 import { faker } from "@faker-js/faker";
 
-export function address(data?: Partial<Address>): typeof _defaults & Omit<Address, keyof typeof _defaults> {
-  const _defaults = {"street": faker.string.alpha(),"city": faker.string.alpha(),"state": faker.string.alpha(),"zip": faker.string.alpha()}
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Address, keyof typeof _defaults>
-  return result
+export function address(data?: Partial<Address>): Required<Address> {
+  return Object.assign({} as Required<Address>, {"street": faker.string.alpha(),"city": faker.string.alpha(),"state": faker.string.alpha(),"zip": faker.string.alpha()}, data)
 }

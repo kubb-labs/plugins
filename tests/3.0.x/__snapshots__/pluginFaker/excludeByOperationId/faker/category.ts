@@ -6,8 +6,6 @@
 import type { Category } from "../types/Category.ts";
 import { faker } from "@faker-js/faker";
 
-export function category(data?: Partial<Category>): typeof _defaults & Omit<Category, keyof typeof _defaults> {
-  const _defaults = {"id": faker.number.int(),"name": faker.string.alpha()}
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Category, keyof typeof _defaults>
-  return result
+export function category(data?: Partial<Category>): Required<Category> {
+  return Object.assign({} as Required<Category>, {"id": faker.number.int(),"name": faker.string.alpha()}, data)
 }

@@ -53,17 +53,12 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const hasGetters = /\bget\s+\w+\s*\(\s*\)\s*\{/.test(fakerText)
 
   let fakerTextWithOverride = fakerText
-  let useObjectAssignShape = false
-  let useSpreadWithTypeAssertion = false
+  let useObjectAssign = false
 
   if (canOverride && isObject) {
-    if (hasGetters) {
-      // When there are getters (circular refs), use Object.assign to avoid invoking them during spread
-      useObjectAssignShape = true
-    } else {
-      // For regular objects without getters, use spread with precise type assertion
-      useSpreadWithTypeAssertion = true
-    }
+    // Always use Object.assign for objects to ensure proper type precision
+    // Required<> marks all properties as required, reflecting that the faker generates all of them
+    useObjectAssign = true
   }
 
   if (canOverride && isTuple) {
@@ -83,7 +78,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  const usesData = useObjectAssignShape || useSpreadWithTypeAssertion || /\bdata\b/.test(fakerTextWithOverride)
+  const usesData = useObjectAssign || /\bdata\b/.test(fakerTextWithOverride)
   const dataParamName = usesData ? 'data' : '_data'
   const params = ast.createFunctionParameters({
     params: [
@@ -96,18 +91,14 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   })
   const paramsSignature = declarationPrinter.print(params) ?? ''
 
-  // For objects with overrides, we need a more precise return type that marks generated properties as required
-  const returnType = useSpreadWithTypeAssertion ? `typeof _defaults & Omit<${typeName}, keyof typeof _defaults>` : resolvedReturnType
+  // For objects with overrides, use Required<> to mark all generated properties as required
+  const returnType = useObjectAssign
+    ? `Required<${typeName}>`
+    : resolvedReturnType
 
-  const body = useObjectAssignShape
-    ? `const result: ${resolvedReturnType} = ${fakerText}
-if (data) Object.assign(result, data)
-return result`
-    : useSpreadWithTypeAssertion
-      ? `const _defaults = ${fakerText}
-const result = { ..._defaults, ...(data || {}) } as ${returnType}
-return result`
-      : `return ${fakerTextWithOverride}`
+  const body = useObjectAssign
+    ? `return Object.assign({} as ${returnType}, ${fakerText}, data)`
+    : `return ${fakerTextWithOverride}`
 
   return (
     <File.Source name={name} isExportable isIndexable>

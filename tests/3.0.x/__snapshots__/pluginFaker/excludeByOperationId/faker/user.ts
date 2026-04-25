@@ -6,8 +6,6 @@
 import type { User } from "../types/User.ts";
 import { faker } from "@faker-js/faker";
 
-export function user(data?: Partial<User>): typeof _defaults & Omit<User, keyof typeof _defaults> {
-  const _defaults = {"id": faker.number.int(),"username": faker.string.alpha(),"firstName": faker.string.alpha(),"lastName": faker.string.alpha(),"email": faker.string.alpha(),"password": faker.string.alpha(),"phone": faker.string.alpha(),"userStatus": faker.number.int()}
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<User, keyof typeof _defaults>
-  return result
+export function user(data?: Partial<User>): Required<User> {
+  return Object.assign({} as Required<User>, {"id": faker.number.int(),"username": faker.string.alpha(),"firstName": faker.string.alpha(),"lastName": faker.string.alpha(),"email": faker.string.alpha(),"password": faker.string.alpha(),"phone": faker.string.alpha(),"userStatus": faker.number.int()}, data)
 }

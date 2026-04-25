@@ -6,8 +6,10 @@
 import dayjs from 'dayjs'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): typeof _defaults & Omit<Pet, keyof typeof _defaults> {
-  const _defaults = {
+export function pet(data?: Partial<Pet>): Required<Pet> {
+  return Object.assign(
+    {} as Required<Pet>,
+    {
       id: faker.number.int(),
       name: faker.string.alpha(),
       tag: faker.string.alpha(),
@@ -15,7 +17,7 @@ export function pet(data?: Partial<Pet>): typeof _defaults & Omit<Pet, keyof typ
       shipDate: dayjs(faker.date.anytime()).format('YYYY-MM-DD'),
       shipTime: dayjs(faker.date.anytime()).format('HH:mm:ss'),
       info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
-    }
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Pet, keyof typeof _defaults>
-  return result
+    },
+    data
+  )
 }

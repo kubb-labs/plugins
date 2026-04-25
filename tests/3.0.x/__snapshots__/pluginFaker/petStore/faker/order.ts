@@ -6,8 +6,6 @@
 import type { Order } from "../types/Order.ts";
 import { faker } from "@faker-js/faker";
 
-export function order(data?: Partial<Order>): typeof _defaults & Omit<Order, keyof typeof _defaults> {
-  const _defaults = {"id": faker.number.int(),"petId": faker.number.int(),"quantity": faker.number.int(),"shipDate": faker.date.anytime().toISOString(),"status": faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),"complete": faker.datatype.boolean()}
-  const result = { ..._defaults, ...(data || {}) } as typeof _defaults & Omit<Order, keyof typeof _defaults>
-  return result
+export function order(data?: Partial<Order>): Required<Order> {
+  return Object.assign({} as Required<Order>, {"id": faker.number.int(),"petId": faker.number.int(),"quantity": faker.number.int(),"shipDate": faker.date.anytime().toISOString(),"status": faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),"complete": faker.datatype.boolean()}, data)
 }
