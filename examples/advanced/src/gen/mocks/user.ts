@@ -2,9 +2,10 @@ import type { User } from '../models/ts/User.ts'
 import { tagTagFaker } from './tag/tag.ts'
 import { faker } from '@faker-js/faker'
 
-export function userFaker(data?: Partial<User>): User {
-  return {
-    ...{
+export function userFaker(data?: Partial<User>): Required<User> {
+  return Object.assign(
+    {} as Required<User>,
+    {
       id: faker.number.int(),
       username: faker.string.alpha(),
       uuid: faker.string.uuid(),
@@ -16,6 +17,6 @@ export function userFaker(data?: Partial<User>): User {
       phone: faker.string.alpha(),
       userStatus: faker.number.int(),
     },
-    ...(data || {}),
-  }
+    data,
+  )
 }

@@ -9,13 +9,10 @@ import { faker } from '@faker-js/faker'
 /**
  * @description successful operation
  */
-export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
+export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200> {
   faker.seed([220])
 
-  return {
-    ...{},
-    ...(data || {}),
-  }
+  return Object.assign({} as Required<GetInventoryStatus200>, {}, data)
 }
 
 export function getInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
