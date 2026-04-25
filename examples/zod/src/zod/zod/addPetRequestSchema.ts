@@ -10,7 +10,9 @@ import { tagSchema } from './tagSchema.ts'
 export const addPetRequestSchema = z.object({
   id: z.int().optional(),
   name: z.string(),
-  category: categorySchema.optional(),
+  get category() {
+    return categorySchema.optional()
+  },
   photoUrls: z.array(z.string()),
   tags: z.array(tagSchema).optional(),
   status: z.enum(['available', 'pending', 'sold']).optional().describe('pet status in the store'),
