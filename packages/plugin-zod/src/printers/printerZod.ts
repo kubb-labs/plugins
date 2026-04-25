@@ -177,13 +177,21 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
 
             const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
 
+            // When the property's baseOutput is a literal/enum (e.g., discriminator property override)
+            // but the schema is a ref, don't apply the description from the ref target.
+            // Only apply description from the ref if the baseOutput is also using the ref.
+            let descriptionToApply = meta.description
+            if (schema.type === 'ref' && (baseOutput.startsWith('z.literal(') || baseOutput.startsWith('z.enum('))) {
+              descriptionToApply = undefined
+            }
+
             const value = applyModifiers({
               value: wrappedOutput,
               nullable: isNullable,
               optional: isOptional,
               nullish: isNullish,
               defaultValue: meta.default,
-              description: meta.description,
+              description: descriptionToApply,
             })
 
             if (hasSelfRef) {
