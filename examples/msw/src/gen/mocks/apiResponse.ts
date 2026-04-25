@@ -8,6 +8,9 @@ import { faker } from '@faker-js/faker'
 
 export function apiResponse(data?: Partial<ApiResponse>): Required<ApiResponse> {
   faker.seed([220])
-
-  return Object.assign({} as Required<ApiResponse>, { code: faker.number.int(), type: faker.string.alpha(), message: faker.string.alpha() }, data)
+  const defaultFakeData = { code: faker.number.int(), type: faker.string.alpha(), message: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<ApiResponse>
 }

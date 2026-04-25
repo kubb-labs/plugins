@@ -9,7 +9,11 @@ import type { GetInventoryResponse, GetInventoryStatus200 } from '../models/GetI
  * @description successful operation
  */
 export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200> {
-  return Object.assign({} as Required<GetInventoryStatus200>, {}, data)
+  const defaultFakeData = {}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<GetInventoryStatus200>
 }
 
 export function getInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
