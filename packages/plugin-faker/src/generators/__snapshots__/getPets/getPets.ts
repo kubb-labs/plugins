@@ -6,21 +6,23 @@
 import { faker } from '@faker-js/faker'
 import { error, pagination, pets } from '../getPets'
 
-export function listPetsQueryParams(data?: Partial<ListPetsQueryParams>): ListPetsQueryParams {
-  return {
-    ...{ limit: faker.string.alpha() },
-    ...(data || {}),
-  }
+export function listPetsQueryParams(data?: Partial<ListPetsQueryParams>): Required<ListPetsQueryParams> {
+  return Object.assign(
+    {} as Required<ListPetsQueryParams>,
+    { limit: faker.string.alpha() },
+    data
+  )
 }
 
 /**
  * @description A paged array of pets
  */
-export function listPets200(data?: Partial<ListPets200>): ListPets200 {
-  return {
-    ...{ ...pagination(), ...pets() },
-    ...(data || {}),
-  }
+export function listPets200(data?: Partial<ListPets200>): Required<ListPets200> {
+  return Object.assign(
+    {} as Required<ListPets200>,
+    { ...pagination(), ...pets() },
+    data
+  )
 }
 
 /**

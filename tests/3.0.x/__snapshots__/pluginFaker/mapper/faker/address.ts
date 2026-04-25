@@ -6,10 +6,11 @@
 import type { Address } from "../types/Address.ts";
 import { faker } from "@faker-js/faker";
 
-export function address(data?: Partial<Address>): Address {
-
+export function address(data?: Partial<Address>): Required<Address>
+{
+  const defaultFakeData = {"street": faker.string.alpha(),"city": faker.string.alpha(),"state": faker.string.alpha(),"zip": faker.string.alpha()}
   return {
-    ...{"street": faker.string.alpha(),"city": faker.string.alpha(),"state": faker.string.alpha(),"zip": faker.string.alpha()},
-    ...(data || {})
-  }
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Address>
 }

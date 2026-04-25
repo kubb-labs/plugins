@@ -5,9 +5,10 @@
 
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Pet {
-  return {
-    ...{
+export function pet(data?: Partial<Pet>): Required<Pet> {
+  return Object.assign(
+    {} as Required<Pet>,
+    {
       id: faker.number.int(),
       name: faker.string.alpha(),
       tag: faker.string.alpha(),
@@ -16,6 +17,6 @@ export function pet(data?: Partial<Pet>): Pet {
       shipTime: faker.date.anytime().toISOString().substring(11, 19),
       info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
     },
-    ...(data || {}),
-  }
+    data
+  )
 }

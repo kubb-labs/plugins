@@ -3,9 +3,10 @@ import { categoryFaker } from './category.ts'
 import { tagTagFaker } from './tag/tag.ts'
 import { faker } from '@faker-js/faker'
 
-export function petFaker(data?: Partial<Pet>): Pet {
-  return {
-    ...{
+export function petFaker(data?: Partial<Pet>): Required<Pet> {
+  return Object.assign(
+    {} as Required<Pet>,
+    {
       id: faker.number.int(),
       parent: faker.helpers.multiple(() => undefined as any),
       signature: faker.helpers.fromRegExp('^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$'),
@@ -16,6 +17,6 @@ export function petFaker(data?: Partial<Pet>): Pet {
       tags: faker.helpers.multiple(() => tagTagFaker()),
       status: faker.helpers.arrayElement<any>(['working', 'idle']),
     },
-    ...(data || {}),
-  }
+    data,
+  )
 }

@@ -6,12 +6,10 @@
 import { faker } from "@faker-js/faker";
 
 export function deletePetHeaderApiKey(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
 export function deletePetPathPetId(data?: number): number {
-
   return data ?? faker.number.int()
 }
 
@@ -19,11 +17,9 @@ export function deletePetPathPetId(data?: number): number {
  * @description Invalid pet value
  */
 export function deletePetStatus400() {
-
   return undefined
 }
 
 export function deletePetResponse() {
-
   return undefined
 }

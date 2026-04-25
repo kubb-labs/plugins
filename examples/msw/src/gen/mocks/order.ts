@@ -6,11 +6,12 @@
 import type { Order } from '../models/Order.ts'
 import { faker } from '@faker-js/faker'
 
-export function order(data?: Partial<Order>): Order {
+export function order(data?: Partial<Order>): Required<Order> {
   faker.seed([220])
 
-  return {
-    ...{
+  return Object.assign(
+    {} as Required<Order>,
+    {
       id: faker.number.int(),
       petId: faker.number.int(),
       quantity: faker.number.int(),
@@ -19,6 +20,6 @@ export function order(data?: Partial<Order>): Order {
       http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
       complete: faker.datatype.boolean(),
     },
-    ...(data || {}),
-  }
+    data,
+  )
 }

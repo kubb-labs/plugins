@@ -7,7 +7,6 @@ import type { DeleteOrderResponse } from "../../types/DeleteOrder.ts";
 import { faker } from "@faker-js/faker";
 
 export function deleteOrderPathOrderId(data?: number): number {
-
   return data ?? faker.number.int()
 }
 
@@ -15,7 +14,6 @@ export function deleteOrderPathOrderId(data?: number): number {
  * @description Invalid ID supplied
  */
 export function deleteOrderStatus400() {
-
   return undefined
 }
 
@@ -23,11 +21,9 @@ export function deleteOrderStatus400() {
  * @description Order not found
  */
 export function deleteOrderStatus404() {
-
   return undefined
 }
 
 export function deleteOrderResponse(_data?: DeleteOrderResponse): DeleteOrderResponse {
-
   return faker.helpers.arrayElement<any>([deleteOrderStatus400(), deleteOrderStatus404()])
 }

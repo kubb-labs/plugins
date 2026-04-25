@@ -11,7 +11,6 @@ import { faker } from "@faker-js/faker";
  * @description Successful operation
  */
 export function createUsersWithListInputStatus200(data?: Partial<CreateUsersWithListInputStatus200>): CreateUsersWithListInputStatus200 {
-
   return user(data)
 }
 
@@ -19,12 +18,10 @@ export function createUsersWithListInputStatus200(data?: Partial<CreateUsersWith
  * @description successful operation
  */
 export function createUsersWithListInputStatusDefault() {
-
   return undefined
 }
 
 export function createUsersWithListInputData(data?: CreateUsersWithListInputData): CreateUsersWithListInputData {
-
   return [
     ...faker.helpers.multiple(() => (user())),
     ...(data || [])
@@ -32,6 +29,5 @@ export function createUsersWithListInputData(data?: CreateUsersWithListInputData
 }
 
 export function createUsersWithListInputResponse(_data?: CreateUsersWithListInputResponse): CreateUsersWithListInputResponse {
-
   return faker.helpers.arrayElement<any>([createUsersWithListInputStatus200(), createUsersWithListInputStatusDefault()])
 }

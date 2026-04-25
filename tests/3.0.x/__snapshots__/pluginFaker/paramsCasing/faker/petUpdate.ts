@@ -6,10 +6,11 @@
 import type { PetUpdate } from "../types/PetUpdate.ts";
 import { faker } from "@faker-js/faker";
 
-export function petUpdate(data?: Partial<PetUpdate>): PetUpdate {
-
+export function petUpdate(data?: Partial<PetUpdate>): Required<PetUpdate>
+{
+  const defaultFakeData = {"name": faker.string.alpha(),"description": faker.string.alpha()}
   return {
-    ...{"name": faker.string.alpha(),"description": faker.string.alpha()},
-    ...(data || {})
-  }
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<PetUpdate>
 }

@@ -20,11 +20,12 @@ export function createPetsError(data?: Partial<CreatePetsError>): CreatePetsErro
   return error(data)
 }
 
-export function createPetsMutationRequest(data?: Partial<CreatePetsMutationRequest>): CreatePetsMutationRequest {
-  return {
-    ...{ name: faker.string.alpha(), tag: faker.string.alpha() },
-    ...(data || {}),
-  }
+export function createPetsMutationRequest(data?: Partial<CreatePetsMutationRequest>): Required<CreatePetsMutationRequest> {
+  return Object.assign(
+    {} as Required<CreatePetsMutationRequest>,
+    { name: faker.string.alpha(), tag: faker.string.alpha() },
+    data
+  )
 }
 
 export function createPetsMutationResponse(data?: Partial<CreatePetsMutationResponse>): CreatePetsMutationResponse {

@@ -12,11 +12,8 @@ export function updatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePe
 /**
  * @description accepted operation
  */
-export function updatePetStatus202(data?: Partial<UpdatePetStatus202>): UpdatePetStatus202 {
-  return {
-    ...{ id: faker.number.int() },
-    ...(data || {}),
-  }
+export function updatePetStatus202(data?: Partial<UpdatePetStatus202>): Required<UpdatePetStatus202> {
+  return Object.assign({} as Required<UpdatePetStatus202>, { id: faker.number.int() }, data)
 }
 
 /**

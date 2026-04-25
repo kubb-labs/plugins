@@ -8,10 +8,11 @@ import { category } from "./category.ts";
 import { tag } from "./tag.ts";
 import { faker } from "@faker-js/faker";
 
-export function pet(data?: Partial<Pet>): Pet {
-
+export function pet(data?: Partial<Pet>): Required<Pet>
+{
+  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha(),"log": faker.helpers.fromRegExp("^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$"),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": 'active'}
   return {
-    ...{"id": faker.number.int(),"name": faker.string.alpha(),"log": faker.helpers.fromRegExp("^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$"),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": 'active'},
-    ...(data || {})
-  }
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Pet>
 }

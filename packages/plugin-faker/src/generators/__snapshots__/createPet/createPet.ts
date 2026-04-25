@@ -16,11 +16,12 @@ export function createPetStatus201(data?: Partial<CreatePetStatus201>): CreatePe
 /**
  * @description Pet to add
  */
-export function createPetData(data?: Partial<CreatePetData>): CreatePetData {
+export function createPetData(data?: Partial<CreatePetData>): Required<CreatePetData> {
+  const defaultFakeData = { name: faker.string.alpha(), category: category() }
   return {
-    ...{ name: faker.string.alpha(), category: category() },
+    ...defaultFakeData,
     ...(data || {}),
-  }
+  } as Required<CreatePetData>
 }
 
 export function createPetResponse(data?: Partial<CreatePetResponse>): CreatePetResponse {

@@ -6,8 +6,8 @@
 import type { Cat } from './types/Cat'
 import { faker } from '@faker-js/faker'
 
-export function cat(data?: Partial<Cat>): Cat {
-  const result: Cat = {
+export function cat(data?: Partial<Cat>): Required<Cat> {
+  const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {
       return faker.helpers.arrayElement<any>([null, pet()])
@@ -16,6 +16,8 @@ export function cat(data?: Partial<Cat>): Cat {
       return faker.helpers.multiple(() => pet())
     },
   }
-  if (data) Object.assign(result, data)
-  return result
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Cat>
 }

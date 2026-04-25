@@ -44,26 +44,11 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 
-  // The printer emits `get prop() { ... }` for properties whose value would
-  // recurse through a circular dependency. Using object spread here would
-  // invoke those getters during construction (per ECMAScript spread semantics)
-  // and reintroduce the recursion we just deferred. Use `Object.assign` instead
-  // so the getters survive on the result object and a user override via `data`
-  // replaces them as plain data properties before they're ever read.
-  const hasGetters = /\bget\s+\w+\s*\(\s*\)\s*\{/.test(fakerText)
-
   let fakerTextWithOverride = fakerText
-  let useObjectAssignShape = false
+  let useGenericOverride = false
 
   if (canOverride && isObject) {
-    if (hasGetters) {
-      useObjectAssignShape = true
-    } else {
-      fakerTextWithOverride = `{
-  ...${fakerText},
-  ...(data || {})
-}`
-    }
+    useGenericOverride = true
   }
 
   if (canOverride && isTuple) {
@@ -83,40 +68,62 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  const usesData = useObjectAssignShape || /\bdata\b/.test(fakerTextWithOverride)
-  const dataParamName = usesData ? 'data' : '_data'
-  const params = ast.createFunctionParameters({
-    params: [
-      ast.createFunctionParameter({
-        name: dataParamName,
-        type: ast.createParamsType({ variant: 'reference', name: dataType }),
-        optional: true,
-      }),
-    ],
-  })
-  const paramsSignature = declarationPrinter.print(params) ?? ''
+  let functionSignature = ''
+  let functionBody = ''
 
-  const returnType = resolvedReturnType
+  if (useGenericOverride) {
+    // Generate function with defaultFakeData structure
+    const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
+    functionSignature = `${jsdoc}export function ${name}(data?: Partial<${typeName}>): Required<${typeName}>`
 
-  const body = useObjectAssignShape
-    ? `const result: ${returnType} = ${fakerText}
-if (data) Object.assign(result, data)
-return result`
-    : `return ${fakerTextWithOverride}`
+    const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
+    functionBody = `{
+  ${seedCode}const defaultFakeData = ${fakerText}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<${typeName}>
+}`
+  } else {
+    const usesData = /\bdata\b/.test(fakerTextWithOverride)
+    const dataParamName = usesData ? 'data' : '_data'
+    const params = ast.createFunctionParameters({
+      params: [
+        ast.createFunctionParameter({
+          name: dataParamName,
+          type: ast.createParamsType({ variant: 'reference', name: dataType }),
+          optional: true,
+        }),
+      ],
+    })
+    const paramsSignature = declarationPrinter.print(params) ?? ''
+    const returnType = resolvedReturnType
+
+    return (
+      <File.Source name={name} isExportable isIndexable>
+        <Function
+          export
+          name={name}
+          JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
+          params={canOverride ? paramsSignature : undefined}
+          returnType={returnType}
+        >
+          {seed ? (
+            <>
+              {`faker.seed(${JSON.stringify(seed)})`}
+              <br />
+            </>
+          ) : undefined}
+          {`return ${fakerTextWithOverride}`}
+        </Function>
+      </File.Source>
+    )
+  }
 
   return (
     <File.Source name={name} isExportable isIndexable>
-      <Function
-        export
-        name={name}
-        JSDoc={{ comments: [description ? `@description ${jsStringEscape(description)}` : undefined].filter(Boolean) }}
-        params={canOverride ? paramsSignature : undefined}
-        returnType={returnType}
-      >
-        {seed ? `faker.seed(${JSON.stringify(seed)})` : undefined}
-        <br />
-        {body}
-      </Function>
+      {functionSignature}
+      {functionBody}
     </File.Source>
   )
 }

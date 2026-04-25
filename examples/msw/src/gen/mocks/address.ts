@@ -6,11 +6,12 @@
 import type { Address } from '../models/Address.ts'
 import { faker } from '@faker-js/faker'
 
-export function address(data?: Partial<Address>): Address {
+export function address(data?: Partial<Address>): Required<Address> {
   faker.seed([220])
 
-  return {
-    ...{ street: faker.string.alpha(), city: faker.string.alpha(), state: faker.string.alpha(), zip: faker.string.alpha() },
-    ...(data || {}),
-  }
+  return Object.assign(
+    {} as Required<Address>,
+    { street: faker.string.alpha(), city: faker.string.alpha(), state: faker.string.alpha(), zip: faker.string.alpha() },
+    data,
+  )
 }

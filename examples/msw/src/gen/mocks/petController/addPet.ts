@@ -20,13 +20,10 @@ export function addPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus20
 /**
  * @description Pet not found
  */
-export function addPetStatus405(data?: Partial<AddPetStatus405>): AddPetStatus405 {
+export function addPetStatus405(data?: Partial<AddPetStatus405>): Required<AddPetStatus405> {
   faker.seed([220])
 
-  return {
-    ...{ code: faker.number.int(), message: faker.string.alpha() },
-    ...(data || {}),
-  }
+  return Object.assign({} as Required<AddPetStatus405>, { code: faker.number.int(), message: faker.string.alpha() }, data)
 }
 
 /**

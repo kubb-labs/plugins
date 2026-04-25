@@ -8,11 +8,12 @@ import { category } from "./category.ts";
 import { tag } from "./tag.ts";
 import { faker } from "@faker-js/faker";
 
-export function addPetRequest(data?: Partial<AddPetRequest>): AddPetRequest {
+export function addPetRequest(data?: Partial<AddPetRequest>): Required<AddPetRequest>
+{
   faker.seed([42])
-
+  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])}
   return {
-    ...{"id": faker.number.int(),"name": faker.string.alpha(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])},
-    ...(data || {})
-  }
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<AddPetRequest>
 }

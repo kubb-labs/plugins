@@ -7,16 +7,17 @@ import RandExp from 'randexp'
 import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
-export function pet(data?: Partial<Pet>): Pet {
-  return {
-    ...{
-      id: faker.number.int(),
-      name: faker.string.alpha(),
-      code: new RandExp('^[A-Z]{3}$').gen(),
-      shipDate: faker.date.anytime().toISOString().substring(0, 10),
-      category: category(),
-      status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
-    },
-    ...(data || {}),
+export function pet(data?: Partial<Pet>): Required<Pet> {
+  const defaultFakeData = {
+    id: faker.number.int(),
+    name: faker.string.alpha(),
+    code: new RandExp('^[A-Z]{3}$').gen(),
+    shipDate: faker.date.anytime().toISOString().substring(0, 10),
+    category: category(),
+    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
   }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Pet>
 }

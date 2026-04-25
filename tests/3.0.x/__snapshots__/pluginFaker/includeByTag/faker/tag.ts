@@ -6,10 +6,11 @@
 import type { Tag } from "../types/Tag.ts";
 import { faker } from "@faker-js/faker";
 
-export function tag(data?: Partial<Tag>): Tag {
-
+export function tag(data?: Partial<Tag>): Required<Tag>
+{
+  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha()}
   return {
-    ...{"id": faker.number.int(),"name": faker.string.alpha()},
-    ...(data || {})
-  }
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Tag>
 }

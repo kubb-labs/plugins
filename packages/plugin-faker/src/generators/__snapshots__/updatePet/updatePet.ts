@@ -6,11 +6,12 @@
 import { faker } from '@faker-js/faker'
 import { error, pet } from '../updatePet'
 
-export function updatePetPathParams(data?: Partial<UpdatePetPathParams>): UpdatePetPathParams {
-  return {
-    ...{ petId: faker.number.int() },
-    ...(data || {}),
-  }
+export function updatePetPathParams(data?: Partial<UpdatePetPathParams>): Required<UpdatePetPathParams> {
+  return Object.assign(
+    {} as Required<UpdatePetPathParams>,
+    { petId: faker.number.int() },
+    data
+  )
 }
 
 /**

@@ -8,7 +8,6 @@ import { pet } from "../pet.ts";
 import { faker } from "@faker-js/faker";
 
 export function findPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
-
   return [
     ...faker.helpers.multiple(() => (faker.string.alpha())),
     ...(data || [])
@@ -19,7 +18,6 @@ export function findPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPet
  * @description successful operation
  */
 export function findPetsByTagsStatus200(data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
-
   return [
     ...faker.helpers.multiple(() => (pet())),
     ...(data || [])
@@ -30,11 +28,9 @@ export function findPetsByTagsStatus200(data?: FindPetsByTagsStatus200): FindPet
  * @description Invalid tag value
  */
 export function findPetsByTagsStatus400() {
-
   return undefined
 }
 
 export function findPetsByTagsResponse(_data?: FindPetsByTagsResponse): FindPetsByTagsResponse {
-
   return faker.helpers.arrayElement<any>([findPetsByTagsStatus200(), findPetsByTagsStatus400()])
 }
