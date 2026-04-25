@@ -10,7 +10,6 @@ import { user } from "../user.ts";
  * @description successful operation
  */
 export function createUserStatusDefault(data?: Partial<CreateUserStatusDefault>): CreateUserStatusDefault {
-
   return user(data)
 }
 
@@ -18,11 +17,9 @@ export function createUserStatusDefault(data?: Partial<CreateUserStatusDefault>)
  * @description Created user object
  */
 export function createUserData(data?: Partial<CreateUserData>): CreateUserData {
-
   return user(data)
 }
 
 export function createUserResponse(data?: Partial<CreateUserResponse>): CreateUserResponse {
-
   return createUserStatusDefault(data)
 }

@@ -7,6 +7,7 @@ import type { DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUs
 import { http } from "msw";
 
 export function deleteUserHandlerResponse400(data?: DeleteUserStatus400) {
+
       return new Response(JSON.stringify(data), {
         status: 400,
 
@@ -14,6 +15,7 @@ export function deleteUserHandlerResponse400(data?: DeleteUserStatus400) {
 }
 
 export function deleteUserHandlerResponse404(data?: DeleteUserStatus404) {
+
       return new Response(JSON.stringify(data), {
         status: 404,
 

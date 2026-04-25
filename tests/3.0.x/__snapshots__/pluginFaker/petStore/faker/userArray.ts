@@ -8,7 +8,6 @@ import { user } from "./user.ts";
 import { faker } from "@faker-js/faker";
 
 export function userArray(data?: UserArray): UserArray {
-
   return [
     ...faker.helpers.multiple(() => (user())),
     ...(data || [])

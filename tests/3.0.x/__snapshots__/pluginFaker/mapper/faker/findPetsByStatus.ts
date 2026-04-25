@@ -8,7 +8,6 @@ import { pet } from "./pet.ts";
 import { faker } from "@faker-js/faker";
 
 export function findPetsByStatusQueryStatus(data?: FindPetsByStatusQueryStatus): FindPetsByStatusQueryStatus {
-
   return data ?? faker.helpers.arrayElement<FindPetsByStatusQueryStatus>(["available", "pending", "sold"])
 }
 
@@ -16,7 +15,6 @@ export function findPetsByStatusQueryStatus(data?: FindPetsByStatusQueryStatus):
  * @description successful operation
  */
 export function findPetsByStatusStatus200(data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
-
   return [
     ...faker.helpers.multiple(() => (pet())),
     ...(data || [])
@@ -31,6 +29,5 @@ export function findPetsByStatusStatus400() {
 }
 
 export function findPetsByStatusResponse(_data?: FindPetsByStatusResponse): FindPetsByStatusResponse {
-
   return faker.helpers.arrayElement<any>([findPetsByStatusStatus200(), findPetsByStatusStatus400()])
 }

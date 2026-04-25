@@ -8,6 +8,7 @@ import { findPetsByTagsResponse } from "../faker/findPetsByTags.ts";
 import { http } from "msw";
 
 export function findPetsByTagsHandlerResponse200(data: FindPetsByTagsResponse) {
+
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -17,6 +18,7 @@ export function findPetsByTagsHandlerResponse200(data: FindPetsByTagsResponse) {
 }
 
 export function findPetsByTagsHandlerResponse400(data?: FindPetsByTagsStatus400) {
+
       return new Response(JSON.stringify(data), {
         status: 400,
 

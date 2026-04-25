@@ -8,7 +8,6 @@ import { pet } from "../pet.ts";
 import { faker } from "@faker-js/faker";
 
 export function getPetByIdPathPetId(data?: number): number {
-
   return data ?? faker.number.int()
 }
 
@@ -16,7 +15,6 @@ export function getPetByIdPathPetId(data?: number): number {
  * @description successful operation
  */
 export function getPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
-
   return pet(data)
 }
 
@@ -35,6 +33,5 @@ export function getPetByIdStatus404() {
 }
 
 export function getPetByIdResponse(_data?: GetPetByIdResponse): GetPetByIdResponse {
-
   return faker.helpers.arrayElement<any>([getPetByIdStatus200(), getPetByIdStatus400(), getPetByIdStatus404()])
 }

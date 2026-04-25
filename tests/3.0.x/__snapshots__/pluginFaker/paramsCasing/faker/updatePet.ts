@@ -9,17 +9,14 @@ import { petUpdate } from "./petUpdate.ts";
 import { faker } from "@faker-js/faker";
 
 export function updatePetPathPetId(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
 export function updatePetQueryIncludeDeleted(data?: boolean): boolean {
-
   return data ?? faker.datatype.boolean()
 }
 
 export function updatePetQueryRequestSource(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
@@ -27,16 +24,13 @@ export function updatePetQueryRequestSource(data?: string): string {
  * @description Success
  */
 export function updatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
-
   return pet(data)
 }
 
 export function updatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
-
   return petUpdate(data)
 }
 
 export function updatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-
   return updatePetStatus200(data)
 }

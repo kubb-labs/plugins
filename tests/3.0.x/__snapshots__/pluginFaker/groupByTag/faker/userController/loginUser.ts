@@ -7,12 +7,10 @@ import type { LoginUserResponse } from "../../types/LoginUser.ts";
 import { faker } from "@faker-js/faker";
 
 export function loginUserQueryUsername(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
 export function loginUserQueryPassword(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
@@ -20,7 +18,6 @@ export function loginUserQueryPassword(data?: string): string {
  * @description successful operation
  */
 export function loginUserStatus200(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
@@ -32,6 +29,5 @@ export function loginUserStatus400() {
 }
 
 export function loginUserResponse(_data?: LoginUserResponse): LoginUserResponse {
-
   return faker.helpers.arrayElement<any>([loginUserStatus200(), loginUserStatus400()])
 }

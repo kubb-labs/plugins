@@ -8,6 +8,7 @@ import { loginUserResponse } from "../faker/loginUser.ts";
 import { http } from "msw";
 
 export function loginUserHandlerResponse200(data: LoginUserResponse) {
+
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -17,6 +18,7 @@ export function loginUserHandlerResponse200(data: LoginUserResponse) {
 }
 
 export function loginUserHandlerResponse400(data?: LoginUserStatus400) {
+
       return new Response(JSON.stringify(data), {
         status: 400,
 

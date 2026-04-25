@@ -8,6 +8,7 @@ import { getInventoryResponse } from "../faker/getInventory.ts";
 import { http } from "msw";
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {
+
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {

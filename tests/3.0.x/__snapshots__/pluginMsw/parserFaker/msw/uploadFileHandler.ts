@@ -8,6 +8,7 @@ import { uploadFileResponse } from "../faker/uploadFile.ts";
 import { http } from "msw";
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
+
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {

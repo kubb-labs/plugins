@@ -7,6 +7,11 @@ import type { Customer } from "../types/Customer.ts";
 import { address } from "./address.ts";
 import { faker } from "@faker-js/faker";
 
-export function customer(data?: Partial<Customer>): Required<Customer> {
-  return Object.assign({} as Required<Customer>, {"id": faker.number.int(),"username": faker.string.alpha(),"address": faker.helpers.multiple(() => (address()))}, data)
+export function customer(data?: Partial<Customer>): Required<Customer>
+{
+  const defaultFakeData = {"id": faker.number.int(),"username": faker.string.alpha(),"address": faker.helpers.multiple(() => (address()))}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<Customer>
 }

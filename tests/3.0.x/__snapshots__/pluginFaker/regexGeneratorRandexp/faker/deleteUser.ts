@@ -7,7 +7,6 @@ import type { DeleteUserResponse } from "../types/DeleteUser.ts";
 import { faker } from "@faker-js/faker";
 
 export function deleteUserPathUsername(data?: string): string {
-
   return data ?? faker.string.alpha()
 }
 
@@ -26,6 +25,5 @@ export function deleteUserStatus404() {
 }
 
 export function deleteUserResponse(_data?: DeleteUserResponse): DeleteUserResponse {
-
   return faker.helpers.arrayElement<any>([deleteUserStatus400(), deleteUserStatus404()])
 }

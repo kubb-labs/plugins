@@ -8,7 +8,6 @@ import { order } from "./order.ts";
 import { faker } from "@faker-js/faker";
 
 export function getOrderByIdPathOrderId(data?: number): number {
-
   return data ?? faker.number.int()
 }
 
@@ -16,7 +15,6 @@ export function getOrderByIdPathOrderId(data?: number): number {
  * @description successful operation
  */
 export function getOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
-
   return order(data)
 }
 
@@ -35,6 +33,5 @@ export function getOrderByIdStatus404() {
 }
 
 export function getOrderByIdResponse(_data?: GetOrderByIdResponse): GetOrderByIdResponse {
-
   return faker.helpers.arrayElement<any>([getOrderByIdStatus200(), getOrderByIdStatus400(), getOrderByIdStatus404()])
 }

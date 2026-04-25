@@ -12,7 +12,6 @@ import { faker } from "@faker-js/faker";
  * @description Successful operation
  */
 export function addPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus200 {
-
   return pet(data)
 }
 
@@ -27,11 +26,9 @@ export function addPetStatus405() {
  * @description Create a new pet in the store
  */
 export function addPetData(data?: Partial<AddPetData>): AddPetData {
-
   return addPetRequest(data)
 }
 
 export function addPetResponse(_data?: AddPetResponse): AddPetResponse {
-
   return faker.helpers.arrayElement<any>([addPetStatus200(), addPetStatus405()])
 }

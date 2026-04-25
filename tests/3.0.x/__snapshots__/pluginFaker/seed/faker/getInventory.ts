@@ -7,15 +7,16 @@ import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetIn
 import { faker } from "@faker-js/faker";
 
 /**
- * @description successful operation
- */
-export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): GetInventoryStatus200 {
+   * @description successful operation
+   */
+  export function getInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200>
+{
   faker.seed([42])
-
+  const defaultFakeData = {}
   return {
-    ...{},
-    ...(data || {})
-  }
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<GetInventoryStatus200>
 }
 
 export function getInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {

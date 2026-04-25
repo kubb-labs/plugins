@@ -8,6 +8,7 @@ import { addPetResponse } from "../faker/addPet.ts";
 import { http } from "msw";
 
 export function addPetHandlerResponse200(data: AddPetResponse) {
+
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -17,6 +18,7 @@ export function addPetHandlerResponse200(data: AddPetResponse) {
 }
 
 export function addPetHandlerResponse405(data?: AddPetStatus405) {
+
       return new Response(JSON.stringify(data), {
         status: 405,
 

@@ -11,7 +11,6 @@ import { faker } from "@faker-js/faker";
  * @description successful operation
  */
 export function placeOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
-
   return order(data)
 }
 
@@ -23,11 +22,9 @@ export function placeOrderStatus405() {
 }
 
 export function placeOrderData(data?: Partial<PlaceOrderData>): PlaceOrderData {
-
   return order(data)
 }
 
 export function placeOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {
-
   return faker.helpers.arrayElement<any>([placeOrderStatus200(), placeOrderStatus405()])
 }

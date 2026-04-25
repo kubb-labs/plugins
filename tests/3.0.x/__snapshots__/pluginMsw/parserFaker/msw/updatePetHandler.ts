@@ -8,6 +8,7 @@ import { updatePetResponse } from "../faker/updatePet.ts";
 import { http } from "msw";
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
+
       return new Response(JSON.stringify(data), {
         status: 200,
           headers: {
@@ -17,6 +18,7 @@ export function updatePetHandlerResponse200(data: UpdatePetResponse) {
 }
 
 export function updatePetHandlerResponse400(data?: UpdatePetStatus400) {
+
       return new Response(JSON.stringify(data), {
         status: 400,
 
@@ -24,6 +26,7 @@ export function updatePetHandlerResponse400(data?: UpdatePetStatus400) {
 }
 
 export function updatePetHandlerResponse404(data?: UpdatePetStatus404) {
+
       return new Response(JSON.stringify(data), {
         status: 404,
 
@@ -31,6 +34,7 @@ export function updatePetHandlerResponse404(data?: UpdatePetStatus404) {
 }
 
 export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
+
       return new Response(JSON.stringify(data), {
         status: 405,
 
