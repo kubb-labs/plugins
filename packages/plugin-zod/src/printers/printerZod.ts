@@ -177,12 +177,11 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
 
             const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
 
-            // When a property schema is an enum/literal (e.g., discriminator property override)
-            // but the reference metadata contains a description (from a ref target),
-            // skip applying that description to avoid issues with overridden values.
-            // Only apply the description if the schema is actually a ref being used as-is.
+            // When a property schema is not a ref but the metadata is from a ref (e.g., discriminator
+            // property override), skip applying the description from the ref target to avoid applying
+            // metadata from a replaced schema.
             let descriptionToApply = meta.description
-            if ((schema.type === 'enum' || schema.type === 'literal') && schema.ref) {
+            if (schema.type !== 'ref' && meta.type === 'ref') {
               descriptionToApply = undefined
             }
 
