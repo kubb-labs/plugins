@@ -7,5 +7,5 @@ import type { TreeNode } from './types/TreeNode'
 import { faker } from '@faker-js/faker'
 
 export function treeNode(data?: Partial<TreeNode>): Required<TreeNode> {
-  return Object.assign({} as Required<TreeNode>, { value: faker.string.alpha(), left: undefined as any, right: undefined as any }, data)
+  return { ...{ value: faker.string.alpha(), left: undefined as any, right: undefined as any }, ...data } as Required<TreeNode>
 }

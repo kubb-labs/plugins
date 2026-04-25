@@ -7,9 +7,8 @@ import RandExp from 'randexp'
 import { faker } from '@faker-js/faker'
 
 export function pet(data?: Partial<Pet>): Required<Pet> {
-  return Object.assign(
-    {} as Required<Pet>,
-    {
+  return {
+    ...{
       id: faker.number.int(),
       name: faker.string.alpha(),
       tag: faker.string.alpha(),
@@ -18,6 +17,6 @@ export function pet(data?: Partial<Pet>): Required<Pet> {
       shipTime: faker.date.anytime(),
       info: { animal: faker.helpers.arrayElement<NonNullable<NonNullable<Pet>['info']>['animal']>(['dog', 'cat', 'ant']) },
     },
-    data,
-  )
+    ...data,
+  } as Required<Pet>
 }

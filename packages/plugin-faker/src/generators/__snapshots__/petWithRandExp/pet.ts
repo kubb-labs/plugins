@@ -8,9 +8,8 @@ import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
 export function pet(data?: Partial<Pet>): Required<Pet> {
-  return Object.assign(
-    {} as Required<Pet>,
-    {
+  return {
+    ...{
       id: faker.number.int(),
       name: faker.string.alpha(),
       code: new RandExp('^[A-Z]{3}$').gen(),
@@ -18,6 +17,6 @@ export function pet(data?: Partial<Pet>): Required<Pet> {
       category: category(),
       status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
     },
-    data,
-  )
+    ...data,
+  } as Required<Pet>
 }
