@@ -1,13 +1,13 @@
 import type { ResponseErrorConfig } from './.kubb/fetch'
 import type { DeletePetPathPetId, DeletePetResponse } from './DeletePet'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import type { CallToolResult, RequestHandlerExtra } from '@modelcontextprotocol/sdk/types'
 import { fetch } from './.kubb/fetch'
 
 /**
  * {@link /pets/:petId}
  */
-export async function deletePetHandler({ petId }: { petId: DeletePetPathPetId }): Promise<Promise<CallToolResult>> {
-  const res = await fetch<DeletePetResponse, ResponseErrorConfig<Error>, unknown>({ method: 'DELETE', url: `/pets/${petId}` })
+export async function deletePetHandler({ petId }: { petId: DeletePetPathPetId }, request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
+  const res = await fetch<DeletePetResponse, ResponseErrorConfig<Error>, unknown>({ method: 'DELETE', url: `/pets/${petId}` }, request)
 
   return {
     content: [

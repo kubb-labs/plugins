@@ -123,8 +123,8 @@ export function Server({ name, serverName, serverVersion, paramsCasing, operatio
 server.registerTool(${JSON.stringify(tool.name)}, {
   ${config},
   inputSchema: ${inputSchema},
-}, async (${destructured}) => {
-  return ${mcp.name}(${destructured})
+}, async (${destructured}, request) => {
+  return ${mcp.name}(${destructured}, request)
 })
           `
           }
@@ -132,8 +132,8 @@ server.registerTool(${JSON.stringify(tool.name)}, {
           return `
 server.registerTool(${JSON.stringify(tool.name)}, {
   ${config},
-}, async () => {
-  return ${mcp.name}()
+}, async (_args, request) => {
+  return ${mcp.name}(request)
 })
           `
         })

@@ -20,8 +20,8 @@ server.registerTool(
     outputSchema: { data: showPetByIdStatus200Schema },
     inputSchema: { petId: showPetByIdPathPetIdSchema },
   },
-  async ({ petId }) => {
-    return showPetByIdHandler({ petId })
+  async ({ petId }, request) => {
+    return showPetByIdHandler({ petId }, request)
   },
 )
 
