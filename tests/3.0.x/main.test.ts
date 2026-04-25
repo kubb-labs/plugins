@@ -126,6 +126,29 @@ const configs = [
     },
   },
   {
+    name: 'discriminatorOneOfExternalRef',
+    config: {
+      root: __dirname,
+      input: {
+        path: '../../schemas/3.0.x/discriminatorOneOfExternalRef.yaml',
+      },
+      output: {
+        path: './gen',
+        barrelType: false,
+      },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs],
+      plugins: [
+        pluginZod({
+          output: {
+            path: './zod',
+            barrelType: false,
+          },
+        }),
+      ],
+    },
+  },
+  {
     name: 'caseSensitivity',
     config: {
       root: __dirname,

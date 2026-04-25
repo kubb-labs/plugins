@@ -556,6 +556,29 @@ describe('printerZod', () => {
     })
   })
 
+  describe('discriminator properties with external refs', () => {
+    test('discriminator property with enum override should not apply ref description', () => {
+      // This test verifies the fix for: https://github.com/kubb-labs/plugins/issues/15
+      // When a discriminator property is a ref to an external schema with a description,
+      // but the property is overridden with an enum value, the description from the ref
+      // should not be applied (it would result in unreachable code in getters).
+      const node = ast.createSchema({
+        type: 'object',
+        properties: [
+          ast.createProperty({
+            name: 'notificationType',
+            required: true,
+            schema: ast.createSchema({
+              type: 'enum',
+              enumValues: ['PING'],
+            }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe('z.object({\n    "notificationType": z.enum(["PING"])\n    })')
+    })
+  })
+
   describe('nodes override', () => {
     test('overrides a single node type', () => {
       const p = printerZod({ nodes: { date: () => 'z.string().date()' } })

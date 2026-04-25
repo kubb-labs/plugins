@@ -1,0 +1,43 @@
+openapi: 3.0.3
+info:
+  title: Discriminator OneOf with External Refs
+  version: 1.0.0
+components:
+  schemas:
+    NotificationType:
+      type: string
+      enum: [PING, ORDER_CREATED, ORDER_CANCELLED]
+      description: "Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled"
+
+    PingNotificationDTO:
+      type: object
+      properties:
+        notificationType:
+          $ref: '#/components/schemas/NotificationType'
+        message:
+          type: string
+      required:
+        - notificationType
+        - message
+
+    OrderCreatedNotificationDTO:
+      type: object
+      properties:
+        notificationType:
+          $ref: '#/components/schemas/NotificationType'
+        orderId:
+          type: string
+      required:
+        - notificationType
+        - orderId
+
+    SendNotificationRequest:
+      description: Notification payload.
+      oneOf:
+        - $ref: '#/components/schemas/PingNotificationDTO'
+        - $ref: '#/components/schemas/OrderCreatedNotificationDTO'
+      discriminator:
+        propertyName: notificationType
+        mapping:
+          PING: '#/components/schemas/PingNotificationDTO'
+          ORDER_CREATED: '#/components/schemas/OrderCreatedNotificationDTO'
