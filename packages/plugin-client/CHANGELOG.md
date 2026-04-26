@@ -1,5 +1,31 @@
 # @kubb/plugin-client
 
+## 5.0.0-alpha.56
+
+### Minor Changes
+
+- [#97](https://github.com/kubb-labs/plugins/pull/97) [`436abe3`](https://github.com/kubb-labs/plugins/commit/436abe33c34c1db8078c8df3f96e8c93414c168b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Always inject `.kubb/client.ts` into generated output so the fetch/axios client is part of the barrel.
+
+  Previously the client file was only written when `bundle: true`. Now it is always written:
+  - **`bundle: false` (default)** — `.kubb/client.ts` re-exports everything from `@kubb/plugin-client/clients/{client}`, so the generated barrel exposes the client without bundling it locally.
+  - **`bundle: true`** — `.kubb/client.ts` contains the full inline source as before.
+
+  The file is marked `isIndexable: true` so kubb's barrel generator includes it in the output `index.ts`.
+
+  The internal file name was also renamed from `.kubb/fetch.ts` to `.kubb/client.ts` to be neutral across both `fetch` and `axios` client types.
+
+  Additionally, `axiosClient` and `fetchClient` are now exported as named namespace exports from the `@kubb/plugin-client` package barrel:
+
+  ```ts
+  import { fetchClient, axiosClient } from "@kubb/plugin-client";
+  ```
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-alpha.56
+  - @kubb/plugin-zod@5.0.0-alpha.56
+
 ## 5.0.0-alpha.55
 
 ### Patch Changes
