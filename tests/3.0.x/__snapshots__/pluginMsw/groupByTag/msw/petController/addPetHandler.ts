@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { AddPetResponse, AddPetStatus405 } from "../../types/AddPet.ts";
+import type { AddPetResponse, AddPetStatus405, AddPetData } from "../../types/AddPet.ts";
+import type { HttpResponseResolver } from "msw";
 import { http } from "msw";
 
 export function addPetHandlerResponse200(data: AddPetResponse) {
@@ -24,8 +25,8 @@ export function addPetHandlerResponse405(data?: AddPetStatus405) {
       })
 }
 
-export function addPetHandler(data?: AddPetResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>)) {
-  return http.post(`/pet`, function handler(info) {
+export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetData, any>) {
+  return http.post<Record<string, string>, AddPetData, any>(`/pet`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {
