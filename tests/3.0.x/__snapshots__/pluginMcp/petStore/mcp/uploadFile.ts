@@ -1,13 +1,14 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from "../types/UploadFile.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFileHandler({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
+export async function uploadFileHandler({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
 
 
   const requestData = data

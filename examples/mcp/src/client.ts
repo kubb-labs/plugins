@@ -1,4 +1,5 @@
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import type { AxiosError, AxiosHeaders, AxiosRequestConfig, AxiosResponse } from 'axios'
 import axios from 'axios'
 
@@ -37,12 +38,12 @@ export const axiosInstance = axios.create({
 
 export type Client = <TData, _TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>,
-  request?: RequestHandlerExtra,
+  request?: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ) => Promise<ResponseConfig<TData>>
 
 export const client = async <TData, TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>,
-  request?: RequestHandlerExtra,
+  request?: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<ResponseConfig<TData>> => {
   const promise = axiosInstance.request<TVariables, ResponseConfig<TData>>({ signal: request?.signal, ...config }).catch((e: AxiosError<TError>) => {
     throw e

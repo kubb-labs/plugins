@@ -1,13 +1,14 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { LogoutUserResponse } from "../types/LogoutUser.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @summary Logs out current logged in user session
  * {@link /user/logout}
  */
-export async function logoutUserHandler(request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
+export async function logoutUserHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
 
 
 

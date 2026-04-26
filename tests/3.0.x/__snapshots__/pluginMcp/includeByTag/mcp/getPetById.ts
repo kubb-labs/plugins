@@ -1,14 +1,15 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @description Returns a single pet
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetByIdHandler({ petId }: { petId: GetPetByIdPathPetId }, request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
+export async function getPetByIdHandler({ petId }: { petId: GetPetByIdPathPetId }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
 
 
 

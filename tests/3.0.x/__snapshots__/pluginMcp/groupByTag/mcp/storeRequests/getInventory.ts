@@ -1,14 +1,15 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetInventoryResponse } from "../../types/GetInventory.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export async function getInventoryHandler(request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
+export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
 
 
 

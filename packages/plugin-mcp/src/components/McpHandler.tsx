@@ -79,7 +79,9 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     paramsCasing,
   })
   const baseParamsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const paramsSignature = baseParamsSignature ? `${baseParamsSignature}, request: RequestHandlerExtra` : 'request: RequestHandlerExtra'
+  const paramsSignature = baseParamsSignature
+    ? `${baseParamsSignature}, request: RequestHandlerExtra<ServerRequest, ServerNotification>`
+    : 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'
 
   const pathParamsMapping = paramsCasing ? getParamsMapping(originalPathParams) : undefined
   const queryParamsMapping = paramsCasing ? getParamsMapping(originalQueryParams) : undefined
