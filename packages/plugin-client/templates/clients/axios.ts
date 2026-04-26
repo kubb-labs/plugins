@@ -60,7 +60,10 @@ export const mergeConfig = <T extends RequestConfig>(...configs: Array<Partial<T
 
 export const axiosInstance = axios.create(getConfig())
 
-export const fetch = async <TData, TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>, _request?: unknown): Promise<ResponseConfig<TData>> => {
+export const fetch = async <TData, TError = unknown, TVariables = unknown>(
+  config: RequestConfig<TVariables>,
+  _request?: unknown,
+): Promise<ResponseConfig<TData>> => {
   return axiosInstance.request<TData, ResponseConfig<TData>>(mergeConfig(getConfig(), config)).catch((e: AxiosError<TError>) => {
     throw e
   })

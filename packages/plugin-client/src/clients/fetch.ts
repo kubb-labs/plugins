@@ -52,7 +52,10 @@ export const mergeConfig = <T extends RequestConfig>(...configs: Array<Partial<T
 
 export type ResponseErrorConfig<TError = unknown> = TError
 
-export type Client = <TResponseData, _TError = unknown, TRequestData = unknown>(config: RequestConfig<TRequestData>, request?: unknown) => Promise<ResponseConfig<TResponseData>>
+export type Client = <TResponseData, _TError = unknown, TRequestData = unknown>(
+  config: RequestConfig<TRequestData>,
+  request?: unknown,
+) => Promise<ResponseConfig<TResponseData>>
 
 export const client = async <TResponseData, _TError = unknown, RequestData = unknown>(
   paramsConfig: RequestConfig<RequestData>,
