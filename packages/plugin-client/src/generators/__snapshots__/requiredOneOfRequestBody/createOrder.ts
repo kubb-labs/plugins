@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { CreateOrderData, CreateOrderResponse } from './CreateOrder'
-import { fetch } from './.kubb/fetch'
+import { fetch } from './.kubb/client'
 
 export function getCreateOrderUrl() {
   const res = { method: 'POST', url: `/orders` as const }
