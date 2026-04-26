@@ -176,11 +176,12 @@ export function Client({
         params: queryParamsName ? (queryParamsMapping ? { value: 'mappedParams' } : {}) : undefined,
         data: requestName
           ? {
-              value: isMultipleContentTypes && hasFormData
-                ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
-                : isFormData
-                  ? 'formData as FormData'
-                  : 'requestData',
+              value:
+                isMultipleContentTypes && hasFormData
+                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
+                  : isFormData
+                    ? 'formData as FormData'
+                    : 'requestData',
             }
           : undefined,
         requestConfig: isConfigurable

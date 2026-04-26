@@ -238,7 +238,9 @@ describe('typeGenerator — Operation', () => {
             },
           ],
         },
-        responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' })],
+        responses: [
+          ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' }),
+        ],
       }),
     },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode }>

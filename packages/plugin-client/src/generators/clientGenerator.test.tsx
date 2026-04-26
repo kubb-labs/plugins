@@ -127,8 +127,20 @@ const multiContentTypeNode = ast.createOperation({
   parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
   requestBody: {
     content: [
-      { contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })] }) },
-      { contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'file', required: true, schema: ast.createSchema({ type: 'string' }) })] }) },
+      {
+        contentType: 'application/json',
+        schema: ast.createSchema({
+          type: 'object',
+          properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+        }),
+      },
+      {
+        contentType: 'multipart/form-data',
+        schema: ast.createSchema({
+          type: 'object',
+          properties: [ast.createProperty({ name: 'file', required: true, schema: ast.createSchema({ type: 'string' }) })],
+        }),
+      },
     ],
   },
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
