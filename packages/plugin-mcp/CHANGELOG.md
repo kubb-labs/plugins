@@ -1,5 +1,16 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-alpha.56
+
+### Patch Changes
+
+- [#84](https://github.com/kubb-labs/plugins/pull/84) [`447ae38`](https://github.com/kubb-labs/plugins/commit/447ae380e5e5adf329c9d6d0fd5c460d88d8aee0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix MCP not passing headers to fetch: the `RequestHandlerExtra` request object is now forwarded from the MCP tool callback to each generated handler function and subsequently to the fetch client call, allowing downstream clients to access headers (auth tokens, traceIds, etc.) from the MCP request context.
+
+- Updated dependencies []:
+  - @kubb/plugin-client@5.0.0-alpha.56
+  - @kubb/plugin-ts@5.0.0-alpha.56
+  - @kubb/plugin-zod@5.0.0-alpha.56
+
 ## 5.0.0-alpha.55
 
 ### Patch Changes
