@@ -58,7 +58,12 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />
-        <File.Import name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))} path={type.file.path} root={mock.file.path} isTypeOnly />
+        <File.Import
+          name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))}
+          path={type.file.path}
+          root={mock.file.path}
+          isTypeOnly
+        />
         {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types

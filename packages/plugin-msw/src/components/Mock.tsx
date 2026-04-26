@@ -45,9 +45,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
     }),
   )
 
-  const httpCall = requestTypeName
-    ? `http.${method}<Record<string, string>, ${requestTypeName}, any>`
-    : `http.${method}`
+  const httpCall = requestTypeName ? `http.${method}<Record<string, string>, ${requestTypeName}, any>` : `http.${method}`
 
   return (
     <File.Source name={name} isIndexable isExportable>

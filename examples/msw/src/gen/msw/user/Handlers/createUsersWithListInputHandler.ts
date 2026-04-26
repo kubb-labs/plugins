@@ -16,7 +16,9 @@ export function createUsersWithListInputHandlerResponse200(data: CreateUsersWith
   })
 }
 
-export function createUsersWithListInputHandler(data?: CreateUsersWithListInputResponse | HttpResponseResolver<Record<string, string>, CreateUsersWithListInputData, any>) {
+export function createUsersWithListInputHandler(
+  data?: CreateUsersWithListInputResponse | HttpResponseResolver<Record<string, string>, CreateUsersWithListInputData, any>,
+) {
   return http.post<Record<string, string>, CreateUsersWithListInputData, any>(`http://localhost:3000/user/createWithList`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
