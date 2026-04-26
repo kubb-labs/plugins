@@ -52,9 +52,9 @@ export const mergeConfig = <T extends RequestConfig>(...configs: Array<Partial<T
 
 export type ResponseErrorConfig<TError = unknown> = TError
 
-export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>) => Promise<ResponseConfig<TData>>
+export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>, request?: unknown) => Promise<ResponseConfig<TData>>
 
-export const fetch = async <TData, _TError = unknown, TVariables = unknown>(paramsConfig: RequestConfig<TVariables>): Promise<ResponseConfig<TData>> => {
+export const fetch = async <TData, _TError = unknown, TVariables = unknown>(paramsConfig: RequestConfig<TVariables>, _request?: unknown): Promise<ResponseConfig<TData>> => {
   const normalizedParams = new URLSearchParams()
 
   const config = mergeConfig(getConfig(), paramsConfig)

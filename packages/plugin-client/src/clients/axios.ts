@@ -32,7 +32,7 @@ export type ResponseConfig<TData = unknown> = {
 
 export type ResponseErrorConfig<TError = unknown> = AxiosError<TError>
 
-export type Client = <TResponseData, _TError = unknown, TRequestData = unknown>(config: RequestConfig<TRequestData>) => Promise<ResponseConfig<TResponseData>>
+export type Client = <TResponseData, _TError = unknown, TRequestData = unknown>(config: RequestConfig<TRequestData>, request?: unknown) => Promise<ResponseConfig<TResponseData>>
 
 let _config: Partial<RequestConfig> = {
   baseURL: typeof AXIOS_BASE !== 'undefined' ? AXIOS_BASE : undefined,
@@ -63,6 +63,7 @@ export const axiosInstance = axios.create(getConfig())
 
 export const client = async <TResponseData, TError = unknown, TRequestData = unknown>(
   config: RequestConfig<TRequestData>,
+  _request?: unknown,
 ): Promise<ResponseConfig<TResponseData>> => {
   return axiosInstance.request<TResponseData, ResponseConfig<TResponseData>>(mergeConfig(getConfig(), config)).catch((e: AxiosError<TError>) => {
     throw e

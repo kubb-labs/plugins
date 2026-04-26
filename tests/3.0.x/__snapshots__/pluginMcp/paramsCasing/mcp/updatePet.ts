@@ -1,12 +1,12 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetResponse } from "../types/UpdatePet.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
+import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
 
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePetHandler({ petId, data, params }: { petId: UpdatePetPathPetId; data: UpdatePetData; params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource } }): Promise<Promise<CallToolResult>> {
+export async function updatePetHandler({ petId, data, params }: { petId: UpdatePetPathPetId; data: UpdatePetData; params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource } }, request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
 
 
   const pet_id = petId
@@ -18,7 +18,7 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
   const requestData = data
 
 
-  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData })
+  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
 
   return {
               content: [

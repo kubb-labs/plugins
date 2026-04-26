@@ -1,18 +1,18 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from "../../types/LoginUser.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
+import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @summary Logs user into the system
  * {@link /user/login}
  */
-export async function loginUserHandler({ params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {}): Promise<Promise<CallToolResult>> {
+export async function loginUserHandler({ params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {}, request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
 
 
 
 
-  const res = await fetch<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: `/user/login`, params })
+  const res = await fetch<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: `/user/login`, params }, request)
 
   return {
               content: [

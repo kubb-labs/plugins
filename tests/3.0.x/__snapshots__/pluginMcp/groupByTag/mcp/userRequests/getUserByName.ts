@@ -1,18 +1,18 @@
 import fetch from "@kubb/plugin-client/clients/axios";
 import type { GetUserByNamePathUsername, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from "../../types/GetUserByName.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types";
+import type { CallToolResult, RequestHandlerExtra } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export async function getUserByNameHandler({ username }: { username: GetUserByNamePathUsername }): Promise<Promise<CallToolResult>> {
+export async function getUserByNameHandler({ username }: { username: GetUserByNamePathUsername }, request: RequestHandlerExtra): Promise<Promise<CallToolResult>> {
 
 
 
 
-  const res = await fetch<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}` })
+  const res = await fetch<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}` }, request)
 
   return {
               content: [

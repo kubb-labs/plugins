@@ -20,8 +20,8 @@ server.registerTool("updatePet", {
   description: "Make a POST request to /pets/{pet_id}",
   outputSchema: { data: updatePetStatus200Schema },
   inputSchema: { petId: updatePetPathPetIdSchema, data: updatePetDataSchema, params: z.object({ "includeDeleted": updatePetQueryIncludeDeletedSchema, "requestSource": updatePetQueryRequestSourceSchema }) },
-}, async ({ petId, data, params }) => {
-  return updatePetHandler({ petId, data, params })
+}, async ({ petId, data, params }, request) => {
+  return updatePetHandler({ petId, data, params }, request)
 })
           
 export async function startServer() {
