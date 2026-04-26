@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderResponse, PlaceOrderStatus405 } from "../../types/PlaceOrder.ts";
+import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderData } from "../../types/PlaceOrder.ts";
+import type { HttpResponseResolver } from "msw";
 import { http } from "msw";
 
 export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
@@ -24,8 +25,8 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
       })
 }
 
-export function placeOrderHandler(data?: PlaceOrderResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>)) {
-  return http.post(`/store/order`, function handler(info) {
+export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderData, any>) {
+  return http.post<Record<string, string>, PlaceOrderData, any>(`/store/order`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {
