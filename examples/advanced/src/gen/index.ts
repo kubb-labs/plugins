@@ -22,11 +22,14 @@ export type {
 } from './models/ts/petController/AddFiles.ts'
 export type {
   AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus405,
   AddPetStatusDefault,
+  AddPetXmlData,
 } from './models/ts/petController/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
@@ -66,6 +69,8 @@ export type {
 } from './models/ts/petController/GetPetById.ts'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -74,6 +79,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './models/ts/petController/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -125,27 +131,36 @@ export type {
 } from './models/ts/storeController/GetOrderById.ts'
 export type {
   PlaceOrderData,
+  PlaceOrderFormUrlEncodedData,
+  PlaceOrderJsonData,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
+  PlaceOrderXmlData,
 } from './models/ts/storeController/PlaceOrder.ts'
 export type {
   PlaceOrderPatchData,
+  PlaceOrderPatchFormUrlEncodedData,
+  PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
+  PlaceOrderPatchXmlData,
 } from './models/ts/storeController/PlaceOrderPatch.ts'
 export type { TagTag } from './models/ts/tag/Tag.ts'
 export type {
   CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserXmlData,
 } from './models/ts/userController/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
@@ -184,11 +199,14 @@ export type {
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/userController/LogoutUser.ts'
 export type {
   UpdateUserData,
+  UpdateUserFormUrlEncodedData,
+  UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
+  UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.ts'
 export type { AddPetRequestSchema } from './zod/addPetRequestSchema.ts'
 export type { AddressSchema } from './zod/addressSchema.ts'

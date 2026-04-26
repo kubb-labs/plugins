@@ -14,7 +14,17 @@ export type { Tag } from './models/Tag.ts'
 export type { UnhappyCustomer } from './models/UnhappyCustomer.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
-export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './models/petController/AddPet.ts'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus200,
+  AddPetStatus405,
+  AddPetXmlData,
+} from './models/petController/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -53,6 +63,8 @@ export type {
 } from './models/petController/GetPetById.ts'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -60,6 +72,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './models/petController/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -99,26 +112,35 @@ export type {
 } from './models/storeController/GetOrderById.ts'
 export type {
   PlaceOrderData,
+  PlaceOrderFormUrlEncodedData,
+  PlaceOrderJsonData,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
+  PlaceOrderXmlData,
 } from './models/storeController/PlaceOrder.ts'
 export type {
   PlaceOrderPatchData,
+  PlaceOrderPatchFormUrlEncodedData,
+  PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
+  PlaceOrderPatchXmlData,
 } from './models/storeController/PlaceOrderPatch.ts'
 export type {
   CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserXmlData,
 } from './models/userController/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
@@ -157,9 +179,12 @@ export type {
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/userController/LogoutUser.ts'
 export type {
   UpdateUserData,
+  UpdateUserFormUrlEncodedData,
+  UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
+  UpdateUserXmlData,
 } from './models/userController/UpdateUser.ts'

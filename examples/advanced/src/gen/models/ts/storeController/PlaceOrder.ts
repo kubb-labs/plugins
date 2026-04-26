@@ -13,7 +13,19 @@ export type PlaceOrderStatus405 = any
 /**
  * @type object | undefined
  */
-export type PlaceOrderData = Order | undefined
+export type PlaceOrderJsonData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderXmlData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderFormUrlEncodedData = Order | undefined
+
+export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrderFormUrlEncodedData
 
 /**
  * @type object
