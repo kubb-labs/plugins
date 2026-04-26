@@ -149,11 +149,16 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
 
     function getContentTypeSuffix(contentType: string): string {
-      if (contentType === 'application/json') return 'Json'
-      if (contentType === 'multipart/form-data') return 'FormData'
-      if (contentType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
-      const lastSegment = contentType.split('/').pop() ?? contentType
-      return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1)
+      // Strip content-type parameters (e.g. "; x-api-version=1.0", "; charset=utf-8")
+      const baseType = contentType.split(';')[0]!.trim()
+      if (baseType === 'application/json') return 'Json'
+      if (baseType === 'multipart/form-data') return 'FormData'
+      if (baseType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
+      // Extract subtype (after '/'), then convert to PascalCase identifier
+      const subtype = baseType.split('/').pop() ?? baseType
+      const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
+      if (parts.length === 0) return 'Unknown'
+      return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
     }
 
     function getPerContentTypeName(dataName: string, suffix: string): string {
@@ -180,11 +185,18 @@ export const typeGenerator = defineGenerator<PluginTs>({
       }
       // Multiple content types — generate individual types + union alias
       const dataName = resolver.resolveDataName(node)
+      const usedNames = new Set<string>()
       const individualItems = requestBodyContent
         .filter((entry) => entry.schema)
         .map((entry) => {
-          const suffix = getContentTypeSuffix(entry.contentType)
-          const individualName = getPerContentTypeName(dataName, suffix)
+          const baseSuffix = getContentTypeSuffix(entry.contentType)
+          let individualName = getPerContentTypeName(dataName, baseSuffix)
+          // Deduplicate names when multiple content types produce the same suffix
+          let counter = 2
+          while (usedNames.has(individualName)) {
+            individualName = getPerContentTypeName(dataName, `${baseSuffix}${counter++}`)
+          }
+          usedNames.add(individualName)
           return {
             name: individualName,
             rendered: renderSchemaType({
