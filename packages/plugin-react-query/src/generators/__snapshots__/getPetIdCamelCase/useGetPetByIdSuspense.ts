@@ -10,7 +10,7 @@ import { fetch } from './.kubb/fetch'
 import { GetPetByIdResponse } from './GetPetById'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getPetByIdSuspenseQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
+export const getPetByIdSuspenseQueryKey = (petId?: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
@@ -25,7 +25,7 @@ export async function getPetByIdSuspense(petId: GetPetByIdPathPetId, config: Par
   return GetPetByIdResponse.parse(res.data)
 }
 
-export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdSuspenseQueryOptions(petId?: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdSuspenseQueryKey(petId)
   return queryOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdResponse, typeof queryKey>({
     enabled: !!petId,

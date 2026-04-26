@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
+import { buildQueryKeyParams, getEnabledParamNames, makeEnabledParamsOptional, resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
 
 type Props = {
@@ -129,7 +129,13 @@ export function QueryOptions({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const rawQueryKeyParams = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const enabledSource = buildEnabledCheck(rawQueryKeyParams)
+  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
+  const enabledNames = getEnabledParamNames(rawQueryKeyParams)
+
+  const rawParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const paramsNode = makeEnabledParamsOptional(rawParamsNode, enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
 
@@ -138,9 +144,6 @@ export function QueryOptions({
 
   const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
 
   return (
     <File.Source name={name} isExportable isIndexable>

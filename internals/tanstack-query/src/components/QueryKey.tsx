@@ -5,7 +5,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Transformer } from '../types.ts'
-import { buildQueryKeyParams } from '../utils.ts'
+import { buildQueryKeyParams, getEnabledParamNames, makeEnabledParamsOptional } from '../utils.ts'
 
 type Props = {
   name: string
@@ -24,7 +24,9 @@ function getParams(
   node: ast.OperationNode,
   options: { pathParamsType: 'object' | 'inline'; paramsCasing: 'camelcase' | undefined; resolver: PluginTs['resolver'] },
 ): ast.FunctionParametersNode {
-  return buildQueryKeyParams(node, options)
+  const params = buildQueryKeyParams(node, options)
+  const enabledNames = getEnabledParamNames(params)
+  return makeEnabledParamsOptional(params, enabledNames)
 }
 
 const getTransformer: Transformer = ({ node, casing }) => {

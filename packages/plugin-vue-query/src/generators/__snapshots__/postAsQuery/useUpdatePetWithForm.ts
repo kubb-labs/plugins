@@ -13,7 +13,7 @@ import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
 export const updatePetWithFormQueryKey = (
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
 ) => [{ url: '/pet/:petId', params: { petId: petId } }, ...(params ? [params] : []), ...(data ? [data] : [])] as const
@@ -45,7 +45,7 @@ export async function updatePetWithForm(
 }
 
 export function updatePetWithFormQueryOptions(
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
@@ -68,7 +68,7 @@ export function useUpdatePetWithForm<
   TQueryData = UpdatePetWithFormResponse,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   options: {

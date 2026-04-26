@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { getComments, resolveErrorNames } from '../utils.ts'
+import { buildQueryKeyParams, getComments, getEnabledParamNames, makeEnabledParamsOptional, resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -85,13 +85,17 @@ export function Query({
   const returnType = `UseQueryResult<${'TData'}, ${TError}> & { queryKey: TQueryKey }`
   const generics = [`TData = ${TData}`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 
+  const rawQueryKeyParams = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const enabledNames = getEnabledParamNames(rawQueryKeyParams)
+
   const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = getParams(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
+  const rawParamsNode = getParams(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
+  const paramsNode = makeEnabledParamsOptional(rawParamsNode, enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

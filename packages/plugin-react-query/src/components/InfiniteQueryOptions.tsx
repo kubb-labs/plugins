@@ -8,6 +8,7 @@ import type { Infinite, PluginReactQuery } from '../types.ts'
 import { resolveErrorNames } from '../utils.ts'
 import { QueryKey } from './QueryKey.tsx'
 import { buildEnabledCheck, getQueryOptionsParams } from './QueryOptions.tsx'
+import { buildQueryKeyParams, getEnabledParamNames, makeEnabledParamsOptional } from '../utils.ts'
 
 type Props = {
   name: string
@@ -78,16 +79,19 @@ export function InfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const rawQueryKeyParams = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const enabledSource = buildEnabledCheck(rawQueryKeyParams)
+  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledNames = getEnabledParamNames(rawQueryKeyParams)
+
+  const rawParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const paramsNode = makeEnabledParamsOptional(rawParamsNode, enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
   const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
 
   const hasNewParams = nextParam !== undefined || previousParam !== undefined
 

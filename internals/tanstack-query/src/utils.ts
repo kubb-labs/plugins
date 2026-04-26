@@ -158,6 +158,56 @@ export function buildQueryKeyParams(
 }
 
 /**
+ * Returns the set of param names that would appear in a tanstack-query `enabled` guard.
+ * These are params that are required (non-optional) and have no default value.
+ */
+export function getEnabledParamNames(paramsNode: ast.FunctionParametersNode): Set<string> {
+  const names = new Set<string>()
+  for (const param of paramsNode.params) {
+    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+      const group = param as ast.ParameterGroupNode
+      for (const child of group.properties) {
+        if (!child.optional && child.default === undefined) {
+          names.add(child.name)
+        }
+      }
+    } else {
+      const fp = param as ast.FunctionParameterNode
+      if (!fp.optional && fp.default === undefined) {
+        names.add(fp.name)
+      }
+    }
+  }
+  return names
+}
+
+/**
+ * Returns a new FunctionParametersNode with the specified params marked as optional.
+ * When all properties in a ParameterGroup become optional, adds a `{}` default.
+ */
+export function makeEnabledParamsOptional(paramsNode: ast.FunctionParametersNode, enabledNames: Set<string>): ast.FunctionParametersNode {
+  if (enabledNames.size === 0) return paramsNode
+  const newParams = paramsNode.params.map((param) => {
+    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+      const group = param as ast.ParameterGroupNode
+      const newProperties = group.properties.map((p) => (enabledNames.has(p.name) ? { ...p, optional: true } : p))
+      const allOptional = newProperties.every((p) => p.optional)
+      // For inline groups, 'default' is not used by the printer — only affects PARAM_RANK sorting.
+      // Adding it would demote the group to rank 2 (withDefault), causing path params to sort after
+      // body/query params. Only add the default for non-inline (destructured) groups.
+      const newDefault = !group.inline && allOptional ? '{}' : group.default
+      return { ...group, properties: newProperties, default: newDefault } as ast.ParameterGroupNode
+    }
+    const fp = param as ast.FunctionParameterNode
+    if (enabledNames.has(fp.name)) {
+      return { ...fp, optional: true } as ast.FunctionParameterNode
+    }
+    return fp
+  })
+  return ast.createFunctionParameters({ params: newParams })
+}
+
+/**
  * Build mutation arg params for paramsToTrigger mode.
  * Contains pathParams + data + queryParams + headers (all flattened, for type alias).
  */
