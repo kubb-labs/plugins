@@ -1,4 +1,5 @@
-import type { CreateUsersWithListInputResponse } from '../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from '../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function createUsersWithListInputHandlerResponse200(data: CreateUsersWithListInputResponse) {
@@ -11,9 +12,9 @@ export function createUsersWithListInputHandlerResponse200(data: CreateUsersWith
 }
 
 export function createUsersWithListInputHandler(
-  data?: CreateUsersWithListInputResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
+  data?: CreateUsersWithListInputResponse | HttpResponseResolver<Record<string, string>, CreateUsersWithListInputData, any>,
 ) {
-  return http.post(`/user/createWithList`, function handler(info) {
+  return http.post<Record<string, string>, CreateUsersWithListInputData, any>(`/user/createWithList`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

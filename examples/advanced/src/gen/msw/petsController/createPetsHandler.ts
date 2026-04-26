@@ -1,4 +1,5 @@
-import type { CreatePetsResponse } from '../../models/ts/petsController/CreatePets.ts'
+import type { CreatePetsResponse, CreatePetsData } from '../../models/ts/petsController/CreatePets.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
@@ -7,10 +8,8 @@ export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
   })
 }
 
-export function createPetsHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
-) {
-  return http.post(`/pets/:uuid`, function handler(info) {
+export function createPetsHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreatePetsData, any>) {
+  return http.post<Record<string, string>, CreatePetsData, any>(`/pets/:uuid`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

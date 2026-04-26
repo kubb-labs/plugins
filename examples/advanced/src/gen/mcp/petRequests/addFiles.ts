@@ -1,7 +1,8 @@
 import fetch from '@kubb/plugin-client/clients/axios'
 import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../../models/ts/petController/AddFiles.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { buildFormData } from '../../.kubb/config.ts'
 
 /**
@@ -9,17 +10,18 @@ import { buildFormData } from '../../.kubb/config.ts'
  * @summary Place an file for a pet
  * {@link /pet/files}
  */
-export async function addFilesHandler({ data }: { data: AddFilesData }): Promise<Promise<CallToolResult>> {
+export async function addFilesHandler(
+  { data }: { data: AddFilesData },
+  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
+): Promise<Promise<CallToolResult>> {
   const requestData = data
 
   const formData = buildFormData(requestData)
 
-  const res = await fetch<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
-    method: 'POST',
-    url: `/pet/files`,
-    baseURL: `https://petstore.swagger.io/v2`,
-    data: formData as FormData,
-  })
+  const res = await fetch<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
+    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, data: formData as FormData },
+    request,
+  )
 
   return {
     content: [

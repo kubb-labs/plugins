@@ -78,7 +78,10 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     resolver,
     paramsCasing,
   })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const baseParamsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const paramsSignature = baseParamsSignature
+    ? `${baseParamsSignature}, request: RequestHandlerExtra<ServerRequest, ServerNotification>`
+    : 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'
 
   const pathParamsMapping = paramsCasing ? getParamsMapping(originalPathParams) : undefined
   const queryParamsMapping = paramsCasing ? getParamsMapping(originalQueryParams) : undefined
@@ -161,7 +164,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
         <br />
         {isFormData && requestName && 'const formData = buildFormData(requestData)'}
         <br />
-        {`const res = await fetch<${generics.join(', ')}>({ ${fetchConfig.join(', ')} })`}
+        {`const res = await fetch<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
         <br />
         {callToolResult}
       </Function>

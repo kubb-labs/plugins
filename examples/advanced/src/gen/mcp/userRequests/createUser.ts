@@ -1,22 +1,24 @@
 import fetch from '@kubb/plugin-client/clients/axios'
 import type { CreateUserData, CreateUserResponse } from '../../models/ts/userController/CreateUser.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description This can only be done by the logged in user.
  * @summary Create user
  * {@link /user}
  */
-export async function createUserHandler({ data }: { data?: CreateUserData } = {}): Promise<Promise<CallToolResult>> {
+export async function createUserHandler(
+  { data }: { data?: CreateUserData } = {},
+  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
+): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
-    method: 'POST',
-    url: `/user`,
-    baseURL: `https://petstore.swagger.io/v2`,
-    data: requestData,
-  })
+  const res = await fetch<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>(
+    { method: 'POST', url: `/user`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
+    request,
+  )
 
   return {
     content: [

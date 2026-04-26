@@ -78,8 +78,8 @@ server.registerTool(
       params: z.object({ offset: createPetsQueryOffsetSchema }),
     },
   },
-  async ({ uuid, data, headers, params }) => {
-    return createPetsHandler({ uuid, data, headers, params })
+  async ({ uuid, data, headers, params }, request) => {
+    return createPetsHandler({ uuid, data, headers, params }, request)
   },
 )
 
@@ -91,8 +91,8 @@ server.registerTool(
     outputSchema: { data: updatePetStatus200Schema },
     inputSchema: { data: updatePetDataSchema },
   },
-  async ({ data }) => {
-    return updatePetHandler({ data })
+  async ({ data }, request) => {
+    return updatePetHandler({ data }, request)
   },
 )
 
@@ -104,8 +104,8 @@ server.registerTool(
     outputSchema: { data: addPetStatus200Schema },
     inputSchema: { data: addPetDataSchema },
   },
-  async ({ data }) => {
-    return addPetHandler({ data })
+  async ({ data }, request) => {
+    return addPetHandler({ data }, request)
   },
 )
 
@@ -117,8 +117,8 @@ server.registerTool(
     outputSchema: { data: findPetsByStatusStatus200Schema },
     inputSchema: { step_id: findPetsByStatusPathStepIdSchema },
   },
-  async ({ step_id }) => {
-    return findPetsByStatusHandler({ step_id })
+  async ({ step_id }, request) => {
+    return findPetsByStatusHandler({ step_id }, request)
   },
 )
 
@@ -133,8 +133,8 @@ server.registerTool(
       params: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
     },
   },
-  async ({ headers, params }) => {
-    return findPetsByTagsHandler({ headers, params })
+  async ({ headers, params }, request) => {
+    return findPetsByTagsHandler({ headers, params }, request)
   },
 )
 
@@ -146,8 +146,8 @@ server.registerTool(
     outputSchema: { data: getPetByIdStatus200Schema },
     inputSchema: { petId: getPetByIdPathPetIdSchema },
   },
-  async ({ petId }) => {
-    return getPetByIdHandler({ petId })
+  async ({ petId }, request) => {
+    return getPetByIdHandler({ petId }, request)
   },
 )
 
@@ -161,8 +161,8 @@ server.registerTool(
       params: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
     },
   },
-  async ({ petId, params }) => {
-    return updatePetWithFormHandler({ petId, params })
+  async ({ petId, params }, request) => {
+    return updatePetWithFormHandler({ petId, params }, request)
   },
 )
 
@@ -173,8 +173,8 @@ server.registerTool(
     description: 'delete a pet',
     inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ api_key: deletePetHeaderApiKeySchema }) },
   },
-  async ({ petId, headers }) => {
-    return deletePetHandler({ petId, headers })
+  async ({ petId, headers }, request) => {
+    return deletePetHandler({ petId, headers }, request)
   },
 )
 
@@ -186,8 +186,8 @@ server.registerTool(
     outputSchema: { data: addFilesStatus200Schema },
     inputSchema: { data: addFilesDataSchema },
   },
-  async ({ data }) => {
-    return addFilesHandler({ data })
+  async ({ data }, request) => {
+    return addFilesHandler({ data }, request)
   },
 )
 
@@ -198,8 +198,8 @@ server.registerTool(
     description: 'Returns a map of status codes to quantities',
     outputSchema: { data: getInventoryStatus200Schema },
   },
-  async () => {
-    return getInventoryHandler()
+  async (request) => {
+    return getInventoryHandler(request)
   },
 )
 
@@ -211,8 +211,8 @@ server.registerTool(
     outputSchema: { data: placeOrderStatus200Schema },
     inputSchema: { data: placeOrderDataSchema },
   },
-  async ({ data }) => {
-    return placeOrderHandler({ data })
+  async ({ data }, request) => {
+    return placeOrderHandler({ data }, request)
   },
 )
 
@@ -224,8 +224,8 @@ server.registerTool(
     outputSchema: { data: placeOrderPatchStatus200Schema },
     inputSchema: { data: placeOrderPatchDataSchema },
   },
-  async ({ data }) => {
-    return placeOrderPatchHandler({ data })
+  async ({ data }, request) => {
+    return placeOrderPatchHandler({ data }, request)
   },
 )
 
@@ -237,8 +237,8 @@ server.registerTool(
     outputSchema: { data: getOrderByIdStatus200Schema },
     inputSchema: { orderId: getOrderByIdPathOrderIdSchema },
   },
-  async ({ orderId }) => {
-    return getOrderByIdHandler({ orderId })
+  async ({ orderId }, request) => {
+    return getOrderByIdHandler({ orderId }, request)
   },
 )
 
@@ -249,8 +249,8 @@ server.registerTool(
     description: 'For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors',
     inputSchema: { orderId: deleteOrderPathOrderIdSchema },
   },
-  async ({ orderId }) => {
-    return deleteOrderHandler({ orderId })
+  async ({ orderId }, request) => {
+    return deleteOrderHandler({ orderId }, request)
   },
 )
 
@@ -261,8 +261,8 @@ server.registerTool(
     description: 'This can only be done by the logged in user.',
     inputSchema: { data: createUserDataSchema },
   },
-  async ({ data }) => {
-    return createUserHandler({ data })
+  async ({ data }, request) => {
+    return createUserHandler({ data }, request)
   },
 )
 
@@ -274,8 +274,8 @@ server.registerTool(
     outputSchema: { data: createUsersWithListInputStatus200Schema },
     inputSchema: { data: createUsersWithListInputDataSchema },
   },
-  async ({ data }) => {
-    return createUsersWithListInputHandler({ data })
+  async ({ data }, request) => {
+    return createUsersWithListInputHandler({ data }, request)
   },
 )
 
@@ -287,8 +287,8 @@ server.registerTool(
     outputSchema: { data: loginUserStatus200Schema },
     inputSchema: { params: z.object({ username: loginUserQueryUsernameSchema, password: loginUserQueryPasswordSchema }) },
   },
-  async ({ params }) => {
-    return loginUserHandler({ params })
+  async ({ params }, request) => {
+    return loginUserHandler({ params }, request)
   },
 )
 
@@ -298,8 +298,8 @@ server.registerTool(
     title: 'Logs out current logged in user session',
     description: 'Make a GET request to /user/logout',
   },
-  async () => {
-    return logoutUserHandler()
+  async (request) => {
+    return logoutUserHandler(request)
   },
 )
 
@@ -311,8 +311,8 @@ server.registerTool(
     outputSchema: { data: getUserByNameStatus200Schema },
     inputSchema: { username: getUserByNamePathUsernameSchema },
   },
-  async ({ username }) => {
-    return getUserByNameHandler({ username })
+  async ({ username }, request) => {
+    return getUserByNameHandler({ username }, request)
   },
 )
 
@@ -323,8 +323,8 @@ server.registerTool(
     description: 'This can only be done by the logged in user.',
     inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
   },
-  async ({ username, data }) => {
-    return updateUserHandler({ username, data })
+  async ({ username, data }, request) => {
+    return updateUserHandler({ username, data }, request)
   },
 )
 
@@ -335,8 +335,8 @@ server.registerTool(
     description: 'This can only be done by the logged in user.',
     inputSchema: { username: deleteUserPathUsernameSchema },
   },
-  async ({ username }) => {
-    return deleteUserHandler({ username })
+  async ({ username }, request) => {
+    return deleteUserHandler({ username }, request)
   },
 )
 

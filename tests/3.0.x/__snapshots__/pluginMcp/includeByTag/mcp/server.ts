@@ -35,8 +35,8 @@ server.registerTool("updatePet", {
   description: "Update an existing pet by Id",
   outputSchema: { data: updatePetStatus200Schema },
   inputSchema: { data: updatePetDataSchema },
-}, async ({ data }) => {
-  return updatePetHandler({ data })
+}, async ({ data }, request) => {
+  return updatePetHandler({ data }, request)
 })
           
 
@@ -45,8 +45,8 @@ server.registerTool("addPet", {
   description: "Add a new pet to the store",
   outputSchema: { data: addPetStatus200Schema },
   inputSchema: { data: addPetDataSchema },
-}, async ({ data }) => {
-  return addPetHandler({ data })
+}, async ({ data }, request) => {
+  return addPetHandler({ data }, request)
 })
           
 
@@ -55,8 +55,8 @@ server.registerTool("findPetsByStatus", {
   description: "Multiple status values can be provided with comma separated strings",
   outputSchema: { data: findPetsByStatusStatus200Schema },
   inputSchema: { params: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
-}, async ({ params }) => {
-  return findPetsByStatusHandler({ params })
+}, async ({ params }, request) => {
+  return findPetsByStatusHandler({ params }, request)
 })
           
 
@@ -65,8 +65,8 @@ server.registerTool("findPetsByTags", {
   description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
   outputSchema: { data: findPetsByTagsStatus200Schema },
   inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
-}, async ({ params }) => {
-  return findPetsByTagsHandler({ params })
+}, async ({ params }, request) => {
+  return findPetsByTagsHandler({ params }, request)
 })
           
 
@@ -75,8 +75,8 @@ server.registerTool("getPetById", {
   description: "Returns a single pet",
   outputSchema: { data: getPetByIdStatus200Schema },
   inputSchema: { petId: getPetByIdPathPetIdSchema },
-}, async ({ petId }) => {
-  return getPetByIdHandler({ petId })
+}, async ({ petId }, request) => {
+  return getPetByIdHandler({ petId }, request)
 })
           
 
@@ -84,8 +84,8 @@ server.registerTool("updatePetWithForm", {
   title: "Updates a pet in the store with form data",
   description: "Make a POST request to /pet/{petId}",
   inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
-}, async ({ petId, params }) => {
-  return updatePetWithFormHandler({ petId, params })
+}, async ({ petId, params }, request) => {
+  return updatePetWithFormHandler({ petId, params }, request)
 })
           
 
@@ -93,8 +93,8 @@ server.registerTool("deletePet", {
   title: "Deletes a pet",
   description: "delete a pet",
   inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ "api_key": deletePetHeaderApiKeySchema }) },
-}, async ({ petId, headers }) => {
-  return deletePetHandler({ petId, headers })
+}, async ({ petId, headers }, request) => {
+  return deletePetHandler({ petId, headers }, request)
 })
           
 
@@ -103,8 +103,8 @@ server.registerTool("uploadFile", {
   description: "Make a POST request to /pet/{petId}/uploadImage",
   outputSchema: { data: uploadFileStatus200Schema },
   inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
-}, async ({ petId, data, params }) => {
-  return uploadFileHandler({ petId, data, params })
+}, async ({ petId, data, params }, request) => {
+  return uploadFileHandler({ petId, data, params }, request)
 })
           
 export async function startServer() {
