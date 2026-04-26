@@ -7,5 +7,3 @@ export { staticClassClientGenerator } from './generators/staticClassClientGenera
 export { default, pluginClient, pluginClientName } from './plugin.ts'
 export { resolverClient } from './resolvers/resolverClient.ts'
 export type { ClientImportPath, PluginClient, ResolverClient } from './types.ts'
-export * as axiosClient from './clients/axios.ts'
-export * as fetchClient from './clients/fetch.ts'
