@@ -184,6 +184,7 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.js'
+export { client } from './.kubb/client.js'
 export { operations } from './clients/axios/operations.js'
 export { addPet } from './clients/axios/petService/addPet.js'
 export { deletePet } from './clients/axios/petService/deletePet.js'

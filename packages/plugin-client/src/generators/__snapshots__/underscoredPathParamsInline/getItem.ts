@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { GetItemPathItemId, GetItemResponse } from './GetItem'
-import { fetch } from './.kubb/fetch'
+import { fetch } from './.kubb/client'
 
 export function getGetItemUrl(itemId: GetItemPathItemId) {
   const item_id = itemId

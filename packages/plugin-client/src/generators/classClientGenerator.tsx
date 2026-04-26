@@ -178,9 +178,9 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             </>
           ) : (
             <>
-              <File.Import name={['fetch']} root={file.path} path={path.resolve(root, '.kubb/fetch.ts')} />
-              <File.Import name={['mergeConfig']} root={file.path} path={path.resolve(root, '.kubb/fetch.ts')} />
-              <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={file.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+              <File.Import name={['fetch']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
+              <File.Import name={['mergeConfig']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
+              <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
             </>
           )}
 
@@ -232,7 +232,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
           {importPath ? (
             <File.Import name={['Client', 'RequestConfig']} path={importPath} isTypeOnly />
           ) : (
-            <File.Import name={['Client', 'RequestConfig']} root={sdkFile.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+            <File.Import name={['Client', 'RequestConfig']} root={sdkFile.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
           )}
 
           {controllers.map(({ name, file }) => (

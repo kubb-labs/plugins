@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey } from '../DeletePet'
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus } from '../FindPetsByTags'
 import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId } from '../UpdatePetWithForm'
-import { fetch, mergeConfig } from '../.kubb/fetch'
+import { fetch, mergeConfig } from '../.kubb/client'
 
 export class petService {
   #config: Partial<RequestConfig> & { client?: Client }

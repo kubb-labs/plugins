@@ -184,6 +184,7 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.ts'
+export { client } from './.kubb/client.ts'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.ts'
 export { petStatusEnum } from './models/ts/Pet.ts'
