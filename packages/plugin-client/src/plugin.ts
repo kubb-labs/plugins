@@ -15,6 +15,12 @@ import { source as fetchClientSource } from './templates/clients/fetch.source.ts
 import { source as configSource } from './templates/config.source.ts'
 import type { PluginClient } from './types.ts'
 
+type InjectFileOptions = Pick<ast.FileNode, 'baseName' | 'path'> & {
+  sources?: ast.FileNode['sources']
+  imports?: ast.FileNode['imports']
+  exports?: ast.FileNode['exports']
+}
+
 /**
  * Canonical plugin name for `@kubb/plugin-client`, used to identify the plugin
  * in driver lookups and warnings.
@@ -126,25 +132,19 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
         const isRelativePath = resolvedImportPath?.startsWith('.')
 
         if (!isRelativePath) {
-          ctx.injectFile({
+          const isInlineSource = bundle && !resolvedImportPath
+          ;(ctx.injectFile as (file: InjectFileOptions) => void)({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
                 name: 'client',
-                nodes: [
-                  ast.createText(
-                    bundle && !resolvedImportPath
-                      ? client === 'fetch'
-                        ? fetchClientSource
-                        : axiosClientSource
-                      : `export * from '${resolvedImportPath}'\nexport { default } from '${resolvedImportPath}'`,
-                  ),
-                ],
+                nodes: isInlineSource ? [ast.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
                 isExportable: true,
                 isIndexable: true,
               }),
             ],
+            exports: !isInlineSource && resolvedImportPath ? [ast.createExport({ path: resolvedImportPath })] : [],
           })
         }
 
