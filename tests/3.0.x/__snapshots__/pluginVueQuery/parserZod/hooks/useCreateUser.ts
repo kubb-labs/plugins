@@ -36,7 +36,7 @@ export async function createUser(data?: CreateUserData, contentType: "applicatio
  * {@link /user}
  */
 export function useCreateUser<TContext>(options: {
-  mutation?: MutationObserverOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUserData>}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUserData>, contentType?: MaybeRefOrGetter<"application/json" | "application/xml" | "application/x-www-form-urlencoded">}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUserData>> & { client?: Client },
 } = {}) {
 
@@ -44,9 +44,9 @@ export function useCreateUser<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? createUserMutationKey()
 
-          return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
-            mutationFn: async({ data }) => {
-              return createUser(data, config)
+          return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+            mutationFn: async({ data, contentType }) => {
+              return createUser(data, contentType, config)
             },
             mutationKey,
             ...mutationOptions

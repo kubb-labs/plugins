@@ -79,6 +79,8 @@ export type {
 } from './models/ts/petController/UpdatePetWithForm.js'
 export type {
   UploadFileData,
+  UploadFileFormData,
+  UploadFileJsonData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

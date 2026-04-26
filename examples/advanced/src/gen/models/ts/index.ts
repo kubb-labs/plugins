@@ -14,6 +14,8 @@ export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
 export type {
   AddFilesData,
+  AddFilesFormData,
+  AddFilesJsonData,
   AddFilesRequestConfig,
   AddFilesResponse,
   AddFilesResponses,

@@ -1,4 +1,13 @@
-export type { AddFilesData, AddFilesRequestConfig, AddFilesResponse, AddFilesResponses, AddFilesStatus200, AddFilesStatus405 } from './AddFiles.ts'
+export type {
+  AddFilesData,
+  AddFilesFormData,
+  AddFilesJsonData,
+  AddFilesRequestConfig,
+  AddFilesResponse,
+  AddFilesResponses,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from './AddFiles.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,

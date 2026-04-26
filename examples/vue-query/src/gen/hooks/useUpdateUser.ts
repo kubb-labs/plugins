@@ -47,7 +47,11 @@ export function useUpdateUser<TContext>(
     mutation?: MutationObserverOptions<
       UpdateUserResponse,
       ResponseErrorConfig<Error>,
-      { username: MaybeRefOrGetter<UpdateUserPathUsername>; data?: MaybeRefOrGetter<UpdateUserData> },
+      {
+        username: MaybeRefOrGetter<UpdateUserPathUsername>
+        data?: MaybeRefOrGetter<UpdateUserData>
+        contentType?: MaybeRefOrGetter<'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'>
+      },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
@@ -57,10 +61,15 @@ export function useUpdateUser<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updateUserMutationKey()
 
-  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>(
+  return useMutation<
+    UpdateUserResponse,
+    ResponseErrorConfig<Error>,
+    { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >(
     {
-      mutationFn: async ({ username, data }) => {
-        return updateUser({ username }, data, config)
+      mutationFn: async ({ username, data, contentType }) => {
+        return updateUser({ username }, data, contentType, config)
       },
       mutationKey,
       ...mutationOptions,

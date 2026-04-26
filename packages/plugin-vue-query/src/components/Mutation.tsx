@@ -24,6 +24,16 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
+function buildContentTypeParam(node: ast.OperationNode): ast.FunctionParameterNode | undefined {
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  if (contentTypes.length <= 1) return undefined
+  return ast.createFunctionParameter({
+    name: 'contentType',
+    type: ast.createParamsType({ variant: 'reference', name: contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') }),
+    optional: true,
+  })
+}
+
 function getParams(
   node: ast.OperationNode,
   options: {
@@ -40,7 +50,8 @@ function getParams(
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
+  const contentTypeParam = buildContentTypeParam(node)
+  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver, extraBodyParams: contentTypeParam ? [contentTypeParam] : [] })
 
   // Vue-query uses MutationObserverOptions instead of UseMutationOptions, and wraps params with MaybeRefOrGetter
   const mutationArgWrapped = mutationArgParamsNode.params.map((param) => {
@@ -102,7 +113,17 @@ export function Mutation({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver: tsResolver })
+  const contentTypeParam = buildContentTypeParam(node)
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  const defaultContentType = contentTypes[0] ?? 'application/json'
+  const contentTypeUnion = contentTypes.map((ct) => JSON.stringify(ct)).join(' | ')
+
+  const mutationArgParamsNode = buildMutationArgParams(node, {
+    paramsCasing,
+    resolver: tsResolver,
+    extraBodyParams: contentTypeParam ? [contentTypeParam] : [],
+  })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
   const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
@@ -118,6 +139,15 @@ export function Mutation({
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
+      ...(isMultipleContentTypes
+        ? [
+            ast.createFunctionParameter({
+              name: 'contentType',
+              type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
+              default: JSON.stringify(defaultContentType),
+            }),
+          ]
+        : []),
       ast.createFunctionParameter({
         name: 'config',
         type: ast.createParamsType({

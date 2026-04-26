@@ -35,7 +35,7 @@ export async function placeOrder(data?: PlaceOrderData, contentType: "applicatio
  * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
-  mutation?: MutationObserverOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: MaybeRefOrGetter<PlaceOrderData>}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: MaybeRefOrGetter<PlaceOrderData>, contentType?: MaybeRefOrGetter<"application/json" | "application/xml" | "application/x-www-form-urlencoded">}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client },
 } = {}) {
 
@@ -43,9 +43,9 @@ export function usePlaceOrder<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
 
-          return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
-            mutationFn: async({ data }) => {
-              return placeOrder(data, config)
+          return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+            mutationFn: async({ data, contentType }) => {
+              return placeOrder(data, contentType, config)
             },
             mutationKey,
             ...mutationOptions

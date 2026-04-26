@@ -149,6 +149,8 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
   UploadFileData,
+  UploadFileFormData,
+  UploadFileJsonData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

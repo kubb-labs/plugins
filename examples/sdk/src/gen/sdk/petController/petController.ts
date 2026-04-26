@@ -25,7 +25,6 @@ import type {
 } from '../../models/petController/UpdatePetWithForm.ts'
 import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../models/petController/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { buildFormData } from '../../.kubb/config.ts'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class petController {
@@ -174,17 +173,17 @@ export class petController {
     { petId }: { petId: UploadFilePathPetId },
     data: UploadFileData,
     params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+    contentType: 'application/json' | 'multipart/form-data' = 'application/json',
     config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
   ) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const formData = buildFormData(requestData)
     const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}/uploadImage`,
       params,
-      data: formData as FormData,
+      data: requestData,
     })
     return res.data
   }

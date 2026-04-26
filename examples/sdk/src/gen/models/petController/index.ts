@@ -68,6 +68,8 @@ export type {
 } from './UpdatePetWithForm.ts'
 export type {
   UploadFileData,
+  UploadFileFormData,
+  UploadFileJsonData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

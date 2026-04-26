@@ -22,6 +22,7 @@ export async function uploadFile(
   petId: UploadFilePathPetId,
   data: UploadFileData,
   params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  contentType: 'application/json' | 'multipart/form-data' = 'application/json',
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
@@ -34,7 +35,7 @@ export async function uploadFile(
     method: 'POST',
     url: getUploadFileUrl(petId).url.toString(),
     params,
-    data: formData as FormData,
+    data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
     ...requestConfig,
   })
 
