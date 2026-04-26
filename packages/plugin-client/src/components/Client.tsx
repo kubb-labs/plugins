@@ -43,24 +43,39 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  const contentTypeUnion = contentTypes.map((ct) => JSON.stringify(ct)).join(' | ')
+  const defaultContentType = contentTypes[0] ?? 'application/json'
 
   return ast.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver: tsResolver,
-    extraParams: isConfigurable
-      ? [
-          ast.createFunctionParameter({
-            name: 'config',
-            type: ast.createParamsType({
-              variant: 'reference',
-              name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+    extraParams: [
+      ...(isMultipleContentTypes
+        ? [
+            ast.createFunctionParameter({
+              name: 'contentType',
+              type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
+              default: JSON.stringify(defaultContentType),
             }),
-            default: '{}',
-          }),
-        ]
-      : [],
+          ]
+        : []),
+      ...(isConfigurable
+        ? [
+            ast.createFunctionParameter({
+              name: 'config',
+              type: ast.createParamsType({
+                variant: 'reference',
+                name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+              }),
+              default: '{}',
+            }),
+          ]
+        : []),
+    ],
   })
 }
 
@@ -84,7 +99,9 @@ export function Client({
 }: Props): KubbReactNode {
   const path = new URLPath(node.path)
   const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'
-  const isFormData = contentType === 'multipart/form-data'
+  const isMultipleContentTypes = (node.requestBody?.content?.length ?? 0) > 1
+  const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
+  const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
 
   const originalPathParams = node.parameters.filter((p) => p.in === 'path')
   const casedPathParams = ast.caseParams(originalPathParams, paramsCasing)
@@ -159,7 +176,11 @@ export function Client({
         params: queryParamsName ? (queryParamsMapping ? { value: 'mappedParams' } : {}) : undefined,
         data: requestName
           ? {
-              value: isFormData ? 'formData as FormData' : 'requestData',
+              value: isMultipleContentTypes && hasFormData
+                ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
+                : isFormData
+                  ? 'formData as FormData'
+                  : 'requestData',
             }
           : undefined,
         requestConfig: isConfigurable
@@ -236,7 +257,7 @@ export function Client({
           )}
           {parser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
           <br />
-          {isFormData && requestName && 'const formData = buildFormData(requestData)'}
+          {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
           <br />
           {isConfigurable
             ? `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`

@@ -119,6 +119,21 @@ const requiredOneOfRequestBodyNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const multiContentTypeNode = ast.createOperation({
+  operationId: 'uploadFile',
+  method: 'POST',
+  path: '/pet/{petId}/uploadImage',
+  tags: ['pet'],
+  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  requestBody: {
+    content: [
+      { contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })] }) },
+      { contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'file', required: true, schema: ast.createSchema({ type: 'string' }) })] }) },
+    ],
+  },
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
 const dashedPathParamsNode = ast.createOperation({
   operationId: 'getOrganization',
   method: 'GET',
@@ -155,6 +170,7 @@ describe('clientGenerator operation', () => {
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const, pathParamsType: 'inline' as const } },
     { name: 'requiredOneOfRequestBody', node: requiredOneOfRequestBodyNode, options: {} },
+    { name: 'multiContentType', node: multiContentTypeNode, options: {} },
     { name: 'dashedPathParams', node: dashedPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'object' as const } },
     { name: 'dashedPathParamsInline', node: dashedPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const } },
     { name: 'underscoredPathParams', node: underscoredPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'object' as const } },

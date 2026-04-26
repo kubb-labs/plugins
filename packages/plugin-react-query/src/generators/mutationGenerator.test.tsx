@@ -92,6 +92,21 @@ const deletePetNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'void' }), description: 'successful operation' })],
 })
 
+const multiContentTypeNode = ast.createOperation({
+  operationId: 'uploadFile',
+  method: 'POST',
+  path: '/pet/{petId}/uploadImage',
+  tags: ['pet'],
+  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  requestBody: {
+    content: [
+      { contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })] }) },
+      { contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'file', required: true, schema: ast.createSchema({ type: 'string' }) })] }) },
+    ],
+  },
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
 describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
@@ -100,6 +115,7 @@ describe('mutationGenerator operation', () => {
     { name: 'updatePetByIdPathParamsObject', node: updatePetByIdNode, options: { pathParamsType: 'object' as const } },
     { name: 'deletePet', node: deletePetNode, options: {} },
     { name: 'deletePetObject', node: deletePetNode, options: { pathParamsType: 'object' as const } },
+    { name: 'multiContentType', node: multiContentTypeNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

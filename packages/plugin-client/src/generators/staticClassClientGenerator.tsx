@@ -160,7 +160,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
           const { typeImportsByFile, typeFilesByPath } = collectTypeImports(ops)
           const { zodImportsByFile, zodFilesByPath } =
             parser === 'zod' ? collectZodImports(ops) : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
-          const hasFormData = ops.some((op) => op.node.requestBody?.content?.[0]?.contentType === 'multipart/form-data')
+          const hasFormData = ops.some((op) => op.node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false)
 
           return (
             <File

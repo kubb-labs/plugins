@@ -159,16 +159,17 @@ export function buildQueryKeyParams(
 
 /**
  * Build mutation arg params for paramsToTrigger mode.
- * Contains pathParams + data + queryParams + headers (all flattened, for type alias).
+ * Contains pathParams + data + extraBodyParams + queryParams + headers (all flattened, for type alias).
  */
 export function buildMutationArgParams(
   node: ast.OperationNode,
   options: {
     paramsCasing: 'camelcase' | undefined
     resolver: PluginTs['resolver']
+    extraBodyParams?: ast.FunctionParameterNode[]
   },
 ): ast.FunctionParametersNode {
-  const { paramsCasing, resolver } = options
+  const { paramsCasing, resolver, extraBodyParams } = options
 
   const casedParams = ast.caseParams(node.parameters, paramsCasing)
   const pathParams = casedParams.filter((p) => p.in === 'path')
@@ -191,6 +192,11 @@ export function buildMutationArgParams(
   // Request body
   if (bodyType) {
     params.push(ast.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
+  }
+
+  // Extra body params (e.g. contentType for multi-content-type operations)
+  if (extraBodyParams?.length) {
+    params.push(...extraBodyParams)
   }
 
   // Query params

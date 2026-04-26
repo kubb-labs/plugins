@@ -23,6 +23,16 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
+function buildContentTypeParam(node: ast.OperationNode): ast.FunctionParameterNode | undefined {
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  if (contentTypes.length <= 1) return undefined
+  return ast.createFunctionParameter({
+    name: 'contentType',
+    type: ast.createParamsType({ variant: 'reference', name: contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') }),
+    optional: true,
+  })
+}
+
 function getParams(
   node: ast.OperationNode,
   options: {
@@ -39,7 +49,12 @@ function getParams(
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
+  const contentTypeParam = buildContentTypeParam(node)
+  const mutationArgParamsNode = buildMutationArgParams(node, {
+    paramsCasing,
+    resolver,
+    extraBodyParams: contentTypeParam ? [contentTypeParam] : [],
+  })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
 
@@ -67,7 +82,12 @@ export function Mutation({ name, mutationOptionsName, paramsCasing, dataReturnTy
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver: tsResolver })
+  const contentTypeParam = buildContentTypeParam(node)
+  const mutationArgParamsNode = buildMutationArgParams(node, {
+    paramsCasing,
+    resolver: tsResolver,
+    extraBodyParams: contentTypeParam ? [contentTypeParam] : [],
+  })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
   const returnType = `UseMutationResult<${generics}>`

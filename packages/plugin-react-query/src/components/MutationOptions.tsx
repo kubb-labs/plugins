@@ -57,7 +57,24 @@ export function MutationOptions({
   const configParamsNode = getConfigParam(node, tsResolver)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver: tsResolver })
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  const contentTypeUnion = contentTypes.map((ct) => JSON.stringify(ct)).join(' | ')
+  const defaultContentType = contentTypes[0] ?? 'application/json'
+
+  const contentTypeParam = isMultipleContentTypes
+    ? ast.createFunctionParameter({
+        name: 'contentType',
+        type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
+        optional: true,
+      })
+    : undefined
+
+  const mutationArgParamsNode = buildMutationArgParams(node, {
+    paramsCasing,
+    resolver: tsResolver,
+    extraBodyParams: contentTypeParam ? [contentTypeParam] : [],
+  })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
 
   const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
@@ -69,6 +86,15 @@ export function MutationOptions({
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
+      ...(isMultipleContentTypes
+        ? [
+            ast.createFunctionParameter({
+              name: 'contentType',
+              type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
+              default: JSON.stringify(defaultContentType),
+            }),
+          ]
+        : []),
       ast.createFunctionParameter({
         name: 'config',
         type: ast.createParamsType({

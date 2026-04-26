@@ -148,16 +148,67 @@ export const typeGenerator = defineGenerator<PluginTs>({
       }),
     )
 
-    const requestType = node.requestBody?.content?.[0]?.schema
-      ? renderSchemaType({
+    function getContentTypeSuffix(contentType: string): string {
+      if (contentType === 'application/json') return 'Json'
+      if (contentType === 'multipart/form-data') return 'FormData'
+      if (contentType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
+      const lastSegment = contentType.split('/').pop() ?? contentType
+      return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1)
+    }
+
+    function getPerContentTypeName(dataName: string, suffix: string): string {
+      if (dataName.endsWith('Data')) {
+        return suffix.endsWith('Data') ? dataName.slice(0, -4) + suffix : `${dataName.slice(0, -4)}${suffix}Data`
+      }
+      return dataName + suffix
+    }
+
+    const requestBodyContent = node.requestBody?.content ?? []
+    const requestType = (() => {
+      if (requestBodyContent.length === 0) return null
+      if (requestBodyContent.length === 1) {
+        const entry = requestBodyContent[0]!
+        if (!entry.schema) return null
+        return renderSchemaType({
           schema: {
-            ...node.requestBody.content![0]!.schema!,
-            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
+            ...entry.schema,
+            description: node.requestBody!.description ?? entry.schema.description,
           },
           name: resolver.resolveDataName(node),
-          keysToOmit: node.requestBody.content![0]!.keysToOmit,
+          keysToOmit: entry.keysToOmit,
         })
-      : null
+      }
+      // Multiple content types — generate individual types + union alias
+      const dataName = resolver.resolveDataName(node)
+      const individualItems = requestBodyContent
+        .filter((entry) => entry.schema)
+        .map((entry) => {
+          const suffix = getContentTypeSuffix(entry.contentType)
+          const individualName = getPerContentTypeName(dataName, suffix)
+          return {
+            name: individualName,
+            rendered: renderSchemaType({
+              schema: {
+                ...entry.schema!,
+                description: node.requestBody!.description ?? entry.schema!.description,
+              },
+              name: individualName,
+              keysToOmit: entry.keysToOmit,
+            }),
+          }
+        })
+      const unionSchema = ast.createSchema({
+        type: 'union',
+        members: individualItems.map((item) => ast.createSchema({ type: 'ref', name: item.name })),
+      })
+      const unionType = renderSchemaType({ schema: unionSchema, name: dataName })
+      return (
+        <>
+          {individualItems.map((item) => item.rendered)}
+          {unionType}
+        </>
+      )
+    })()
 
     const responseTypes = node.responses.map((res) =>
       renderSchemaType({
