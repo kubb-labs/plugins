@@ -1,9 +1,9 @@
+import type { CreateUserData } from '../../models/ts/userController/CreateUser.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function createUserHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>),
-) {
-  return http.post(`/user`, function handler(info) {
+export function createUserHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreateUserData, any>) {
+  return http.post<Record<string, string>, CreateUserData, any>(`/user`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {

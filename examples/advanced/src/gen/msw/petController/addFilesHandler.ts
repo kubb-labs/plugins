@@ -1,4 +1,5 @@
-import type { AddFilesResponse, AddFilesStatus405 } from '../../models/ts/petController/AddFiles.ts'
+import type { AddFilesResponse, AddFilesStatus405, AddFilesData } from '../../models/ts/petController/AddFiles.ts'
+import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
 export function addFilesHandlerResponse200(data: AddFilesResponse) {
@@ -16,8 +17,8 @@ export function addFilesHandlerResponse405(data?: AddFilesStatus405) {
   })
 }
 
-export function addFilesHandler(data?: AddFilesResponse | ((info: Parameters<Parameters<typeof http.post>[1]>[0]) => Response | Promise<Response>)) {
-  return http.post(`/pet/files`, function handler(info) {
+export function addFilesHandler(data?: AddFilesResponse | HttpResponseResolver<Record<string, string>, AddFilesData, any>) {
+  return http.post<Record<string, string>, AddFilesData, any>(`/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
