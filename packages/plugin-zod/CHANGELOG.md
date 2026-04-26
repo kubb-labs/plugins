@@ -1,5 +1,7 @@
 # @kubb/plugin-zod
 
+## 5.0.0-alpha.56
+
 ## 5.0.0-alpha.55
 
 ### Patch Changes
