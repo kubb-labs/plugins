@@ -75,8 +75,8 @@ server.registerTool(
       params: z.object({ boolParam: createPetsQueryBoolParamSchema, offset: createPetsQueryOffsetSchema }),
     },
   },
-  async ({ uuid, data, headers, params }) => {
-    return createPetsHandler({ uuid, data, headers, params })
+  async ({ uuid, data, headers, params }, request) => {
+    return createPetsHandler({ uuid, data, headers, params }, request)
   },
 )
 
@@ -88,8 +88,8 @@ server.registerTool(
     outputSchema: { data: updatePetStatus200Schema },
     inputSchema: { data: updatePetDataSchema },
   },
-  async ({ data }) => {
-    return updatePetHandler({ data })
+  async ({ data }, request) => {
+    return updatePetHandler({ data }, request)
   },
 )
 
@@ -100,8 +100,8 @@ server.registerTool(
     description: 'Add a new pet to the store',
     inputSchema: { data: addPetDataSchema },
   },
-  async ({ data }) => {
-    return addPetHandler({ data })
+  async ({ data }, request) => {
+    return addPetHandler({ data }, request)
   },
 )
 
@@ -113,8 +113,8 @@ server.registerTool(
     outputSchema: { data: findPetsByStatusStatus200Schema },
     inputSchema: { stepId: findPetsByStatusPathStepIdSchema },
   },
-  async ({ stepId }) => {
-    return findPetsByStatusHandler({ stepId })
+  async ({ stepId }, request) => {
+    return findPetsByStatusHandler({ stepId }, request)
   },
 )
 
@@ -129,8 +129,8 @@ server.registerTool(
       params: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
     },
   },
-  async ({ headers, params }) => {
-    return findPetsByTagsHandler({ headers, params })
+  async ({ headers, params }, request) => {
+    return findPetsByTagsHandler({ headers, params }, request)
   },
 )
 
@@ -142,8 +142,8 @@ server.registerTool(
     outputSchema: { data: getPetByIdStatus200Schema },
     inputSchema: { petId: getPetByIdPathPetIdSchema },
   },
-  async ({ petId }) => {
-    return getPetByIdHandler({ petId })
+  async ({ petId }, request) => {
+    return getPetByIdHandler({ petId }, request)
   },
 )
 
@@ -157,8 +157,8 @@ server.registerTool(
       params: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
     },
   },
-  async ({ petId, params }) => {
-    return updatePetWithFormHandler({ petId, params })
+  async ({ petId, params }, request) => {
+    return updatePetWithFormHandler({ petId, params }, request)
   },
 )
 
@@ -169,8 +169,8 @@ server.registerTool(
     description: 'delete a pet',
     inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ apiKey: deletePetHeaderApiKeySchema }) },
   },
-  async ({ petId, headers }) => {
-    return deletePetHandler({ petId, headers })
+  async ({ petId, headers }, request) => {
+    return deletePetHandler({ petId, headers }, request)
   },
 )
 
@@ -182,8 +182,8 @@ server.registerTool(
     outputSchema: { data: addFilesStatus200Schema },
     inputSchema: { data: addFilesDataSchema },
   },
-  async ({ data }) => {
-    return addFilesHandler({ data })
+  async ({ data }, request) => {
+    return addFilesHandler({ data }, request)
   },
 )
 
@@ -199,8 +199,8 @@ server.registerTool(
       params: z.object({ additionalMetadata: uploadFileQueryAdditionalMetadataSchema }),
     },
   },
-  async ({ petId, data, params }) => {
-    return uploadFileHandler({ petId, data, params })
+  async ({ petId, data, params }, request) => {
+    return uploadFileHandler({ petId, data, params }, request)
   },
 )
 
@@ -211,8 +211,8 @@ server.registerTool(
     description: 'This can only be done by the logged in user.',
     inputSchema: { data: createUserDataSchema },
   },
-  async ({ data }) => {
-    return createUserHandler({ data })
+  async ({ data }, request) => {
+    return createUserHandler({ data }, request)
   },
 )
 
@@ -224,8 +224,8 @@ server.registerTool(
     outputSchema: { data: createUsersWithListInputStatus200Schema },
     inputSchema: { data: createUsersWithListInputDataSchema },
   },
-  async ({ data }) => {
-    return createUsersWithListInputHandler({ data })
+  async ({ data }, request) => {
+    return createUsersWithListInputHandler({ data }, request)
   },
 )
 
@@ -237,8 +237,8 @@ server.registerTool(
     outputSchema: { data: loginUserStatus200Schema },
     inputSchema: { params: z.object({ username: loginUserQueryUsernameSchema, password: loginUserQueryPasswordSchema }) },
   },
-  async ({ params }) => {
-    return loginUserHandler({ params })
+  async ({ params }, request) => {
+    return loginUserHandler({ params }, request)
   },
 )
 
@@ -248,8 +248,8 @@ server.registerTool(
     title: 'Logs out current logged in user session',
     description: 'Make a GET request to /user/logout',
   },
-  async () => {
-    return logoutUserHandler()
+  async (_args, request) => {
+    return logoutUserHandler(request)
   },
 )
 
@@ -261,8 +261,8 @@ server.registerTool(
     outputSchema: { data: getUserByNameStatus200Schema },
     inputSchema: { username: getUserByNamePathUsernameSchema },
   },
-  async ({ username }) => {
-    return getUserByNameHandler({ username })
+  async ({ username }, request) => {
+    return getUserByNameHandler({ username }, request)
   },
 )
 
@@ -273,8 +273,8 @@ server.registerTool(
     description: 'This can only be done by the logged in user.',
     inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
   },
-  async ({ username, data }) => {
-    return updateUserHandler({ username, data })
+  async ({ username, data }, request) => {
+    return updateUserHandler({ username, data }, request)
   },
 )
 
@@ -285,8 +285,8 @@ server.registerTool(
     description: 'This can only be done by the logged in user.',
     inputSchema: { username: deleteUserPathUsernameSchema },
   },
-  async ({ username }) => {
-    return deleteUserHandler({ username })
+  async ({ username }, request) => {
+    return deleteUserHandler({ username }, request)
   },
 )
 

@@ -1,22 +1,24 @@
 import fetch from '@kubb/plugin-client/clients/axios'
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/ts/petController/UpdatePet.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { CallToolResult } from '@modelcontextprotocol/sdk/types'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Update an existing pet by Id
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePetHandler({ data }: { data: UpdatePetData }): Promise<Promise<CallToolResult>> {
+export async function updatePetHandler(
+  { data }: { data: UpdatePetData },
+  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
+): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
-    method: 'PUT',
-    url: `/pet`,
-    baseURL: `https://petstore.swagger.io/v2`,
-    data: requestData,
-  })
+  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>(
+    { method: 'PUT', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
+    request,
+  )
 
   return {
     content: [
