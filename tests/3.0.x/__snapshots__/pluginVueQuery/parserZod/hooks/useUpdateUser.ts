@@ -18,7 +18,7 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 

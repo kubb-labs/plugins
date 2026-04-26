@@ -17,7 +17,7 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  * @summary Create user
  * {@link /user}
  */
-export async function createUser({ data }: { data?: CreateUserData } = {}, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+export async function createUser({ data }: { data?: CreateUserData } = {}, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 

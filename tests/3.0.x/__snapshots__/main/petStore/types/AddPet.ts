@@ -20,7 +20,21 @@ export type AddPetStatus405 = any;
  * @description Create a new pet in the store
  * @type object
 */
-export type AddPetData = AddPetRequest;
+export type AddPetJsonData = AddPetRequest;
+
+/**
+ * @description Create a new pet in the store
+ * @type object
+*/
+export type AddPetXmlData = Pet;
+
+/**
+ * @description Create a new pet in the store
+ * @type object
+*/
+export type AddPetFormUrlEncodedData = Pet;
+
+export type AddPetData = (AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData);
 
 /**
  * @type object
