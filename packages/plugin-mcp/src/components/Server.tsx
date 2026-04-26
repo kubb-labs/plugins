@@ -132,7 +132,7 @@ server.registerTool(${JSON.stringify(tool.name)}, {
           return `
 server.registerTool(${JSON.stringify(tool.name)}, {
   ${config},
-}, async (_args, request) => {
+}, async (request) => {
   return ${mcp.name}(request)
 })
           `

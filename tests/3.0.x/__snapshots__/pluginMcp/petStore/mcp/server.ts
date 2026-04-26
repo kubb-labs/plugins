@@ -133,7 +133,7 @@ server.registerTool("getInventory", {
   title: "Returns pet inventories by status",
   description: "Returns a map of status codes to quantities",
   outputSchema: { data: getInventoryStatus200Schema },
-}, async (_args, request) => {
+}, async (request) => {
   return getInventoryHandler(request)
 })
           
@@ -199,7 +199,7 @@ server.registerTool("loginUser", {
 server.registerTool("logoutUser", {
   title: "Logs out current logged in user session",
   description: "Make a GET request to /user/logout",
-}, async (_args, request) => {
+}, async (request) => {
   return logoutUserHandler(request)
 })
           
