@@ -46,6 +46,7 @@ Tests performance with a full suite of generators including validation and mocki
 - `plugin-ts` - TypeScript types generator
 - `plugin-client` - API client generator
 - `plugin-zod` - Zod validation schemas
+- `plugin-valibot` - Valibot validation schemas
 - `plugin-faker` - Mock data generators
 
 ## Understanding Results

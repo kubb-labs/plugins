@@ -5,6 +5,7 @@ import { AsyncEventEmitter, createKubb, type Plugin } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
+import { pluginValibot } from '@kubb/plugin-valibot'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
 import { bench, describe } from 'vitest'
@@ -124,6 +125,13 @@ describe('Plugin Generation Performance', () => {
           pluginZod({
             output: {
               path: 'zod',
+              barrelType: false,
+            },
+            inferred: true,
+          }),
+          pluginValibot({
+            output: {
+              path: 'valibot',
               barrelType: false,
             },
             inferred: true,

@@ -83,6 +83,7 @@ options:
       | Plugin | Default resolver |
       | --- | --- |
       | `@kubb/plugin-ts` | `resolverTs` |
+      | `@kubb/plugin-valibot` | `resolverValibot` |
       | `@kubb/plugin-zod` | `resolverZod` |
       | `@kubb/plugin-cypress` | `resolverCypress` |
       | `@kubb/plugin-mcp` | `resolverMcp` |

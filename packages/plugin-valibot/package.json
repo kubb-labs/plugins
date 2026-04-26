@@ -1,0 +1,87 @@
+{
+  "name": "@kubb/plugin-valibot",
+  "version": "5.0.0-alpha.55",
+  "description": "Valibot schema generator plugin for Kubb, creating type-safe validation schemas from OpenAPI specifications for runtime data validation.",
+  "keywords": [
+    "code-generator",
+    "codegen",
+    "kubb",
+    "oas",
+    "openapi",
+    "plugins",
+    "runtime-validation",
+    "schema",
+    "schema-validation",
+    "swagger",
+    "type-safe",
+    "type-safety",
+    "typescript",
+    "validation",
+    "valibot"
+  ],
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "directory": "packages/plugin-valibot"
+  },
+  "files": [
+    "src",
+    "templates",
+    "dist",
+    "plugin.json",
+    "!/**/**.test.**",
+    "!/**/__tests__/**",
+    "!/**/__snapshots__/**"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "tsdown && size-limit",
+    "clean": "npx rimraf ./dist",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "release": "pnpm publish --no-git-check",
+    "release:canary": "bash ../../.github/canary.sh && node ../../scripts/build.js canary && pnpm publish --no-git-check",
+    "start": "tsdown --watch",
+    "test": "vitest --passWithNoTests",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/core": "catalog:",
+    "@kubb/renderer-jsx": "catalog:",
+    "remeda": "catalog:"
+  },
+  "devDependencies": {
+    "@internals/utils": "workspace:*",
+    "@kubb/parser-ts": "catalog:"
+  },
+  "peerDependencies": {
+    "@kubb/renderer-jsx": "catalog:"
+  },
+  "size-limit": [
+    {
+      "path": "./dist/*.js",
+      "limit": "510 KiB",
+      "gzip": true
+    }
+  ],
+  "engines": {
+    "node": ">=22"
+  }
+}

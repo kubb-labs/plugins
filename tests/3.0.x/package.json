@@ -28,6 +28,7 @@
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
+    "@kubb/plugin-valibot": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
     "@kubb/plugin-zod": "workspace:*"
   },

@@ -46,6 +46,9 @@
 '@kubb/plugin-vue-query':
   - any: ['packages/plugin-vue-query/**', '!packages/plugin-vue-query/package.json']
 
+'@kubb/plugin-valibot':
+  - any: ['packages/plugin-valibot/**', '!packages/plugin-valibot/package.json']
+
 '@kubb/plugin-zod':
   - any: ['packages/plugin-zod/**', '!packages/plugin-zod/package.json']
 

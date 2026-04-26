@@ -5,6 +5,7 @@ import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
+import { pluginValibot } from '@kubb/plugin-valibot'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
 
@@ -67,6 +68,16 @@ export default defineConfig(() => {
       pluginZod({
         output: {
           path: './zod',
+          barrelType: false,
+        },
+        group: { type: 'tag' },
+        inferred: true,
+        typed: false,
+        operations: false,
+      }),
+      pluginValibot({
+        output: {
+          path: './valibot',
           barrelType: false,
         },
         group: { type: 'tag' },
