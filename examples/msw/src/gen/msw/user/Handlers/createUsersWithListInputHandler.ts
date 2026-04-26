@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from '../../../models/CreateUsersWithListInput.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

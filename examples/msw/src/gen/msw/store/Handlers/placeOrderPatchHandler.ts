@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../../models/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchData } from '../../../models/PlaceOrderPatch.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
