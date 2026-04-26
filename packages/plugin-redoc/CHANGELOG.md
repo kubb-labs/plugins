@@ -1,5 +1,7 @@
 # @kubb/plugin-redoc
 
+## 5.0.0-alpha.56
+
 ## 5.0.0-alpha.55
 
 ## 5.0.0-alpha.54

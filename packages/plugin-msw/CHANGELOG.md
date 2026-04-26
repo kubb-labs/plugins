@@ -1,5 +1,15 @@
 # @kubb/plugin-msw
 
+## 5.0.0-alpha.56
+
+### Patch Changes
+
+- [#82](https://github.com/kubb-labs/plugins/pull/82) [`f15bafe`](https://github.com/kubb-labs/plugins/commit/f15bafecac89c9bf9df53a7a2b60569e38b1d1a5) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix typed request body in generated MSW handler callbacks. When an operation has a request body, the generated handler now passes the request body type as a generic to `http.<method>`, so `info.request.json()` returns the typed payload without requiring a manual cast.
+
+- Updated dependencies []:
+  - @kubb/plugin-faker@5.0.0-alpha.56
+  - @kubb/plugin-ts@5.0.0-alpha.56
+
 ## 5.0.0-alpha.55
 
 ### Patch Changes
