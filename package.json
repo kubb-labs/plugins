@@ -15,7 +15,7 @@
       "packages/*",
       "internals/*",
       "examples/*",
-      "tests/*"
+      "tests/**"
     ]
   },
   "scripts": {
