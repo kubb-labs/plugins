@@ -7,7 +7,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildParamsMapping, getComments } from '../utils.ts'
+import { buildParamsMapping, getComments, getContentTypeInfo } from '../utils.ts'
 import { Url } from './Url.tsx'
 
 type Props = {
@@ -43,10 +43,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
-  const isMultipleContentTypes = contentTypes.length > 1
-  const contentTypeUnion = contentTypes.map((ct) => JSON.stringify(ct)).join(' | ')
-  const defaultContentType = contentTypes[0] ?? 'application/json'
+  const { isMultipleContentTypes, contentTypeUnion, defaultContentType } = getContentTypeInfo(node)
 
   return ast.createOperationParams(node, {
     paramsType,
@@ -98,10 +95,8 @@ export function Client({
   isConfigurable = true,
 }: Props): KubbReactNode {
   const path = new URLPath(node.path)
-  const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'
-  const isMultipleContentTypes = (node.requestBody?.content?.length ?? 0) > 1
+  const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
-  const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
 
   const originalPathParams = node.parameters.filter((p) => p.in === 'path')
   const casedPathParams = ast.caseParams(originalPathParams, paramsCasing)

@@ -5,6 +5,18 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
+export function getContentTypeInfo(node: ast.OperationNode) {
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  return {
+    contentTypes,
+    isMultipleContentTypes,
+    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
+    defaultContentType: contentTypes[0] ?? 'application/json',
+    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
+  }
+}
+
 export function getComments(node: ast.OperationNode): Array<string> {
   return [
     node.description && `@description ${node.description}`,

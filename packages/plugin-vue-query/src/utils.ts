@@ -2,10 +2,12 @@ import type { ast } from '@kubb/core'
 import type { PluginVueQuery } from './types.ts'
 
 export {
+  buildContentTypeParams,
   buildGroupParam,
   buildMutationArgParams,
   buildQueryKeyParams,
   getComments,
+  getContentTypeInfo,
   resolveErrorNames,
   resolveHeaderGroupType,
   resolvePathParamType,

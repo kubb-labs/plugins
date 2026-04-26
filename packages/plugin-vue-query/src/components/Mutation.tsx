@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { buildMutationArgParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildContentTypeParams, buildMutationArgParams, getComments, getContentTypeInfo, resolveErrorNames } from '../utils.ts'
 import { MutationKey } from './MutationKey.tsx'
 
 type Props = {
@@ -24,16 +24,6 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
-function buildContentTypeParam(node: ast.OperationNode): ast.FunctionParameterNode | undefined {
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
-  if (contentTypes.length <= 1) return undefined
-  return ast.createFunctionParameter({
-    name: 'contentType',
-    type: ast.createParamsType({ variant: 'reference', name: contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') }),
-    optional: true,
-  })
-}
-
 function getParams(
   node: ast.OperationNode,
   options: {
@@ -50,8 +40,7 @@ function getParams(
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const contentTypeParam = buildContentTypeParam(node)
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver, extraBodyParams: contentTypeParam ? [contentTypeParam] : [] })
+  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver, extraBodyParams: buildContentTypeParams(node) })
 
   // Vue-query uses MutationObserverOptions instead of UseMutationOptions, and wraps params with MaybeRefOrGetter
   const mutationArgWrapped = mutationArgParamsNode.params.map((param) => {
@@ -113,16 +102,12 @@ export function Mutation({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const contentTypeParam = buildContentTypeParam(node)
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
-  const isMultipleContentTypes = contentTypes.length > 1
-  const defaultContentType = contentTypes[0] ?? 'application/json'
-  const contentTypeUnion = contentTypes.map((ct) => JSON.stringify(ct)).join(' | ')
+  const { isMultipleContentTypes, contentTypeUnion, defaultContentType } = getContentTypeInfo(node)
 
   const mutationArgParamsNode = buildMutationArgParams(node, {
     paramsCasing,
     resolver: tsResolver,
-    extraBodyParams: contentTypeParam ? [contentTypeParam] : [],
+    extraBodyParams: buildContentTypeParams(node),
   })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
   const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''

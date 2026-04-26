@@ -1,6 +1,30 @@
 import { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 
+export function getContentTypeInfo(node: ast.OperationNode) {
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  return {
+    contentTypes,
+    isMultipleContentTypes,
+    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
+    defaultContentType: contentTypes[0] ?? 'application/json',
+    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
+  }
+}
+
+export function buildContentTypeParams(node: ast.OperationNode): ast.FunctionParameterNode[] {
+  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
+  if (!isMultipleContentTypes) return []
+  return [
+    ast.createFunctionParameter({
+      name: 'contentType',
+      type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
+      optional: true,
+    }),
+  ]
+}
+
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
 }
@@ -194,7 +218,6 @@ export function buildMutationArgParams(
     params.push(ast.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
   }
 
-  // Extra body params (e.g. contentType for multi-content-type operations)
   if (extraBodyParams?.length) {
     params.push(...extraBodyParams)
   }

@@ -6,6 +6,24 @@ import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
 import { buildData, buildResponses, buildResponseUnion } from '../utils.ts'
 
+function getContentTypeSuffix(contentType: string): string {
+  const baseType = contentType.split(';')[0]!.trim()
+  if (baseType === 'application/json') return 'Json'
+  if (baseType === 'multipart/form-data') return 'FormData'
+  if (baseType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
+  const subtype = baseType.split('/').pop() ?? baseType
+  const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
+  if (parts.length === 0) return 'Unknown'
+  return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
+}
+
+function getPerContentTypeName(dataName: string, suffix: string): string {
+  if (dataName.endsWith('Data')) {
+    return suffix.endsWith('Data') ? dataName.slice(0, -4) + suffix : `${dataName.slice(0, -4)}${suffix}Data`
+  }
+  return dataName + suffix
+}
+
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
@@ -148,28 +166,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
       }),
     )
 
-    function getContentTypeSuffix(contentType: string): string {
-      // Strip content-type parameters (e.g. "; x-api-version=1.0", "; charset=utf-8")
-      const baseType = contentType.split(';')[0]!.trim()
-      if (baseType === 'application/json') return 'Json'
-      if (baseType === 'multipart/form-data') return 'FormData'
-      if (baseType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
-      // Extract subtype (after '/'), then convert to PascalCase identifier
-      const subtype = baseType.split('/').pop() ?? baseType
-      const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
-      if (parts.length === 0) return 'Unknown'
-      return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
-    }
-
-    function getPerContentTypeName(dataName: string, suffix: string): string {
-      if (dataName.endsWith('Data')) {
-        return suffix.endsWith('Data') ? dataName.slice(0, -4) + suffix : `${dataName.slice(0, -4)}${suffix}Data`
-      }
-      return dataName + suffix
-    }
-
     const requestBodyContent = node.requestBody?.content ?? []
-    const requestType = (() => {
+
+    function buildRequestType() {
       if (requestBodyContent.length === 0) return null
       if (requestBodyContent.length === 1) {
         const entry = requestBodyContent[0]!
@@ -191,7 +190,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
         .map((entry) => {
           const baseSuffix = getContentTypeSuffix(entry.contentType)
           let individualName = getPerContentTypeName(dataName, baseSuffix)
-          // Deduplicate names when multiple content types produce the same suffix
           let counter = 2
           while (usedNames.has(individualName)) {
             individualName = getPerContentTypeName(dataName, `${baseSuffix}${counter++}`)
@@ -220,7 +218,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
           {unionType}
         </>
       )
-    })()
+    }
+
+    const requestType = buildRequestType()
 
     const responseTypes = node.responses.map((res) =>
       renderSchemaType({
@@ -240,15 +240,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
       name: resolver.resolveResponsesName(node),
     })
 
-    const responseType = (() => {
+    function buildResponseType() {
       if (!node.responses.some((res) => res.schema)) {
         return null
       }
 
       const responseName = resolver.resolveResponseName(node)
 
-      // Skip generating the response union type when an imported component schema
-      // has the same resolved name to avoid redeclaration errors.
       const responsesWithSchema = node.responses.filter((res) => res.schema)
       const importedNames = new Set(
         responsesWithSchema.flatMap((res) =>
@@ -274,7 +272,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
         },
         name: responseName,
       })
-    })()
+    }
+
+    const responseType = buildResponseType()
 
     return (
       <File
