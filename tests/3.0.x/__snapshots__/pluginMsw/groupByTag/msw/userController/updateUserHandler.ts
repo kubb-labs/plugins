@@ -3,10 +3,12 @@
 * Do not edit manually.
 */
 
+import type { UpdateUserData } from "../../types/UpdateUser.ts";
+import type { HttpResponseResolver } from "msw";
 import { http } from "msw";
 
-export function updateUserHandler(data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.put>[1]>[0]) => Response | Promise<Response>)) {
-  return http.put(`/user/:username`, function handler(info) {
+export function updateUserHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, UpdateUserData, any>) {
+  return http.put<Record<string, string>, UpdateUserData, any>(`/user/:username`, function handler(info) {
       if(typeof data === 'function') return data(info)
 
       return new Response(JSON.stringify(data), {
