@@ -17,7 +17,21 @@ export type UpdateUserStatusDefault = any
  * @description Update an existent user in the store
  * @type object | undefined
  */
-export type UpdateUserData = User | undefined
+export type UpdateUserJsonData = User | undefined
+
+/**
+ * @description Update an existent user in the store
+ * @type object | undefined
+ */
+export type UpdateUserXmlData = User | undefined
+
+/**
+ * @description Update an existent user in the store
+ * @type object | undefined
+ */
+export type UpdateUserFormUrlEncodedData = User | undefined
+
+export type UpdateUserData = UpdateUserJsonData | UpdateUserXmlData | UpdateUserFormUrlEncodedData
 
 /**
  * @type object

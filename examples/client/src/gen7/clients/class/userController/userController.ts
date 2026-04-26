@@ -28,7 +28,11 @@ export class userController {
    * @summary Create user
    * {@link /user}
    */
-  async createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+  async createUser(
+    data?: CreateUserData,
+    contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
+    config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {},
+  ) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
@@ -107,6 +111,7 @@ export class userController {
   async updateUser(
     { username }: { username: UpdateUserPathUsername },
     data?: UpdateUserData,
+    contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
     config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
   ) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)

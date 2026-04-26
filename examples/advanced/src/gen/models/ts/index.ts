@@ -20,7 +20,17 @@ export type {
   AddFilesStatus200,
   AddFilesStatus405,
 } from './petController/AddFiles.ts'
-export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus405, AddPetStatusDefault } from './petController/AddPet.ts'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus405,
+  AddPetStatusDefault,
+  AddPetXmlData,
+} from './petController/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -59,6 +69,8 @@ export type {
 } from './petController/GetPetById.ts'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -67,6 +79,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './petController/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -118,22 +131,37 @@ export type {
 } from './storeController/GetOrderById.ts'
 export type {
   PlaceOrderData,
+  PlaceOrderFormUrlEncodedData,
+  PlaceOrderJsonData,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
+  PlaceOrderXmlData,
 } from './storeController/PlaceOrder.ts'
 export type {
   PlaceOrderPatchData,
+  PlaceOrderPatchFormUrlEncodedData,
+  PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
+  PlaceOrderPatchXmlData,
 } from './storeController/PlaceOrderPatch.ts'
 export type { TagTag } from './tag/Tag.ts'
-export type { CreateUserData, CreateUserRequestConfig, CreateUserResponse, CreateUserResponses, CreateUserStatusDefault } from './userController/CreateUser.ts'
+export type {
+  CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
+  CreateUserRequestConfig,
+  CreateUserResponse,
+  CreateUserResponses,
+  CreateUserStatusDefault,
+  CreateUserXmlData,
+} from './userController/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
@@ -171,11 +199,14 @@ export type {
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './userController/LogoutUser.ts'
 export type {
   UpdateUserData,
+  UpdateUserFormUrlEncodedData,
+  UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
+  UpdateUserXmlData,
 } from './userController/UpdateUser.ts'
 export { addPetRequestStatusEnum } from './AddPetRequest.ts'
 export { animalTypeEnum } from './Animal.ts'

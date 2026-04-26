@@ -17,7 +17,11 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatchHook(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
+export async function placeOrderPatchHook(
+  data?: PlaceOrderPatchData,
+  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
+  config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
@@ -34,10 +38,15 @@ export async function placeOrderPatchHook(data?: PlaceOrderPatchData, config: Pa
 
 export function placeOrderPatchMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
+  return mutationOptions<
+    PlaceOrderPatchResponse,
+    ResponseErrorConfig<PlaceOrderPatchStatus405>,
+    { data?: PlaceOrderPatchData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >({
     mutationKey,
-    mutationFn: async ({ data }) => {
-      return placeOrderPatchHook(data, config)
+    mutationFn: async ({ data, contentType }) => {
+      return placeOrderPatchHook(data, contentType, config)
     },
   })
 }
@@ -49,9 +58,12 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(config: P
  */
 export function usePlaceOrderPatchHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: UseMutationOptions<
+      PlaceOrderPatchResponse,
+      ResponseErrorConfig<PlaceOrderPatchStatus405>,
+      { data?: PlaceOrderPatchData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+      TContext
+    > & { client?: QueryClient }
     client?: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client }
   } = {},
 ) {
@@ -62,17 +74,22 @@ export function usePlaceOrderPatchHook<TContext>(
   const baseOptions = placeOrderPatchMutationOptionsHook(config) as UseMutationOptions<
     PlaceOrderPatchResponse,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    { data?: PlaceOrderPatchData },
+    { data?: PlaceOrderPatchData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'usePlaceOrderPatchHook', operationId: 'placeOrderPatch' }) as UseMutationOptions<
     PlaceOrderPatchResponse,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    { data?: PlaceOrderPatchData },
+    { data?: PlaceOrderPatchData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
     TContext
   >
 
-  return useMutation<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>(
+  return useMutation<
+    PlaceOrderPatchResponse,
+    ResponseErrorConfig<PlaceOrderPatchStatus405>,
+    { data?: PlaceOrderPatchData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >(
     {
       ...baseOptions,
       ...customOptions,
@@ -80,5 +97,10 @@ export function usePlaceOrderPatchHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>
+  ) as UseMutationResult<
+    PlaceOrderPatchResponse,
+    ResponseErrorConfig<PlaceOrderPatchStatus405>,
+    { data?: PlaceOrderPatchData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >
 }

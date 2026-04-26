@@ -18,17 +18,23 @@ export type {
 } from './GetOrderById.js'
 export type {
   PlaceOrderData,
+  PlaceOrderFormUrlEncodedData,
+  PlaceOrderJsonData,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
+  PlaceOrderXmlData,
 } from './PlaceOrder.js'
 export type {
   PlaceOrderPatchData,
+  PlaceOrderPatchFormUrlEncodedData,
+  PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
+  PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.js'

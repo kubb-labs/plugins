@@ -303,6 +303,9 @@ export type Pet = (
    * @type string
    */
   name: string
+  /**
+   * @type object | undefined
+   */
   category?: Category
   /**
    * @type array
@@ -427,7 +430,19 @@ export type UpdatePetStatus405 = any
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetJsonData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+/**
+ * @description Update an existent pet in the store
+ */
+export type UpdatePetXmlData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+/**
+ * @description Update an existent pet in the store
+ */
+export type UpdatePetFormUrlEncodedData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
 
 /**
  * @type object
@@ -478,7 +493,19 @@ export type AddPetStatus405 = {
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetData = AddPetRequest
+export type AddPetJsonData = AddPetRequest
+
+/**
+ * @description Create a new pet in the store
+ */
+export type AddPetXmlData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+/**
+ * @description Create a new pet in the store
+ */
+export type AddPetFormUrlEncodedData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData
 
 /**
  * @type object
@@ -892,7 +919,19 @@ export type PlaceOrderStatus405 = any
  * @description Order description
  * @type object | undefined
  */
-export type PlaceOrderData = Order | undefined
+export type PlaceOrderJsonData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderXmlData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderFormUrlEncodedData = Order | undefined
+
+export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrderFormUrlEncodedData
 
 /**
  * @type object
@@ -934,7 +973,19 @@ export type PlaceOrderPatchStatus405 = any
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchData = Order | undefined
+export type PlaceOrderPatchJsonData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderPatchXmlData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderPatchFormUrlEncodedData = Order | undefined
+
+export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlData | PlaceOrderPatchFormUrlEncodedData
 
 /**
  * @type object
@@ -1074,7 +1125,21 @@ export type CreateUserStatusDefault = User
  * @description Created user object
  * @type object | undefined
  */
-export type CreateUserData = User | undefined
+export type CreateUserJsonData = User | undefined
+
+/**
+ * @description Created user object
+ * @type object | undefined
+ */
+export type CreateUserXmlData = User | undefined
+
+/**
+ * @description Created user object
+ * @type object | undefined
+ */
+export type CreateUserFormUrlEncodedData = User | undefined
+
+export type CreateUserData = CreateUserJsonData | CreateUserXmlData | CreateUserFormUrlEncodedData
 
 /**
  * @type object
@@ -1299,7 +1364,21 @@ export type UpdateUserStatusDefault = any
  * @description Update an existent user in the store
  * @type object | undefined
  */
-export type UpdateUserData = User | undefined
+export type UpdateUserJsonData = User | undefined
+
+/**
+ * @description Update an existent user in the store
+ * @type object | undefined
+ */
+export type UpdateUserXmlData = User | undefined
+
+/**
+ * @description Update an existent user in the store
+ * @type object | undefined
+ */
+export type UpdateUserFormUrlEncodedData = User | undefined
+
+export type UpdateUserData = UpdateUserJsonData | UpdateUserXmlData | UpdateUserFormUrlEncodedData
 
 /**
  * @type object

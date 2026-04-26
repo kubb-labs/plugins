@@ -17,7 +17,11 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  * @summary Create user
  * {@link /user}
  */
-export async function createUserHook(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+export async function createUserHook(
+  data?: CreateUserData,
+  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
+  config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
@@ -34,10 +38,15 @@ export async function createUserHook(data?: CreateUserData, config: Partial<Requ
 
 export function createUserMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
   const mutationKey = createUserMutationKey()
-  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>({
+  return mutationOptions<
+    CreateUserResponse,
+    ResponseErrorConfig<Error>,
+    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >({
     mutationKey,
-    mutationFn: async ({ data }) => {
-      return createUserHook(data, config)
+    mutationFn: async ({ data, contentType }) => {
+      return createUserHook(data, contentType, config)
     },
   })
 }
@@ -49,7 +58,12 @@ export function createUserMutationOptionsHook<TContext = unknown>(config: Partia
  */
 export function useCreateUserHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<
+      CreateUserResponse,
+      ResponseErrorConfig<Error>,
+      { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+      TContext
+    > & { client?: QueryClient }
     client?: Partial<RequestConfig<CreateUserData>> & { client?: Client }
   } = {},
 ) {
@@ -60,17 +74,22 @@ export function useCreateUserHook<TContext>(
   const baseOptions = createUserMutationOptionsHook(config) as UseMutationOptions<
     CreateUserResponse,
     ResponseErrorConfig<Error>,
-    { data?: CreateUserData },
+    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useCreateUserHook', operationId: 'createUser' }) as UseMutationOptions<
     CreateUserResponse,
     ResponseErrorConfig<Error>,
-    { data?: CreateUserData },
+    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
     TContext
   >
 
-  return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>(
+  return useMutation<
+    CreateUserResponse,
+    ResponseErrorConfig<Error>,
+    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >(
     {
       ...baseOptions,
       ...customOptions,
@@ -78,5 +97,10 @@ export function useCreateUserHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>
+  ) as UseMutationResult<
+    CreateUserResponse,
+    ResponseErrorConfig<Error>,
+    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >
 }

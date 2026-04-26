@@ -17,7 +17,11 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrderHook(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export async function placeOrderHook(
+  data?: PlaceOrderData,
+  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
+  config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {},
+) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
@@ -34,10 +38,15 @@ export async function placeOrderHook(data?: PlaceOrderData, config: Partial<Requ
 
 export function placeOrderMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
   const mutationKey = placeOrderMutationKey()
-  return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>({
+  return mutationOptions<
+    PlaceOrderResponse,
+    ResponseErrorConfig<PlaceOrderStatus405>,
+    { data?: PlaceOrderData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >({
     mutationKey,
-    mutationFn: async ({ data }) => {
-      return placeOrderHook(data, config)
+    mutationFn: async ({ data, contentType }) => {
+      return placeOrderHook(data, contentType, config)
     },
   })
 }
@@ -49,7 +58,12 @@ export function placeOrderMutationOptionsHook<TContext = unknown>(config: Partia
  */
 export function usePlaceOrderHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<
+      PlaceOrderResponse,
+      ResponseErrorConfig<PlaceOrderStatus405>,
+      { data?: PlaceOrderData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+      TContext
+    > & { client?: QueryClient }
     client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client }
   } = {},
 ) {
@@ -60,17 +74,22 @@ export function usePlaceOrderHook<TContext>(
   const baseOptions = placeOrderMutationOptionsHook(config) as UseMutationOptions<
     PlaceOrderResponse,
     ResponseErrorConfig<PlaceOrderStatus405>,
-    { data?: PlaceOrderData },
+    { data?: PlaceOrderData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'usePlaceOrderHook', operationId: 'placeOrder' }) as UseMutationOptions<
     PlaceOrderResponse,
     ResponseErrorConfig<PlaceOrderStatus405>,
-    { data?: PlaceOrderData },
+    { data?: PlaceOrderData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
     TContext
   >
 
-  return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>(
+  return useMutation<
+    PlaceOrderResponse,
+    ResponseErrorConfig<PlaceOrderStatus405>,
+    { data?: PlaceOrderData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >(
     {
       ...baseOptions,
       ...customOptions,
@@ -78,5 +97,10 @@ export function usePlaceOrderHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>
+  ) as UseMutationResult<
+    PlaceOrderResponse,
+    ResponseErrorConfig<PlaceOrderStatus405>,
+    { data?: PlaceOrderData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    TContext
+  >
 }
