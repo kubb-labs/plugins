@@ -139,7 +139,14 @@ export function applyModifiers({ value, nullable, optional, nullish, defaultValu
     result = `v.nullish(${result})`
   } else if (optional) {
     // Valibot can express optional object entries in three distinct ways.
-    const optionalFn = optionalType === 'exactOptional' ? 'exactOptional' : optionalType === 'undefinedable' ? 'undefinedable' : 'optional'
+    let optionalFn: string
+    if (optionalType === 'exactOptional') {
+      optionalFn = 'exactOptional'
+    } else if (optionalType === 'undefinedable') {
+      optionalFn = 'undefinedable'
+    } else {
+      optionalFn = 'optional'
+    }
     result = defaultValue !== undefined ? `v.${optionalFn}(${result}, ${formatDefault(defaultValue)})` : `v.${optionalFn}(${result})`
   } else if (nullable) {
     result = `v.nullable(${result})`
