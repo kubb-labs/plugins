@@ -5,14 +5,14 @@ packages:
   - tests/**
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-alpha.70
-  '@kubb/agent': 5.0.0-alpha.70
-  '@kubb/core': 5.0.0-alpha.70
-  '@kubb/middleware-barrel': 5.0.0-alpha.70
-  '@kubb/parser-ts': 5.0.0-alpha.70
-  '@kubb/renderer-jsx': 5.0.0-alpha.70
-  kubb: 5.0.0-alpha.70
-  unplugin-kubb: 5.0.0-alpha.70
+  '@kubb/adapter-oas': 5.0.0-alpha.71
+  '@kubb/agent': 5.0.0-alpha.71
+  '@kubb/core': 5.0.0-alpha.71
+  '@kubb/middleware-barrel': 5.0.0-alpha.71
+  '@kubb/parser-ts': 5.0.0-alpha.71
+  '@kubb/renderer-jsx': 5.0.0-alpha.71
+  kubb: 5.0.0-alpha.71
+  unplugin-kubb: 5.0.0-alpha.71
   '@types/node': ^22.19.17
   '@types/react': ^19.2.14
   '@size-limit/file': ^12.1.0
