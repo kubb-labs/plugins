@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse } from './FindPetsByStatus'
-import { fetch } from './.kubb/fetch'
+import { fetch } from './.kubb/client'
 
 export function getFindPetsByStatusUrl() {
   const res = { method: 'GET', url: `/pet/findByStatus` as const }

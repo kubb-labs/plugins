@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig } from './.kubb/fetch'
+import type { Client, RequestConfig } from './.kubb/client'
 import { petService } from './petService/petService'
 
 export class PetStoreClient {

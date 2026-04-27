@@ -123,18 +123,23 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
 
-        if (bundle && !resolvedImportPath) {
+        const isRelativePath = resolvedImportPath?.startsWith('.')
+
+        if (!isRelativePath) {
+          const isInlineSource = bundle && !resolvedImportPath
+
           ctx.injectFile({
-            baseName: 'fetch.ts',
-            path: path.resolve(root, '.kubb/fetch.ts'),
+            baseName: 'client.ts',
+            path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
-                name: 'fetch',
-                nodes: [ast.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)],
+                name: 'client',
+                nodes: isInlineSource ? [ast.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
                 isExportable: true,
                 isIndexable: true,
               }),
             ],
+            exports: !isInlineSource && resolvedImportPath ? [ast.createExport({ path: resolvedImportPath })] : [],
           })
         }
 
