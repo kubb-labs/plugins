@@ -153,7 +153,8 @@ export const printerValibot = ast.definePrinter<PrinterValibotFactory>((options)
         let result = pipe(`v.array(${inner})`, lengthActions(node))
 
         if (node.unique) {
-          result = pipe(result, [`v.check(items => new Set(items).size === items.length, "Array entries must be unique")`])
+          const isUniqueArray = (items: unknown[]) => new Set(items).size === items.length
+          result = pipe(result, [`v.check(isUniqueArray, "Array entries must be unique")`])
         }
 
         return result
