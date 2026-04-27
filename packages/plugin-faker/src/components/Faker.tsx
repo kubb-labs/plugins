@@ -77,13 +77,27 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
     functionSignature = `${jsdoc}export function ${name}(data?: Partial<${typeName}>): Required<${typeName}>`
 
     const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
-    functionBody = `{
+    // When the printer emits getter properties (cyclic schemas), spreading defaultFakeData
+    // would invoke the getters and cause infinite recursion (Cat → Pet → Cat → …).
+    // Instead, build the result object directly and apply data overrides using
+    // Object.defineProperties, which uses [[DefineOwnProperty]] and can safely override
+    // configurable getters with plain value descriptors without ever reading the getters.
+    const hasGetters = /\bget \w/.test(fakerText)
+    if (hasGetters) {
+      functionBody = `{
+  ${seedCode}const result = ${fakerText}
+  Object.defineProperties(result, Object.getOwnPropertyDescriptors(data || {}))
+  return result as Required<${typeName}>
+}`
+    } else {
+      functionBody = `{
   ${seedCode}const defaultFakeData = ${fakerText}
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Required<${typeName}>
 }`
+    }
   } else {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
