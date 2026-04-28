@@ -134,6 +134,37 @@ pnpm test:watch
 pnpm typecheck
 ```
 
+## Plugin Architecture
+
+Every Kubb plugin is built from four parts that work together:
+
+| Part | File | Purpose |
+|------|------|---------|
+| **Plugin factory** | `src/plugin.ts` | Wires options, resolver, and generators together via `definePlugin` |
+| **Generator** | `src/generators/` | Produces output files from schema/operation nodes via `defineGenerator` |
+| **Resolver** | `src/resolvers/` | Controls name and path conventions via `defineResolver` |
+| **Types** | `src/types.ts` | Declares `Options`, `ResolvedOptions`, and `PluginFactoryOptions` |
+
+Generators use JSX (rendered by `@kubb/renderer-jsx`) to describe output files. The `<File>` component writes each file; components in `src/components/` handle rendering of individual constructs such as types, schemas, or clients.
+
+A minimal `kubb.config.ts` that uses a plugin looks like this:
+
+```ts
+import { adapterOas } from '@kubb/adapter-oas'
+import { pluginTs } from '@kubb/plugin-ts'
+import { defineConfig } from 'kubb'
+
+export default defineConfig({
+  root: '.',
+  input: { path: './openapi.yaml' },
+  output: { path: './src/gen', clean: true },
+  adapter: adapterOas(),
+  plugins: [
+    pluginTs({ output: { path: 'models' } }),
+  ],
+})
+```
+
 ## Contributing
 
 Want to contribute to a plugin or add a new one? Here's how:
@@ -143,9 +174,12 @@ Want to contribute to a plugin or add a new one? Here's how:
    packages/
    └── plugin-your-name/
        ├── src/
-       │   ├── index.ts
-       │   ├── plugin.ts
-       │   └── generators/
+       │   ├── components/      # JSX components for code rendering
+       │   ├── generators/      # defineGenerator implementations
+       │   ├── resolvers/       # defineResolver implementation
+       │   ├── index.ts         # public re-exports
+       │   ├── plugin.ts        # definePlugin factory
+       │   └── types.ts         # Options, ResolvedOptions, PluginFactoryOptions
        ├── package.json
        ├── tsconfig.json
        ├── tsdown.config.ts
@@ -153,16 +187,18 @@ Want to contribute to a plugin or add a new one? Here's how:
    ```
 
 2. **Use the same tooling conventions**:
-   - `tsdown` for building
+   - `tsdown` for building (ESM + CJS dual output)
    - `vitest` for testing
-   - `oxlint` for linting/formatting
+   - `oxlint` for linting
    - Extend `../../tsconfig.json` in your `tsconfig.json`
 
 3. **Add an example** under `examples/` that demonstrates your plugin.
 
-4. **Open a pull request** with your changes.
+4. **Create a changeset** with `pnpm run changeset`.
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for full details.
+5. **Open a pull request** targeting `main`.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full setup guide, plugin architecture walkthrough, and step-by-step instructions for building a new plugin.
 
 ## License
 
