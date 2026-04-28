@@ -6,9 +6,9 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 
 ## Before You Start
 
-- Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR.
-- For significant changes, open an issue first and wait for maintainer feedback.
-- Small fixes (typos, docs, tests) can go straight to a PR.
+* Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR.
+* For significant changes, open an issue first and wait for maintainer feedback.
+* Small fixes (typos, docs, tests) can go straight to a PR.
 
 ## Tech Stack
 
@@ -68,9 +68,9 @@ pnpm generate    # update generated examples after plugin changes
 pnpm changeset   # required if you changed any published package
 ```
 
-- Target the `main` branch.
-- Fill out the PR template completely.
-- Include a changeset for every code change that affects a published package.
+* Target the `main` branch.
+* Fill out the PR template completely.
+* Include a changeset for every code change that affects a published package.
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages: `feat:`, `fix:`, `docs:`, `chore:`, etc.
 
