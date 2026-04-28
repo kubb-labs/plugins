@@ -7,23 +7,23 @@ settings:
 catalogs:
   default:
     '@kubb/adapter-oas':
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     '@kubb/agent':
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     '@kubb/core':
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     '@kubb/middleware-barrel':
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     '@kubb/parser-ts':
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     '@kubb/renderer-jsx':
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     '@size-limit/file':
       specifier: ^12.1.0
       version: 12.1.0
@@ -34,8 +34,8 @@ catalogs:
       specifier: ^19.2.14
       version: 19.2.14
     kubb:
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     remeda:
       specifier: ^2.34.0
       version: 2.34.0
@@ -49,8 +49,8 @@ catalogs:
       specifier: ^6.0.3
       version: 6.0.3
     unplugin-kubb:
-      specifier: 5.0.0-alpha.72
-      version: 5.0.0-alpha.72
+      specifier: 5.0.0-alpha.73
+      version: 5.0.0-alpha.73
     vitest:
       specifier: ^4.1.5
       version: 4.1.5
@@ -67,16 +67,16 @@ importers:
         version: 2.31.0(@types/node@22.19.17)
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/middleware-barrel':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))
+        version: 5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:packages/plugin-cypress
@@ -209,16 +209,16 @@ importers:
     devDependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/agent':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -227,13 +227,13 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -242,13 +242,13 @@ importers:
         version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
       axios:
         specifier: ^1.15.2
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
     devDependencies:
       '@types/react':
         specifier: 'catalog:'
@@ -270,7 +270,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -289,7 +289,7 @@ importers:
         version: 10.4.0
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -304,7 +304,7 @@ importers:
         version: 1.11.20
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -317,7 +317,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -326,7 +326,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
     devDependencies:
       react:
         specifier: ^19.2.5
@@ -339,13 +339,13 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -354,13 +354,13 @@ importers:
         version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
       axios:
         specifier: ^1.15.2
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
     devDependencies:
       '@types/react':
         specifier: 'catalog:'
@@ -376,7 +376,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-mcp':
         specifier: workspace:*
         version: link:../../packages/plugin-mcp
@@ -394,7 +394,7 @@ importers:
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       zod:
         specifier: ^4.3.6
         version: 4.3.6
@@ -410,7 +410,7 @@ importers:
         version: 10.4.0
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -428,7 +428,7 @@ importers:
         version: 0.10.3(msw@2.13.6(@types/node@25.6.0)(typescript@6.0.3))
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       msw:
         specifier: ^2.13.6
         version: 2.13.6(@types/node@25.6.0)(typescript@6.0.3)
@@ -447,7 +447,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -468,7 +468,7 @@ importers:
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -477,7 +477,7 @@ importers:
         version: 19.2.5(react@19.2.5)
       unplugin-kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))(@kubb/renderer-jsx@5.0.0-alpha.72)(esbuild@0.27.7)(rolldown@1.0.0-rc.17)(rollup@4.60.1)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3))
+        version: 5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))(@kubb/renderer-jsx@5.0.0-alpha.73)(esbuild@0.27.7)(rolldown@1.0.0-rc.17)(rollup@4.60.1)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3))
     devDependencies:
       '@types/react':
         specifier: 'catalog:'
@@ -502,7 +502,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -511,7 +511,7 @@ importers:
         version: link:../../packages/plugin-ts
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -521,7 +521,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -545,7 +545,7 @@ importers:
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -560,7 +560,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -569,7 +569,7 @@ importers:
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -579,7 +579,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -600,7 +600,7 @@ importers:
         version: 1.15.2
       unplugin-kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))(@kubb/renderer-jsx@5.0.0-alpha.72)(esbuild@0.27.7)(rolldown@1.0.0-rc.17)(rollup@4.60.1)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3))
+        version: 5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))(@kubb/renderer-jsx@5.0.0-alpha.73)(esbuild@0.27.7)(rolldown@1.0.0-rc.17)(rollup@4.60.1)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3))
       vue:
         specifier: ^3.5.33
         version: 3.5.33(typescript@6.0.3)
@@ -634,7 +634,7 @@ importers:
         version: 1.15.2
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       react:
         specifier: ^19.2.5
         version: 19.2.5
@@ -652,13 +652,13 @@ importers:
         version: link:../utils
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
     devDependencies:
       '@types/node':
         specifier: 'catalog:'
@@ -674,7 +674,7 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -683,7 +683,7 @@ importers:
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
     devDependencies:
       '@internals/utils':
         specifier: workspace:*
@@ -696,13 +696,13 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
     devDependencies:
       '@internals/utils':
         specifier: workspace:*
@@ -712,13 +712,13 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
     devDependencies:
       '@internals/utils':
         specifier: workspace:*
@@ -728,7 +728,7 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -740,7 +740,7 @@ importers:
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
     devDependencies:
       '@internals/utils':
         specifier: workspace:*
@@ -750,7 +750,7 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../plugin-faker
@@ -759,7 +759,7 @@ importers:
         version: link:../plugin-ts
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
     devDependencies:
       '@internals/utils':
         specifier: workspace:*
@@ -769,7 +769,7 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -781,7 +781,7 @@ importers:
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
       remeda:
         specifier: 'catalog:'
         version: 2.34.0
@@ -797,10 +797,10 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       handlebars:
         specifier: ^4.7.9
         version: 4.7.9
@@ -813,13 +813,13 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
       remeda:
         specifier: 'catalog:'
         version: 2.34.0
@@ -835,7 +835,7 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -847,7 +847,7 @@ importers:
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
       remeda:
         specifier: 'catalog:'
         version: 2.34.0
@@ -863,10 +863,10 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72
+        version: 5.0.0-alpha.73
       remeda:
         specifier: 'catalog:'
         version: 2.34.0
@@ -882,13 +882,13 @@ importers:
         version: link:../../internals/utils
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/parser-ts':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -934,7 +934,7 @@ importers:
         version: 10.4.0
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -970,7 +970,7 @@ importers:
         version: 15.14.1
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
       msw:
         specifier: ^2.13.6
         version: 2.13.6(@types/node@25.6.0)(typescript@6.0.3)
@@ -1001,10 +1001,10 @@ importers:
         version: link:../../internals/utils
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -1019,7 +1019,7 @@ importers:
         version: link:../../packages/plugin-zod
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
+        version: 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -1656,48 +1656,48 @@ packages:
     peerDependencies:
       jsep: ^0.4.0||^1.0.0
 
-  '@kubb/adapter-oas@5.0.0-alpha.72':
-    resolution: {integrity: sha512-60GAGX8ozm3qEeBtAPEd07GNI6XF1LvtavhVMcz9rJIbDnxvRFNCo4zvlTLDnEGt+bV0un1ZC1EQUu7NSbMHEQ==}
+  '@kubb/adapter-oas@5.0.0-alpha.73':
+    resolution: {integrity: sha512-P+TzJET9Ld+97jkpyQgCTIQWBgLcTmYJEsdTwSwcHKwCrhz0/9wm9kuOXyaIA0oqO3xq40hcE3hpjPUUCAlb0w==}
     engines: {node: '>=22'}
 
-  '@kubb/agent@5.0.0-alpha.72':
-    resolution: {integrity: sha512-p0TcE0sSd0axvTEbltEnKHnRNbbZbz6K4oJVfY3eODw9MXkHS0D3yWcmOQI/qQ0JCCtVQTHerCZPyOC1CKwGKQ==}
+  '@kubb/agent@5.0.0-alpha.73':
+    resolution: {integrity: sha512-v5VAu4vOgA3uOpoNxrJ7o1oU0X5sfgJyrAszSW7WPB0e307mIoFJ1GAGzzVEe+S6b3vspHuQlzdrjXl6RUBlZQ==}
     engines: {node: '>=22'}
 
-  '@kubb/ast@5.0.0-alpha.72':
-    resolution: {integrity: sha512-rOebGlZOgCXJtcc05GZ+qgJb7vB7H0c+i3D2lKwNbRzYGQLdwZOSebm0swJc7e5Ny0RxPcFnXkDHVksaS15NBg==}
+  '@kubb/ast@5.0.0-alpha.73':
+    resolution: {integrity: sha512-HzUvnceqjIWQeR/HCM8EHO0HFMoneTNAY9+J/3DFYBKuGRMkUrosK3pRgsTxyjEI4DapOfp81D/9c1vKvS1XKA==}
     engines: {node: '>=22'}
 
-  '@kubb/cli@5.0.0-alpha.72':
-    resolution: {integrity: sha512-Mwa0m4ffUZ9wSIPSDZO3gOP8+0nk9U1ld8NTMECOsGvH/wOvjpy+M7Q1kmHQBFAdytJs9rWeITHioBmv4vLVjA==}
-    engines: {node: '>=22'}
-    hasBin: true
-
-  '@kubb/core@5.0.0-alpha.72':
-    resolution: {integrity: sha512-CSqh0GKxcRde0wWkZ23awbIbq89JuugTfnc3XeIifmvxtxYhlMLBmDnGxpH6MQCPESupekU16fF5Ut1z0s8RLg==}
-    engines: {node: '>=22'}
-    peerDependencies:
-      '@kubb/renderer-jsx': 5.0.0-alpha.72
-
-  '@kubb/mcp@5.0.0-alpha.72':
-    resolution: {integrity: sha512-H4mmC70ZeKxdSoO+kblrWlgaQfkfvbHjVF+n1Y0Aw0TFKpyJu1FGEbLqiRzpjhgP5JYy50W5u1znEhAGHkA19A==}
+  '@kubb/cli@5.0.0-alpha.73':
+    resolution: {integrity: sha512-VZJrAzI7IlNjEM0HxAOnT5+Ey/gMsh6+kWUsZATh9SwCBq9ZSPk3obJupHzH10FV4wMRv2Vk8vDCJAEnqbiDzQ==}
     engines: {node: '>=22'}
     hasBin: true
-    peerDependencies:
-      '@kubb/renderer-jsx': 5.0.0-alpha.72
 
-  '@kubb/middleware-barrel@5.0.0-alpha.72':
-    resolution: {integrity: sha512-16Zdz5kBaHx53gZBqVBVmMCFflRIteTrO0yF0r9sKOgfSshWSRGgncV/ALmETYQ2v8ZtS2zNs7F6npi1VKFTJA==}
+  '@kubb/core@5.0.0-alpha.73':
+    resolution: {integrity: sha512-ST0ANSPzXKWWXYT1bXGHUnnNss9ZSojhe0D8MMdBMqBsaCDEVKoWqgrXS98nrWSorbmjBRH3D9hLK0Qn3Lc7Tg==}
     engines: {node: '>=22'}
     peerDependencies:
-      '@kubb/core': 5.0.0-alpha.72
+      '@kubb/renderer-jsx': 5.0.0-alpha.73
 
-  '@kubb/parser-ts@5.0.0-alpha.72':
-    resolution: {integrity: sha512-1FYxevHZPxt+MEGfOnVvlpUs0TdH8K/49ulY7JsasxnGpWXtbLxFjB7oAg3tJ9lO+yg0QOkwwIS8dIBWsFKdsA==}
+  '@kubb/mcp@5.0.0-alpha.73':
+    resolution: {integrity: sha512-5r/5Jp80gUKF9Za91zYFmyxoBzF4jrOpyD7VGQooilCBAjOwuB+B12CTdeX1PwyAn9YDbk/3PCKtaDEzg1J31A==}
+    engines: {node: '>=22'}
+    hasBin: true
+    peerDependencies:
+      '@kubb/renderer-jsx': 5.0.0-alpha.73
+
+  '@kubb/middleware-barrel@5.0.0-alpha.73':
+    resolution: {integrity: sha512-UiNrMwYMnz2xttCgEtnBRvHTPrhIB5PRXhpAhn3KigyOMzBoQGoZUtwYhSWrdY6B6i0hKfPrxbYwDZHm3AT+XQ==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      '@kubb/core': 5.0.0-alpha.73
+
+  '@kubb/parser-ts@5.0.0-alpha.73':
+    resolution: {integrity: sha512-r6/qAc/H/0hwunql52PpTNjSExeX+olpFJkIbJFCs2X7ut8E3p1HJ0JVch2Mv14DI+/jiBHJEa5KaNkoJ+OxkQ==}
     engines: {node: '>=22'}
 
-  '@kubb/renderer-jsx@5.0.0-alpha.72':
-    resolution: {integrity: sha512-V2qEltdCnuEQms9zRLiTq4eKcKmjdWAx8HrySVMGdV/qG0vNlYuBRM9FW1i81H1tBEcBnaia34DgXdWsYPvtag==}
+  '@kubb/renderer-jsx@5.0.0-alpha.73':
+    resolution: {integrity: sha512-1+xlFKTvXSDbMAaTNhGqQebHswUsxr1+hZnGDJa+u/KqqSIrLLugsp+YTlgUNWH6Al9G73ZDogeos30l8zNK9w==}
     engines: {node: '>=22'}
 
   '@logtail/core@0.5.8':
@@ -3717,8 +3717,8 @@ packages:
     resolution: {integrity: sha512-gqXddjPqQ6G40VdnI6T6yObEC+pDNvyP95wdQhkWkg7crHH3km5qP1FsOXEkzEQwnz6gz5qGTn1c2Y52wP3OyQ==}
     engines: {'0': node >=0.6.0}
 
-  kubb@5.0.0-alpha.72:
-    resolution: {integrity: sha512-8BBMtiOs77U6qKQGA2otFY+GAIyPNMuLqljyJguDb2XBPLoamaowgiV1au5jmzjIP+jEkqasJlfjvBiG9pAhgA==}
+  kubb@5.0.0-alpha.73:
+    resolution: {integrity: sha512-Xg5VojW68Gzr0SYB48kkgyNieKHRrdt45u4fdfD6mbKweV4vr38NkaMV6V+62cSMtt74XyrX38t/gC5j4rxx/w==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -4808,8 +4808,8 @@ packages:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
     engines: {node: '>= 0.8'}
 
-  unplugin-kubb@5.0.0-alpha.72:
-    resolution: {integrity: sha512-FbiJFc7hMKlj4HpHdqh9P8VJM7WIMQjMzQzGTp340wW3Q9Djl1BScj6o7FU4VCJnr2WESAidybq88DtXaCQ4Bw==}
+  unplugin-kubb@5.0.0-alpha.73:
+    resolution: {integrity: sha512-9N9JHPd8A2KOpa+pfyOp2s7BVJGRQ5yWfI8x3YdRiLGBr5OZQbu7VYT+4QfySvYQEEWYkAePbshDVizwF7vl6A==}
     engines: {node: '>=22'}
     peerDependencies:
       '@farmfe/core': ^1.7.0
@@ -5831,9 +5831,9 @@ snapshots:
     dependencies:
       jsep: 1.4.0
 
-  '@kubb/adapter-oas@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)':
+  '@kubb/adapter-oas@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)':
     dependencies:
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@redocly/openapi-core': 2.30.1
       oas: 32.1.18
       oas-normalize: 16.0.4
@@ -5842,10 +5842,10 @@ snapshots:
       - '@kubb/renderer-jsx'
       - encoding
 
-  '@kubb/agent@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)':
+  '@kubb/agent@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)':
     dependencies:
-      '@kubb/ast': 5.0.0-alpha.72
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/ast': 5.0.0-alpha.73
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       '@logtail/node': 0.5.8
       consola: 3.4.2
       remeda: 2.34.0
@@ -5878,20 +5878,20 @@ snapshots:
       - uploadthing
       - utf-8-validate
 
-  '@kubb/ast@5.0.0-alpha.72': {}
+  '@kubb/ast@5.0.0-alpha.73': {}
 
-  '@kubb/cli@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)':
+  '@kubb/cli@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)':
     dependencies:
       '@clack/prompts': 1.2.0
-      '@kubb/adapter-oas': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/adapter-oas': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       chokidar: 5.0.0
       cosmiconfig: 9.0.1(typescript@6.0.3)
       tinyexec: 1.1.1
       unrun: 0.2.37
     optionalDependencies:
-      '@kubb/agent': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/mcp': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/agent': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/mcp': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -5921,17 +5921,17 @@ snapshots:
       - uploadthing
       - utf-8-validate
 
-  '@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)':
+  '@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)':
     dependencies:
-      '@kubb/ast': 5.0.0-alpha.72
-      '@kubb/renderer-jsx': 5.0.0-alpha.72
+      '@kubb/ast': 5.0.0-alpha.73
+      '@kubb/renderer-jsx': 5.0.0-alpha.73
       fflate: 0.8.2
       tinyexec: 1.1.1
 
-  '@kubb/mcp@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)':
+  '@kubb/mcp@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)':
     dependencies:
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/renderer-jsx': 5.0.0-alpha.72
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/renderer-jsx': 5.0.0-alpha.73
       '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.6)
       unrun: 0.2.37
       zod: 4.3.6
@@ -5940,20 +5940,20 @@ snapshots:
       - supports-color
       - synckit
 
-  '@kubb/middleware-barrel@5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))':
+  '@kubb/middleware-barrel@5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))':
     dependencies:
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
 
-  '@kubb/parser-ts@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)':
+  '@kubb/parser-ts@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)':
     dependencies:
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       typescript: 6.0.3
     transitivePeerDependencies:
       - '@kubb/renderer-jsx'
 
-  '@kubb/renderer-jsx@5.0.0-alpha.72':
+  '@kubb/renderer-jsx@5.0.0-alpha.73':
     dependencies:
-      '@kubb/ast': 5.0.0-alpha.72
+      '@kubb/ast': 5.0.0-alpha.73
 
   '@logtail/core@0.5.8':
     dependencies:
@@ -7917,15 +7917,15 @@ snapshots:
       json-schema: 0.4.0
       verror: 1.10.0
 
-  kubb@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3):
+  kubb@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3):
     dependencies:
-      '@kubb/adapter-oas': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/agent': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/cli': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)(typescript@6.0.3)
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/mcp': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/middleware-barrel': 5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))
-      '@kubb/parser-ts': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/adapter-oas': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/agent': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/cli': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)(typescript@6.0.3)
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/mcp': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/middleware-barrel': 5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))
+      '@kubb/parser-ts': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9103,12 +9103,12 @@ snapshots:
 
   unpipe@1.0.0: {}
 
-  unplugin-kubb@5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))(@kubb/renderer-jsx@5.0.0-alpha.72)(esbuild@0.27.7)(rolldown@1.0.0-rc.17)(rollup@4.60.1)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3)):
+  unplugin-kubb@5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))(@kubb/renderer-jsx@5.0.0-alpha.73)(esbuild@0.27.7)(rolldown@1.0.0-rc.17)(rollup@4.60.1)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3)):
     dependencies:
-      '@kubb/adapter-oas': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/core': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
-      '@kubb/middleware-barrel': 5.0.0-alpha.72(@kubb/core@5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72))
-      '@kubb/parser-ts': 5.0.0-alpha.72(@kubb/renderer-jsx@5.0.0-alpha.72)
+      '@kubb/adapter-oas': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/core': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
+      '@kubb/middleware-barrel': 5.0.0-alpha.73(@kubb/core@5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73))
+      '@kubb/parser-ts': 5.0.0-alpha.73(@kubb/renderer-jsx@5.0.0-alpha.73)
       unplugin: 3.0.0
     optionalDependencies:
       esbuild: 0.27.7

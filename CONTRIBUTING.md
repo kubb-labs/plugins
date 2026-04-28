@@ -1,86 +1,99 @@
-# Contribution Guidelines
+# Contributing to Kubb
 
-When contributing to `Kubb`, whether on GitHub or in other community spaces:
+This repository is home to both **official** and **community** plugins for [Kubb](https://kubb.dev) — the meta framework for code generation. Contributions are welcome.
 
-- Be respectful, civil, and open-minded.
-- Before opening a new pull request, try searching through the [issue tracker](https://github.com/kubb-labs/kubb/issues) for known issues or fixes.
-- If you want to make code changes based on your personal opinion(s), make sure you open an issue first describing the changes you want to make, and open a pull request only when your suggestions get approved by maintainers.
+Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 
-## How to Contribute
+## Before You Start
 
-### Prerequisites
+* Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR.
+* For significant changes, open an issue first and wait for maintainer feedback.
+* Small fixes (typos, docs, tests) can go straight to a PR.
 
-In order to not waste your time implementing a change that has already been declined, or is generally not needed, start by [opening an issue](https://github.com/kubb-labs/kubb/issues/new) describing the problem you would like to solve.
+## Tech Stack
 
-### Setup your environment locally
+| Tool | Purpose |
+|------|---------|
+| [Node.js](https://nodejs.org/) ≥ 22 | Runtime |
+| [pnpm](https://pnpm.io/) ≥ 10 | Package manager |
+| [Turborepo](https://turbo.build/) | Monorepo task runner |
+| [TypeScript](https://www.typescriptlang.org/) | Language (strict, ESM-only) |
+| [tsdown](https://github.com/sxzz/tsdown) | Bundler |
+| [Vitest](https://vitest.dev/) | Testing |
+| [oxlint](https://oxc.rs/docs/guide/usage/linter) | Linter |
+| [oxfmt](https://github.com/nicolo-ribaudo/oxfmt) | Formatter |
+| [Changesets](https://github.com/changesets/changesets) | Versioning |
 
-_Some commands will assume you have the GitHub CLI installed, if you haven't, consider [installing it](https://github.com/cli/cli#installation), but you can always use the Web UI if you prefer that instead._
-
-In order to contribute to this project, you will need to fork the repository:
-
-```bash
-gh repo fork kubb-labs/kubb
-```
-
-then, clone it to your local machine:
-
-```bash
-gh repo clone <your-github-name>/kubb
-```
-
-### Implement your changes
-
-This project includes several code quality tools to help maintain code standards:
-
-- **Linting**: Run `pnpm run lint` to check code style (uses Biome)
-- **Formatting**: Run `pnpm run format` to auto-format code
-- **Type checking**: Run `pnpm run typecheck` to verify TypeScript types
-- **Spell checking**: Run `pnpm run lint:spell` to check spelling in `.ts` and `.md` files (uses CSpell)
-- **Testing**: Run `pnpm run test` to run the test suite
-- **Performance benchmarks**: Run `pnpm run test:bench` to run performance benchmarks
-
-#### Spell Checking
-
-This project uses [CSpell](https://cspell.org/) to catch spelling errors in code and documentation. The configuration is in `cspell.json` and uses American English.
-
-If you encounter a spelling error:
-- For typos: Fix the spelling in your code
-- For technical terms, library names, or contributor names: Add them to the `words` array in `cspell.json`
-
-Common technical terms, framework names, and contributor names are already in the dictionary.
-
-#### Performance Testing
-
-Performance benchmarks are located in `tests/performance/` and test the code generation speed of various plugin combinations. These benchmarks help ensure performance doesn't regress over time.
-
-To run benchmarks:
-```bash
-pnpm run test:bench
-```
-
-When making changes that might affect generation performance (e.g., changes to core build process, plugin generators, or file processing), consider running the benchmarks before and after your changes to verify there are no significant regressions.
-
-See [tests/performance/README.md](tests/performance/README.md) for more details on adding new benchmarks.
-
-When making commits, make sure to follow the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) guidelines, i.e. prepending the message with `feat:`, `fix:`, `chore:`, `docs:`, etc... You can use `git status` to double check which files have not yet been staged for commit:
+## Setup
 
 ```bash
-git add <file> && git commit -m "feat/fix/chore/docs: commit message"
+gh repo fork kubb-labs/plugins --clone
+cd plugins
+pnpm install
+pnpm build
 ```
 
-Next to [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) we also use [changesets](https://github.com/changesets/changesets). Run the following command and follow the steps in the CLI. You will be prompted to select the changed packages, select if the changes are major/minor/patch and a message that you want to add to generated changelog.
+## Commands
 
 ```bash
-pnpm run changeset
-npx changeset
+pnpm build          # Build all packages
+pnpm generate       # Run all examples against local packages
+pnpm test           # Run all tests
+pnpm test:watch     # Watch mode
+pnpm test:bench     # Performance benchmarks
+pnpm format         # Format code
+pnpm lint:fix       # Lint and auto-fix
+pnpm typecheck      # Type check all packages
+pnpm lint:spell     # Spell check .ts and .md files
+pnpm changeset      # Create a changeset for versioning
 ```
 
-### When you're done
+To run tests for a single package:
 
-When all that's done, it's time to file a pull request to upstream:
+```bash
+pnpm vitest run --config ./configs/vitest.config.ts packages/plugin-ts
+# Update snapshots
+pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts
+```
 
-**NOTE**: All pull requests should target the `main` branch.
+## Pull Request Checklist
 
-## Credits
+Run checks in this order before opening a PR:
 
-This documented was inspired by the contributing guidelines for [create-t3-app](https://github.com/t3-oss/create-t3-app/blob/next/CONTRIBUTING.md).
+```bash
+pnpm format && pnpm lint:fix
+pnpm typecheck
+pnpm test
+pnpm generate    # update generated examples after plugin changes
+pnpm changeset   # required if you changed any published package
+```
+
+* Target the `main` branch.
+* Fill out the PR template completely.
+* Include a changeset for every code change that affects a published package.
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages: `feat:`, `fix:`, `docs:`, `chore:`, etc.
+
+## Adding a Plugin
+
+Plugins live under `packages/plugin-<name>/`. Each plugin follows this layout:
+
+```
+packages/plugin-<name>/
+├── src/
+│   ├── index.ts        # Public API
+│   ├── plugin.ts       # Plugin definition
+│   ├── components/     # JSX components
+│   ├── generators/     # Code generation logic
+│   └── *.test.ts(x)    # Unit tests
+├── package.json
+├── tsconfig.json       # extends ../../tsconfig.json
+├── tsdown.config.ts
+└── vitest.config.ts
+```
+
+After scaffolding:
+
+1. Add a runnable example under `examples/`.
+2. Add tests in `src/`.
+3. Open a PR with a changeset.
