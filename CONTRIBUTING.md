@@ -1,86 +1,293 @@
-# Contribution Guidelines
+# Contributing to Kubb
 
-When contributing to `Kubb`, whether on GitHub or in other community spaces:
+Thank you for your interest in contributing to Kubb! We welcome contributions of all kinds — bug fixes, new features, documentation improvements, and more. This guide will help you get started quickly.
 
-- Be respectful, civil, and open-minded.
-- Before opening a new pull request, try searching through the [issue tracker](https://github.com/kubb-labs/kubb/issues) for known issues or fixes.
-- If you want to make code changes based on your personal opinion(s), make sure you open an issue first describing the changes you want to make, and open a pull request only when your suggestions get approved by maintainers.
+Before contributing, please read our [Code of Conduct](./CODE_OF_CONDUCT.md). We expect all contributors to follow it in every community space.
 
-## How to Contribute
+## Table of Contents
 
-### Prerequisites
+- [Before You Start](#before-you-start)
+- [Tech Stack](#tech-stack)
+- [Setting Up Your Environment](#setting-up-your-environment)
+- [Project Structure](#project-structure)
+- [Development Workflow](#development-workflow)
+- [Testing](#testing)
+- [Linting, Formatting & Type Checking](#linting-formatting--type-checking)
+- [Changesets & Versioning](#changesets--versioning)
+- [Submitting a Pull Request](#submitting-a-pull-request)
+- [Creating a New Plugin](#creating-a-new-plugin)
 
-In order to not waste your time implementing a change that has already been declined, or is generally not needed, start by [opening an issue](https://github.com/kubb-labs/kubb/issues/new) describing the problem you would like to solve.
+---
 
-### Setup your environment locally
+## Before You Start
 
-_Some commands will assume you have the GitHub CLI installed, if you haven't, consider [installing it](https://github.com/cli/cli#installation), but you can always use the Web UI if you prefer that instead._
+To avoid wasted effort, please:
 
-In order to contribute to this project, you will need to fork the repository:
+1. Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) to check whether the bug or feature has already been reported or discussed.
+2. For significant changes, [open an issue](https://github.com/kubb-labs/plugins/issues/new) first to describe the problem or proposal. Wait for maintainer feedback before writing code.
+3. For small fixes (typos, documentation, tests), you can open a pull request directly.
 
-```bash
-gh repo fork kubb-labs/kubb
-```
+---
 
-then, clone it to your local machine:
+## Tech Stack
 
-```bash
-gh repo clone <your-github-name>/kubb
-```
+| Tool | Purpose |
+|------|---------|
+| [Node.js](https://nodejs.org/) ≥ 22 | JavaScript runtime |
+| [pnpm](https://pnpm.io/) ≥ 10 | Package manager and workspace orchestration |
+| [Turborepo](https://turbo.build/) | Monorepo task runner and caching |
+| [TypeScript](https://www.typescriptlang.org/) | Language (strict, ESM-only) |
+| [tsdown](https://github.com/sxzz/tsdown) | Package bundler |
+| [Vitest](https://vitest.dev/) | Unit and benchmark testing |
+| [oxlint](https://oxc.rs/docs/guide/usage/linter) | Fast JavaScript/TypeScript linter |
+| [oxfmt](https://github.com/nicolo-ribaudo/oxfmt) | Code formatter |
+| [CSpell](https://cspell.org/) | Spell checker for code and docs |
+| [Changesets](https://github.com/changesets/changesets) | Versioning and changelog management |
 
-### Implement your changes
+---
 
-This project includes several code quality tools to help maintain code standards:
+## Setting Up Your Environment
 
-- **Linting**: Run `pnpm run lint` to check code style (uses Biome)
-- **Formatting**: Run `pnpm run format` to auto-format code
-- **Type checking**: Run `pnpm run typecheck` to verify TypeScript types
-- **Spell checking**: Run `pnpm run lint:spell` to check spelling in `.ts` and `.md` files (uses CSpell)
-- **Testing**: Run `pnpm run test` to run the test suite
-- **Performance benchmarks**: Run `pnpm run test:bench` to run performance benchmarks
+_The commands below assume you have the [GitHub CLI](https://github.com/cli/cli#installation) installed. You can also use the GitHub web UI if you prefer._
 
-#### Spell Checking
-
-This project uses [CSpell](https://cspell.org/) to catch spelling errors in code and documentation. The configuration is in `cspell.json` and uses American English.
-
-If you encounter a spelling error:
-- For typos: Fix the spelling in your code
-- For technical terms, library names, or contributor names: Add them to the `words` array in `cspell.json`
-
-Common technical terms, framework names, and contributor names are already in the dictionary.
-
-#### Performance Testing
-
-Performance benchmarks are located in `tests/performance/` and test the code generation speed of various plugin combinations. These benchmarks help ensure performance doesn't regress over time.
-
-To run benchmarks:
-```bash
-pnpm run test:bench
-```
-
-When making changes that might affect generation performance (e.g., changes to core build process, plugin generators, or file processing), consider running the benchmarks before and after your changes to verify there are no significant regressions.
-
-See [tests/performance/README.md](tests/performance/README.md) for more details on adding new benchmarks.
-
-When making commits, make sure to follow the [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) guidelines, i.e. prepending the message with `feat:`, `fix:`, `chore:`, `docs:`, etc... You can use `git status` to double check which files have not yet been staged for commit:
+### 1. Fork and clone the repository
 
 ```bash
-git add <file> && git commit -m "feat/fix/chore/docs: commit message"
+gh repo fork kubb-labs/plugins --clone
+cd plugins
 ```
 
-Next to [conventional commit](https://www.conventionalcommits.org/en/v1.0.0/) we also use [changesets](https://github.com/changesets/changesets). Run the following command and follow the steps in the CLI. You will be prompted to select the changed packages, select if the changes are major/minor/patch and a message that you want to add to generated changelog.
+Or clone your fork manually:
 
 ```bash
-pnpm run changeset
-npx changeset
+git clone https://github.com/<your-github-name>/plugins.git
+cd plugins
 ```
 
-### When you're done
+### 2. Install dependencies
 
-When all that's done, it's time to file a pull request to upstream:
+```bash
+pnpm install
+```
 
-**NOTE**: All pull requests should target the `main` branch.
+### 3. Build all packages
+
+```bash
+pnpm build
+```
+
+---
+
+## Project Structure
+
+```
+plugins/
+├── packages/           # Published Kubb plugins
+│   ├── plugin-ts/      # TypeScript type generation
+│   ├── plugin-client/  # API client generation (Axios, Fetch)
+│   ├── plugin-zod/     # Zod schema generation
+│   ├── plugin-faker/   # Faker.js mock data
+│   ├── plugin-msw/     # Mock Service Worker handlers
+│   ├── plugin-react-query/  # TanStack Query hooks for React
+│   ├── plugin-vue-query/    # TanStack Query composables for Vue
+│   ├── plugin-svelte-query/ # TanStack Query stores for Svelte
+│   ├── plugin-solid-query/  # TanStack Query primitives for Solid
+│   ├── plugin-swr/     # SWR hooks
+│   ├── plugin-cypress/ # Cypress e2e test generation
+│   ├── plugin-redoc/   # ReDoc documentation generation
+│   └── plugin-mcp/     # Model Context Protocol integration
+├── internals/          # Shared internal utilities (not published)
+│   ├── utils/          # @internals/utils
+│   └── tanstack-query/ # @internals/tanstack-query
+├── examples/           # Runnable usage examples
+├── tests/              # Performance benchmarks and e2e tests
+│   └── performance/    # Vitest benchmarks
+└── configs/            # Shared Vitest and tooling configuration
+```
+
+Each plugin follows the same internal layout:
+
+```
+packages/plugin-<name>/
+├── src/
+│   ├── index.ts            # Public API
+│   ├── plugin.ts           # Plugin definition
+│   ├── components/         # React-fabric JSX components
+│   ├── generators/         # Code generation logic
+│   └── *.test.ts(x)        # Unit tests
+├── package.json
+├── tsconfig.json
+├── tsdown.config.ts
+└── vitest.config.ts
+```
+
+---
+
+## Development Workflow
+
+### Build
+
+```bash
+# Build all packages
+pnpm build
+
+# Build a single package (e.g. plugin-ts)
+pnpm turbo run build --filter=@kubb/plugin-ts
+```
+
+### Generate examples
+
+```bash
+pnpm generate
+```
+
+This runs all examples against the local packages and auto-fixes + formats the output.
+
+### Watch mode
+
+```bash
+pnpm test:watch
+```
+
+---
+
+## Testing
+
+Tests live alongside source files in `src/` and use the `.test.ts` or `.test.tsx` extension.
+
+### Run all tests
+
+```bash
+pnpm test
+```
+
+### Run tests for a specific package
+
+```bash
+pnpm vitest run --config ./configs/vitest.config.ts packages/plugin-ts
+```
+
+### Update snapshots
+
+```bash
+pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts
+```
+
+### Performance benchmarks
+
+Benchmarks live in `tests/performance/` and measure code generation speed across plugin combinations. Run them before and after changes that touch core generation logic.
+
+```bash
+pnpm test:bench
+```
+
+See [tests/performance/README.md](tests/performance/README.md) for details on understanding results and adding new benchmarks.
+
+---
+
+## Linting, Formatting & Type Checking
+
+Run these checks locally before opening a pull request. The order matters: **format → lint → typecheck → test**.
+
+```bash
+# Format code (oxfmt)
+pnpm format
+
+# Lint code (oxlint) and auto-fix where possible
+pnpm lint:fix
+
+# Type check all packages
+pnpm typecheck
+
+# Spell check .ts and .md files (CSpell)
+pnpm lint:spell
+```
+
+> [!TIP]
+> If you add a new technical term, library name, or proper noun that CSpell flags, add it to the `words` array in `cspell.json`.
+
+---
+
+## Changesets & Versioning
+
+This repository uses [Changesets](https://github.com/changesets/changesets) to manage versioning and changelogs. Every pull request that changes published package code must include a changeset.
+
+### Create a changeset
+
+```bash
+pnpm changeset
+```
+
+The interactive CLI will ask you to:
+
+1. Select the packages you changed.
+2. Choose the semver bump type (`major` / `minor` / `patch`).
+3. Write a short summary of the change (this appears in the changelog).
+
+A new file is created in `.changeset/`. Commit this file with your changes.
+
+### Commit convention
+
+Use [Conventional Commits](https://www.conventionalcommits.org/) for your commit messages:
+
+```bash
+git add <file>
+git commit -m "feat(plugin-ts): add support for discriminated union types"
+git commit -m "fix(plugin-zod): correct optional field handling"
+git commit -m "docs: update CONTRIBUTING guide"
+git commit -m "chore: upgrade vitest to v4"
+```
+
+The title format for commits in this repo is `[<plugin-name>] <description>` or a conventional commit prefix.
+
+---
+
+## Submitting a Pull Request
+
+1. Ensure all checks pass locally:
+
+   ```bash
+   pnpm format && pnpm lint:fix
+   pnpm typecheck
+   pnpm test
+   ```
+
+2. Create a changeset if you changed any published package:
+
+   ```bash
+   pnpm changeset
+   ```
+
+3. Push your branch and open a pull request against the `main` branch.
+
+4. Fill out the pull request template completely.
+
+5. Request a review from the maintainers.
+
+> [!IMPORTANT]
+> All pull requests must target the `main` branch.
+
+---
+
+## Creating a New Plugin
+
+1. Create your package under `packages/plugin-<name>/` following the existing plugin layout shown in [Project Structure](#project-structure).
+
+2. Follow the same tooling conventions:
+   - `tsdown` for building
+   - `vitest` for testing
+   - `oxlint` + `oxfmt` for linting and formatting
+   - Extend `../../tsconfig.json` in your `tsconfig.json`
+   - Export a typed plugin factory function as the public API
+
+3. Add a runnable example under `examples/` that demonstrates your plugin with a real OpenAPI spec.
+
+4. Add tests in `src/` covering the generators and components.
+
+5. Open a pull request with a changeset describing the new plugin.
+
+---
 
 ## Credits
 
-This documented was inspired by the contributing guidelines for [create-t3-app](https://github.com/t3-oss/create-t3-app/blob/next/CONTRIBUTING.md).
+This guide was inspired by the contributing guidelines for [create-t3-app](https://github.com/t3-oss/create-t3-app/blob/next/CONTRIBUTING.md).

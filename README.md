@@ -1,17 +1,19 @@
 <div align="center">
-  <h1>Kubb Plugins</h1>
+  <h1>Kubb</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
 
-  <p>Official plugins for <a href="https://kubb.dev">Kubb</a> - Generate type-safe SDKs from OpenAPI specifications.</p>
+  <p><strong>The meta framework for code generation.</strong><br>Stop writing glue code. Define your API once and Kubb generates types, clients, hooks, validators, mocks and more.</p>
 
 [![License][license-src]][license-href]
 </div>
 
 ## Overview
 
-This monorepo contains all official Kubb plugins for code generation from OpenAPI specifications. It follows the same monorepo structure used in the main [kubb-labs/kubb](https://github.com/kubb-labs/kubb) repository.
+This monorepo contains all official Kubb plugins. Point Kubb at your OpenAPI specification and it generates everything you need — TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more. No glue code required.
+
+Built on the same monorepo structure as [kubb-labs/kubb](https://github.com/kubb-labs/kubb).
 
 ## Packages
 
