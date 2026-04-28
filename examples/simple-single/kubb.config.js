@@ -19,6 +19,7 @@ export default defineConfig([
       extension: {
         '.ts': '',
       },
+      lint: false,
       format: 'auto',
     },
     hooks: {

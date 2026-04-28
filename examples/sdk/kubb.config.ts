@@ -14,6 +14,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
     clean: true,
+    format: false,
+    lint: false,
   },
   adapter: adapterOas(),
   plugins: [

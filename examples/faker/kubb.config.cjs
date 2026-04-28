@@ -13,6 +13,8 @@ module.exports = defineConfig(() => {
       },
       output: {
         path: './src/gen',
+        lint: false,
+        format: false,
         clean: true,
       },
       adapter: adapterOas(),
@@ -48,6 +50,8 @@ module.exports = defineConfig(() => {
       },
       output: {
         path: './src/gen',
+        lint: false,
+        format: false,
       },
       adapter: adapterOas(),
       hooks: {

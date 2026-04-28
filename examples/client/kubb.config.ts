@@ -24,6 +24,8 @@ export default defineConfig([
       extension: {
         '.ts': '.js',
       },
+      format: false,
+      lint: false,
     },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
@@ -50,7 +52,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen2' },
+    output: { path: './src/gen2', format: false, lint: false },
     adapter: adapterOas({ dateType: 'date', contentType: 'application/xml' }),
     plugins: [
       tsPlugin,
@@ -68,7 +70,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen3', clean: true },
+    output: { path: './src/gen3', clean: true, format: false, lint: false },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       tsPlugin,
@@ -90,7 +92,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen4', clean: true },
+    output: { path: './src/gen4', clean: true, format: false, lint: false },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       pluginClient({
@@ -105,7 +107,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen5', clean: true },
+    output: { path: './src/gen5', clean: true, format: false, lint: false },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       pluginClient({
@@ -120,7 +122,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen6', clean: true },
+    output: { path: './src/gen6', clean: true, format: false, lint: false },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       tsPlugin,
@@ -140,7 +142,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    output: { path: './src/gen7', clean: true },
+    output: { path: './src/gen7', clean: true, format: false, lint: false },
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },

@@ -26,6 +26,7 @@ export default defineConfig({
     clean: true,
     barrelType: 'named',
     defaultBanner: false,
+    lint: false,
     format: 'oxfmt',
   },
   hooks: {

@@ -14,6 +14,8 @@ export const config = {
     clean: true,
     barrelType: 'named',
     defaultBanner: 'simple' as const,
+    format: false,
+    lint: false,
   },
   hooks: {
     done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],

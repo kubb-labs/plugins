@@ -13,6 +13,8 @@ export default defineConfig(() => {
     output: {
       path: './src/gen',
       clean: true,
+      lint: false,
+      format: false,
     },
     hooks: {
       done: ['npm run typecheck'],
