@@ -1,10 +1,10 @@
 <div align="center">
-  <h1>Kubb</h1>
+  <h1>Kubb Plugins</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="./assets/logo.png" alt="Kubb logo">
   </a>
 
-  <p><strong>The meta framework for code generation.</strong><br>Stop writing glue code. Define your API once and Kubb generates types, clients, hooks, validators, mocks and more.</p>
+  <p><strong>Official and community plugins for <a href="https://kubb.dev">Kubb</a>.</strong><br>Point Kubb at your OpenAPI spec and generate TypeScript types, API clients, Zod schemas, TanStack Query hooks, Faker mocks, MSW handlers, and more.</p>
 
 [![License][license-src]][license-href]
 </div>
