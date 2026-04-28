@@ -17,10 +17,10 @@ Prefer direct, concrete, technical language over marketing phrasing. Be specific
 
 When describing a feature, option, or example use this short structure:
 
-1. What — short description of the feature or option.
-2. Why — the problem it solves or the primary use case (optional if obvious).
-3. When — when to use it versus alternatives (optional).
-4. How — a minimal, working example demonstrating usage.
+1. What: short description of the feature or option.
+2. Why: the problem it solves or the primary use case (optional if obvious).
+3. When: when to use it versus alternatives (optional).
+4. How: a minimal, working example demonstrating usage.
 
 ## Sentence Patterns
 
