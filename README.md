@@ -11,9 +11,9 @@
 
 ## Overview
 
-This monorepo contains all official Kubb plugins. Point Kubb at your OpenAPI specification and it generates everything you need — TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more. No glue code required.
+This monorepo is the home for **official and community plugins** for [Kubb](https://kubb.dev) — the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates everything you need: TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
 
-Built on the same monorepo structure as [kubb-labs/kubb](https://github.com/kubb-labs/kubb).
+Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Packages
 
@@ -138,33 +138,7 @@ pnpm typecheck
 
 ## Contributing
 
-Want to contribute to a plugin or add a new one? Here's how:
-
-1. **Create your package** under `packages/` following the existing plugin layout:
-   ```
-   packages/
-   └── plugin-your-name/
-       ├── src/
-       │   ├── index.ts
-       │   ├── plugin.ts
-       │   └── generators/
-       ├── package.json
-       ├── tsconfig.json
-       ├── tsdown.config.ts
-       └── vitest.config.ts
-   ```
-
-2. **Use the same tooling conventions**:
-   - `tsdown` for building
-   - `vitest` for testing
-   - `oxlint` for linting/formatting
-   - Extend `../../tsconfig.json` in your `tsconfig.json`
-
-3. **Add an example** under `examples/` that demonstrates your plugin.
-
-4. **Open a pull request** with your changes.
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for full details.
+Want to contribute to an existing plugin or add a new one — official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 
