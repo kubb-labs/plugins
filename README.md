@@ -15,9 +15,9 @@ This monorepo is the home for **official and community plugins** for [Kubb](http
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## Packages
+## Official Plugins
 
-Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
+Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
 
 ### TypeScript
 
@@ -58,6 +58,12 @@ Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/
 |---------|---------|-------------|
 | [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://www.npmjs.com/package/@kubb/plugin-redoc) | ReDoc API documentation generation |
 | [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://www.npmjs.com/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
+
+## Community Plugins
+
+Plugins built and maintained by the community. Want to add yours? See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+> No community plugins listed yet — be the first to [contribute one](./CONTRIBUTING.md#adding-a-plugin)!
 
 ## Examples
 
