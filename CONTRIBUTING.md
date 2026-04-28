@@ -64,6 +64,7 @@ Run checks in this order before opening a PR:
 pnpm format && pnpm lint:fix
 pnpm typecheck
 pnpm test
+pnpm generate    # update generated examples after plugin changes
 pnpm changeset   # required if you changed any published package
 ```
 

@@ -1,7 +1,7 @@
 <div align="center">
   <h1>Kubb</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
+    <img width="180" src="./assets/logo.png" alt="Kubb logo">
   </a>
 
   <p><strong>The meta framework for code generation.</strong><br>Stop writing glue code. Define your API once and Kubb generates types, clients, hooks, validators, mocks and more.</p>
