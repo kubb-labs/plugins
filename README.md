@@ -4,7 +4,7 @@
     <img width="180" src="./assets/logo.png" alt="Kubb logo">
   </a>
 
-  <p><strong>Official and community plugins for <a href="https://kubb.dev">Kubb</a>.</strong><br>Point Kubb at your OpenAPI spec and generate TypeScript types, API clients, Zod schemas, TanStack Query hooks, Faker mocks, MSW handlers, and more.</p>
+  <p><strong>Official and community plugins for <a href="https://kubb.dev">Kubb</a>.</strong></p>
 
 [![License][license-src]][license-href]
 </div>
