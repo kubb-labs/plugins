@@ -5,14 +5,14 @@ import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 export type { Transformer } from '@internals/tanstack-query'
 
 /**
- * The concrete resolver type for `@kubb/plugin-react-query`.
- * Extends the base `Resolver` with a `resolveName` helper for hook function names.
+ * Resolver for React Query that provides naming methods for hook functions.
  */
 export type ResolverReactQuery = Resolver & {
   /**
-   * Resolves the hook function name for a given raw operation name.
+   * Resolves the hook function name for an operation.
+   *
    * @example
-   * resolver.resolveName('show pet by id') // -> 'showPetById'
+   * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverReactQuery, name: string): string
 }
@@ -20,18 +20,19 @@ export type ResolverReactQuery = Resolver & {
 type Suspense = object
 
 /**
- * Customize the queryKey
+ * Customize the queryKey.
  */
 type QueryKey = Transformer
 
 /**
- * Customize the mutationKey
+ * Customize the mutationKey.
  */
 type MutationKey = Transformer
 
 type Query = {
   /**
-   * Define which HttpMethods can be used for queries
+   * HTTP methods to use for queries.
+   *
    * @default ['get']
    */
   methods?: Array<string>
@@ -47,7 +48,8 @@ type Query = {
 
 type Mutation = {
   /**
-   * Define which HttpMethods can be used for mutations
+   * HTTP methods to use for mutations.
+   *
    * @default ['post', 'put', 'delete']
    */
   methods?: Array<string>
@@ -116,82 +118,75 @@ export type Options = {
   group?: Group
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Tags, operations, or paths to include in generation.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * How to style your params, by default no casing is applied
-   * - 'camelcase' uses camelcase for the params names
+   * Apply casing to parameter names.
    */
   paramsCasing?: 'camelcase'
   /**
-   * How to pass your params.
-   * - 'object' returns the params and pathParams as an object.
-   * - 'inline' returns the params as comma separated params.
+   * How parameters are passed: grouped in an object or spread inline.
+   *
    * @default 'inline'
    */
   paramsType?: 'object' | 'inline'
   /**
-   * How to pass your pathParams.
-   * - 'object' returns the pathParams as an object.
-   * - 'inline': returns the pathParams as comma separated params.
+   * How path parameters are passed: grouped in an object or spread inline.
+   *
    * @default 'inline'
    */
   pathParamsType?: PluginClient['options']['pathParamsType']
   /**
-   * When set, an infiniteQuery hooks is added.
+   * Add infinite query hooks.
    */
   infinite?: Partial<Infinite> | false
   /**
-   * When set, a suspenseQuery hooks is added.
+   * Add suspense query hooks.
    */
   suspense?: Partial<Suspense> | false
   queryKey?: QueryKey
   /**
-   * Override some useQuery behaviors.
+   * Configure useQuery behavior.
    */
   query?: Partial<Query> | false
   mutationKey?: MutationKey
   /**
-   * Override some useMutation behaviors.
+   * Configure useMutation behavior.
    */
   mutation?: Partial<Mutation> | false
   /**
-   * When set, a custom hook is used to customize the options of the generated hooks.
-   * It will also generate a `HookOptions` type that can be used to type the custom options of each hook for type-safety.
+   * Use a custom hook to customize hook options and generate a HookOptions type.
    */
   customOptions?: CustomOptions
   /**
-   * Which parser should be used before returning the data to `@tanstack/query`.
-   * `'zod'` uses `@kubb/plugin-zod` to parse the data.
+   * Parser to use for validating response data.
    */
   parser?: PluginClient['options']['parser']
   transformers?: {
     /**
-     * Customize the names based on the type that is provided by the plugin.
+     * Override the default naming for hooks.
      */
     name?: (name: string, type?: string) => string
   }
   /**
-   * Override individual resolver methods. Any method you omit falls back to the
-   * preset resolver's implementation. Use `this.default(...)` to call it.
+   * Override naming conventions for function names and types.
    */
   resolver?: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
   /**
-   * Single AST visitor applied to each node before printing.
-   * Return `null` or `undefined` from a method to leave the node unchanged.
+   * AST visitor to transform generated nodes.
    */
   transformer?: ast.Visitor
   /**
-   * Define some generators next to the react-query generators
+   * Additional generators alongside the default generators.
    */
   generators?: Array<Generator<PluginReactQuery>>
 }

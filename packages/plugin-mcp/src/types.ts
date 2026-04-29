@@ -2,14 +2,14 @@ import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginF
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 /**
- * The concrete resolver type for `@kubb/plugin-mcp`.
- * Extends the base `Resolver` with a `resolveName` helper for MCP handler function names.
+ * Resolver for MCP that provides naming methods for handler functions.
  */
 export type ResolverMcp = Resolver & {
   /**
-   * Resolves the handler function name for a given raw operation name.
+   * Resolves the handler function name for an operation.
+   *
    * @example
-   * resolver.resolveName('show pet by id') // -> 'showPetByIdHandler'
+   * `resolver.resolveName('show pet by id') // -> 'showPetByIdHandler'`
    */
   resolveName(this: ResolverMcp, name: string): string
 }
@@ -25,10 +25,7 @@ export type Options = {
    */
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
-   * Transform parameter names to a specific casing format.
-   * When set to 'camelcase', parameter names in path, query, and header params will be transformed to camelCase.
-   * This should match the paramsCasing setting used in @kubb/plugin-ts.
-   * @default undefined
+   * Apply casing to parameter names to match your configuration.
    */
   paramsCasing?: 'camelcase'
   /**
@@ -36,29 +33,27 @@ export type Options = {
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Tags, operations, or paths to include in generation.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * A single resolver whose methods override the default resolver's naming conventions.
-   * When a method returns `null` or `undefined`, the default resolver's result is used instead.
+   * Override naming conventions for function names and types.
    */
   resolver?: Partial<ResolverMcp> & ThisType<ResolverMcp>
   /**
-   * A single AST visitor applied before printing.
-   * When a visitor method returns `null` or `undefined`, the preset transformer's result is used instead.
+   * AST visitor to transform generated nodes.
    */
   transformer?: ast.Visitor
   /**
-   * Define some generators next to the default MCP generators.
+   * Additional generators alongside the default generators.
    */
   generators?: Array<Generator<PluginMcp>>
 }
