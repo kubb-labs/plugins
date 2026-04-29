@@ -99,46 +99,6 @@ options:
         // Inferred type export
         export type Pet = z.infer<typeof petSchema>
 
-  - name: dateType
-    type: "false | 'string' | 'stringOffset' | 'stringLocal' | 'date'"
-    required: false
-    default: "'string'"
-    description: |
-      Choose to use `date` or `datetime` as JavaScript `Date` instead of `string`.
-
-      See [DateTimes](https://zod.dev/?id=datetimes).
-    examples:
-      - name: 'false'
-        files:
-          - lang: typescript
-            code: |
-              z.string();
-            twoslash: false
-      - name: "'string'"
-        files:
-          - lang: typescript
-            code: |
-              z.string().datetime();
-            twoslash: false
-      - name: "'stringOffset'"
-        files:
-          - lang: typescript
-            code: |
-              z.string().datetime({ offset: true });
-            twoslash: false
-      - name: "'stringLocal'"
-        files:
-          - lang: typescript
-            code: |
-              z.string().datetime({ local: true });
-            twoslash: false
-      - name: "'date'"
-        files:
-          - lang: typescript
-            code: |
-              z.date();
-            twoslash: false
-
   - name: integerType
     warning: |
       This option has been moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.

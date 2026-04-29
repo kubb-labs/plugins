@@ -3,6 +3,7 @@ import { stringify } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyModifiers, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
+import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
  * Partial map of node-type overrides for the Zod printer.
@@ -29,7 +30,7 @@ export type PrinterZodNodes = ast.PrinterPartial<string, PrinterZodOptions>
 export type PrinterZodOptions = {
   coercion?: PluginZod['resolvedOptions']['coercion']
   guidType?: PluginZod['resolvedOptions']['guidType']
-  dateType?: PluginZod['resolvedOptions']['dateType']
+  dateType?: AdapterOas['resolvedOptions']['dateType']
   wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
   resolver?: ResolverZod
   /**

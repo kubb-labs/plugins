@@ -127,12 +127,11 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrelType: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, dateType: 'date' }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
           output: { path: './zod', barrelType: false },
-          dateType: 'date',
         }),
       ],
     },

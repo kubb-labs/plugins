@@ -1,4 +1,6 @@
+import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
+import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations.tsx'
 import { Zod } from '../components/Zod.tsx'
@@ -13,7 +15,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, dateType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
+    const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
+    const dateType = (adapter as Adapter<AdapterOas>).options.dateType
 
     if (!node.name) {
       return
@@ -57,7 +60,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
   },
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, dateType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
+    const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
+    const dateType = (adapter as Adapter<AdapterOas>).options.dateType
 
     const mode = ctx.getMode(output)
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')

@@ -110,16 +110,6 @@ export type Options = {
    */
   importPath?: 'zod' | 'zod/mini' | (string & {})
   /**
-   * Choose to use date or datetime as JavaScript Date instead of string.
-   * - false falls back to a simple z.string() format.
-   * - 'string' uses z.string().datetime() for datetime validation.
-   * - 'stringOffset' uses z.string().datetime({ offset: true }) for datetime with timezone offset validation.
-   * - 'stringLocal' uses z.string().datetime({ local: true }) for local datetime validation.
-   * - 'date' uses z.date() for JavaScript Date objects.
-   * @default 'string'
-   */
-  dateType?: false | 'string' | 'stringOffset' | 'stringLocal' | 'date'
-  /**
    * Use TypeScript(`@kubb/plugin-ts`) to add type annotation.
    */
   typed?: boolean
@@ -209,7 +199,6 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | undefined
-  dateType: NonNullable<Options['dateType']>
   typed: NonNullable<Options['typed']>
   inferred: NonNullable<Options['inferred']>
   importPath: NonNullable<Options['importPath']>
