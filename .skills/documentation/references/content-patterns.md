@@ -1,6 +1,6 @@
 # Content Patterns
 
-Blog post structure, frontmatter, and component patterns for the Kubb ecosystem documentation.
+Blog post structure, frontmatter, and component patterns for documentation.
 
 ## Default
 
@@ -25,7 +25,7 @@ For packages documentation:
 ```yaml
 ---
 layout: doc
-title: \@kubb/name  # Escape @ symbol
+title: \@scope/name  # Escape @ symbol
 outline: deep
 ---
 ```
@@ -39,7 +39,7 @@ Structure for package documentation pages:
   - Use code groups (start with `::: code-group` and end with `:::`) for multiple package managers (always include `bun`, `pnpm`, `npm`, `yarn` in that order):
 
 ```shell [bun]
-bun add -d @kubb/name
+bun add -d @scope/name
 ```
 
 3. **Options** (one section per option, in logical order)
@@ -184,11 +184,11 @@ Always include file path:
 Use `twoslash` annotation for TypeScript: enables type checking
 
 ````md
-```ts twoslash [kubb.config.ts]
+```ts twoslash [config.ts]
 export default defineConfig({
 })
 ```
-```ts [kubb.config.ts]
+```ts [config.ts]
 export default defineConfig({
 })
 ```
@@ -200,6 +200,6 @@ type Test = {
 ```
 
 ```bash
-pnpm add @kubb/core
+pnpm add @scope/package
 ```
 ````
