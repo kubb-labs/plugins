@@ -7,7 +7,7 @@ export type ResolverCypress = Resolver & {
   /**
    * Resolves the function name for an operation.
    *
-   * @example
+   * @example Resolving function names
    * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverCypress, name: string): string

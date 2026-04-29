@@ -119,7 +119,8 @@ export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: 
 
 /**
  * Minimum nodes length of 2
- * @example `string | number`
+ * @example Union type example
+ * `string | number`
  */
 export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<ts.TypeNode>; withParentheses?: boolean }): ts.TypeNode {
   if (!nodes.length) {

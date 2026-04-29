@@ -8,7 +8,7 @@ export type ResolverMcp = Resolver & {
   /**
    * Resolves the handler function name for an operation.
    *
-   * @example
+   * @example Resolving handler function names
    * `resolver.resolveName('show pet by id') // -> 'showPetByIdHandler'`
    */
   resolveName(this: ResolverMcp, name: string): string

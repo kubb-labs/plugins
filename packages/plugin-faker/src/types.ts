@@ -9,56 +9,56 @@ export type ResolverFaker = Resolver &
     /**
      * Resolves the faker function name for a schema.
      *
-     * @example
+     * @example Resolving faker function names
      * `resolver.resolveName('show pet by id') // -> 'showPetById'`
      */
     resolveName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
     /**
      * Resolves the output file name for a faker module.
      *
-     * @example
+     * @example Resolving faker file names
      * `resolver.resolvePathName('show pet by id', 'file') // -> 'showPetById'`
      */
     resolvePathName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
     /**
      * Resolves the faker function name for a request body.
      *
-     * @example
+     * @example Resolving data function names
      * `resolver.resolveDataName(node) // -> 'createPetsData'`
      */
     resolveDataName(this: ResolverFaker, node: ast.OperationNode): string
     /**
      * Resolves the faker function name for a response by status code.
      *
-     * @example
+     * @example Response status names
      * `resolver.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'`
      */
     resolveResponseStatusName(this: ResolverFaker, node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
      * Resolves the faker function name for the response union.
      *
-     * @example
+     * @example Response union names
      * `resolver.resolveResponseName(node) // -> 'listPetsResponse'`
      */
     resolveResponseName(this: ResolverFaker, node: ast.OperationNode): string
     /**
      * Resolves the faker function name for path parameters.
      *
-     * @example
+     * @example Path parameters names
      * `resolver.resolvePathParamsName(node, param) // -> 'showPetByIdPathPetId'`
      */
     resolvePathParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the faker function name for query parameters.
      *
-     * @example
+     * @example Query parameters names
      * `resolver.resolveQueryParamsName(node, param) // -> 'listPetsQueryLimit'`
      */
     resolveQueryParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the faker function name for header parameters.
      *
-     * @example
+     * @example Header parameters names
      * `resolver.resolveHeaderParamsName(node, param) // -> 'deletePetHeaderApiKey'`
      */
     resolveHeaderParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string

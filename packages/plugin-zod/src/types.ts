@@ -14,15 +14,17 @@ export type ResolverZod = Resolver &
     /**
      * Resolves the schema type name (inferred type from schema).
      *
-     * @example
+     * @example Schema type names
      * `resolver.resolveSchemaTypeName('pet') // → 'Pet'`
      */
     resolveSchemaTypeName(this: ResolverZod, name: string): string
     /**
      * Resolves the generated type name from the schema.
      *
-     * @example
+     * @example Type names
      * `resolver.resolveTypeName('pet') // → 'Pet'`
+     */
+    resolveTypeName(this: ResolverZod, name: string): string
     /**
      * Resolves the output file name for a schema.
      */
@@ -30,43 +32,43 @@ export type ResolverZod = Resolver &
     /**
      * Resolves the name for an operation response by status code.
      *
-     * @example
-     * resolver.resolveResponseStatusName(node, 200) // → 'listPetsStatus200Schema'
+     * @example Response status names
+     * `resolver.resolveResponseStatusName(node, 200) // → 'listPetsStatus200Schema'`
      */
     resolveResponseStatusName(this: ResolverZod, node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
      * Resolves the name for the collection of all operation responses.
      *
-     * @example
-     * resolver.resolveResponsesName(node) // → 'listPetsResponsesSchema'
+     * @example Responses collection names
+     * `resolver.resolveResponsesName(node) // → 'listPetsResponsesSchema'`
      */
     resolveResponsesName(this: ResolverZod, node: ast.OperationNode): string
     /**
      * Resolves the name for the union of all operation responses.
      *
-     * @example
-     * resolver.resolveResponseName(node) // → 'listPetsResponseSchema'
+     * @example Response union names
+     * `resolver.resolveResponseName(node) // → 'listPetsResponseSchema'`
      */
     resolveResponseName(this: ResolverZod, node: ast.OperationNode): string
     /**
      * Resolves the name for an operation's grouped path parameters type.
      *
-     * @example
-     * resolver.resolvePathParamsName(node, param) // → 'deletePetPathPetIdSchema'
+     * @example Path parameters names
+     * `resolver.resolvePathParamsName(node, param) // → 'deletePetPathPetIdSchema'`
      */
     resolvePathParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped query parameters type.
      *
-     * @example
-     * resolver.resolveQueryParamsName(node, param) // → 'findPetsByStatusQueryStatusSchema'
+     * @example Query parameters names
+     * `resolver.resolveQueryParamsName(node, param) // → 'findPetsByStatusQueryStatusSchema'`
      */
     resolveQueryParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped header parameters type.
      *
-     * @example
-     * resolver.resolveHeaderParamsName(node, param) // → 'deletePetHeaderApiKeySchema'
+     * @example Header parameters names
+     * `resolver.resolveHeaderParamsName(node, param) // → 'deletePetHeaderApiKeySchema'`
      */
     resolveHeaderParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
   }

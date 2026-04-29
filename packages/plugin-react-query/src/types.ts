@@ -11,7 +11,7 @@ export type ResolverReactQuery = Resolver & {
   /**
    * Resolves the hook function name for an operation.
    *
-   * @example
+   * @example Resolving hook names
    * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverReactQuery, name: string): string
