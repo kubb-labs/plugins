@@ -3,16 +3,12 @@ import { defineResolver } from '@kubb/core'
 import type { PluginReactQuery } from '../types.ts'
 
 /**
- * Resolver for `@kubb/plugin-react-query` that provides the default naming
- * and path-resolution helpers used by the plugin.
+ * Naming convention resolver for React Query plugin.
+ *
+ * Provides default naming helpers using camelCase for functions and file paths.
  *
  * @example
- * ```ts
- * import { resolverReactQuery } from '@kubb/plugin-react-query'
- *
- * resolverReactQuery.default('list pets', 'function') // -> 'listPets'
- * resolverReactQuery.resolveName('show pet by id')    // -> 'showPetById'
- * ```
+ * `resolverReactQuery.default('list pets', 'function')  // → 'listPets'`
  */
 export const resolverReactQuery = defineResolver<PluginReactQuery>((ctx) => ({
   name: 'default',

@@ -2,6 +2,11 @@ import { camelCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginMsw } from '../types.ts'
 
+/**
+ * Naming convention resolver for MSW plugin.
+ *
+ * Provides default naming helpers using camelCase with a `handler` suffix.
+ */
 export const resolverMsw = defineResolver<PluginMsw>((_ctx) => ({
   name: 'default',
   pluginName: 'plugin-msw',

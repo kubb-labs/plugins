@@ -28,22 +28,31 @@ import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini }
 export type PrinterZodMiniNodes = ast.PrinterPartial<string, PrinterZodMiniOptions>
 
 export type PrinterZodMiniOptions = {
+  /**
+   * Use `z.guid()` or `z.uuid()` for UUID/GUID validation.
+   *
+   * @default 'uuid'
+   */
   guidType?: PluginZod['resolvedOptions']['guidType']
+  /**
+   * Hook to transform generated Zod schema before output.
+   */
   wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
+  /**
+   * Transforms raw schema names into valid JavaScript identifiers.
+   */
   resolver?: ResolverZod
   /**
-   * Property keys to exclude from the generated object schema via `.omit({ key: true })`.
+   * Properties to exclude using `.omit({ key: true })`.
    */
   keysToOmit?: Array<string>
   /**
-   * Names of schemas (raw OAS names) that participate in a circular dependency
-   * chain (direct self-loops or indirect cycles such as Pet → Cat → Pet).
-   * Properties whose schema transitively references one of these are emitted
-   * as lazy getters and refs to them are wrapped in `z.lazy(() => …)`.
+   * Schema names that form circular dependency chains.
+   * Properties referencing these emit lazy getters wrapping refs in `z.lazy(() => …)`.
    */
   cyclicSchemas?: ReadonlySet<string>
   /**
-   * Partial map of node-type overrides. Each entry replaces the built-in handler for that node type.
+   * Custom handler map for node type overrides.
    */
   nodes?: PrinterZodMiniNodes
 }
@@ -52,12 +61,10 @@ export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', Printe
 /**
  * Zod v4 **Mini** printer built with `definePrinter`.
  *
- * Converts a `SchemaNode` AST into a Zod v4 Mini code string using the
- * functional API (`z.optional(z.string())`) for better tree-shaking.
+ * Converts a `SchemaNode` AST into a Zod v4 code string using the functional API
+ * (`z.optional(z.string())`) for improved tree-shaking. See {@link printerZod} for the chainable API.
  *
- * For the standard chainable API, see {@link printerZod}.
- *
- * @example
+ * @example Functional Mini API
  * ```ts
  * const printer = printerZodMini({})
  * const code = printer.print(optionalStringNode) // "z.optional(z.string())"

@@ -5,23 +5,20 @@ import { resolverZod } from './resolvers/resolverZod.ts'
 import type { PluginZod } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-zod`, used to identify the plugin in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-zod`, used in driver lookups and warnings.
  */
 export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 
 /**
- * The `@kubb/plugin-zod` plugin factory.
+ * Generates Zod validation schemas from an OpenAPI specification.
+ * Walks schemas and operations, delegates to generators, and writes barrel files
+ * based on the configured `barrelType`.
  *
- * Generates Zod validation schemas from an OpenAPI/AST `RootNode`.
- * Walks schemas and operations, delegates rendering to the active generators,
- * and writes barrel files based on `output.barrelType`.
- *
- * @example
+ * @example Zod schema generator
  * ```ts
  * import pluginZod from '@kubb/plugin-zod'
- *
  * export default defineConfig({
- *   plugins: [pluginZod({ output: { path: 'zod' } })],
+ *   plugins: [pluginZod({ output: { path: 'zod' } })]
  * })
  * ```
  */
