@@ -2,8 +2,14 @@ import { stringify, toRegExpString } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
+/**
+ * Partial printer nodes for Faker generation, mapping schema types to output strings.
+ */
 export type PrinterFakerNodes = ast.PrinterPartial<string, PrinterFakerOptions>
 
+/**
+ * Configuration options for the Faker printer, including resolvers, mappers, and cyclic schema tracking.
+ */
 export type PrinterFakerOptions = {
   dateParser?: PluginFaker['resolvedOptions']['dateParser']
   regexGenerator?: PluginFaker['resolvedOptions']['regexGenerator']
@@ -22,6 +28,9 @@ export type PrinterFakerOptions = {
   cyclicSchemas?: ReadonlySet<string>
 }
 
+/**
+ * Factory options for the Faker printer, defining input/output types and configuration.
+ */
 export type PrinterFakerFactory = ast.PrinterFactoryOptions<'faker', PrinterFakerOptions, string, string>
 
 const fakerKeywordMapper = {
@@ -171,6 +180,10 @@ function parseEnumValue(value: string | number | boolean | undefined) {
   return value
 }
 
+/**
+ * Creates a Faker printer that generates mock data generation code from schema nodes.
+ * Handles circular references gracefully by emitting lazy getters for cyclic properties.
+ */
 export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.definePrinter<PrinterFakerFactory>((options) => {
   const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
     return (

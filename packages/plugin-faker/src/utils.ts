@@ -2,6 +2,9 @@ import { posix } from 'node:path'
 import { ast } from '@kubb/core'
 import type { ResolverFaker } from './types.ts'
 
+/**
+ * Determines if a schema node can be overridden during faker generation.
+ */
 export function canOverrideSchema(node: ast.SchemaNode): boolean {
   return new Set<ast.SchemaNode['type']>([
     'array',
@@ -26,6 +29,10 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
   ]).has(node.type)
 }
 
+/**
+ * Resolves a schema reference by looking up the referenced schema in the provided array.
+ * Returns the original node if it's not a reference.
+ */
 export function resolveSchemaRef(node: ast.SchemaNode, schemas: Array<ast.SchemaNode>): ast.SchemaNode {
   if (node.type !== 'ref') {
     return node
@@ -34,6 +41,9 @@ export function resolveSchemaRef(node: ast.SchemaNode, schemas: Array<ast.Schema
   return schemas.find((schema) => schema.name === node.name && schema.type !== 'ref') ?? node
 }
 
+/**
+ * Resolves a parameter name based on its location (path, query, header, etc.) using the provided resolver.
+ */
 export function resolveParamNameByLocation(
   resolver: Pick<ResolverFaker, 'resolvePathParamsName' | 'resolveQueryParamsName' | 'resolveHeaderParamsName' | 'resolveParamName'>,
   node: ast.OperationNode,
@@ -76,6 +86,10 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
   ]).has(schema.type)
 }
 
+/**
+ * Builds a response schema as a union of all response statuses.
+ * Returns null if no responses are provided, or inlines single simple responses.
+ */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
   const responses = node.responses.filter((response) => response.schema)
 
@@ -97,8 +111,14 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   })
 }
 
+/**
+ * Import name that can be a string or a renamed import object.
+ */
 export type ImportName = string | { propertyName: string; name?: string }
 
+/**
+ * Import entry containing module path and imported names.
+ */
 export type ImportEntry = {
   name: string | Array<ImportName>
   path: string
@@ -130,6 +150,10 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+/**
+ * Filters imports to only those that are actually used in the generated code.
+ * Checks for function calls matching the imported names.
+ */
 export function filterUsedImports(imports: Array<ImportEntry>, text: string, skipImportNames: Array<string> = []): Array<ImportEntry> {
   return imports.filter((entry) => {
     const names = (Array.isArray(entry.name) ? entry.name : [entry.name])
@@ -152,6 +176,10 @@ export function filterUsedImports(imports: Array<ImportEntry>, text: string, ski
   })
 }
 
+/**
+ * Detects and resolves import name conflicts by adding aliases to conflicting names.
+ * Returns updated imports with a mapping of original names to their aliases.
+ */
 export function aliasConflictingImports(
   imports: Array<ImportEntry>,
   reservedNames: Iterable<string>,
@@ -186,10 +214,17 @@ export function aliasConflictingImports(
   }
 }
 
+/**
+ * Replaces all occurrences of original names with their aliased versions in the given text.
+ */
 export function rewriteAliasedImports(text: string, aliases: ReadonlyMap<string, string>): string {
   return Array.from(aliases).reduce((acc, [name, alias]) => acc.replace(new RegExp(`\\b${escapeRegExp(name)}\\b`, 'g'), alias), text)
 }
 
+/**
+ * Resolves a type reference, determining if it needs an import statement or inline type reference.
+ * Takes into account whether the type can be overridden and the file paths.
+ */
 export function resolveTypeReference({
   node,
   canOverride,
@@ -223,6 +258,10 @@ export function resolveTypeReference({
   }
 }
 
+/**
+ * Maps a schema node type to its corresponding scalar type representation.
+ * Returns the type name for enums or the base type (string, number, etc.) for primitives.
+ */
 export function getScalarType(node: ast.SchemaNode, typeName: string): string {
   switch (node.type) {
     case 'string':
@@ -251,6 +290,10 @@ export function getScalarType(node: ast.SchemaNode, typeName: string): string {
   }
 }
 
+/**
+ * Resolves faker type usage information for a schema.
+ * Determines the data type, return type, and whether it uses the type name.
+ */
 export function resolveFakerTypeUsage(
   node: ast.SchemaNode,
   typeName: string,

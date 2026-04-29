@@ -57,6 +57,9 @@ export type PrinterZodMiniOptions = {
   nodes?: PrinterZodMiniNodes
 }
 
+/**
+ * Factory options for the Zod Mini printer, defining input/output types and configuration.
+ */
 export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
 /**
  * Zod v4 **Mini** printer built with `definePrinter`.

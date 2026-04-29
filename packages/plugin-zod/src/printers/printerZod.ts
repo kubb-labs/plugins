@@ -65,6 +65,9 @@ export type PrinterZodOptions = {
   nodes?: PrinterZodNodes
 }
 
+/**
+ * Factory options for the Zod printer, defining input/output types and configuration.
+ */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
 /**
