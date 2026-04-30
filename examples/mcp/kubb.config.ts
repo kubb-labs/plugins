@@ -17,7 +17,7 @@ export default defineConfig(() => {
     output: {
       path: './src/gen',
       clean: true,
-      barrelType: 'all',
+      barrel: { type: 'all' },
       extension: {
         '.ts': '.js',
       },
@@ -26,7 +26,7 @@ export default defineConfig(() => {
     },
     plugins: [
       pluginTs({
-        output: { path: 'models/ts', barrelType: 'named' },
+        output: { path: 'models/ts', barrel: { type: 'named' } },
       }),
       pluginZod({}),
       pluginMcp({

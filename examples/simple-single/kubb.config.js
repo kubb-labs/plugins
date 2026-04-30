@@ -15,7 +15,7 @@ export default defineConfig([
     output: {
       path: './src/gen',
       clean: true,
-      barrelType: 'named',
+      barrel: { type: 'named' },
       extension: {
         '.ts': '',
       },

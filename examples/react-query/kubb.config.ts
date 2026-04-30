@@ -12,7 +12,7 @@ export const config = {
   output: {
     path: './src/gen',
     clean: true,
-    barrelType: 'named',
+    barrel: { type: 'named' },
     defaultBanner: 'simple' as const,
     format: false,
     lint: false,
@@ -24,7 +24,7 @@ export const config = {
     pluginTs({
       output: {
         path: 'models',
-        barrelType: 'named',
+        barrel: { type: 'named' },
         banner(oas) {
           return `// version: ${oas?.meta?.version || 'unknown'}`
         },
@@ -44,7 +44,7 @@ export const config = {
       },
       output: {
         path: './hooks',
-        barrelType: 'named',
+        barrel: { type: 'named' },
       },
       group: {
         type: 'path',
