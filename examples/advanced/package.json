@@ -40,14 +40,14 @@
     "@tanstack/vue-query": "^5.100.6",
     "@types/react": "catalog:",
     "axios": "^1.15.2",
-    "cypress": "^15.14.1",
-    "msw": "^2.14.0",
+    "cypress": "^15.14.2",
+    "msw": "^2.14.2",
     "react": "^19.2.5",
     "solid-js": "^1.9.12",
     "svelte": "^5.55.5",
     "swr": "^2.4.1",
     "vue": "^3.5.33",
-    "zod": "^4.3.6"
+    "zod": "^4.4.1"
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",

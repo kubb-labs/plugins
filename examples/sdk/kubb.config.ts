@@ -26,7 +26,7 @@ export default defineConfig({
     pluginClient({
       output: {
         path: './sdk',
-        barrelType: 'propagate',
+        barrel: { type: 'all', nested: true },
       },
       client: 'fetch',
       group: { type: 'tag' },

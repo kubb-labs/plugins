@@ -11,7 +11,7 @@ export type Category = {
      * @example 1
      * @type integer | undefined
     */
-    id?: number;
+    id?: bigint;
     /**
      * @example Dogs
      * @type string | undefined

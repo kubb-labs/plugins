@@ -8,8 +8,8 @@ import { faker } from '@faker-js/faker'
 
 export function order(data?: Partial<Order>): Required<Order> {
   const defaultFakeData = {
-    id: faker.number.int(),
-    petId: faker.number.int(),
+    id: faker.number.bigInt(),
+    petId: faker.number.bigInt(),
     quantity: faker.number.int(),
     shipDateTime: faker.date.anytime().toISOString(),
     shipDate: faker.date.anytime().toISOString().substring(0, 10),

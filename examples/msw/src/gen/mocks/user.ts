@@ -9,7 +9,7 @@ import { faker } from '@faker-js/faker'
 export function user(data?: Partial<User>): Required<User> {
   faker.seed([220])
   const defaultFakeData = {
-    id: faker.number.int(),
+    id: faker.number.bigInt(),
     username: faker.string.alpha(),
     firstName: faker.string.alpha(),
     lastName: faker.string.alpha(),

@@ -3,7 +3,7 @@
 /**
  * @type integer
 */
-export type GetItemPathId = number;
+export type GetItemPathId = bigint;
 
 /**
  * @description A simple item

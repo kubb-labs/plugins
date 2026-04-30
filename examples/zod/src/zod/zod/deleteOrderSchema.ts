@@ -5,7 +5,7 @@
 
 import { z } from '../../zod.ts'
 
-export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
+export const deleteOrderPathOrderIdSchema = z.bigint().describe('ID of the order that needs to be deleted')
 
 export type DeleteOrderPathOrderIdSchema = z.infer<typeof deleteOrderPathOrderIdSchema>
 

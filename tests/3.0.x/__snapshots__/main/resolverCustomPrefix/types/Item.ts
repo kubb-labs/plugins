@@ -9,7 +9,7 @@ export type CustomItem = {
      * @description Unique identifier
      * @type integer
     */
-    id: number;
+    id: bigint;
     /**
      * @description Display name
      * @type string

@@ -9,8 +9,8 @@ import { faker } from '@faker-js/faker'
 export function order(data?: Partial<Order>): Required<Order> {
   faker.seed([220])
   const defaultFakeData = {
-    id: faker.number.int(),
-    petId: faker.number.int(),
+    id: faker.number.bigInt(),
+    petId: faker.number.bigInt(),
     quantity: faker.number.int(),
     shipDate: faker.date.anytime().toISOString(),
     status: faker.helpers.arrayElement<NonNullable<Order>['status']>(['placed', 'approved', 'delivered']),

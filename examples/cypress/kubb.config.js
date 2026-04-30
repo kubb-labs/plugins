@@ -12,7 +12,7 @@ export default defineConfig([
       clean: true,
       lint: false,
       format: false,
-      barrelType: 'named',
+      barrel: { type: 'named' },
     },
     plugins: [
       pluginTs({
