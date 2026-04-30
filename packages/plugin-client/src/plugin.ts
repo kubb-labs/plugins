@@ -16,24 +16,20 @@ import { source as configSource } from './templates/config.source.ts'
 import type { PluginClient } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-client`, used to identify the plugin
- * in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-client`, used in driver lookups and warnings.
  */
 export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 
 /**
- * The `@kubb/plugin-client` plugin factory.
+ * Generates type-safe HTTP client functions or classes from an OpenAPI specification.
+ * Creates client APIs by walking operations and delegating to generators.
+ * Writes barrel files based on the configured `barrelType`.
  *
- * Generates type-safe HTTP client functions (or classes) from an OpenAPI/AST `RootNode`.
- * Walks operations, delegates rendering to the active generators,
- * and writes barrel files based on `output.barrelType`.
- *
- * @example
+ * @example Client generator
  * ```ts
  * import pluginClient from '@kubb/plugin-client'
- *
  * export default defineConfig({
- *   plugins: [pluginClient({ output: { path: 'clients' } })],
+ *   plugins: [pluginClient({ output: { path: 'clients' } })]
  * })
  * ```
  */

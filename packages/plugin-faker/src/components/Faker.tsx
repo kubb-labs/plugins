@@ -77,13 +77,37 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
     functionSignature = `${jsdoc}export function ${name}(data?: Partial<${typeName}>): Required<${typeName}>`
 
     const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
-    functionBody = `{
+
+    // When the object node has properties that transitively reference a cyclic schema,
+    // the printer emits memoizing getters for those properties. Spreading the object
+    // literal would immediately invoke those getters, triggering recursive faker calls
+    // and causing a stack overflow. Detect this upfront via ast helpers so we can
+    // use Object.defineProperty-based merging instead of spread.
+    const { cyclicSchemas, schemaName } = printer.options
+    const hasGetters =
+      node.type === 'object' &&
+      !!cyclicSchemas &&
+      (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+
+    if (hasGetters) {
+      functionBody = `{
+  ${seedCode}const defaultFakeData = ${fakerText}
+  if (data) {
+    for (const [key, value] of Object.entries(data)) {
+      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
+    }
+  }
+  return defaultFakeData as Required<${typeName}>
+}`
+    } else {
+      functionBody = `{
   ${seedCode}const defaultFakeData = ${fakerText}
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Required<${typeName}>
 }`
+    }
   } else {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'

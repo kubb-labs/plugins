@@ -22,7 +22,7 @@ export type Pet = {
      * @example 10
      * @type integer | undefined
     */
-    id?: number;
+    id?: bigint;
     /**
      * @example doggie
      * @type string

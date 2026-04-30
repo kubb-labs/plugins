@@ -2,56 +2,64 @@ import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginF
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
- * Default resolver contract for `@kubb/plugin-faker`.
+ * Resolver for Faker that provides naming methods for mock functions.
  */
 export type ResolverFaker = Resolver &
   ast.OperationParamsResolver & {
     /**
-     * Resolves the generated faker function name for a named schema.
-     * @example
-     * resolver.resolveName('show pet by id') // -> 'showPetById'
+     * Resolves the faker function name for a schema.
+     *
+     * @example Resolving faker function names
+     * `resolver.resolveName('show pet by id') // -> 'showPetById'`
      */
     resolveName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
     /**
-     * Resolves the output file name/path for a generated faker module.
-     * @example
-     * resolver.resolvePathName('show pet by id', 'file') // -> 'showPetById'
+     * Resolves the output file name for a faker module.
+     *
+     * @example Resolving faker file names
+     * `resolver.resolvePathName('show pet by id', 'file') // -> 'showPetById'`
      */
     resolvePathName(this: ResolverFaker, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
     /**
-     * Resolves the faker function name for an operation request body.
-     * @example
-     * resolver.resolveDataName(node) // -> 'createPetsData'
+     * Resolves the faker function name for a request body.
+     *
+     * @example Resolving data function names
+     * `resolver.resolveDataName(node) // -> 'createPetsData'`
      */
     resolveDataName(this: ResolverFaker, node: ast.OperationNode): string
     /**
-     * Resolves the faker function name for an operation response by status code.
-     * @example
-     * resolver.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'
+     * Resolves the faker function name for a response by status code.
+     *
+     * @example Response status names
+     * `resolver.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'`
      */
     resolveResponseStatusName(this: ResolverFaker, node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
-     * Resolves the faker function name for the operation response union.
-     * @example
-     * resolver.resolveResponseName(node) // -> 'listPetsResponse'
+     * Resolves the faker function name for the response union.
+     *
+     * @example Response union names
+     * `resolver.resolveResponseName(node) // -> 'listPetsResponse'`
      */
     resolveResponseName(this: ResolverFaker, node: ast.OperationNode): string
     /**
-     * Resolves the faker function name for grouped path params or a single path param.
-     * @example
-     * resolver.resolvePathParamsName(node, param) // -> 'showPetByIdPathPetId'
+     * Resolves the faker function name for path parameters.
+     *
+     * @example Path parameters names
+     * `resolver.resolvePathParamsName(node, param) // -> 'showPetByIdPathPetId'`
      */
     resolvePathParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
-     * Resolves the faker function name for grouped query params or a single query param.
-     * @example
-     * resolver.resolveQueryParamsName(node, param) // -> 'listPetsQueryLimit'
+     * Resolves the faker function name for query parameters.
+     *
+     * @example Query parameters names
+     * `resolver.resolveQueryParamsName(node, param) // -> 'listPetsQueryLimit'`
      */
     resolveQueryParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
-     * Resolves the faker function name for grouped header params or a single header param.
-     * @example
-     * resolver.resolveHeaderParamsName(node, param) // -> 'deletePetHeaderApiKey'
+     * Resolves the faker function name for header parameters.
+     *
+     * @example Header parameters names
+     * `resolver.resolveHeaderParamsName(node, param) // -> 'deletePetHeaderApiKey'`
      */
     resolveHeaderParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
   }
@@ -67,29 +75,26 @@ export type Options = {
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Tags, operations, or paths to include in generation.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Which parser should be used when date/time values are represented as strings.
-   * - 'faker' uses faker's built-in ISO formatting.
-   * - 'dayjs' uses dayjs for custom formatting.
-   * - 'moment' uses moment for custom formatting.
+   * Parser to use when formatting date/time values as strings.
+   *
    * @default 'faker'
    */
   dateParser?: 'faker' | 'dayjs' | 'moment' | (string & {})
   /**
-   * Choose which generator to use when using RegExp patterns.
-   * - 'faker' uses faker.helpers.fromRegExp.
-   * - 'randexp' uses RandExp.
+   * Generator to use for RegExp patterns.
+   *
    * @default 'faker'
    */
   regexGenerator?: 'faker' | 'randexp'
@@ -98,27 +103,39 @@ export type Options = {
    */
   mapper?: Record<string, string>
   /**
+   * Locale for generating mock data.
+   * Imports the matching localized `@faker-js/faker` instance so names, addresses,
+   * and phone numbers reflect the target region.
+   *
+   * @default 'en'
+   *
+   * @example German
+   * `locale: 'de'`
+   *
+   * @example Austrian German
+   * `locale: 'de_AT'`
+   *
+   * @see https://fakerjs.dev/api/localization.html
+   */
+  locale?: string
+  /**
    * Seed faker for deterministic output.
    */
   seed?: number | number[]
   /**
-   * Transform parameter names to a specific casing format.
-   * When set to 'camelcase', parameter names in path, query, and header params will be transformed to camelCase.
-   * This should match the paramsCasing setting used in @kubb/plugin-ts.
-   * @default undefined
+   * Apply casing to parameter names to match your configuration.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Define additional generators next to the faker generators.
+   * Additional generators alongside the default generators.
    */
   generators?: Array<Generator<PluginFaker>>
   /**
-   * Override individual resolver methods. Any method you omit falls back to the
-   * active preset resolver.
+   * Override naming conventions for function names and types.
    */
   resolver?: Partial<ResolverFaker> & ThisType<ResolverFaker>
   /**
-   * Single AST visitor applied to each node before rendering.
+   * AST visitor to transform generated nodes.
    */
   transformer?: ast.Visitor
   /**
@@ -139,6 +156,7 @@ type ResolvedOptions = {
   regexGenerator: NonNullable<Options['regexGenerator']>
   mapper: NonNullable<Options['mapper']>
   seed: NonNullable<Options['seed']> | undefined
+  locale: Options['locale']
   paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }

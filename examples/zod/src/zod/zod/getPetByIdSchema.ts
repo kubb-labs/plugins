@@ -6,7 +6,7 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema.ts'
 
-export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
+export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
 
 export type GetPetByIdPathPetIdSchema = z.infer<typeof getPetByIdPathPetIdSchema>
 

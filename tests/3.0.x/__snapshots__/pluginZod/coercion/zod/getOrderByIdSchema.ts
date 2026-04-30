@@ -6,7 +6,7 @@
 import * as z from "zod";
 import { orderSchema } from "./orderSchema.ts";
 
-export const getOrderByIdPathOrderIdSchema = z.coerce.number().int().describe("ID of order that needs to be fetched")
+export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().describe("ID of order that needs to be fetched")
 
 export const getOrderByIdStatus200Schema = orderSchema
 

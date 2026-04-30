@@ -12,7 +12,7 @@ export type Item = {
      * @example test
      * @type integer
     */
-    id: number;
+    id: bigint;
     /**
      * @example test
      * @type string

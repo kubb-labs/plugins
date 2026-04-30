@@ -5,7 +5,7 @@
 
 import { z } from '../../zod.ts'
 
-export const updatePetWithFormPathPetIdSchema = z.int().describe('ID of pet that needs to be updated')
+export const updatePetWithFormPathPetIdSchema = z.bigint().describe('ID of pet that needs to be updated')
 
 export type UpdatePetWithFormPathPetIdSchema = z.infer<typeof updatePetWithFormPathPetIdSchema>
 

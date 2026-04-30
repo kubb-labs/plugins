@@ -6,7 +6,7 @@
 import { z } from '../../zod.ts'
 import { apiResponseSchema } from './apiResponseSchema.ts'
 
-export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
+export const uploadFilePathPetIdSchema = z.bigint().describe('ID of pet to update')
 
 export type UploadFilePathPetIdSchema = z.infer<typeof uploadFilePathPetIdSchema>
 

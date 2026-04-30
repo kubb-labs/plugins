@@ -71,6 +71,9 @@ export function formatLiteral(v: string | number | boolean): string {
   return String(v)
 }
 
+/**
+ * Numeric constraint limits for Zod schemas (min, max, and exclusive bounds).
+ */
 export type NumericConstraints = {
   min?: number
   max?: number
@@ -79,12 +82,18 @@ export type NumericConstraints = {
   multipleOf?: number
 }
 
+/**
+ * Length constraint limits for string and array schemas (min, max, and regex pattern).
+ */
 export type LengthConstraints = {
   min?: number
   max?: number
   pattern?: string
 }
 
+/**
+ * Modifier options for applying chainable methods to Zod schema values.
+ */
 export type ModifierOptions = {
   value: string
   nullable?: boolean

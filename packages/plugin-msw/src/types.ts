@@ -1,6 +1,12 @@
 import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolveNameParams, Resolver } from '@kubb/core'
 
+/**
+ * Resolver for MSW that provides naming methods for handler functions.
+ */
 export type ResolverMsw = Resolver & {
+  /**
+   * Resolves the handler function name for an operation.
+   */
   resolveName(this: ResolverMsw, name: string): string
 }
 
@@ -16,29 +22,29 @@ export type Options = {
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Tags, operations, or paths to include in generation.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
   transformers?: {
     /**
-     * Customize the names based on the type that is provided by the plugin.
+     * Override the default naming for handlers.
      */
     name?: (name: ResolveNameParams['name'], type?: ResolveNameParams['type']) => string
   }
   /**
-   * Override individual resolver methods.
+   * Override naming conventions for function names and types.
    */
   resolver?: Partial<ResolverMsw> & ThisType<ResolverMsw>
   /**
-   * Single AST visitor applied before printing.
+   * AST visitor to transform generated nodes.
    */
   transformer?: ast.Visitor
   /**
@@ -47,14 +53,13 @@ export type Options = {
    */
   handlers?: boolean
   /**
-   * Which parser should be used before returning the data to the Response of MSW.
-   * - 'data' uses your custom data to generate the data for the response.
-   * - 'faker' uses @kubb/plugin-faker to generate the data for the response.
+   * Which parser to use for generating response data.
+   *
    * @default 'data'
    */
   parser?: 'data' | 'faker'
   /**
-   * Define some generators next to the msw generators
+   * Additional generators alongside the default generators.
    */
   generators?: Array<Generator<PluginMsw>>
 }

@@ -7,7 +7,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kubb-labs/kubb.git",
+    "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "examples/vue-query"
   },
   "type": "module",
@@ -26,14 +26,14 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@tanstack/vue-query": "^5.100.5",
+    "@tanstack/vue-query": "^5.100.6",
     "axios": "^1.15.2",
     "unplugin-kubb": "catalog:",
     "vue": "^3.5.33"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
-    "msw": "^2.13.6",
+    "msw": "^2.14.2",
     "typescript": "catalog:",
     "vite": "^8.0.10"
   },

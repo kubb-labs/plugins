@@ -8,6 +8,9 @@ const { SyntaxKind, factory } = ts
 
 // https://ts-ast-viewer.com/
 
+/**
+ * TypeScript AST modifiers for common keywords (async, export, const, static).
+ */
 export const modifiers = {
   async: factory.createModifier(ts.SyntaxKind.AsyncKeyword),
   export: factory.createModifier(ts.SyntaxKind.ExportKeyword),
@@ -15,6 +18,9 @@ export const modifiers = {
   static: factory.createModifier(ts.SyntaxKind.StaticKeyword),
 } as const
 
+/**
+ * TypeScript syntax kind constants for union, literal, and string types.
+ */
 export const syntaxKind = {
   union: SyntaxKind.UnionType as 192,
   literalType: SyntaxKind.LiteralType,
@@ -40,6 +46,10 @@ function propertyName(name: string | ts.PropertyName): ts.PropertyName {
 
 const questionToken = factory.createToken(ts.SyntaxKind.QuestionToken)
 
+/**
+ * Creates a question token for optional type annotations.
+ * Pass `true` to use the cached token, or provide a pre-created token.
+ */
 export function createQuestionToken(token?: boolean | ts.QuestionToken) {
   if (!token) {
     return undefined
@@ -50,6 +60,10 @@ export function createQuestionToken(token?: boolean | ts.QuestionToken) {
   return token
 }
 
+/**
+ * Creates a TypeScript intersection type node from multiple type nodes.
+ * Returns the single node if only one is provided, or wraps in parentheses if requested.
+ */
 export function createIntersectionDeclaration({ nodes, withParentheses }: { nodes: Array<ts.TypeNode>; withParentheses?: boolean }): ts.TypeNode | null {
   if (!nodes.length) {
     return null
@@ -68,6 +82,16 @@ export function createIntersectionDeclaration({ nodes, withParentheses }: { node
   return node
 }
 
+/**
+ * Creates a TypeScript array type node.
+ * Use `arrayType: 'array'` for bracket syntax (`T[]`), or `'generic'` for `Array<T>`.
+ *
+ * @example Array bracket syntax
+ * `createArrayDeclaration({ nodes: [stringType], arrayType: 'array' }) // → string[]`
+ *
+ * @example Generic Array syntax
+ * `createArrayDeclaration({ nodes: [stringType], arrayType: 'generic' }) // → Array<string>`
+ */
 export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: Array<ts.TypeNode>; arrayType?: 'array' | 'generic' }): ts.TypeNode | null {
   if (!nodes.length) {
     return factory.createTupleTypeNode([])
@@ -95,7 +119,8 @@ export function createArrayDeclaration({ nodes, arrayType = 'array' }: { nodes: 
 
 /**
  * Minimum nodes length of 2
- * @example `string | number`
+ * @example Union type example
+ * `string | number`
  */
 export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Array<ts.TypeNode>; withParentheses?: boolean }): ts.TypeNode {
   if (!nodes.length) {
@@ -115,6 +140,10 @@ export function createUnionDeclaration({ nodes, withParentheses }: { nodes: Arra
   return node
 }
 
+/**
+ * Creates a TypeScript property signature for object/interface members.
+ * Supports optional markers, readonly modifiers, and type annotations.
+ */
 export function createPropertySignature({
   readOnly,
   modifiers = [],
@@ -136,6 +165,9 @@ export function createPropertySignature({
   )
 }
 
+/**
+ * Creates a function parameter declaration with optional markers, rest parameters, and type annotations.
+ */
 export function createParameterSignature(
   name: string | ts.BindingName,
   {
@@ -156,6 +188,10 @@ export function createParameterSignature(
   return factory.createParameterDeclaration(modifiers, dotDotDotToken, name, createQuestionToken(questionToken), type, initializer)
 }
 
+/**
+ * Creates a JSDoc comment node from an array of comment strings.
+ * Returns null if no comments are provided.
+ */
 export function createJSDoc({ comments }: { comments: string[] }) {
   if (!comments.length) {
     return null
@@ -174,7 +210,10 @@ export function createJSDoc({ comments }: { comments: string[] }) {
 }
 
 /**
- * @link https://github.com/microsoft/TypeScript/issues/44151
+ * Attaches JSDoc comments to an AST node as synthetic leading comments.
+ * Filters out undefined comments before attaching.
+ *
+ * @see https://github.com/microsoft/TypeScript/issues/44151
  */
 export function appendJSDocToNode<TNode extends ts.Node>({ node, comments }: { node: TNode; comments: Array<string | undefined> }) {
   const filteredComments = comments.filter(Boolean)
@@ -192,6 +231,10 @@ export function appendJSDocToNode<TNode extends ts.Node>({ node, comments }: { n
   return ts.addSyntheticLeadingComment(node, ts.SyntaxKind.MultiLineCommentTrivia, `${text || '*'}\n`, true)
 }
 
+/**
+ * Creates a TypeScript index signature for dynamic property access.
+ * Defines the key type (default: `string`) and value type on an object.
+ */
 export function createIndexSignature(
   type: ts.TypeNode,
   {
@@ -208,6 +251,9 @@ export function createIndexSignature(
   return factory.createIndexSignature(modifiers, [createParameterSignature(indexName, { type: indexType })], type)
 }
 
+/**
+ * Creates a TypeScript type alias declaration with optional modifiers and type parameters.
+ */
 export function createTypeAliasDeclaration({
   modifiers,
   name,
@@ -222,6 +268,9 @@ export function createTypeAliasDeclaration({
   return factory.createTypeAliasDeclaration(modifiers, name, typeParameters, type)
 }
 
+/**
+ * Creates a TypeScript interface declaration with optional modifiers, type parameters, and members.
+ */
 export function createInterfaceDeclaration({
   modifiers,
   name,
@@ -236,6 +285,10 @@ export function createInterfaceDeclaration({
   return factory.createInterfaceDeclaration(modifiers, name, typeParameters, undefined, members)
 }
 
+/**
+ * Creates a TypeScript type declaration as either a type alias or interface.
+ * Intelligently selects the syntax based on the type structure and attaches JSDoc comments.
+ */
 export function createTypeDeclaration({
   syntax,
   isExportable,
@@ -276,6 +329,9 @@ export function createTypeDeclaration({
   })
 }
 
+/**
+ * Creates a TypeScript namespace declaration (exported module).
+ */
 export function createNamespaceDeclaration({ statements, name }: { name: string; statements: ts.Statement[] }) {
   return factory.createModuleDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
@@ -286,8 +342,17 @@ export function createNamespaceDeclaration({ statements, name }: { name: string;
 }
 
 /**
- * In { propertyName: string; name?: string } is `name` being used to make the type more unique when multiple same names are used.
- * @example `import { Pet as Cat } from './Pet'`
+ * Creates an import declaration with support for default imports, named imports, namespace imports, and type-only imports.
+ * Optionally rename imported members with `propertyName` and `name` pairs.
+ *
+ * @example Default import
+ * `import Pet from './Pet'`
+ *
+ * @example Named imports with rename
+ * `import { Pet as Cat } from './Pet'`
+ *
+ * @example Namespace import
+ * `import * as Pet from './Pet'`
  */
 export function createImportDeclaration({
   name,
@@ -345,6 +410,10 @@ export function createImportDeclaration({
   )
 }
 
+/**
+ * Creates an export declaration with support for named exports, namespace exports, and type-only exports.
+ * Sorts export names alphabetically for consistent output across platforms.
+ */
 export function createExportDeclaration({
   path,
   asAlias,
@@ -410,6 +479,20 @@ function applyEnumKeyCasing(key: string, casing: 'screamingSnakeCase' | 'snakeCa
   return key
 }
 
+/**
+ * Creates a TypeScript enum declaration or equivalent construct in various formats.
+ * Returns a tuple of [name node, type node] - name node may be undefined for certain types.
+ *
+ * @example
+ * ```ts
+ * const [name, type] = createEnumDeclaration({
+ *   type: 'enum',
+ *   name: 'petType',
+ *   typeName: 'PetType',
+ *   enums: [['cat', 'cat'], ['dog', 'dog']],
+ * })
+ * ```
+ */
 export function createEnumDeclaration({
   type = 'enum',
   name,
@@ -596,6 +679,10 @@ export function createEnumDeclaration({
   ]
 }
 
+/**
+ * Creates a TypeScript `Omit<T, Keys>` type reference node.
+ * Optionally wraps the type in `NonNullable<T>` if `nonNullable` is true.
+ */
 export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array<string> | string; type: ts.TypeNode; nonNullable?: boolean }) {
   const node = nonNullable ? factory.createTypeReferenceNode(factory.createIdentifier('NonNullable'), [type]) : type
 
@@ -613,6 +700,10 @@ export function createOmitDeclaration({ keys, type, nonNullable }: { keys: Array
   return factory.createTypeReferenceNode(factory.createIdentifier('Omit'), [node, factory.createLiteralTypeNode(factory.createStringLiteral(keys))])
 }
 
+/**
+ * Pre-built TypeScript keyword type nodes for common primitive types.
+ * Use these to avoid repeatedly creating the same type nodes.
+ */
 export const keywordTypeNodes = {
   any: factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
   unknown: factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
@@ -671,28 +762,94 @@ export function createUrlTemplateType(path: string): ts.TypeNode {
   return ts.factory.createTemplateLiteralType(head, templateSpans)
 }
 
+/**
+ * Creates a TypeScript type literal node (anonymous object type).
+ */
 export const createTypeLiteralNode = factory.createTypeLiteralNode
 
+/**
+ * Creates a TypeScript type reference node (e.g., `Array<string>`, `Record<K, V>`).
+ */
 export const createTypeReferenceNode = factory.createTypeReferenceNode
+
+/**
+ * Creates a numeric literal type node.
+ */
 export const createNumericLiteral = factory.createNumericLiteral
+
+/**
+ * Creates a string literal type node.
+ */
 export const createStringLiteral = factory.createStringLiteral
 
+/**
+ * Creates an array type node (e.g., `T[]`).
+ */
 export const createArrayTypeNode = factory.createArrayTypeNode
+
+/**
+ * Creates a parenthesized type node to control operator precedence.
+ */
 export const createParenthesizedType = factory.createParenthesizedType
 
+/**
+ * Creates a literal type node (e.g., `'hello'`, `42`, `true`).
+ */
 export const createLiteralTypeNode = factory.createLiteralTypeNode
+
+/**
+ * Creates a null literal type node.
+ */
 export const createNull = factory.createNull
+
+/**
+ * Creates an identifier node.
+ */
 export const createIdentifier = factory.createIdentifier
 
+/**
+ * Creates an optional type node (e.g., `T | undefined`).
+ */
 export const createOptionalTypeNode = factory.createOptionalTypeNode
+
+/**
+ * Creates a tuple type node (e.g., `[string, number]`).
+ */
 export const createTupleTypeNode = factory.createTupleTypeNode
+
+/**
+ * Creates a rest type node for variadic tuple elements (e.g., `...T[]`).
+ */
 export const createRestTypeNode = factory.createRestTypeNode
+
+/**
+ * Creates a boolean true literal type node.
+ */
 export const createTrue = factory.createTrue
+
+/**
+ * Creates a boolean false literal type node.
+ */
 export const createFalse = factory.createFalse
+
+/**
+ * Creates an indexed access type node (e.g., `T[K]`).
+ */
 export const createIndexedAccessTypeNode = factory.createIndexedAccessTypeNode
+
+/**
+ * Creates a type operator node (e.g., `keyof T`, `readonly T[]`).
+ */
 export const createTypeOperatorNode = factory.createTypeOperatorNode
+
+/**
+ * Creates a prefix unary expression (e.g., negative numbers, logical not).
+ */
 export const createPrefixUnaryExpression = factory.createPrefixUnaryExpression
 
+/**
+ * Exports TypeScript SyntaxKind enum for AST node type checking.
+ */
 export { SyntaxKind }
 
 // ─── Printer helpers ──────────────────────────────────────────────────────────

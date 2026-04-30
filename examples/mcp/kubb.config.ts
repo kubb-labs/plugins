@@ -10,21 +10,23 @@ export default defineConfig(() => {
     input: {
       path: './petStore.yaml',
     },
-    adapter: adapterOas({ validate: false }),
+    adapter: adapterOas({ validate: false, integerType: 'number' }),
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },
     output: {
       path: './src/gen',
       clean: true,
-      barrelType: 'all',
+      barrel: { type: 'all' },
       extension: {
         '.ts': '.js',
       },
+      format: false,
+      lint: false,
     },
     plugins: [
       pluginTs({
-        output: { path: 'models/ts', barrelType: 'named' },
+        output: { path: 'models/ts', barrel: { type: 'named' } },
       }),
       pluginZod({}),
       pluginMcp({

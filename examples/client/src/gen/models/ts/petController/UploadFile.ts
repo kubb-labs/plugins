@@ -9,7 +9,7 @@ import type { ApiResponse } from '../ApiResponse.js'
  * @description ID of pet to update
  * @type integer
  */
-export type UploadFilePathPetId = number
+export type UploadFilePathPetId = bigint
 
 /**
  * @description Additional Metadata

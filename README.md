@@ -1,21 +1,23 @@
 <div align="center">
   <h1>Kubb Plugins</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
+    <img width="180" src="./assets/logo.png" alt="Kubb logo">
   </a>
 
-  <p>Official plugins for <a href="https://kubb.dev">Kubb</a> - Generate type-safe SDKs from OpenAPI specifications.</p>
+  <p><strong>Official and community plugins for <a href="https://kubb.dev">Kubb</a>.</strong></p>
 
 [![License][license-src]][license-href]
 </div>
 
 ## Overview
 
-This monorepo contains all official Kubb plugins for code generation from OpenAPI specifications. It follows the same monorepo structure used in the main [kubb-labs/kubb](https://github.com/kubb-labs/kubb) repository.
+This monorepo is the home for **official and community plugins** for [Kubb](https://kubb.dev) — the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates everything you need: TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
 
-## Packages
+Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
+## Official Plugins
+
+Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
 
 ### TypeScript
 
@@ -56,6 +58,12 @@ Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/
 |---------|---------|-------------|
 | [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://www.npmjs.com/package/@kubb/plugin-redoc) | ReDoc API documentation generation |
 | [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://www.npmjs.com/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
+
+## Community Plugins
+
+Plugins built and maintained by the community. Want to add yours? See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+> No community plugins listed yet — be the first to [contribute one](./CONTRIBUTING.md#adding-a-plugin)!
 
 ## Examples
 
@@ -136,33 +144,7 @@ pnpm typecheck
 
 ## Contributing
 
-Want to contribute to a plugin or add a new one? Here's how:
-
-1. **Create your package** under `packages/` following the existing plugin layout:
-   ```
-   packages/
-   └── plugin-your-name/
-       ├── src/
-       │   ├── index.ts
-       │   ├── plugin.ts
-       │   └── generators/
-       ├── package.json
-       ├── tsconfig.json
-       ├── tsdown.config.ts
-       └── vitest.config.ts
-   ```
-
-2. **Use the same tooling conventions**:
-   - `tsdown` for building
-   - `vitest` for testing
-   - `oxlint` for linting/formatting
-   - Extend `../../tsconfig.json` in your `tsconfig.json`
-
-3. **Add an example** under `examples/` that demonstrates your plugin.
-
-4. **Open a pull request** with your changes.
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for full details.
+Want to contribute to an existing plugin or add a new one — official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 

@@ -11,12 +11,12 @@ export type Order = {
    * @example 10
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @example 198772
    * @type integer | undefined
    */
-  petId: number | undefined
+  petId: bigint | undefined
   /**
    * @type object | undefined
    */
@@ -96,7 +96,7 @@ export type Customer = {
    * @example 100000
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @type object | undefined
    */
@@ -151,7 +151,7 @@ export type Category = {
    * @example 1
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @example Dogs
    * @type string | undefined
@@ -167,7 +167,7 @@ export type User = {
    * @example 10
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @example theUser
    * @type string | undefined
@@ -213,7 +213,7 @@ export type Tag = {
   /**
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @type string | undefined
    */
@@ -268,7 +268,7 @@ export type Pet = (
    * @example 10
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @type string
    */
@@ -316,7 +316,7 @@ export type AddPetRequest = {
    * @example 10
    * @type integer | undefined
    */
-  id: number | undefined
+  id: bigint | undefined
   /**
    * @example doggie
    * @type string
@@ -621,7 +621,7 @@ export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsSta
  * @description ID of pet to return
  * @type integer
  */
-export type GetPetByIdPathPetId = number
+export type GetPetByIdPathPetId = bigint
 
 export type GetPetByIdStatus200 = Pet
 
@@ -672,7 +672,7 @@ export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | Get
  * @description ID of pet that needs to be updated
  * @type integer
  */
-export type UpdatePetWithFormPathPetId = number
+export type UpdatePetWithFormPathPetId = bigint
 
 /**
  * @description Name of pet that needs to be updated
@@ -739,7 +739,7 @@ export type DeletePetHeaderApiKey = string | undefined
  * @description Pet id to delete
  * @type integer
  */
-export type DeletePetPathPetId = number
+export type DeletePetPathPetId = bigint
 
 /**
  * @type array
@@ -794,7 +794,7 @@ export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
  * @description ID of pet to update
  * @type integer
  */
-export type UploadFilePathPetId = number
+export type UploadFilePathPetId = bigint
 
 /**
  * @description Additional Metadata
@@ -996,7 +996,7 @@ export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatch
  * @description ID of order that needs to be fetched
  * @type integer
  */
-export type GetOrderByIdPathOrderId = number
+export type GetOrderByIdPathOrderId = bigint
 
 /**
  * @type object
@@ -1050,7 +1050,7 @@ export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400
  * @description ID of the order that needs to be deleted
  * @type integer
  */
-export type DeleteOrderPathOrderId = number
+export type DeleteOrderPathOrderId = bigint
 
 /**
  * @type any

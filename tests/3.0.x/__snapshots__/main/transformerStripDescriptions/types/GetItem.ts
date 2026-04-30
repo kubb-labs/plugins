@@ -9,7 +9,7 @@ import type { Item } from "./Item.ts";
  * @example test
  * @type integer
 */
-export type GetItemPathId = number;
+export type GetItemPathId = bigint;
 
 /**
  * @example test

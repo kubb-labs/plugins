@@ -25,14 +25,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
-          output: { path: './mcp', barrelType: false },
+          output: { path: './mcp', barrel: false },
         }),
       ],
     },
@@ -44,14 +44,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
-          output: { path: './mcp', barrelType: false },
+          output: { path: './mcp', barrel: false },
           paramsCasing: 'camelcase',
         }),
       ],
@@ -64,14 +64,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
-          output: { path: './mcp', barrelType: false },
+          output: { path: './mcp', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -85,14 +85,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
-          output: { path: './mcp', barrelType: false },
+          output: { path: './mcp', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -105,14 +105,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
-          output: { path: './mcp', barrelType: false },
+          output: { path: './mcp', barrel: false },
           group: { type: 'tag' },
         }),
       ],

@@ -13,7 +13,6 @@ import { zodGenerator } from './zodGenerator.tsx'
 const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
 
 const defaultOptions: PluginZod['resolvedOptions'] = {
-  dateType: 'string',
   typed: false,
   inferred: false,
   importPath: 'zod',
@@ -281,7 +280,7 @@ describe('zodGenerator — Schema', () => {
 
     await renderGeneratorSchema(zodGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options,
@@ -298,6 +297,7 @@ describe('zodGenerator — Schema', () => {
     await renderGeneratorSchema(zodGenerator, catCycleSchema, {
       config: testConfig,
       adapter: createMockedAdapter({
+        resolvedOptions: { dateType: 'string' },
         inputNode: {
           kind: 'Input',
           schemas: [petPolySchema, catCycleSchema],
@@ -555,7 +555,7 @@ describe('zodGenerator — Operation', () => {
 
     await renderGeneratorOperation(zodGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options,
@@ -608,7 +608,7 @@ describe('zodGenerator — Operation — group', () => {
 
     await renderGeneratorOperation(zodGenerator, node, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options,
@@ -631,7 +631,7 @@ describe('zodGenerator — paramsCasing', () => {
 
     await renderGeneratorOperation(zodGenerator, operationWithSnakeCaseParams, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options,
@@ -648,7 +648,7 @@ describe('zodGenerator — paramsCasing', () => {
 
     await renderGeneratorOperation(zodGenerator, operationWithSnakeCaseParams, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options,
@@ -674,7 +674,7 @@ describe('zodGenerator — transformers', () => {
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options: defaultOptions,
@@ -707,7 +707,7 @@ describe('zodGenerator — transformers', () => {
 
     await renderGeneratorSchema(zodGenerator, schemaWithInteger, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
       driver,
       plugin,
       options: defaultOptions,

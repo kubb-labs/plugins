@@ -7,7 +7,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kubb-labs/kubb.git",
+    "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "examples/msw"
   },
   "type": "module",
@@ -30,7 +30,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "@mswjs/http-middleware": "^0.10.3",
     "kubb": "catalog:",
-    "msw": "^2.13.6",
+    "msw": "^2.14.2",
     "react": "^19.2.5"
   },
   "devDependencies": {

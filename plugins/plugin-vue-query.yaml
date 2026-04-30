@@ -1,7 +1,7 @@
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-vue-query
 name: Vue Query
-description: Generate Vue Query composables from OpenAPI specifications for type-safe data fetching in Vue.js applications.
+description: Generate Vue Query composables from OpenAPI specifications.
 category: framework
 type: official
 npmPackage: '@kubb/plugin-vue-query'
@@ -37,7 +37,7 @@ icon:
 intro: |
   # @kubb/plugin-vue-query
 
-  Generate Vue Query hooks from your OpenAPI schema.
+  Generate type-safe Vue Query composables from your OpenAPI schema for data fetching, caching, and synchronization.
 
 options:
   - name: output
@@ -62,7 +62,7 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+        description: Return the name of a group based on the group name. This is used for file and identifier generation.
 
   - name: client
     type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
@@ -85,9 +85,7 @@ options:
     required: false
     default: 'false'
     description: |
-      When set, an `infiniteQuery` hook will be added.
-
-      To disable infinite queries pass `false`.
+      Generate an `infiniteQuery` composable for paginated queries. Pass `false` to disable.
     typeDefinition: |
       type Infinite = {
         /**

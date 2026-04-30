@@ -20,12 +20,14 @@ export default defineConfig({
   adapter: adapterOas({
     validate: true,
     discriminator: 'strict',
+    integerType: 'number',
   }),
   output: {
     path: './src/gen',
     clean: true,
-    barrelType: 'named',
+    barrel: { type: 'named' },
     defaultBanner: false,
+    lint: false,
     format: 'oxfmt',
   },
   hooks: {
@@ -143,7 +145,7 @@ export default defineConfig({
     pluginMcp({
       output: {
         path: './mcp',
-        barrelType: false,
+        barrel: false,
       },
       exclude: [
         {
@@ -181,7 +183,7 @@ export default defineConfig({
     pluginCypress({
       output: {
         path: 'cypress',
-        barrelType: false,
+        barrel: false,
       },
       group: { type: 'tag' },
       paramsCasing: 'camelcase',

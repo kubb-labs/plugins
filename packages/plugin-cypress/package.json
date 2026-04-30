@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0-alpha.56",
+  "version": "5.0.0-beta.3",
   "description": "Cypress test generator plugin for Kubb, creating end-to-end tests from OpenAPI specifications for automated API testing.",
   "keywords": [
     "api-testing",
@@ -24,7 +24,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
     "directory": "packages/plugin-cypress"
   },
   "files": [

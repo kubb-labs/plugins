@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-mcp",
-  "version": "5.0.0-alpha.56",
+  "version": "5.0.0-beta.3",
   "description": "Model Context Protocol (MCP) plugin for Kubb, generating MCP-compatible tools and schemas from OpenAPI specifications for AI assistants.",
   "keywords": [
     "ai",
@@ -21,7 +21,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
     "directory": "packages/plugin-mcp"
   },
   "files": [

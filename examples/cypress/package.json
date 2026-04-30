@@ -7,7 +7,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kubb-labs/kubb.git",
+    "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "examples/cypress"
   },
   "type": "module",
@@ -28,7 +28,7 @@
     "react": "^19.2.5"
   },
   "devDependencies": {
-    "cypress": "^15.14.1",
+    "cypress": "^15.14.2",
     "typescript": "catalog:"
   },
   "engines": {

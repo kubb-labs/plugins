@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-redoc",
-  "version": "5.0.0-alpha.56",
+  "version": "5.0.0-beta.3",
   "description": "Redoc documentation generator plugin for Kubb, creating beautiful, interactive API documentation from OpenAPI specifications.",
   "keywords": [
     "api-docs",
@@ -19,7 +19,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
     "directory": "packages/plugin-redoc"
   },
   "files": [

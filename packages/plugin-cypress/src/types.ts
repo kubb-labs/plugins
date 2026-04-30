@@ -1,53 +1,40 @@
 import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
- * The concrete resolver type for `@kubb/plugin-cypress`.
- * Extends the base `Resolver` with a `resolveName` helper for operation function names.
+ * Resolver for Cypress that provides naming methods for test functions.
  */
 export type ResolverCypress = Resolver & {
   /**
-   * Resolves the function name for a given raw operation name.
-   * @example
-   * resolver.resolveName('show pet by id') // -> 'showPetById'
+   * Resolves the function name for an operation.
+   *
+   * @example Resolving function names
+   * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverCypress, name: string): string
 }
 
 /**
- * Discriminated union that ties `pathParamsType` to the `paramsType` values where it is meaningful.
- *
- * - `paramsType: 'object'` — all parameters (including path params) are merged into a single
- *   destructured object. `pathParamsType` is never reached in this code path and has no effect.
- * - `paramsType?: 'inline'` (or omitted) — each parameter group is a separate function argument.
- *   `pathParamsType` controls whether the path-param group itself is destructured (`'object'`)
- *   or spread as individual arguments (`'inline'`).
+ * Parameter handling mode that determines how path params and query/body params are arranged in function signatures.
  */
 type ParamsTypeOptions =
   | {
       /**
-       * All parameters — path, query, headers, and body — are merged into a single
-       * destructured object argument.
-       * - 'object' returns the params and pathParams as an object.
-       * @default 'inline'
+       * All parameters merged into a single destructured object.
        */
       paramsType: 'object'
       /**
-       * `pathParamsType` has no effect when `paramsType` is `'object'`.
-       * Path params are already inside the single destructured object.
+       * Not applicable when all parameters are merged into a single object.
        */
       pathParamsType?: never
     }
   | {
       /**
-       * Each parameter group is emitted as a separate function argument.
-       * - 'inline' returns the params as comma separated params.
-       * @default 'inline'
+       * Each parameter group emitted as a separate function argument.
        */
       paramsType?: 'inline'
       /**
-       * Controls how path parameters are arranged within the inline argument list.
-       * - 'object' groups path params into a destructured object: `{ petId }: PathParams`.
-       * - 'inline' emits each path param as its own argument: `petId: string`.
+       * How path parameters are arranged: grouped in an object or spread inline.
+       *
        * @default 'inline'
        */
       pathParamsType?: 'object' | 'inline'
@@ -60,15 +47,13 @@ export type Options = {
    */
   output?: Output
   /**
-   * Return type when calling cy.request.
-   * - 'data' returns ResponseConfig[data].
-   * - 'full' returns ResponseConfig.
+   * Return type when calling cy.request: response data only or full response.
+   *
    * @default 'data'
    */
   dataReturnType?: 'data' | 'full'
   /**
-   * How to style your params, by default no casing is applied.
-   * - 'camelcase' uses camelCase for the params names.
+   * Apply casing to parameter names.
    */
   paramsCasing?: 'camelcase'
   /**
@@ -80,29 +65,27 @@ export type Options = {
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Tags, operations, or paths to include in generation.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * A single resolver whose methods override the default resolver's naming conventions.
-   * When a method returns `null` or `undefined`, the default resolver's result is used instead.
+   * Override naming conventions for function names and types.
    */
   resolver?: Partial<ResolverCypress> & ThisType<ResolverCypress>
   /**
-   * A single AST visitor applied before printing.
-   * When a visitor method returns `null` or `undefined`, the preset transformer's result is used instead.
+   * AST visitor to transform generated nodes.
    */
   transformer?: ast.Visitor
   /**
-   * Define some generators next to the default generators.
+   * Additional generators alongside the default generators.
    */
   generators?: Array<Generator<PluginCypress>>
 } & ParamsTypeOptions

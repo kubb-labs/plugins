@@ -3,8 +3,7 @@ import type { PrinterZodNodes } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
 
 /**
- * The concrete resolver type for `@kubb/plugin-zod`.
- * Extends the base `Resolver` with zod-specific naming helpers.
+ * Resolver for Zod that provides naming methods for schema types.
  */
 export type ResolverZod = Resolver &
   ast.OperationParamsResolver & {
@@ -13,69 +12,63 @@ export type ResolverZod = Resolver &
      */
     resolveSchemaName(this: ResolverZod, name: string): string
     /**
-     * Resolves the name for a `z.infer<typeof ...>` type export.
-     * Strips the trailing `Schema` suffix (added by `resolveSchemaName`) before PascalCasing.
+     * Resolves the schema type name (inferred type from schema).
      *
-     * @example
-     * resolver.resolveSchemaTypeName('pet) // → 'PetSchema'
-     * resolver.resolveSchemaTypeName('addPet200') // → 'AddPet200Schema'
-     * resolver.resolveSchemaTypeName('PetName') // → 'PetNameSchema'
+     * @example Schema type names
+     * `resolver.resolveSchemaTypeName('pet') // → 'Pet'`
      */
     resolveSchemaTypeName(this: ResolverZod, name: string): string
     /**
-     * Resolves the name for a `z.infer<typeof ...>` type export.
-     * Strips the trailing `Schema` suffix (added by `resolveSchemaName`) before PascalCasing.
+     * Resolves the generated type name from the schema.
      *
-     * @example
-     * resolver.resolveTypeName('pet') // → 'Pet'
-     * resolver.resolveTypeName('addPet200') // → 'AddPet200'
-     * resolver.resolveTypeName('PetName') // → 'PetName'
+     * @example Type names
+     * `resolver.resolveTypeName('pet') // → 'Pet'`
      */
     resolveTypeName(this: ResolverZod, name: string): string
     /**
-     * Resolves a PascalCase path/file name for the generated output.
+     * Resolves the output file name for a schema.
      */
     resolvePathName(this: ResolverZod, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
     /**
      * Resolves the name for an operation response by status code.
      *
-     * @example
-     * resolver.resolveResponseStatusName(node, 200) // → 'listPetsStatus200Schema'
+     * @example Response status names
+     * `resolver.resolveResponseStatusName(node, 200) // → 'listPetsStatus200Schema'`
      */
     resolveResponseStatusName(this: ResolverZod, node: ast.OperationNode, statusCode: ast.StatusCode): string
     /**
      * Resolves the name for the collection of all operation responses.
      *
-     * @example
-     * resolver.resolveResponsesName(node) // → 'listPetsResponsesSchema'
+     * @example Responses collection names
+     * `resolver.resolveResponsesName(node) // → 'listPetsResponsesSchema'`
      */
     resolveResponsesName(this: ResolverZod, node: ast.OperationNode): string
     /**
      * Resolves the name for the union of all operation responses.
      *
-     * @example
-     * resolver.resolveResponseName(node) // → 'listPetsResponseSchema'
+     * @example Response union names
+     * `resolver.resolveResponseName(node) // → 'listPetsResponseSchema'`
      */
     resolveResponseName(this: ResolverZod, node: ast.OperationNode): string
     /**
      * Resolves the name for an operation's grouped path parameters type.
      *
-     * @example
-     * resolver.resolvePathParamsName(node, param) // → 'deletePetPathPetIdSchema'
+     * @example Path parameters names
+     * `resolver.resolvePathParamsName(node, param) // → 'deletePetPathPetIdSchema'`
      */
     resolvePathParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped query parameters type.
      *
-     * @example
-     * resolver.resolveQueryParamsName(node, param) // → 'findPetsByStatusQueryStatusSchema'
+     * @example Query parameters names
+     * `resolver.resolveQueryParamsName(node, param) // → 'findPetsByStatusQueryStatusSchema'`
      */
     resolveQueryParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
     /**
      * Resolves the name for an operation's grouped header parameters type.
      *
-     * @example
-     * resolver.resolveHeaderParamsName(node, param) // → 'deletePetHeaderApiKeySchema'
+     * @example Header parameters names
+     * `resolver.resolveHeaderParamsName(node, param) // → 'deletePetHeaderApiKeySchema'`
      */
     resolveHeaderParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
   }
@@ -90,46 +83,33 @@ export type Options = {
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Tags, operations, or paths to exclude from generation.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Tags, operations, or paths to include in generation.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Path to Zod
-   * It used as `import { z } from '${importPath}'`.
-   * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Import path for Zod package.
+   *
    * @default 'zod'
    */
   importPath?: 'zod' | 'zod/mini' | (string & {})
   /**
-   * Choose to use date or datetime as JavaScript Date instead of string.
-   * - false falls back to a simple z.string() format.
-   * - 'string' uses z.string().datetime() for datetime validation.
-   * - 'stringOffset' uses z.string().datetime({ offset: true }) for datetime with timezone offset validation.
-   * - 'stringLocal' uses z.string().datetime({ local: true }) for local datetime validation.
-   * - 'date' uses z.date() for JavaScript Date objects.
-   * @default 'string'
-   */
-  dateType?: false | 'string' | 'stringOffset' | 'stringLocal' | 'date'
-  /**
-   * Use TypeScript(`@kubb/plugin-ts`) to add type annotation.
+   * Add TypeScript type annotations to generated schemas.
    */
   typed?: boolean
   /**
-   * Return Zod generated schema as type with z.infer<TYPE>
+   * Return schemas as inferred types using `z.infer`.
    */
   inferred?: boolean
   /**
-   * Use of z.coerce.string() instead of z.string().
-   * Can also be an object to enable coercion for dates, strings, and numbers.
+   * Apply coercion to string values or configure coercion per type.
    */
   coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
   /**
@@ -137,68 +117,43 @@ export type Options = {
    */
   operations?: boolean
   /**
-   * Which Zod GUID validator to use for OpenAPI `format: uuid`.
-   * - 'uuid' uses UUID validation.
-   * - 'guid' uses GUID validation.
+   * Validator to use for UUID format: `uuid` or `guid`.
+   *
    * @default 'uuid'
    */
   guidType?: 'uuid' | 'guid'
   /**
-   * Use Zod Mini's functional API for better tree-shaking support.
-   * When enabled, generates functional syntax (e.g., `z.optional(z.string())`)
-   * instead of chainable methods (e.g., `z.string().optional()`).
-   * When `mini: true`, `importPath` will default to 'zod/mini'.
+   * Use Zod Mini's functional API for better tree-shaking.
+   *
    * @default false
    */
   mini?: boolean
   /**
-   * Callback function to wrap the output of the generated zod schema.
+   * Callback to wrap the generated schema output.
    *
-   * Useful for edge cases like adding `.openapi()` metadata or wrapping
-   * schemas with extension helpers (openapi -> zod -> openapi round-trips).
+   * Useful for adding metadata like `.openapi()` or extension helpers.
    */
   wrapOutput?: (arg: { output: string; schema: ast.SchemaNode }) => string | undefined
   /**
-   * How to style your params, by default no casing is applied
-   * - 'camelcase' uses camelCase for pathParams, queryParams and headerParams property names
-   * @default undefined
+   * Apply casing to parameter names.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Define additional generators next to the zod generators.
+   * Additional generators alongside the default generators.
    */
   generators?: Array<Generator<PluginZod>>
   /**
-   * A single resolver whose methods override the default resolver's naming conventions.
-   * When a method returns `null` or `undefined`, the default resolver's result is used instead.
+   * Override naming conventions for schema names and types.
    */
   resolver?: Partial<ResolverZod> & ThisType<ResolverZod>
   /**
-   * Override individual printer node handlers to customize rendering of specific schema types.
-   *
-   * Each key is a `SchemaType` (e.g. `'date'`, `'string'`). The function replaces the
-   * built-in handler for that type. Use `this.transform` to recurse into nested schema nodes.
-   * When `mini: true`, the overrides apply to the Zod Mini printer.
-   *
-   * @example Override the `date` node to use `z.string().date()`
-   * ```ts
-   * pluginZod({
-   *   printer: {
-   *     nodes: {
-   *       date(node) {
-   *         return 'z.string().date()'
-   *       },
-   *     },
-   *   },
-   * })
-   * ```
+   * Override printer node handlers to customize rendering of specific schema types.
    */
   printer?: {
     nodes?: PrinterZodNodes | PrinterZodMiniNodes
   }
   /**
-   * A single AST visitor applied to each SchemaNode/OperationNode before printing.
-   * When a visitor method returns `null` or `undefined`, the preset transformer's result is used instead.
+   * AST visitor to transform schema and operation nodes.
    */
   transformer?: ast.Visitor
 }
@@ -209,7 +164,6 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | undefined
-  dateType: NonNullable<Options['dateType']>
   typed: NonNullable<Options['typed']>
   inferred: NonNullable<Options['inferred']>
   importPath: NonNullable<Options['importPath']>
