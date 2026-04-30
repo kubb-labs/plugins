@@ -2,33 +2,105 @@
 
 Kubb is a plugin-based code-generation toolkit for generating client code from OpenAPI specifications.
 
-## Folder Structure
+## Repository Structure
 
-### Packages
+```
+.
+├── packages/                # Plugin packages
+├── internals/               # Shared internal utilities
+├── examples/                # Example projects
+├── tests/                   # Test suites
+├── plugins/                 # Plugin configurations (YAML)
+├── schemas/                 # OpenAPI schema definitions
+├── docs/                    # Documentation
+├── configs/                 # Shared configurations
+├── assets/                  # Static assets
+└── .github/                 # GitHub workflows & templates
+```
+
+## Packages
+
+The `packages/` directory contains the plugin implementations:
 
 ```
 packages/
-├── plugin-oas/              # OAS plugin - OpenAPI spec parsing
 ├── plugin-ts/               # TypeScript type generation
 ├── plugin-client/           # Client generator (fetch, axios, etc.)
 ├── plugin-faker/            # Faker.js mock data generation
 ├── plugin-zod/              # Zod schema generation
 ├── plugin-msw/              # MSW mock handlers
 ├── plugin-react-query/      # React Query/TanStack Query hooks
-├── plugin-solid-query/      # Solid Query hooks
-├── plugin-svelte-query/     # Svelte Query hooks
 ├── plugin-vue-query/        # Vue Query hooks
-├── plugin-swr/              # SWR hooks
 ├── plugin-cypress/          # Cypress test generation
 ├── plugin-redoc/            # ReDoc documentation
 └── plugin-mcp/              # MCP (Model Context Protocol) integration
 ```
 
-Plugins follow this convention:
+### Plugin Structure
+
+Each plugin follows this convention:
 
 - `src/components/` - jsx-renderer components
 - `src/generators/` - Generator implementations
 - `src/*.test.ts` - Tests
+- `package.json` - Plugin configuration
+
+## Internals
+
+The `internals/` directory contains shared utilities used across plugins:
+
+```
+internals/
+├── tanstack-query/          # Shared TanStack Query utilities
+└── utils/                   # General utilities
+```
+
+## Plugin Configurations
+
+The `plugins/` directory contains YAML configuration files for each plugin:
+
+```
+plugins/
+├── _shared/                 # Shared plugin templates
+├── plugin-*.yaml            # Individual plugin configurations
+└── ...
+```
+
+## Examples
+
+The `examples/` directory contains working example projects demonstrating plugin usage:
+
+- `simple-single/` - Basic single-file example
+- `fetch/` - Fetch API client example
+- `typescript/` - TypeScript example
+- `react-query/` - React Query integration
+- `vue-query/` - Vue Query integration
+- `zod/` - Zod validation example
+- `msw/` - MSW mocking example
+- `faker/` - Faker.js data generation
+- `cypress/` - Cypress testing example
+- `generators/` - Custom generator examples
+
+## Tests
+
+The `tests/` directory contains test suites:
+
+```
+tests/
+├── e2e/                     # End-to-end tests
+├── performance/             # Performance tests
+└── 3.0.x/                   # Version-specific tests
+```
+
+## Schemas
+
+The `schemas/` directory contains OpenAPI schema definitions for testing and documentation:
+
+```
+schemas/
+├── external-refs/           # Schemas with external references
+└── 3.0.x/                   # OpenAPI 3.0.x specifications
+```
 
 ## Repository Setup
 
