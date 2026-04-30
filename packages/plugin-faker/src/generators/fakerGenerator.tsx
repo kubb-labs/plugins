@@ -16,25 +16,6 @@ import {
   rewriteAliasedImports,
 } from '../utils.ts'
 
-/**
- * Returns a stable, memoized import-name array for a locale.
- *
- * Reusing the same array and inner object reference across multiple JSX
- * renders lets `combineImports` (which uses a `Set` for deduplication) treat
- * repeated locale imports as identical — otherwise each render would create
- * new object instances that the `Set` cannot merge.
- */
-const localeImportNameCache = new Map<string, [{ propertyName: string; name: string }]>()
-function getLocaleImportNames(locale: string): [{ propertyName: string; name: string }] {
-  const key = localeToFakerImport(locale)
-  let cached = localeImportNameCache.get(key)
-  if (!cached) {
-    cached = [{ propertyName: key, name: 'faker' }]
-    localeImportNameCache.set(key, cached)
-  }
-  return cached
-}
-
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRenderer,
@@ -99,7 +80,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
         footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
-        <File.Import name={locale ? getLocaleImportNames(locale) : ['faker']} path="@faker-js/faker" />
+        <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
         {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
@@ -252,7 +233,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
         footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
-        <File.Import name={locale ? getLocaleImportNames(locale) : ['faker']} path="@faker-js/faker" />
+        <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
         {paramEntries.map(({ param, name, typeName }) =>

@@ -13,4 +13,4 @@ pluginFaker({
 })
 ```
 
-The generated output uses `import { fakerDE } from '@faker-js/faker'` and re-exports it as `faker` so all existing call sites remain unchanged.
+The generated output uses `import { fakerDE as faker } from '@faker-js/faker'` so all existing call sites remain unchanged.
