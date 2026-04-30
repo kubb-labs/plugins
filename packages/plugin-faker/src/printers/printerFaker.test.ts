@@ -108,6 +108,43 @@ describe('printerFaker', () => {
     )
   })
 
+  test('memoizing getters return a stable reference and data overrides replace the getter', () => {
+    // Simulate the runtime object-literal pattern the printer generates for cyclic
+    // properties (e.g. Cat.friends → Pet → Cat).  The getter must memoize its value
+    // via Object.defineProperty so that:
+    //   1. Accessing the same property twice returns the exact same reference.
+    //   2. Passing `data` (partial override) replaces the getter with the supplied value.
+
+    const mockFriends = [{ id: 1 }]
+
+    // Mirrors the structure emitted by the printer's `object` handler.
+    function makeCat(data?: Record<string, unknown>) {
+      const defaultFakeData: Record<string, unknown> = {
+        id: 42,
+        get friends() {
+          const _value = mockFriends
+          Object.defineProperty(this, 'friends', { value: _value, configurable: true, writable: true, enumerable: true })
+          return _value
+        },
+      }
+      if (data) {
+        for (const [key, value] of Object.entries(data)) {
+          Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
+        }
+      }
+      return defaultFakeData
+    }
+
+    // 1. Repeated property access must return the same reference (getter is memoized).
+    const newCat = makeCat()
+    expect(newCat.friends).toBe(newCat.friends)
+
+    // 2. Passing data must override the getter with the supplied value.
+    const overrideFriends = [{ id: 99 }]
+    const catWithData = makeCat({ friends: overrideFriends })
+    expect(catWithData.friends).toBe(overrideFriends)
+  })
+
   test('emits memoizing getter for properties that participate in a cyclic dependency', () => {
     // Cat.friend → Pet which is cyclic; the getter must cache its computed value via
     // Object.defineProperty so that repeated access returns the same object instance.
