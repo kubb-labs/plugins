@@ -1,7 +1,7 @@
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-redoc
 name: Redoc
-description: Generate beautiful, interactive API documentation using Redoc from OpenAPI specifications.
+description: Generate API documentation with Redoc from OpenAPI specifications.
 category: documentation
 type: official
 npmPackage: '@kubb/plugin-redoc'
@@ -31,7 +31,7 @@ featured: false
 icon:
   light: 'https://kubb.dev/feature/openapi.svg'
 intro: |
-  Generate API documentation using [Redoc](https://redocly.com/).
+  Generate interactive API documentation from your OpenAPI schema using [Redoc](https://redocly.com/).
 options:
   - name: output
     type: '{ path: string }'
@@ -41,9 +41,7 @@ options:
       - extends: ./_shared/core/output-path.yaml
         default: "'docs.html'"
         description: |
-          The output location for the generated documentation.
-
-          This plugin uses [Redocly](https://redocly.com/) for HTML generation.
+          The output file path for the generated documentation HTML.
 examples:
   - name: kubb.config.ts
     files:

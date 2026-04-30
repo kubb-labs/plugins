@@ -42,7 +42,7 @@ describe('Plugin Generation Performance', () => {
           pluginTs({
             output: {
               path: 'types',
-              barrelType: false,
+              barrel: false,
             },
             enumType: 'asConst',
           }),
@@ -75,7 +75,7 @@ describe('Plugin Generation Performance', () => {
           pluginTs({
             output: {
               path: 'types',
-              barrelType: false,
+              barrel: false,
             },
             enumType: 'asConst',
           }),
@@ -113,7 +113,7 @@ describe('Plugin Generation Performance', () => {
           pluginTs({
             output: {
               path: 'types',
-              barrelType: false,
+              barrel: false,
             },
             enumType: 'asConst',
           }),
@@ -125,7 +125,7 @@ describe('Plugin Generation Performance', () => {
           pluginZod({
             output: {
               path: 'zod',
-              barrelType: false,
+              barrel: false,
             },
             inferred: true,
           }),
@@ -139,7 +139,7 @@ describe('Plugin Generation Performance', () => {
           pluginFaker({
             output: {
               path: 'mocks',
-              barrelType: false,
+              barrel: false,
             },
           }),
         ] as Plugin[],

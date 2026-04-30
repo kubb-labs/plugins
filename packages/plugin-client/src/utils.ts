@@ -5,6 +5,10 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
+/**
+ * Extracts documentation comments from an operation node.
+ * Includes description, summary, link, and deprecation information.
+ */
 export function getComments(node: ast.OperationNode): Array<string> {
   return [
     node.description && `@description ${node.description}`,
@@ -17,6 +21,10 @@ export function getComments(node: ast.OperationNode): Array<string> {
     .filter((x): x is string => Boolean(x))
 }
 
+/**
+ * Builds a mapping of original parameter names to their transformed (cased) names.
+ * Returns undefined if no names have changed.
+ */
 export function buildParamsMapping(originalParams: Array<ast.ParameterNode>, casedParams: Array<ast.ParameterNode>): Record<string, string> | undefined {
   const mapping: Record<string, string> = {}
   let hasChanged = false
@@ -30,6 +38,10 @@ export function buildParamsMapping(originalParams: Array<ast.ParameterNode>, cas
   return hasChanged ? mapping : undefined
 }
 
+/**
+ * Builds HTTP headers array for a client request.
+ * Includes Content-Type (if not default) and spreads header parameters if present.
+ */
 export function buildHeaders(contentType: string, hasHeaderParams: boolean): Array<string> {
   return [
     contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
@@ -37,6 +49,10 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
   ].filter(Boolean) as Array<string>
 }
 
+/**
+ * Builds TypeScript generic parameters for a client method.
+ * Includes response type, error type, and optional request type.
+ */
 export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const responseName = tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
@@ -45,6 +61,10 @@ export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): 
   return [responseName, TError, requestName || 'unknown'].filter(Boolean)
 }
 
+/**
+ * Builds the parameters object for a class-based client method.
+ * Includes URL, method, base URL, headers, and request/response data.
+ */
 export function buildClassClientParams({
   node,
   path,
@@ -100,6 +120,10 @@ export function buildClassClientParams({
   })
 }
 
+/**
+ * Builds the request data parsing line for client methods.
+ * Applies Zod validation if configured, otherwise uses data directly.
+ */
 export function buildRequestDataLine({
   parser,
   node,
@@ -119,10 +143,18 @@ export function buildRequestDataLine({
   return ''
 }
 
+/**
+ * Builds the form data conversion line for file upload requests.
+ * Returns empty string if not applicable.
+ */
 export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): string {
   return isFormData && hasRequest ? 'const formData = buildFormData(requestData)' : ''
 }
 
+/**
+ * Builds the return statement for a client method.
+ * Applies Zod validation to response data if configured, otherwise returns raw response.
+ */
 export function buildReturnStatement({
   dataReturnType,
   parser,

@@ -10,14 +10,20 @@ export function cat(data?: Partial<Cat>): Required<Cat> {
   const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {
-      return faker.helpers.arrayElement<any>([null, pet()])
+      const _value = faker.helpers.arrayElement<any>([null, pet()])
+      Object.defineProperty(this, 'archEnemy', { value: _value, configurable: true, writable: true, enumerable: true })
+      return _value
     },
     get friends() {
-      return faker.helpers.multiple(() => pet())
+      const _value = faker.helpers.multiple(() => pet())
+      Object.defineProperty(this, 'friends', { value: _value, configurable: true, writable: true, enumerable: true })
+      return _value
     },
   }
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as Required<Cat>
+  if (data) {
+    for (const [key, value] of Object.entries(data)) {
+      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
+    }
+  }
+  return defaultFakeData as Required<Cat>
 }

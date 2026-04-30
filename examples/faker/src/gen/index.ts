@@ -140,12 +140,7 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
-export { address } from './faker/address.ts'
-export { apiResponse } from './faker/apiResponse.ts'
 export { category } from './faker/category.ts'
-export { customer } from './faker/customer.ts'
-export { item } from './faker/item.ts'
-export { order } from './faker/order.ts'
 export { pet } from './faker/pet.ts'
 export { tag } from './faker/tag.ts'
 export { updatePetData, updatePetResponse, updatePetStatus200, updatePetStatus400, updatePetStatus404, updatePetStatus405 } from './faker/updatePet.ts'
@@ -156,8 +151,6 @@ export {
   updatePetWithFormResponse,
   updatePetWithFormStatus405,
 } from './faker/updatePetWithForm.ts'
-export { user } from './faker/user.ts'
-export { userArray } from './faker/userArray.ts'
 export { addressIdentifierEnum } from './models/Address.ts'
 export { orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'

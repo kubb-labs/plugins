@@ -26,14 +26,14 @@ const configs = [
       adapter: adapterOas({ validate: false }),
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       parsers: [parserTs],
       plugins: [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -48,7 +48,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false, discriminator: 'inherit' }),
       parsers: [parserTs],
@@ -56,7 +56,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -71,7 +71,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -79,7 +79,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -95,7 +95,7 @@ const configs = [
       output: {
         path: './gen',
         clean: true,
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -111,7 +111,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -119,7 +119,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -134,7 +134,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -142,7 +142,7 @@ const configs = [
         pluginZod({
           output: {
             path: './zod',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -157,7 +157,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -165,7 +165,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -180,7 +180,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -188,7 +188,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -210,7 +210,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -218,7 +218,7 @@ const configs = [
         pluginZod({
           output: {
             path: './zod',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -242,7 +242,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -250,7 +250,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
         }),
       ],
@@ -270,7 +270,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -278,7 +278,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
           enumType: 'asConst',
         }),
@@ -298,7 +298,7 @@ const configs = [
       },
       output: {
         path: './gen',
-        barrelType: false,
+        barrel: false,
       },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
@@ -306,7 +306,7 @@ const configs = [
         pluginTs({
           output: {
             path: './types',
-            barrelType: false,
+            barrel: false,
           },
           group: { type: 'tag' },
         }),
@@ -324,12 +324,12 @@ const configs = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/simple.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrelType: false },
+          output: { path: './types', barrel: false },
           resolver: {
             resolveBanner() {
               return '// Custom banner'
@@ -352,12 +352,12 @@ const configs = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/simple.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           printer: {
             nodes: {
               integer() {
@@ -379,12 +379,12 @@ const configs = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/simple.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrelType: false },
+          output: { path: './types', barrel: false },
           transformer: {
             schema(node) {
               return { ...node, example: 'test', description: undefined }

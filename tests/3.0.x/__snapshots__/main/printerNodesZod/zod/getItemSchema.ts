@@ -6,7 +6,7 @@
 import * as z from "zod";
 import { itemSchema } from "./itemSchema.ts";
 
-export const getItemPathIdSchema = z.number()
+export const getItemPathIdSchema = z.bigint()
 
 export const getItemStatus200Schema = itemSchema.describe("A simple item")
 

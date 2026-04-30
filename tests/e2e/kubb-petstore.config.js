@@ -25,7 +25,7 @@ export default defineConfig(() => {
       pluginTs({
         output: {
           path: 'models/ts',
-          barrelType: false,
+          barrel: false,
         },
         group: {
           type: 'tag',
@@ -44,7 +44,7 @@ export default defineConfig(() => {
       pluginClient({
         output: {
           path: './clients/axiosClass',
-          barrelType: false,
+          barrel: false,
         },
         group: {
           type: 'tag',
@@ -56,7 +56,7 @@ export default defineConfig(() => {
       pluginCypress({
         output: {
           path: './clients/cypress',
-          barrelType: false,
+          barrel: false,
         },
         group: {
           type: 'tag',
@@ -68,7 +68,7 @@ export default defineConfig(() => {
       pluginZod({
         output: {
           path: './zod',
-          barrelType: false,
+          barrel: false,
         },
         group: { type: 'tag' },
         inferred: true,
@@ -88,7 +88,7 @@ export default defineConfig(() => {
       pluginFaker({
         output: {
           path: 'mocks',
-          barrelType: false,
+          barrel: false,
         },
         group: { type: 'tag' },
       }),

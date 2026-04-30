@@ -26,7 +26,7 @@ export type Pet = (
    * @example 10
    * @type integer | undefined
    */
-  id?: number
+  id?: bigint
   /**
    * @type string
    */
@@ -36,9 +36,6 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
   /**
    * @type array

@@ -15,15 +15,12 @@ function isValidStrictIdentifier(name: string): boolean {
 }
 
 /**
- * Default resolver for `@kubb/plugin-faker`.
+ * Naming convention resolver for Faker plugin.
  *
- * Uses camelCase naming for generated function and file names.
+ * Provides default naming helpers using camelCase. Prefixes invalid identifiers with `_`.
  *
  * @example
- * ```ts
- * resolverFaker.default('list pets', 'function') // -> 'listPets'
- * resolverFaker.resolveResponseStatusName(node, 200) // -> 'listPetsStatus200'
- * ```
+ * `resolverFaker.default('list pets', 'function')  // → 'listPets'`
  */
 export const resolverFaker = defineResolver<PluginFaker>((ctx) => {
   return {

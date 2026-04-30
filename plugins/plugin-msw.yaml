@@ -1,7 +1,7 @@
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-msw
 name: MSW
-description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications for frontend development and testing.
+description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications.
 category: mocks
 type: official
 npmPackage: '@kubb/plugin-msw'
@@ -37,7 +37,7 @@ icon:
 intro: |
   # @kubb/plugin-msw
 
-  Generate [MSW](https://mswjs.io/) API mock handlers from your OpenAPI schema.
+  Generate [MSW](https://mswjs.io/) API mock handlers from your OpenAPI schema. Mock API requests in development and tests with type-safe handlers.
 
 options:
   - name: output
@@ -70,13 +70,13 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+        description: Return the name of a group based on the group name. This is used for file and identifier generation.
 
   - name: parser
     type: "'data' | 'faker'"
     required: false
     default: "'data'"
-    description: Which parser should be used before returning the data to the `Response` of MSW.
+    description: Choose which parser to use when generating response data.
     body: |
       - `'faker'` will use `@kubb/plugin-faker` to generate the data for the response.
       - `'data'` will use your custom data to generate the data for the response.

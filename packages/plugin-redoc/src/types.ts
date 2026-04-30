@@ -3,7 +3,8 @@ import type { Exclude, Include, Output, Override, PluginFactoryOptions } from '@
 export type Options = {
   output?: {
     /**
-     * Output for the generated doc, [https://redocly.com/](https://redocly.com/) is being used for the generation
+     * Output path for the generated HTML documentation.
+     *
      * @default 'docs.html'
      */
     path: string

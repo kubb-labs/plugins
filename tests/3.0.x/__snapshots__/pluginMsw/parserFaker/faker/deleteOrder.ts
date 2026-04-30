@@ -6,8 +6,8 @@
 import type { DeleteOrderResponse } from "../types/DeleteOrder.ts";
 import { faker } from "@faker-js/faker";
 
-export function deleteOrderPathOrderId(data?: number): number {
-  return data ?? faker.number.int()
+export function deleteOrderPathOrderId(data?: bigint): bigint {
+  return data ?? faker.number.bigInt()
 }
 
 /**

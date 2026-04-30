@@ -88,6 +88,10 @@ function createCallParam(name: string, spec: ParamSpec): ast.FunctionParameterNo
   })
 }
 
+/**
+ * Creates function parameter builders for generating function signatures and calls.
+ * Returns utilities to output constructor signatures (`toConstructor()`) or call expressions (`toCall()`).
+ */
 export function createFunctionParams(params: Record<string, ParamSpec | undefined>) {
   const entries = Object.entries(params).filter(([, spec]) => spec !== undefined) as Array<[string, ParamSpec]>
 

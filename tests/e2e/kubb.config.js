@@ -54,7 +54,7 @@ const baseConfig = {
     pluginTs({
       output: {
         path: 'models/ts',
-        barrelType: false,
+        barrel: false,
       },
       group: {
         type: 'tag',
@@ -81,7 +81,7 @@ const baseConfig = {
     pluginCypress({
       output: {
         path: './clients/cypress',
-        barrelType: false,
+        barrel: false,
       },
       group: {
         type: 'tag',
@@ -93,7 +93,7 @@ const baseConfig = {
     pluginZod({
       output: {
         path: './zod',
-        barrelType: false,
+        barrel: false,
       },
       group: { type: 'tag' },
       inferred: true,
@@ -113,7 +113,7 @@ const baseConfig = {
     pluginFaker({
       output: {
         path: 'mocks',
-        barrelType: false,
+        barrel: false,
       },
       group: { type: 'tag' },
     }),

@@ -6,7 +6,7 @@
 import { z } from '../../zod.ts'
 import { orderSchema } from './orderSchema.ts'
 
-export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
+export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
 export type GetOrderByIdPathOrderIdSchema = z.infer<typeof getOrderByIdPathOrderIdSchema>
 

@@ -27,7 +27,7 @@ type in the spec when no global override is set).
 |---|---|
 | `kubb/packages/adapter-oas/src/parser.ts` | Parses OpenAPI → `OperationNode`. Already populates `requestBody.content[]` for every declared content type when no global `contentType` override is set (line 855). |
 | `kubb/packages/adapter-oas/src/resolvers.ts` | `getRequestBodyContentTypes()`, `getRequestSchema()` |
-| `kubb/packages/ast/src/nodes/operation.ts` | `OperationNode.requestBody.content` is already an **array** — the AST supports multiple entries today. |
+| `kubb/packages/ast/src/nodes/operation.ts` | `OperationNode.requestBody.content` is already an **array**. The AST supports multiple entries today. |
 | `packages/plugin-ts/src/generators/typeGenerator.tsx` line 151 | Reads `content[0]` only. |
 | `packages/plugin-client/src/components/Client.tsx` line 86 | `const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'` |
 | `packages/plugin-client/src/generators/clientGenerator.tsx` line 73 | `const isFormData = node.requestBody?.content?.[0]?.contentType === 'multipart/form-data'` |
@@ -45,20 +45,20 @@ const allContentTypes = ctx.contentType
   : getRequestBodyContentTypes(document, operation)  // no override → all entries
 ```
 
-So `node.requestBody.content` is already a fully-populated array — plugins just need to
+So `node.requestBody.content` is already a fully-populated array. Plugins just need to
 consume it properly.
 
 ---
 
 ## Desired generated output
 
-### Single content type (no change — backwards-compatible)
+### Single content type (no change, backwards-compatible)
 
 ```ts
-// plugin-ts — unchanged
+// plugin-ts: unchanged
 export type CreatePathData = { name: string }
 
-// plugin-client — unchanged
+// plugin-client: unchanged
 export async function createPath({ data }: { data: CreatePathData }, config = {}) {
   const requestData = data
   const res = await fetch<CreatePathResponse, ResponseErrorConfig<Error>, CreatePathData>({
@@ -67,7 +67,7 @@ export async function createPath({ data }: { data: CreatePathData }, config = {}
   return res.data
 }
 
-// plugin-react-query — unchanged
+// plugin-react-query: unchanged
 export function useCreatePath() {
   return useMutation({ mutationFn: ({ data }) => createPath({ data }) })
 }
@@ -76,12 +76,12 @@ export function useCreatePath() {
 ### Multiple content types (new behaviour)
 
 ```ts
-// plugin-ts — union alias added after individual types
+// plugin-ts: union alias added after individual types
 export type CreatePathJsonData = { name: string }
 export type CreatePathFormData = { file: File }
 export type CreatePathData = CreatePathJsonData | CreatePathFormData  // ← new
 
-// plugin-client — contentType param added, ternary replaces static isFormData
+// plugin-client: contentType param added, ternary replaces static isFormData
 export async function createPath(
   { data, contentType = 'application/json' }: {
     data: CreatePathData
@@ -99,7 +99,7 @@ export async function createPath(
   return res.data
 }
 
-// plugin-react-query — contentType forwarded through mutation variables
+// plugin-react-query: contentType forwarded through mutation variables
 export function useCreatePath() {
   return useMutation({
     mutationFn: ({ data, contentType }: { data: CreatePathData; contentType?: 'application/json' | 'multipart/form-data' }) =>
@@ -115,13 +115,13 @@ export function useCreatePath() {
 All changes must be **backwards-compatible**: when `content.length === 1`, generated output
 is identical to today.
 
-### Step 1 — `plugin-ts` typeGenerator
+### Step 1: `plugin-ts` typeGenerator
 
 **File:** `packages/plugin-ts/src/generators/typeGenerator.tsx`
 
 When `node.requestBody.content.length > 1`:
 - The individual schema types are already generated per content entry (this works today when
-  no global contentType override is set — verify this assumption by running tests).
+  no global contentType override is set. Verify this assumption by running tests).
 - Add a **union alias** after the individual types:
   ```ts
   export type CreatePathData = CreatePathJsonData | CreatePathFormData
@@ -136,7 +136,7 @@ When `node.requestBody.content.length > 1`:
   - `application/x-www-form-urlencoded` → `FormUrlEncoded`
   - anything else → capitalised last segment of the MIME type
 
-### Step 2 — `plugin-client` Client.tsx
+### Step 2: `plugin-client` Client.tsx
 
 **File:** `packages/plugin-client/src/components/Client.tsx`
 
@@ -153,7 +153,7 @@ When `node.requestBody?.content?.length > 1`:
    // e.g. "'application/json' | 'multipart/form-data'"
    ```
 
-2. **Derive the default** — use `content[0].contentType` (this is the adapter-oas configured
+2. **Derive the default**: use `content[0].contentType` (this is the adapter-oas configured
    type when a global override is set, or the first type in the spec otherwise).
 
 3. **Add `contentType` to the function params** (via `extraParams` in `getParams()` or
@@ -173,7 +173,7 @@ When `node.requestBody?.content?.length > 1`:
 // before
 const isFormData = node.requestBody?.content?.[0]?.contentType === 'multipart/form-data'
 
-// after — only used to determine whether buildFormData import is needed
+// after: only used to determine whether buildFormData import is needed
 const hasFormData = node.requestBody?.content?.some(e => e.contentType === 'multipart/form-data') ?? false
 ```
 
@@ -181,14 +181,14 @@ const hasFormData = node.requestBody?.content?.some(e => e.contentType === 'mult
 `hasFormData` with `.some()`, but still narrow to `content?.[0]?...`. Update to check all
 entries:
 ```ts
-// before (already uses hasFormData but wrong — checks only content[0])
+// before (already uses hasFormData but wrong: checks only content[0])
 const hasFormData = ops.some((op) => op.node.requestBody?.content?.[0]?.contentType === 'multipart/form-data')
 
-// after — checks all declared content types per operation
+// after: checks all declared content types per operation
 const hasFormData = ops.some((op) => op.node.requestBody?.content?.some(e => e.contentType === 'multipart/form-data'))
 ```
 
-### Step 3 — `plugin-react-query` mutationGenerator
+### Step 3: `plugin-react-query` mutationGenerator
 
 **File:** `packages/plugin-react-query/src/generators/mutationGenerator.tsx`
 
@@ -199,7 +199,7 @@ imported when `!shouldUseClientPlugin`, regardless of whether the operation has 
 // before
 {!shouldUseClientPlugin && <File.Import name={['buildFormData']} ... />}
 
-// after — only import when actually needed
+// after: only import when actually needed
 {!shouldUseClientPlugin && node.requestBody?.content?.some(e => e.contentType === 'multipart/form-data') && (
   <File.Import name={['buildFormData']} ... />
 )}
@@ -233,6 +233,6 @@ When `content.length === 1`: no change.
 
 ## Out of scope (follow-up)
 
-- `plugin-vue-query`, `plugin-swr` — same pattern as plugin-react-query, can follow after
-- `plugin-mcp` — same pattern
+- `plugin-vue-query`, `plugin-swr`: same pattern as plugin-react-query, can follow after
+- `plugin-mcp`: same pattern
 - Response content type union (only requestBody is in scope here)

@@ -7,8 +7,8 @@ import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginF
 export type ResolverClient = Resolver & {
   /**
    * Resolves the function name for a given raw operation name.
-   * @example
-   * resolver.resolveName('show pet by id') // -> 'showPetById'
+   * @example Resolving operation names
+   * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverClient, name: string): string
 }

@@ -14,6 +14,8 @@ export default defineConfig({
   output: {
     path: './src/gen',
     clean: true,
+    format: false,
+    lint: false,
   },
   adapter: adapterOas(),
   plugins: [
@@ -24,7 +26,7 @@ export default defineConfig({
     pluginClient({
       output: {
         path: './sdk',
-        barrelType: 'propagate',
+        barrel: { type: 'all', nested: true },
       },
       client: 'fetch',
       group: { type: 'tag' },

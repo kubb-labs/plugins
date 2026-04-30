@@ -11,7 +11,7 @@ import { faker } from "@faker-js/faker";
 
 export function pet(data?: Partial<Pet>): Required<Pet>
 {
-  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha(),"log": new RandExp("^[A-Za-z0-9()\\[\\]'\"][-A-Za-z0-9_. \\/()\\[\\]]{0,40}[A-Za-z0-9()\\[\\]'\"]$").gen(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<Pet>["status"]>(["available", "pending", "sold"])}
+  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha(),"log": new RandExp("^[A-Za-z0-9()\\[\\]'\"][-A-Za-z0-9_. \\/()\\[\\]]{0,40}[A-Za-z0-9()\\[\\]'\"]$").gen(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<Pet>["status"]>(["available", "pending", "sold"])}
   return {
     ...defaultFakeData,
     ...(data || {}),

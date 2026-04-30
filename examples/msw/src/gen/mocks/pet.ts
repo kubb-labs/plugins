@@ -11,7 +11,7 @@ import { faker } from '@faker-js/faker'
 export function pet(data?: Partial<Pet>): Required<Pet> {
   faker.seed([220])
   const defaultFakeData = {
-    id: faker.number.int(),
+    id: faker.number.bigInt(),
     name: faker.string.alpha(),
     category: category(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),

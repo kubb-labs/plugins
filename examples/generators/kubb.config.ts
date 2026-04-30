@@ -15,6 +15,8 @@ export default defineConfig([
     output: {
       path: './src/gen',
       clean: true,
+      format: false,
+      lint: false,
     },
     plugins: [
       pluginClient({
@@ -27,7 +29,7 @@ export default defineConfig([
     root: '.',
     input,
     adapter: adapterOas({ validate: false }),
-    output: { path: './src/gen2' },
+    output: { path: './src/gen2', format: false, lint: false },
     plugins: [
       pluginClient({
         output: { path: './example2.ts' },
@@ -39,7 +41,7 @@ export default defineConfig([
     root: '.',
     input,
     adapter: adapterOas({ validate: false }),
-    output: { path: './src/gen3' },
+    output: { path: './src/gen3', format: false, lint: false },
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },

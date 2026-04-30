@@ -34,9 +34,7 @@ icon:
 intro: |
   # @kubb/plugin-zod
 
-  Generate [Zod](https://zod.dev/) validation schemas from your OpenAPI schema.
-
-  Kubb v5 always generates **Zod v4** schemas. Zod v3 is no longer supported.
+  Generate [Zod](https://zod.dev/) validation schemas from your OpenAPI schema for runtime validation. Kubb generates Zod v4 schemas.
 
 options:
   - name: output
@@ -62,20 +60,20 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. Used for the file and identifier generation.
+        description: Return the name of a group based on the group name. This is used for file and identifier generation.
 
   - name: importPath
     type: string
     required: false
     default: "'zod'"
     description: |
-      Path to the Zod package used in generated import statements. Accepts a package name or a relative path. Set to `'zod/mini'` when using `mini: true`.
+      Import path for Zod. Use `'zod/mini'` to import from Zod's mini bundle.
 
   - name: typed
     type: boolean
     required: false
     default: 'false'
-    description: Annotate each generated schema with its inferred TypeScript type, using `@kubb/plugin-ts` output as the source. Requires `@kubb/plugin-ts` to be configured in the same `plugins` array.
+    description: Annotate schemas with their TypeScript types from `@kubb/plugin-ts`. Requires `@kubb/plugin-ts` in the plugins array.
     important: |
       We rely on [`ToZod`](https://github.com/colinhacks/tozod) from the creator of Zod to create a schema based on a type.
       Kubb contains its own version to those kind of conversions.
@@ -84,7 +82,7 @@ options:
     type: boolean
     required: false
     default: 'false'
-    description: Export a `z.infer<typeof schema>` type alias alongside each generated schema. This gives you a TypeScript type that always stays in sync with the schema's runtime validation.
+    description: Export a `z.infer<typeof schema>` type alias for each schema to keep types in sync with validation.
     codeBlock:
       lang: typescript
       title: 'inferred: true'
@@ -98,46 +96,6 @@ options:
 
         // Inferred type export
         export type Pet = z.infer<typeof petSchema>
-
-  - name: dateType
-    type: "false | 'string' | 'stringOffset' | 'stringLocal' | 'date'"
-    required: false
-    default: "'string'"
-    description: |
-      Choose to use `date` or `datetime` as JavaScript `Date` instead of `string`.
-
-      See [DateTimes](https://zod.dev/?id=datetimes).
-    examples:
-      - name: 'false'
-        files:
-          - lang: typescript
-            code: |
-              z.string();
-            twoslash: false
-      - name: "'string'"
-        files:
-          - lang: typescript
-            code: |
-              z.string().datetime();
-            twoslash: false
-      - name: "'stringOffset'"
-        files:
-          - lang: typescript
-            code: |
-              z.string().datetime({ offset: true });
-            twoslash: false
-      - name: "'stringLocal'"
-        files:
-          - lang: typescript
-            code: |
-              z.string().datetime({ local: true });
-            twoslash: false
-      - name: "'date'"
-        files:
-          - lang: typescript
-            code: |
-              z.date();
-            twoslash: false
 
   - name: integerType
     warning: |
@@ -186,12 +144,12 @@ options:
     type: boolean
     required: false
     default: 'false'
-    description: Generate a combined `operations.ts` file that exports all operation-level schemas grouped by `operationId`. When enabled, each operation gets its own schema that includes the request body, path params, query params, and response schemas.
+    description: Generate an `operations.ts` file with schemas for each operation, including request and response data.
 
   - name: paramsCasing
     type: "'camelcase'"
     required: false
-    description: Transform property names in path, query, and header parameter types to camelCase.
+    description: Transform parameter property names to camelCase.
     codeBlock:
       lang: typescript
       title: "'camelcase'"

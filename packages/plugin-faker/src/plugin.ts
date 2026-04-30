@@ -6,23 +6,17 @@ import { resolverFaker } from './resolvers/resolverFaker.ts'
 import type { PluginFaker } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-faker`, used to identify the plugin in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-faker`, used in driver lookups and warnings.
  */
 export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
 
 /**
- * The `@kubb/plugin-faker` plugin factory.
+ * Generates Faker mock data factories from OpenAPI/AST specification.
  *
- * Generates Faker mock helpers from schema and operation AST nodes.
+ * Creates randomized test data and mock helpers from schema definitions.
  *
  * @example
- * ```ts
- * import pluginFaker from '@kubb/plugin-faker'
- *
- * export default defineConfig({
- *   plugins: [pluginFaker({ output: { path: 'mocks' } })],
- * })
- * ```
+ * `import pluginFaker from '@kubb/plugin-faker'; export default defineConfig({ plugins: [pluginFaker({ output: { path: 'mocks' } })], })`
  */
 export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {

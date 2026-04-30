@@ -1,7 +1,7 @@
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
 id: plugin-react-query
 name: React Query
-description: Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications for type-safe data fetching in React applications.
+description: Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications.
 category: framework
 type: official
 npmPackage: '@kubb/plugin-react-query'
@@ -37,7 +37,7 @@ icon:
 intro: |
   # @kubb/plugin-react-query
 
-  Generate React Query hooks from your OpenAPI schema.
+  Generate type-safe React Query hooks from your OpenAPI schema for data fetching, caching, and synchronization.
 
 options:
   - name: output
@@ -62,7 +62,7 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. Used for the file and identifier generation.
+        description: Return the name of a group based on the group name. This is used for file and identifier generation.
 
   - name: client
     type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle? }'
@@ -85,9 +85,7 @@ options:
     required: false
     default: 'false'
     description: |
-      When set, an `infiniteQuery` hook will be added.
-
-      To disable infinite queries pass `false`.
+      Generate an `infiniteQuery` hook for paginated queries. Pass `false` to disable.
     codeBlock:
       lang: typescript
       title: Infinite

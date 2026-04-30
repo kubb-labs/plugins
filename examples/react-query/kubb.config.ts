@@ -1,3 +1,4 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { QueryKey } from '@kubb/plugin-react-query/components'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -9,11 +10,14 @@ export const config = {
   input: {
     path: './petStore.yaml',
   },
+  adapter: adapterOas({ integerType: 'number' }),
   output: {
     path: './src/gen',
     clean: true,
-    barrelType: 'named',
+    barrel: { type: 'named' },
     defaultBanner: 'simple' as const,
+    format: false,
+    lint: false,
   },
   hooks: {
     done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
@@ -22,7 +26,7 @@ export const config = {
     pluginTs({
       output: {
         path: 'models',
-        barrelType: 'named',
+        barrel: { type: 'named' },
         banner(oas) {
           return `// version: ${oas?.meta?.version || 'unknown'}`
         },
@@ -42,7 +46,7 @@ export const config = {
       },
       output: {
         path: './hooks',
-        barrelType: 'named',
+        barrel: { type: 'named' },
       },
       group: {
         type: 'path',

@@ -10,11 +10,11 @@ The `docs/config.json` file uses a custom Kubb.dev schema (not standard VitePres
 
 ## Why config.json?
 
-- **Separation of concerns** — Documentation config separate from VitePress build tooling
-- **Schema validation** — JSON schema validates structure
-- **Centralization** — Single source of truth for navigation
-- **Platform agnostic** — Can transform to VitePress, Docusaurus, or other formats
-- **No build dependencies** — Main repo stays clean of documentation tooling
+- **Separation of concerns**: Documentation config separate from VitePress build tooling
+- **Schema validation**: JSON schema validates structure
+- **Centralization**: Single source of truth for navigation
+- **Platform agnostic**: Can transform to VitePress, Docusaurus, or other formats
+- **No build dependencies**: Main repo stays clean of documentation tooling
 
 ## Structure
 
@@ -162,23 +162,23 @@ Include full URL and set target:
 
 ### Sidebar Organization
 
-1. **Group related items** — Use `items` for logical grouping
-2. **Start expanded** — Set `collapsed: false` for important sections
-3. **Clear labels** — Use descriptive `text` values
-4. **Consistent depth** — Keep nesting to 2-3 levels max
+1. **Group related items**: Use `items` for logical grouping
+2. **Start expanded**: Set `collapsed: false` for important sections
+3. **Clear labels**: Use descriptive `text` values
+4. **Consistent depth**: Keep nesting to 2-3 levels max
 
 ### Navigation Structure
 
-1. **Primary actions first** — Getting Started, API, Guides
-2. **Dropdown for sections** — Use `items` to group related links
-3. **External links last** — GitHub, social links at end
-4. **Clear hierarchy** — Use nested items for subsections
+1. **Primary actions first**: Getting Started, API, Guides
+2. **Dropdown for sections**: Use `items` to group related links
+3. **External links last**: GitHub, social links at end
+4. **Clear hierarchy**: Use nested items for subsections
 
 ### Route Mapping
 
-1. **Match URL structure** — `/getting-started` maps to `gettingStarted` sidebar
-2. **Consistent naming** — Use camelCase for sidebar names
-3. **Complete coverage** — Map all top-level routes
+1. **Match URL structure**: `/getting-started` maps to `gettingStarted` sidebar
+2. **Consistent naming**: Use camelCase for sidebar names
+3. **Complete coverage**: Map all top-level routes
 
 ## Example: Adding New Section
 
@@ -244,10 +244,10 @@ The config.json integrates with `kubb.dev`:
 
 1. **Edit** `config.json` in this repo
 2. **Commit** changes with markdown files
-3. **Sync** — Kubb.dev build system syncs repo
-4. **Parse** — Reads config.json schema
-5. **Generate** — Transforms to VitePress config
-6. **Deploy** — Builds and publishes docs
+3. **Sync**: Kubb.dev build system syncs repo
+4. **Parse**: Reads config.json schema
+5. **Generate**: Transforms to VitePress config
+6. **Deploy**: Builds and publishes docs
 
 ## Common Patterns
 

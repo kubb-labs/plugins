@@ -3,16 +3,12 @@ import { defineResolver } from '@kubb/core'
 import type { PluginCypress } from '../types.ts'
 
 /**
- * Resolver for `@kubb/plugin-cypress` that provides the default naming
- * and path-resolution helpers used by the plugin.
+ * Naming convention resolver for Cypress plugin.
+ *
+ * Provides default naming helpers using camelCase for functions and file paths.
  *
  * @example
- * ```ts
- * import { resolverCypress } from '@kubb/plugin-cypress'
- *
- * resolverCypress.default('list pets', 'function') // -> 'listPets'
- * resolverCypress.resolveName('show pet by id')    // -> 'showPetById'
- * ```
+ * `resolverCypress.default('list pets', 'function')  // → 'listPets'`
  */
 export const resolverCypress = defineResolver<PluginCypress>((ctx) => ({
   name: 'default',

@@ -30,55 +30,72 @@ export type PrinterTsNodes = ast.PrinterPartial<ts.TypeNode, PrinterTsOptions>
 
 export type PrinterTsOptions = {
   /**
+   * Mark parameters as optional with `?` or `| undefined`.
+   * - `'questionToken'` adds `?` to properties
+   * - `'undefined'` adds `| undefined` to types
+   *
    * @default `'questionToken'`
    */
   optionalType: PluginTs['resolvedOptions']['optionalType']
   /**
+   * Array representation style.
+   * - `'array'` uses bracket notation (`T[]`)
+   * - `'generic'` uses generic syntax (`Array<T>`)
+   *
    * @default `'array'`
    */
   arrayType: PluginTs['resolvedOptions']['arrayType']
   /**
+   * Enum output format.
+   * - `'inlineLiteral'` embeds literal unions inline
+   * - `'asPascalConst'` generates named const unions
+   * - `'asConst'` generates as const declarations
+   *
    * @default `'inlineLiteral'`
    */
   enumType: PluginTs['resolvedOptions']['enumType']
   /**
-   * Suffix appended to the generated type alias name when `enumType` is `asConst` or `asPascalConst`.
+   * Suffix appended to enum key reference names.
+   *
+   * @example Enum key naming
+   * `StatusKey` when `enumType` is `'asConst'`
    *
    * @default `'Key'`
    */
   enumTypeSuffix?: PluginTs['resolvedOptions']['enumTypeSuffix']
   /**
-   * Controls whether a `type` alias or `interface` declaration is emitted.
+   * Syntax for generated declarations.
+   * - `'type'` generates type aliases
+   * - `'interface'` generates interface declarations
+   *
    * @default `'type'`
    */
   syntaxType?: PluginTs['resolvedOptions']['syntaxType']
   /**
-   * When set, `printer.print(node)` produces a full `type Name = …` declaration.
-   * When omitted, `printer.print(node)` returns the raw type node.
+   * Exported name for the type declaration.
+   * When omitted, returns only the raw type node.
    */
   name?: string
 
   /**
-   * JSDoc `@description` comment added to the generated type or interface declaration.
+   * JSDoc comment to attach to the generated type.
    */
   description?: string
   /**
-   * Property keys to exclude from the generated type via `Omit<Type, Keys>`.
-   * Forces type-alias syntax even when `syntaxType` is `'interface'`.
+   * Properties to exclude using `Omit<Type, Keys>`.
+   * Forces type alias syntax regardless of `syntaxType` setting.
    */
   keysToOmit?: Array<string>
   /**
-   * Resolver used to transform raw schema names into valid TypeScript identifiers.
+   * Transforms raw schema names into valid TypeScript identifiers.
    */
   resolver: ResolverTs
   /**
-   * Names of top-level schemas that are enums.
-   * When set, the `ref` handler uses the suffixed type name (e.g. `StatusKey`) for enum refs
-   * instead of the plain PascalCase name, so imports align with what the enum file actually exports.
+   * Schema names that represent enums for suffixed key references.
    */
   enumSchemaNames?: Set<string>
   /**
-   * Partial map of node-type overrides. Each entry replaces the built-in handler for that node type.
+   * Custom handler map for node type overrides.
    */
   nodes?: PrinterTsNodes
 }
