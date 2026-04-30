@@ -5,9 +5,7 @@
 
 import type { UserArray } from "../types/UserArray.ts";
 import { user } from "./user.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 export function userArray(data?: UserArray): UserArray {
   return [

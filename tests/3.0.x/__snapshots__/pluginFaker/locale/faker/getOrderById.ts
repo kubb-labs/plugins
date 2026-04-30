@@ -5,12 +5,10 @@
 
 import type { GetOrderByIdResponse, GetOrderByIdStatus200 } from "../types/GetOrderById.ts";
 import { order } from "./order.ts";
-import { fakerDE } from "@faker-js/faker";
+import { fakerDE as faker } from "@faker-js/faker";
 
-const faker = fakerDE
-
-export function getOrderByIdPathOrderId(data?: number): number {
-  return data ?? faker.number.int()
+export function getOrderByIdPathOrderId(data?: bigint): bigint {
+  return data ?? faker.number.bigInt()
 }
 
 /**

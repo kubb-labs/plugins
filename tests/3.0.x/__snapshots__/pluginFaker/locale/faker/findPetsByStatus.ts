@@ -5,9 +5,7 @@
 
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus200 } from "../types/FindPetsByStatus.ts";
 import { pet } from "./pet.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 export function findPetsByStatusQueryStatus(data?: FindPetsByStatusQueryStatus): FindPetsByStatusQueryStatus {
   return data ?? faker.helpers.arrayElement<FindPetsByStatusQueryStatus>(["available", "pending", "sold"])

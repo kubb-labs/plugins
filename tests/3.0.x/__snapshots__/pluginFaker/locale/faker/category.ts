@@ -4,13 +4,11 @@
 */
 
 import type { Category } from "../types/Category.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 export function category(data?: Partial<Category>): Required<Category>
 {
-  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha()}
+  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha()}
   return {
     ...defaultFakeData,
     ...(data || {}),

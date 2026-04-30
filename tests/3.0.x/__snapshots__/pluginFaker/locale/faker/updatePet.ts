@@ -5,9 +5,7 @@
 
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200 } from "../types/UpdatePet.ts";
 import { pet } from "./pet.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 /**
  * @description Successful operation

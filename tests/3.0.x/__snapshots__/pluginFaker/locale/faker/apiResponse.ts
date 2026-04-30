@@ -4,9 +4,7 @@
 */
 
 import type { ApiResponse } from "../types/ApiResponse.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 export function apiResponse(data?: Partial<ApiResponse>): Required<ApiResponse>
 {

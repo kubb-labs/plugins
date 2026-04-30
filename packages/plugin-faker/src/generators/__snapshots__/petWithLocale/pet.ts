@@ -4,9 +4,7 @@
  */
 
 import type { Pet } from './types/Pet'
-import { fakerDE } from '@faker-js/faker'
-
-const faker = fakerDE
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function pet(data?: Partial<Pet>): Required<Pet> {
   const defaultFakeData = {

@@ -6,13 +6,11 @@
 import type { AddPetRequest } from "../types/AddPetRequest.ts";
 import { category } from "./category.ts";
 import { tag } from "./tag.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 export function addPetRequest(data?: Partial<AddPetRequest>): Required<AddPetRequest>
 {
-  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])}
+  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha(),"category": category(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (tag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])}
   return {
     ...defaultFakeData,
     ...(data || {}),

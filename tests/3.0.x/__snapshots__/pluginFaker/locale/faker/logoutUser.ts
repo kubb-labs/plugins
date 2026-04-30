@@ -3,10 +3,6 @@
 * Do not edit manually.
 */
 
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
-
 /**
  * @description successful operation
  */

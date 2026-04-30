@@ -5,9 +5,6 @@
 
 import type { CreateUserData, CreateUserResponse, CreateUserStatusDefault } from "../types/CreateUser.ts";
 import { user } from "./user.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
 
 /**
  * @description successful operation

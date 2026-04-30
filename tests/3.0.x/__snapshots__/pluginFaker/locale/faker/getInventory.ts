@@ -4,9 +4,6 @@
 */
 
 import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetInventory.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
 
 /**
    * @description successful operation

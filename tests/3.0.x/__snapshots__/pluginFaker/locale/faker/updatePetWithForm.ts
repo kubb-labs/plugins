@@ -3,12 +3,10 @@
 * Do not edit manually.
 */
 
-import { fakerDE } from "@faker-js/faker";
+import { fakerDE as faker } from "@faker-js/faker";
 
-const faker = fakerDE
-
-export function updatePetWithFormPathPetId(data?: number): number {
-  return data ?? faker.number.int()
+export function updatePetWithFormPathPetId(data?: bigint): bigint {
+  return data ?? faker.number.bigInt()
 }
 
 export function updatePetWithFormQueryName(data?: string): string {

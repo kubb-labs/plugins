@@ -5,9 +5,7 @@
 
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200 } from "../types/PlaceOrder.ts";
 import { order } from "./order.ts";
-import { fakerDE } from "@faker-js/faker";
-
-const faker = fakerDE
+import { fakerDE as faker } from "@faker-js/faker";
 
 /**
  * @description successful operation
