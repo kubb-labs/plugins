@@ -3,7 +3,7 @@ import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
+import type { FakerPrinter } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { resolveFakerTypeUsage } from '../utils.ts'
 
@@ -11,7 +11,7 @@ type Props = {
   name: string
   typeName: string
   node: ast.SchemaNode
-  printer: ast.Printer<PrinterFakerFactory>
+  printer: FakerPrinter
   seed?: PluginFaker['options']['seed']
   description?: string
   canOverride: boolean
@@ -78,12 +78,12 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
     const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
 
-    // When the object literal contains memoizing getters (cyclic properties), spreading
-    // it would immediately invoke those getters – which triggers recursive faker calls and
-    // causes an infinite-recursion stack overflow.  Instead, we return the object as-is and
-    // merge overrides via Object.defineProperty so that getter-only properties can be
-    // replaced without needing a setter.
-    const hasGetters = /\bget [a-zA-Z_$]/.test(fakerText)
+    // When the printer emitted memoizing getters (cyclic properties), spreading the
+    // object literal would immediately invoke those getters – which triggers recursive
+    // faker calls and causes an infinite-recursion stack overflow.  Instead, we return
+    // the object as-is and merge overrides via Object.defineProperty so that
+    // getter-only properties can be replaced without needing a setter.
+    const hasGetters = printer.containsGetters()
 
     if (hasGetters) {
       functionBody = `{

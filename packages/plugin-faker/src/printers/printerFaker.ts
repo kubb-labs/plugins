@@ -33,6 +33,18 @@ export type PrinterFakerOptions = {
  */
 export type PrinterFakerFactory = ast.PrinterFactoryOptions<'faker', PrinterFakerOptions, string, string>
 
+/**
+ * Faker printer instance, extending the base printer with a method to check
+ * whether any memoizing getters were emitted for cyclic properties.
+ */
+export type FakerPrinter = ast.Printer<PrinterFakerFactory> & {
+  /**
+   * Returns true if the last `print` call emitted at least one memoizing getter,
+   * indicating the generated object literal must not be spread on construction.
+   */
+  containsGetters: () => boolean
+}
+
 const fakerKeywordMapper = {
   any: () => 'undefined',
   unknown: () => 'undefined',
@@ -182,160 +194,169 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 
 /**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
- * Handles circular references gracefully by emitting lazy getters for cyclic properties.
+ * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
+ * The returned printer exposes `containsGetters()` so callers can adjust the generated
+ * function body without inspecting the printed text string.
  */
-export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.definePrinter<PrinterFakerFactory>((options) => {
-  const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
-    return (
-      printerFaker({
-        ...options,
-        ...overrideOptions,
-        nodes: options.nodes,
-      }).print(node) ?? 'undefined'
-    )
-  }
+export function printerFaker(options: PrinterFakerOptions): FakerPrinter {
+  let _hasGetters = false
 
-  return {
-    name: 'faker',
-    options,
-    nodes: {
-      any: () => fakerKeywordMapper.any(),
-      unknown: () => fakerKeywordMapper.unknown(),
-      void: () => fakerKeywordMapper.void(),
-      boolean: () => fakerKeywordMapper.boolean(),
-      null: () => fakerKeywordMapper.null(),
-      string(node) {
-        if (node.pattern) {
-          return fakerKeywordMapper.matches(node.pattern, this.options.regexGenerator)
-        }
+  const factory = ast.definePrinter<PrinterFakerFactory>((opts) => {
+    const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
+      return (
+        printerFaker({
+          ...opts,
+          ...overrideOptions,
+          nodes: opts.nodes,
+        }).print(node) ?? 'undefined'
+      )
+    }
 
-        return fakerKeywordMapper.string(node.min, node.max)
-      },
-      email: () => fakerKeywordMapper.email(),
-      url: () => fakerKeywordMapper.url(),
-      uuid: () => fakerKeywordMapper.uuid(),
-      number(node) {
-        return fakerKeywordMapper.number(node.min, node.max)
-      },
-      integer(node) {
-        return fakerKeywordMapper.integer(node.min, node.max)
-      },
-      bigint: () => fakerKeywordMapper.bigint(),
-      blob: () => fakerKeywordMapper.blob(),
-      datetime: () => fakerKeywordMapper.datetime(),
-      date(node) {
-        return fakerKeywordMapper.date(node.representation ?? 'string', this.options.dateParser)
-      },
-      time(node) {
-        return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
-      },
-      ref(node) {
-        // Parser-generated refs (with $ref) carry raw schema names that need resolving.
-        // Use the canonical name from the $ref path — node.name may have been overridden
-        // (e.g. by single-member allOf flatten using the property-derived child name).
-        // Inline refs (without $ref) from faker utils already carry resolved helper names.
-        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name ?? node.schema?.name) : (node.name ?? node.schema?.name)
+    return {
+      name: 'faker',
+      options: opts,
+      nodes: {
+        any: () => fakerKeywordMapper.any(),
+        unknown: () => fakerKeywordMapper.unknown(),
+        void: () => fakerKeywordMapper.void(),
+        boolean: () => fakerKeywordMapper.boolean(),
+        null: () => fakerKeywordMapper.null(),
+        string(node) {
+          if (node.pattern) {
+            return fakerKeywordMapper.matches(node.pattern, this.options.regexGenerator)
+          }
 
-        if (!refName) {
-          throw new Error('Name not defined for ref node')
-        }
+          return fakerKeywordMapper.string(node.min, node.max)
+        },
+        email: () => fakerKeywordMapper.email(),
+        url: () => fakerKeywordMapper.url(),
+        uuid: () => fakerKeywordMapper.uuid(),
+        number(node) {
+          return fakerKeywordMapper.number(node.min, node.max)
+        },
+        integer(node) {
+          return fakerKeywordMapper.integer(node.min, node.max)
+        },
+        bigint: () => fakerKeywordMapper.bigint(),
+        blob: () => fakerKeywordMapper.blob(),
+        datetime: () => fakerKeywordMapper.datetime(),
+        date(node) {
+          return fakerKeywordMapper.date(node.representation ?? 'string', this.options.dateParser)
+        },
+        time(node) {
+          return fakerKeywordMapper.time(node.representation ?? 'string', this.options.dateParser)
+        },
+        ref(node) {
+          // Parser-generated refs (with $ref) carry raw schema names that need resolving.
+          // Use the canonical name from the $ref path — node.name may have been overridden
+          // (e.g. by single-member allOf flatten using the property-derived child name).
+          // Inline refs (without $ref) from faker utils already carry resolved helper names.
+          const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name ?? node.schema?.name) : (node.name ?? node.schema?.name)
 
-        if (this.options.schemaName && refName === this.options.schemaName) {
-          return 'undefined as any'
-        }
+          if (!refName) {
+            throw new Error('Name not defined for ref node')
+          }
 
-        // Internal helper refs (for generated response/data helpers) are already
-        // emitted with resolver output and should not be transformed twice.
-        const resolvedName = node.ref ? this.options.resolver.resolveName(refName) : refName
+          if (this.options.schemaName && refName === this.options.schemaName) {
+            return 'undefined as any'
+          }
 
-        if (!this.options.nestedInObject) {
-          return `${resolvedName}(data)`
-        }
+          // Internal helper refs (for generated response/data helpers) are already
+          // emitted with resolver output and should not be transformed twice.
+          const resolvedName = node.ref ? this.options.resolver.resolveName(refName) : refName
 
-        return `${resolvedName}()`
-      },
-      enum(node) {
-        return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
-      },
-      union(node): string {
-        const items: string[] = (node.members ?? [])
-          .map((member) =>
-            printNested(member, {
-              nestedInObject: true,
-            }),
-          )
-          .filter((item): item is string => Boolean(item))
+          if (!this.options.nestedInObject) {
+            return `${resolvedName}(data)`
+          }
 
-        return fakerKeywordMapper.union(items)
-      },
-      intersection(node): string {
-        const items: string[] = (node.members ?? [])
-          .map((member) =>
-            printNested(member, {
-              nestedInObject: true,
-            }),
-          )
-          .filter((item): item is string => Boolean(item))
-
-        return fakerKeywordMapper.and(items)
-      },
-      array(node): string {
-        const items: string[] = (node.items ?? [])
-          .map((member) =>
-            printNested(member, {
-              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
-              nestedInObject: true,
-            }),
-          )
-          .filter((item): item is string => Boolean(item))
-
-        return fakerKeywordMapper.array(items, node.min, node.max)
-      },
-      tuple(node): string {
-        const items: string[] = (node.items ?? [])
-          .map((member, index) =>
-            printNested(member, {
-              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${index}]` : undefined,
-              nestedInObject: true,
-            }),
-          )
-          .filter((item): item is string => Boolean(item))
-
-        return fakerKeywordMapper.tuple(items)
-      },
-      object(node): string {
-        const cyclicSchemas = this.options.cyclicSchemas
-        const properties = (node.properties ?? [])
-          .map((property): string => {
-            if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
-              return `"${property.name}": ${this.options.mapper[property.name]}`
-            }
-
-            const value: string =
-              printNested(property.schema, {
-                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
+          return `${resolvedName}()`
+        },
+        enum(node) {
+          return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
+        },
+        union(node): string {
+          const items: string[] = (node.members ?? [])
+            .map((member) =>
+              printNested(member, {
                 nestedInObject: true,
-              }) ?? 'undefined'
+              }),
+            )
+            .filter((item): item is string => Boolean(item))
 
-            // When the property's schema transitively references a schema that is
-            // part of a circular dependency (other than the current schema itself),
-            // emit a memoizing lazy getter. On first access it computes the value,
-            // replaces itself with a plain data property via Object.defineProperty,
-            // and returns the cached value – so every subsequent read is stable.
-            if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-              return `get ${property.name}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
-            }
+          return fakerKeywordMapper.union(items)
+        },
+        intersection(node): string {
+          const items: string[] = (node.members ?? [])
+            .map((member) =>
+              printNested(member, {
+                nestedInObject: true,
+              }),
+            )
+            .filter((item): item is string => Boolean(item))
 
-            return `"${property.name}": ${value}`
-          })
-          .join(',')
+          return fakerKeywordMapper.and(items)
+        },
+        array(node): string {
+          const items: string[] = (node.items ?? [])
+            .map((member) =>
+              printNested(member, {
+                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
+                nestedInObject: true,
+              }),
+            )
+            .filter((item): item is string => Boolean(item))
 
-        return `{${properties}}`
+          return fakerKeywordMapper.array(items, node.min, node.max)
+        },
+        tuple(node): string {
+          const items: string[] = (node.items ?? [])
+            .map((member, index) =>
+              printNested(member, {
+                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${index}]` : undefined,
+                nestedInObject: true,
+              }),
+            )
+            .filter((item): item is string => Boolean(item))
+
+          return fakerKeywordMapper.tuple(items)
+        },
+        object(node): string {
+          const cyclicSchemas = this.options.cyclicSchemas
+          const properties = (node.properties ?? [])
+            .map((property): string => {
+              if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
+                return `"${property.name}": ${this.options.mapper[property.name]}`
+              }
+
+              const value: string =
+                printNested(property.schema, {
+                  typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
+                  nestedInObject: true,
+                }) ?? 'undefined'
+
+              // When the property's schema transitively references a schema that is
+              // part of a circular dependency (other than the current schema itself),
+              // emit a memoizing lazy getter. On first access it computes the value,
+              // replaces itself with a plain data property via Object.defineProperty,
+              // and returns the cached value – so every subsequent read is stable.
+              if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+                _hasGetters = true
+                return `get ${property.name}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
+              }
+
+              return `"${property.name}": ${value}`
+            })
+            .join(',')
+
+          return `{${properties}}`
+        },
+        ...opts.nodes,
       },
-      ...options.nodes,
-    },
-    print(node) {
-      return this.transform(node) ?? null
-    },
-  }
-})
+      print(node) {
+        return this.transform(node) ?? null
+      },
+    }
+  })
+
+  return Object.assign(factory(options), { containsGetters: () => _hasGetters })
+}
