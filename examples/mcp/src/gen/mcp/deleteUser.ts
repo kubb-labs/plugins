@@ -1,30 +1,28 @@
-import fetch from '../../client.js'
-import type { ResponseErrorConfig } from '../../client.js'
-import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../models/ts/DeleteUser.js'
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
-import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import fetch from "../../client.js";
+import type { ResponseErrorConfig } from "../../client.js";
+import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from "../models/ts/DeleteUser.js";
+import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
+import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
 
 /**
  * @description This can only be done by the logged in user.
  * @summary Delete user
  * {@link /user/:username}
  */
-export async function deleteUserHandler(
-  { username }: { username: DeleteUserPathUsername },
-  request: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): Promise<Promise<CallToolResult>> {
-  const res = await fetch<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>(
-    { method: 'DELETE', url: `/user/${username}`, baseURL: `https://petstore.swagger.io/v2` },
-    request,
-  )
+export async function deleteUserHandler({ username }: { username: DeleteUserPathUsername }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+
+
+
+
+  const res = await fetch<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: "DELETE", url: `/user/${username}`, baseURL: `https://petstore.swagger.io/v2` }, request)
 
   return {
-    content: [
-      {
-        type: 'text',
-        text: JSON.stringify(res.data),
-      },
-    ],
-    structuredContent: { data: res.data },
-  }
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(res.data)
+                }
+              ],
+              structuredContent: { data: res.data }
+             }
 }

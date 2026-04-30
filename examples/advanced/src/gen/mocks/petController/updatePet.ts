@@ -13,7 +13,7 @@ export function updatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePe
  * @description accepted operation
  */
 export function updatePetStatus202(data?: Partial<UpdatePetStatus202>): Required<UpdatePetStatus202> {
-  const defaultFakeData = { id: faker.number.int() }
+  const defaultFakeData = { id: faker.number.bigInt() }
   return {
     ...defaultFakeData,
     ...(data || {}),

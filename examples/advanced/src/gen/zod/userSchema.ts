@@ -2,7 +2,7 @@ import * as z from 'zod'
 import { tagTagSchema } from './tag/tagSchema.ts'
 
 export const userSchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   username: z.string().optional(),
   uuid: z.uuid().optional(),
   tag: tagTagSchema.optional().describe('The active tag'),

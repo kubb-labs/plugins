@@ -1,1 +1,1 @@
-export * from '@kubb/plugin-client/clients/fetch'
+export * from "@kubb/plugin-client/clients/fetch";

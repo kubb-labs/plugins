@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 
 export function userFaker(data?: Partial<User>): Required<User> {
   const defaultFakeData = {
-    id: faker.number.int(),
+    id: faker.number.bigInt(),
     username: faker.string.alpha(),
     uuid: faker.string.uuid(),
     tag: tagTagFaker(),

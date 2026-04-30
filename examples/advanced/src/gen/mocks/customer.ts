@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 
 export function customerFaker(data?: Partial<Customer>): Required<Customer> {
   const defaultFakeData = {
-    id: faker.number.int(),
+    id: faker.number.bigInt(),
     username: faker.string.alpha(),
     params: { status: faker.helpers.arrayElement<any>(['working', 'idle']), type: faker.string.alpha() },
     address: faker.helpers.multiple(() => addressFaker()),

@@ -8,7 +8,7 @@ export type TagTag = {
    * @default 1
    * @type integer | undefined
    */
-  id?: number
+  id?: bigint
   /**
    * @type string | undefined
    */

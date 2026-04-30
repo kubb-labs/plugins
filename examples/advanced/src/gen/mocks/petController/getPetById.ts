@@ -2,8 +2,8 @@ import type { GetPetByIdResponse, GetPetByIdStatus200 } from '../../models/ts/pe
 import { petFaker } from '../pet.ts'
 import { faker } from '@faker-js/faker'
 
-export function getPetByIdPathPetId(data?: number): number {
-  return data ?? faker.number.int()
+export function getPetByIdPathPetId(data?: bigint): bigint {
+  return data ?? faker.number.bigInt()
 }
 
 /**
