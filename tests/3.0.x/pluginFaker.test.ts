@@ -36,6 +36,25 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── locale ─────────────────────────────────────────────────────────────
+  {
+    name: 'locale',
+    config: {
+      root: __dirname,
+      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      output: { path: './gen', barrelType: false },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs],
+      plugins: [
+        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginFaker({
+          output: { path: './faker', barrelType: false },
+          locale: 'de',
+        }),
+      ],
+    },
+  },
+
   // ─── seed ───────────────────────────────────────────────────────────────
   {
     name: 'seed',

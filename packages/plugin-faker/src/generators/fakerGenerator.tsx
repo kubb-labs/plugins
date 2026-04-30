@@ -9,6 +9,7 @@ import {
   buildResponseUnionSchema,
   canOverrideSchema,
   filterUsedImports,
+  localeToFakerImport,
   resolveParamNameByLocation,
   resolveSchemaRef,
   resolveTypeReference,
@@ -20,7 +21,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, group, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
+    const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!node.name || !pluginTs || !adapter.inputNode) {
@@ -79,7 +80,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
         footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
-        <File.Import name={['faker']} path="@faker-js/faker" />
+        <File.Import name={locale ? [localeToFakerImport(locale)] : ['faker']} path="@faker-js/faker" />
+        {locale && <File.Source>{`const faker = ${localeToFakerImport(locale)}`}</File.Source>}
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
         {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
@@ -99,7 +101,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   },
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, printer } = ctx.options
+    const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!pluginTs) {
@@ -232,7 +234,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
         footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
       >
-        <File.Import name={['faker']} path="@faker-js/faker" />
+        <File.Import name={locale ? [localeToFakerImport(locale)] : ['faker']} path="@faker-js/faker" />
+        {locale && <File.Source>{`const faker = ${localeToFakerImport(locale)}`}</File.Source>}
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
         {paramEntries.map(({ param, name, typeName }) =>

@@ -103,6 +103,22 @@ export type Options = {
    */
   mapper?: Record<string, string>
   /**
+   * Locale for generating mock data.
+   * Imports the matching localized `@faker-js/faker` instance so names, addresses,
+   * and phone numbers reflect the target region.
+   *
+   * @default 'en'
+   *
+   * @example German
+   * `locale: 'de'`
+   *
+   * @example Austrian German
+   * `locale: 'de_AT'`
+   *
+   * @see https://fakerjs.dev/api/localization.html
+   */
+  locale?: string
+  /**
    * Seed faker for deterministic output.
    */
   seed?: number | number[]
@@ -140,6 +156,7 @@ type ResolvedOptions = {
   regexGenerator: NonNullable<Options['regexGenerator']>
   mapper: NonNullable<Options['mapper']>
   seed: NonNullable<Options['seed']> | undefined
+  locale: Options['locale']
   paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
