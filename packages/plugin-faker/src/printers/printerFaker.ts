@@ -319,10 +319,11 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
             // When the property's schema transitively references a schema that is
             // part of a circular dependency (other than the current schema itself),
-            // emit a lazy getter. This delays the recursive faker call so a user
-            // override via `Object.assign(result, data)` can prevent it entirely.
+            // emit a memoizing lazy getter. On first access it computes the value,
+            // replaces itself with a plain data property via Object.defineProperty,
+            // and returns the cached value – so every subsequent read is stable.
             if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-              return `get ${property.name}() { return ${value} }`
+              return `get ${property.name}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
             }
 
             return `"${property.name}": ${value}`

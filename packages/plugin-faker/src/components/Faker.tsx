@@ -77,13 +77,33 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
     functionSignature = `${jsdoc}export function ${name}(data?: Partial<${typeName}>): Required<${typeName}>`
 
     const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
-    functionBody = `{
+
+    // When the object literal contains memoizing getters (cyclic properties), spreading
+    // it would immediately invoke those getters – which triggers recursive faker calls and
+    // causes an infinite-recursion stack overflow.  Instead, we return the object as-is and
+    // merge overrides via Object.defineProperty so that getter-only properties can be
+    // replaced without needing a setter.
+    const hasGetters = /\bget [a-zA-Z_$]/.test(fakerText)
+
+    if (hasGetters) {
+      functionBody = `{
+  ${seedCode}const defaultFakeData = ${fakerText}
+  if (data) {
+    for (const [key, value] of Object.entries(data)) {
+      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
+    }
+  }
+  return defaultFakeData as Required<${typeName}>
+}`
+    } else {
+      functionBody = `{
   ${seedCode}const defaultFakeData = ${fakerText}
   return {
     ...defaultFakeData,
     ...(data || {}),
   } as Required<${typeName}>
 }`
+    }
   } else {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'

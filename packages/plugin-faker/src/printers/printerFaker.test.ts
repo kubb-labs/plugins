@@ -107,4 +107,29 @@ describe('printerFaker', () => {
       `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(["NW", "NE", "SW", "SE"])]"`,
     )
   })
+
+  test('emits memoizing getter for properties that participate in a cyclic dependency', () => {
+    // Cat.friend → Pet which is cyclic; the getter must cache its computed value via
+    // Object.defineProperty so that repeated access returns the same object instance.
+    const cyclicSchemas = new Set(['Pet'])
+    const node = ast.createSchema({
+      type: 'object',
+      properties: [
+        ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
+        ast.createProperty({
+          name: 'friend',
+          schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+        }),
+      ],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, schemaName: 'Cat', cyclicSchemas }).print(node)
+
+    // The cyclic property must use a memoizing getter
+    expect(result).toContain('get friend()')
+    expect(result).toContain('Object.defineProperty(this, "friend"')
+    expect(result).toContain('configurable: true')
+    // Non-cyclic properties must not use a getter
+    expect(result).not.toContain('get id()')
+  })
 })
