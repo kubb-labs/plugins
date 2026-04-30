@@ -3,7 +3,7 @@ import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { FakerPrinter } from '../printers/printerFaker.ts'
+import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { resolveFakerTypeUsage } from '../utils.ts'
 
@@ -11,7 +11,7 @@ type Props = {
   name: string
   typeName: string
   node: ast.SchemaNode
-  printer: FakerPrinter
+  printer: ast.Printer<PrinterFakerFactory>
   seed?: PluginFaker['options']['seed']
   description?: string
   canOverride: boolean
@@ -78,12 +78,16 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
 
     const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
 
-    // When the printer emitted memoizing getters (cyclic properties), spreading the
-    // object literal would immediately invoke those getters – which triggers recursive
-    // faker calls and causes an infinite-recursion stack overflow.  Instead, we return
-    // the object as-is and merge overrides via Object.defineProperty so that
-    // getter-only properties can be replaced without needing a setter.
-    const hasGetters = printer.containsGetters()
+    // When the object node has properties that transitively reference a cyclic schema,
+    // the printer emits memoizing getters for those properties. Spreading the object
+    // literal would immediately invoke those getters, triggering recursive faker calls
+    // and causing a stack overflow. Detect this upfront via ast helpers so we can
+    // use Object.defineProperty-based merging instead of spread.
+    const { cyclicSchemas, schemaName } = printer.options
+    const hasGetters =
+      node.type === 'object' &&
+      !!cyclicSchemas &&
+      (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
     if (hasGetters) {
       functionBody = `{
