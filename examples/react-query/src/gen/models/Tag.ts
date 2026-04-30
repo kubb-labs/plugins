@@ -2,14 +2,14 @@
 
 /**
  * @type object
-*/
+ */
 export type Tag = {
-    /**
-     * @type integer | undefined
-    */
-    id?: bigint;
-    /**
-     * @type string | undefined
-    */
-    name?: string;
-};
+  /**
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @type string | undefined
+   */
+  name?: string
+}

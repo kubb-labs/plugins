@@ -1,8 +1,8 @@
-import fetch from "../../client.js";
-import type { ResponseErrorConfig } from "../../client.js";
-import type { GetInventoryResponse } from "../models/ts/GetInventory.js";
-import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
-import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
+import fetch from '../../client.js'
+import type { ResponseErrorConfig } from '../../client.js'
+import type { GetInventoryResponse } from '../models/ts/GetInventory.js'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Returns a map of status codes to quantities
@@ -10,19 +10,18 @@ import type { CallToolResult, ServerNotification, ServerRequest } from "@modelco
  * {@link /store/inventory}
  */
 export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
-  const res = await fetch<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory`, baseURL: `https://petstore.swagger.io/v2` }, request)
+  const res = await fetch<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>(
+    { method: 'GET', url: `/store/inventory`, baseURL: `https://petstore.swagger.io/v2` },
+    request,
+  )
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data),
+      },
+    ],
+    structuredContent: { data: res.data },
+  }
 }
