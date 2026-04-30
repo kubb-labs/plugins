@@ -4,25 +4,6 @@ Kubb is a plugin-based code-generation toolkit for generating client code from O
 
 ## Folder Structure
 
-### Documentation
-
-```
-docs/
-├── config.json              # Navigation and sidebar (Kubb.dev schema)
-├── migration-guide.md       # Updated after major releases
-├── changelog.md             # Updated with every PR (via changeset)
-├── getting-started/         # Installation, quick-start, configuration
-├── helpers/                 # Extra packages (CLI guides, OAS core helpers)
-├── guide/                   # Feature deep-dives and how-tos
-├── plugins/                 # Plugin documentation (mirrors `packages/`)
-├── tutorials/               # Step-by-step tutorials
-├── examples/                # Playground and examples
-├── builders/                # Builder integrations (unplugin, etc.)
-└── public/                  # Static assets
-```
-
-All markdown files follow VitePress conventions. The `config.json` file uses the Kubb.dev schema for navigation. See `.skills/documentation/` for writing guidelines.
-
 ### Packages
 
 ```
@@ -45,7 +26,7 @@ packages/
 
 Plugins follow this convention:
 
-- `src/components/` - React-fabric components
+- `src/components/` - jsx-renderer components
 - `src/generators/` - Generator implementations
 - `src/*.test.ts` - Tests
 
