@@ -21,7 +21,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'models.ts',
-          barrelType: false,
+          barrel: false,
         },
         transformer: {
           // Make all properties of the "Pet" schema required
@@ -52,7 +52,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'models.ts',
-          barrelType: false,
+          barrel: false,
         },
         enumType: 'asConst',
         arrayType: 'generic',
@@ -72,7 +72,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'modelsConst.ts',
-          barrelType: false,
+          barrel: false,
         },
         enumType: 'asConst',
         enumTypeSuffix: 'enumType',
@@ -90,7 +90,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'modelsPascalConst.ts',
-          barrelType: false,
+          barrel: false,
         },
         enumType: 'asPascalConst',
       }),
@@ -107,7 +107,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'modelsConstEnum.ts',
-          barrelType: false,
+          barrel: false,
         },
         enumType: 'constEnum',
       }),
@@ -124,7 +124,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'modelsLiteral.ts',
-          barrelType: false,
+          barrel: false,
         },
         enumType: 'literal',
       }),
@@ -155,7 +155,7 @@ export default defineConfig([
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
-        output: { path: 'modelsInlineLiteral.ts', barrelType: false },
+        output: { path: 'modelsInlineLiteral.ts', barrel: false },
         enumType: 'inlineLiteral',
       }),
     ],
@@ -167,7 +167,7 @@ export default defineConfig([
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
-        output: { path: 'modelsOptionalUndefined.ts', barrelType: false },
+        output: { path: 'modelsOptionalUndefined.ts', barrel: false },
         enumType: 'inlineLiteral',
         optionalType: 'undefined',
       }),
@@ -180,7 +180,7 @@ export default defineConfig([
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
-        output: { path: 'modelsOptionalBoth.ts', barrelType: false },
+        output: { path: 'modelsOptionalBoth.ts', barrel: false },
         enumType: 'inlineLiteral',
         optionalType: 'questionTokenAndUndefined',
       }),
@@ -207,7 +207,7 @@ export default defineConfig([
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
-        output: { path: 'modelsPascalCaseKeys.ts', barrelType: false },
+        output: { path: 'modelsPascalCaseKeys.ts', barrel: false },
         enumType: 'asConst',
         enumKeyCasing: 'pascalCase',
       }),
@@ -223,7 +223,7 @@ export default defineConfig([
     adapter: adapterOas({ validate: false }),
     plugins: [
       pluginTs({
-        output: { path: 'modelsCamelCaseKeys.ts', barrelType: false },
+        output: { path: 'modelsCamelCaseKeys.ts', barrel: false },
         enumType: 'asConst',
         enumKeyCasing: 'camelCase',
       }),

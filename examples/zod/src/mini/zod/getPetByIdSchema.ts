@@ -6,7 +6,7 @@
 import * as z from 'zod/mini'
 import { petSchema } from './petSchema.ts'
 
-export const getPetByIdPathPetIdSchema = z.int()
+export const getPetByIdPathPetIdSchema = z.bigint()
 
 export const getPetByIdStatus200Schema = z.lazy(() => petSchema)
 

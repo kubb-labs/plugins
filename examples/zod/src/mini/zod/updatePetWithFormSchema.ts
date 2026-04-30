@@ -5,7 +5,7 @@
 
 import * as z from 'zod/mini'
 
-export const updatePetWithFormPathPetIdSchema = z.int()
+export const updatePetWithFormPathPetIdSchema = z.bigint()
 
 export const updatePetWithFormQueryNameSchema = z.optional(z.string())
 

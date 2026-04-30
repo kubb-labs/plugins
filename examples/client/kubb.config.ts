@@ -33,7 +33,7 @@ export default defineConfig([
       pluginClient({
         output: {
           path: './clients/axios',
-          barrelType: 'propagate',
+          barrel: { type: 'all', nested: true },
           banner: '/* eslint-disable no-alert, no-console */',
         },
         client: 'fetch',
@@ -59,7 +59,7 @@ export default defineConfig([
       pluginClient({
         output: {
           path: './clients/axios/xml',
-          barrelType: 'propagate',
+          barrel: { type: 'all', nested: true },
           banner: '/* eslint-disable no-alert, no-console */',
         },
         include: [{ type: 'operationId', pattern: 'uploadFile' }],
@@ -152,7 +152,7 @@ export default defineConfig([
       pluginClient({
         output: {
           path: './clients/class',
-          barrelType: false,
+          barrel: false,
           banner: '/* eslint-disable no-alert, no-console */',
         },
         client: 'fetch',

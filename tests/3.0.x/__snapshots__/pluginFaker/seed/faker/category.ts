@@ -9,7 +9,7 @@ import { faker } from "@faker-js/faker";
 export function category(data?: Partial<Category>): Required<Category>
 {
   faker.seed([42])
-  const defaultFakeData = {"id": faker.number.int(),"name": faker.string.alpha()}
+  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha()}
   return {
     ...defaultFakeData,
     ...(data || {}),

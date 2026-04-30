@@ -7,7 +7,7 @@ import * as z from "zod";
 import { addressSchema } from "./addressSchema.ts";
 
 export const customerSchema = z.object({
-    "id": z.coerce.number().int().optional(),
+    "id": z.coerce.bigint().optional(),
     "username": z.coerce.string().optional(),
     "address": z.array(addressSchema).optional()
     })

@@ -26,13 +26,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
         }),
       ],
     },
@@ -44,13 +44,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           paramsType: 'object',
         }),
       ],
@@ -63,13 +63,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           pathParamsType: 'object',
         }),
       ],
@@ -82,13 +82,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           infinite: {
             queryParam: 'page',
             initialPageParam: 0,
@@ -104,14 +104,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           parser: 'zod',
         }),
       ],
@@ -124,13 +124,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           mutation: false,
         }),
       ],
@@ -143,13 +143,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           paramsCasing: 'camelcase',
         }),
       ],
@@ -162,13 +162,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -182,13 +182,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -201,13 +201,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
           group: { type: 'tag' },
         }),
       ],
@@ -220,14 +220,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginClient({ output: { path: './clients', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginClient({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
-          output: { path: './hooks', barrelType: false },
+          output: { path: './hooks', barrel: false },
         }),
       ],
     },

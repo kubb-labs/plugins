@@ -12,7 +12,7 @@ export type DeletePetHeaderApiKey = string | undefined
  * @description Pet id to delete
  * @type integer
  */
-export type DeletePetPathPetId = number
+export type DeletePetPathPetId = bigint
 
 /**
  * @type array

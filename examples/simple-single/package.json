@@ -32,6 +32,6 @@
     "kubb": "catalog:",
     "react": "^19.2.5",
     "typescript": "catalog:",
-    "zod": "^4.3.6"
+    "zod": "^4.4.1"
   }
 }

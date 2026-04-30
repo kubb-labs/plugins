@@ -8,7 +8,7 @@ import { categorySchema } from './categorySchema.ts'
 import { tagSchema } from './tagSchema.ts'
 
 export const petSchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   get parent() {
     return z.array(petSchema).optional()
   },

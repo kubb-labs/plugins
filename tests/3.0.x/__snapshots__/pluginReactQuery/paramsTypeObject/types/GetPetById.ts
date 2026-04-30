@@ -9,7 +9,7 @@ import type { Pet } from "./Pet.ts";
  * @description ID of pet to return
  * @type integer
 */
-export type GetPetByIdPathPetId = number;
+export type GetPetByIdPathPetId = bigint;
 
 /**
  * @type object

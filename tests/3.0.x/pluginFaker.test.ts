@@ -24,13 +24,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
         }),
       ],
     },
@@ -61,13 +61,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           seed: [42],
         }),
       ],
@@ -80,13 +80,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           mapper: {
             status: "'active'",
           },
@@ -101,13 +101,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           dateParser: 'dayjs',
         }),
       ],
@@ -120,13 +120,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           regexGenerator: 'randexp',
         }),
       ],
@@ -139,13 +139,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           paramsCasing: 'camelcase',
         }),
       ],
@@ -158,13 +158,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -178,13 +178,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -197,13 +197,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
-          output: { path: './faker', barrelType: false },
+          output: { path: './faker', barrel: false },
           group: { type: 'tag' },
         }),
       ],

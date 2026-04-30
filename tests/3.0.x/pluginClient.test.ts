@@ -25,13 +25,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
         }),
       ],
     },
@@ -43,13 +43,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           dataReturnType: 'full',
         }),
       ],
@@ -62,13 +62,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           paramsType: 'object',
         }),
       ],
@@ -81,13 +81,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           pathParamsType: 'object',
         }),
       ],
@@ -100,13 +100,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           operations: true,
         }),
       ],
@@ -119,14 +119,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginZod({ output: { path: './zod', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           parser: 'zod',
         }),
       ],
@@ -139,13 +139,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           clientType: 'class',
         }),
       ],
@@ -158,13 +158,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           paramsCasing: 'camelcase',
         }),
       ],
@@ -177,13 +177,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           baseURL: 'https://api.example.com/v1',
         }),
       ],
@@ -196,13 +196,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -216,13 +216,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -235,13 +235,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
-          output: { path: './clients', barrelType: false },
+          output: { path: './clients', barrel: false },
           group: { type: 'tag' },
         }),
       ],

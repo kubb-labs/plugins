@@ -6,8 +6,8 @@
 import * as z from 'zod'
 
 export const orderSchema = z.object({
-  id: z.int().optional(),
-  petId: z.int().optional(),
+  id: z.bigint().optional(),
+  petId: z.bigint().optional(),
   quantity: z.int().optional(),
   shipDate: z.iso.datetime().optional(),
   status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
@@ -26,13 +26,13 @@ export const addressSchema = z.object({
 })
 
 export const customerSchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   username: z.string().optional(),
   address: z.array(addressSchema).optional(),
 })
 
 export const categorySchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   name: z.string().optional(),
 })
 
@@ -42,7 +42,7 @@ export const personSchema = z.object({
 
 export const userSchema = personSchema.and(
   z.object({
-    id: z.int().optional(),
+    id: z.bigint().optional(),
     username: z.string().optional(),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
@@ -54,12 +54,12 @@ export const userSchema = personSchema.and(
 )
 
 export const tagSchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   name: z.string().optional(),
 })
 
 export const petSchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   name: z.string(),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
@@ -68,7 +68,7 @@ export const petSchema = z.object({
 })
 
 export const addPetRequestSchema = z.object({
-  id: z.int().optional(),
+  id: z.bigint().optional(),
   name: z.string(),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
@@ -136,7 +136,7 @@ export const findPetsByTagsStatus400Schema = z.any()
 
 export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])
 
-export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
+export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
 
 export const getPetByIdStatus200Schema = petSchema
 
@@ -146,7 +146,7 @@ export const getPetByIdStatus404Schema = z.any()
 
 export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
-export const updatePetWithFormPathPetIdSchema = z.int().describe('ID of pet that needs to be updated')
+export const updatePetWithFormPathPetIdSchema = z.bigint().describe('ID of pet that needs to be updated')
 
 export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
@@ -158,13 +158,13 @@ export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema
 
 export const deletePetHeaderApiKeySchema = z.string().optional()
 
-export const deletePetPathPetIdSchema = z.int().describe('Pet id to delete')
+export const deletePetPathPetIdSchema = z.bigint().describe('Pet id to delete')
 
 export const deletePetStatus400Schema = z.any()
 
 export const deletePetResponseSchema = deletePetStatus400Schema
 
-export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
+export const uploadFilePathPetIdSchema = z.bigint().describe('ID of pet to update')
 
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
@@ -194,7 +194,7 @@ export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Sc
 
 export const placeOrderPatchDataSchema = orderSchema.optional()
 
-export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
+export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
 export const getOrderByIdStatus200Schema = orderSchema
 
@@ -204,7 +204,7 @@ export const getOrderByIdStatus404Schema = z.any()
 
 export const getOrderByIdResponseSchema = z.union([getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
-export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
+export const deleteOrderPathOrderIdSchema = z.bigint().describe('ID of the order that needs to be deleted')
 
 export const deleteOrderStatus400Schema = z.any()
 

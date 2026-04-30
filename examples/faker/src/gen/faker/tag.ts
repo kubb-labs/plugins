@@ -7,7 +7,7 @@ import type { Tag } from '../models/Tag.ts'
 import { faker } from '@faker-js/faker'
 
 export function tag(data?: Partial<Tag>): Required<Tag> {
-  const defaultFakeData = { id: faker.number.int(), name: faker.string.alpha() }
+  const defaultFakeData = { id: faker.number.bigInt(), name: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),

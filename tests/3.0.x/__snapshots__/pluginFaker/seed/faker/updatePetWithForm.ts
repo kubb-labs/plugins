@@ -5,10 +5,10 @@
 
 import { faker } from "@faker-js/faker";
 
-export function updatePetWithFormPathPetId(data?: number): number {
+export function updatePetWithFormPathPetId(data?: bigint): bigint {
   faker.seed([42])
 
-  return data ?? faker.number.int()
+  return data ?? faker.number.bigInt()
 }
 
 export function updatePetWithFormQueryName(data?: string): string {

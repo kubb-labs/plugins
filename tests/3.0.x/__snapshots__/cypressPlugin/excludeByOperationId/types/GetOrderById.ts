@@ -9,7 +9,7 @@ import type { Order } from "./Order.ts";
  * @description ID of order that needs to be fetched
  * @type integer
 */
-export type GetOrderByIdPathOrderId = number;
+export type GetOrderByIdPathOrderId = bigint;
 
 /**
  * @type object

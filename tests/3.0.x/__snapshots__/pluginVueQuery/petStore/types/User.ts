@@ -11,7 +11,7 @@ export type User = {
      * @example 10
      * @type integer | undefined
     */
-    id?: number;
+    id?: bigint;
     /**
      * @example theUser
      * @type string | undefined

@@ -5,8 +5,8 @@
 
 import { faker } from '@faker-js/faker'
 
-export function updatePetWithFormPathPetId(data?: number): number {
-  return data ?? faker.number.int()
+export function updatePetWithFormPathPetId(data?: bigint): bigint {
+  return data ?? faker.number.bigInt()
 }
 
 export function updatePetWithFormQueryName(data?: string): string {

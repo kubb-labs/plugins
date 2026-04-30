@@ -13,7 +13,7 @@ export type Customer = {
    * @example 100000
    * @type integer | undefined
    */
-  id?: number
+  id?: bigint
   /**
    * @type object | undefined
    */

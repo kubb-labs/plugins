@@ -7,10 +7,10 @@ import type { UploadFileResponse, UploadFileStatus200 } from '../../models/Uploa
 import { apiResponse } from '../apiResponse.ts'
 import { faker } from '@faker-js/faker'
 
-export function uploadFilePathPetId(data?: number): number {
+export function uploadFilePathPetId(data?: bigint): bigint {
   faker.seed([220])
 
-  return data ?? faker.number.int()
+  return data ?? faker.number.bigInt()
 }
 
 export function uploadFileQueryAdditionalMetadata(data?: string): string {

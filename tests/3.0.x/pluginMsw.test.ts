@@ -25,13 +25,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
         }),
       ],
     },
@@ -43,14 +43,14 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
-        pluginFaker({ output: { path: './faker', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginFaker({ output: { path: './faker', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
           parser: 'faker',
         }),
       ],
@@ -63,13 +63,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
           handlers: true,
         }),
       ],
@@ -82,13 +82,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
           baseURL: 'http://localhost:3000',
         }),
       ],
@@ -101,13 +101,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -121,13 +121,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -140,13 +140,13 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
-        pluginTs({ output: { path: './types', barrelType: false } }),
+        pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
-          output: { path: './msw', barrelType: false },
+          output: { path: './msw', barrel: false },
           group: { type: 'tag' },
         }),
       ],
