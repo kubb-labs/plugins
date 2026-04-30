@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { buildContentTypeParams, buildMutationArgParams, getComments, getContentTypeInfo, resolveErrorNames } from '../utils.ts'
+import { buildMutationArgParams, getComments, resolveErrorNames } from '../utils.ts'
 import { MutationKey } from './MutationKey.tsx'
 
 type Props = {
@@ -40,7 +40,7 @@ function getParams(
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver, extraBodyParams: buildContentTypeParams(node) })
+  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
 
   // Vue-query uses MutationObserverOptions instead of UseMutationOptions, and wraps params with MaybeRefOrGetter
   const mutationArgWrapped = mutationArgParamsNode.params.map((param) => {
@@ -102,12 +102,9 @@ export function Mutation({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const { isMultipleContentTypes, contentTypeUnion, defaultContentType } = getContentTypeInfo(node)
-
   const mutationArgParamsNode = buildMutationArgParams(node, {
     paramsCasing,
     resolver: tsResolver,
-    extraBodyParams: buildContentTypeParams(node),
   })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
   const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
@@ -124,15 +121,6 @@ export function Mutation({
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
-      ...(isMultipleContentTypes
-        ? [
-            ast.createFunctionParameter({
-              name: 'contentType',
-              type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
-              default: JSON.stringify(defaultContentType),
-            }),
-          ]
-        : []),
       ast.createFunctionParameter({
         name: 'config',
         type: ast.createParamsType({

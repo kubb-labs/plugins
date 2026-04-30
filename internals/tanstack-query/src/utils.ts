@@ -13,18 +13,6 @@ export function getContentTypeInfo(node: ast.OperationNode) {
   }
 }
 
-export function buildContentTypeParams(node: ast.OperationNode): ast.FunctionParameterNode[] {
-  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
-  if (!isMultipleContentTypes) return []
-  return [
-    ast.createFunctionParameter({
-      name: 'contentType',
-      type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
-      optional: true,
-    }),
-  ]
-}
-
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
 }

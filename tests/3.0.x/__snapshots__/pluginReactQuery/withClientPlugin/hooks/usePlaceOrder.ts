@@ -14,10 +14,10 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
 
         const mutationKey = placeOrderMutationKey()
-        return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+        return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
           mutationKey,
-          mutationFn: async({ data, contentType }) => {
-            return placeOrder(data, contentType, config)
+          mutationFn: async({ data }) => {
+            return placeOrder(data, config)
           },
         })
 
@@ -29,7 +29,7 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Re
  * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
-  mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client },
 } = {}) {
 
@@ -37,13 +37,13 @@ export function usePlaceOrder<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
 
-          const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>
+          const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
 
 
-          return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+          return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>
+          }, queryClient) as UseMutationResult<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
 
 }

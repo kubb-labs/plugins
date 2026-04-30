@@ -2,7 +2,6 @@ import type { ast } from '@kubb/core'
 import type { PluginReactQuery } from './types.ts'
 
 export {
-  buildContentTypeParams,
   buildGroupParam,
   buildMutationArgParams,
   buildQueryKeyParams,

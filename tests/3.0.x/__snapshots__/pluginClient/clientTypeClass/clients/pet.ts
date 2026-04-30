@@ -27,7 +27,7 @@ export class Pet {
    * @summary Update an existing pet
    * {@link /pet}
    */
-  async updatePet(data: UpdatePetData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+  async updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ ...requestConfig, method: "PUT", url: `/pet`, data: requestData })
@@ -39,7 +39,7 @@ export class Pet {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  async addPet(data: AddPetData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+  async addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ ...requestConfig, method: "POST", url: `/pet`, data: requestData })

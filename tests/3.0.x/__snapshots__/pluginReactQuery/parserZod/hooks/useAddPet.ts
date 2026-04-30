@@ -17,7 +17,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 
@@ -32,10 +32,10 @@ export async function addPet(data: AddPetData, contentType: "application/json" |
 export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
 
         const mutationKey = addPetMutationKey()
-        return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+        return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
           mutationKey,
-          mutationFn: async({ data, contentType }) => {
-            return addPet(data, contentType, config)
+          mutationFn: async({ data }) => {
+            return addPet(data, config)
           },
         })
 
@@ -47,7 +47,7 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
  * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
-  mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<AddPetData>> & { client?: Client },
 } = {}) {
 
@@ -55,13 +55,13 @@ export function useAddPet<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
-          const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>
+          const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>
 
 
-          return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+          return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>
+          }, queryClient) as UseMutationResult<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>
 
 }

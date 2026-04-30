@@ -17,7 +17,7 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
 
@@ -35,7 +35,7 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
  * {@link /user/:username}
  */
 export function useUpdateUser<TContext>(options: {
-  mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, {username: MaybeRefOrGetter<UpdateUserPathUsername>, data?: MaybeRefOrGetter<UpdateUserData>, contentType?: MaybeRefOrGetter<"application/json" | "application/xml" | "application/x-www-form-urlencoded">}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, {username: MaybeRefOrGetter<UpdateUserPathUsername>, data?: MaybeRefOrGetter<UpdateUserData>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client },
 } = {}) {
 
@@ -43,9 +43,9 @@ export function useUpdateUser<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? updateUserMutationKey()
 
-          return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathUsername, data?: UpdateUserData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
-            mutationFn: async({ username, data, contentType }) => {
-              return updateUser(username, data, contentType, config)
+          return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathUsername, data?: UpdateUserData}, TContext>({
+            mutationFn: async({ username, data }) => {
+              return updateUser(username, data, config)
             },
             mutationKey,
             ...mutationOptions

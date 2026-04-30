@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildContentTypeParams, buildMutationArgParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildMutationArgParams, getComments, resolveErrorNames } from '../utils.ts'
 import { MutationOptions } from './MutationOptions.tsx'
 
 type Props = {
@@ -42,7 +42,6 @@ function getParams(
   const mutationArgParamsNode = buildMutationArgParams(node, {
     paramsCasing,
     resolver,
-    extraBodyParams: buildContentTypeParams(node),
   })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
@@ -74,7 +73,6 @@ export function Mutation({ name, mutationOptionsName, paramsCasing, dataReturnTy
   const mutationArgParamsNode = buildMutationArgParams(node, {
     paramsCasing,
     resolver: tsResolver,
-    extraBodyParams: buildContentTypeParams(node),
   })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')

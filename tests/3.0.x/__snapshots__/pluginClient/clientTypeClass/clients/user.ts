@@ -26,7 +26,7 @@ export class User {
    * @summary Create user
    * {@link /user}
    */
-  async createUser(data?: CreateUserData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+  async createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ ...requestConfig, method: "POST", url: `/user`, data: requestData })
@@ -80,7 +80,7 @@ export class User {
    * @summary Update user
    * {@link /user/:username}
    */
-  async updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, contentType: "application/json" | "application/xml" | "application/x-www-form-urlencoded" = "application/json", config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+  async updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ ...requestConfig, method: "PUT", url: `/user/${username}`, data: requestData })

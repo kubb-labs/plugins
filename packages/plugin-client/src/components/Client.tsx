@@ -43,7 +43,6 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
-  const { isMultipleContentTypes, contentTypeUnion, defaultContentType } = getContentTypeInfo(node)
 
   return ast.createOperationParams(node, {
     paramsType,
@@ -51,15 +50,6 @@ function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver,
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
-      ...(isMultipleContentTypes
-        ? [
-            ast.createFunctionParameter({
-              name: 'contentType',
-              type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
-              default: JSON.stringify(defaultContentType),
-            }),
-          ]
-        : []),
       ...(isConfigurable
         ? [
             ast.createFunctionParameter({
@@ -219,7 +209,9 @@ export function Client({
           }}
           returnType={returnType}
         >
-          {isConfigurable ? 'const { client: request = fetch, ...requestConfig } = config' : ''}
+          {isConfigurable
+            ? `const { client: request = fetch, ${isMultipleContentTypes && hasFormData ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
+            : ''}
           <br />
           <br />
           {pathParamsMapping &&

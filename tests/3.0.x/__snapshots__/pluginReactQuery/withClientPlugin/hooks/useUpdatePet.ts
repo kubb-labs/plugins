@@ -14,10 +14,10 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
 
         const mutationKey = updatePetMutationKey()
-        return mutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+        return mutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext>({
           mutationKey,
-          mutationFn: async({ data, contentType }) => {
-            return updatePet(data, contentType, config)
+          mutationFn: async({ data }) => {
+            return updatePet(data, config)
           },
         })
 
@@ -29,7 +29,7 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
  * {@link /pet}
  */
 export function useUpdatePet<TContext>(options: {
-  mutation?: UseMutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
 } = {}) {
 
@@ -37,13 +37,13 @@ export function useUpdatePet<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
-          const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>
+          const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext>
 
 
-          return useMutation<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>({
+          return useMutation<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData, contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded"}, TContext>
+          }, queryClient) as UseMutationResult<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext>
 
 }

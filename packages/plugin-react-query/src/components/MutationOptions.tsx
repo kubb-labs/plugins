@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildContentTypeParams, buildMutationArgParams, getContentTypeInfo, resolveErrorNames } from '../utils.ts'
+import { buildMutationArgParams, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -57,12 +57,9 @@ export function MutationOptions({
   const configParamsNode = getConfigParam(node, tsResolver)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
-  const { isMultipleContentTypes, contentTypeUnion, defaultContentType } = getContentTypeInfo(node)
-
   const mutationArgParamsNode = buildMutationArgParams(node, {
     paramsCasing,
     resolver: tsResolver,
-    extraBodyParams: buildContentTypeParams(node),
   })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
 
@@ -75,15 +72,6 @@ export function MutationOptions({
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
-      ...(isMultipleContentTypes
-        ? [
-            ast.createFunctionParameter({
-              name: 'contentType',
-              type: ast.createParamsType({ variant: 'reference', name: contentTypeUnion }),
-              default: JSON.stringify(defaultContentType),
-            }),
-          ]
-        : []),
       ast.createFunctionParameter({
         name: 'config',
         type: ast.createParamsType({

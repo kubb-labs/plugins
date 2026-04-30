@@ -16,6 +16,7 @@ export type RequestConfig<TData = unknown> = {
   signal?: AbortSignal
   headers?: [string, string][] | Record<string, string>
   credentials?: RequestCredentials
+  contentType?: string
 }
 
 /**
@@ -79,7 +80,10 @@ export const fetch = async <TData, _TError = unknown, TVariables = unknown>(
     method: config.method?.toUpperCase(),
     body: config.data instanceof FormData ? config.data : JSON.stringify(config.data),
     signal: config.signal,
-    headers: config.headers,
+    headers: {
+      ...(config.contentType && config.contentType !== 'multipart/form-data' ? { 'Content-Type': config.contentType } : {}),
+      ...(Array.isArray(config.headers) ? Object.fromEntries(config.headers) : config.headers),
+    },
   })
 
   const data = [204, 205, 304].includes(response.status) || !response.body ? {} : await response.json()
