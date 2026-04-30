@@ -20,6 +20,7 @@ export default defineConfig({
   adapter: adapterOas({
     validate: true,
     discriminator: 'strict',
+    integerType: 'number',
   }),
   output: {
     path: './src/gen',

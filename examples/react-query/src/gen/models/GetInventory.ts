@@ -2,33 +2,33 @@
 
 /**
  * @type object
-*/
+ */
 export type GetInventoryStatus200 = {
-    [key: string]: number;
-};
+  [key: string]: number
+}
 
 /**
  * @type object
-*/
+ */
 export type GetInventoryRequestConfig = {
-    data?: never;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
-    /**
-     * @type string
-    */
-    url: "/store/inventory";
-};
+  data?: never
+  pathParams?: never
+  queryParams?: never
+  headerParams?: never
+  /**
+   * @type string
+   */
+  url: '/store/inventory'
+}
 
 /**
  * @type object
-*/
+ */
 export type GetInventoryResponses = {
-    "200": GetInventoryStatus200;
-};
+  '200': GetInventoryStatus200
+}
 
 /**
  * @description Union of all possible responses
-*/
-export type GetInventoryResponse = GetInventoryStatus200;
+ */
+export type GetInventoryResponse = GetInventoryStatus200

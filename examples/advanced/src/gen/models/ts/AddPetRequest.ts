@@ -17,7 +17,7 @@ export type AddPetRequest = {
    * @example 10
    * @type integer | undefined
    */
-  id?: bigint
+  id?: number
   /**
    * @example doggie
    * @type string

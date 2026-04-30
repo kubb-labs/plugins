@@ -2,8 +2,8 @@ import type { UploadFileResponse, UploadFileStatus200 } from '../../models/ts/pe
 import { apiResponseFaker } from '../apiResponse.ts'
 import { faker } from '@faker-js/faker'
 
-export function uploadFilePathPetId(data?: bigint): bigint {
-  return data ?? faker.number.bigInt()
+export function uploadFilePathPetId(data?: number): number {
+  return data ?? faker.number.int()
 }
 
 export function uploadFileQueryAdditionalMetadata(data?: string): string {

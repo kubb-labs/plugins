@@ -4,8 +4,8 @@ export function deletePetHeaderApiKey(data?: string): string {
   return data ?? faker.string.alpha()
 }
 
-export function deletePetPathPetId(data?: bigint): bigint {
-  return data ?? faker.number.bigInt()
+export function deletePetPathPetId(data?: number): number {
+  return data ?? faker.number.int()
 }
 
 /**

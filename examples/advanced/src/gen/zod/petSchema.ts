@@ -3,7 +3,7 @@ import { categorySchema } from './categorySchema.ts'
 import { tagTagSchema } from './tag/tagSchema.ts'
 
 export const petSchema = z.object({
-  id: z.bigint().optional(),
+  id: z.int().optional(),
   get parent() {
     return z.array(petSchema).optional()
   },

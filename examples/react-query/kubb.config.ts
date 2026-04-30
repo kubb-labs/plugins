@@ -1,3 +1,4 @@
+import { adapterOas } from '@kubb/adapter-oas'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { QueryKey } from '@kubb/plugin-react-query/components'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -9,6 +10,7 @@ export const config = {
   input: {
     path: './petStore.yaml',
   },
+  adapter: adapterOas({ integerType: 'number' }),
   output: {
     path: './src/gen',
     clean: true,

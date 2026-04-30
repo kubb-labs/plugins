@@ -2,7 +2,7 @@
  * @description ID of pet that needs to be updated
  * @type integer
  */
-export type UpdatePetWithFormPathPetId = bigint
+export type UpdatePetWithFormPathPetId = number
 
 /**
  * @description Name of pet that needs to be updated

@@ -8,7 +8,7 @@ export type User = {
    * @example 10
    * @type integer | undefined
    */
-  id?: bigint
+  id?: number
   /**
    * @example theUser
    * @type string | undefined

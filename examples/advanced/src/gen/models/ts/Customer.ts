@@ -16,7 +16,7 @@ export type Customer = {
    * @example 100000
    * @type integer | undefined
    */
-  id?: bigint
+  id?: number
   /**
    * @example fehguy
    * @type string | undefined

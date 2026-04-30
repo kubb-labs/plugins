@@ -10,7 +10,7 @@ export default defineConfig(() => {
     input: {
       path: './petStore.yaml',
     },
-    adapter: adapterOas({ validate: false }),
+    adapter: adapterOas({ validate: false, integerType: 'number' }),
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },

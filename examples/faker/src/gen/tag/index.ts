@@ -1,5 +1,5 @@
-export { deleteOrderPathOrderId, deleteOrderResponse, deleteOrderStatus400, deleteOrderStatus404 } from "./deleteOrder.ts";
-export { getInventoryResponse, getInventoryStatus200 } from "./getInventory.ts";
-export { getOrderByIdPathOrderId, getOrderByIdResponse, getOrderByIdStatus200, getOrderByIdStatus400, getOrderByIdStatus404 } from "./getOrderById.ts";
-export { order } from "./order.ts";
-export { placeOrderData, placeOrderResponse, placeOrderStatus200, placeOrderStatus405 } from "./placeOrder.ts";
+export { deleteOrderPathOrderId, deleteOrderResponse, deleteOrderStatus400, deleteOrderStatus404 } from './deleteOrder.ts'
+export { getInventoryResponse, getInventoryStatus200 } from './getInventory.ts'
+export { getOrderByIdPathOrderId, getOrderByIdResponse, getOrderByIdStatus200, getOrderByIdStatus400, getOrderByIdStatus404 } from './getOrderById.ts'
+export { order } from './order.ts'
+export { placeOrderData, placeOrderResponse, placeOrderStatus200, placeOrderStatus405 } from './placeOrder.ts'

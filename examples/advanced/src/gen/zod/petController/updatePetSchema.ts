@@ -6,7 +6,7 @@ export const updatePetStatus200Schema = z.lazy(() => petSchema.omit({ name: true
 export type UpdatePetStatus200Schema = z.infer<typeof updatePetStatus200Schema>
 
 export const updatePetStatus202Schema = z.object({
-  id: z.bigint().optional(),
+  id: z.int().optional(),
 })
 
 export type UpdatePetStatus202Schema = z.infer<typeof updatePetStatus202Schema>

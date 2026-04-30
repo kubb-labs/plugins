@@ -4,7 +4,7 @@ import type { ApiResponse } from '../ApiResponse.ts'
  * @description ID of pet to update
  * @type integer
  */
-export type UploadFilePathPetId = bigint
+export type UploadFilePathPetId = number
 
 /**
  * @description Additional Metadata

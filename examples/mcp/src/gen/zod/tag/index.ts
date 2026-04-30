@@ -1,1 +1,1 @@
-export * from "./tagSchema.js";
+export * from './tagSchema.js'

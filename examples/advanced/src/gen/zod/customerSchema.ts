@@ -2,7 +2,7 @@ import * as z from 'zod'
 import { addressSchema } from './addressSchema.ts'
 
 export const customerSchema = z.object({
-  id: z.bigint().optional(),
+  id: z.int().optional(),
   username: z.string().optional(),
   params: z
     .object({

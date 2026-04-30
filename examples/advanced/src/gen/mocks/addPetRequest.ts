@@ -5,7 +5,7 @@ import { faker } from '@faker-js/faker'
 
 export function addPetRequestFaker(data?: Partial<AddPetRequest>): Required<AddPetRequest> {
   const defaultFakeData = {
-    id: faker.number.bigInt(),
+    id: faker.number.int(),
     name: faker.string.alpha(),
     category: categoryFaker(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),

@@ -3,8 +3,8 @@ import { faker } from '@faker-js/faker'
 
 export function orderFaker(data?: Partial<Order>): Required<Order> {
   const defaultFakeData = {
-    id: faker.number.bigInt(),
-    petId: faker.number.bigInt(),
+    id: faker.number.int(),
+    petId: faker.number.int(),
     params: { status: faker.helpers.arrayElement<any>(['working', 'idle']), type: faker.string.alpha() },
     quantity: faker.number.int(),
     orderType: faker.helpers.arrayElement<NonNullable<Order>['orderType']>(['foo', 'bar']),

@@ -2,7 +2,7 @@
  * @description ID of the order that needs to be deleted
  * @type integer
  */
-export type DeleteOrderPathOrderId = bigint
+export type DeleteOrderPathOrderId = number
 
 /**
  * @type any
