@@ -119,6 +119,25 @@ options:
     required: false
     description: Seed faker for deterministic output.
 
+  - name: locale
+    type: string
+    required: false
+    default: "'en'"
+    description: Generate mock data using a locale-specific Faker instance.
+    tip: |
+      See the [Faker.js localization docs](https://fakerjs.dev/api/localization.html) for the full list of supported locales.
+    examples:
+      - name: "'de'"
+        files:
+          - lang: ts
+            code: |
+              import { fakerDE as faker } from '@faker-js/faker'
+      - name: "'de_AT'"
+        files:
+          - lang: ts
+            code: |
+              import { fakerDE_AT as faker } from '@faker-js/faker'
+
   - extends: ./_shared/core/include.yaml
 
   - extends: ./_shared/core/exclude.yaml

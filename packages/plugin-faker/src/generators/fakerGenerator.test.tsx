@@ -142,6 +142,7 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
   dateParser: 'faker',
   regexGenerator: 'faker',
   seed: undefined,
+  locale: undefined,
   paramsCasing: undefined,
   printer: undefined,
 }
@@ -168,6 +169,7 @@ describe('fakerGenerator — schema', () => {
     },
     { name: 'treeNode', node: treeNodeSchema, options: {} },
     { name: 'catCycle', node: catSchema, options: {} },
+    { name: 'petWithLocale', node: petSchema, options: { locale: 'de' as const } },
   ] as const)('$name', async ({ name, node, options }) => {
     const resolvedOptions: PluginFaker['resolvedOptions'] = { ...defaultOptions, ...options }
     const plugin = createMockedPlugin<PluginFaker>({ name: 'plugin-faker', options: resolvedOptions, resolver: resolverFaker })

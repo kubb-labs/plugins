@@ -22,6 +22,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {
     output = { path: 'mocks', barrelType: 'named' },
     seed,
+    locale,
     group,
     exclude = [],
     include,
@@ -60,6 +61,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
         ctx.setOptions({
           output,
           seed,
+          locale,
           exclude,
           include,
           override,

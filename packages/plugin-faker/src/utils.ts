@@ -3,6 +3,31 @@ import { ast } from '@kubb/core'
 import type { ResolverFaker } from './types.ts'
 
 /**
+ * Returns the `@faker-js/faker` named export for a locale code.
+ *
+ * Without a locale, returns `'faker'` for the default English instance.
+ * With a locale, the language code is converted to upper case and joined with any region suffix.
+ *
+ * @example Default
+ * `localeToFakerImport() // 'faker'`
+ *
+ * @example Simple locale
+ * `localeToFakerImport('de') // 'fakerDE'`
+ *
+ * @example Compound locale
+ * `localeToFakerImport('de_AT') // 'fakerDE_AT'`
+ */
+export function localeToFakerImport(locale?: string): string {
+  if (!locale) {
+    return 'faker'
+  }
+
+  const parts = locale.split('_')
+  parts[0] = parts[0]!.toUpperCase()
+  return `faker${parts.join('_')}`
+}
+
+/**
  * Determines if a schema node can be overridden during faker generation.
  */
 export function canOverrideSchema(node: ast.SchemaNode): boolean {
@@ -88,7 +113,7 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
 
 /**
  * Builds a response schema as a union of all response statuses.
- * Returns null if no responses are provided, or inlines single simple responses.
+ * Returns null if no responses are provided, or embeds single simple responses inline.
  */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
   const responses = node.responses.filter((response) => response.schema)
