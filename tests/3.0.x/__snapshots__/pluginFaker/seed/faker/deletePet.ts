@@ -11,10 +11,10 @@ export function deletePetHeaderApiKey(data?: string): string {
   return data ?? faker.string.alpha()
 }
 
-export function deletePetPathPetId(data?: number): number {
+export function deletePetPathPetId(data?: bigint): bigint {
   faker.seed([42])
 
-  return data ?? faker.number.int()
+  return data ?? faker.number.bigInt()
 }
 
 /**

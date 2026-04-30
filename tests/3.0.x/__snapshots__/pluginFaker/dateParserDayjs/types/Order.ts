@@ -19,12 +19,12 @@ export type Order = {
      * @example 10
      * @type integer | undefined
     */
-    id?: number;
+    id?: bigint;
     /**
      * @example 198772
      * @type integer | undefined
     */
-    petId?: number;
+    petId?: bigint;
     /**
      * @example 7
      * @type integer | undefined

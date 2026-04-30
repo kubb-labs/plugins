@@ -7,8 +7,8 @@ import type { GetOrderByIdResponse, GetOrderByIdStatus200 } from "../types/GetOr
 import { order } from "./order.ts";
 import { faker } from "@faker-js/faker";
 
-export function getOrderByIdPathOrderId(data?: number): number {
-  return data ?? faker.number.int()
+export function getOrderByIdPathOrderId(data?: bigint): bigint {
+  return data ?? faker.number.bigInt()
 }
 
 /**

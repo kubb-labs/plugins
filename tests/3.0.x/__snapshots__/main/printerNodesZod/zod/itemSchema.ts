@@ -6,7 +6,7 @@
 import * as z from "zod";
 
 export const itemSchema = z.object({
-    "id": z.number().describe("Unique identifier"),
+    "id": z.bigint().describe("Unique identifier"),
     "name": z.string().describe("Display name"),
     "count": z.number().optional()
     }).describe("A simple item")

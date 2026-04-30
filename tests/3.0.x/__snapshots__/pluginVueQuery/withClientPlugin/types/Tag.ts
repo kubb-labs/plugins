@@ -10,7 +10,7 @@ export type Tag = {
     /**
      * @type integer | undefined
     */
-    id?: number;
+    id?: bigint;
     /**
      * @type string | undefined
     */

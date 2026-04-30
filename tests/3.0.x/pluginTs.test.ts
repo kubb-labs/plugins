@@ -27,12 +27,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/noTagsDotOperationId.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrelType: false },
+          output: { path: './types', barrel: false },
           group: { type: 'tag' },
         }),
       ],
@@ -45,12 +45,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrelType: false },
+          output: { path: './types', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -64,12 +64,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
-          output: { path: './types', barrelType: false },
+          output: { path: './types', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],

@@ -23,12 +23,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
         }),
       ],
     },
@@ -39,12 +39,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -58,12 +58,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -75,12 +75,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           group: { type: 'tag' },
         }),
       ],
@@ -92,12 +92,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           inferred: true,
         }),
       ],
@@ -109,12 +109,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           coercion: true,
         }),
       ],
@@ -126,12 +126,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, dateType: 'date' }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
         }),
       ],
     },
@@ -142,12 +142,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     config: {
       root: __dirname,
       input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
-      output: { path: './gen', barrelType: false },
+      output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
-          output: { path: './zod', barrelType: false },
+          output: { path: './zod', barrel: false },
           paramsCasing: 'camelcase',
         }),
       ],

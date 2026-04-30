@@ -8,7 +8,7 @@ import { faker } from "@faker-js/faker";
 
 export function user(data?: Partial<User>): Required<User>
 {
-  const defaultFakeData = {"id": faker.number.int(),"username": faker.string.alpha(),"firstName": faker.string.alpha(),"lastName": faker.string.alpha(),"email": faker.string.alpha(),"password": faker.string.alpha(),"phone": faker.string.alpha(),"userStatus": faker.number.int()}
+  const defaultFakeData = {"id": faker.number.bigInt(),"username": faker.string.alpha(),"firstName": faker.string.alpha(),"lastName": faker.string.alpha(),"email": faker.string.alpha(),"password": faker.string.alpha(),"phone": faker.string.alpha(),"userStatus": faker.number.int()}
   return {
     ...defaultFakeData,
     ...(data || {}),

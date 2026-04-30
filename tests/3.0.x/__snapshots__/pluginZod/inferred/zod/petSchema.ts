@@ -8,7 +8,7 @@ import { categorySchema } from "./categorySchema.ts";
 import { tagSchema } from "./tagSchema.ts";
 
 export const petSchema = z.object({
-    "id": z.int().optional(),
+    "id": z.bigint().optional(),
     "name": z.string(),
     "log": z.string().min(2).max(42).regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/).optional(),
     "category": categorySchema.optional(),
