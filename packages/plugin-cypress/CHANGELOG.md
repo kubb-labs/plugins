@@ -1,5 +1,12 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.2
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.2
+
 ## 5.0.0-alpha.56
 
 ### Patch Changes

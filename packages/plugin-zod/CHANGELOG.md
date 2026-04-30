@@ -1,13 +1,15 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.2
+
 ## 5.0.0-alpha.56
 
 ### Breaking Changes
 
 - **`dateType` option removed** — moved to `adapterOas()` for centralized date type handling. Use `adapterOas({ dateType: 'date' })` instead of `pluginZod({ dateType: 'date' })`.
 
-  | Before | After |
-  | --- | --- |
+  | Before                            | After                              |
+  | --------------------------------- | ---------------------------------- |
   | `pluginZod({ dateType: 'date' })` | `adapterOas({ dateType: 'date' })` |
 
 ## 5.0.0-alpha.55
