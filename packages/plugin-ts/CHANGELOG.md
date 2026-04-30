@@ -1,5 +1,7 @@
 # @kubb/plugin-ts
 
+## 5.0.0-alpha.74
+
 ## 5.0.0-alpha.56
 
 ## 5.0.0-alpha.55

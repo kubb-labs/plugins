@@ -1,5 +1,13 @@
 # @kubb/plugin-client
 
+## 5.0.0-alpha.74
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-alpha.74
+  - @kubb/plugin-zod@5.0.0-alpha.74
+
 ## 5.0.0-alpha.56
 
 ### Minor Changes

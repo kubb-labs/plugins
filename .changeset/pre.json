@@ -39,6 +39,7 @@
     "plugin-client-params-casing-unused-var",
     "plugin-client-v5-migration",
     "plugin-cypress-v5-upgrade",
+    "plugin-faker-stable-cyclic-getters",
     "plugin-faker-type-precision-fix",
     "plugin-faker-v5-rewrite",
     "plugin-mcp-enum-path-params",
