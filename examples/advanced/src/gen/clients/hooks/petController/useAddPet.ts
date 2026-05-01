@@ -8,15 +8,10 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<
-    ResponseConfig<AddPetResponse>,
-    ResponseErrorConfig<AddPetStatus405>,
-    { data: AddPetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >({
+  return mutationOptions<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>({
     mutationKey,
-    mutationFn: async ({ data, contentType }) => {
-      return addPet({ data }, contentType, config)
+    mutationFn: async ({ data }) => {
+      return addPet({ data }, config)
     },
   })
 }
@@ -28,12 +23,9 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      ResponseConfig<AddPetResponse>,
-      ResponseErrorConfig<AddPetStatus405>,
-      { data: AddPetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<AddPetData>> & { client?: Client }
   } = {},
 ) {
@@ -44,26 +36,16 @@ export function useAddPet<TContext>(
   const baseOptions = addPetMutationOptions(config) as UseMutationOptions<
     ResponseConfig<AddPetResponse>,
     ResponseErrorConfig<AddPetStatus405>,
-    { data: AddPetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { data: AddPetData },
     TContext
   >
 
-  return useMutation<
-    ResponseConfig<AddPetResponse>,
-    ResponseErrorConfig<AddPetStatus405>,
-    { data: AddPetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >(
+  return useMutation<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    ResponseConfig<AddPetResponse>,
-    ResponseErrorConfig<AddPetStatus405>,
-    { data: AddPetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >
+  ) as UseMutationResult<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>
 }

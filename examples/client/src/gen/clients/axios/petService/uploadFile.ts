@@ -19,10 +19,9 @@ export async function uploadFile(
   { petId }: { petId: UploadFilePathPetId },
   data: UploadFileData,
   params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
-  contentType: 'application/json' | 'multipart/form-data' = 'application/json',
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 

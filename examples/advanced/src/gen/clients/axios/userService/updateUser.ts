@@ -16,7 +16,6 @@ export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsernam
  */
 export async function updateUser(
   { username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData },
-  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
   config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config

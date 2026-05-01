@@ -35,11 +35,7 @@ export class storeController {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-  async placeOrder(
-    data?: PlaceOrderData,
-    contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
-    config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {},
-  ) {
+  async placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
@@ -56,11 +52,7 @@ export class storeController {
    * @summary Place an order for a pet with patch
    * {@link /store/order}
    */
-  async placeOrderPatch(
-    data?: PlaceOrderPatchData,
-    contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
-    config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {},
-  ) {
+  async placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({

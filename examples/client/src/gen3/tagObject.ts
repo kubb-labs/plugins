@@ -37,11 +37,7 @@ getInventory.queryParams = {} as never
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(
-  data?: PlaceOrderData,
-  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
-  config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {},
-) {
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
@@ -69,11 +65,7 @@ placeOrder.queryParams = {} as never
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(
-  data?: PlaceOrderPatchData,
-  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
-  config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {},
-) {
+export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data

@@ -17,12 +17,12 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
   return mutationOptions<
     ResponseConfig<UpdatePetResponse>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { data: UpdatePetData },
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ data, contentType }) => {
-      return updatePet({ data }, contentType, config)
+    mutationFn: async ({ data }) => {
+      return updatePet({ data }, config)
     },
   })
 }
@@ -37,7 +37,7 @@ export function useUpdatePet<TContext>(
     mutation?: UseMutationOptions<
       ResponseConfig<UpdatePetResponse>,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      { data: UpdatePetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+      { data: UpdatePetData },
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client }
@@ -50,14 +50,14 @@ export function useUpdatePet<TContext>(
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
     ResponseConfig<UpdatePetResponse>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { data: UpdatePetData },
     TContext
   >
 
   return useMutation<
     ResponseConfig<UpdatePetResponse>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { data: UpdatePetData },
     TContext
   >(
     {
@@ -69,7 +69,7 @@ export function useUpdatePet<TContext>(
   ) as UseMutationResult<
     ResponseConfig<UpdatePetResponse>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { data: UpdatePetData },
     TContext
   >
 }

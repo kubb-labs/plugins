@@ -18,6 +18,7 @@ export type RequestConfig<TData = unknown> = {
   validateStatus?: (status: number) => boolean
   headers?: AxiosRequestConfig['headers']
   paramsSerializer?: AxiosRequestConfig['paramsSerializer']
+  contentType?: string
 }
 
 /**

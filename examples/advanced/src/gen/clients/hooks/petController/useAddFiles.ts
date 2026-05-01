@@ -8,15 +8,10 @@ export const addFilesMutationKey = () => [{ url: '/pet/files' }] as const
 
 export function addFilesMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddFilesData>> & { client?: Client } = {}) {
   const mutationKey = addFilesMutationKey()
-  return mutationOptions<
-    ResponseConfig<AddFilesResponse>,
-    ResponseErrorConfig<AddFilesStatus405>,
-    { data: AddFilesData; contentType?: 'application/json' | 'multipart/form-data' },
-    TContext
-  >({
+  return mutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>({
     mutationKey,
-    mutationFn: async ({ data, contentType }) => {
-      return addFiles({ data }, contentType, config)
+    mutationFn: async ({ data }) => {
+      return addFiles({ data }, config)
     },
   })
 }
@@ -28,12 +23,9 @@ export function addFilesMutationOptions<TContext = unknown>(config: Partial<Requ
  */
 export function useAddFiles<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      ResponseConfig<AddFilesResponse>,
-      ResponseErrorConfig<AddFilesStatus405>,
-      { data: AddFilesData; contentType?: 'application/json' | 'multipart/form-data' },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<AddFilesData>> & { client?: Client }
   } = {},
 ) {
@@ -44,26 +36,16 @@ export function useAddFiles<TContext>(
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
     ResponseConfig<AddFilesResponse>,
     ResponseErrorConfig<AddFilesStatus405>,
-    { data: AddFilesData; contentType?: 'application/json' | 'multipart/form-data' },
+    { data: AddFilesData },
     TContext
   >
 
-  return useMutation<
-    ResponseConfig<AddFilesResponse>,
-    ResponseErrorConfig<AddFilesStatus405>,
-    { data: AddFilesData; contentType?: 'application/json' | 'multipart/form-data' },
-    TContext
-  >(
+  return useMutation<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    ResponseConfig<AddFilesResponse>,
-    ResponseErrorConfig<AddFilesStatus405>,
-    { data: AddFilesData; contentType?: 'application/json' | 'multipart/form-data' },
-    TContext
-  >
+  ) as UseMutationResult<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>
 }

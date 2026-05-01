@@ -16,6 +16,7 @@ export type RequestConfig<TData = unknown> = {
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
   headers?: AxiosRequestConfig['headers']
+  contentType?: string
 }
 /**
  * Subset of AxiosResponse

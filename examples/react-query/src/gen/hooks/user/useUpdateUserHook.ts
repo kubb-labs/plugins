@@ -20,7 +20,6 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function updateUserHook(
   { username }: { username: UpdateUserPathUsername },
   data?: UpdateUserData,
-  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
   config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
 ) {
   const { client: request = fetch, ...requestConfig } = config
@@ -39,15 +38,10 @@ export async function updateUserHook(
 
 export function updateUserMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
   const mutationKey = updateUserMutationKey()
-  return mutationOptions<
-    UpdateUserResponse,
-    ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >({
+  return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>({
     mutationKey,
-    mutationFn: async ({ username, data, contentType }) => {
-      return updateUserHook({ username }, data, contentType, config)
+    mutationFn: async ({ username, data }) => {
+      return updateUserHook({ username }, data, config)
     },
   })
 }
@@ -59,12 +53,9 @@ export function updateUserMutationOptionsHook<TContext = unknown>(config: Partia
  */
 export function useUpdateUserHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      UpdateUserResponse,
-      ResponseErrorConfig<Error>,
-      { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
   } = {},
 ) {
@@ -75,22 +66,17 @@ export function useUpdateUserHook<TContext>(
   const baseOptions = updateUserMutationOptionsHook(config) as UseMutationOptions<
     UpdateUserResponse,
     ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { username: UpdateUserPathUsername; data?: UpdateUserData },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useUpdateUserHook', operationId: 'updateUser' }) as UseMutationOptions<
     UpdateUserResponse,
     ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { username: UpdateUserPathUsername; data?: UpdateUserData },
     TContext
   >
 
-  return useMutation<
-    UpdateUserResponse,
-    ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >(
+  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -98,10 +84,5 @@ export function useUpdateUserHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    UpdateUserResponse,
-    ResponseErrorConfig<Error>,
-    { username: UpdateUserPathUsername; data?: UpdateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >
+  ) as UseMutationResult<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>
 }

@@ -8,15 +8,10 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
 
 export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
   const mutationKey = createUserMutationKey()
-  return mutationOptions<
-    ResponseConfig<CreateUserResponse>,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >({
+  return mutationOptions<ResponseConfig<CreateUserResponse>, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>({
     mutationKey,
-    mutationFn: async ({ data, contentType }) => {
-      return createUser({ data }, contentType, config)
+    mutationFn: async ({ data }) => {
+      return createUser({ data }, config)
     },
   })
 }
@@ -28,12 +23,9 @@ export function createUserMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function useCreateUser<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      ResponseConfig<CreateUserResponse>,
-      ResponseErrorConfig<Error>,
-      { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<ResponseConfig<CreateUserResponse>, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<CreateUserData>> & { client?: Client }
   } = {},
 ) {
@@ -44,26 +36,16 @@ export function useCreateUser<TContext>(
   const baseOptions = createUserMutationOptions(config) as UseMutationOptions<
     ResponseConfig<CreateUserResponse>,
     ResponseErrorConfig<Error>,
-    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
+    { data?: CreateUserData },
     TContext
   >
 
-  return useMutation<
-    ResponseConfig<CreateUserResponse>,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >(
+  return useMutation<ResponseConfig<CreateUserResponse>, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    ResponseConfig<CreateUserResponse>,
-    ResponseErrorConfig<Error>,
-    { data?: CreateUserData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >
+  ) as UseMutationResult<ResponseConfig<CreateUserResponse>, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>
 }

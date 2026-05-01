@@ -17,11 +17,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(
-  data: AddPetData,
-  contentType: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' = 'application/json',
-  config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {},
-) {
+export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
   const requestData = data
@@ -43,12 +39,9 @@ export async function addPet(
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: MutationObserverOptions<
-      AddPetResponse,
-      ResponseErrorConfig<AddPetStatus405>,
-      { data: MaybeRefOrGetter<AddPetData>; contentType?: MaybeRefOrGetter<'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'> },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: MutationObserverOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: MaybeRefOrGetter<AddPetData> }, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<AddPetData>> & { client?: Client }
   } = {},
 ) {
@@ -56,15 +49,10 @@ export function useAddPet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-  return useMutation<
-    AddPetResponse,
-    ResponseErrorConfig<AddPetStatus405>,
-    { data: AddPetData; contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded' },
-    TContext
-  >(
+  return useMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
     {
-      mutationFn: async ({ data, contentType }) => {
-        return addPet(data, contentType, config)
+      mutationFn: async ({ data }) => {
+        return addPet(data, config)
       },
       mutationKey,
       ...mutationOptions,
