@@ -26,7 +26,7 @@
     "src",
     "dist",
     "static",
-    "plugin.yaml",
+    "extension.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"

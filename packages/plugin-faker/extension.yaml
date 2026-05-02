@@ -1,4 +1,5 @@
-$schema: https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+$schema: https://kubb.dev/schemas/extension.json
+kind: plugin
 id: plugin-faker
 name: Faker
 description: Generate realistic mock data using Faker.js from OpenAPI specifications.

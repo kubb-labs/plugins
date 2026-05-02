@@ -1,4 +1,5 @@
-$schema: https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+$schema: https://kubb.dev/schemas/extension.json
+kind: plugin
 id: plugin-zod
 name: Zod
 description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
