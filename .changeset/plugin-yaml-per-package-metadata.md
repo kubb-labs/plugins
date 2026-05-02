@@ -11,12 +11,13 @@
 "@kubb/plugin-zod": minor
 ---
 
-Each plugin package now ships a `plugin.yaml` file describing its options and metadata.
+Each plugin package now ships an `extension.yaml` file describing its options and metadata.
 
-The file is self-contained — no `extends:` references — so third-party plugin authors can follow the same pattern in their own packages without access to this monorepo. Add `plugin.yaml` to the `files` array in `package.json` and reference the schema for IDE validation:
+The file is self-contained — no `extends:` references — so third-party plugin authors can follow the same pattern in their own packages without access to this monorepo. Add `extension.yaml` to the `files` array in `package.json` and reference the unified schema for IDE validation:
 
 ```yaml
-$schema: 'https://kubb.dev/schemas/plugins/plugin.json'
+$schema: 'https://kubb.dev/schemas/extension.json'
+kind: plugin
 ```
 
 A `build:plugin-yaml` script resolves shared authoring templates and regenerates all ten files:
