@@ -1,0 +1,631 @@
+$schema: https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+id: plugin-ts
+name: TypeScript
+description: Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.
+category: types
+type: official
+npmPackage: "@kubb/plugin-ts"
+docsPath: /plugins/plugin-ts
+repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/typescript
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - typescript
+  - types
+  - interfaces
+  - codegen
+  - openapi
+dependencies: []
+resources:
+  documentation: https://kubb.dev/plugins/plugin-ts
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-ts/CHANGELOG.md
+featured: true
+icon:
+  light: https://kubb.dev/feature/typescript.svg
+intro: |
+  # @kubb/plugin-ts
+
+  Generate TypeScript types from your OpenAPI schema. Use this plugin to produce type-safe representations of your API's request and response shapes, giving your TypeScript project compile-time guarantees over every API interaction.
+
+  **See also**
+
+  - [TypeScript](https://www.typescriptlang.org/)
+  - [TypeScript Compiler API](https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API)
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'types', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory or file for the generated code, relative to the global `output.path`.
+        tip: |
+          if `output.path` is a file, `group` cannot be used.
+        default: "'types'"
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Specify what to export and optionally disable barrel-file generation.
+        tip: |
+          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        examples:
+          - name: all
+            files:
+              - lang: typescript
+                code: |
+                  export * from './gen/petService.ts'
+                twoslash: false
+          - name: named
+            files:
+              - lang: typescript
+                code: |
+                  export { PetService } from './gen/petService.ts'
+                twoslash: false
+          - name: propagate
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+          - name: "false"
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+      - name: banner
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: footer
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: override
+        type: boolean
+        required: false
+        default: "false"
+        description: Whether Kubb overrides existing external files that can be generated if they already exist.
+  - name: contentType
+    type: "'application/json' | (string & {})"
+    required: false
+    description: |
+      Define which content type to use.
+
+      By default, Kubb uses the first JSON-valid media type.
+  - name: group
+    type: Group
+    required: false
+    description: |
+      Grouping combines files in a folder based on a specific `type`.
+    examples:
+      - name: kubb.config.ts
+        files:
+          - lang: typescript
+            code: |
+              group: {
+                type: 'tag',
+                name({ group }) {
+                  return `${group}Controller`
+                }
+              }
+            twoslash: false
+    body: |
+      With the configuration above, the generator emits:
+
+      ```text
+      .
+      ├── src/
+      │   └── petController/
+      │   │   ├── addPet.ts
+      │   │   └── getPet.ts
+      │   └── storeController/
+      │       ├── createStore.ts
+      │       └── getStoreById.ts
+      ├── petStore.yaml
+      ├── kubb.config.ts
+      └── package.json
+      ```
+    properties:
+      - name: type
+        type: "'tag'"
+        required: true
+        description: Specify the property to group files by. Required when `group` is defined.
+        note: |
+          `Required: true*` means this is required only when the `group` option is used. The `group` option itself is optional.
+        body: |
+          - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
+      - name: name
+        type: "(context: GroupContext) => string"
+        required: false
+        default: (ctx) => `${ctx.group}Controller`
+        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+  - name: enumType
+    type: "'enum' | 'asConst' | 'asPascalConst' | 'constEnum' | 'literal' | 'inlineLiteral'"
+    required: false
+    default: "'asConst'"
+    description: Choose to use `enum` or `as const` for enums.
+    tip: |
+      The difference between `asConst` and `asPascalConst` is the casing of the constant variable name:
+
+      - `asConst`: generates a camelCase constant name (e.g., `petType`)
+      - `asPascalConst`: generates a PascalCase constant name (e.g., `PetType`)
+    examples:
+      - name: "'enum'"
+        files:
+          - lang: typescript
+            code: |
+              enum PetType {
+                Dog = 'dog',
+                Cat = 'cat',
+              }
+            twoslash: false
+      - name: "'asConst'"
+        files:
+          - lang: typescript
+            code: |
+              const petType = {
+                Dog: 'dog',
+                Cat: 'cat',
+              } as const;
+            twoslash: false
+      - name: "'asPascalConst'"
+        files:
+          - lang: typescript
+            code: |
+              const PetType = {
+                Dog: 'dog',
+                Cat: 'cat',
+              } as const;
+            twoslash: false
+      - name: "'constEnum'"
+        files:
+          - lang: typescript
+            code: |
+              const enum PetType {
+                Dog = 'dog',
+                Cat = 'cat',
+              }
+            twoslash: false
+      - name: "'literal'"
+        files:
+          - lang: typescript
+            code: |
+              type PetType = 'dog' | 'cat';
+            twoslash: false
+      - name: "'inlineLiteral'"
+        files:
+          - lang: typescript
+            code: |
+              // Enum values are inlined directly into the type
+              export interface Pet {
+                status?: 'available' | 'pending' | 'sold';
+              }
+            twoslash: false
+    body: |
+      > [!TIP]
+      > Consider `'inlineLiteral'` for the most idiomatic output — enum values are inlined directly into the property type instead of creating a separate named type.
+  - name: enumSuffix
+    required: false
+    description: ""
+    warning: |
+      This option has been moved to [`adapterOas`](/adapters/adapter-oas#enumSuffix). Use `adapterOas({ enumSuffix })` instead.
+  - name: enumTypeSuffix
+    type: string
+    required: false
+    default: "'Key'"
+    description: |
+      Suffix appended to the generated type alias name when `enumType` is `asConst` or `asPascalConst`.
+
+      Only the type alias is affected — the const object name stays unchanged.
+    examples:
+      - name: "'Key' (default)"
+        files:
+          - lang: typescript
+            code: |
+              const petType = {
+                Dog: 'dog',
+                Cat: 'cat',
+              } as const;
+
+              export type PetTypeKey = (typeof petType)[keyof typeof petType];
+            twoslash: false
+      - name: "'Value'"
+        files:
+          - lang: typescript
+            code: |
+              // enumTypeSuffix: 'Value'
+              const petType = {
+                Dog: 'dog',
+                Cat: 'cat',
+              } as const;
+
+              export type PetTypeValue = (typeof petType)[keyof typeof petType];
+            twoslash: false
+      - name: "'' (no suffix)"
+        files:
+          - lang: typescript
+            code: |
+              // enumTypeSuffix: ''
+              const petType = {
+                Dog: 'dog',
+                Cat: 'cat',
+              } as const;
+
+              export type PetType = (typeof petType)[keyof typeof petType];
+            twoslash: false
+  - name: enumKeyCasing
+    type: "'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'"
+    required: false
+    default: "'none'"
+    description: Control the casing applied to enum key names in generated TypeScript. Use this to align generated enum keys with your project's naming conventions.
+    body: |
+      - `'screamingSnakeCase'`: `ENUM_VALUE`
+      - `'snakeCase'`: `enum_value`
+      - `'pascalCase'`: `EnumValue`
+      - `'camelCase'`: `enumValue`
+      - `'none'`: Uses the enum value as-is
+  - name: dateType
+    required: false
+    description: ""
+    warning: |
+      This option has been moved to [`adapterOas`](/adapters/adapter-oas#dateType). Use `adapterOas({ dateType })` instead.
+  - name: integerType
+    required: false
+    description: ""
+    warning: |
+      This option has been moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.
+  - name: syntaxType
+    type: "'type' | 'interface'"
+    required: false
+    default: "'type'"
+    description: |
+      Control whether the TypeScript generator emits `type` aliases or `interface` declarations for object schemas.
+      See [Type vs Interface: Which Should You Use](https://www.totaltypescript.com/type-vs-interface-which-should-you-use).
+    examples:
+      - name: "'type'"
+        files:
+          - lang: typescript
+            code: |
+              type Pet = {
+                name: string;
+              };
+            twoslash: false
+      - name: "'interface'"
+        files:
+          - lang: typescript
+            code: |
+              interface Pet {
+                name: string;
+              }
+            twoslash: false
+  - name: unknownType
+    required: false
+    description: ""
+    warning: |
+      This option has been moved to [`adapterOas`](/adapters/adapter-oas#unknownType). Use `adapterOas({ unknownType })` instead.
+  - name: emptySchemaType
+    required: false
+    description: ""
+    warning: |
+      This option has been moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
+  - name: optionalType
+    type: "'questionToken' | 'undefined' | 'questionTokenAndUndefined'"
+    required: false
+    default: "'questionToken'"
+    description: Control how optional properties are represented in generated TypeScript types.
+    examples:
+      - name: "'questionToken'"
+        files:
+          - lang: typescript
+            code: |
+              type Pet = {
+                type?: string;
+              };
+            twoslash: false
+      - name: "'undefined'"
+        files:
+          - lang: typescript
+            code: |
+              type Pet = {
+                type: string | undefined;
+              };
+            twoslash: false
+      - name: "'questionTokenAndUndefined'"
+        files:
+          - lang: typescript
+            code: |
+              type Pet = {
+                type?: string | undefined;
+              };
+            twoslash: false
+  - name: arrayType
+    type: "'array' | 'generic'"
+    required: false
+    default: "'array'"
+    description: Choose between `Array<Type>` or `Type[]` syntax for array types.
+    examples:
+      - name: "'array'"
+        files:
+          - lang: typescript
+            code: |
+              type Pet = {
+                tags: string[];
+              };
+            twoslash: false
+      - name: "'generic'"
+        files:
+          - lang: typescript
+            code: |
+              type Pet = {
+                tags: Array<string>;
+              };
+            twoslash: false
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    default: undefined
+    description: Transform parameter names to a specific casing format for path, query, and header parameters.
+    important: |
+      When enabled, this option transforms property names in `PathParams`, `QueryParams`, and `HeaderParams` types to the specified casing. Response and request body types are **not** affected.
+
+      All plugins that reference parameters (like `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-swr`, `@kubb/plugin-faker`, `@kubb/plugin-mcp`) should use the same `paramsCasing` setting to ensure type compatibility.
+    examples:
+      - name: Original API
+        files:
+          - lang: typescript
+            code: |
+              // OpenAPI spec has: step_id, X-Custom-Header, bool_param
+
+              // Without paramsCasing
+              type FindPetsByStatusPathParams = {
+                step_id: string;
+              };
+
+              type FindPetsByStatusQueryParams = {
+                bool_param?: boolean;
+              };
+
+              type FindPetsByStatusHeaderParams = {
+                'X-Custom-Header'?: string;
+              };
+            twoslash: false
+      - name: "With paramsCasing: 'camelcase'"
+        files:
+          - lang: typescript
+            code: |
+              // Properties are transformed to camelCase
+
+              type FindPetsByStatusPathParams = {
+                stepId: string;  // ✓ camelCase
+              };
+
+              type FindPetsByStatusQueryParams = {
+                boolParam?: boolean;  // ✓ camelCase
+              };
+
+              type FindPetsByStatusHeaderParams = {
+                xCustomHeader?: string;  // ✓ camelCase
+              };
+            twoslash: false
+  - name: resolver
+    type: Partial<ResolverTs> & ThisType<ResolverTs>
+    required: false
+    description: |
+      A single resolver that overrides the naming and path-resolution conventions. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the resolver's result is used as the fallback, so you only need to supply the methods you want to change.
+
+      `this` inside each method is bound to the **full** resolver, so you can call other resolver methods (e.g. `this.default(name, 'function')`) without losing context.
+    body: |
+      Each plugin ships a built-in resolver:
+
+      | Plugin | Default resolver |
+      | --- | --- |
+      | `@kubb/plugin-ts` | `resolverTs` |
+      | `@kubb/plugin-zod` | `resolverZod` |
+      | `@kubb/plugin-cypress` | `resolverCypress` |
+      | `@kubb/plugin-mcp` | `resolverMcp` |
+    codeBlock:
+      lang: typescript
+      title: Custom resolver (plugin-ts example)
+      code: |
+        import { pluginTs } from '@kubb/plugin-ts'
+
+        pluginTs({
+          resolver: {
+            resolveName(name) {
+              // Prefix every operation-derived name; falls back for names where
+              // this returns null/undefined.
+              return `Api${this.default(name, 'function')}`
+            },
+          },
+        })
+    tip: |
+      Use `resolver` for fine-grained control over naming conventions.
+    examples:
+      - name: Custom prefix for operation names
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                resolver: {
+                  resolveName(name) {
+                    return `Custom${this.default(name, 'function')}`
+                  },
+                },
+              })
+            twoslash: false
+  - name: include
+    type: Array<Include>
+    required: false
+    description: Array containing include parameters to include tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Include
+      code: |
+        export type Include = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: exclude
+    type: Array<Exclude>
+    required: false
+    description: Array containing exclude parameters to exclude or skip tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Exclude
+      code: |
+        export type Exclude = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: override
+    type: Array<Override>
+    required: false
+    description: Array containing override parameters to override `options` based on tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Override
+      code: |
+        export type Override = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+          options: PluginOptions
+        }
+  - name: generators
+    type: Array<Generator<PluginTs>>
+    required: false
+    experimental: true
+    description: |
+      Define additional generators next to the built-in generators.
+
+      See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
+  - name: transformer
+    type: Visitor
+    required: false
+    description: |
+      A single AST visitor applied to every node before code is printed. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the preset transformer's result is used as the fallback — so you only need to supply the methods you want to change.
+
+      Visitor methods receive the node and a context object. Return a modified node to replace it, or return `undefined`/`void` to leave it unchanged.
+    examples:
+      - name: Strip descriptions before printing
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                transformer: {
+                  schema(node) {
+                    return { ...node, description: undefined }
+                  },
+                },
+              })
+            twoslash: false
+      - name: Prefix every operationId
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                transformer: {
+                  operation(node) {
+                    return { ...node, operationId: `api_${node.operationId}` }
+                  },
+                },
+              })
+            twoslash: false
+    tip: |
+      Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.
+    note: |
+      `@kubb/plugin-ts` uses AST `Visitor` transformers for schema/operation node transforms. For output naming customization, use `resolver` instead.
+  - name: printer
+    type: "{ nodes?: PrinterTsNodes }"
+    required: false
+    description: |
+      Override individual printer node handlers to customize how specific schema types are rendered.
+
+      Each key is a `SchemaType` (e.g. `'integer'`, `'date'`). The function you provide replaces the built-in handler for that type. Use `this.transform` to recurse into nested schema nodes and `this.options` to read printer options.
+    examples:
+      - name: Override the date node to use the Date object
+        files:
+          - lang: typescript
+            code: |
+              import ts from 'typescript'
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                printer: {
+                  nodes: {
+                    date(node) {
+                      return ts.factory.createTypeReferenceNode('Date', [])
+                    },
+                  },
+                },
+              })
+            twoslash: false
+      - name: Override integer to bigint
+        files:
+          - lang: typescript
+            code: |
+              import ts from 'typescript'
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                printer: {
+                  nodes: {
+                    integer() {
+                      return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+                    },
+                  },
+                },
+              })
+            twoslash: false
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb';
+          import { pluginTs } from '@kubb/plugin-ts';
+
+          export default defineConfig({
+            input: {
+              path: './petStore.yaml',
+            },
+            output: {
+              path: './src/gen',
+            },
+            plugins: [
+              pluginTs({
+                output: {
+                  path: './types',
+                },
+                exclude: [
+                  {
+                    type: 'tag',
+                    pattern: 'store',
+                  },
+                ],
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Controller`,
+                },
+                enumType: 'asConst',
+                optionalType: 'questionTokenAndUndefined',
+                paramsCasing: 'camelcase',
+              }),
+            ],
+          })
+        twoslash: false
