@@ -64,7 +64,7 @@
     "size-limit": "catalog:",
     "taze": "^19.11.0",
     "tsdown": "catalog:",
-    "turbo": "^2.9.6",
+    "turbo": "^2.9.7",
     "typescript": "catalog:",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.5"

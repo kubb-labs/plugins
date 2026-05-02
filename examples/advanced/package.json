@@ -35,9 +35,9 @@
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@tanstack/query-core": "^5.100.6",
-    "@tanstack/react-query": "^5.100.6",
-    "@tanstack/vue-query": "^5.100.6",
+    "@tanstack/query-core": "^5.100.8",
+    "@tanstack/react-query": "^5.100.8",
+    "@tanstack/vue-query": "^5.100.8",
     "@types/react": "catalog:",
     "axios": "^1.15.2",
     "cypress": "^15.14.2",
@@ -47,7 +47,7 @@
     "svelte": "^5.55.5",
     "swr": "^2.4.1",
     "vue": "^3.5.33",
-    "zod": "^4.4.1"
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",
