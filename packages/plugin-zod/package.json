@@ -30,7 +30,7 @@
     "src",
     "templates",
     "dist",
-    "plugin.yaml",
+    "extension.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"

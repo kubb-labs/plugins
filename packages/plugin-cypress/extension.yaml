@@ -1,4 +1,5 @@
-$schema: https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json
+$schema: https://kubb.dev/schemas/extension.json
+kind: plugin
 id: plugin-cypress
 name: Cypress
 description: Generate Cypress end-to-end tests from OpenAPI specifications.

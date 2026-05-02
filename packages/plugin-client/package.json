@@ -31,7 +31,7 @@
     "src",
     "dist",
     "templates",
-    "plugin.yaml",
+    "extension.yaml",
     "*.d.ts",
     "*.d.cts",
     "!/**/**.test.**",
