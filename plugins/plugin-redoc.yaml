@@ -1,4 +1,4 @@
-$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
+$schema: 'https://kubb.dev/schemas/extension.json'
 id: plugin-redoc
 name: Redoc
 description: Generate API documentation with Redoc from OpenAPI specifications.

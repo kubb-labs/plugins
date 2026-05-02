@@ -1,4 +1,4 @@
-$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
+$schema: 'https://kubb.dev/schemas/extension.json'
 id: plugin-ts
 name: TypeScript
 description: Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.
