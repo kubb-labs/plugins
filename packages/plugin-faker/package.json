@@ -31,7 +31,7 @@
   "files": [
     "src",
     "dist",
-    "plugin.json",
+    "plugin.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"
