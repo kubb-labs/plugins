@@ -1,4 +1,4 @@
-$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
+$schema: 'https://kubb.dev/schemas/extension.json'
 id: plugin-client
 name: Client
 description: Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.
