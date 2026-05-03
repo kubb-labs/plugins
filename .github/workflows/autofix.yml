@@ -27,6 +27,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Build extension yaml
+        run: pnpm build:extension-yaml
+
       - name: Fix formatting
         run: pnpm run format
 

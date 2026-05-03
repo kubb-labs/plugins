@@ -47,9 +47,6 @@ jobs:
       - name: Build
         run: pnpm run build
 
-      - name: Build extension yaml
-        run: pnpm build:extension-yaml
-
       - name: Test
         run: pnpm run test
 
