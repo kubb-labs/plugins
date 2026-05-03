@@ -13,7 +13,6 @@
 
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { adapterOas } from '@kubb/adapter-oas'
 import { ast, createKubb, definePlugin } from '@kubb/core'
 import { parse, stringify } from 'yaml'
 
@@ -106,16 +105,12 @@ async function run() {
 
   const kubb = createKubb({
     root: ROOT,
-    input: {
-      data: { openapi: '3.0.0', info: { title: 'build-plugin-yaml', version: '0.0.0' }, paths: {} },
-    },
     output: {
       path: './packages',
       format: false,
       lint: false,
       defaultBanner: false,
     },
-    adapter: adapterOas(),
     plugins: [
       definePlugin(() => ({
         name: 'plugin-yaml-builder',
