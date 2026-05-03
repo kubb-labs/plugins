@@ -1,6 +1,6 @@
 /**
  * Resolves `extends:` references in source plugin YAML files and writes
- * self-contained `plugin.yaml` files into each package directory.
+ * self-contained `extension.yaml` files into each package directory.
  *
  * Usage:
  *   node --import tsx/esm scripts/build-plugin-yaml.ts
@@ -8,7 +8,7 @@
  *
  * Source files:  plugins/<name>.yaml  (may contain extends: references)
  * Shared files:  plugins/_shared/**\/*.yaml
- * Output files:  packages/<name>/plugin.yaml  (fully resolved, no extends:)
+ * Output files:  packages/<name>/extension.yaml  (fully resolved, no extends:)
  */
 
 import { existsSync, readFileSync } from 'node:fs'
@@ -134,12 +134,12 @@ const kubb = createKubb({
             const output = stringify(resolvePluginYaml(doc, dirname(sourcePath)), { blockQuote: 'literal', lineWidth: 0 })
 
             injectFile({
-              baseName: 'plugin.yaml',
-              path: join(packageDir, 'plugin.yaml'),
+              baseName: 'extension.yaml',
+              path: join(packageDir, 'extension.yaml'),
               sources: [ast.createSource({ nodes: [ast.createText(output)] })],
             })
 
-            console.log(`[ok] ${name} → packages/${name}/plugin.yaml`)
+            console.log(`[ok] ${name} → packages/${name}/extension.yaml`)
           }
         },
       },

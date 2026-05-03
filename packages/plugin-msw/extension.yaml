@@ -5,15 +5,15 @@ name: MSW
 description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications.
 category: mocks
 type: official
-npmPackage: '@kubb/plugin-msw'
+npmPackage: "@kubb/plugin-msw"
 docsPath: /plugins/plugin-msw
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - msw
   - mock-service-worker
@@ -75,30 +75,30 @@ options:
           - name: propagate
             files:
               - lang: typescript
-                code: ''
+                code: ""
                 twoslash: false
-          - name: 'false'
+          - name: "false"
             files:
               - lang: typescript
-                code: ''
+                code: ""
                 twoslash: false
       - name: banner
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
       - name: footer
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
       - name: override
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: Whether Kubb overrides existing external files that can be generated if they already exist.
   - name: handlers
     type: boolean
     required: false
-    default: 'false'
+    default: "false"
     description: Create a `handlers.ts` file with all handlers grouped by methods.
   - name: contentType
     type: "'application/json' | (string & {})"
@@ -154,7 +154,7 @@ options:
         body: |
           - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
       - name: name
-        type: '(context: GroupContext) => string'
+        type: "(context: GroupContext) => string"
         required: false
         default: (ctx) => `${ctx.group}Controller`
         description: Return the name of a group based on the group name. This is used for file and identifier generation.
@@ -217,7 +217,7 @@ options:
     description: Customize the generated names based on the type provided by the plugin.
     properties:
       - name: name
-        type: '(name: string, type?: ResolveType) => string'
+        type: "(name: string, type?: ResolveType) => string"
         required: false
         description: Customize the names based on the type that is provided by the plugin.
         codeBlock:
