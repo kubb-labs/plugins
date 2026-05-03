@@ -13,7 +13,7 @@
 
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { ast, createKubb, definePlugin } from '@kubb/core'
+import { ast, createKubb } from '@kubb/core'
 import { parse, stringify } from 'yaml'
 
 const ROOT = resolve(import.meta.dirname, '..')
@@ -99,64 +99,54 @@ const sourceFiles = [
   'plugin-zod',
 ]
 
-async function run() {
-  let created = 0
-  let skipped = 0
-
-  const kubb = createKubb({
-    root: ROOT,
-    output: {
-      path: './packages',
-      format: false,
-      lint: false,
-      defaultBanner: false,
-    },
-    plugins: [
-      definePlugin(() => ({
-        name: 'plugin-yaml-builder',
-        hooks: {
-          'kubb:plugin:setup'({ injectFile }) {
-            for (const name of sourceFiles) {
-              const sourcePath = join(PLUGINS_DIR, `${name}.yaml`)
-              const packageDir = join(PACKAGES_DIR, name)
-              const outputPath = join(packageDir, 'plugin.yaml')
-
-              if (!existsSync(sourcePath)) {
-                console.warn(`[skip] source not found: ${sourcePath}`)
-                skipped++
-                continue
-              }
-
-              if (!existsSync(packageDir)) {
-                console.warn(`[skip] package dir not found: ${packageDir}`)
-                skipped++
-                continue
-              }
-
-              const sourceDir = dirname(sourcePath)
-              const raw = readFileSync(sourcePath, 'utf8')
-              const doc = parse(raw) as PluginYaml
-              const resolved = resolvePluginYaml(doc, sourceDir)
-              const output = stringify(resolved, { blockQuote: 'literal', lineWidth: 0 })
-
-              injectFile({
-                baseName: 'plugin.yaml',
-                path: outputPath,
-                sources: [ast.createSource({ nodes: [ast.createText(output)] })],
-              })
-
-              console.log(`[ok] ${name} → packages/${name}/plugin.yaml`)
-              created++
-            }
-          },
-        },
-      }))(),
-    ],
+const resolved = sourceFiles
+  .map((name) => ({
+    name,
+    sourcePath: join(PLUGINS_DIR, `${name}.yaml`),
+    packageDir: join(PACKAGES_DIR, name),
+  }))
+  .filter(({ name, sourcePath, packageDir }) => {
+    if (!existsSync(sourcePath)) {
+      console.warn(`[skip] source not found: ${sourcePath}`)
+      return false
+    }
+    if (!existsSync(packageDir)) {
+      console.warn(`[skip] package dir not found: ${packageDir}`)
+      return false
+    }
+    return true
   })
 
-  await kubb.build()
+const kubb = createKubb({
+  root: ROOT,
+  output: {
+    path: './packages',
+    defaultBanner: false,
+  },
+  plugins: [
+    {
+      name: 'plugin-yaml-builder',
+      hooks: {
+        'kubb:plugin:setup'({ injectFile }) {
+          for (const { name, sourcePath, packageDir } of resolved) {
+            const raw = readFileSync(sourcePath, 'utf8')
+            const doc = parse(raw) as PluginYaml
+            const output = stringify(resolvePluginYaml(doc, dirname(sourcePath)), { blockQuote: 'literal', lineWidth: 0 })
 
-  console.log(`\nDone: ${created} created, ${skipped} skipped`)
-}
+            injectFile({
+              baseName: 'plugin.yaml',
+              path: join(packageDir, 'plugin.yaml'),
+              sources: [ast.createSource({ nodes: [ast.createText(output)] })],
+            })
 
-run()
+            console.log(`[ok] ${name} → packages/${name}/plugin.yaml`)
+          }
+        },
+      },
+    },
+  ],
+})
+
+await kubb.build()
+
+console.log(`\nDone: ${resolved.length} created, ${sourceFiles.length - resolved.length} skipped`)
