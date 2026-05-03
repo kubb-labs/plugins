@@ -8,7 +8,6 @@ type: official
 npmPackage: '@kubb/plugin-react-query'
 docsPath: /plugins/plugin-react-query
 repo: https://github.com/kubb-labs/plugins
-codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/react-query
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -31,6 +30,7 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-react-query/CHANGELOG.md
+  codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/react-query
 featured: true
 icon:
   light: https://kubb.dev/feature/tanstack.svg

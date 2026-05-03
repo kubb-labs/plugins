@@ -8,7 +8,6 @@ type: official
 npmPackage: '@kubb/plugin-vue-query'
 docsPath: /plugins/plugin-vue-query
 repo: https://github.com/kubb-labs/plugins
-codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/vue-query
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -31,6 +30,7 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-vue-query/CHANGELOG.md
+  codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/vue-query
 featured: false
 icon:
   light: https://kubb.dev/feature/tanstack.svg
