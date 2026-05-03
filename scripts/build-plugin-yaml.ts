@@ -11,8 +11,10 @@
  * Output files:  packages/<name>/plugin.yaml  (fully resolved, no extends:)
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'node:fs'
-import { join, resolve, dirname } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { dirname, join, resolve } from 'node:path'
+import { adapterOas } from '@kubb/adapter-oas'
+import { ast, createKubb, definePlugin } from '@kubb/core'
 import { parse, stringify } from 'yaml'
 
 const ROOT = resolve(import.meta.dirname, '..')
@@ -32,10 +34,6 @@ type PluginYaml = {
   [key: string]: unknown
 }
 
-/**
- * Deep-merge two plain objects. Values in `overrides` take precedence.
- * Arrays are replaced (not concatenated).
- */
 function deepMerge(base: Record<string, unknown>, overrides: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = { ...base }
   for (const [key, value] of Object.entries(overrides)) {
@@ -55,10 +53,6 @@ function deepMerge(base: Record<string, unknown>, overrides: Record<string, unkn
   return result
 }
 
-/**
- * Resolve a single option object, recursively resolving extends: and
- * processing nested properties.
- */
 function resolveOption(option: PluginOption, baseDir: string): PluginOption {
   let resolved: PluginOption = { ...option }
 
@@ -70,10 +64,8 @@ function resolveOption(option: PluginOption, baseDir: string): PluginOption {
       const sharedRaw = readFileSync(sharedPath, 'utf8')
       const sharedData = parse(sharedRaw) as Record<string, unknown>
 
-      // Remove $schema — it's metadata for the shared file, not the merged option
       delete sharedData['$schema']
 
-      // Local fields win; extends: is consumed (not in output)
       const { extends: _ext, ...localFields } = resolved
       resolved = deepMerge(sharedData, localFields) as PluginOption
     }
@@ -86,9 +78,6 @@ function resolveOption(option: PluginOption, baseDir: string): PluginOption {
   return resolved
 }
 
-/**
- * Resolve all options in a plugin YAML document.
- */
 function resolvePluginYaml(doc: PluginYaml, sourceDir: string): PluginYaml {
   if (!Array.isArray(doc.options)) return doc
 
@@ -98,7 +87,6 @@ function resolvePluginYaml(doc: PluginYaml, sourceDir: string): PluginYaml {
   }
 }
 
-// Discover source YAML files
 const sourceFiles = [
   'plugin-client',
   'plugin-cypress',
@@ -112,36 +100,68 @@ const sourceFiles = [
   'plugin-zod',
 ]
 
-let created = 0
-let skipped = 0
+async function run() {
+  let created = 0
+  let skipped = 0
 
-for (const name of sourceFiles) {
-  const sourcePath = join(PLUGINS_DIR, `${name}.yaml`)
-  const packageDir = join(PACKAGES_DIR, name)
-  const outputPath = join(packageDir, 'plugin.yaml')
+  const kubb = createKubb({
+    root: ROOT,
+    input: {
+      data: { openapi: '3.0.0', info: { title: 'build-plugin-yaml', version: '0.0.0' }, paths: {} },
+    },
+    output: {
+      path: './packages',
+      format: false,
+      lint: false,
+      defaultBanner: false,
+    },
+    adapter: adapterOas(),
+    plugins: [
+      definePlugin(() => ({
+        name: 'plugin-yaml-builder',
+        hooks: {
+          'kubb:plugin:setup'({ injectFile }) {
+            for (const name of sourceFiles) {
+              const sourcePath = join(PLUGINS_DIR, `${name}.yaml`)
+              const packageDir = join(PACKAGES_DIR, name)
+              const outputPath = join(packageDir, 'plugin.yaml')
 
-  if (!existsSync(sourcePath)) {
-    console.warn(`[skip] source not found: ${sourcePath}`)
-    skipped++
-    continue
-  }
+              if (!existsSync(sourcePath)) {
+                console.warn(`[skip] source not found: ${sourcePath}`)
+                skipped++
+                continue
+              }
 
-  if (!existsSync(packageDir)) {
-    console.warn(`[skip] package dir not found: ${packageDir}`)
-    skipped++
-    continue
-  }
+              if (!existsSync(packageDir)) {
+                console.warn(`[skip] package dir not found: ${packageDir}`)
+                skipped++
+                continue
+              }
 
-  const sourceDir = dirname(sourcePath)
-  const raw = readFileSync(sourcePath, 'utf8')
-  const doc = parse(raw) as PluginYaml
-  const resolved = resolvePluginYaml(doc, sourceDir)
+              const sourceDir = dirname(sourcePath)
+              const raw = readFileSync(sourcePath, 'utf8')
+              const doc = parse(raw) as PluginYaml
+              const resolved = resolvePluginYaml(doc, sourceDir)
+              const output = stringify(resolved, { blockQuote: 'literal', lineWidth: 0 })
 
-  // stringify with block style for readability
-  const output = stringify(resolved, { blockQuote: 'literal', lineWidth: 0 })
-  writeFileSync(outputPath, output, 'utf8')
-  console.log(`[ok] ${name} → packages/${name}/plugin.yaml`)
-  created++
+              injectFile({
+                baseName: 'plugin.yaml',
+                path: outputPath,
+                sources: [ast.createSource({ nodes: [ast.createText(output)] })],
+              })
+
+              console.log(`[ok] ${name} → packages/${name}/plugin.yaml`)
+              created++
+            }
+          },
+        },
+      }))(),
+    ],
+  })
+
+  await kubb.build()
+
+  console.log(`\nDone: ${created} created, ${skipped} skipped`)
 }
 
-console.log(`\nDone: ${created} created, ${skipped} skipped`)
+run()
