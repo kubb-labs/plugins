@@ -20,7 +20,7 @@
   },
   "scripts": {
     "build": "turbo run build --filter=./packages/*",
-    "build:plugin-yaml": "tsx scripts/build-plugin-yaml.ts",
+    "build:extension-yaml": "tsx scripts/build-extension-yaml.ts",
     "build:examples": "turbo run build --filter=./examples/*",
     "test:bench": "vitest bench --config ./configs/vitest.bench.config.ts",
     "changeset": "changeset",
