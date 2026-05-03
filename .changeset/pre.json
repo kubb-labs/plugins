@@ -62,6 +62,7 @@
     "plugin-ts-v2-helpers",
     "plugin-vue-query-key-transformer-compat",
     "plugin-vue-query-v5-migration",
+    "plugin-yaml-per-package-metadata",
     "plugin-yaml-tip-values-metadata",
     "plugin-zod-discriminator-ref-description",
     "plugin-zod-v5-rewrite",
