@@ -1,0 +1,469 @@
+$schema: https://kubb.dev/schemas/extension.json
+id: plugin-mcp
+name: MCP
+description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications for AI assistants to call your API.
+category: ai
+type: official
+npmPackage: "@kubb/plugin-mcp"
+docsPath: /plugins/plugin-mcp
+repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/mcp
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - mcp
+  - model-context-protocol
+  - ai
+  - claude
+  - llm
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts
+  - plugin-client
+  - plugin-zod
+resources:
+  documentation: https://kubb.dev/plugins/plugin-mcp
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-mcp/CHANGELOG.md
+featured: false
+icon:
+  light: https://kubb.dev/feature/mcp-light.svg
+  dark: https://kubb.dev/feature/mcp-dark.svg
+intro: |
+  # @kubb/plugin-mcp
+
+  Generate [Model Context Protocol](https://modelcontextprotocol.io/introduction) servers from your OpenAPI schema. AI assistants like Claude can now call your API through conversational interfaces.
+
+  ```mermaid
+  graph TD
+    A[Kubb<br/>Generates code from OpenAPI] --> B[MCP Server<br/>Handles tool calls]
+    B --> C[Claude<br/>Conversational AI]
+    C -->|Sends tool request| B
+    B -->|Uses generated code| A
+  ```
+notes:
+  - type: tip
+    body: |
+      See [Setup Claude with Kubb](https://modelcontextprotocol.io/docs/tools/claude-desktop) for configuration instructions.
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'mcp', barrelType: 'named' }"
+    description: Specify the export location for the files and define the behavior of the output.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: Output directory or file for the generated code, relative to the global `output.path`.
+        tip: |
+          if `output.path` is a file, `group` cannot be used.
+        default: "'mcp'"
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
+        required: false
+        default: "'named'"
+        description: Specify what to export and optionally disable barrel-file generation.
+        tip: |
+          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        examples:
+          - name: all
+            files:
+              - lang: typescript
+                code: |
+                  export * from './gen/petService.ts'
+                twoslash: false
+          - name: named
+            files:
+              - lang: typescript
+                code: |
+                  export { PetService } from './gen/petService.ts'
+                twoslash: false
+          - name: propagate
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+          - name: "false"
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+      - name: banner
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: footer
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: override
+        type: boolean
+        required: false
+        default: "false"
+        description: Whether Kubb overrides existing external files that can be generated if they already exist.
+  - name: resolver
+    type: Partial<ResolverMcp> & ThisType<ResolverMcp>
+    required: false
+    description: |
+      A single resolver that overrides the naming and path-resolution conventions. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the resolver's result is used as the fallback, so you only need to supply the methods you want to change.
+
+      `this` inside each method is bound to the **full** resolver, so you can call other resolver methods (e.g. `this.default(name, 'function')`) without losing context.
+    body: |
+      Each plugin ships a built-in resolver:
+
+      | Plugin | Default resolver |
+      | --- | --- |
+      | `@kubb/plugin-ts` | `resolverTs` |
+      | `@kubb/plugin-zod` | `resolverZod` |
+      | `@kubb/plugin-cypress` | `resolverCypress` |
+      | `@kubb/plugin-mcp` | `resolverMcp` |
+    codeBlock:
+      lang: typescript
+      title: Custom resolver (plugin-mcp example)
+      code: |
+        import { pluginMcp } from '@kubb/plugin-mcp'
+
+        pluginMcp({
+          resolver: {
+            resolveName(name) {
+              return `Mcp${this.default(name, 'function')}`
+            },
+          },
+        })
+    tip: |
+      Use `resolver` for fine-grained control over naming conventions.
+  - name: group
+    type: Group
+    required: false
+    description: |
+      Grouping combines files in a folder based on a specific `type`.
+    examples:
+      - name: kubb.config.ts
+        files:
+          - lang: typescript
+            code: |
+              group: {
+                type: 'tag',
+                name({ group }) {
+                  return `${group}Controller`
+                }
+              }
+            twoslash: false
+    body: |
+      With the configuration above, the generator emits:
+
+      ```text
+      .
+      ├── src/
+      │   └── petController/
+      │   │   ├── addPet.ts
+      │   │   └── getPet.ts
+      │   └── storeController/
+      │       ├── createStore.ts
+      │       └── getStoreById.ts
+      ├── petStore.yaml
+      ├── kubb.config.ts
+      └── package.json
+      ```
+    properties:
+      - name: type
+        type: "'tag'"
+        required: true
+        description: Specify the property to group files by. Required when `group` is defined.
+        note: |
+          `Required: true*` means this is required only when the `group` option is used. The `group` option itself is optional.
+        body: |
+          - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
+      - name: name
+        type: "(context: GroupContext) => string"
+        required: false
+        default: (ctx) => `${ctx.group}Requests`
+        description: Return the name of a group based on the group name. This is used for file and identifier generation.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to camelCase in generated MCP handlers.
+    important: |
+      When using `paramsCasing`, ensure that `@kubb/plugin-ts` also has the same `paramsCasing` setting. This option automatically maps transformed parameter names back to their original API names in HTTP requests.
+    body: |
+      - `'camelcase'` transforms parameter names to camelCase.
+    examples:
+      - name: With paramsCasing camelcase
+        files:
+          - lang: typescript
+            code: |
+              // Handler uses camelCase parameters
+              export async function findPetsByStatusHandler({
+                stepId  // ✓ camelCase
+              }: {
+                stepId: FindPetsByStatusPathParams['stepId']
+              }): Promise<Promise<CallToolResult>> {
+                // Automatically maps back to original name
+                const step_id = stepId
+
+                const res = await fetch({
+                  method: 'GET',
+                  url: `/pet/findByStatus/${step_id}`,  // Uses original API name
+                  ...
+                })
+                ...
+              }
+            twoslash: false
+      - name: Without paramsCasing
+        files:
+          - lang: typescript
+            code: |
+              // Handler uses original API naming
+              export async function findPetsByStatusHandler({
+                step_id  // Original naming
+              }: {
+                step_id: FindPetsByStatusPathParams['step_id']
+              }): Promise<Promise<CallToolResult>> {
+                const res = await fetch({
+                  method: 'GET',
+                  url: `/pet/findByStatus/${step_id}`,
+                  ...
+                })
+                ...
+              }
+            twoslash: false
+  - name: client
+    type: ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }
+    required: false
+    description: Client configuration for HTTP request generation, including client type, data return type, base URL, and bundling options.
+    properties:
+      - name: importPath
+        type: string
+        required: false
+        description: Path to the client used for API calls. Supports both relative and absolute paths.
+        details:
+          - title: When to use `importPath`
+            body: |
+              Use `importPath` when you want to:
+
+              - **Customize the HTTP client**: Provide your own client implementation with custom configurations (e.g., baseURL, headers, interceptors)
+              - **Add authentication**: Include authentication tokens or other security mechanisms in your client
+              - **Override default behavior**: Replace the default Kubb client with your own implementation
+          - title: Default behavior
+            body: |
+              When `importPath` is not specified:
+
+              - If `bundle: false` (default): Uses `@kubb/plugin-client/clients/${client}` where client is either `axios` or `fetch`.
+              - If `bundle: true`: Bundles the client into `.kubb/fetch.ts`.
+          - title: Import structure
+            body: "Generated code imports the client as a default import and the runtime types as named type imports:"
+            codeBlock:
+              lang: typescript
+              code: |-
+                /**
+                 * Generated by Kubb (https://kubb.dev/).
+                 * Do not edit manually.
+                 */
+                import client from '${client.importPath}'
+                import type { RequestConfig, ResponseErrorConfig } from '${client.importPath}'
+                // ... rest of generated file
+        important: |
+          When using `importPath` with query plugins such as `@kubb/plugin-react-query` or `@kubb/plugin-vue-query`, the generated hooks also import a `Client` type alongside `RequestConfig` and `ResponseErrorConfig` from the custom module. Your custom client module **must** export all three types — if any is missing, TypeScript will report an unresolvable import error.
+        codeBlock:
+          lang: typescript
+          title: client.ts
+          code: |
+            export type RequestConfig<TData = unknown> = {
+              url?: string
+              method: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE'
+              params?: object
+              data?: TData | FormData
+              responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
+              signal?: AbortSignal
+              headers?: HeadersInit
+            }
+
+            export type ResponseConfig<TData = unknown> = {
+              data: TData
+              status: number
+              statusText: string
+            }
+
+            export type ResponseErrorConfig<TError = unknown> = TError
+
+            // The Client type alias is required when using query plugins
+            export type Client = <TData, _TError = unknown, TVariables = unknown>(
+              config: RequestConfig<TVariables>
+            ) => Promise<ResponseConfig<TData>>
+
+            export const client: Client = async (config) => { /* ... */ }
+            export default client
+        examples:
+          - name: kubb.config.ts
+            files:
+              - lang: typescript
+                code: |
+                  import { defineConfig } from 'kubb'
+                  import { pluginClient } from '@kubb/plugin-client'
+
+                  export default defineConfig({
+                    // ...
+                    plugins: [
+                      pluginClient({
+                        importPath: './src/client.ts', // Path to your custom client
+                      }),
+                    ],
+                  })
+                twoslash: false
+        tip: |
+          Learn more about defining a custom client [here](https://kubb.dev/plugins/plugin-client#importpath).
+      - name: dataReturnType
+        type: "'data' | 'full'"
+        required: false
+        default: "'data'"
+        description: |
+          Return type used when calling the client.
+
+          - `'data'` returns `ResponseConfig['data']`.
+          - `'full'` returns the full `ResponseConfig`.
+        examples:
+          - name: data
+            files:
+              - lang: typescript
+                code: |
+                  export async function getPetById<TData>(
+                    petId: GetPetByIdPathParams,
+                  ): Promise<ResponseConfig<TData>['data']> {
+                    ...
+                  }
+                twoslash: false
+          - name: full
+            files:
+              - lang: typescript
+                code: |
+                  export async function getPetById<TData>(
+                    petId: GetPetByIdPathParams,
+                  ): Promise<ResponseConfig<TData>> {
+                    ...
+                  }
+                twoslash: false
+      - name: baseURL
+        type: string
+        required: false
+        description: Sets a custom base URL for all generated calls. When not set, the base URL is automatically taken from the OAS spec via the adapter (e.g. the `servers[0].url` field).
+  - name: include
+    type: Array<Include>
+    required: false
+    description: Array containing include parameters to include tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Include
+      code: |
+        export type Include = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: exclude
+    type: Array<Exclude>
+    required: false
+    description: Array containing exclude parameters to exclude or skip tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Exclude
+      code: |
+        export type Exclude = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: override
+    type: Array<Override>
+    required: false
+    description: Array containing override parameters to override `options` based on tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Override
+      code: |
+        export type Override = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+          options: PluginOptions
+        }
+  - name: generators
+    type: Array<Generator<PluginMcp>>
+    required: false
+    experimental: true
+    description: |
+      Define additional generators next to the built-in generators.
+
+      See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
+  - name: transformer
+    type: Visitor
+    required: false
+    description: |
+      A single AST visitor applied to every node before code is printed. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the preset transformer's result is used as the fallback — so you only need to supply the methods you want to change.
+
+      Visitor methods receive the node and a context object. Return a modified node to replace it, or return `undefined`/`void` to leave it unchanged.
+    examples:
+      - name: Strip descriptions before printing
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                transformer: {
+                  schema(node) {
+                    return { ...node, description: undefined }
+                  },
+                },
+              })
+            twoslash: false
+      - name: Prefix every operationId
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              pluginTs({
+                transformer: {
+                  operation(node) {
+                    return { ...node, operationId: `api_${node.operationId}` }
+                  },
+                },
+              })
+            twoslash: false
+    tip: |
+      Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginClient } from '@kubb/plugin-client'
+          import { pluginZod } from '@kubb/plugin-zod'
+          import { pluginMcp } from '@kubb/plugin-mcp'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs(),
+              pluginClient(),
+              pluginZod(),
+              pluginMcp({
+                output: { path: 'mcp', barrelType: 'named' },
+                client: {
+                  baseURL: 'https://petstore.swagger.io/v2',
+                },
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Handlers`,
+                },
+              }),
+            ],
+          })
+        twoslash: false

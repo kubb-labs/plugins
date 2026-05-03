@@ -1,0 +1,66 @@
+$schema: https://kubb.dev/schemas/extension.json
+id: plugin-redoc
+name: Redoc
+description: Generate API documentation with Redoc from OpenAPI specifications.
+category: documentation
+type: official
+npmPackage: "@kubb/plugin-redoc"
+docsPath: /plugins/plugin-redoc
+repo: https://github.com/kubb-labs/plugins
+codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/simple-single
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: ">=5.0.0"
+  node: ">=22"
+tags:
+  - redoc
+  - api-docs
+  - documentation
+  - interactive-docs
+  - codegen
+  - openapi
+dependencies: []
+resources:
+  documentation: https://kubb.dev/plugins/plugin-redoc
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-redoc/CHANGELOG.md
+featured: false
+icon:
+  light: https://kubb.dev/feature/openapi.svg
+intro: |
+  Generate interactive API documentation from your OpenAPI schema using [Redoc](https://redocly.com/).
+options:
+  - name: output
+    type: "{ path: string }"
+    required: false
+    description: Specify the output path for the generated documentation HTML file.
+    properties:
+      - name: path
+        type: string
+        required: true
+        description: |
+          The output file path for the generated documentation HTML.
+        tip: |
+          if `output.path` is a file, `group` cannot be used.
+        default: "'docs.html'"
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginRedoc } from '@kubb/plugin-redoc'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginRedoc({
+                output: { path: 'docs.html' },
+              }),
+            ],
+          })
+        twoslash: false
