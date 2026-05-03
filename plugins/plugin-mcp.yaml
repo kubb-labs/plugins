@@ -1,4 +1,5 @@
 $schema: 'https://kubb.dev/schemas/extension.json'
+kind: plugin
 id: plugin-mcp
 name: MCP
 description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications for AI assistants to call your API.
@@ -7,7 +8,6 @@ type: official
 npmPackage: '@kubb/plugin-mcp'
 docsPath: /plugins/plugin-mcp
 repo: https://github.com/kubb-labs/plugins
-codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/mcp
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -31,6 +31,7 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-mcp/CHANGELOG.md
+  codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/mcp
 featured: false
 icon:
   light: 'https://kubb.dev/feature/mcp-light.svg'

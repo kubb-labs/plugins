@@ -5,15 +5,15 @@ name: Redoc
 description: Generate API documentation with Redoc from OpenAPI specifications.
 category: documentation
 type: official
-npmPackage: '@kubb/plugin-redoc'
+npmPackage: "@kubb/plugin-redoc"
 docsPath: /plugins/plugin-redoc
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - redoc
   - api-docs
@@ -35,7 +35,7 @@ intro: |
   Generate interactive API documentation from your OpenAPI schema using [Redoc](https://redocly.com/).
 options:
   - name: output
-    type: '{ path: string }'
+    type: "{ path: string }"
     required: false
     description: Specify the output path for the generated documentation HTML file.
     properties:

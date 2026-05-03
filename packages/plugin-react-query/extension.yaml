@@ -5,15 +5,15 @@ name: React Query
 description: Generate React Query hooks (useQuery, useMutation) from OpenAPI specifications.
 category: framework
 type: official
-npmPackage: '@kubb/plugin-react-query'
+npmPackage: "@kubb/plugin-react-query"
 docsPath: /plugins/plugin-react-query
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - react-query
   - tanstack-query
@@ -75,25 +75,25 @@ options:
           - name: propagate
             files:
               - lang: typescript
-                code: ''
+                code: ""
                 twoslash: false
-          - name: 'false'
+          - name: "false"
             files:
               - lang: typescript
-                code: ''
+                code: ""
                 twoslash: false
       - name: banner
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
       - name: footer
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
       - name: override
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: Whether Kubb overrides existing external files that can be generated if they already exist.
   - name: contentType
     type: "'application/json' | (string & {})"
@@ -145,7 +145,7 @@ options:
         body: |
           - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
       - name: name
-        type: '(context: GroupContext) => string'
+        type: "(context: GroupContext) => string"
         required: false
         default: (ctx) => `${ctx.group}Controller`
         description: Return the name of a group based on the group name. This is used for file and identifier generation.
@@ -173,7 +173,7 @@ options:
               - If `bundle: false` (default): Uses `@kubb/plugin-client/clients/${client}` where client is either `axios` or `fetch`.
               - If `bundle: true`: Bundles the client into `.kubb/fetch.ts`.
           - title: Import structure
-            body: 'Generated code imports the client as a default import and the runtime types as named type imports:'
+            body: "Generated code imports the client as a default import and the runtime types as named type imports:"
             codeBlock:
               lang: typescript
               code: |-
@@ -278,7 +278,7 @@ options:
       - name: bundle
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: Controls whether the HTTP client runtime is copied into the generated `.kubb` directory.
         body: |
           - `true` adds a `.kubb/fetch.ts` file containing the selected client template (fetch or axios). Generated clients remain self-contained.
@@ -412,7 +412,7 @@ options:
   - name: infinite
     type: Infinite | false
     required: false
-    default: 'false'
+    default: "false"
     description: |
       Generate an `infiniteQuery` hook for paginated queries. Pass `false` to disable.
     codeBlock:
@@ -455,13 +455,13 @@ options:
       - name: initialPageParam
         type: unknown
         required: false
-        default: '0'
+        default: "0"
         description: Specify the initial page param value.
       - name: cursorParam
         type: string | undefined
         required: false
         deprecated:
-          note: '`cursorParam` is deprecated. Use `nextParam` and `previousParam` instead for more flexible pagination handling.'
+          note: "`cursorParam` is deprecated. Use `nextParam` and `previousParam` instead for more flexible pagination handling."
         description: Which field of the data will be used, set it to undefined when no cursor is known.
       - name: nextParam
         type: string | string[] | undefined
@@ -507,7 +507,7 @@ options:
           It will be used as `import { useQuery } from '${hook.importPath}'`.
           It allows both relative and absolute path. The path will be applied as is, so a relative path should be based on the file being generated.
   - name: queryKey
-    type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
+    type: "(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]"
     required: false
     description: |
       Customize the queryKey that will be used for the query.
@@ -572,7 +572,7 @@ options:
               export const findPetsByTagsQueryKey = (params?: FindPetsByTagsQueryParams) =>
                 ['v5', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
       - title: Using operation ID
-        body: 'Create a simple queryKey using the operation ID:'
+        body: "Create a simple queryKey using the operation ID:"
         codeBlock:
           lang: typescript
           code: |-
@@ -589,7 +589,7 @@ options:
               ],
             })
       - title: Conditional keys based on parameters
-        body: 'Include query parameters when they exist:'
+        body: "Include query parameters when they exist:"
         codeBlock:
           lang: typescript
           code: |-
@@ -651,7 +651,7 @@ options:
           It will be used as `import { useMutation } from '${hook.importPath}'`.
           It allows both relative and absolute path. The path will be applied as is, so a relative path should be based on the file being generated.
   - name: mutationKey
-    type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
+    type: "(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]"
     required: false
     description: Customize the mutationKey.
     warning: |
@@ -802,12 +802,12 @@ options:
 
       See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
   - name: transformers
-    type: '{ name?: (name: string, type?: ResolveType) => string }'
+    type: "{ name?: (name: string, type?: ResolveType) => string }"
     required: false
     description: Customize the generated names based on the type provided by the plugin.
     properties:
       - name: name
-        type: '(name: string, type?: ResolveType) => string'
+        type: "(name: string, type?: ResolveType) => string"
         required: false
         description: Customize the names based on the type that is provided by the plugin.
         codeBlock:
