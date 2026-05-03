@@ -1,5 +1,30 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.4
+
+### Minor Changes
+
+- [#125](https://github.com/kubb-labs/plugins/pull/125) [`3be0fc5`](https://github.com/kubb-labs/plugins/commit/3be0fc5fba830d6dae6f37e134f29e7191f480f2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Each plugin package now ships an `extension.yaml` file describing its options and metadata.
+
+  The file is self-contained — no `extends:` references — so third-party plugin authors can follow the same pattern in their own packages without access to this monorepo. Add `extension.yaml` to the `files` array in `package.json` and reference the unified schema for IDE validation:
+
+  ```yaml
+  $schema: "https://kubb.dev/schemas/extension.json"
+  kind: plugin
+  ```
+
+  A `build:plugin-yaml` script resolves shared authoring templates and regenerates all ten files:
+
+  ```bash
+  pnpm build:plugin-yaml
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`3be0fc5`](https://github.com/kubb-labs/plugins/commit/3be0fc5fba830d6dae6f37e134f29e7191f480f2)]:
+  - @kubb/plugin-ts@5.0.0-beta.4
+  - @kubb/plugin-zod@5.0.0-beta.4
+
 ## 5.0.0-beta.3
 
 ### Patch Changes
