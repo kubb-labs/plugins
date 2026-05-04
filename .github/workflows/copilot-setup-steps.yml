@@ -28,11 +28,5 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install RTK
-        run: |
-          curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-          "$HOME/.local/bin/rtk" --version
-
       - name: Build
         run: pnpm run build
