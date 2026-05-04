@@ -14,7 +14,11 @@ export function getUploadFileUrl(petId: UploadFilePathPetId) {
 /**
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile(
+  petId: UploadFilePathPetId,
+  data?: UploadFileData,
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
+) {
   const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
@@ -25,6 +29,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
     method: 'POST',
     url: getUploadFileUrl(petId).url.toString(),
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    contentType,
     ...requestConfig,
   })
 

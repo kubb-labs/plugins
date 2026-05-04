@@ -5,6 +5,7 @@ export {
   buildGroupParam,
   buildMutationArgParams,
   buildQueryKeyParams,
+  buildRequestConfigType,
   getComments,
   getContentTypeInfo,
   resolveErrorNames,

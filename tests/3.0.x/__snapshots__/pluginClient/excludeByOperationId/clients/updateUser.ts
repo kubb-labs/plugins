@@ -18,14 +18,14 @@ function getUpdateUserUrl(username: UpdateUserPathUsername) {
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: getUpdateUserUrl(username).url.toString(), data: requestData, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: getUpdateUserUrl(username).url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

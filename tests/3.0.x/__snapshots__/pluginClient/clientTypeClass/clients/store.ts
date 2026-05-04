@@ -34,10 +34,10 @@ export class Store {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-  async placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+  async placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+    const { client: request = fetch, contentType = "application/json", ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, data: requestData })
+    const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, data: requestData, contentType })
     return res.data
   }
 

@@ -13,6 +13,15 @@ export function getContentTypeInfo(node: ast.OperationNode) {
   }
 }
 
+export function buildRequestConfigType(node: ast.OperationNode, resolver: PluginTs['resolver']): string {
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
+  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
+  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
+
+  return `${configType} & { ${configProps} }`
+}
+
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
 }

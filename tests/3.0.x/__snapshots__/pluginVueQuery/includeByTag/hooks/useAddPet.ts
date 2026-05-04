@@ -17,14 +17,14 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, data: requestData, ...requestConfig })
+  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
@@ -36,7 +36,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
  */
 export function useAddPet<TContext>(options: {
   mutation?: MutationObserverOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: MaybeRefOrGetter<AddPetData>}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<AddPetData>> & { client?: Client },
+  client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

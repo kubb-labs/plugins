@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildMutationArgParams, resolveErrorNames } from '../utils.ts'
+import { buildMutationArgParams, buildRequestConfigType, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -23,14 +23,13 @@ const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
 function getConfigParam(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   return ast.createFunctionParameters({
     params: [
       ast.createFunctionParameter({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+          name: buildRequestConfigType(node, resolver),
         }),
         default: '{}',
       }),
@@ -76,9 +75,7 @@ export function MutationOptions({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: node.requestBody?.content?.[0]?.schema
-            ? `Partial<RequestConfig<${tsResolver.resolveDataName(node)}>> & { client?: Client }`
-            : 'Partial<RequestConfig> & { client?: Client }',
+          name: buildRequestConfigType(node, tsResolver),
         }),
         default: '{}',
       }),

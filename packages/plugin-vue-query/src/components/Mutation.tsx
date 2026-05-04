@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { buildMutationArgParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildMutationArgParams, buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
 import { MutationKey } from './MutationKey.tsx'
 
 type Props = {
@@ -34,7 +34,6 @@ function getParams(
 ): ast.FunctionParametersNode {
   const { paramsCasing, dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
@@ -61,7 +60,7 @@ function getParams(
           variant: 'reference',
           name: `{
   mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'void', 'TContext'].join(', ')}> & { client?: QueryClient },
-  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'},
+  client?: ${buildRequestConfigType(node, resolver)},
 }`,
         }),
         default: '{}',
@@ -125,9 +124,7 @@ export function Mutation({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: node.requestBody?.content?.[0]?.schema
-            ? `Partial<RequestConfig<${tsResolver.resolveDataName(node)}>> & { client?: Client }`
-            : 'Partial<RequestConfig> & { client?: Client }',
+          name: buildRequestConfigType(node, tsResolver),
         }),
         default: '{}',
       }),

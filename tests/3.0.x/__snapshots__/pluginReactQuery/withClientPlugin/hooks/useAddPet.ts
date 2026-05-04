@@ -11,7 +11,7 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
 
         const mutationKey = addPetMutationKey()
         return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
@@ -30,7 +30,7 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
  */
 export function useAddPet<TContext>(options: {
   mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<AddPetData>> & { client?: Client },
+  client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

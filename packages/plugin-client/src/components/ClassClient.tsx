@@ -6,7 +6,16 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginClient } from '../types.ts'
-import { buildClassClientParams, buildFormDataLine, buildGenerics, buildHeaders, buildRequestDataLine, buildReturnStatement, getComments } from '../utils.ts'
+import {
+  buildClassClientParams,
+  buildFormDataLine,
+  buildGenerics,
+  buildHeaders,
+  buildRequestDataLine,
+  buildReturnStatement,
+  getComments,
+  getContentTypeInfo,
+} from '../utils.ts'
 import { Client } from './Client.tsx'
 
 type OperationData = {
@@ -58,25 +67,25 @@ function generateMethod({
   pathParamsType,
 }: GenerateMethodProps): string {
   const path = new URLPath(node.path, { casing: paramsCasing })
-  const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'
-  const isFormData = contentType === 'multipart/form-data'
+  const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
+  const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const headerParamsName =
     node.parameters.filter((p) => p.in === 'header').length > 0
       ? tsResolver.resolveHeaderParamsName(node, node.parameters.filter((p) => p.in === 'header')[0]!)
       : undefined
-  const headers = buildHeaders(contentType, !!headerParamsName)
+  const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
   const generics = buildGenerics(node, tsResolver)
   const paramsNode = ClassClient.getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, headers })
+  const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers })
   const jsdoc = buildJSDoc(getComments(node))
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
-  const formDataLine = buildFormDataLine(isFormData, !!node.requestBody?.content?.[0]?.schema)
+  const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
   const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
 
   const methodBody = [
-    'const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)',
+    `const { client: request = fetch, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
     '',
     requestDataLine,
     formDataLine,

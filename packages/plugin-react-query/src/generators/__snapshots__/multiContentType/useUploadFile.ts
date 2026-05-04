@@ -16,7 +16,11 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 /**
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile(
+  petId: UploadFilePathPetId,
+  data?: UploadFileData,
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
+) {
   const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = UploadFileData.parse(data)
@@ -27,13 +31,16 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    contentType,
     ...requestConfig,
   })
 
   return UploadFileResponse.parse(res.data)
 }
 
-export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
+) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileResponse, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext>({
     mutationKey,
@@ -51,7 +58,7 @@ export function useUploadFile<TContext>(
     mutation?: UseMutationOptions<UploadFileResponse, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<UploadFileData>> & { client?: Client }
+    client?: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

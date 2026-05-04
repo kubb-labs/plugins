@@ -20,20 +20,20 @@ The approach is incomplete when `contentType` is destructured out of config and 
 |---|---:|---|
 | AST input | Done | `requestBody.content` already contains all media types when adapter-oas does not receive a global content type override. |
 | `plugin-ts` | Done | Multi-content request bodies emit individual data types plus a union alias such as `UploadFileData = UploadFileJsonData \| UploadFileFormData`. |
-| `plugin-client` function client | Partial | Generated clients compute a default `contentType` and switch between `requestData` and `FormData` when multipart is present. |
+| `plugin-client` function client | Done | Generated clients compute a default `contentType`, type it as a literal union, forward it to request config, and switch between `requestData` and `FormData` when multipart is present. |
 | `plugin-client` form-data detection | Done | Imports now check all content entries with `.some()` instead of only `content[0]`. |
-| Fetch client | Partial | `RequestConfig` includes `contentType?: string`, and fetch sets `Content-Type` when the value is not `multipart/form-data`. |
-| Axios client | Partial | `RequestConfig` includes `contentType?: string`, but axios does not yet translate it into request headers. |
-| React Query | Partial | The standalone `contentType` mutation variable was removed, and `buildFormData` import is conditional. Per-mutation content type selection still needs a final design. |
-| Vue Query | Partial | Vue Query needs parity with React Query for conditional imports and content type selection. |
+| Fetch client | Done | `RequestConfig` includes `contentType?: string`, and fetch sets `Content-Type` when the value is not `multipart/form-data`. |
+| Axios client | Done | `RequestConfig` includes `contentType?: string`, and axios sets `Content-Type` when the value is not `multipart/form-data`. |
+| React Query | Done | Hook-level client config now exposes the same operation-specific `contentType` literal union as the generated client. |
+| Vue Query | Done | Vue Query matches React Query for conditional `buildFormData` imports and hook-level content type config. |
 | Examples | Done | Examples regenerate and typecheck after adding `contentType` to the published fetch and axios client files. |
 | Copilot setup | Done | The setup workflow installs RTK from `rtk-ai/rtk` so future agent sessions can use the `rtk` CLI. |
 
-## What still needs work
+## Implemented follow-up work
 
 ### 1. Forward `contentType` to the transport client
 
-Generated clients currently destructure `contentType` from `config` before building the request. The selected value should still reach the transport client.
+Generated clients forward the selected `contentType` to the transport client.
 
 ```ts [generated-client.ts]
 const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
@@ -56,22 +56,21 @@ config: Partial<RequestConfig<UploadFileData>> & {
 
 ### 2. Update axios to honor `config.contentType`
 
-The axios client should set `Content-Type` from `config.contentType` in the same way the fetch client does. It should skip an explicit header for `multipart/form-data` when the body is `FormData`, so axios or the browser can attach the boundary.
+The axios client sets `Content-Type` from `config.contentType` in the same way the fetch client does. It skips an explicit header for `multipart/form-data`, so axios or the browser can attach the boundary.
 
 ### 3. Finish TanStack Query behavior
 
-React Query and Vue Query should share the same policy through `internals/tanstack-query`.
+React Query and Vue Query share the same hook-level policy through `internals/tanstack-query`.
 
-Recommended direction:
+Current direction:
 
 1. Keep `contentType` as `RequestConfig` metadata, not as a separate top-level generated function argument.
 2. Allow hook-level configuration through the existing `client` option.
-3. Decide whether mutation-call-level overrides are required. If they are required, add a typed `client` or `config` value to mutation variables and forward it into the generated client call.
-4. Keep React Query and Vue Query snapshots aligned.
+3. Keep React Query and Vue Query snapshots aligned.
 
 ### 4. Update class and static clients
 
-Class-based clients should use the same multi-content logic as function clients:
+Class-based clients use the same multi-content logic as function clients:
 
 - Detect multipart content with `.some()` across every content entry.
 - Use the runtime `contentType` selector when both JSON and multipart bodies exist.
@@ -79,7 +78,7 @@ Class-based clients should use the same multi-content logic as function clients:
 
 ### 5. Add coverage for edge cases
 
-Add or update snapshots and unit tests for these cases:
+Snapshots and unit tests now cover these cases:
 
 - A single content type remains byte-for-byte compatible.
 - `application/json` + `multipart/form-data` switches payloads correctly.
@@ -95,8 +94,8 @@ Add or update snapshots and unit tests for these cases:
 - [x] Regenerate examples.
 - [x] Typecheck examples.
 - [x] Run the existing test suite.
-- [ ] Forward `contentType` to fetch and axios at runtime.
-- [ ] Add literal union typing to generated request config.
-- [ ] Finish React Query and Vue Query parity.
-- [ ] Update class and static client generation.
-- [ ] Add snapshots for the remaining edge cases.
+- [x] Forward `contentType` to fetch and axios at runtime.
+- [x] Add literal union typing to generated request config.
+- [x] Finish React Query and Vue Query parity.
+- [x] Update class and static client generation.
+- [x] Add snapshots for the remaining edge cases.

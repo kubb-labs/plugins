@@ -38,9 +38,18 @@ export const axiosInstance = axios.create({
 export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>) => Promise<ResponseConfig<TData>>
 
 export const client = async <TData, TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>): Promise<ResponseConfig<TData>> => {
-  const promise = axiosInstance.request<TVariables, ResponseConfig<TData>>(config).catch((e: AxiosError<TError>) => {
-    throw e
-  })
+  const { contentType, headers, ...axiosConfig } = config
+  const promise = axiosInstance
+    .request<TVariables, ResponseConfig<TData>>({
+      ...axiosConfig,
+      headers: {
+        ...(contentType && contentType !== 'multipart/form-data' ? { 'Content-Type': contentType } : {}),
+        ...headers,
+      },
+    })
+    .catch((e: AxiosError<TError>) => {
+      throw e
+    })
 
   return promise
 }

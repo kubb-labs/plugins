@@ -7,7 +7,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildParamsMapping, getComments, getContentTypeInfo } from '../utils.ts'
+import { buildParamsMapping, buildRequestConfigType, getComments, getContentTypeInfo } from '../utils.ts'
 import { Url } from './Url.tsx'
 
 type Props = {
@@ -42,8 +42,6 @@ type GetParamsProps = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
-
   return ast.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
@@ -56,7 +54,7 @@ function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver,
               name: 'config',
               type: ast.createParamsType({
                 variant: 'reference',
-                name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+                name: buildRequestConfigType(node, tsResolver),
               }),
               default: '{}',
             }),
@@ -115,7 +113,7 @@ export function Client({
     .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
 
   const headers = [
-    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
+    !isMultipleContentTypes && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
     headerParamsName ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : undefined,
   ].filter(Boolean)
 
@@ -169,6 +167,7 @@ export function Client({
                     : 'requestData',
             }
           : undefined,
+        contentType: isConfigurable && isMultipleContentTypes ? {} : undefined,
         requestConfig: isConfigurable
           ? {
               mode: 'inlineSpread',
@@ -210,7 +209,7 @@ export function Client({
           returnType={returnType}
         >
           {isConfigurable
-            ? `const { client: request = fetch, ${isMultipleContentTypes && hasFormData ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
+            ? `const { client: request = fetch, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
             : ''}
           <br />
           <br />
