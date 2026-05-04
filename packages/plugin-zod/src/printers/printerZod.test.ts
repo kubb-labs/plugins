@@ -372,6 +372,20 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.union([z.string(), z.number()])')
     })
 
+    test('oneOf union', () => {
+      const node = ast.createSchema({
+        type: 'union',
+        strategy: 'one',
+        members: [
+          ast.createSchema({ type: 'ref', name: 'TypeA', ref: '#/components/schemas/TypeA' }),
+          ast.createSchema({ type: 'ref', name: 'TypeB', ref: '#/components/schemas/TypeB' }),
+        ],
+      })
+      expect(printer.print(node)).toBe(
+        "z.union([TypeA, TypeB]).refine((data) => [TypeA, TypeB].filter((schema) => schema.safeParse(data).success).length === 1, { message: 'Exactly one schema must be valid' })",
+      )
+    })
+
     test('single member union', () => {
       const node = ast.createSchema({
         type: 'union',
