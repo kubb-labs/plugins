@@ -212,13 +212,19 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
         const members = nodeMembers.map((m) => this.transform(m)).filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
+
+        const oneOfRefinement = `(z.refine((data) => [${members.join(', ')}].filter((schema) => schema.safeParse(data).success).length === 1, { message: 'Exactly one schema must be valid' }))`
         if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
           // z.discriminatedUnion requires ZodObject members; intersections (ZodIntersection) are not
           // assignable to $ZodDiscriminant, so fall back to z.union when any member is an intersection.
-          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, [${members.join(', ')}])`
+          const discriminatedUnion = `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, [${members.join(', ')}])`
+
+          return node.strategy === 'one' ? `${discriminatedUnion}.check${oneOfRefinement}` : discriminatedUnion
         }
 
-        return `z.union([${members.join(', ')}])`
+        const union = `z.union([${members.join(', ')}])`
+
+        return node.strategy === 'one' ? `${union}.check${oneOfRefinement}` : union
       },
       intersection(node) {
         const members = node.members ?? []
