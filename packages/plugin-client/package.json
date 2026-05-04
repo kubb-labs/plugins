@@ -112,7 +112,7 @@
   },
   "devDependencies": {
     "@internals/utils": "workspace:*",
-    "axios": "^1.15.2"
+    "axios": "^1.16.0"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:",
