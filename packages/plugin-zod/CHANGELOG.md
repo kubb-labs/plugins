@@ -1,5 +1,11 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- [#130](https://github.com/kubb-labs/plugins/pull/130) [`f98b0ce`](https://github.com/kubb-labs/plugins/commit/f98b0ce1b230d0fc439c4bcc8c216ed44ad4e989) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Generate exact-one validation for OpenAPI `oneOf` schemas in Zod unions.
+
 ## 5.0.0-beta.4
 
 ### Minor Changes

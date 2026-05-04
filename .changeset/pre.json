@@ -65,6 +65,7 @@
     "plugin-yaml-per-package-metadata",
     "plugin-yaml-tip-values-metadata",
     "plugin-zod-discriminator-ref-description",
+    "plugin-zod-oneof-union",
     "plugin-zod-v5-rewrite",
     "printer-options-api",
     "remove-plugin-key-use-name",
