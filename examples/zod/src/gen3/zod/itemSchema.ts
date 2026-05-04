@@ -20,6 +20,22 @@ export const itemSchema = z
       }),
     ),
   ])
+  .refine(
+    (data) =>
+      [
+        itemTypeASchema.and(
+          z.object({
+            type: z.enum(['typeA']),
+          }),
+        ),
+        itemTypeBSchema.and(
+          z.object({
+            type: z.enum(['typeB']),
+          }),
+        ),
+      ].filter((schema) => schema.safeParse(data).success).length === 1,
+    { message: 'Exactly one schema must be valid' },
+  )
   .and(
     z.object({
       id: z.int().optional(),
