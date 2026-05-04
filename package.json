@@ -69,7 +69,7 @@
     "turbo": "^2.9.8",
     "typescript": "catalog:",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.5",
+    "vitest": "catalog:",
     "yaml": "^2.8.4"
   },
   "engines": {
