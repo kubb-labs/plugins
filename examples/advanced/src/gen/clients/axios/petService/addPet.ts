@@ -14,8 +14,14 @@ export function getAddPetUrl() {
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet({ data }: { data: AddPetData }, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function addPet(
+  { data }: { data: AddPetData },
+  config: Partial<RequestConfig<AddPetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = addPetDataSchema.parse(data)
 
@@ -23,6 +29,7 @@ export async function addPet({ data }: { data: AddPetData }, config: Partial<Req
     method: 'POST',
     url: getAddPetUrl().url.toString(),
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 

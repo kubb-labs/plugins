@@ -13,7 +13,19 @@ export type PlaceOrderPatchStatus405 = any
 /**
  * @type object | undefined
  */
-export type PlaceOrderPatchData = Order | undefined
+export type PlaceOrderPatchJsonData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderPatchXmlData = Order | undefined
+
+/**
+ * @type object | undefined
+ */
+export type PlaceOrderPatchFormUrlEncodedData = Order | undefined
+
+export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlData | PlaceOrderPatchFormUrlEncodedData
 
 /**
  * @type object

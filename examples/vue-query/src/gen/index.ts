@@ -6,11 +6,30 @@ export type { GetPetByIdQueryKey } from './hooks/useGetPetById.ts'
 export type { GetUserByNameQueryKey } from './hooks/useGetUserByName.ts'
 export type { LoginUserQueryKey } from './hooks/useLoginUser.ts'
 export type { LogoutUserQueryKey } from './hooks/useLogoutUser.ts'
-export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './models/AddPet.ts'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus200,
+  AddPetStatus405,
+  AddPetXmlData,
+} from './models/AddPet.ts'
 export type { Address, AddressIdentifierEnumKey } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
-export type { CreateUserData, CreateUserRequestConfig, CreateUserResponse, CreateUserResponses, CreateUserStatusDefault } from './models/CreateUser.ts'
+export type {
+  CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
+  CreateUserRequestConfig,
+  CreateUserResponse,
+  CreateUserResponses,
+  CreateUserStatusDefault,
+  CreateUserXmlData,
+} from './models/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
@@ -102,15 +121,20 @@ export type { Order, OrderStatusEnumKey } from './models/Order.ts'
 export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
 export type {
   PlaceOrderData,
+  PlaceOrderFormUrlEncodedData,
+  PlaceOrderJsonData,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
+  PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
 export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -118,6 +142,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './models/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
@@ -130,11 +155,14 @@ export type {
 } from './models/UpdatePetWithForm.ts'
 export type {
   UpdateUserData,
+  UpdateUserFormUrlEncodedData,
+  UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
+  UpdateUserXmlData,
 } from './models/UpdateUser.ts'
 export type {
   UploadFileData,

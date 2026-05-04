@@ -17,8 +17,14 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatchHook(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrderPatchHook(
+  data?: PlaceOrderPatchData,
+  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -26,13 +32,19 @@ export async function placeOrderPatchHook(data?: PlaceOrderPatchData, config: Pa
     method: 'PATCH',
     url: `/store/order`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function placeOrderPatchMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
+export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
+  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = placeOrderPatchMutationKey()
   return mutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
     mutationKey,
@@ -52,7 +64,10 @@ export function usePlaceOrderPatchHook<TContext>(
     mutation?: UseMutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client }
+    client?: Partial<RequestConfig<PlaceOrderPatchData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

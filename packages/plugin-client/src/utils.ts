@@ -5,6 +5,27 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
+export function getContentTypeInfo(node: ast.OperationNode) {
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  return {
+    contentTypes,
+    isMultipleContentTypes,
+    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
+    defaultContentType: contentTypes[0] ?? 'application/json',
+    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
+  }
+}
+
+export function buildRequestConfigType(node: ast.OperationNode, tsResolver: ResolverTs): string {
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
+  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
+  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
+
+  return `${configType} & { ${configProps} }`
+}
+
 /**
  * Extracts documentation comments from an operation node.
  * Includes description, summary, link, and deprecation information.
@@ -71,6 +92,8 @@ export function buildClassClientParams({
   baseURL,
   tsResolver,
   isFormData,
+  isMultipleContentTypes,
+  hasFormData,
   headers,
 }: {
   node: ast.OperationNode
@@ -78,6 +101,8 @@ export function buildClassClientParams({
   baseURL: string | undefined
   tsResolver: ResolverTs
   isFormData: boolean
+  isMultipleContentTypes: boolean
+  hasFormData: boolean
   headers: Array<string>
 }) {
   const queryParamsName =
@@ -107,9 +132,15 @@ export function buildClassClientParams({
         params: queryParamsName ? {} : undefined,
         data: requestName
           ? {
-              value: isFormData ? 'formData as FormData' : 'requestData',
+              value:
+                isMultipleContentTypes && hasFormData
+                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
+                  : isFormData
+                    ? 'formData as FormData'
+                    : 'requestData',
             }
           : undefined,
+        contentType: isMultipleContentTypes ? {} : undefined,
         headers: headers.length
           ? {
               value: `{ ${headers.join(', ')}, ...requestConfig.headers }`,

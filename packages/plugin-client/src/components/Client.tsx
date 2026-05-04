@@ -7,7 +7,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildParamsMapping, getComments } from '../utils.ts'
+import { buildParamsMapping, buildRequestConfigType, getComments, getContentTypeInfo } from '../utils.ts'
 import { Url } from './Url.tsx'
 
 type Props = {
@@ -42,25 +42,25 @@ type GetParamsProps = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
-
   return ast.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver: tsResolver,
-    extraParams: isConfigurable
-      ? [
-          ast.createFunctionParameter({
-            name: 'config',
-            type: ast.createParamsType({
-              variant: 'reference',
-              name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+    extraParams: [
+      ...(isConfigurable
+        ? [
+            ast.createFunctionParameter({
+              name: 'config',
+              type: ast.createParamsType({
+                variant: 'reference',
+                name: buildRequestConfigType(node, tsResolver),
+              }),
+              default: '{}',
             }),
-            default: '{}',
-          }),
-        ]
-      : [],
+          ]
+        : []),
+    ],
   })
 }
 
@@ -83,8 +83,8 @@ export function Client({
   isConfigurable = true,
 }: Props): KubbReactNode {
   const path = new URLPath(node.path)
-  const contentType = node.requestBody?.content?.[0]?.contentType ?? 'application/json'
-  const isFormData = contentType === 'multipart/form-data'
+  const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
+  const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
 
   const originalPathParams = node.parameters.filter((p) => p.in === 'path')
   const casedPathParams = ast.caseParams(originalPathParams, paramsCasing)
@@ -113,7 +113,7 @@ export function Client({
     .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
 
   const headers = [
-    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
+    !isMultipleContentTypes && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
     headerParamsName ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : undefined,
   ].filter(Boolean)
 
@@ -159,9 +159,15 @@ export function Client({
         params: queryParamsName ? (queryParamsMapping ? { value: 'mappedParams' } : {}) : undefined,
         data: requestName
           ? {
-              value: isFormData ? 'formData as FormData' : 'requestData',
+              value:
+                isMultipleContentTypes && hasFormData
+                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
+                  : isFormData
+                    ? 'formData as FormData'
+                    : 'requestData',
             }
           : undefined,
+        contentType: isConfigurable && isMultipleContentTypes ? {} : undefined,
         requestConfig: isConfigurable
           ? {
               mode: 'inlineSpread',
@@ -202,7 +208,9 @@ export function Client({
           }}
           returnType={returnType}
         >
-          {isConfigurable ? 'const { client: request = fetch, ...requestConfig } = config' : ''}
+          {isConfigurable
+            ? `const { client: request = fetch, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
+            : ''}
           <br />
           <br />
           {pathParamsMapping &&
@@ -236,7 +244,7 @@ export function Client({
           )}
           {parser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
           <br />
-          {isFormData && requestName && 'const formData = buildFormData(requestData)'}
+          {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
           <br />
           {isConfigurable
             ? `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`

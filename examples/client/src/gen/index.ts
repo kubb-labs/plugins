@@ -9,7 +9,17 @@ export type { PetNotFound } from './models/ts/PetNotFound.js'
 export type { Tag } from './models/ts/Tag.js'
 export type { User } from './models/ts/User.js'
 export type { UserArray } from './models/ts/UserArray.js'
-export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './models/ts/petController/AddPet.js'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus200,
+  AddPetStatus405,
+  AddPetXmlData,
+} from './models/ts/petController/AddPet.js'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -47,6 +57,8 @@ export type {
 } from './models/ts/petController/GetPetById.js'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -54,6 +66,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './models/ts/petController/UpdatePet.js'
 export type {
   UpdatePetWithFormPathPetId,
@@ -66,6 +79,8 @@ export type {
 } from './models/ts/petController/UpdatePetWithForm.js'
 export type {
   UploadFileData,
+  UploadFileFormData,
+  UploadFileJsonData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -93,26 +108,35 @@ export type {
 } from './models/ts/storeController/GetOrderById.js'
 export type {
   PlaceOrderData,
+  PlaceOrderFormUrlEncodedData,
+  PlaceOrderJsonData,
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
   PlaceOrderStatus200,
   PlaceOrderStatus405,
+  PlaceOrderXmlData,
 } from './models/ts/storeController/PlaceOrder.js'
 export type {
   PlaceOrderPatchData,
+  PlaceOrderPatchFormUrlEncodedData,
+  PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
+  PlaceOrderPatchXmlData,
 } from './models/ts/storeController/PlaceOrderPatch.js'
 export type {
   CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserXmlData,
 } from './models/ts/userController/CreateUser.js'
 export type {
   CreateUsersWithListInputData,
@@ -151,11 +175,14 @@ export type {
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/userController/LogoutUser.js'
 export type {
   UpdateUserData,
+  UpdateUserFormUrlEncodedData,
+  UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
+  UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.js'
 export { client } from './.kubb/client.js'
 export { operations } from './clients/axios/operations.js'

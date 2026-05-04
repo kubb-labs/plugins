@@ -25,7 +25,19 @@ export type UpdatePetStatus405 = any
 /**
  * @description Update an existent pet in the store
  */
-export type UpdatePetData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+export type UpdatePetJsonData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+/**
+ * @description Update an existent pet in the store
+ */
+export type UpdatePetXmlData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+/**
+ * @description Update an existent pet in the store
+ */
+export type UpdatePetFormUrlEncodedData = Omit<NonNullable<Pet>, 'type' | 'tags'>
+
+export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
 
 /**
  * @type object

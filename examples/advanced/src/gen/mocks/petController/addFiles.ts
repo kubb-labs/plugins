@@ -16,8 +16,12 @@ export function addFilesStatus405() {
   return undefined
 }
 
-export function addFilesData(data?: Partial<AddFilesData>): AddFilesData {
-  return petFaker(data)
+export function addFilesData(data?: Partial<AddFilesData>): Required<AddFilesData> {
+  const defaultFakeData = { url: faker.internet.url() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<AddFilesData>
 }
 
 export function addFilesResponse(_data?: AddFilesResponse): AddFilesResponse {

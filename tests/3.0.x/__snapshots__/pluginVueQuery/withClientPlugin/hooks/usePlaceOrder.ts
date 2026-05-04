@@ -19,7 +19,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: MutationObserverOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: MaybeRefOrGetter<PlaceOrderData>}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client },
+  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

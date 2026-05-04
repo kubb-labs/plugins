@@ -18,6 +18,7 @@ export type RequestConfig<TData = unknown> = {
   validateStatus?: (status: number) => boolean
   headers?: AxiosRequestConfig['headers']
   paramsSerializer?: AxiosRequestConfig['paramsSerializer']
+  contentType?: string
 }
 
 /**
@@ -68,9 +69,19 @@ export const client = async <TResponseData, TError = unknown, TRequestData = unk
   config: RequestConfig<TRequestData>,
   _request?: unknown,
 ): Promise<ResponseConfig<TResponseData>> => {
-  return axiosInstance.request<TResponseData, ResponseConfig<TResponseData>>(mergeConfig(getConfig(), config)).catch((e: AxiosError<TError>) => {
-    throw e
-  })
+  const requestConfig = mergeConfig(getConfig(), config)
+  const { contentType, headers, ...axiosConfig } = requestConfig
+  return axiosInstance
+    .request<TResponseData, ResponseConfig<TResponseData>>({
+      ...axiosConfig,
+      headers: {
+        ...(contentType && contentType !== 'multipart/form-data' ? { 'Content-Type': contentType } : {}),
+        ...headers,
+      },
+    })
+    .catch((e: AxiosError<TError>) => {
+      throw e
+    })
 }
 
 client.getConfig = getConfig

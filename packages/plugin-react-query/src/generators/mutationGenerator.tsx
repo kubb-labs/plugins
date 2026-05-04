@@ -123,7 +123,9 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
           </>
         )}
         {shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
-        {!shouldUseClientPlugin && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
+        {!shouldUseClientPlugin && node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
+          <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
+        )}
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />

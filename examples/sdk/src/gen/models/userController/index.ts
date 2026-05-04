@@ -1,4 +1,13 @@
-export type { CreateUserData, CreateUserRequestConfig, CreateUserResponse, CreateUserResponses, CreateUserStatusDefault } from './CreateUser.ts'
+export type {
+  CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
+  CreateUserRequestConfig,
+  CreateUserResponse,
+  CreateUserResponses,
+  CreateUserStatusDefault,
+  CreateUserXmlData,
+} from './CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
@@ -36,9 +45,12 @@ export type {
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
 export type {
   UpdateUserData,
+  UpdateUserFormUrlEncodedData,
+  UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
   UpdateUserResponse,
   UpdateUserResponses,
   UpdateUserStatusDefault,
+  UpdateUserXmlData,
 } from './UpdateUser.ts'

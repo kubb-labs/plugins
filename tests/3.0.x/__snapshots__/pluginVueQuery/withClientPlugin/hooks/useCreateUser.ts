@@ -19,7 +19,7 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  */
 export function useCreateUser<TContext>(options: {
   mutation?: MutationObserverOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUserData>}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<CreateUserData>> & { client?: Client },
+  client?: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

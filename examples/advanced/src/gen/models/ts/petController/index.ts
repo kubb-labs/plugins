@@ -1,5 +1,24 @@
-export type { AddFilesData, AddFilesRequestConfig, AddFilesResponse, AddFilesResponses, AddFilesStatus200, AddFilesStatus405 } from './AddFiles.ts'
-export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus405, AddPetStatusDefault } from './AddPet.ts'
+export type {
+  AddFilesData,
+  AddFilesFormData,
+  AddFilesJsonData,
+  AddFilesRequestConfig,
+  AddFilesResponse,
+  AddFilesResponses,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from './AddFiles.ts'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus405,
+  AddPetStatusDefault,
+  AddPetXmlData,
+} from './AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -38,6 +57,8 @@ export type {
 } from './GetPetById.ts'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -46,6 +67,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,

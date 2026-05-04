@@ -17,14 +17,14 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
  * @summary Update user
  * {@link /user/:username}
  */
-export async function updateUser({ username }: { username: UpdateUserPathUsername }, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function updateUser({ username }: { username: UpdateUserPathUsername }, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: `/user/${username}`, data: requestData, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
@@ -36,7 +36,7 @@ export async function updateUser({ username }: { username: UpdateUserPathUsernam
  */
 export function useUpdateUser<TContext>(options: {
   mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, {username: MaybeRefOrGetter<UpdateUserPathUsername>, data?: MaybeRefOrGetter<UpdateUserData>}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client },
+  client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

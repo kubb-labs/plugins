@@ -16,19 +16,19 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ data }: { data?: PlaceOrderData } = {}, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrder({ data }: { data?: PlaceOrderData } = {}, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData, ...requestConfig })
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
 
-export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
 
         const mutationKey = placeOrderMutationKey()
         return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
@@ -47,7 +47,7 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client },
+  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

@@ -1,4 +1,14 @@
-export type { AddPetData, AddPetRequestConfig, AddPetResponse, AddPetResponses, AddPetStatus200, AddPetStatus405 } from './AddPet.js'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus200,
+  AddPetStatus405,
+  AddPetXmlData,
+} from './AddPet.js'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -36,6 +46,8 @@ export type {
 } from './GetPetById.js'
 export type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
@@ -43,6 +55,7 @@ export type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from './UpdatePet.js'
 export type {
   UpdatePetWithFormPathPetId,
@@ -55,6 +68,8 @@ export type {
 } from './UpdatePetWithForm.js'
 export type {
   UploadFileData,
+  UploadFileFormData,
+  UploadFileJsonData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

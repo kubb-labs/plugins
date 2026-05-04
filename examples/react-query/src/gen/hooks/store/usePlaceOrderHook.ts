@@ -17,8 +17,14 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrderHook(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrderHook(
+  data?: PlaceOrderData,
+  config: Partial<RequestConfig<PlaceOrderData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -26,13 +32,19 @@ export async function placeOrderHook(data?: PlaceOrderData, config: Partial<Requ
     method: 'POST',
     url: `/store/order`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function placeOrderMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderMutationOptionsHook<TContext = unknown>(
+  config: Partial<RequestConfig<PlaceOrderData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = placeOrderMutationKey()
   return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>({
     mutationKey,
@@ -50,7 +62,10 @@ export function placeOrderMutationOptionsHook<TContext = unknown>(config: Partia
 export function usePlaceOrderHook<TContext>(
   options: {
     mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client }
+    client?: Partial<RequestConfig<PlaceOrderData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

@@ -70,7 +70,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           : undefined,
     } as const
 
-    const isFormData = node.requestBody?.content?.[0]?.contentType === 'multipart/form-data'
+    const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
 
     return (
       <File
@@ -97,9 +97,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           </>
         )}
 
-        {isFormData && node.requestBody?.content?.[0]?.schema && (
-          <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
-        )}
+        {hasFormData && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as string[]} root={meta.file.path} path={meta.fileZod.path} />}
 

@@ -373,6 +373,16 @@ paths:
       operationId: addFiles
       requestBody:
         content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - url
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: URL of the image to upload
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/Pet'

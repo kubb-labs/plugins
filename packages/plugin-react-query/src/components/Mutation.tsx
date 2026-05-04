@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildMutationArgParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildMutationArgParams, buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
 import { MutationOptions } from './MutationOptions.tsx'
 
 type Props = {
@@ -33,13 +33,15 @@ function getParams(
 ): ast.FunctionParametersNode {
   const { paramsCasing, dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
+  const mutationArgParamsNode = buildMutationArgParams(node, {
+    paramsCasing,
+    resolver,
+  })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
 
@@ -51,7 +53,7 @@ function getParams(
           variant: 'reference',
           name: `{
   mutation?: UseMutationOptions<${generics}> & { client?: QueryClient },
-  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'},
+  client?: ${buildRequestConfigType(node, resolver)},
 }`,
         }),
         default: '{}',
@@ -67,7 +69,10 @@ export function Mutation({ name, mutationOptionsName, paramsCasing, dataReturnTy
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver: tsResolver })
+  const mutationArgParamsNode = buildMutationArgParams(node, {
+    paramsCasing,
+    resolver: tsResolver,
+  })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
   const returnType = `UseMutationResult<${generics}>`

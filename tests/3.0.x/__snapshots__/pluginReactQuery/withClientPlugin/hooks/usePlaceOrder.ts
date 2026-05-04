@@ -11,7 +11,7 @@ import { mutationOptions, useMutation } from "@tanstack/react-query";
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
-export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
 
         const mutationKey = placeOrderMutationKey()
         return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
@@ -30,7 +30,7 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function usePlaceOrder<TContext>(options: {
   mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client },
+  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

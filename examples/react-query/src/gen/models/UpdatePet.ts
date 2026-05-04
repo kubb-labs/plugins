@@ -26,7 +26,21 @@ export type UpdatePetStatus405 = any
  * @description Update an existent pet in the store
  * @type object
  */
-export type UpdatePetData = Pet
+export type UpdatePetJsonData = Pet
+
+/**
+ * @description Update an existent pet in the store
+ * @type object
+ */
+export type UpdatePetXmlData = Pet
+
+/**
+ * @description Update an existent pet in the store
+ * @type object
+ */
+export type UpdatePetFormUrlEncodedData = Pet
+
+export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetFormUrlEncodedData
 
 /**
  * @type object
