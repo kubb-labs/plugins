@@ -33,6 +33,12 @@ catalogs:
     '@types/react':
       specifier: ^19.2.14
       version: 19.2.14
+    '@vitest/coverage-v8':
+      specifier: ^4.1.5
+      version: 4.1.5
+    '@vitest/ui':
+      specifier: ^4.1.5
+      version: 4.1.5
     kubb:
       specifier: 5.0.0-beta.4
       version: 5.0.0-beta.4
@@ -93,10 +99,10 @@ importers:
         specifier: 'catalog:'
         version: 22.19.17
       '@vitest/coverage-v8':
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.5(vitest@4.1.5)
       '@vitest/ui':
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.5(vitest@4.1.5)
       bun-types:
         specifier: ^1.3.13
@@ -135,7 +141,7 @@ importers:
         specifier: ^6.1.1
         version: 6.1.1(typescript@6.0.3)(vite@8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))
       vitest:
-        specifier: ^4.1.5
+        specifier: 'catalog:'
         version: 4.1.5(@types/node@22.19.17)(@vitest/coverage-v8@4.1.5)(@vitest/ui@4.1.5)(msw@2.14.3(@types/node@22.19.17)(typescript@6.0.3))(vite@8.0.10(@types/node@22.19.17)(esbuild@0.27.7)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.4))
       yaml:
         specifier: ^2.8.4
