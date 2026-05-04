@@ -15,22 +15,6 @@ export const animalSchema = z
       }),
     ),
   ])
-  .refine(
-    (data) =>
-      [
-        catSchema.and(
-          z.object({
-            type: z.enum(['cat']),
-          }),
-        ),
-        dogSchema.and(
-          z.object({
-            type: z.enum(['dog']),
-          }),
-        ),
-      ].filter((schema) => schema.safeParse(data).success).length === 1,
-    { message: 'Exactly one schema must be valid' },
-  )
   .and(
     z
       .object({

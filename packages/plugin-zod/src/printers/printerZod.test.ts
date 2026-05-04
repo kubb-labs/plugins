@@ -381,9 +381,51 @@ describe('printerZod', () => {
           ast.createSchema({ type: 'ref', name: 'TypeB', ref: '#/components/schemas/TypeB' }),
         ],
       })
+      expect(printer.print(node)).toBe('z.union([TypeA, TypeB])')
+    })
+
+    test('oneOf union with object members uses strict objects', () => {
+      const node = ast.createSchema({
+        type: 'union',
+        strategy: 'one',
+        members: [
+          ast.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.createProperty({ name: 'valueA', required: true, schema: ast.createSchema({ type: 'string' }) })],
+          }),
+          ast.createSchema({
+            type: 'object',
+            primitive: 'object',
+            properties: [ast.createProperty({ name: 'valueB', required: true, schema: ast.createSchema({ type: 'number' }) })],
+          }),
+        ],
+      })
       expect(printer.print(node)).toBe(
-        "z.union([TypeA, TypeB]).refine((data) => [TypeA, TypeB].filter((schema) => schema.safeParse(data).success).length === 1, { message: 'Exactly one schema must be valid' })",
+        'z.union([z.object({\n    "valueA": z.string()\n    }).strict(), z.object({\n    "valueB": z.number()\n    }).strict()])',
       )
+    })
+
+    test('oneOf union with resolved object refs uses strict refs', () => {
+      const node = ast.createSchema({
+        type: 'union',
+        strategy: 'one',
+        members: [
+          ast.createSchema({
+            type: 'ref',
+            name: 'TypeA',
+            ref: '#/components/schemas/TypeA',
+            schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }),
+          }),
+          ast.createSchema({
+            type: 'ref',
+            name: 'TypeB',
+            ref: '#/components/schemas/TypeB',
+            schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }),
+          }),
+        ],
+      })
+      expect(printer.print(node)).toBe('z.union([TypeA.strict(), TypeB.strict()])')
     })
 
     test('single member union', () => {

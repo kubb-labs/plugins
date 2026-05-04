@@ -61,6 +61,15 @@ export type PrinterZodMiniOptions = {
  * Factory options for the Zod Mini printer, defining input/output types and configuration.
  */
 export type PrinterZodMiniFactory = ast.PrinterFactoryOptions<'zod-mini', PrinterZodMiniOptions, string, string>
+
+function strictOneOfMember(member: string, node: ast.SchemaNode): string {
+  if (node.type === 'object' && (node.additionalProperties === undefined || node.additionalProperties === false)) {
+    return member.replace(/^z\.object\(/, 'z.strictObject(')
+  }
+
+  return member
+}
+
 /**
  * Zod v4 **Mini** printer built with `definePrinter`.
  *
@@ -209,22 +218,22 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = nodeMembers.map((m) => this.transform(m)).filter(Boolean)
+        const members = nodeMembers
+          .map((memberNode) => {
+            const member = this.transform(memberNode)
+
+            return member && node.strategy === 'one' ? strictOneOfMember(member, memberNode) : member
+          })
+          .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
-
-        const oneOfRefinement = `(z.refine((data) => [${members.join(', ')}].filter((schema) => schema.safeParse(data).success).length === 1, { message: 'Exactly one schema must be valid' }))`
         if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
           // z.discriminatedUnion requires ZodObject members; intersections (ZodIntersection) are not
           // assignable to $ZodDiscriminant, so fall back to z.union when any member is an intersection.
-          const discriminatedUnion = `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, [${members.join(', ')}])`
-
-          return node.strategy === 'one' ? `${discriminatedUnion}.check${oneOfRefinement}` : discriminatedUnion
+          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, [${members.join(', ')}])`
         }
 
-        const union = `z.union([${members.join(', ')}])`
-
-        return node.strategy === 'one' ? `${union}.check${oneOfRefinement}` : union
+        return `z.union([${members.join(', ')}])`
       },
       intersection(node) {
         const members = node.members ?? []
