@@ -5,15 +5,15 @@ name: Zod
 description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
 category: validation
 type: official
-npmPackage: "@kubb/plugin-zod"
+npmPackage: '@kubb/plugin-zod'
 docsPath: /plugins/plugin-zod
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - zod
   - validation
@@ -72,25 +72,25 @@ options:
           - name: propagate
             files:
               - lang: typescript
-                code: ""
+                code: ''
                 twoslash: false
-          - name: "false"
+          - name: 'false'
             files:
               - lang: typescript
-                code: ""
+                code: ''
                 twoslash: false
       - name: banner
-        type: "string | ((node: RootNode) => string)"
+        type: 'string | ((node: RootNode) => string)'
         required: false
         description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
       - name: footer
-        type: "string | ((node: RootNode) => string)"
+        type: 'string | ((node: RootNode) => string)'
         required: false
         description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
       - name: override
         type: boolean
         required: false
-        default: "false"
+        default: 'false'
         description: Whether Kubb overrides existing external files that can be generated if they already exist.
   - name: resolver
     type: Partial<ResolverZod> & ThisType<ResolverZod>
@@ -168,7 +168,7 @@ options:
         body: |
           - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
       - name: name
-        type: "(context: GroupContext) => string"
+        type: '(context: GroupContext) => string'
         required: false
         default: (ctx) => `${ctx.group}Controller`
         description: Return the name of a group based on the group name. This is used for file and identifier generation.
@@ -181,7 +181,7 @@ options:
   - name: typed
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Annotate schemas with their TypeScript types from `@kubb/plugin-ts`. Requires `@kubb/plugin-ts` in the plugins array.
     important: |
       We rely on [`ToZod`](https://github.com/colinhacks/tozod) from the creator of Zod to create a schema based on a type.
@@ -189,11 +189,11 @@ options:
   - name: inferred
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Export a `z.infer<typeof schema>` type alias for each schema to keep types in sync with validation.
     codeBlock:
       lang: typescript
-      title: "inferred: true"
+      title: 'inferred: true'
       code: |
         import { z } from 'zod'
 
@@ -214,12 +214,12 @@ options:
     warning: |
       This option has been moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
   - name: coercion
-    type: "boolean | { dates?: boolean, strings?: boolean, numbers?: boolean }"
+    type: 'boolean | { dates?: boolean, strings?: boolean, numbers?: boolean }'
     required: false
-    default: "false"
+    default: 'false'
     description: Apply `z.coerce` to automatically convert input values to the expected type before validation. Pass `true` to coerce all primitives, or an object to selectively enable coercion for `dates`, `strings`, and `numbers`. See [Coercion for primitives](https://zod.dev/?id=coercion-for-primitives).
     examples:
-      - name: "true"
+      - name: 'true'
         files:
           - lang: typescript
             code: |
@@ -227,7 +227,7 @@ options:
               z.coerce.date();
               z.coerce.number();
             twoslash: false
-      - name: "false"
+      - name: 'false'
         files:
           - lang: typescript
             code: |
@@ -235,7 +235,7 @@ options:
               z.date();
               z.number();
             twoslash: false
-      - name: "{numbers: true, strings: false, dates: false}"
+      - name: '{numbers: true, strings: false, dates: false}'
         files:
           - lang: typescript
             code: |
@@ -246,7 +246,7 @@ options:
   - name: operations
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: Generate an `operations.ts` file with schemas for each operation, including request and response data.
   - name: paramsCasing
     type: "'camelcase'"
@@ -287,7 +287,7 @@ options:
   - name: mini
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     badge:
       type: tip
       text: beta
@@ -302,7 +302,7 @@ options:
     tip: |
       Zod Mini provides a smaller bundle size with better tree-shaking. See [Zod Mini documentation](https://zod.dev/packages/mini) for more details.
     examples:
-      - name: "mini: true"
+      - name: 'mini: true'
         files:
           - lang: typescript
             code: |
@@ -314,7 +314,7 @@ options:
               z.nullable(z.number())
               z.array(z.string()).check(z.minLength(1), z.maxLength(10))
             twoslash: false
-      - name: "mini: false (default)"
+      - name: 'mini: false (default)'
         files:
           - lang: typescript
             code: |
@@ -410,7 +410,7 @@ options:
     tip: |
       Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.
   - name: printer
-    type: "{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }"
+    type: '{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }'
     required: false
     description: |
       Override individual printer node handlers to customize how specific schema types are rendered. When `mini: true` the overrides apply to the Zod Mini printer.
@@ -450,7 +450,7 @@ options:
               })
             twoslash: false
   - name: wrapOutput
-    type: "(arg: { output: string; schema: SchemaNode }) => string | undefined"
+    type: '(arg: { output: string; schema: SchemaNode }) => string | undefined'
     required: false
     description: Wrap the generated Zod schema string with additional validation or metadata. The callback receives the schema's output string and the `SchemaNode` AST node, and returns the modified schema string.
     tip: |
