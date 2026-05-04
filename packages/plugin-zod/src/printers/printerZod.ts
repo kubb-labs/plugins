@@ -70,6 +70,26 @@ export type PrinterZodOptions = {
  */
 export type PrinterZodFactory = ast.PrinterFactoryOptions<'zod', PrinterZodOptions, string, string>
 
+function strictOneOfMember(member: string, node: ast.SchemaNode): string {
+  if (node.type === 'object' && node.additionalProperties === undefined) {
+    return `${member}.strict()`
+  }
+
+  if (node.type === 'ref') {
+    if (member.startsWith('z.lazy(')) {
+      return member
+    }
+
+    const schema = ast.syncSchemaRef(node)
+
+    if (schema.type === 'object' && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
+      return `${member}.strict()`
+    }
+  }
+
+  return member
+}
+
 /**
  * Zod v4 printer built with `definePrinter`.
  *
@@ -252,7 +272,13 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       },
       union(node) {
         const nodeMembers = node.members ?? []
-        const members = nodeMembers.map((m) => this.transform(m)).filter(Boolean)
+        const members = nodeMembers
+          .map((memberNode) => {
+            const member = this.transform(memberNode)
+
+            return member && node.strategy === 'one' ? strictOneOfMember(member, memberNode) : member
+          })
+          .filter(Boolean)
         if (members.length === 0) return ''
         if (members.length === 1) return members[0]!
         if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
