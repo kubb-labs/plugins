@@ -17,8 +17,14 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrder(
+  data?: PlaceOrderData,
+  config: Partial<RequestConfig<PlaceOrderData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -26,6 +32,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
     method: 'POST',
     url: `/store/order`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
@@ -42,7 +49,10 @@ export function usePlaceOrder<TContext>(
     mutation?: MutationObserverOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: MaybeRefOrGetter<PlaceOrderData> }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client }
+    client?: Partial<RequestConfig<PlaceOrderData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

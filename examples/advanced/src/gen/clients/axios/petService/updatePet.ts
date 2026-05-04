@@ -20,8 +20,14 @@ export function getUpdatePetUrl() {
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePet({ data }: { data: UpdatePetData }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function updatePet(
+  { data }: { data: UpdatePetData },
+  config: Partial<RequestConfig<UpdatePetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = updatePetDataSchema.parse(data)
 
@@ -29,6 +35,7 @@ export async function updatePet({ data }: { data: UpdatePetData }, config: Parti
     method: 'PUT',
     url: getUpdatePetUrl().url.toString(),
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 

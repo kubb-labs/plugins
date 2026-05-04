@@ -18,8 +18,14 @@ function getPlaceOrderPatchUrl() {
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrderPatch(
+  data?: PlaceOrderPatchData,
+  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -27,6 +33,7 @@ export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partia
     method: 'PATCH',
     url: getPlaceOrderPatchUrl().url.toString(),
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 

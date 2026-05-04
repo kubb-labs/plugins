@@ -17,8 +17,14 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  * @summary Create user
  * {@link /user}
  */
-export async function createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function createUser(
+  data?: CreateUserData,
+  config: Partial<RequestConfig<CreateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -26,6 +32,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
     method: 'POST',
     url: `/user`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
@@ -42,7 +49,10 @@ export function useCreateUser<TContext>(
     mutation?: MutationObserverOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: MaybeRefOrGetter<CreateUserData> }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<CreateUserData>> & { client?: Client }
+    client?: Partial<RequestConfig<CreateUserData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

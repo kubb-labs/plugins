@@ -6,7 +6,9 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const addFilesMutationKey = () => [{ url: '/pet/files' }] as const
 
-export function addFilesMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddFilesData>> & { client?: Client } = {}) {
+export function addFilesMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
+) {
   const mutationKey = addFilesMutationKey()
   return mutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>({
     mutationKey,
@@ -26,7 +28,7 @@ export function useAddFiles<TContext>(
     mutation?: UseMutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<AddFilesData>> & { client?: Client }
+    client?: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
