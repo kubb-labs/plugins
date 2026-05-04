@@ -1,19 +1,19 @@
-$schema: 'https://kubb.dev/schemas/extension.json'
+$schema: https://kubb.dev/schemas/extension.json
 kind: plugin
 id: plugin-faker
 name: Faker
 description: Generate realistic mock data using Faker.js from OpenAPI specifications.
 category: mocks
 type: official
-npmPackage: '@kubb/plugin-faker'
+npmPackage: "@kubb/plugin-faker"
 docsPath: /plugins/plugin-faker
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - faker
   - mock-data
@@ -32,13 +32,11 @@ resources:
   codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/faker
 featured: false
 icon:
-  light: 'https://kubb.dev/feature/faker.svg'
-
+  light: https://kubb.dev/feature/faker.svg
 intro: |
   # @kubb/plugin-faker
 
   Generate mock data factories from your OpenAPI schema using [Faker.js](https://fakerjs.dev/). Create realistic test data that matches your API's types.
-
 options:
   - name: output
     type: Output
@@ -46,22 +44,103 @@ options:
     default: "{ path: 'mocks', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - extends: ./_shared/core/output-path.yaml
+      - name: path
+        type: string
+        required: true
+        description: Output directory or file for the generated code, relative to the global `output.path`.
+        tip: |
+          if `output.path` is a file, `group` cannot be used.
         default: "'mocks'"
-      - extends: ./_shared/core/output-barrel-type.yaml
-      - extends: ./_shared/core/output-banner.yaml
-      - extends: ./_shared/core/output-footer.yaml
-      - extends: ./_shared/core/output-override.yaml
-
-  - extends: ./_shared/core/group.yaml
-    properties:
-      - extends: ./_shared/core/group-type.yaml
-      - name: name
-        type: '(context: GroupContext) => string'
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
         required: false
-        default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. This is used for file and helper name generation.
+        default: "'named'"
+        description: Specify what to export and optionally disable barrel-file generation.
+        tip: |
+          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        examples:
+          - name: all
+            files:
+              - lang: typescript
+                code: |
+                  export * from './gen/petService.ts'
+                twoslash: false
+          - name: named
+            files:
+              - lang: typescript
+                code: |
+                  export { PetService } from './gen/petService.ts'
+                twoslash: false
+          - name: propagate
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+          - name: "false"
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+      - name: banner
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: footer
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: override
+        type: boolean
+        required: false
+        default: "false"
+        description: Whether Kubb overrides existing external files that can be generated if they already exist.
+  - name: group
+    type: Group
+    required: false
+    description: |
+      Grouping combines files in a folder based on a specific `type`.
+    examples:
+      - name: kubb.config.ts
+        files:
+          - lang: typescript
+            code: |
+              group: {
+                type: 'tag',
+                name({ group }) {
+                  return `${group}Controller`
+                }
+              }
+            twoslash: false
+    body: |
+      With the configuration above, the generator emits:
 
+      ```text
+      .
+      ├── src/
+      │   └── petController/
+      │   │   ├── addPet.ts
+      │   │   └── getPet.ts
+      │   └── storeController/
+      │       ├── createStore.ts
+      │       └── getStoreById.ts
+      ├── petStore.yaml
+      ├── kubb.config.ts
+      └── package.json
+      ```
+    properties:
+      - name: type
+        type: "'tag'"
+        required: true
+        description: Specify the property to group files by. Required when `group` is defined.
+        note: |
+          `Required: true*` means this is required only when the `group` option is used. The `group` option itself is optional.
+        body: |
+          - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
+      - name: name
+        type: "(context: GroupContext) => string"
+        required: false
+        default: (ctx) => `${ctx.group}Controller`
+        description: Return the name of a group based on the group name. This is used for file and helper name generation.
   - name: dateParser
     type: "'faker' | 'dayjs' | 'moment' | string"
     required: false
@@ -85,19 +164,16 @@ options:
           - lang: ts
             code: |
               moment(faker.date.anytime()).format('YYYY-MM-DD')
-
   - name: mapper
-    type: 'Record<string, string>'
+    type: Record<string, string>
     required: false
     description: Override individual properties with custom Faker expressions.
-
   - name: paramsCasing
     type: "'camelcase'"
     required: false
     description: Transform parameter property names in generated mocks for path, query, and headers.
     important: |
       Use the same `paramsCasing` value in `@kubb/plugin-ts` so the generated mock objects stay compatible with the generated types.
-
   - name: regexGenerator
     type: "'faker' | 'randexp'"
     required: false
@@ -114,12 +190,10 @@ options:
           - lang: ts
             code: |
               new RandExp(/^[A-Z]+$/).gen()
-
   - name: seed
-    type: 'number | number[]'
+    type: number | number[]
     required: false
     description: Seed faker for deterministic output.
-
   - name: locale
     type: string
     required: false
@@ -138,18 +212,53 @@ options:
           - lang: ts
             code: |
               import { fakerDE_AT as faker } from '@faker-js/faker'
+  - name: include
+    type: Array<Include>
+    required: false
+    description: Array containing include parameters to include tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Include
+      code: |
+        export type Include = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: exclude
+    type: Array<Exclude>
+    required: false
+    description: Array containing exclude parameters to exclude or skip tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Exclude
+      code: |
+        export type Exclude = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: override
+    type: Array<Override>
+    required: false
+    description: Array containing override parameters to override `options` based on tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Override
+      code: |
+        export type Override = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+          options: PluginOptions
+        }
+  - name: generators
+    type: Array<Generator<PluginFaker>>
+    required: false
+    experimental: true
+    description: |
+      Define additional generators next to the built-in generators.
 
-  - extends: ./_shared/core/include.yaml
-
-  - extends: ./_shared/core/exclude.yaml
-
-  - extends: ./_shared/core/override.yaml
-
-  - extends: ./_shared/core/generators.yaml
-    type: 'Array<Generator<PluginFaker>>'
-
+      See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
   - name: resolver
-    type: 'Partial<ResolverFaker>'
+    type: Partial<ResolverFaker>
     required: false
     description: Customize helper naming on top of the active compatibility preset.
     codeBlock:
@@ -162,7 +271,6 @@ options:
             },
           },
         })
-
   - name: transformer
     type: ast.Visitor
     required: false
@@ -177,9 +285,8 @@ options:
             },
           },
         })
-
   - name: printer
-    type: '{ nodes?: PrinterFakerNodes }'
+    type: "{ nodes?: PrinterFakerNodes }"
     required: false
     description: |
       Override individual printer node handlers to customize how specific schema types are rendered.

@@ -1,6 +1,6 @@
 {
   "name": "e2e",
-  "version": "0.0.1-beta.4",
+  "version": "0.0.1-beta.5",
   "private": true,
   "description": "",
   "repository": {
@@ -30,8 +30,8 @@
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@tanstack/react-query": "^5.100.6",
-    "@tanstack/vue-query": "^5.100.6",
+    "@tanstack/react-query": "^5.100.8",
+    "@tanstack/vue-query": "^5.100.8",
     "axios": "^1.15.2",
     "cypress": "^15.14.2",
     "kubb": "catalog:",
@@ -40,7 +40,7 @@
     "oxlint": "^1.62.0",
     "react": "^19.2.5",
     "vue": "^3.5.33",
-    "zod": "^4.4.1"
+    "zod": "^4.4.2"
   },
   "devDependencies": {
     "typescript": "catalog:"

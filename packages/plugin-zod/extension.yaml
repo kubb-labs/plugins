@@ -1,19 +1,19 @@
-$schema: 'https://kubb.dev/schemas/extension.json'
+$schema: https://kubb.dev/schemas/extension.json
 kind: plugin
 id: plugin-zod
 name: Zod
 description: Generate Zod validation schemas from OpenAPI specifications for runtime data validation.
 category: validation
 type: official
-npmPackage: '@kubb/plugin-zod'
+npmPackage: "@kubb/plugin-zod"
 docsPath: /plugins/plugin-zod
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - zod
   - validation
@@ -30,13 +30,11 @@ resources:
   codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/zod
 featured: true
 icon:
-  light: 'https://kubb.dev/feature/zod.svg'
-
+  light: https://kubb.dev/feature/zod.svg
 intro: |
   # @kubb/plugin-zod
 
   Generate [Zod](https://zod.dev/) validation schemas from your OpenAPI schema for runtime validation. Kubb generates Zod v4 schemas.
-
 options:
   - name: output
     type: Output
@@ -44,49 +42,158 @@ options:
     default: "{ path: 'zod', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
-      - extends: ./_shared/core/output-path.yaml
+      - name: path
+        type: string
+        required: true
+        description: Output directory or file for the generated code, relative to the global `output.path`.
+        tip: |
+          if `output.path` is a file, `group` cannot be used.
         default: "'zod'"
-      - extends: ./_shared/core/output-barrel-type.yaml
-      - extends: ./_shared/core/output-banner.yaml
-      - extends: ./_shared/core/output-footer.yaml
-      - extends: ./_shared/core/output-override.yaml
-
-  - extends: ./_shared/core/resolver.yaml
-    type: 'Partial<ResolverZod> & ThisType<ResolverZod>'
-
-  - extends: ./_shared/core/group.yaml
-    properties:
-      - extends: ./_shared/core/group-type.yaml
-      - name: name
-        type: '(context: GroupContext) => string'
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
         required: false
-        default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. This is used for file and identifier generation.
+        default: "'named'"
+        description: Specify what to export and optionally disable barrel-file generation.
+        tip: |
+          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        examples:
+          - name: all
+            files:
+              - lang: typescript
+                code: |
+                  export * from './gen/petService.ts'
+                twoslash: false
+          - name: named
+            files:
+              - lang: typescript
+                code: |
+                  export { PetService } from './gen/petService.ts'
+                twoslash: false
+          - name: propagate
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+          - name: "false"
+            files:
+              - lang: typescript
+                code: ""
+                twoslash: false
+      - name: banner
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a banner comment at the top of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: footer
+        type: "string | ((node: RootNode) => string)"
+        required: false
+        description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+      - name: override
+        type: boolean
+        required: false
+        default: "false"
+        description: Whether Kubb overrides existing external files that can be generated if they already exist.
+  - name: resolver
+    type: Partial<ResolverZod> & ThisType<ResolverZod>
+    required: false
+    description: |
+      A single resolver that overrides the naming and path-resolution conventions. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the resolver's result is used as the fallback, so you only need to supply the methods you want to change.
 
+      `this` inside each method is bound to the **full** resolver, so you can call other resolver methods (e.g. `this.default(name, 'function')`) without losing context.
+    body: |
+      Each plugin ships a built-in resolver:
+
+      | Plugin | Default resolver |
+      | --- | --- |
+      | `@kubb/plugin-ts` | `resolverTs` |
+      | `@kubb/plugin-zod` | `resolverZod` |
+      | `@kubb/plugin-cypress` | `resolverCypress` |
+      | `@kubb/plugin-mcp` | `resolverMcp` |
+    codeBlock:
+      lang: typescript
+      title: Custom resolver (plugin-ts example)
+      code: |
+        import { pluginTs } from '@kubb/plugin-ts'
+
+        pluginTs({
+          resolver: {
+            resolveName(name) {
+              // Prefix every operation-derived name; falls back for names where
+              // this returns null/undefined.
+              return `Api${this.default(name, 'function')}`
+            },
+          },
+        })
+    tip: |
+      Use `resolver` for fine-grained control over naming conventions.
+  - name: group
+    type: Group
+    required: false
+    description: |
+      Grouping combines files in a folder based on a specific `type`.
+    examples:
+      - name: kubb.config.ts
+        files:
+          - lang: typescript
+            code: |
+              group: {
+                type: 'tag',
+                name({ group }) {
+                  return `${group}Controller`
+                }
+              }
+            twoslash: false
+    body: |
+      With the configuration above, the generator emits:
+
+      ```text
+      .
+      ├── src/
+      │   └── petController/
+      │   │   ├── addPet.ts
+      │   │   └── getPet.ts
+      │   └── storeController/
+      │       ├── createStore.ts
+      │       └── getStoreById.ts
+      ├── petStore.yaml
+      ├── kubb.config.ts
+      └── package.json
+      ```
+    properties:
+      - name: type
+        type: "'tag'"
+        required: true
+        description: Specify the property to group files by. Required when `group` is defined.
+        note: |
+          `Required: true*` means this is required only when the `group` option is used. The `group` option itself is optional.
+        body: |
+          - `'tag'`: Uses the first tag from `operation.getTags().at(0)?.name`
+      - name: name
+        type: "(context: GroupContext) => string"
+        required: false
+        default: (ctx) => `${ctx.group}Controller`
+        description: Return the name of a group based on the group name. This is used for file and identifier generation.
   - name: importPath
     type: string
     required: false
     default: "'zod'"
     description: |
       Import path for Zod. Use `'zod/mini'` to import from Zod's mini bundle.
-
   - name: typed
     type: boolean
     required: false
-    default: 'false'
+    default: "false"
     description: Annotate schemas with their TypeScript types from `@kubb/plugin-ts`. Requires `@kubb/plugin-ts` in the plugins array.
     important: |
       We rely on [`ToZod`](https://github.com/colinhacks/tozod) from the creator of Zod to create a schema based on a type.
       Kubb contains its own version to those kind of conversions.
-
   - name: inferred
     type: boolean
     required: false
-    default: 'false'
+    default: "false"
     description: Export a `z.infer<typeof schema>` type alias for each schema to keep types in sync with validation.
     codeBlock:
       lang: typescript
-      title: 'inferred: true'
+      title: "inferred: true"
       code: |
         import { z } from 'zod'
 
@@ -97,26 +204,22 @@ options:
 
         // Inferred type export
         export type Pet = z.infer<typeof petSchema>
-
   - name: integerType
     warning: |
       This option has been moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.
-
   - name: unknownType
     warning: |
       This option has been moved to [`adapterOas`](/adapters/adapter-oas#unknownType). Use `adapterOas({ unknownType })` instead.
-
   - name: emptySchemaType
     warning: |
       This option has been moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
-
   - name: coercion
-    type: 'boolean | { dates?: boolean, strings?: boolean, numbers?: boolean }'
+    type: "boolean | { dates?: boolean, strings?: boolean, numbers?: boolean }"
     required: false
-    default: 'false'
+    default: "false"
     description: Apply `z.coerce` to automatically convert input values to the expected type before validation. Pass `true` to coerce all primitives, or an object to selectively enable coercion for `dates`, `strings`, and `numbers`. See [Coercion for primitives](https://zod.dev/?id=coercion-for-primitives).
     examples:
-      - name: 'true'
+      - name: "true"
         files:
           - lang: typescript
             code: |
@@ -124,7 +227,7 @@ options:
               z.coerce.date();
               z.coerce.number();
             twoslash: false
-      - name: 'false'
+      - name: "false"
         files:
           - lang: typescript
             code: |
@@ -132,7 +235,7 @@ options:
               z.date();
               z.number();
             twoslash: false
-      - name: '{numbers: true, strings: false, dates: false}'
+      - name: "{numbers: true, strings: false, dates: false}"
         files:
           - lang: typescript
             code: |
@@ -140,13 +243,11 @@ options:
               z.date();
               z.coerce.number();
             twoslash: false
-
   - name: operations
     type: boolean
     required: false
-    default: 'false'
+    default: "false"
     description: Generate an `operations.ts` file with schemas for each operation, including request and response data.
-
   - name: paramsCasing
     type: "'camelcase'"
     required: false
@@ -164,7 +265,6 @@ options:
         type GetPetHeaderParams = {
           xApiKey?: string  // ✓ camelCase
         }
-
   - name: guidType
     type: "'uuid' | 'guid'"
     required: false
@@ -184,11 +284,10 @@ options:
             code: |
               z.guid()
             twoslash: false
-
   - name: mini
     type: boolean
     required: false
-    default: 'false'
+    default: "false"
     badge:
       type: tip
       text: beta
@@ -203,7 +302,7 @@ options:
     tip: |
       Zod Mini provides a smaller bundle size with better tree-shaking. See [Zod Mini documentation](https://zod.dev/packages/mini) for more details.
     examples:
-      - name: 'mini: true'
+      - name: "mini: true"
         files:
           - lang: typescript
             code: |
@@ -215,7 +314,7 @@ options:
               z.nullable(z.number())
               z.array(z.string()).check(z.minLength(1), z.maxLength(10))
             twoslash: false
-      - name: 'mini: false (default)'
+      - name: "mini: false (default)"
         files:
           - lang: typescript
             code: |
@@ -227,18 +326,91 @@ options:
               z.number().nullable()
               z.array(z.string()).min(1).max(10)
             twoslash: false
+  - name: include
+    type: Array<Include>
+    required: false
+    description: Array containing include parameters to include tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Include
+      code: |
+        export type Include = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: exclude
+    type: Array<Exclude>
+    required: false
+    description: Array containing exclude parameters to exclude or skip tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Exclude
+      code: |
+        export type Exclude = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+        }
+  - name: override
+    type: Array<Override>
+    required: false
+    description: Array containing override parameters to override `options` based on tags, operations, methods, paths, or content types.
+    codeBlock:
+      lang: typescript
+      title: Override
+      code: |
+        export type Override = {
+          type: 'tag' | 'operationId' | 'path' | 'method' | 'contentType'
+          pattern: string | RegExp
+          options: PluginOptions
+        }
+  - name: generators
+    type: Array<Generator<PluginZod>>
+    required: false
+    experimental: true
+    description: |
+      Define additional generators next to the built-in generators.
 
-  - extends: ./_shared/core/include.yaml
-  - extends: ./_shared/core/exclude.yaml
-  - extends: ./_shared/core/override.yaml
+      See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
+  - name: transformer
+    type: Visitor
+    required: false
+    description: |
+      A single AST visitor applied to every node before code is printed. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the preset transformer's result is used as the fallback — so you only need to supply the methods you want to change.
 
-  - extends: ./_shared/core/generators.yaml
-    type: 'Array<Generator<PluginZod>>'
+      Visitor methods receive the node and a context object. Return a modified node to replace it, or return `undefined`/`void` to leave it unchanged.
+    examples:
+      - name: Strip descriptions before printing
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
 
-  - extends: ./_shared/core/transformer.yaml
+              pluginTs({
+                transformer: {
+                  schema(node) {
+                    return { ...node, description: undefined }
+                  },
+                },
+              })
+            twoslash: false
+      - name: Prefix every operationId
+        files:
+          - lang: typescript
+            code: |
+              import { pluginTs } from '@kubb/plugin-ts'
 
+              pluginTs({
+                transformer: {
+                  operation(node) {
+                    return { ...node, operationId: `api_${node.operationId}` }
+                  },
+                },
+              })
+            twoslash: false
+    tip: |
+      Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.
   - name: printer
-    type: '{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }'
+    type: "{ nodes?: PrinterZodNodes | PrinterZodMiniNodes }"
     required: false
     description: |
       Override individual printer node handlers to customize how specific schema types are rendered. When `mini: true` the overrides apply to the Zod Mini printer.
@@ -277,9 +449,8 @@ options:
                 },
               })
             twoslash: false
-
   - name: wrapOutput
-    type: '(arg: { output: string; schema: SchemaNode }) => string | undefined'
+    type: "(arg: { output: string; schema: SchemaNode }) => string | undefined"
     required: false
     description: Wrap the generated Zod schema string with additional validation or metadata. The callback receives the schema's output string and the `SchemaNode` AST node, and returns the modified schema string.
     tip: |
