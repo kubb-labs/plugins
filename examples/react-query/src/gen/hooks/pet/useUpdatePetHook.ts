@@ -17,8 +17,14 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePetHook(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function updatePetHook(
+  data: UpdatePetData,
+  config: Partial<RequestConfig<UpdatePetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -26,13 +32,19 @@ export async function updatePetHook(data: UpdatePetData, config: Partial<Request
     method: 'PUT',
     url: `/pet`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function updatePetMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export function updatePetMutationOptionsHook<TContext = unknown>(
+  config: Partial<RequestConfig<UpdatePetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
     UpdatePetResponse,
@@ -60,7 +72,10 @@ export function useUpdatePetHook<TContext>(
       { data: UpdatePetData },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client }
+    client?: Partial<RequestConfig<UpdatePetData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

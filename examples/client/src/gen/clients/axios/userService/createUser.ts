@@ -15,8 +15,14 @@ function getCreateUserUrl() {
  * @summary Create user
  * {@link /user}
  */
-export async function createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function createUser(
+  data?: CreateUserData,
+  config: Partial<RequestConfig<CreateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -24,6 +30,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
     method: 'POST',
     url: getCreateUserUrl().url.toString(),
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 

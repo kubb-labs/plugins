@@ -20,9 +20,12 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function updateUser(
   { username }: { username: UpdateUserPathUsername },
   data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -30,6 +33,7 @@ export async function updateUser(
     method: 'PUT',
     url: `/user/${username}`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
@@ -49,7 +53,10 @@ export function useUpdateUser<TContext>(
       { username: MaybeRefOrGetter<UpdateUserPathUsername>; data?: MaybeRefOrGetter<UpdateUserData> },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
+    client?: Partial<RequestConfig<UpdateUserData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

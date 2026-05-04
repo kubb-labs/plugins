@@ -28,6 +28,7 @@ import type {
 } from '../../../models/ts/petController/UpdatePetWithForm.ts'
 import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { buildFormData } from '../../../.kubb/config.ts'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class petController {
@@ -42,14 +43,21 @@ export class petController {
    * @summary Update an existing pet
    * {@link /pet}
    */
-  async updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+  async updatePet(
+    data: UpdatePetData,
+    config: Partial<RequestConfig<UpdatePetData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    } = {},
+  ) {
+    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
       ...requestConfig,
       method: 'PUT',
       url: `/pet`,
       data: requestData,
+      contentType,
     })
     return res.data
   }
@@ -59,14 +67,21 @@ export class petController {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  async addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+  async addPet(
+    data: AddPetData,
+    config: Partial<RequestConfig<AddPetData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    } = {},
+  ) {
+    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet`,
       data: requestData,
+      contentType,
     })
     return res.data
   }
@@ -168,16 +183,18 @@ export class petController {
     { petId }: { petId: UploadFilePathPetId },
     data: UploadFileData,
     params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
-    config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
+    config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
   ) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
+    const formData = buildFormData(requestData)
     const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}/uploadImage`,
       params,
-      data: requestData,
+      data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+      contentType,
     })
     return res.data
   }
