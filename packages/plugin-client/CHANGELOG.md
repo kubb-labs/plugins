@@ -1,5 +1,24 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.5
+
+### Minor Changes
+
+- [#91](https://github.com/kubb-labs/plugins/pull/91) [`2ff4885`](https://github.com/kubb-labs/plugins/commit/2ff48855500effc7e7bef07e7c45ef7928de914f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Support multiple content types in `requestBody`.
+
+  When an OpenAPI operation declares more than one content type for its `requestBody` (e.g. `application/json` **and** `multipart/form-data`), plugins now generate correct output for all declared types instead of silently ignoring all but the first.
+  - **plugin-ts**: emits individual types per content type (e.g. `UploadFileJsonData`, `UploadFileFormData`) plus a union alias (`type UploadFileData = UploadFileJsonData | UploadFileFormData`).
+  - **plugin-client**: adds a `contentType` parameter with a literal union type and a default matching the first declared type; uses a runtime ternary to dispatch between form-data and JSON request paths.
+  - **plugin-react-query**: `contentType` is forwarded through mutation variables into the client call; `buildFormData` import is now conditional on the operation actually using `multipart/form-data`.
+
+  Single-content-type operations are backwards-compatible — generated output is identical to before.
+
+### Patch Changes
+
+- Updated dependencies [[`2ff4885`](https://github.com/kubb-labs/plugins/commit/2ff48855500effc7e7bef07e7c45ef7928de914f), [`f98b0ce`](https://github.com/kubb-labs/plugins/commit/f98b0ce1b230d0fc439c4bcc8c216ed44ad4e989)]:
+  - @kubb/plugin-ts@5.0.0-beta.5
+  - @kubb/plugin-zod@5.0.0-beta.5
+
 ## 5.0.0-beta.4
 
 ### Minor Changes
