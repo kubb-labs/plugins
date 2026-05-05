@@ -67,8 +67,7 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
-    "@internals/utils": "workspace:*",
-    "prettier": "catalog:"
+    "@internals/utils": "workspace:*"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:"

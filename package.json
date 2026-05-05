@@ -61,6 +61,7 @@
     "cspell": "^10.0.0",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
+    "prettier": "catalog:",
     "size-limit": "catalog:",
     "taze": "^19.11.0",
     "tsdown": "catalog:",
