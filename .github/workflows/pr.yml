@@ -19,8 +19,6 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
-    env:
-      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -33,7 +31,7 @@ jobs:
           node-version: '22'
 
       - name: Build
-        run: pnpm turbo run build --affected
+        run: pnpm build
 
   typecheck:
     name: Typecheck
@@ -41,8 +39,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
     needs: build
-    env:
-      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -55,10 +51,10 @@ jobs:
           node-version: '22'
 
       - name: Build
-        run: pnpm turbo run build --affected
+        run: pnpm build
 
       - name: Typecheck
-        run: pnpm turbo run typecheck --affected --continue
+        run: pnpm typecheck
 
   tests:
     name: Tests
@@ -139,8 +135,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
     needs: build
-    env:
-      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -153,7 +147,7 @@ jobs:
           node-version: '22'
 
       - name: Build
-        run: pnpm turbo run build --affected
+        run: pnpm build
 
       - name: Run Vitest benchmarks
         run: pnpm run test:bench
