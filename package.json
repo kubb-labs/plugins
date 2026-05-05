@@ -61,14 +61,12 @@
     "cspell": "^10.0.0",
     "oxfmt": "^0.47.0",
     "oxlint": "^1.62.0",
-    "prettier": "^3.8.3",
     "size-limit": "catalog:",
     "taze": "^19.11.0",
     "tsdown": "catalog:",
     "tsx": "^4.21.0",
     "turbo": "^2.9.9",
     "typescript": "catalog:",
-    "vite-tsconfig-paths": "^6.1.1",
     "vitest": "catalog:",
     "yaml": "^2.8.4"
   },
@@ -76,7 +74,7 @@
     "node": ">=22",
     "pnpm": ">=10.0.0"
   },
-  "packageManager": "pnpm@10.33.0",
+  "packageManager": "pnpm@10.33.3",
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild"

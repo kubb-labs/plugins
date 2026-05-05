@@ -13,7 +13,8 @@ catalog:
   '@kubb/renderer-jsx': 5.0.0-beta.4
   kubb: 5.0.0-beta.4
   unplugin-kubb: 5.0.0-beta.4
-  '@types/node': ^22.19.17
+  '@types/node': ^22.x
+  prettier: ^3.8.3
   '@types/react': ^19.2.14
   '@size-limit/file': ^12.1.0
   'size-limit': ^12.1.0

@@ -69,7 +69,8 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
-    "@internals/utils": "workspace:*"
+    "@internals/utils": "workspace:*",
+    "prettier": "catalog:"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:"
