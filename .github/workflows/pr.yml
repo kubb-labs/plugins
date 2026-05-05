@@ -93,7 +93,6 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
-    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -115,7 +114,6 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
-    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@v6
