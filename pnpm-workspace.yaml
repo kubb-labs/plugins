@@ -5,7 +5,11 @@ packages:
   - tests/**
 
 allowBuilds:
+  cypress: true
+  es5-ext: true
   esbuild: true
+  msw: true
+  vue-demi: true
 
 pmOnFail: warn
 minimumReleaseAge: 0
