@@ -81,7 +81,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -240,7 +240,7 @@ jobs:
 
       - name: Create Pull Request with generated files
         if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           base: ${{ github.head_ref || github.ref_name }}
           branch: chore/update-generated-examples-${{ github.event.number }}

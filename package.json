@@ -72,13 +72,8 @@
   },
   "engines": {
     "node": ">=22",
-    "pnpm": ">=10.0.0"
+    "pnpm": ">=11.0.0"
   },
-  "packageManager": "pnpm@10.33.3",
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
+  "packageManager": "pnpm@11.0.5",
   "namespace": "@kubb"
 }
