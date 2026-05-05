@@ -1,17 +1,17 @@
 {
   "name": "e2e",
-  "version": "0.0.1-beta.5",
+  "version": "0.0.0",
   "private": true,
   "description": "",
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "tests/e2e"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "clean": "npx rimraf ./dist",
     "format": "echo 'empty'",
@@ -45,9 +45,9 @@
   "devDependencies": {
     "typescript": "catalog:"
   },
-  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=22",
     "pnpm": ">=10.0.0"
-  }
+  },
+  "packageManager": "pnpm@10.33.0"
 }
