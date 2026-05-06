@@ -31,7 +31,7 @@
     "@mswjs/http-middleware": "^0.10.3",
     "kubb": "catalog:",
     "msw": "^2.14.3",
-    "react": "^19.2.5"
+    "react": "^19.2.6"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

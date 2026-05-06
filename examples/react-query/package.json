@@ -29,8 +29,8 @@
     "@tanstack/react-query-devtools": "^5.100.9",
     "axios": "^1.16.0",
     "kubb": "catalog:",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
     "unplugin-kubb": "catalog:"
   },
   "devDependencies": {
