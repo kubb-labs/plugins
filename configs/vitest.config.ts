@@ -1,11 +1,8 @@
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  resolve: {
-    tsconfigPaths: true,
-  },
   test: {
-    testTimeout: 30000,
+    testTimeout: 30_000,
     exclude: ['**/node_modules/**', '**/dist/**', '**/mocks/**', '**/*.bench.ts'],
     coverage: {
       exclude: [
@@ -39,5 +36,8 @@ export default defineConfig({
         '**/.rc.{?(c|m)js,yml}',
       ],
     },
+  },
+  resolve: {
+    tsconfigPaths: true,
   },
 })
