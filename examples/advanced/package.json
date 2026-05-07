@@ -41,7 +41,7 @@
     "@types/react": "catalog:",
     "axios": "^1.16.0",
     "cypress": "^15.14.2",
-    "msw": "^2.14.3",
+    "msw": "^2.14.4",
     "react": "^19.2.6",
     "solid-js": "^1.9.12",
     "svelte": "^5.55.5",
