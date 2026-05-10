@@ -95,7 +95,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         ...(zod.headerParams ?? []).map((p) => p.schemaName),
         zod.requestName,
         zod.responseName,
-      ].filter(Boolean)
+      ].filter((name): name is string => Boolean(name))
 
       const uniqueNames = [...new Set(zodNames)].sort()
 

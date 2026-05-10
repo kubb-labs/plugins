@@ -6,6 +6,10 @@ import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments } from '../utils.ts'
 
+function isNonNullable<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined
+}
+
 /**
  * Partial map of node-type overrides for the TypeScript printer.
  *
@@ -191,7 +195,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
           const literalNodes = values
             .filter((v): v is string | number | boolean => v !== null && v !== undefined)
             .map((value) => factory.constToTypeNode(value, typeof value as 'string' | 'number' | 'boolean'))
-            .filter(Boolean)
+            .filter(isNonNullable)
 
           return factory.createUnionDeclaration({ withParentheses: true, nodes: literalNodes }) ?? undefined
         }
@@ -224,7 +228,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
 
               return this.transform(m)
             })
-            .filter(Boolean)
+            .filter(isNonNullable)
 
           return factory.createUnionDeclaration({ withParentheses: true, nodes: memberNodes }) ?? undefined
         }
@@ -235,7 +239,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) }) ?? undefined
       },
       array(node) {
-        const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
+        const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(isNonNullable)
 
         return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType }) ?? undefined
       },

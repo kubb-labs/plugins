@@ -61,7 +61,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
       mutationGenerator,
       hookOptionsGenerator,
       customHookOptionsFileGenerator,
-    ].filter(Boolean)
+    ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
   const groupConfig = group
     ? ({
@@ -80,7 +80,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   return {
     name: pluginReactQueryName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter(Boolean),
+    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverReactQuery, ...userResolver } : resolverReactQuery
