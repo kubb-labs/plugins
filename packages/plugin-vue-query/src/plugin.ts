@@ -42,7 +42,8 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
 
   const selectedGenerators =
-    options.generators ?? [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
+    options.generators ??
+    [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
   const groupConfig = group
     ? ({

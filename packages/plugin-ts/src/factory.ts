@@ -162,7 +162,9 @@ export function createPropertySignature({
   type?: ts.TypeNode
 }) {
   return factory.createPropertySignature(
-    [...modifiers, readOnly ? factory.createToken(ts.SyntaxKind.ReadonlyKeyword) : undefined].filter((modifier): modifier is ts.Modifier => modifier !== undefined),
+    [...modifiers, readOnly ? factory.createToken(ts.SyntaxKind.ReadonlyKeyword) : undefined].filter(
+      (modifier): modifier is ts.Modifier => modifier !== undefined,
+    ),
     propertyName(name),
     createQuestionToken(questionToken),
     type,
@@ -568,9 +570,7 @@ export function createEnumDeclaration({
       undefined,
       factory.createEnumDeclaration(
         [factory.createToken(ts.SyntaxKind.ExportKeyword), type === 'constEnum' ? factory.createToken(ts.SyntaxKind.ConstKeyword) : undefined].filter(
-          (
-            modifier,
-          ): modifier is ts.ModifierToken<ts.SyntaxKind.ExportKeyword> | ts.ModifierToken<ts.SyntaxKind.ConstKeyword> => modifier !== undefined,
+          (modifier): modifier is ts.ModifierToken<ts.SyntaxKind.ExportKeyword> | ts.ModifierToken<ts.SyntaxKind.ConstKeyword> => modifier !== undefined,
         ),
         factory.createIdentifier(typeName),
         enums
@@ -658,13 +658,13 @@ export function createEnumDeclaration({
                       initializer = value ? factory.createTrue() : factory.createFalse()
                     }
 
-                  if (key) {
-                    const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-                    return factory.createPropertyAssignment(propertyName(casingKey), initializer)
-                  }
+                    if (key) {
+                      const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
+                      return factory.createPropertyAssignment(propertyName(casingKey), initializer)
+                    }
 
-                  return undefined
-                })
+                    return undefined
+                  })
                   .filter((property): property is ts.PropertyAssignment => property !== undefined),
                 true,
               ),
