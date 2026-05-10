@@ -27,6 +27,10 @@ export const syntaxKind = {
   stringLiteral: SyntaxKind.StringLiteral,
 } as const
 
+function isNonNullable<T>(value: T | null | undefined): value is T {
+  return value !== null && value !== undefined
+}
+
 function isValidIdentifier(str: string): boolean {
   if (!str.length || str.trim() !== str) {
     return false
@@ -158,7 +162,7 @@ export function createPropertySignature({
   type?: ts.TypeNode
 }) {
   return factory.createPropertySignature(
-    [...modifiers, readOnly ? factory.createToken(ts.SyntaxKind.ReadonlyKeyword) : undefined].filter(Boolean),
+    [...modifiers, readOnly ? factory.createToken(ts.SyntaxKind.ReadonlyKeyword) : undefined].filter((modifier): modifier is ts.Modifier => modifier !== undefined),
     propertyName(name),
     createQuestionToken(questionToken),
     type,
@@ -553,7 +557,7 @@ export function createEnumDeclaration({
 
               return undefined
             })
-            .filter(Boolean),
+            .filter((node): node is ts.LiteralTypeNode => node !== undefined),
         ),
       ),
     ]
@@ -563,7 +567,11 @@ export function createEnumDeclaration({
     return [
       undefined,
       factory.createEnumDeclaration(
-        [factory.createToken(ts.SyntaxKind.ExportKeyword), type === 'constEnum' ? factory.createToken(ts.SyntaxKind.ConstKeyword) : undefined].filter(Boolean),
+        [factory.createToken(ts.SyntaxKind.ExportKeyword), type === 'constEnum' ? factory.createToken(ts.SyntaxKind.ConstKeyword) : undefined].filter(
+          (
+            modifier,
+          ): modifier is ts.ModifierToken<ts.SyntaxKind.ExportKeyword> | ts.ModifierToken<ts.SyntaxKind.ConstKeyword> => modifier !== undefined,
+        ),
         factory.createIdentifier(typeName),
         enums
           .map(([key, value]) => {
@@ -594,7 +602,7 @@ export function createEnumDeclaration({
 
             return undefined
           })
-          .filter(Boolean),
+          .filter((member): member is ts.EnumMember => member !== undefined),
       ),
     ]
   }
@@ -650,14 +658,14 @@ export function createEnumDeclaration({
                       initializer = value ? factory.createTrue() : factory.createFalse()
                     }
 
-                    if (key) {
-                      const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
-                      return factory.createPropertyAssignment(propertyName(casingKey), initializer)
-                    }
+                  if (key) {
+                    const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
+                    return factory.createPropertyAssignment(propertyName(casingKey), initializer)
+                  }
 
-                    return undefined
-                  })
-                  .filter(Boolean),
+                  return undefined
+                })
+                  .filter((property): property is ts.PropertyAssignment => property !== undefined),
                 true,
               ),
               factory.createTypeReferenceNode(factory.createIdentifier('const'), undefined),
@@ -885,7 +893,7 @@ export function buildMemberNodes(
   members: Array<ast.SchemaNode> | undefined,
   print: (node: ast.SchemaNode) => ts.TypeNode | null | undefined,
 ): Array<ts.TypeNode> {
-  return (members ?? []).map(print).filter(Boolean)
+  return (members ?? []).map(print).filter(isNonNullable)
 }
 
 /**
@@ -893,7 +901,7 @@ export function buildMemberNodes(
  * applying min/max slice and optional/rest element rules.
  */
 export function buildTupleNode(node: ast.ArraySchemaNode, print: (node: ast.SchemaNode) => ts.TypeNode | null | undefined): ts.TypeNode | undefined {
-  let items = (node.items ?? []).map(print).filter(Boolean)
+  let items = (node.items ?? []).map(print).filter(isNonNullable)
 
   const restNode = node.rest ? (print(node.rest) ?? undefined) : undefined
   const { min, max } = node

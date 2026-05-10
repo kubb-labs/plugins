@@ -31,7 +31,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
       ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
       node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
       tsResolver.resolveResponseName(node),
-    ].filter(Boolean)
+    ].filter((name): name is string => Boolean(name))
 
     const meta = {
       name: resolver.resolveName(node.operationId),

@@ -41,7 +41,8 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
 
-  const selectedGenerators = options.generators ?? [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter(Boolean)
+  const selectedGenerators =
+    options.generators ?? [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
   const groupConfig = group
     ? ({
@@ -60,7 +61,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   return {
     name: pluginVueQueryName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter(Boolean),
+    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverVueQuery, ...userResolver } : resolverVueQuery

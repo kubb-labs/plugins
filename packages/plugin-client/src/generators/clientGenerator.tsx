@@ -38,11 +38,13 @@ export const clientGenerator = defineGenerator<PluginClient>({
       node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
       tsResolver.resolveResponseName(node),
       ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-    ].filter(Boolean)
+    ].filter((name): name is string => Boolean(name))
 
     const importedZodNames =
       zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
+        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(
+            (name): name is string => Boolean(name),
+          )
         : []
 
     const meta = {
