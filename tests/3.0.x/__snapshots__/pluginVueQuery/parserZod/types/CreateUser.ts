@@ -14,7 +14,21 @@ export type CreateUserStatusDefault = User;
  * @description Created user object
  * @type object | undefined
 */
-export type CreateUserData = User | undefined;
+export type CreateUserJsonData = User | undefined;
+
+/**
+ * @description Created user object
+ * @type object | undefined
+*/
+export type CreateUserXmlData = User | undefined;
+
+/**
+ * @description Created user object
+ * @type object | undefined
+*/
+export type CreateUserFormUrlEncodedData = User | undefined;
+
+export type CreateUserData = (CreateUserJsonData | CreateUserXmlData | CreateUserFormUrlEncodedData);
 
 /**
  * @type object

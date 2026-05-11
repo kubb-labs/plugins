@@ -1,6 +1,6 @@
 {
   "mode": "pre",
-  "tag": "alpha",
+  "tag": "beta",
   "initialVersions": {
     "@internals/tanstack-query": "0.0.0",
     "@internals/utils": "0.0.0",
@@ -41,6 +41,8 @@
     "plugin-client-params-casing-unused-var",
     "plugin-client-v5-migration",
     "plugin-cypress-v5-upgrade",
+    "plugin-faker-locale-support",
+    "plugin-faker-stable-cyclic-getters",
     "plugin-faker-type-precision-fix",
     "plugin-faker-v5-rewrite",
     "plugin-mcp-enum-path-params",
@@ -62,6 +64,7 @@
     "plugin-ts-v2-helpers",
     "plugin-vue-query-key-transformer-compat",
     "plugin-vue-query-v5-migration",
+    "plugin-yaml-per-package-metadata",
     "plugin-yaml-tip-values-metadata",
     "plugin-zod-discriminator-ref-description",
     "plugin-zod-v5-rewrite",

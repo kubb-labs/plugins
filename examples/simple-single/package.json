@@ -7,7 +7,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kubb-labs/kubb.git",
+    "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "examples/single-single"
   },
   "type": "module",
@@ -27,11 +27,11 @@
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@tanstack/react-query": "^5.100.6",
-    "axios": "^1.15.2",
+    "@tanstack/react-query": "^5.100.9",
+    "axios": "^1.16.0",
     "kubb": "catalog:",
-    "react": "^19.2.5",
+    "react": "^19.2.6",
     "typescript": "catalog:",
-    "zod": "^4.4.1"
+    "zod": "^4.4.3"
   }
 }

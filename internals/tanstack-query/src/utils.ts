@@ -1,6 +1,27 @@
 import { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 
+export function getContentTypeInfo(node: ast.OperationNode) {
+  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
+  const isMultipleContentTypes = contentTypes.length > 1
+  return {
+    contentTypes,
+    isMultipleContentTypes,
+    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
+    defaultContentType: contentTypes[0] ?? 'application/json',
+    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
+  }
+}
+
+export function buildRequestConfigType(node: ast.OperationNode, resolver: PluginTs['resolver']): string {
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
+  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
+  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
+
+  return `${configType} & { ${configProps} }`
+}
+
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
 }
@@ -159,16 +180,17 @@ export function buildQueryKeyParams(
 
 /**
  * Build mutation arg params for paramsToTrigger mode.
- * Contains pathParams + data + queryParams + headers (all flattened, for type alias).
+ * Contains pathParams + data + extraBodyParams + queryParams + headers (all flattened, for type alias).
  */
 export function buildMutationArgParams(
   node: ast.OperationNode,
   options: {
     paramsCasing: 'camelcase' | undefined
     resolver: PluginTs['resolver']
+    extraBodyParams?: ast.FunctionParameterNode[]
   },
 ): ast.FunctionParametersNode {
-  const { paramsCasing, resolver } = options
+  const { paramsCasing, resolver, extraBodyParams } = options
 
   const casedParams = ast.caseParams(node.parameters, paramsCasing)
   const pathParams = casedParams.filter((p) => p.in === 'path')
@@ -191,6 +213,10 @@ export function buildMutationArgParams(
   // Request body
   if (bodyType) {
     params.push(ast.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
+  }
+
+  if (extraBodyParams?.length) {
+    params.push(...extraBodyParams)
   }
 
   // Query params

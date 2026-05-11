@@ -16,19 +16,19 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  * @summary Create user
  * {@link /user}
  */
-export async function createUser({ data }: { data?: CreateUserData } = {}, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function createUser({ data }: { data?: CreateUserData } = {}, config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData, ...requestConfig })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
 
-export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
 
         const mutationKey = createUserMutationKey()
         return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
@@ -47,7 +47,7 @@ export function createUserMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function useCreateUser<TContext>(options: {
   mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<CreateUserData>> & { client?: Client },
+  client?: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

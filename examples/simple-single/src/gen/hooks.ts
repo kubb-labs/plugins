@@ -94,8 +94,14 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function updatePet(
+  data: UpdatePetData,
+  config: Partial<RequestConfig<UpdatePetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -103,13 +109,19 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
     method: 'PUT',
     url: `/pet`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export function updatePetMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<UpdatePetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
     UpdatePetResponse,
@@ -137,7 +149,10 @@ export function useUpdatePet<TContext>(
       { data: UpdatePetData },
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client }
+    client?: Partial<RequestConfig<UpdatePetData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -173,8 +188,14 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function addPet(
+  data: AddPetData,
+  config: Partial<RequestConfig<AddPetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -182,13 +203,19 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
     method: 'POST',
     url: `/pet`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export function addPetMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<AddPetData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>({
     mutationKey,
@@ -206,7 +233,10 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
 export function useAddPet<TContext>(
   options: {
     mutation?: UseMutationOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<AddPetData>> & { client?: Client }
+    client?: Partial<RequestConfig<AddPetData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1011,8 +1041,14 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrder(
+  data?: PlaceOrderData,
+  config: Partial<RequestConfig<PlaceOrderData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -1020,13 +1056,19 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
     method: 'POST',
     url: `/store/order`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<PlaceOrderData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = placeOrderMutationKey()
   return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>({
     mutationKey,
@@ -1044,7 +1086,10 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Re
 export function usePlaceOrder<TContext>(
   options: {
     mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client }
+    client?: Partial<RequestConfig<PlaceOrderData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1075,8 +1120,14 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrderPatch(
+  data?: PlaceOrderPatchData,
+  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -1084,13 +1135,19 @@ export async function placeOrderPatch(data?: PlaceOrderPatchData, config: Partia
     method: 'PATCH',
     url: `/store/order`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function placeOrderPatchMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client } = {}) {
+export function placeOrderPatchMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = placeOrderPatchMutationKey()
   return mutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
     mutationKey,
@@ -1110,7 +1167,10 @@ export function usePlaceOrderPatch<TContext>(
     mutation?: UseMutationOptions<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<PlaceOrderPatchData>> & { client?: Client }
+    client?: Partial<RequestConfig<PlaceOrderPatchData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1335,8 +1395,14 @@ export const createUserMutationKey = () => [{ url: '/user' }] as const
  * @summary Create user
  * {@link /user}
  */
-export async function createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function createUser(
+  data?: CreateUserData,
+  config: Partial<RequestConfig<CreateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -1344,13 +1410,19 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
     method: 'POST',
     url: `/user`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
+export function createUserMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<CreateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = createUserMutationKey()
   return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext>({
     mutationKey,
@@ -1368,7 +1440,10 @@ export function createUserMutationOptions<TContext = unknown>(config: Partial<Re
 export function useCreateUser<TContext>(
   options: {
     mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, { data?: CreateUserData }, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<CreateUserData>> & { client?: Client }
+    client?: Partial<RequestConfig<CreateUserData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -1839,9 +1914,12 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function updateUser(
   username: UpdateUserPathUsername,
   data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -1849,13 +1927,19 @@ export async function updateUser(
     method: 'PUT',
     url: `/user/${username}`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function updateUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export function updateUserMutationOptions<TContext = unknown>(
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = updateUserMutationKey()
   return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>({
     mutationKey,
@@ -1875,7 +1959,10 @@ export function useUpdateUser<TContext>(
     mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
+    client?: Partial<RequestConfig<UpdateUserData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

@@ -25,12 +25,25 @@ export type UploadFileStatus200 = ApiResponse
 /**
  * @type object
  */
-export type UploadFileData = {
+export type UploadFileJsonData = {
+  /**
+   * @description URL of the image to upload
+   * @type string
+   */
+  url: string
+}
+
+/**
+ * @type object
+ */
+export type UploadFileFormData = {
   /**
    * @type string
    */
   file: Blob
 }
+
+export type UploadFileData = UploadFileJsonData | UploadFileFormData
 
 /**
  * @type object

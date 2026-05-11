@@ -20,9 +20,12 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function updateUserHook(
   { username }: { username: UpdateUserPathUsername },
   data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -30,13 +33,19 @@ export async function updateUserHook(
     method: 'PUT',
     url: `/user/${username}`,
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function updateUserMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export function updateUserMutationOptionsHook<TContext = unknown>(
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
+) {
   const mutationKey = updateUserMutationKey()
   return mutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext>({
     mutationKey,
@@ -56,7 +65,10 @@ export function useUpdateUserHook<TContext>(
     mutation?: UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, { username: UpdateUserPathUsername; data?: UpdateUserData }, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client }
+    client?: Partial<RequestConfig<UpdateUserData>> & {
+      client?: Client
+      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+    }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

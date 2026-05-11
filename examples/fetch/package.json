@@ -7,7 +7,7 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kubb-labs/kubb.git",
+    "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "examples/fetch"
   },
   "sideEffects": false,
@@ -24,7 +24,7 @@
     "kubb": "catalog:"
   },
   "devDependencies": {
-    "react": "^19.2.5",
+    "react": "^19.2.6",
     "typescript": "catalog:"
   },
   "engines": {

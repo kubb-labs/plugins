@@ -84,7 +84,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
   return {
     name: pluginClientName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter(Boolean),
+    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverClient, ...userResolver } : resolverClient

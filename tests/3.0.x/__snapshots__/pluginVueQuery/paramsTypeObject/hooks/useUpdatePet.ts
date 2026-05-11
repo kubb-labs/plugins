@@ -17,14 +17,14 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePet({ data }: { data: UpdatePetData }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function updatePet({ data }: { data: UpdatePetData }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, ...requestConfig })
+  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
@@ -36,7 +36,7 @@ export async function updatePet({ data }: { data: UpdatePetData }, config: Parti
  */
 export function useUpdatePet<TContext>(options: {
   mutation?: MutationObserverOptions<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: MaybeRefOrGetter<UpdatePetData>}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
+  client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

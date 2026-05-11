@@ -3,13 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "description": "Kubb's monorepo",
+  "license": "MIT",
+  "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "https://github.com/kubb-labs/plugins.git"
   },
-  "license": "MIT",
-  "author": "stijnvanhulle",
-  "type": "module",
   "workspaces": {
     "packages": [
       "packages/*",
@@ -18,8 +17,10 @@
       "tests/**"
     ]
   },
+  "type": "module",
   "scripts": {
     "build": "turbo run build --filter=./packages/*",
+    "build:extension-yaml": "tsx scripts/build-extension-yaml.ts",
     "build:examples": "turbo run build --filter=./examples/*",
     "test:bench": "vitest bench --config ./configs/vitest.bench.config.ts",
     "changeset": "changeset",
@@ -34,7 +35,7 @@
     "release": "changeset publish",
     "release:canary": "changeset publish --no-git-tag",
     "start": "turbo run start --filter=./packages/*",
-    "test": "vitest run --config ./configs/vitest.config.ts --coverage",
+    "test": "vitest run --config ./configs/vitest.config.ts",
     "test:watch": "vitest --config ./configs/vitest.config.ts",
     "typecheck": "turbo run typecheck --continue --filter='./packages/*' --filter='./tests/**'",
     "typecheck:examples": "turbo run typecheck --continue --filter='./examples/*'",
@@ -55,30 +56,26 @@
     "@kubb/plugin-zod": "workspace:*",
     "@size-limit/file": "catalog:",
     "@types/node": "catalog:",
-    "@vitest/coverage-v8": "^4.1.5",
-    "@vitest/ui": "^4.1.5",
+    "@vitest/coverage-v8": "catalog:",
+    "@vitest/ui": "catalog:",
     "bun-types": "^1.3.13",
     "cspell": "^10.0.0",
-    "oxfmt": "^0.45.0",
-    "oxlint": "^1.62.0",
-    "prettier": "^3.8.3",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
+    "prettier": "catalog:",
     "size-limit": "catalog:",
     "taze": "^19.11.0",
     "tsdown": "catalog:",
-    "turbo": "^2.9.6",
+    "tsx": "^4.21.0",
+    "turbo": "^2.9.10",
     "typescript": "catalog:",
-    "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.5"
+    "vitest": "catalog:",
+    "yaml": "^2.8.4"
   },
-  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=22",
-    "pnpm": ">=10.0.0"
+    "pnpm": ">=11.0.0"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
+  "packageManager": "pnpm@11.0.5",
   "namespace": "@kubb"
 }

@@ -18,7 +18,22 @@ export type AddFilesStatus405 = any
 /**
  * @type object | undefined
  */
-export type AddFilesData = Omit<NonNullable<Pet>, 'id'> | undefined
+export type AddFilesJsonData =
+  | {
+      /**
+       * @description URL of the image to upload
+       * @type string
+       */
+      url: string
+    }
+  | undefined
+
+/**
+ * @type object | undefined
+ */
+export type AddFilesFormData = Omit<NonNullable<Pet>, 'id'> | undefined
+
+export type AddFilesData = AddFilesJsonData | AddFilesFormData
 
 /**
  * @type object

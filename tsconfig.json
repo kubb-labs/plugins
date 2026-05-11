@@ -1,5 +1,6 @@
 {
-  "extends": "./bundler.json",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "./configs/bundler.json",
   "compilerOptions": {
     "rootDir": ".",
     "types": ["bun-types"],

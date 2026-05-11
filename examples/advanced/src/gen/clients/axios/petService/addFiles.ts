@@ -14,8 +14,11 @@ export function getAddFilesUrl() {
  * @summary Place an file for a pet
  * {@link /pet/files}
  */
-export async function addFiles({ data }: { data: AddFilesData }, config: Partial<RequestConfig<AddFilesData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function addFiles(
+  { data }: { data: AddFilesData },
+  config: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
+) {
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -24,7 +27,8 @@ export async function addFiles({ data }: { data: AddFilesData }, config: Partial
   const res = await request<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
     method: 'POST',
     url: getAddFilesUrl().url.toString(),
-    data: formData as FormData,
+    data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    contentType,
     ...requestConfig,
   })
 

@@ -29,7 +29,21 @@ export type AddPetStatus405 = {
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetData = AddPetRequest
+export type AddPetJsonData = AddPetRequest
+
+/**
+ * @description Create a new pet in the store
+ * @type object
+ */
+export type AddPetXmlData = Omit<NonNullable<Pet>, 'id'>
+
+/**
+ * @description Create a new pet in the store
+ * @type object
+ */
+export type AddPetFormUrlEncodedData = Omit<NonNullable<Pet>, 'id'>
+
+export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedData
 
 /**
  * @type object

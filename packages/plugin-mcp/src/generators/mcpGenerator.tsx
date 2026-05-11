@@ -33,7 +33,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
       node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
       tsResolver.resolveResponseName(node),
       ...node.responses.filter((r) => Number(r.statusCode) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode)),
-    ].filter(Boolean)
+    ].filter((name): name is string => Boolean(name))
 
     const meta = {
       name: resolver.resolveName(node.operationId),

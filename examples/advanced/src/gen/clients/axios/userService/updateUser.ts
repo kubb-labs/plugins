@@ -16,9 +16,12 @@ export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsernam
  */
 export async function updateUser(
   { username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData },
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = updateUserDataSchema.parse(data)
 
@@ -26,6 +29,7 @@ export async function updateUser(
     method: 'PUT',
     url: getUpdateUserUrl({ username }).url.toString(),
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 

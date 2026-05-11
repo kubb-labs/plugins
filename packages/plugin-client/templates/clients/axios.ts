@@ -17,6 +17,7 @@ export type RequestConfig<TData = unknown> = {
   signal?: AbortSignal
   validateStatus?: (status: number) => boolean
   headers?: AxiosRequestConfig['headers']
+  contentType?: string
 }
 
 /**
@@ -64,9 +65,19 @@ export const fetch = async <TData, TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>,
   _request?: unknown,
 ): Promise<ResponseConfig<TData>> => {
-  return axiosInstance.request<TData, ResponseConfig<TData>>(mergeConfig(getConfig(), config)).catch((e: AxiosError<TError>) => {
-    throw e
-  })
+  const requestConfig = mergeConfig(getConfig(), config)
+  const { contentType, headers, ...axiosConfig } = requestConfig
+  return axiosInstance
+    .request<TData, ResponseConfig<TData>>({
+      ...axiosConfig,
+      headers: {
+        ...(contentType && contentType !== 'multipart/form-data' ? { 'Content-Type': contentType } : {}),
+        ...headers,
+      },
+    })
+    .catch((e: AxiosError<TError>) => {
+      throw e
+    })
 }
 
 fetch.getConfig = getConfig

@@ -6,6 +6,24 @@ import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
 import { buildData, buildResponses, buildResponseUnion } from '../utils.ts'
 
+function getContentTypeSuffix(contentType: string): string {
+  const baseType = contentType.split(';')[0]!.trim()
+  if (baseType === 'application/json') return 'Json'
+  if (baseType === 'multipart/form-data') return 'FormData'
+  if (baseType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
+  const subtype = baseType.split('/').pop() ?? baseType
+  const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
+  if (parts.length === 0) return 'Unknown'
+  return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
+}
+
+function getPerContentTypeName(dataName: string, suffix: string): string {
+  if (dataName.endsWith('Data')) {
+    return suffix.endsWith('Data') ? dataName.slice(0, -4) + suffix : `${dataName.slice(0, -4)}${suffix}Data`
+  }
+  return dataName + suffix
+}
+
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
@@ -148,16 +166,61 @@ export const typeGenerator = defineGenerator<PluginTs>({
       }),
     )
 
-    const requestType = node.requestBody?.content?.[0]?.schema
-      ? renderSchemaType({
+    const requestBodyContent = node.requestBody?.content ?? []
+
+    function buildRequestType() {
+      if (requestBodyContent.length === 0) return null
+      if (requestBodyContent.length === 1) {
+        const entry = requestBodyContent[0]!
+        if (!entry.schema) return null
+        return renderSchemaType({
           schema: {
-            ...node.requestBody.content![0]!.schema!,
-            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
+            ...entry.schema,
+            description: node.requestBody!.description ?? entry.schema.description,
           },
           name: resolver.resolveDataName(node),
-          keysToOmit: node.requestBody.content![0]!.keysToOmit,
+          keysToOmit: entry.keysToOmit,
         })
-      : null
+      }
+      // Multiple content types — generate individual types + union alias
+      const dataName = resolver.resolveDataName(node)
+      const usedNames = new Set<string>()
+      const individualItems = requestBodyContent
+        .filter((entry) => entry.schema)
+        .map((entry) => {
+          const baseSuffix = getContentTypeSuffix(entry.contentType)
+          let individualName = getPerContentTypeName(dataName, baseSuffix)
+          let counter = 2
+          while (usedNames.has(individualName)) {
+            individualName = getPerContentTypeName(dataName, `${baseSuffix}${counter++}`)
+          }
+          usedNames.add(individualName)
+          return {
+            name: individualName,
+            rendered: renderSchemaType({
+              schema: {
+                ...entry.schema!,
+                description: node.requestBody!.description ?? entry.schema!.description,
+              },
+              name: individualName,
+              keysToOmit: entry.keysToOmit,
+            }),
+          }
+        })
+      const unionSchema = ast.createSchema({
+        type: 'union',
+        members: individualItems.map((item) => ast.createSchema({ type: 'ref', name: item.name })),
+      })
+      const unionType = renderSchemaType({ schema: unionSchema, name: dataName })
+      return (
+        <>
+          {individualItems.map((item) => item.rendered)}
+          {unionType}
+        </>
+      )
+    }
+
+    const requestType = buildRequestType()
 
     const responseTypes = node.responses.map((res) =>
       renderSchemaType({
@@ -177,15 +240,13 @@ export const typeGenerator = defineGenerator<PluginTs>({
       name: resolver.resolveResponsesName(node),
     })
 
-    const responseType = (() => {
+    function buildResponseType() {
       if (!node.responses.some((res) => res.schema)) {
         return null
       }
 
       const responseName = resolver.resolveResponseName(node)
 
-      // Skip generating the response union type when an imported component schema
-      // has the same resolved name to avoid redeclaration errors.
       const responsesWithSchema = node.responses.filter((res) => res.schema)
       const importedNames = new Set(
         responsesWithSchema.flatMap((res) =>
@@ -211,7 +272,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
         },
         name: responseName,
       })
-    })()
+    }
+
+    const responseType = buildResponseType()
 
     return (
       <File

@@ -18,14 +18,14 @@ function getPlaceOrderUrl() {
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: getPlaceOrderUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res
 }

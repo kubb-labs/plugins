@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-ts",
-  "version": "5.0.0-alpha.73",
+  "version": "5.0.0-beta.4",
   "description": "TypeScript code generation plugin for Kubb, transforming OpenAPI schemas into TypeScript interfaces, types, and utility functions.",
   "keywords": [
     "code-generator",
@@ -21,13 +21,13 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
     "directory": "packages/plugin-ts"
   },
   "files": [
     "src",
     "dist",
-    "plugin.json",
+    "extension.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"

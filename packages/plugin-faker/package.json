@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-faker",
-  "version": "5.0.0-alpha.73",
+  "version": "5.0.0-beta.4",
   "description": "Faker.js data generator plugin for Kubb, creating realistic mock data from OpenAPI specifications for development and testing.",
   "keywords": [
     "code-generator",
@@ -25,13 +25,13 @@
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kubb-labs/kubb.git",
+    "url": "git+https://github.com/kubb-labs/plugins.git",
     "directory": "packages/plugin-faker"
   },
   "files": [
     "src",
     "dist",
-    "plugin.json",
+    "extension.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
     "!/**/__snapshots__/**"

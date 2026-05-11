@@ -18,9 +18,12 @@ function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
 export async function updateUser(
   { username }: { username: UpdateUserPathUsername },
   data?: UpdateUserData,
-  config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {},
+  config: Partial<RequestConfig<UpdateUserData>> & {
+    client?: Client
+    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
+  } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -28,6 +31,7 @@ export async function updateUser(
     method: 'PUT',
     url: getUpdateUserUrl({ username }).url.toString(),
     data: requestData,
+    contentType,
     ...requestConfig,
   })
 

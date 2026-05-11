@@ -19,7 +19,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  */
 export function useAddPet<TContext>(options: {
   mutation?: MutationObserverOptions<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, {data: MaybeRefOrGetter<AddPetData>}, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<AddPetData>> & { client?: Client },
+  client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
           const { mutation = {}, client: config = {} } = options ?? {}

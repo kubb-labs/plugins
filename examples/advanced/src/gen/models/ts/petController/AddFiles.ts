@@ -13,7 +13,20 @@ export type AddFilesStatus405 = any
 /**
  * @type object
  */
-export type AddFilesData = Omit<NonNullable<Pet>, 'id'>
+export type AddFilesJsonData = {
+  /**
+   * @description URL of the image to upload
+   * @type string
+   */
+  url: string
+}
+
+/**
+ * @type object
+ */
+export type AddFilesFormData = Omit<NonNullable<Pet>, 'id'>
+
+export type AddFilesData = AddFilesJsonData | AddFilesFormData
 
 /**
  * @type object

@@ -1,5 +1,59 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.4
+
+### Minor Changes
+
+- [#125](https://github.com/kubb-labs/plugins/pull/125) [`3be0fc5`](https://github.com/kubb-labs/plugins/commit/3be0fc5fba830d6dae6f37e134f29e7191f480f2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Each plugin package now ships an `extension.yaml` file describing its options and metadata.
+
+  The file is self-contained — no `extends:` references — so third-party plugin authors can follow the same pattern in their own packages without access to this monorepo. Add `extension.yaml` to the `files` array in `package.json` and reference the unified schema for IDE validation:
+
+  ```yaml
+  $schema: "https://kubb.dev/schemas/extension.json"
+  kind: plugin
+  ```
+
+  A `build:plugin-yaml` script resolves shared authoring templates and regenerates all ten files:
+
+  ```bash
+  pnpm build:plugin-yaml
+  ```
+
+### Patch Changes
+
+- Updated dependencies [[`3be0fc5`](https://github.com/kubb-labs/plugins/commit/3be0fc5fba830d6dae6f37e134f29e7191f480f2)]:
+  - @kubb/plugin-ts@5.0.0-beta.4
+
+## 5.0.0-beta.3
+
+### Minor Changes
+
+- [#114](https://github.com/kubb-labs/plugins/pull/114) [`578afd6`](https://github.com/kubb-labs/plugins/commit/578afd666c5e864c7615f3bfe057118b49a21f6b) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Add `locale` option to generate mock data in a specific language.
+
+  Set `locale` to any [Faker.js locale code](https://fakerjs.dev/api/localization.html) (e.g. `'de'`, `'fr'`, `'de_AT'`) and the generated file imports the matching localized faker instance instead of the default English one. Names, addresses, phone numbers, and other locale-aware fields then reflect the target region.
+
+  ```ts
+  pluginFaker({
+    output: { path: "mocks" },
+    locale: "de",
+  });
+  ```
+
+  The generated output uses `import { fakerDE as faker } from '@faker-js/faker'` so all existing call sites remain unchanged.
+
+### Patch Changes
+
+- [#112](https://github.com/kubb-labs/plugins/pull/112) [`6a2a378`](https://github.com/kubb-labs/plugins/commit/6a2a3780c200ea261e321ac7df97c89518662e4d) Thanks [@copilot-swe-agent](https://github.com/apps/copilot-swe-agent)! - Fix cyclic-schema getters so property values are stable and construction never stack-overflows.
+
+  Previously, objects with circular references (e.g. `Cat → Pet → Cat`) used plain lazy getters that both (a) called the recursive faker factory on every property access – returning a different random value each time – and (b) triggered infinite recursion when the object was spread during construction.
+
+  The generated code now emits **memoizing getters**: on first access the value is computed, stored via `Object.defineProperty`, and returned; every subsequent access returns the cached value. The function body no longer spreads the object literal (which would invoke the getters), instead returning it directly and merging user-supplied `data` overrides through `Object.defineProperty` so that getter-only properties can be replaced without a setter.
+
+  Result: `myCat.archEnemy === myCat.archEnemy` is now always `true`, and calling `cat()` no longer risks a stack overflow.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.3
+
 ## 5.0.0-alpha.56
 
 ### Patch Changes

@@ -1,4 +1,5 @@
-$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json'
+$schema: 'https://kubb.dev/schemas/extension.json'
+kind: plugin
 id: plugin-faker
 name: Faker
 description: Generate realistic mock data using Faker.js from OpenAPI specifications.
@@ -7,7 +8,6 @@ type: official
 npmPackage: '@kubb/plugin-faker'
 docsPath: /plugins/plugin-faker
 repo: https://github.com/kubb-labs/plugins
-codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/faker
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
@@ -29,6 +29,7 @@ resources:
   repository: https://github.com/kubb-labs/plugins
   issues: https://github.com/kubb-labs/plugins/issues
   changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-faker/CHANGELOG.md
+  codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/faker
 featured: false
 icon:
   light: 'https://kubb.dev/feature/faker.svg'
@@ -118,6 +119,25 @@ options:
     type: 'number | number[]'
     required: false
     description: Seed faker for deterministic output.
+
+  - name: locale
+    type: string
+    required: false
+    default: "'en'"
+    description: Generate mock data using a locale-specific Faker instance.
+    tip: |
+      See the [Faker.js localization docs](https://fakerjs.dev/api/localization.html) for the full list of supported locales.
+    examples:
+      - name: "'de'"
+        files:
+          - lang: ts
+            code: |
+              import { fakerDE as faker } from '@faker-js/faker'
+      - name: "'de_AT'"
+        files:
+          - lang: ts
+            code: |
+              import { fakerDE_AT as faker } from '@faker-js/faker'
 
   - extends: ./_shared/core/include.yaml
 

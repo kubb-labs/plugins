@@ -23,7 +23,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@main
@@ -31,7 +31,7 @@ jobs:
           node-version: '22'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm build
 
   typecheck:
     name: Typecheck
@@ -43,7 +43,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@main
@@ -51,13 +51,10 @@ jobs:
           node-version: '22'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm build
 
       - name: Typecheck
-        run: pnpm run typecheck
-
-      - name: Typecheck examples
-        run: pnpm run typecheck:examples
+        run: pnpm typecheck
 
   tests:
     name: Tests
@@ -65,11 +62,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
     needs: build
+    env:
+      TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@main
@@ -77,11 +76,11 @@ jobs:
           node-version: '22'
 
       - name: Test
-        run: pnpm run test
+        run: pnpm run test --coverage
 
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -90,7 +89,6 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
-    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -112,7 +110,6 @@ jobs:
     timeout-minutes: 15
     runs-on: ubuntu-latest
     if: github.actor != 'github-actions[bot]'
-    needs: build
     steps:
       - name: Check out code
         uses: actions/checkout@v6
@@ -142,7 +139,7 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v6
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Setup Tools
         uses: kubb-labs/config/.github/setup@main
@@ -150,7 +147,7 @@ jobs:
           node-version: '22'
 
       - name: Build
-        run: pnpm run build
+        run: pnpm build
 
       - name: Run Vitest benchmarks
         run: pnpm run test:bench
@@ -240,7 +237,7 @@ jobs:
 
       - name: Create Pull Request with generated files
         if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           base: ${{ github.head_ref || github.ref_name }}
           branch: chore/update-generated-examples-${{ github.event.number }}

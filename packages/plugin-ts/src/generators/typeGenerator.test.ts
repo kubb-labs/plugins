@@ -212,6 +212,37 @@ describe('typeGenerator — Operation', () => {
         responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Enterprise config' })],
       }),
     },
+    {
+      name: 'multiContentType — POST with json and form-data request body',
+      node: ast.createOperation({
+        operationId: 'uploadFile',
+        method: 'POST',
+        path: '/pet/{petId}/uploadImage',
+        tags: ['pet'],
+        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+        requestBody: {
+          content: [
+            {
+              contentType: 'application/json',
+              schema: ast.createSchema({
+                type: 'object',
+                properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+              }),
+            },
+            {
+              contentType: 'multipart/form-data',
+              schema: ast.createSchema({
+                type: 'object',
+                properties: [ast.createProperty({ name: 'file', required: true, schema: ast.createSchema({ type: 'string' }) })],
+              }),
+            },
+          ],
+        },
+        responses: [
+          ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' }),
+        ],
+      }),
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode }>
 
   test.each(operations)('$name', async (props) => {

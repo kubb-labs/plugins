@@ -237,5 +237,53 @@ describe('fetch client', () => {
       expect(response.data).toEqual({})
       expect(response.status).toBe(204)
     })
+
+    it('should set Content-Type from config.contentType', async () => {
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers(),
+        body: {},
+        json: async () => ({}),
+      })
+
+      await client({
+        url: '/api/users',
+        method: 'POST',
+        data: { name: 'John' },
+        contentType: 'application/json',
+      })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/users',
+        expect.objectContaining({
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      )
+    })
+
+    it('should not set Content-Type for multipart/form-data', async () => {
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers(),
+        body: {},
+        json: async () => ({}),
+      })
+
+      await client({
+        url: '/api/upload',
+        method: 'POST',
+        data: new FormData(),
+        contentType: 'multipart/form-data',
+      })
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/upload',
+        expect.objectContaining({
+          headers: {},
+        }),
+      )
+    })
   })
 })

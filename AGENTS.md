@@ -1,53 +1,73 @@
 # AGENTS.md
 
-Kubb is a plugin-based code-generation toolkit for generating client code from OpenAPI specifications.
+Kubb is a plugin-based code-generation toolkit for generating TypeScript, React-Query, Zod, Faker.js, MSW and more from OpenAPI specifications.
 
-## Folder Structure
+## High-Level Architecture
 
-### Documentation
+This repository contains the plugin ecosystem for Kubb, organized around:
 
-```
-docs/
-├── config.json              # Navigation and sidebar (Kubb.dev schema)
-├── migration-guide.md       # Updated after major releases
-├── changelog.md             # Updated with every PR (via changeset)
-├── getting-started/         # Installation, quick-start, configuration
-├── helpers/                 # Extra packages (CLI guides, OAS core helpers)
-├── guide/                   # Feature deep-dives and how-tos
-├── plugins/                 # Plugin documentation (mirrors `packages/`)
-├── tutorials/               # Step-by-step tutorials
-├── examples/                # Playground and examples
-├── builders/                # Builder integrations (unplugin, etc.)
-└── public/                  # Static assets
-```
+- **Plugin System** - Modular code generators (TypeScript, Client, React-Query, Vue-Query, Zod, Faker, MSW, Cypress, ReDoc, MCP)
+- **Shared Utilities** - Common tools and helpers used across plugins
+- **Configuration Management** - YAML-based plugin configuration system
+- **Testing & Examples** - Comprehensive test suites and working examples
 
-All markdown files follow VitePress conventions. The `config.json` file uses the Kubb.dev schema for navigation. See `.skills/documentation/` for writing guidelines.
+## Directory Organization
 
-### Packages
+The monorepo is structured as follows:
 
 ```
-packages/
-├── plugin-oas/              # OAS plugin - OpenAPI spec parsing
-├── plugin-ts/               # TypeScript type generation
-├── plugin-client/           # Client generator (fetch, axios, etc.)
-├── plugin-faker/            # Faker.js mock data generation
-├── plugin-zod/              # Zod schema generation
-├── plugin-msw/              # MSW mock handlers
-├── plugin-react-query/      # React Query/TanStack Query hooks
-├── plugin-solid-query/      # Solid Query hooks
-├── plugin-svelte-query/     # Svelte Query hooks
-├── plugin-vue-query/        # Vue Query hooks
-├── plugin-swr/              # SWR hooks
-├── plugin-cypress/          # Cypress test generation
-├── plugin-redoc/            # ReDoc documentation
-└── plugin-mcp/              # MCP (Model Context Protocol) integration
+.
+├── packages/                # Plugin implementations
+│   ├── plugin-ts/           # TypeScript type generation
+│   ├── plugin-client/       # Client generator (fetch, axios, etc.)
+│   ├── plugin-faker/        # Faker.js mock data generation
+│   ├── plugin-zod/          # Zod schema generation
+│   ├── plugin-msw/          # MSW mock handlers
+│   ├── plugin-react-query/  # React Query/TanStack Query hooks
+│   ├── plugin-vue-query/    # Vue Query hooks
+│   ├── plugin-cypress/      # Cypress test generation
+│   ├── plugin-redoc/        # ReDoc documentation
+│   └── plugin-mcp/          # MCP (Model Context Protocol) integration
+├── internals/               # Shared internal utilities
+│   ├── tanstack-query/      # Shared TanStack Query utilities
+│   └── utils/               # General utilities
+├── examples/                # Example projects demonstrating plugins
+├── tests/                   # Test suites (e2e, performance, version-specific)
+├── plugins/                 # YAML plugin configurations
+├── schemas/                 # OpenAPI schema definitions
+├── docs/                    # Documentation
+├── configs/                 # Shared configurations
+├── assets/                  # Static assets
+└── .github/                 # GitHub workflows & templates
 ```
 
-Plugins follow this convention:
+## Plugin Ecosystem
 
-- `src/components/` - React-fabric components
+### Plugin Packages
+
+Each plugin in the `packages/` directory follows a consistent structure:
+
+- `src/components/` - JSX-renderer components
 - `src/generators/` - Generator implementations
 - `src/*.test.ts` - Tests
+- `package.json` - Plugin metadata
+
+### Shared Utilities
+
+The `internals/` directory provides shared utilities:
+
+- **tanstack-query** - Shared TanStack Query utilities
+- **utils** - General utility functions
+
+### Plugin Configurations
+
+The `plugins/` directory contains YAML configuration files for each plugin, with shared templates in `_shared/`.
+
+### Examples & Tests
+
+- **Examples** - Working example projects for each plugin (fetch, TypeScript, React-Query, Vue-Query, Zod, MSW, Faker, Cypress, custom generators)
+- **Tests** - E2E tests, performance tests, and version-specific test suites
+- **Schemas** - OpenAPI schema definitions for testing
 
 ## Repository Setup
 

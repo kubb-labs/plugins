@@ -3,7 +3,6 @@ import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../../mo
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { buildFormData } from '../../.kubb/config.ts'
 
 /**
  * @description Place a new file in the store
@@ -16,10 +15,8 @@ export async function addFilesHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const formData = buildFormData(requestData)
-
   const res = await fetch<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
-    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, data: formData as FormData },
+    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
     request,
   )
 
