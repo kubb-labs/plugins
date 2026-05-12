@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Plugin Faker</h1>
+  <h1>@kubb/plugin-faker</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
@@ -33,9 +33,11 @@
 ## Installation
 
 ```bash
-npm install @kubb/plugin-faker
+bun add @kubb/plugin-faker
 # or
 pnpm add @kubb/plugin-faker
+# or
+npm install @kubb/plugin-faker
 ```
 
 ## Documentation
@@ -44,7 +46,7 @@ See the [full documentation](https://kubb.dev/plugins/faker) for configuration o
 
 ## Supporting Kubb
 
-Kubb uses an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 

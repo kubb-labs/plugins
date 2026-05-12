@@ -39,7 +39,7 @@
     "test:watch": "vitest --config ./configs/vitest.config.ts",
     "typecheck": "turbo run typecheck --continue --filter='./packages/*' --filter='./tests/**'",
     "typecheck:examples": "turbo run typecheck --continue --filter='./examples/*'",
-    "upgrade": "npx taze -r -w --exclude pnpm",
+    "upgrade": "npx taze -r -w --exclude pnpm --maturity-period 3",
     "version": "changeset version",
     "version:canary": "changeset version --snapshot canary"
   },
@@ -69,7 +69,7 @@
     "turbo": "^2.9.12",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "yaml": "^2.9.0"
+    "yaml": "^2.8.1"
   },
   "engines": {
     "node": ">=22",

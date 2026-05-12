@@ -26,16 +26,16 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@tanstack/vue-query": "^5.100.10",
+    "@tanstack/vue-query": "^5.100.1",
     "axios": "^1.16.0",
     "unplugin-kubb": "catalog:",
     "vue": "^3.5.34"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.6",
-    "msw": "^2.14.6",
+    "msw": "^2.14.5",
     "typescript": "catalog:",
-    "vite": "^8.0.12"
+    "vite": "^8.0.11"
   },
   "engines": {
     "node": ">=22",
