@@ -801,19 +801,6 @@ options:
       Define additional generators next to the built-in generators.
 
       See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
-  - name: transformers
-    type: '{ name?: (name: string, type?: ResolveType) => string }'
-    required: false
-    description: Customize the generated names based on the type provided by the plugin.
-    properties:
-      - name: name
-        type: '(name: string, type?: ResolveType) => string'
-        required: false
-        description: Customize the names based on the type that is provided by the plugin.
-        codeBlock:
-          lang: typescript
-          code: |
-            type ResolveType = 'file' | 'function' | 'type' | 'const'
   - name: resolver
     type: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
     required: false

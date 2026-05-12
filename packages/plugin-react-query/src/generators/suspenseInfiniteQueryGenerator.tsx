@@ -7,7 +7,6 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { QueryKey, SuspenseInfiniteQuery, SuspenseInfiniteQueryOptions } from '../components'
 import type { PluginReactQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-infinite-query',
@@ -26,7 +25,6 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       parser,
       client: clientOptions,
       group,
-      transformers,
       customOptions,
     } = ctx.options
 
@@ -54,13 +52,11 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
-    const baseName = resolver.resolveName(node.operationId)
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    const queryName = transformName(`use${capitalize(baseName)}SuspenseInfinite`, 'function', transformers)
-    const queryOptionsName = transformName(`${baseName}SuspenseInfiniteQueryOptions`, 'function', transformers)
-    const queryKeyName = transformName(`${baseName}SuspenseInfiniteQueryKey`, 'const', transformers)
-    const queryKeyTypeName = transformName(`${capitalize(baseName)}SuspenseInfiniteQueryKey`, 'type', transformers)
-    const clientBaseName = transformName(`${baseName}SuspenseInfinite`, 'function', transformers)
+    const queryName = resolver.resolveSuspenseInfiniteQueryName(node)
+    const queryOptionsName = resolver.resolveSuspenseInfiniteQueryOptionsName(node)
+    const queryKeyName = resolver.resolveSuspenseInfiniteQueryKeyName(node)
+    const queryKeyTypeName = resolver.resolveSuspenseInfiniteQueryKeyTypeName(node)
+    const clientBaseName = resolver.resolveSuspenseInfiniteClientName(node)
 
     const meta = {
       file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),

@@ -36,7 +36,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
     ].filter((name): name is string => Boolean(name))
 
     const meta = {
-      name: resolver.resolveName(node.operationId),
+      name: resolver.resolveHandlerName(node),
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },

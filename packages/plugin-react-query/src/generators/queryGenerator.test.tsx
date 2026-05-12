@@ -44,7 +44,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   output: { path: '.' },
   group: undefined,
   resolver: resolverReactQuery,
-  transformers: {},
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({

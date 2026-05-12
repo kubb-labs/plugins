@@ -49,7 +49,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const meta = {
       name: resolver.resolveName(node.operationId),
-      urlName: `get${resolver.resolveName(node.operationId).charAt(0).toUpperCase()}${resolver.resolveName(node.operationId).slice(1)}Url`,
+      urlName: resolver.resolveUrlName(node),
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },

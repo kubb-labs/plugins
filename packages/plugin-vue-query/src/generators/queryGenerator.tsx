@@ -7,14 +7,13 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { Query, QueryKey, QueryOptions } from '../components'
 import type { PluginVueQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const queryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query',
   renderer: jsxRenderer,
   operation(node, ctx) {
     const { adapter, config, driver, resolver, root } = ctx
-    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, transformers } = ctx.options
+    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -30,13 +29,11 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
 
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
-    const baseName = resolver.resolveName(node.operationId)
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    const queryName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
-    const queryOptionsName = transformName(`${baseName}QueryOptions`, 'function', transformers)
-    const queryKeyName = transformName(`${baseName}QueryKey`, 'const', transformers)
-    const queryKeyTypeName = transformName(`${capitalize(baseName)}QueryKey`, 'type', transformers)
-    const clientName = transformName(baseName, 'function', transformers)
+    const queryName = resolver.resolveQueryName(node)
+    const queryOptionsName = resolver.resolveQueryOptionsName(node)
+    const queryKeyName = resolver.resolveQueryKeyName(node)
+    const queryKeyTypeName = resolver.resolveQueryKeyTypeName(node)
+    const clientName = resolver.resolveClientName(node)
 
     const meta = {
       file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),

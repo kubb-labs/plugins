@@ -73,7 +73,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           description: node.description || `Make a ${node.method.toUpperCase()} request to ${node.path}`,
         },
         mcp: {
-          name: resolver.resolveName(node.operationId),
+          name: resolver.resolveHandlerName(node),
           file: mcpFile,
         },
         zod: {

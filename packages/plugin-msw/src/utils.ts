@@ -4,13 +4,6 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import type { PluginMsw } from './types.ts'
 
 /**
- * Applies a name transformer function to a name if configured, otherwise returns it unchanged.
- */
-export function transformName(name: string, type: 'function' | 'type' | 'file' | 'const', transformers?: PluginMsw['resolvedOptions']['transformers']): string {
-  return transformers?.name?.(name, type) || name
-}
-
-/**
  * Filters responses to only those with 2xx status codes.
  */
 export function getSuccessResponses(node: ast.OperationNode): ast.ResponseNode[] {

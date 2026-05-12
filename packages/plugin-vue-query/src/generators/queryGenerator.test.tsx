@@ -43,7 +43,6 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   include: undefined,
   override: [],
   resolver: resolverVueQuery,
-  transformers: {},
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({

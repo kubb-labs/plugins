@@ -7,14 +7,13 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import type { PluginVueQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-infinite',
   renderer: jsxRenderer,
   operation(node, ctx) {
     const { adapter, config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, transformers } = ctx.options
+    const { output, query, mutation, infinite, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -40,13 +39,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
 
     const importPath = query ? query.importPath : '@tanstack/vue-query'
 
-    const baseName = resolver.resolveName(node.operationId)
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    const queryName = transformName(`use${capitalize(baseName)}Infinite`, 'function', transformers)
-    const queryOptionsName = transformName(`${baseName}InfiniteQueryOptions`, 'function', transformers)
-    const queryKeyName = transformName(`${baseName}InfiniteQueryKey`, 'const', transformers)
-    const queryKeyTypeName = transformName(`${capitalize(baseName)}InfiniteQueryKey`, 'type', transformers)
-    const clientBaseName = transformName(`${baseName}Infinite`, 'function', transformers)
+    const queryName = resolver.resolveInfiniteQueryName(node)
+    const queryOptionsName = resolver.resolveInfiniteQueryOptionsName(node)
+    const queryKeyName = resolver.resolveInfiniteQueryKeyName(node)
+    const queryKeyTypeName = resolver.resolveInfiniteQueryKeyTypeName(node)
+    const clientBaseName = resolver.resolveInfiniteClientName(node)
 
     const meta = {
       file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),

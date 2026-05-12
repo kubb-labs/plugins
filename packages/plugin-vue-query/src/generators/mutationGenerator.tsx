@@ -7,14 +7,13 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { Mutation, MutationKey } from '../components'
 import type { PluginVueQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const mutationGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-mutation',
   renderer: jsxRenderer,
   operation(node, ctx) {
     const { adapter, config, driver, resolver, root } = ctx
-    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, transformers } = ctx.options
+    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -30,12 +29,10 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
     const importPath = mutation ? mutation.importPath : '@tanstack/vue-query'
 
-    const baseName = resolver.resolveName(node.operationId)
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    const mutationHookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
-    const mutationTypeName = transformName(`${capitalize(baseName)}`, 'type', transformers)
-    const mutationKeyName = transformName(`${baseName}MutationKey`, 'const', transformers)
-    const clientName = transformName(baseName, 'function', transformers)
+    const mutationHookName = resolver.resolveMutationName(node)
+    const mutationTypeName = resolver.resolveMutationTypeName(node)
+    const mutationKeyName = resolver.resolveMutationKeyName(node)
+    const clientName = resolver.resolveClientName(node)
 
     const meta = {
       file: resolver.resolveFile({ name: mutationHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),

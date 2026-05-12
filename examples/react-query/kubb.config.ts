@@ -4,6 +4,14 @@ import { QueryKey } from '@kubb/plugin-react-query/components'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
 
+function capitalize(name: string): string {
+  return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
+}
+
+function hookName(name: string): string {
+  return `${name}Hook`
+}
+
 /** @type {import('@kubb/core').UserConfig} */
 export const config = {
   root: '.',
@@ -36,12 +44,48 @@ export const config = {
       client: {
         bundle: true,
       },
-      transformers: {
-        name: (name, type) => {
-          if (type === 'file' || type === 'function') {
-            return `${name}Hook`
-          }
-          return name
+      resolver: {
+        resolveQueryName(node) {
+          return hookName(`use${capitalize(this.resolveName(node.operationId))}`)
+        },
+        resolveSuspenseQueryName(node) {
+          return hookName(`use${capitalize(this.resolveName(node.operationId))}Suspense`)
+        },
+        resolveInfiniteQueryName(node) {
+          return hookName(`use${capitalize(this.resolveName(node.operationId))}Infinite`)
+        },
+        resolveSuspenseInfiniteQueryName(node) {
+          return hookName(`use${capitalize(this.resolveName(node.operationId))}SuspenseInfinite`)
+        },
+        resolveMutationName(node) {
+          return hookName(`use${capitalize(this.resolveName(node.operationId))}`)
+        },
+        resolveQueryOptionsName(node) {
+          return hookName(`${this.resolveName(node.operationId)}QueryOptions`)
+        },
+        resolveSuspenseQueryOptionsName(node) {
+          return hookName(`${this.resolveName(node.operationId)}SuspenseQueryOptions`)
+        },
+        resolveInfiniteQueryOptionsName(node) {
+          return hookName(`${this.resolveName(node.operationId)}InfiniteQueryOptions`)
+        },
+        resolveSuspenseInfiniteQueryOptionsName(node) {
+          return hookName(`${this.resolveName(node.operationId)}SuspenseInfiniteQueryOptions`)
+        },
+        resolveMutationOptionsName(node) {
+          return hookName(`${this.resolveName(node.operationId)}MutationOptions`)
+        },
+        resolveClientName(node) {
+          return hookName(this.resolveName(node.operationId))
+        },
+        resolveSuspenseClientName(node) {
+          return hookName(`${this.resolveName(node.operationId)}Suspense`)
+        },
+        resolveInfiniteClientName(node) {
+          return hookName(`${this.resolveName(node.operationId)}Infinite`)
+        },
+        resolveSuspenseInfiniteClientName(node) {
+          return hookName(`${this.resolveName(node.operationId)}SuspenseInfinite`)
         },
       },
       output: {
