@@ -1,18 +1,8 @@
 import { createHash } from 'node:crypto'
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
+import { camelCase, isValidVarName } from '@internals/utils'
 import { defineResolver, PluginDriver } from '@kubb/core'
 import type { PluginFaker } from '../types.ts'
-
-function isValidStrictIdentifier(name: string): boolean {
-  try {
-    new Function(`"use strict"; const ${name} = 1;`)
-  } catch {
-    return false
-  }
-
-  return true
-}
 
 /**
  * Naming convention resolver for Faker plugin.
@@ -29,7 +19,7 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     default(name, type) {
       const resolvedName = camelCase(name, { isFile: type === 'file', prefix: 'create' })
 
-      if (type === 'file' || isValidStrictIdentifier(resolvedName)) {
+      if (type === 'file' || isValidVarName(resolvedName)) {
         return resolvedName
       }
 
