@@ -4,14 +4,32 @@ import { camelCase } from '@internals/utils'
 import { defineResolver, PluginDriver } from '@kubb/core'
 import type { PluginFaker } from '../types.ts'
 
-function isValidStrictIdentifier(name: string): boolean {
-  try {
-    new Function(`"use strict"; const ${name} = 1;`)
-  } catch {
-    return false
-  }
+/**
+ * Reserved words that cannot be used as identifiers in strict mode JavaScript.
+ *
+ * Covers ES2015+ keywords, strict-mode-only reserved words (`eval`, `arguments`),
+ * future reserved words, and literal values.
+ */
+const STRICT_MODE_RESERVED_WORDS = new Set([
+  // Keywords
+  'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger', 'default',
+  'delete', 'do', 'else', 'export', 'extends', 'finally', 'for', 'function',
+  'if', 'import', 'in', 'instanceof', 'new', 'return', 'super', 'switch',
+  'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with',
+  // Strict mode reserved
+  'let', 'static', 'implements', 'interface', 'package', 'private', 'protected',
+  'public', 'yield',
+  // Restricted in strict mode
+  'eval', 'arguments',
+  // Future reserved / literals
+  'await', 'enum', 'null', 'true', 'false', 'undefined',
+])
 
-  return true
+/** Matches a valid ECMAScript identifier (ASCII subset, no unicode escapes). */
+const IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/
+
+function isValidStrictIdentifier(name: string): boolean {
+  return IDENTIFIER_RE.test(name) && !STRICT_MODE_RESERVED_WORDS.has(name)
 }
 
 /**
