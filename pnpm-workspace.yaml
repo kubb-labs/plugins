@@ -12,7 +12,7 @@ allowBuilds:
   vue-demi: true
 
 pmOnFail: warn
-minimumReleaseAge: 0
+minimumReleaseAge: 1440
 
 catalog:
   '@kubb/adapter-oas': 5.0.0-beta.6
