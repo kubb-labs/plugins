@@ -8,10 +8,12 @@ export {
   buildRequestConfigType,
   getComments,
   getContentTypeInfo,
+  printType,
   resolveErrorNames,
   resolveHeaderGroupType,
   resolvePathParamType,
   resolveQueryGroupType,
   resolveStatusCodeNames,
   transformName,
+  transformParamTypes,
 } from './utils.ts'

@@ -227,3 +227,62 @@ export function buildMutationArgParams(
 
   return ast.createFunctionParameters({ params })
 }
+
+/**
+ * Render a {@link ast.ParamsTypeNode} back to its TypeScript source form.
+ */
+export function printType(typeNode: ast.ParamsTypeNode | undefined): string {
+  if (!typeNode) return 'unknown'
+  if (typeNode.variant === 'reference') return typeNode.name
+  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
+  if (typeNode.variant === 'struct') {
+    const parts = typeNode.properties.map((p) => {
+      const typeStr = printType(p.type)
+      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
+      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
+    })
+    return `{ ${parts.join('; ')} }`
+  }
+  return 'unknown'
+}
+
+/**
+ * Rewrite selected parameter types in a {@link ast.FunctionParametersNode}
+ * using a caller-supplied `wrapType` and `shouldWrap` predicate. Handles
+ * both inline parameters and grouped/destructured ones.
+ *
+ * @example Vue's `MaybeRefOrGetter`
+ * `transformParamTypes(p, { wrapType: (t) => \`MaybeRefOrGetter<${t}>\`, shouldWrap: (p) => p.name !== 'options' })`
+ *
+ * @example React's path-param getter union
+ * `transformParamTypes(p, { wrapType: (t) => \`${t} | (() => ${t}) | undefined\`, shouldWrap: (p) => pathNames.has(p.name) })`
+ */
+export function transformParamTypes(
+  paramsNode: ast.FunctionParametersNode,
+  options: {
+    wrapType: (inner: string) => string
+    shouldWrap: (param: ast.FunctionParameterNode) => boolean
+  },
+): ast.FunctionParametersNode {
+  const { wrapType, shouldWrap } = options
+  const wrap = (p: ast.FunctionParameterNode): ast.FunctionParameterNode => {
+    if (!p.type) return p
+    return {
+      ...p,
+      type: ast.createParamsType({ variant: 'reference', name: wrapType(printType(p.type)) }),
+    }
+  }
+  return ast.createFunctionParameters({
+    params: paramsNode.params.map((param) => {
+      if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+        const group = param as ast.ParameterGroupNode
+        return {
+          ...group,
+          properties: group.properties.map((p) => (shouldWrap(p) ? wrap(p) : p)),
+        }
+      }
+      const fp = param as ast.FunctionParameterNode
+      return shouldWrap(fp) ? wrap(fp) : fp
+    }),
+  })
+}
