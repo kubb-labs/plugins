@@ -1,3 +1,4 @@
+import { buildOperationComments, buildParamsMapping, buildRequestConfigType, getContentTypeInfo } from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -7,7 +8,6 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildParamsMapping, buildRequestConfigType, getComments, getContentTypeInfo } from '../utils.ts'
 import { Url } from './Url.tsx'
 
 type Props = {
@@ -204,7 +204,7 @@ export function Client({
           export={isExportable}
           params={paramsSignature}
           JSDoc={{
-            comments: getComments(node),
+            comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }),
           }}
           returnType={returnType}
         >

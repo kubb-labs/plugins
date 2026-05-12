@@ -1,10 +1,10 @@
 import path from 'node:path'
+import { findSuccessStatusCode } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
 import type { PluginMcp } from '../types.ts'
-import { findSuccessStatusCode } from '../utils.ts'
 
 /**
  * Default v5 server generator for `@kubb/plugin-mcp`.

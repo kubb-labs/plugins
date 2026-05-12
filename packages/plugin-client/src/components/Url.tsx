@@ -1,3 +1,4 @@
+import { buildParamsMapping } from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -5,7 +6,6 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginClient } from '../types.ts'
-import { buildParamsMapping } from '../utils.ts'
 
 type Props = {
   name: string

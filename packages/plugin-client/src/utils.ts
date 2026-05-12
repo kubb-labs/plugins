@@ -1,63 +1,9 @@
-import { URLPath } from '@internals/utils'
+import type { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
-
-export function getContentTypeInfo(node: ast.OperationNode) {
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
-  const isMultipleContentTypes = contentTypes.length > 1
-  return {
-    contentTypes,
-    isMultipleContentTypes,
-    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
-    defaultContentType: contentTypes[0] ?? 'application/json',
-    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
-  }
-}
-
-export function buildRequestConfigType(node: ast.OperationNode, tsResolver: ResolverTs): string {
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
-  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
-  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
-
-  return `${configType} & { ${configProps} }`
-}
-
-/**
- * Extracts documentation comments from an operation node.
- * Includes description, summary, link, and deprecation information.
- */
-export function getComments(node: ast.OperationNode): Array<string> {
-  return [
-    node.description && `@description ${node.description}`,
-    node.summary && `@summary ${node.summary}`,
-    node.path && `{@link ${new URLPath(node.path).URL}}`,
-    node.deprecated && '@deprecated',
-  ]
-    .filter((x): x is string => Boolean(x))
-    .flatMap((text) => text.split(/\r?\n/).map((line) => line.trim()))
-    .filter((x): x is string => Boolean(x))
-}
-
-/**
- * Builds a mapping of original parameter names to their transformed (cased) names.
- * Returns undefined if no names have changed.
- */
-export function buildParamsMapping(originalParams: Array<ast.ParameterNode>, casedParams: Array<ast.ParameterNode>): Record<string, string> | undefined {
-  const mapping: Record<string, string> = {}
-  let hasChanged = false
-  originalParams.forEach((param, i) => {
-    const casedName = casedParams[i]?.name ?? param.name
-    mapping[param.name] = casedName
-    if (param.name !== casedName) {
-      hasChanged = true
-    }
-  })
-  return hasChanged ? mapping : undefined
-}
 
 /**
  * Builds HTTP headers array for a client request.

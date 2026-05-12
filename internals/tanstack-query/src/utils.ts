@@ -1,60 +1,8 @@
 import { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 
-export function getContentTypeInfo(node: ast.OperationNode) {
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
-  const isMultipleContentTypes = contentTypes.length > 1
-  return {
-    contentTypes,
-    isMultipleContentTypes,
-    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
-    defaultContentType: contentTypes[0] ?? 'application/json',
-    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
-  }
-}
-
-export function buildRequestConfigType(node: ast.OperationNode, resolver: PluginTs['resolver']): string {
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
-  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
-  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
-
-  return `${configType} & { ${configProps} }`
-}
-
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
-}
-
-/**
- * Build JSDoc comment lines from an OperationNode.
- */
-export function getComments(node: ast.OperationNode): Array<string> {
-  return [
-    node.description && `@description ${node.description}`,
-    node.summary && `@summary ${node.summary}`,
-    node.deprecated && '@deprecated',
-    `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}`,
-  ].filter((x): x is string => Boolean(x))
-}
-
-/**
- * Resolve error type names from operation responses.
- */
-export function resolveErrorNames(node: ast.OperationNode, tsResolver: PluginTs['resolver']): string[] {
-  return node.responses
-    .filter((r) => {
-      const code = Number.parseInt(r.statusCode, 10)
-      return code >= 400
-    })
-    .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
-}
-
-/**
- * Resolve all status code type names from operation responses (for imports).
- */
-export function resolveStatusCodeNames(node: ast.OperationNode, tsResolver: PluginTs['resolver']): string[] {
-  return node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
 }
 
 /**
