@@ -5,7 +5,7 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
-import { MutationKey, QueryKey } from '../components'
+import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { suspenseInfiniteQueryGenerator } from './suspenseInfiniteQueryGenerator.tsx'
@@ -23,8 +23,8 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
-  queryKey: QueryKey.getTransformer,
-  mutationKey: MutationKey.getTransformer,
+  queryKey: queryKeyTransformer,
+  mutationKey: mutationKeyTransformer,
   query: {
     importPath: '@tanstack/react-query',
     methods: ['get'],

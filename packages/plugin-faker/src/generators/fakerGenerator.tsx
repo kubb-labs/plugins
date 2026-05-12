@@ -1,3 +1,4 @@
+import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -5,15 +6,12 @@ import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import {
-  aliasConflictingImports,
   buildResponseUnionSchema,
   canOverrideSchema,
-  filterUsedImports,
   localeToFakerImport,
   resolveParamNameByLocation,
   resolveSchemaRef,
   resolveTypeReference,
-  rewriteAliasedImports,
 } from '../utils.ts'
 
 export const fakerGenerator = defineGenerator<PluginFaker>({

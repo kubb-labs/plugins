@@ -1,4 +1,5 @@
 import path from 'node:path'
+import { resolveOperationTypeNames } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
@@ -28,15 +29,7 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  const names: Array<string | undefined> = [
-    node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
-    tsResolver.resolveResponseName(node),
-    ...node.parameters.filter((p) => p.in === 'path').map((p) => tsResolver.resolvePathParamsName(node, p)),
-    ...node.parameters.filter((p) => p.in === 'query').map((p) => tsResolver.resolveQueryParamsName(node, p)),
-    ...node.parameters.filter((p) => p.in === 'header').map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-    ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-  ]
-  return names.filter((n): n is string => Boolean(n))
+  return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {

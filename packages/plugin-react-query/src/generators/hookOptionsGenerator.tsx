@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -71,7 +72,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (isInfiniteOp) {
           // Validate queryParam
           const normalizeKey = (key: string) => key.replace(/\?$/, '')
-          const queryParamKeys = node.parameters.filter((p) => p.in === 'query').map((p) => p.name)
+          const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
           const hasQueryParam = nodeInfiniteOptions!.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === nodeInfiniteOptions!.queryParam) : false
 
           if (hasQueryParam) {

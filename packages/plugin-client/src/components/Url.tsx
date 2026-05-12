@@ -1,4 +1,4 @@
-import { buildParamsMapping } from '@internals/shared'
+import { buildParamsMapping, getOperationParameters } from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -30,7 +30,7 @@ type GetParamsProps = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
+export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
   // Build a URL-only node with only path params (no body, query, header)
   const urlNode: ast.OperationNode = {
     ...node,
@@ -59,7 +59,7 @@ export function Url({
 }: Props): KubbReactNode {
   const path = new URLPath(node.path)
 
-  const paramsNode = getParams({
+  const paramsNode = buildUrlParamsNode({
     paramsType,
     paramsCasing,
     pathParamsType,
@@ -68,8 +68,8 @@ export function Url({
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  const originalPathParams = node.parameters.filter((p) => p.in === 'path')
-  const casedPathParams = ast.caseParams(originalPathParams, paramsCasing)
+  const { path: originalPathParams } = getOperationParameters(node)
+  const { path: casedPathParams } = getOperationParameters(node, { paramsCasing })
   const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : undefined
 
   return (
@@ -88,5 +88,3 @@ export function Url({
     </File.Source>
   )
 }
-
-Url.getParams = getParams

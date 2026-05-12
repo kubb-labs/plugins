@@ -4,8 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { buildQueryKeyParams, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -94,7 +93,7 @@ export function QueryOptions({
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
@@ -117,5 +116,3 @@ export function QueryOptions({
     </File.Source>
   )
 }
-
-QueryOptions.getParams = getQueryOptionsParams

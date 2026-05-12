@@ -23,7 +23,7 @@ describe('URLPath', () => {
 
   test('if params is getting returned', () => {
     expect(simplePath.params).toStrictEqual({ userID: 'userID' })
-    expect(simplePath.getParams()).toStrictEqual({ userID: 'userID' })
+    expect(simplePath.toParamsObject()).toStrictEqual({ userID: 'userID' })
   })
   test('if colon-suffix custom method (e.g. :search) is preserved', () => {
     // OpenAPI supports Google-style custom methods: /pet/{petId}:search

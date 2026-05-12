@@ -1,3 +1,4 @@
+import { aliasConflictingImports, rewriteAliasedImports } from '@internals/utils'
 import type { Config } from '@kubb/core'
 import { ast, FileProcessor } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
@@ -7,7 +8,6 @@ import { describe, expect, test } from 'vitest'
 import { format, matchFiles } from '#mocks'
 import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import { aliasConflictingImports, rewriteAliasedImports } from '../utils.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'
 
 const categorySchema = ast.createSchema({

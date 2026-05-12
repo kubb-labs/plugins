@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
@@ -70,8 +71,7 @@ export function Server({ name, serverName, serverVersion, paramsCasing, operatio
 
       {operations
         .map(({ tool, mcp, zod, node }) => {
-          const casedParams = ast.caseParams(node.parameters, paramsCasing)
-          const pathParams = casedParams.filter((p) => p.in === 'path')
+          const { path: pathParams } = getOperationParameters(node, { paramsCasing })
 
           const pathEntries: Array<{ key: string; value: string }> = []
           const otherEntries: Array<{ key: string; value: string }> = []

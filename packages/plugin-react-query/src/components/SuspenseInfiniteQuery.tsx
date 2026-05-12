@@ -1,11 +1,11 @@
+import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { getComments, resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -27,7 +27,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function getParams(
+function buildSuspenseInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
     paramsType: PluginReactQuery['resolvedOptions']['paramsType']
@@ -98,7 +98,7 @@ export function SuspenseInfiniteQuery({
           ? 'boolean'
           : 'unknown'
 
-  const rawQueryParams = node.parameters.filter((p) => p.in === 'query')
+  const rawQueryParams = getOperationParameters(node).query
   const queryParamsTypeName =
     rawQueryParams.length > 0
       ? (() => {
@@ -120,13 +120,20 @@ export function SuspenseInfiniteQuery({
     `TPageParam = ${pageParamType}`,
   ]
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = getParams(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver, pageParamGeneric: 'TPageParam' })
+  const paramsNode = buildSuspenseInfiniteQueryParamsNode(node, {
+    paramsType,
+    paramsCasing,
+    pathParamsType,
+    dataReturnType,
+    resolver: tsResolver,
+    pageParamGeneric: 'TPageParam',
+  })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -152,5 +159,3 @@ export function SuspenseInfiniteQuery({
     </File.Source>
   )
 }
-
-SuspenseInfiniteQuery.getParams = getParams

@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
 import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 
 type Props = {
   name: string
@@ -136,7 +136,7 @@ export function QueryOptions({
   // Transform: wrap non-config params with toValue(), add signal to config
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
@@ -189,5 +189,3 @@ function addToValueCalls(callStr: string): string {
 
   return result
 }
-
-QueryOptions.getParams = getQueryOptionsParams

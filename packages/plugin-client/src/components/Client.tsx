@@ -1,4 +1,4 @@
-import { buildOperationComments, buildParamsMapping, buildRequestConfigType, getContentTypeInfo } from '@internals/shared'
+import { buildOperationComments, buildParamsMapping, buildRequestConfigType, getContentTypeInfo, getOperationParameters } from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -8,7 +8,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { Url } from './Url.tsx'
+import { buildUrlParamsNode } from './Url.tsx'
 
 type Props = {
   name: string
@@ -41,7 +41,14 @@ type GetParamsProps = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-function getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
+export function buildClientParamsNode({
+  paramsType,
+  paramsCasing,
+  pathParamsType,
+  node,
+  tsResolver,
+  isConfigurable,
+}: GetParamsProps): ast.FunctionParametersNode {
   return ast.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
@@ -86,12 +93,8 @@ export function Client({
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
 
-  const originalPathParams = node.parameters.filter((p) => p.in === 'path')
-  const casedPathParams = ast.caseParams(originalPathParams, paramsCasing)
-  const originalQueryParams = node.parameters.filter((p) => p.in === 'query')
-  const casedQueryParams = ast.caseParams(originalQueryParams, paramsCasing)
-  const originalHeaderParams = node.parameters.filter((p) => p.in === 'header')
-  const casedHeaderParams = ast.caseParams(originalHeaderParams, paramsCasing)
+  const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
+  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing })
 
   const pathParamsMapping = paramsCasing && !urlName ? buildParamsMapping(originalPathParams, casedPathParams) : undefined
   const queryParamsMapping = paramsCasing ? buildParamsMapping(originalQueryParams, casedQueryParams) : undefined
@@ -120,7 +123,7 @@ export function Client({
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const generics = [responseName, TError, requestName || 'unknown'].filter(Boolean)
-  const paramsNode = getParams({
+  const paramsNode = buildClientParamsNode({
     paramsType,
     paramsCasing,
     pathParamsType,
@@ -130,7 +133,7 @@ export function Client({
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  const urlParamsNode = Url.getParams({
+  const urlParamsNode = buildUrlParamsNode({
     paramsType,
     paramsCasing,
     pathParamsType,
@@ -256,5 +259,3 @@ export function Client({
     </>
   )
 }
-
-Client.getParams = getParams

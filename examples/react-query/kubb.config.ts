@@ -1,6 +1,6 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { URLPath } from '@kubb/core'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
-import { QueryKey } from '@kubb/plugin-react-query/components'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
 
@@ -95,9 +95,17 @@ export const config = {
       group: {
         type: 'path',
       },
-      queryKey(props) {
-        const keys = QueryKey.getTransformer(props)
-        return ['"v5"', ...keys]
+      queryKey({ node, casing }) {
+        const path = new URLPath(node.path, { casing })
+        const hasQueryParams = node.parameters?.some((p) => p.in === 'query') ?? false
+        const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
+
+        return [
+          '"v5"',
+          path.toObject({ type: 'path', stringify: true }),
+          hasQueryParams ? '...(params ? [params] : [])' : undefined,
+          hasRequestBody ? '...(data ? [data] : [])' : undefined,
+        ].filter(Boolean) as [string, ...string[]]
       },
       customOptions: {
         importPath: '../../../useCustomHookOptions.ts',

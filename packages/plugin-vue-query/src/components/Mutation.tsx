@@ -4,8 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { buildMutationArgParams, buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
-import { MutationKey } from './MutationKey.tsx'
+import { buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -24,7 +23,22 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
-function getParams(
+function createMutationArgParams(
+  node: ast.OperationNode,
+  options: {
+    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
+    resolver: ResolverTs
+  },
+): ast.FunctionParametersNode {
+  return ast.createOperationParams(node, {
+    paramsType: 'inline',
+    pathParamsType: 'inline',
+    paramsCasing: options.paramsCasing,
+    resolver: options.resolver,
+  })
+}
+
+function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
     paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
@@ -39,14 +53,23 @@ function getParams(
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
+  const mutationArgParamsNode = createMutationArgParams(node, { paramsCasing, resolver })
 
   // Vue-query uses MutationObserverOptions instead of UseMutationOptions, and wraps params with MaybeRefOrGetter
   const mutationArgWrapped = mutationArgParamsNode.params.map((param) => {
-    const fp = param as ast.FunctionParameterNode
+    if (param.kind === 'ParameterGroup') {
+      return {
+        ...param,
+        properties: param.properties.map((property) => ({
+          ...property,
+          type: property.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(property.type)}>` }) : property.type,
+        })),
+      }
+    }
+
     return {
-      ...fp,
-      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
+      ...param,
+      type: param.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(param.type)}>` }) : param.type,
     }
   })
   const wrappedParamsNode = ast.createFunctionParameters({ params: mutationArgWrapped })
@@ -101,7 +124,7 @@ export function Mutation({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = buildMutationArgParams(node, {
+  const mutationArgParamsNode = createMutationArgParams(node, {
     paramsCasing,
     resolver: tsResolver,
   })
@@ -111,7 +134,7 @@ export function Mutation({
 
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
 
-  const mutationKeyParamsNode = MutationKey.getParams()
+  const mutationKeyParamsNode = ast.createFunctionParameters({ params: [] })
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
 
   const clientCallParamsNode = ast.createOperationParams(node, {
@@ -132,7 +155,7 @@ export function Mutation({
   })
   const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
 
-  const paramsNode = getParams(node, { paramsCasing, dataReturnType, resolver: tsResolver })
+  const paramsNode = buildMutationParamsNode(node, { paramsCasing, dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -155,5 +178,3 @@ export function Mutation({
     </File.Source>
   )
 }
-
-Mutation.getParams = getParams

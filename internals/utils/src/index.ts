@@ -1,5 +1,6 @@
 export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
 export { getRelativePath } from './fs.ts'
+export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'
 export { buildJSDoc } from './jsdoc.ts'
 export { getUniqueName } from './names.ts'
 export { getNestedAccessor, stringify, stringifyObject } from './object.ts'
