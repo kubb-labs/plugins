@@ -14,89 +14,89 @@ function capitalize(name: string): string {
  * @example
  * `resolverReactQuery.default('list pets', 'function')  // → 'listPets'`
  */
-export const resolverReactQuery = defineResolver<PluginReactQuery>((ctx) => ({
+export const resolverReactQuery = defineResolver<PluginReactQuery>(() => ({
   name: 'default',
   pluginName: 'plugin-react-query',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })
   },
   resolveName(name) {
-    return ctx.default(name, 'function')
+    return this.default(name, 'function')
   },
   resolvePathName(name, type) {
-    return ctx.default(name, type)
+    return this.default(name, type)
   },
   resolveQueryName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}`
+    return `use${capitalize(this.resolveName(node.operationId))}`
   },
   resolveSuspenseQueryName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}Suspense`
+    return `use${capitalize(this.resolveName(node.operationId))}Suspense`
   },
   resolveInfiniteQueryName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}Infinite`
+    return `use${capitalize(this.resolveName(node.operationId))}Infinite`
   },
   resolveSuspenseInfiniteQueryName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}SuspenseInfinite`
+    return `use${capitalize(this.resolveName(node.operationId))}SuspenseInfinite`
   },
   resolveMutationName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}`
+    return `use${capitalize(this.resolveName(node.operationId))}`
   },
   resolveQueryOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}QueryOptions`
+    return `${this.resolveName(node.operationId)}QueryOptions`
   },
   resolveSuspenseQueryOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}SuspenseQueryOptions`
+    return `${this.resolveName(node.operationId)}SuspenseQueryOptions`
   },
   resolveInfiniteQueryOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}InfiniteQueryOptions`
+    return `${this.resolveName(node.operationId)}InfiniteQueryOptions`
   },
   resolveSuspenseInfiniteQueryOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}SuspenseInfiniteQueryOptions`
+    return `${this.resolveName(node.operationId)}SuspenseInfiniteQueryOptions`
   },
   resolveMutationOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}MutationOptions`
+    return `${this.resolveName(node.operationId)}MutationOptions`
   },
   resolveQueryKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}QueryKey`
+    return `${this.resolveName(node.operationId)}QueryKey`
   },
   resolveSuspenseQueryKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}SuspenseQueryKey`
+    return `${this.resolveName(node.operationId)}SuspenseQueryKey`
   },
   resolveInfiniteQueryKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}InfiniteQueryKey`
+    return `${this.resolveName(node.operationId)}InfiniteQueryKey`
   },
   resolveSuspenseInfiniteQueryKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}SuspenseInfiniteQueryKey`
+    return `${this.resolveName(node.operationId)}SuspenseInfiniteQueryKey`
   },
   resolveMutationKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}MutationKey`
+    return `${this.resolveName(node.operationId)}MutationKey`
   },
   resolveQueryKeyTypeName(node) {
-    return `${capitalize(ctx.resolveName(node.operationId))}QueryKey`
+    return `${capitalize(this.resolveName(node.operationId))}QueryKey`
   },
   resolveSuspenseQueryKeyTypeName(node) {
-    return `${capitalize(ctx.resolveName(node.operationId))}SuspenseQueryKey`
+    return `${capitalize(this.resolveName(node.operationId))}SuspenseQueryKey`
   },
   resolveInfiniteQueryKeyTypeName(node) {
-    return `${capitalize(ctx.resolveName(node.operationId))}InfiniteQueryKey`
+    return `${capitalize(this.resolveName(node.operationId))}InfiniteQueryKey`
   },
   resolveSuspenseInfiniteQueryKeyTypeName(node) {
-    return `${capitalize(ctx.resolveName(node.operationId))}SuspenseInfiniteQueryKey`
+    return `${capitalize(this.resolveName(node.operationId))}SuspenseInfiniteQueryKey`
   },
   resolveMutationTypeName(node) {
-    return capitalize(ctx.resolveName(node.operationId))
+    return capitalize(this.resolveName(node.operationId))
   },
   resolveClientName(node) {
-    return ctx.resolveName(node.operationId)
+    return this.resolveName(node.operationId)
   },
   resolveSuspenseClientName(node) {
-    return `${ctx.resolveName(node.operationId)}Suspense`
+    return `${this.resolveName(node.operationId)}Suspense`
   },
   resolveInfiniteClientName(node) {
-    return `${ctx.resolveName(node.operationId)}Infinite`
+    return `${this.resolveName(node.operationId)}Infinite`
   },
   resolveSuspenseInfiniteClientName(node) {
-    return `${ctx.resolveName(node.operationId)}SuspenseInfinite`
+    return `${this.resolveName(node.operationId)}SuspenseInfinite`
   },
   resolveHookOptionsName() {
     return 'HookOptions'

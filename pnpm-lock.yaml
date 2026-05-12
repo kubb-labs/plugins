@@ -28,7 +28,7 @@ catalogs:
       specifier: ^12.1.0
       version: 12.1.0
     '@types/node':
-      specifier: ^22.19.18
+      specifier: ^22.19.17
       version: 22.19.18
     '@types/react':
       specifier: ^19.2.14
@@ -187,7 +187,7 @@ importers:
         version: 1.29.0(zod@4.4.3)
       '@tanstack/query-core':
         specifier: ^5.100.9
-        version: 5.100.10
+        version: 5.100.9
       '@tanstack/react-query':
         specifier: ^5.100.9
         version: 5.100.9(react@19.2.6)
@@ -2121,8 +2121,8 @@ packages:
   '@redocly/config@0.48.1':
     resolution: {integrity: sha512-vq8GM3e0KiglqkwE5Lb9XayrmZY4dHCs21BsvV92yAZN68f1N9cZUuwY1SwnztPbH06dn9uLzubBl/JNfImqfA==}
 
-  '@redocly/openapi-core@2.30.4':
-    resolution: {integrity: sha512-23Mg0EPaczaxnbcLokUwY6fnzWhldc84XBvEMn4sOc6iV/TtroNmWx70WttT6Xs6dBUNeFUVZEI7MlKAmZRvcw==}
+  '@redocly/openapi-core@2.30.5':
+    resolution: {integrity: sha512-ikljMaow1wX3GoRvLiJvqOq8H3f6XsuMBZqCGmeY0+UPmlnVhrvW8m/gC1vkKcGNvYINUrgi/Z6dBtzQ7854wA==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/binding-android-arm64@1.0.0':
@@ -2344,9 +2344,6 @@ packages:
   '@tanstack/match-sorter-utils@8.19.4':
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
     engines: {node: '>=12'}
-
-  '@tanstack/query-core@5.100.10':
-    resolution: {integrity: sha512-8UR0yJR+GiQ40m3lPhUr0xbfAupe6GSQiksSBSa9SM2NjezFyxXCIA69/lz8cSoNKZLrw1/PktIyQBJcVeMi3w==}
 
   '@tanstack/query-core@5.100.9':
     resolution: {integrity: sha512-SJSFw1S8+kQ0+knv/XGfrbocWoAlT7vDKsSImtLx3ZPQmEcR46hkDjLSvynSy25N8Ms4tIEini1FuBd5k7IscQ==}
@@ -5835,7 +5832,7 @@ snapshots:
   '@kubb/adapter-oas@5.0.0-beta.7(@kubb/renderer-jsx@5.0.0-beta.7)':
     dependencies:
       '@kubb/core': 5.0.0-beta.7(@kubb/renderer-jsx@5.0.0-beta.7)
-      '@redocly/openapi-core': 2.30.4
+      '@redocly/openapi-core': 2.30.5
       oas: 32.1.18
       oas-normalize: 16.0.4
       swagger2openapi: 7.0.8
@@ -6201,7 +6198,7 @@ snapshots:
     dependencies:
       json-schema-to-ts: 2.7.2
 
-  '@redocly/openapi-core@2.30.4':
+  '@redocly/openapi-core@2.30.5':
     dependencies:
       '@redocly/ajv': 8.18.3
       '@redocly/config': 0.48.1
@@ -6333,8 +6330,6 @@ snapshots:
   '@tanstack/match-sorter-utils@8.19.4':
     dependencies:
       remove-accents: 0.5.0
-
-  '@tanstack/query-core@5.100.10': {}
 
   '@tanstack/query-core@5.100.9': {}
 
