@@ -56,7 +56,7 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'mcp', barrelType: 'named' }"
+    default: "{ path: 'mcp', barrel: { type: 'named' } }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - name: path
@@ -66,13 +66,11 @@ options:
         tip: |
           if `output.path` is a file, `group` cannot be used.
         default: "'mcp'"
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
+      - name: barrel
+        type: "{ type: 'named' | 'all', nested?: boolean } | false"
         required: false
-        default: "'named'"
-        description: Specify what to export and optionally disable barrel-file generation.
-        tip: |
-          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        default: "{ type: 'named' }"
+        description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
         examples:
           - name: all
             files:
@@ -85,11 +83,6 @@ options:
               - lang: typescript
                 code: |
                   export { PetService } from './gen/petService.ts'
-                twoslash: false
-          - name: propagate
-            files:
-              - lang: typescript
-                code: ''
                 twoslash: false
           - name: 'false'
             files:
@@ -456,7 +449,7 @@ examples:
               pluginClient(),
               pluginZod(),
               pluginMcp({
-                output: { path: 'mcp', barrelType: 'named' },
+                output: { path: 'mcp', barrel: { type: 'named' } },
                 client: {
                   baseURL: 'https://petstore.swagger.io/v2',
                 },
