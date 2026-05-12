@@ -1,5 +1,6 @@
 import path from 'node:path'
-import { ast, defineGenerator } from '@kubb/core'
+import { resolveOperationTypeNames } from '@internals/shared'
+import { defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
@@ -20,23 +21,10 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const casedParams = ast.caseParams(node.parameters, paramsCasing)
-
-    const pathParams = casedParams.filter((p) => p.in === 'path')
-    const queryParams = casedParams.filter((p) => p.in === 'query')
-    const headerParams = casedParams.filter((p) => p.in === 'header')
-
-    const importedTypeNames = [
-      ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
-      ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
-      ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-      node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
-      tsResolver.resolveResponseName(node),
-      ...node.responses.filter((r) => Number(r.statusCode) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode)),
-    ].filter((name): name is string => Boolean(name))
+    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing, responseStatusNames: 'error' })
 
     const meta = {
-      name: resolver.resolveName(node.operationId),
+      name: resolver.resolveHandlerName(node),
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },

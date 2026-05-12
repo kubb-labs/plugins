@@ -89,19 +89,6 @@ options:
   - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginMsw>>'
 
-  - name: transformers
-    type: object
-    required: false
-    description: Customize the generated names based on the type provided by the plugin.
-    properties:
-      - name: name
-        type: '(name: string, type?: ResolveType) => string'
-        required: false
-        description: Customize the names based on the type that is provided by the plugin.
-        codeBlock:
-          lang: typescript
-          code: |
-            type ResolveType = 'file' | 'function' | 'type' | 'const'
 examples:
   - name: kubb.config.ts
     files:

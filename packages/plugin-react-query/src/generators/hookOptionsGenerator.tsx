@@ -1,9 +1,10 @@
+import { getOperationParameters } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { difference } from 'remeda'
 import type { PluginReactQuery } from '../types'
-import { resolveOperationOverrides, transformName } from '../utils.ts'
+import { resolveOperationOverrides } from '../utils.ts'
 
 type QueryOption = PluginReactQuery['resolvedOptions']['query']
 type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
@@ -13,24 +14,22 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { resolver, config, root, adapter } = ctx
-    const { output, customOptions, query, mutation, suspense, infinite, group, transformers, override } = ctx.options
+    const { output, customOptions, query, mutation, suspense, infinite, group, override } = ctx.options
 
     if (!customOptions) return null
 
-    const resolvedFile = resolver.resolveFile({ name: 'HookOptions', extname: '.ts' }, { root, output, group })
+    const name = resolver.resolveHookOptionsName()
+    const resolvedFile = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
     const hookOptionsFile = {
       ...resolvedFile,
-      baseName: 'HookOptions.ts' as const,
-      path: resolvedFile.path.replace(/hookOptions\.ts$/, 'HookOptions.ts'),
+      baseName: `${name}.ts` as const,
+      path: resolvedFile.path.replace(/[^/\\]+\.ts$/, `${name}.ts`),
     }
-
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
     const imports: KubbReactNode[] = []
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {
-      const baseName = resolver.resolveName(node.operationId)
       const opOverrides = resolveOperationOverrides(node, override)
       const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
       const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation
@@ -50,8 +49,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       const isInfiniteOp = !!nodeInfiniteOptions
 
       if (isQueryOp) {
-        const queryOptionsName = transformName(`${baseName}QueryOptions`, 'function', transformers)
-        const queryHookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
+        const queryOptionsName = resolver.resolveQueryOptionsName(node)
+        const queryHookName = resolver.resolveQueryName(node)
         const queryHookFile = resolver.resolveFile(
           { name: queryHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
           { root, output, group },
@@ -60,8 +59,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         hookOptions[queryHookName] = `Partial<ReturnType<typeof ${queryOptionsName}>>`
 
         if (isSuspenseOp) {
-          const suspenseOptionsName = transformName(`${baseName}SuspenseQueryOptions`, 'function', transformers)
-          const suspenseHookName = transformName(`use${capitalize(baseName)}Suspense`, 'function', transformers)
+          const suspenseOptionsName = resolver.resolveSuspenseQueryOptionsName(node)
+          const suspenseHookName = resolver.resolveSuspenseQueryName(node)
           const suspenseHookFile = resolver.resolveFile(
             { name: suspenseHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
             { root, output, group },
@@ -73,12 +72,12 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         if (isInfiniteOp) {
           // Validate queryParam
           const normalizeKey = (key: string) => key.replace(/\?$/, '')
-          const queryParamKeys = node.parameters.filter((p) => p.in === 'query').map((p) => p.name)
+          const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
           const hasQueryParam = nodeInfiniteOptions!.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === nodeInfiniteOptions!.queryParam) : false
 
           if (hasQueryParam) {
-            const infiniteOptionsName = transformName(`${baseName}InfiniteQueryOptions`, 'function', transformers)
-            const infiniteHookName = transformName(`use${capitalize(baseName)}Infinite`, 'function', transformers)
+            const infiniteOptionsName = resolver.resolveInfiniteQueryOptionsName(node)
+            const infiniteHookName = resolver.resolveInfiniteQueryName(node)
             const infiniteHookFile = resolver.resolveFile(
               { name: infiniteHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
               { root, output, group },
@@ -87,8 +86,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
             hookOptions[infiniteHookName] = `Partial<ReturnType<typeof ${infiniteOptionsName}>>`
 
             if (isSuspenseOp) {
-              const suspenseInfiniteOptionsName = transformName(`${baseName}SuspenseInfiniteQueryOptions`, 'function', transformers)
-              const suspenseInfiniteHookName = transformName(`use${capitalize(baseName)}SuspenseInfinite`, 'function', transformers)
+              const suspenseInfiniteOptionsName = resolver.resolveSuspenseInfiniteQueryOptionsName(node)
+              const suspenseInfiniteHookName = resolver.resolveSuspenseInfiniteQueryName(node)
               const suspenseInfiniteHookFile = resolver.resolveFile(
                 { name: suspenseInfiniteHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
                 { root, output, group },
@@ -101,8 +100,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       }
 
       if (isMutationOp) {
-        const mutationOptionsName = transformName(`${baseName}MutationOptions`, 'function', transformers)
-        const mutationHookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
+        const mutationOptionsName = resolver.resolveMutationOptionsName(node)
+        const mutationHookName = resolver.resolveMutationName(node)
         const mutationHookFile = resolver.resolveFile(
           { name: mutationHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
           { root, output, group },
@@ -111,8 +110,6 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         hookOptions[mutationHookName] = `Partial<ReturnType<typeof ${mutationOptionsName}>>`
       }
     }
-
-    const name = 'HookOptions'
 
     return (
       <File

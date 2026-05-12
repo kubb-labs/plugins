@@ -1,21 +1,15 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0-beta.4",
-  "description": "Cypress test generator plugin for Kubb, creating end-to-end tests from OpenAPI specifications for automated API testing.",
+  "version": "5.0.0-beta.6",
+  "description": "Generate Cypress request commands and e2e test fixtures from your OpenAPI specification, enabling automated API testing with zero manual setup.",
   "keywords": [
-    "api-testing",
-    "code-generator",
+    "code-generation",
     "codegen",
     "cypress",
     "e2e-testing",
-    "end-to-end",
-    "integration-testing",
     "kubb",
-    "oas",
     "openapi",
-    "plugins",
     "swagger",
-    "test-automation",
     "test-generation",
     "testing",
     "typescript"
@@ -69,6 +63,7 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {

@@ -30,7 +30,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "@mswjs/http-middleware": "^0.10.3",
     "kubb": "catalog:",
-    "msw": "^2.14.4",
+    "msw": "^2.14.5",
     "react": "^19.2.6"
   },
   "devDependencies": {

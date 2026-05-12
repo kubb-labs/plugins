@@ -1,3 +1,4 @@
+import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
 import { buildJSDoc, URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -6,17 +7,8 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginClient } from '../types.ts'
-import {
-  buildClassClientParams,
-  buildFormDataLine,
-  buildGenerics,
-  buildHeaders,
-  buildRequestDataLine,
-  buildReturnStatement,
-  getComments,
-  getContentTypeInfo,
-} from '../utils.ts'
-import { Client } from './Client.tsx'
+import { buildClassClientParams, buildFormDataLine, buildGenerics, buildHeaders, buildRequestDataLine, buildReturnStatement } from '../utils.ts'
+import { buildClientParamsNode } from './Client.tsx'
 
 type OperationData = {
   node: ast.OperationNode
@@ -69,16 +61,14 @@ function generateMethod({
   const path = new URLPath(node.path, { casing: paramsCasing })
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
-  const headerParamsName =
-    node.parameters.filter((p) => p.in === 'header').length > 0
-      ? tsResolver.resolveHeaderParamsName(node, node.parameters.filter((p) => p.in === 'header')[0]!)
-      : undefined
+  const { header: headerParams } = getOperationParameters(node)
+  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : undefined
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
   const generics = buildGenerics(node, tsResolver)
-  const paramsNode = ClassClient.getParams({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
+  const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers })
-  const jsdoc = buildJSDoc(getComments(node))
+  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
   const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
@@ -144,4 +134,3 @@ ${methods.join('\n\n')}
     </File.Source>
   )
 }
-ClassClient.getParams = Client.getParams

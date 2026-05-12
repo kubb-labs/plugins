@@ -1,5 +1,6 @@
 import path from 'node:path'
-import { camelCase, pascalCase } from '@internals/utils'
+import { resolveOperationTypeNames } from '@internals/shared'
+import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -26,15 +27,7 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  const names: Array<string | undefined> = [
-    node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
-    tsResolver.resolveResponseName(node),
-    ...node.parameters.filter((p) => p.in === 'path').map((p) => tsResolver.resolvePathParamsName(node, p)),
-    ...node.parameters.filter((p) => p.in === 'query').map((p) => tsResolver.resolveQueryParamsName(node, p)),
-    ...node.parameters.filter((p) => p.in === 'header').map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-    ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-  ]
-  return names.filter((n): n is string => Boolean(n))
+  return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
@@ -86,10 +79,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
     const controllers = nodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
-      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? pascalCase(tag)) : 'Client'
+      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
       if (!tag && !group) {
-        const name = 'ApiClient'
+        const name = resolver.resolveClassName('ApiClient')
         const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)

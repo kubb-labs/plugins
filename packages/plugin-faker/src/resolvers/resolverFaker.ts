@@ -79,6 +79,9 @@ export const resolverFaker = defineResolver<PluginFaker>((ctx) => {
     resolveResponseName(node) {
       return ctx.resolveName(`${node.operationId} Response`)
     },
+    resolveResponsesName(node) {
+      return ctx.resolveName(`${node.operationId} Responses`)
+    },
     resolvePathParamsName(node, param) {
       return ctx.resolveParamName(node, param)
     },

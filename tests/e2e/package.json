@@ -36,9 +36,9 @@
     "axios": "^1.16.0",
     "cypress": "^15.14.2",
     "kubb": "catalog:",
-    "msw": "^2.14.4",
-    "oxfmt": "^0.45.0",
-    "oxlint": "^1.63.0",
+    "msw": "^2.14.5",
+    "oxfmt": "catalog:",
+    "oxlint": "catalog:",
     "react": "^19.2.6",
     "vue": "^3.5.34",
     "zod": "^4.4.3"

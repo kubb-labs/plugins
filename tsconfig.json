@@ -6,6 +6,7 @@
     "types": ["bun-types"],
     "paths": {
       "#mocks": ["./configs/mocks.ts"],
+      "@internals/shared": ["./internals/shared/src/index.ts"],
       "@internals/utils": ["./internals/utils/src/index.ts"],
       "@internals/tanstack-query": ["./internals/tanstack-query/src/index.ts"],
       "@kubb/plugin-ts/components": ["./packages/plugin-ts/src/components/index.ts"],

@@ -15,17 +15,13 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-function getParams(): ast.FunctionParametersNode {
-  return ast.createFunctionParameters({ params: [] })
-}
-
-const getTransformer: Transformer = ({ node, casing }) => {
+export const mutationKeyTransformer: Transformer = ({ node, casing }) => {
   const path = new URLPath(node.path, { casing })
   return [`{ url: '${path.toURLPath()}' }`]
 }
 
-export function MutationKey({ name, paramsCasing, node, transformer = getTransformer }: Props): KubbReactNode {
-  const paramsNode = getParams()
+export function MutationKey({ name, paramsCasing, node, transformer = mutationKeyTransformer }: Props): KubbReactNode {
+  const paramsNode = ast.createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({ node, casing: paramsCasing })
 
@@ -37,6 +33,3 @@ export function MutationKey({ name, paramsCasing, node, transformer = getTransfo
     </File.Source>
   )
 }
-
-MutationKey.getParams = getParams
-MutationKey.getTransformer = getTransformer

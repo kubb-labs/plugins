@@ -3,9 +3,9 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildEnabledCheck } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { buildQueryKeyParams, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -52,26 +52,6 @@ export function getQueryOptionsParams(
   })
 }
 
-export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
-  const required: string[] = []
-  for (const param of paramsNode.params) {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      for (const child of group.properties) {
-        if (!child.optional && child.default === undefined) {
-          required.push(child.name)
-        }
-      }
-    } else {
-      const fp = param as ast.FunctionParameterNode
-      if (!fp.optional && fp.default === undefined) {
-        required.push(fp.name)
-      }
-    }
-  }
-  return required.join(' && ')
-}
-
 export function QueryOptions({
   name,
   clientName,
@@ -94,7 +74,7 @@ export function QueryOptions({
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
@@ -117,5 +97,3 @@ export function QueryOptions({
     </File.Source>
   )
 }
-
-QueryOptions.getParams = getQueryOptionsParams

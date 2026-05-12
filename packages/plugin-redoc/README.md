@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Plugin Redoc</h1>
+  <h1>@kubb/plugin-redoc</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/typescript" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/redoc" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,11 +21,31 @@
 </h4>
 </div>
 
-Create beautiful docs with Redoc.
+`@kubb/plugin-redoc` generates a ReDoc API reference page from your OpenAPI specification. The output is a standalone HTML file you can host without a build step or server.
+
+## Features
+
+- Produces a self-contained HTML file with the ReDoc three-panel layout
+- Supports theming and branding via ReDoc configuration options
+- Works with any valid OpenAPI 3.0 or 3.1 specification
+
+## Installation
+
+```bash
+bun add @kubb/plugin-redoc
+# or
+pnpm add @kubb/plugin-redoc
+# or
+npm install @kubb/plugin-redoc
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/redoc) for configuration options and examples.
 
 ## Supporting Kubb
 
-Kubb uses an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 

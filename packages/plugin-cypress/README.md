@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Plugin Cypress</h1>
+  <h1>@kubb/plugin-cypress</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/cypress" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/cypress" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,11 +21,31 @@
 </h4>
 </div>
 
-Swagger integration to create Cypress requests commands.
+`@kubb/plugin-cypress` generates Cypress request commands from your OpenAPI specification. Each operation in the spec becomes a typed Cypress command, ready to use in your test files.
+
+## Features
+
+- Generates Cypress request commands for each OpenAPI operation
+- Infers request and response types from OpenAPI schemas
+- Works with `@kubb/plugin-ts` for typed test utilities
+
+## Installation
+
+```bash
+bun add @kubb/plugin-cypress
+# or
+pnpm add @kubb/plugin-cypress
+# or
+npm install @kubb/plugin-cypress
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/cypress) for configuration options and examples.
 
 ## Supporting Kubb
 
-Kubb uses an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 

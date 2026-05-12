@@ -1,21 +1,22 @@
+import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
-import { getResponseTypes, getSuccessResponses, resolveFakerMeta, transformName } from '../utils.ts'
+import { resolveFakerMeta } from '../utils.ts'
 
 export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
   renderer: jsxRenderer,
   operation(node, ctx) {
     const { driver, resolver, config, root, adapter } = ctx
-    const { output, parser, baseURL, group, transformers } = ctx.options
+    const { output, parser, baseURL, group } = ctx.options
 
     const fileName = resolver.resolveName(node.operationId)
     const mock = {
-      name: transformName(fileName, 'function', transformers),
+      name: resolver.resolveHandlerName(node),
       file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     }
 
@@ -42,8 +43,8 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       responseName: tsResolver.resolveResponseName(node),
     }
 
-    const types = getResponseTypes(node, tsResolver)
-    const successResponses = getSuccessResponses(node)
+    const types = resolveResponseTypes(node, tsResolver)
+    const successResponses = getOperationSuccessResponses(node)
     const hasSuccessSchema = successResponses.some((response) => !!response.schema)
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined

@@ -1,9 +1,10 @@
+import { getPrimarySuccessResponse } from '@internals/shared'
 import { URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { getContentType, getMswMethod, getMswUrl, getPrimarySuccessResponse, hasResponseSchema } from '../utils.ts'
+import { getContentType, getMswMethod, getMswUrl, hasResponseSchema } from '../utils.ts'
 
 type Props = {
   name: string

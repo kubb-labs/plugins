@@ -1,19 +1,16 @@
 {
   "name": "@kubb/plugin-ts",
-  "version": "5.0.0-beta.4",
-  "description": "TypeScript code generation plugin for Kubb, transforming OpenAPI schemas into TypeScript interfaces, types, and utility functions.",
+  "version": "5.0.0-beta.6",
+  "description": "Generate TypeScript types, interfaces, and enums from your OpenAPI specification. The foundational plugin that powers type safety across the entire Kubb ecosystem.",
   "keywords": [
-    "code-generator",
+    "code-generation",
     "codegen",
+    "enums",
     "interfaces",
     "kubb",
-    "oas",
     "openapi",
-    "plugins",
     "swagger",
-    "type-definitions",
     "type-generation",
-    "type-safe",
     "types",
     "typescript"
   ],
@@ -67,6 +64,7 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {

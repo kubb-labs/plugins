@@ -9,12 +9,120 @@ export type { Transformer } from '@internals/tanstack-query'
  */
 export type ResolverReactQuery = Resolver & {
   /**
-   * Resolves the hook function name for an operation.
+   * Resolves the base function name for an operation.
    *
-   * @example Resolving hook names
+   * @example Resolving base operation names
    * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverReactQuery, name: string): string
+  /**
+   * Resolves the output file name for a hook module.
+   */
+  resolvePathName(this: ResolverReactQuery, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+  /**
+   * Resolves a query hook function name.
+   */
+  resolveQueryName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves a suspense query hook function name.
+   */
+  resolveSuspenseQueryName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves an infinite query hook function name.
+   */
+  resolveInfiniteQueryName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves a suspense infinite query hook function name.
+   */
+  resolveSuspenseInfiniteQueryName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves a mutation hook function name.
+   */
+  resolveMutationName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the query options helper name.
+   */
+  resolveQueryOptionsName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the suspense query options helper name.
+   */
+  resolveSuspenseQueryOptionsName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the infinite query options helper name.
+   */
+  resolveInfiniteQueryOptionsName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the suspense infinite query options helper name.
+   */
+  resolveSuspenseInfiniteQueryOptionsName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the mutation options helper name.
+   */
+  resolveMutationOptionsName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the query key helper name.
+   */
+  resolveQueryKeyName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the suspense query key helper name.
+   */
+  resolveSuspenseQueryKeyName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the infinite query key helper name.
+   */
+  resolveInfiniteQueryKeyName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the suspense infinite query key helper name.
+   */
+  resolveSuspenseInfiniteQueryKeyName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the mutation key helper name.
+   */
+  resolveMutationKeyName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the query key type name.
+   */
+  resolveQueryKeyTypeName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the suspense query key type name.
+   */
+  resolveSuspenseQueryKeyTypeName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the infinite query key type name.
+   */
+  resolveInfiniteQueryKeyTypeName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the suspense infinite query key type name.
+   */
+  resolveSuspenseInfiniteQueryKeyTypeName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the mutation type name.
+   */
+  resolveMutationTypeName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the client function name generated inline by query hooks.
+   */
+  resolveClientName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the client function name generated inline by suspense query hooks.
+   */
+  resolveSuspenseClientName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the client function name generated inline by infinite query hooks.
+   */
+  resolveInfiniteClientName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the client function name generated inline by suspense infinite query hooks.
+   */
+  resolveSuspenseInfiniteClientName(this: ResolverReactQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the generated custom hook options map type name.
+   */
+  resolveHookOptionsName(this: ResolverReactQuery): string
+  /**
+   * Resolves the helper function name used inside the custom hook options file.
+   */
+  resolveCustomHookOptionsName(this: ResolverReactQuery): string
 }
 
 type Suspense = object
@@ -171,12 +279,6 @@ export type Options = {
    * Parser to use for validating response data.
    */
   parser?: PluginClient['options']['parser']
-  transformers?: {
-    /**
-     * Override the default naming for hooks.
-     */
-    name?: (name: string, type?: string) => string
-  }
   /**
    * Override naming conventions for function names and types.
    */
@@ -213,7 +315,6 @@ type ResolvedOptions = {
   mutation: NonNullable<Required<Mutation>> | false
   customOptions: NonNullable<Required<CustomOptions>> | undefined
   resolver: ResolverReactQuery
-  transformers: NonNullable<Options['transformers']>
 }
 
 export type PluginReactQuery = PluginFactoryOptions<'plugin-react-query', Options, ResolvedOptions, ResolverReactQuery>

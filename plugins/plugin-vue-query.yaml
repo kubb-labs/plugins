@@ -326,18 +326,6 @@ options:
   - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginVueQuery>>'
 
-  - extends: ./_shared/core/transformer.yaml
-    name: transformers
-    properties:
-      - name: name
-        type: '(name: string, type?: ResolveType) => string'
-        required: false
-        description: Customize the names based on the type that is provided by the plugin.
-        codeBlock:
-          lang: typescript
-          code: |
-            type ResolveType = 'file' | 'function' | 'type' | 'const'
-
   - name: resolver
     type: 'Partial<ResolverVueQuery>'
     required: false

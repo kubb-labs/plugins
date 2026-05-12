@@ -1,60 +1,56 @@
 import { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 
-export function getContentTypeInfo(node: ast.OperationNode) {
-  const contentTypes = node.requestBody?.content?.map((e) => e.contentType) ?? []
-  const isMultipleContentTypes = contentTypes.length > 1
-  return {
-    contentTypes,
-    isMultipleContentTypes,
-    contentTypeUnion: isMultipleContentTypes ? contentTypes.map((ct) => JSON.stringify(ct)).join(' | ') : '',
-    defaultContentType: contentTypes[0] ?? 'application/json',
-    hasFormData: contentTypes.some((ct) => ct === 'multipart/form-data'),
-  }
-}
-
-export function buildRequestConfigType(node: ast.OperationNode, resolver: PluginTs['resolver']): string {
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
-  const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
-  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
-
-  return `${configType} & { ${configProps} }`
-}
-
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
 }
 
-/**
- * Build JSDoc comment lines from an OperationNode.
- */
-export function getComments(node: ast.OperationNode): Array<string> {
-  return [
-    node.description && `@description ${node.description}`,
-    node.summary && `@summary ${node.summary}`,
-    node.deprecated && '@deprecated',
-    `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}`,
-  ].filter((x): x is string => Boolean(x))
+type OverrideEntry<TOptions> = {
+  type: string
+  pattern: string | RegExp
+  options?: Partial<TOptions>
+}
+
+function matchesPattern(node: ast.OperationNode, ov: { type: string; pattern: string | RegExp }): boolean {
+  const { type, pattern } = ov
+  const matches = (value: string) => (typeof pattern === 'string' ? value === pattern : pattern.test(value))
+  if (type === 'operationId') return matches(node.operationId)
+  if (type === 'tag') return node.tags.some((t) => matches(t))
+  if (type === 'path') return matches(node.path)
+  if (type === 'method') return matches(node.method)
+  return false
 }
 
 /**
- * Resolve error type names from operation responses.
+ * Resolves per-operation overrides (first matching override wins).
+ *
+ * @example
+ * ```ts
+ * const opts = resolveOperationOverrides(node, override)
+ * const queryOpts = 'query' in opts ? opts.query : defaultQuery
+ * ```
  */
-export function resolveErrorNames(node: ast.OperationNode, tsResolver: PluginTs['resolver']): string[] {
-  return node.responses
-    .filter((r) => {
-      const code = Number.parseInt(r.statusCode, 10)
-      return code >= 400
-    })
-    .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
+export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, override?: ReadonlyArray<OverrideEntry<TOptions>>): Partial<TOptions> {
+  if (!override) return {}
+  const match = override.find((ov) => matchesPattern(node, ov))
+  return match?.options ?? {}
+}
+
+type ZodSchemaNameResolverLike = {
+  resolveResponseName?: (node: ast.OperationNode) => string | undefined
+  resolveDataName?: (node: ast.OperationNode) => string | undefined
 }
 
 /**
- * Resolve all status code type names from operation responses (for imports).
+ * Collects the Zod schema import names for an operation (response + request body).
+ *
+ * Returns an empty array when no resolver is provided or the operation has no request body schema.
  */
-export function resolveStatusCodeNames(node: ast.OperationNode, tsResolver: PluginTs['resolver']): string[] {
-  return node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
+export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | undefined): string[] {
+  if (!zodResolver) return []
+  return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(
+    (n): n is string => Boolean(n),
+  )
 }
 
 /**
@@ -178,52 +174,22 @@ export function buildQueryKeyParams(
   return ast.createFunctionParameters({ params })
 }
 
-/**
- * Build mutation arg params for paramsToTrigger mode.
- * Contains pathParams + data + extraBodyParams + queryParams + headers (all flattened, for type alias).
- */
-export function buildMutationArgParams(
-  node: ast.OperationNode,
-  options: {
-    paramsCasing: 'camelcase' | undefined
-    resolver: PluginTs['resolver']
-    extraBodyParams?: ast.FunctionParameterNode[]
-  },
-): ast.FunctionParametersNode {
-  const { paramsCasing, resolver, extraBodyParams } = options
-
-  const casedParams = ast.caseParams(node.parameters, paramsCasing)
-  const pathParams = casedParams.filter((p) => p.in === 'path')
-  const queryParams = casedParams.filter((p) => p.in === 'query')
-  const headerParams = casedParams.filter((p) => p.in === 'header')
-
-  const queryGroupType = resolveQueryGroupType(node, queryParams, resolver)
-  const headerGroupType = resolveHeaderGroupType(node, headerParams, resolver)
-
-  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
-  const bodyRequired = node.requestBody?.required ?? false
-
-  const params: Array<ast.FunctionParameterNode | ast.ParameterGroupNode> = []
-
-  // Path params (individual entries)
-  for (const p of pathParams) {
-    params.push(ast.createFunctionParameter({ name: p.name, type: resolvePathParamType(node, p, resolver), optional: !p.required }))
+export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
+  const required: string[] = []
+  for (const param of paramsNode.params) {
+    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+      const group = param as ast.ParameterGroupNode
+      for (const child of group.properties) {
+        if (!child.optional && child.default === undefined) {
+          required.push(child.name)
+        }
+      }
+    } else {
+      const fp = param as ast.FunctionParameterNode
+      if (!fp.optional && fp.default === undefined) {
+        required.push(fp.name)
+      }
+    }
   }
-
-  // Request body
-  if (bodyType) {
-    params.push(ast.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
-  }
-
-  if (extraBodyParams?.length) {
-    params.push(...extraBodyParams)
-  }
-
-  // Query params
-  params.push(...buildGroupParam('params', node, queryParams, queryGroupType, resolver))
-
-  // Header params
-  params.push(...buildGroupParam('headers', node, headerParams, headerGroupType, resolver))
-
-  return ast.createFunctionParameters({ params })
+  return required.join(' && ')
 }

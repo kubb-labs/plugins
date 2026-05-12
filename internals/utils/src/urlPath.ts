@@ -121,7 +121,7 @@ export class URLPath {
    * ```
    */
   get params(): Record<string, string> | undefined {
-    return this.getParams()
+    return this.toParamsObject()
   }
 
   #transformParam(raw: string): string {
@@ -142,7 +142,7 @@ export class URLPath {
   toObject({ type = 'path', replacer, stringify }: ObjectOptions = {}): URLObject | string {
     const object = {
       url: type === 'path' ? this.toURLPath() : this.toTemplateString({ replacer }),
-      params: this.getParams(),
+      params: this.toParamsObject(),
     }
 
     if (stringify) {
@@ -187,11 +187,11 @@ export class URLPath {
    *
    * @example
    * ```ts
-   * new URLPath('/pet/{petId}/tag/{tagId}').getParams()
+   * new URLPath('/pet/{petId}/tag/{tagId}').toParamsObject()
    * // { petId: 'petId', tagId: 'tagId' }
    * ```
    */
-  getParams(replacer?: (pathParam: string) => string): Record<string, string> | undefined {
+  toParamsObject(replacer?: (pathParam: string) => string): Record<string, string> | undefined {
     const params: Record<string, string> = {}
 
     this.#eachParam((_raw, param) => {

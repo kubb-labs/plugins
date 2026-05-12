@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Plugin Vue-Query</h1>
+  <h1>@kubb/plugin-vue-query</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/vue-query" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/vue-query" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,11 +21,32 @@
 </h4>
 </div>
 
-Swagger integration for React-Query to generate all the different hooks based on an OpenAPI specification.
+`@kubb/plugin-vue-query` generates TanStack Query composables from your OpenAPI specification. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` composable for Vue 3.
+
+## Features
+
+- Generates `useQuery`, `useMutation`, `useInfiniteQuery`, and `queryOptions` composables
+- Infers request, response, and error types from the spec
+- Uses Vue 3 Composition API types, including `MaybeRef` and `MaybeRefOrGetter`
+- Works with `@kubb/plugin-ts`, `@kubb/plugin-zod`, and `@kubb/plugin-client`
+
+## Installation
+
+```bash
+bun add @kubb/plugin-vue-query
+# or
+pnpm add @kubb/plugin-vue-query
+# or
+npm install @kubb/plugin-vue-query
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/vue-query) for configuration options and examples.
 
 ## Supporting Kubb
 
-Kubb uses an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 
