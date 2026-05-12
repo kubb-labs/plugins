@@ -5,13 +5,8 @@ export {
   buildGroupParam,
   buildMutationArgParams,
   buildQueryKeyParams,
-  buildRequestConfigType,
-  getComments,
-  getContentTypeInfo,
-  resolveErrorNames,
   resolveHeaderGroupType,
   resolvePathParamType,
   resolveQueryGroupType,
-  resolveStatusCodeNames,
   transformName,
 } from './utils.ts'

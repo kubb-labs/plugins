@@ -5,15 +5,11 @@ export {
   buildGroupParam,
   buildMutationArgParams,
   buildQueryKeyParams,
-  buildRequestConfigType,
-  getComments,
-  getContentTypeInfo,
-  resolveErrorNames,
   resolveHeaderGroupType,
   resolvePathParamType,
   resolveQueryGroupType,
-  resolveStatusCodeNames,
 } from '@internals/tanstack-query'
+export { buildOperationComments as getComments, buildRequestConfigType, getContentTypeInfo, resolveErrorNames, resolveStatusCodeNames } from '@internals/shared'
 
 export function transformName(name: string, type: string, transformers?: PluginReactQuery['resolvedOptions']['transformers']): string {
   return transformers?.name?.(name, type) || name

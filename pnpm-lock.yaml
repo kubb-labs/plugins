@@ -663,8 +663,24 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
 
+  internals/shared:
+    dependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../utils
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.6(@kubb/renderer-jsx@5.0.0-beta.6)
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.19.18
+
   internals/tanstack-query:
     dependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../shared
       '@internals/utils':
         specifier: workspace:*
         version: link:../utils
@@ -703,6 +719,9 @@ importers:
         specifier: 'catalog:'
         version: 5.0.0-beta.6
     devDependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
@@ -760,6 +779,9 @@ importers:
         specifier: 'catalog:'
         version: 5.0.0-beta.6
     devDependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
@@ -804,6 +826,9 @@ importers:
         specifier: 'catalog:'
         version: 2.34.0
     devDependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
       '@internals/tanstack-query':
         specifier: workspace:*
         version: link:../../internals/tanstack-query
@@ -870,6 +895,9 @@ importers:
         specifier: 'catalog:'
         version: 2.34.0
     devDependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
       '@internals/tanstack-query':
         specifier: workspace:*
         version: link:../../internals/tanstack-query

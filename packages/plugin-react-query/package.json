@@ -87,6 +87,7 @@
     "remeda": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*"
   },

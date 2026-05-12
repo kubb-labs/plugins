@@ -24,7 +24,6 @@
   "files": [
     "src",
     "dist",
-    "templates",
     "extension.yaml",
     "*.d.ts",
     "*.d.cts",
@@ -105,6 +104,7 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
     "axios": "^1.16.0"
   },
