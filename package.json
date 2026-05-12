@@ -69,7 +69,7 @@
     "turbo": "^2.9.12",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "yaml": "^2.8.1"
+    "yaml": "^2.8.4"
   },
   "engines": {
     "node": ">=22",
