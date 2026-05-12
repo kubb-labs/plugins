@@ -17,17 +17,17 @@ function isValidStrictIdentifier(name: string): boolean {
 /**
  * Naming convention resolver for Faker plugin.
  *
- * Provides default naming helpers using camelCase. Prefixes invalid identifiers with `_`.
+ * Provides default naming helpers using camelCase with a `create` prefix for factory functions and files.
  *
  * @example
- * `resolverFaker.default('list pets', 'function')  // → 'listPets'`
+ * `resolverFaker.default('list pets', 'function')  // → 'createListPets'`
  */
-export const resolverFaker = defineResolver<PluginFaker>((ctx) => {
+export const resolverFaker = defineResolver<PluginFaker>(() => {
   return {
     name: 'default',
     pluginName: 'plugin-faker',
     default(name, type) {
-      const resolvedName = camelCase(name, { isFile: type === 'file' })
+      const resolvedName = camelCase(name, { isFile: type === 'file', prefix: 'create' })
 
       if (type === 'file' || isValidStrictIdentifier(resolvedName)) {
         return resolvedName
@@ -36,15 +36,15 @@ export const resolverFaker = defineResolver<PluginFaker>((ctx) => {
       return `_${resolvedName}`
     },
     resolveName(name, type) {
-      return ctx.default(name, type)
+      return this.default(name, type)
     },
     resolvePathName(name, type) {
-      return ctx.default(name, type)
+      return this.default(name, type)
     },
     resolveFile({ name, extname, tag, path: groupPath }, context) {
       const pathMode = PluginDriver.getMode(path.resolve(context.root, context.output.path))
-      const baseName = `${pathMode === 'single' ? '' : ctx.resolveName(name, 'file')}${extname}` as `${string}.${string}`
-      const filePath = ctx.resolvePath(
+      const baseName = `${pathMode === 'single' ? '' : this.resolveName(name, 'file')}${extname}` as `${string}.${string}`
+      const filePath = this.resolvePath(
         {
           baseName,
           pathMode,
@@ -61,35 +61,35 @@ export const resolverFaker = defineResolver<PluginFaker>((ctx) => {
         path: filePath,
         baseName,
         extname,
-        meta: { pluginName: ctx.pluginName },
+        meta: { pluginName: this.pluginName },
         sources: [],
         imports: [],
         exports: [],
       }
     },
     resolveParamName(node, param) {
-      return ctx.resolveName(`${node.operationId} ${param.in} ${param.name}`)
+      return this.resolveName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveDataName(node) {
-      return ctx.resolveName(`${node.operationId} Data`)
+      return this.resolveName(`${node.operationId} Data`)
     },
     resolveResponseStatusName(node, statusCode) {
-      return ctx.resolveName(`${node.operationId} Status ${statusCode}`)
+      return this.resolveName(`${node.operationId} Status ${statusCode}`)
     },
     resolveResponseName(node) {
-      return ctx.resolveName(`${node.operationId} Response`)
+      return this.resolveName(`${node.operationId} Response`)
     },
     resolveResponsesName(node) {
-      return ctx.resolveName(`${node.operationId} Responses`)
+      return this.resolveName(`${node.operationId} Responses`)
     },
     resolvePathParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
     resolveQueryParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
     resolveHeaderParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
   }
 })

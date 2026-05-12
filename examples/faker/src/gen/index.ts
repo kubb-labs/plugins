@@ -168,17 +168,24 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
-export { category } from './faker/category.ts'
-export { pet } from './faker/pet.ts'
-export { tag } from './faker/tag.ts'
-export { updatePetData, updatePetResponse, updatePetStatus200, updatePetStatus400, updatePetStatus404, updatePetStatus405 } from './faker/updatePet.ts'
+export { createCategory } from './faker/createCategory.ts'
+export { createPet } from './faker/createPet.ts'
+export { createTag } from './faker/createTag.ts'
 export {
-  updatePetWithFormPathPetId,
-  updatePetWithFormQueryName,
-  updatePetWithFormQueryStatus,
-  updatePetWithFormResponse,
-  updatePetWithFormStatus405,
-} from './faker/updatePetWithForm.ts'
+  createUpdatePetData,
+  createUpdatePetResponse,
+  createUpdatePetStatus200,
+  createUpdatePetStatus400,
+  createUpdatePetStatus404,
+  createUpdatePetStatus405,
+} from './faker/createUpdatePet.ts'
+export {
+  createUpdatePetWithFormPathPetId,
+  createUpdatePetWithFormQueryName,
+  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormResponse,
+  createUpdatePetWithFormStatus405,
+} from './faker/createUpdatePetWithForm.ts'
 export { addressIdentifierEnum } from './models/Address.ts'
 export { orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'

@@ -4,7 +4,7 @@
 */
 
 import type { GetInventoryResponse } from "../types/GetInventory.ts";
-import { getInventoryResponse } from "../faker/getInventory.ts";
+import { createGetInventoryResponse } from "../faker/createGetInventory.ts";
 import { http } from "msw";
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {
@@ -21,7 +21,7 @@ export function getInventoryHandler(data?: GetInventoryResponse | ((info: Parame
   return http.get('/store/inventory', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || getInventoryResponse(data)), {
+      return new Response(JSON.stringify(data || createGetInventoryResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

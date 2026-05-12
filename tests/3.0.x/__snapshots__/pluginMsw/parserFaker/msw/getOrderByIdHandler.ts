@@ -4,7 +4,7 @@
 */
 
 import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
-import { getOrderByIdResponse } from "../faker/getOrderById.ts";
+import { createGetOrderByIdResponse } from "../faker/createGetOrderById.ts";
 import { http } from "msw";
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
@@ -37,7 +37,7 @@ export function getOrderByIdHandler(data?: GetOrderByIdResponse | ((info: Parame
   return http.get('/store/order/:orderId', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || getOrderByIdResponse(data)), {
+      return new Response(JSON.stringify(data || createGetOrderByIdResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'
