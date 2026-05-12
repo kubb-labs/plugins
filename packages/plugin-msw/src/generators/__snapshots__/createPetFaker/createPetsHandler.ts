@@ -5,7 +5,7 @@
 
 import type { CreatePetsResponse, CreatePetsData } from './CreatePets'
 import type { HttpResponseResolver } from 'msw'
-import { createPetsResponse } from './createPets'
+import { createCreatePetsResponse } from './createCreatePets'
 import { http } from 'msw'
 
 export function createPetsHandlerResponse201(data?: CreatePetsResponse) {
@@ -18,7 +18,7 @@ export function createPetsHandler(data?: CreatePetsResponse | HttpResponseResolv
   return http.post<Record<string, string>, CreatePetsData, any>('/pets', function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data || createPetsResponse(data)), {
+    return new Response(JSON.stringify(data || createCreatePetsResponse(data)), {
       status: 201,
     })
   })

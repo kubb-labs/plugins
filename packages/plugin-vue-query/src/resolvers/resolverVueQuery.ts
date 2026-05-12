@@ -11,55 +11,55 @@ function capitalize(name: string): string {
  *
  * Provides default naming helpers using camelCase for functions and file paths.
  */
-export const resolverVueQuery = defineResolver<PluginVueQuery>((ctx) => ({
+export const resolverVueQuery = defineResolver<PluginVueQuery>(() => ({
   name: 'default',
   pluginName: 'plugin-vue-query',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })
   },
   resolveName(name) {
-    return ctx.default(name, 'function')
+    return this.default(name, 'function')
   },
   resolvePathName(name, type) {
-    return ctx.default(name, type)
+    return this.default(name, type)
   },
   resolveQueryName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}`
+    return `use${capitalize(this.resolveName(node.operationId))}`
   },
   resolveInfiniteQueryName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}Infinite`
+    return `use${capitalize(this.resolveName(node.operationId))}Infinite`
   },
   resolveMutationName(node) {
-    return `use${capitalize(ctx.resolveName(node.operationId))}`
+    return `use${capitalize(this.resolveName(node.operationId))}`
   },
   resolveQueryOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}QueryOptions`
+    return `${this.resolveName(node.operationId)}QueryOptions`
   },
   resolveInfiniteQueryOptionsName(node) {
-    return `${ctx.resolveName(node.operationId)}InfiniteQueryOptions`
+    return `${this.resolveName(node.operationId)}InfiniteQueryOptions`
   },
   resolveQueryKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}QueryKey`
+    return `${this.resolveName(node.operationId)}QueryKey`
   },
   resolveInfiniteQueryKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}InfiniteQueryKey`
+    return `${this.resolveName(node.operationId)}InfiniteQueryKey`
   },
   resolveMutationKeyName(node) {
-    return `${ctx.resolveName(node.operationId)}MutationKey`
+    return `${this.resolveName(node.operationId)}MutationKey`
   },
   resolveQueryKeyTypeName(node) {
-    return `${capitalize(ctx.resolveName(node.operationId))}QueryKey`
+    return `${capitalize(this.resolveName(node.operationId))}QueryKey`
   },
   resolveInfiniteQueryKeyTypeName(node) {
-    return `${capitalize(ctx.resolveName(node.operationId))}InfiniteQueryKey`
+    return `${capitalize(this.resolveName(node.operationId))}InfiniteQueryKey`
   },
   resolveMutationTypeName(node) {
-    return capitalize(ctx.resolveName(node.operationId))
+    return capitalize(this.resolveName(node.operationId))
   },
   resolveClientName(node) {
-    return ctx.resolveName(node.operationId)
+    return this.resolveName(node.operationId)
   },
   resolveInfiniteClientName(node) {
-    return `${ctx.resolveName(node.operationId)}Infinite`
+    return `${this.resolveName(node.operationId)}Infinite`
   },
 }))

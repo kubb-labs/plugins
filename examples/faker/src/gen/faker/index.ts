@@ -1,11 +1,18 @@
-export { category } from './category.ts'
-export { pet } from './pet.ts'
-export { tag } from './tag.ts'
-export { updatePetData, updatePetResponse, updatePetStatus200, updatePetStatus400, updatePetStatus404, updatePetStatus405 } from './updatePet.ts'
+export { createCategory } from './createCategory.ts'
+export { createPet } from './createPet.ts'
+export { createTag } from './createTag.ts'
 export {
-  updatePetWithFormPathPetId,
-  updatePetWithFormQueryName,
-  updatePetWithFormQueryStatus,
-  updatePetWithFormResponse,
-  updatePetWithFormStatus405,
-} from './updatePetWithForm.ts'
+  createUpdatePetData,
+  createUpdatePetResponse,
+  createUpdatePetStatus200,
+  createUpdatePetStatus400,
+  createUpdatePetStatus404,
+  createUpdatePetStatus405,
+} from './createUpdatePet.ts'
+export {
+  createUpdatePetWithFormPathPetId,
+  createUpdatePetWithFormQueryName,
+  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormResponse,
+  createUpdatePetWithFormStatus405,
+} from './createUpdatePetWithForm.ts'

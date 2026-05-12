@@ -188,86 +188,128 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
-export { addPetRequest } from './mocks/addPetRequest.ts'
-export { address } from './mocks/address.ts'
-export { apiResponse } from './mocks/apiResponse.ts'
-export { category } from './mocks/category.ts'
-export { customer } from './mocks/customer.ts'
-export { order } from './mocks/order.ts'
-export { pet } from './mocks/pet.ts'
-export { addPetData, addPetResponse, addPetStatus200, addPetStatus405 } from './mocks/petController/addPet.ts'
-export { deletePetHeaderApiKey, deletePetPathPetId, deletePetResponse, deletePetStatus400 } from './mocks/petController/deletePet.ts'
+export { createAddPetRequest } from './mocks/createAddPetRequest.ts'
+export { createAddress } from './mocks/createAddress.ts'
+export { createApiResponse } from './mocks/createApiResponse.ts'
+export { createCategory } from './mocks/createCategory.ts'
+export { createCustomer } from './mocks/createCustomer.ts'
+export { createOrder } from './mocks/createOrder.ts'
+export { createPet } from './mocks/createPet.ts'
+export { createPetNotFound } from './mocks/createPetNotFound.ts'
+export { createTag } from './mocks/createTag.ts'
+export { createUser } from './mocks/createUser.ts'
+export { createUserArray } from './mocks/createUserArray.ts'
+export { createAddPetData, createAddPetResponse, createAddPetStatus200, createAddPetStatus405 } from './mocks/petController/createAddPet.ts'
 export {
-  findPetsByStatusQueryStatus,
-  findPetsByStatusResponse,
-  findPetsByStatusStatus200,
-  findPetsByStatusStatus400,
-} from './mocks/petController/findPetsByStatus.ts'
+  createDeletePetHeaderApiKey,
+  createDeletePetPathPetId,
+  createDeletePetResponse,
+  createDeletePetStatus400,
+} from './mocks/petController/createDeletePet.ts'
 export {
-  findPetsByTagsQueryPage,
-  findPetsByTagsQueryPageSize,
-  findPetsByTagsQueryTags,
-  findPetsByTagsResponse,
-  findPetsByTagsStatus200,
-  findPetsByTagsStatus400,
-} from './mocks/petController/findPetsByTags.ts'
-export { getPetByIdPathPetId, getPetByIdResponse, getPetByIdStatus200, getPetByIdStatus400, getPetByIdStatus404 } from './mocks/petController/getPetById.ts'
-export { optionsFindPetsByStatusResponse, optionsFindPetsByStatusStatus200 } from './mocks/petController/optionsFindPetsByStatus.ts'
+  createFindPetsByStatusQueryStatus,
+  createFindPetsByStatusResponse,
+  createFindPetsByStatusStatus200,
+  createFindPetsByStatusStatus400,
+} from './mocks/petController/createFindPetsByStatus.ts'
 export {
-  updatePetData,
-  updatePetResponse,
-  updatePetStatus200,
-  updatePetStatus400,
-  updatePetStatus404,
-  updatePetStatus405,
-} from './mocks/petController/updatePet.ts'
+  createFindPetsByTagsQueryPage,
+  createFindPetsByTagsQueryPageSize,
+  createFindPetsByTagsQueryTags,
+  createFindPetsByTagsResponse,
+  createFindPetsByTagsStatus200,
+  createFindPetsByTagsStatus400,
+} from './mocks/petController/createFindPetsByTags.ts'
 export {
-  updatePetWithFormPathPetId,
-  updatePetWithFormQueryName,
-  updatePetWithFormQueryStatus,
-  updatePetWithFormResponse,
-  updatePetWithFormStatus405,
-} from './mocks/petController/updatePetWithForm.ts'
+  createGetPetByIdPathPetId,
+  createGetPetByIdResponse,
+  createGetPetByIdStatus200,
+  createGetPetByIdStatus400,
+  createGetPetByIdStatus404,
+} from './mocks/petController/createGetPetById.ts'
+export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './mocks/petController/createOptionsFindPetsByStatus.ts'
 export {
-  uploadFileData,
-  uploadFilePathPetId,
-  uploadFileQueryAdditionalMetadata,
-  uploadFileResponse,
-  uploadFileStatus200,
-} from './mocks/petController/uploadFile.ts'
-export { petNotFound } from './mocks/petNotFound.ts'
-export { deleteOrderPathOrderId, deleteOrderResponse, deleteOrderStatus400, deleteOrderStatus404 } from './mocks/storeController/deleteOrder.ts'
-export { getInventoryResponse, getInventoryStatus200 } from './mocks/storeController/getInventory.ts'
+  createUpdatePetData,
+  createUpdatePetResponse,
+  createUpdatePetStatus200,
+  createUpdatePetStatus400,
+  createUpdatePetStatus404,
+  createUpdatePetStatus405,
+} from './mocks/petController/createUpdatePet.ts'
 export {
-  getOrderByIdPathOrderId,
-  getOrderByIdResponse,
-  getOrderByIdStatus200,
-  getOrderByIdStatus400,
-  getOrderByIdStatus404,
-} from './mocks/storeController/getOrderById.ts'
-export { placeOrderData, placeOrderResponse, placeOrderStatus200, placeOrderStatus405 } from './mocks/storeController/placeOrder.ts'
-export { placeOrderPatchData, placeOrderPatchResponse, placeOrderPatchStatus200, placeOrderPatchStatus405 } from './mocks/storeController/placeOrderPatch.ts'
-export { tag } from './mocks/tag.ts'
-export { user } from './mocks/user.ts'
-export { userArray } from './mocks/userArray.ts'
-export { createUserData, createUserResponse, createUserStatusDefault } from './mocks/userController/createUser.ts'
+  createUpdatePetWithFormPathPetId,
+  createUpdatePetWithFormQueryName,
+  createUpdatePetWithFormQueryStatus,
+  createUpdatePetWithFormResponse,
+  createUpdatePetWithFormStatus405,
+} from './mocks/petController/createUpdatePetWithForm.ts'
 export {
-  createUsersWithListInputData,
-  createUsersWithListInputResponse,
-  createUsersWithListInputStatus200,
-  createUsersWithListInputStatusDefault,
-} from './mocks/userController/createUsersWithListInput.ts'
-export { deleteUserPathUsername, deleteUserResponse, deleteUserStatus400, deleteUserStatus404 } from './mocks/userController/deleteUser.ts'
+  createUploadFileData,
+  createUploadFilePathPetId,
+  createUploadFileQueryAdditionalMetadata,
+  createUploadFileResponse,
+  createUploadFileStatus200,
+} from './mocks/petController/createUploadFile.ts'
 export {
-  getUserByNamePathUsername,
-  getUserByNameResponse,
-  getUserByNameStatus200,
-  getUserByNameStatus400,
-  getUserByNameStatus404,
-} from './mocks/userController/getUserByName.ts'
-export { loginUserQueryPassword, loginUserQueryUsername, loginUserResponse, loginUserStatus200, loginUserStatus400 } from './mocks/userController/loginUser.ts'
-export { logoutUserResponse, logoutUserStatusDefault } from './mocks/userController/logoutUser.ts'
-export { updateUserData, updateUserPathUsername, updateUserResponse, updateUserStatusDefault } from './mocks/userController/updateUser.ts'
+  createDeleteOrderPathOrderId,
+  createDeleteOrderResponse,
+  createDeleteOrderStatus400,
+  createDeleteOrderStatus404,
+} from './mocks/storeController/createDeleteOrder.ts'
+export { createGetInventoryResponse, createGetInventoryStatus200 } from './mocks/storeController/createGetInventory.ts'
+export {
+  createGetOrderByIdPathOrderId,
+  createGetOrderByIdResponse,
+  createGetOrderByIdStatus200,
+  createGetOrderByIdStatus400,
+  createGetOrderByIdStatus404,
+} from './mocks/storeController/createGetOrderById.ts'
+export {
+  createPlaceOrderData,
+  createPlaceOrderResponse,
+  createPlaceOrderStatus200,
+  createPlaceOrderStatus405,
+} from './mocks/storeController/createPlaceOrder.ts'
+export {
+  createPlaceOrderPatchData,
+  createPlaceOrderPatchResponse,
+  createPlaceOrderPatchStatus200,
+  createPlaceOrderPatchStatus405,
+} from './mocks/storeController/createPlaceOrderPatch.ts'
+export { createCreateUserData, createCreateUserResponse, createCreateUserStatusDefault } from './mocks/userController/createCreateUser.ts'
+export {
+  createCreateUsersWithListInputData,
+  createCreateUsersWithListInputResponse,
+  createCreateUsersWithListInputStatus200,
+  createCreateUsersWithListInputStatusDefault,
+} from './mocks/userController/createCreateUsersWithListInput.ts'
+export {
+  createDeleteUserPathUsername,
+  createDeleteUserResponse,
+  createDeleteUserStatus400,
+  createDeleteUserStatus404,
+} from './mocks/userController/createDeleteUser.ts'
+export {
+  createGetUserByNamePathUsername,
+  createGetUserByNameResponse,
+  createGetUserByNameStatus200,
+  createGetUserByNameStatus400,
+  createGetUserByNameStatus404,
+} from './mocks/userController/createGetUserByName.ts'
+export {
+  createLoginUserQueryPassword,
+  createLoginUserQueryUsername,
+  createLoginUserResponse,
+  createLoginUserStatus200,
+  createLoginUserStatus400,
+} from './mocks/userController/createLoginUser.ts'
+export { createLogoutUserResponse, createLogoutUserStatusDefault } from './mocks/userController/createLogoutUser.ts'
+export {
+  createUpdateUserData,
+  createUpdateUserPathUsername,
+  createUpdateUserResponse,
+  createUpdateUserStatusDefault,
+} from './mocks/userController/createUpdateUser.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'

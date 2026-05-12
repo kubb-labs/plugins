@@ -1,1 +1,1 @@
-export { tagTagFaker } from './tag.ts'
+export { createTagTagFaker } from './createTagFaker.ts'

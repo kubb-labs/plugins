@@ -1,5 +1,5 @@
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
@@ -9,7 +9,15 @@ import { resolverClient } from '../resolvers/resolverClient.ts'
 import type { PluginClient } from '../types.ts'
 import { operationsGenerator } from './operationsGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',

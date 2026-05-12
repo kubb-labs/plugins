@@ -1,6 +1,6 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import { pluginFakerName, resolverFaker } from '@kubb/plugin-faker'
 import type { PluginTs } from '@kubb/plugin-ts'
@@ -11,7 +11,15 @@ import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
 import { mswGenerator } from './mswGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginMsw['resolvedOptions'] = {
   output: { path: '.' },
