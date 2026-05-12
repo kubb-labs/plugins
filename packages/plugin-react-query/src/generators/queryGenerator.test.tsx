@@ -118,6 +118,18 @@ describe('queryGenerator operation', () => {
       node: getPetByIdNode,
       options: { pathParamsAsGetters: true, pathParamsType: 'object' as const },
     },
+    {
+      name: 'getPetByIdPathParamsAsGettersAllObject',
+      node: getPetByIdNode,
+      options: { pathParamsAsGetters: true, paramsType: 'object' as const },
+    },
+    {
+      // Operations without path params should be byte-identical to the baseline
+      // when the option is enabled — guards the short-circuit in getParams.
+      name: 'findByTagsPathParamsAsGetters',
+      node: findByTagsNode,
+      options: { pathParamsAsGetters: true },
+    },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const } },
     { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const } },

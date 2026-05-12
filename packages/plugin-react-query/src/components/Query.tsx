@@ -87,12 +87,12 @@ function getParams(
     paramsType: PluginReactQuery['resolvedOptions']['paramsType']
     paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
-    pathParamNames: ReadonlySet<string>
+    pathParamNames?: ReadonlySet<string>
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, pathParamNames, dataReturnType, resolver } = options
+  const { paramsType, paramsCasing, pathParamsType, pathParamNames = new Set<string>(), dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
