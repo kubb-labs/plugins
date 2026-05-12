@@ -1,3 +1,4 @@
+import { transformParamTypes } from '@internals/tanstack-query'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -63,45 +64,11 @@ function getParams(
     extraParams: [optionsParam],
   })
 
-  return wrapOperationParamsWithMaybeRef(baseParams)
-}
-
-function wrapOperationParamsWithMaybeRef(paramsNode: ast.FunctionParametersNode): ast.FunctionParametersNode {
-  const wrappedParams = paramsNode.params.map((param) => {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      return {
-        ...group,
-        properties: group.properties.map((p) => ({
-          ...p,
-          type: p.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(p.type)}>` }) : p.type,
-        })),
-      }
-    }
-    const fp = param as ast.FunctionParameterNode
-    // Don't wrap 'options' param — it's not a reactive value
-    if (fp.name === 'options') return fp
-    return {
-      ...fp,
-      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
-    }
+  return transformParamTypes(baseParams, {
+    wrapType: (inner) => `MaybeRefOrGetter<${inner}>`,
+    // 'options' is the trailing config bag, not a reactive value
+    shouldWrap: (p) => p.name !== 'options',
   })
-  return ast.createFunctionParameters({ params: wrappedParams })
-}
-
-function printType(typeNode: ast.ParamsTypeNode | undefined): string {
-  if (!typeNode) return 'unknown'
-  if (typeNode.variant === 'reference') return typeNode.name
-  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
-  if (typeNode.variant === 'struct') {
-    const parts = typeNode.properties.map((p) => {
-      const typeStr = printType(p.type)
-      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
-      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
-    })
-    return `{ ${parts.join('; ')} }`
-  }
-  return 'unknown'
 }
 
 export function Query({

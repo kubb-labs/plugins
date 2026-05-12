@@ -1,3 +1,4 @@
+import { transformParamTypes } from '@internals/tanstack-query'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -42,14 +43,10 @@ function getParams(
   const mutationArgParamsNode = buildMutationArgParams(node, { paramsCasing, resolver })
 
   // Vue-query uses MutationObserverOptions instead of UseMutationOptions, and wraps params with MaybeRefOrGetter
-  const mutationArgWrapped = mutationArgParamsNode.params.map((param) => {
-    const fp = param as ast.FunctionParameterNode
-    return {
-      ...fp,
-      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
-    }
+  const wrappedParamsNode = transformParamTypes(mutationArgParamsNode, {
+    wrapType: (inner) => `MaybeRefOrGetter<${inner}>`,
+    shouldWrap: () => true,
   })
-  const wrappedParamsNode = ast.createFunctionParameters({ params: mutationArgWrapped })
   const TRequestWrapped = wrappedParamsNode.params.length > 0 ? (declarationPrinter.print(wrappedParamsNode) ?? '') : ''
 
   return ast.createFunctionParameters({
@@ -67,21 +64,6 @@ function getParams(
       }),
     ],
   })
-}
-
-function printType(typeNode: ast.ParamsTypeNode | undefined): string {
-  if (!typeNode) return 'unknown'
-  if (typeNode.variant === 'reference') return typeNode.name
-  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
-  if (typeNode.variant === 'struct') {
-    const parts = typeNode.properties.map((p) => {
-      const typeStr = printType(p.type)
-      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
-      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
-    })
-    return `{ ${parts.join('; ')} }`
-  }
-  return 'unknown'
 }
 
 export function Mutation({
