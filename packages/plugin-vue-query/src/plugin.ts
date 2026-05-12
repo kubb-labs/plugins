@@ -8,7 +8,7 @@ import { source as configSource } from '@kubb/plugin-client/templates/config.sou
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
-import { queryKeyTransformer } from './components/QueryKey.tsx'
+import { queryKeyTransformer } from '@internals/tanstack-query'
 import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from './types.ts'

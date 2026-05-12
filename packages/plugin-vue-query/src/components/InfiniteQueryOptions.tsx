@@ -8,7 +8,8 @@ import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
 import { resolveErrorNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
-import { buildEnabledCheck, getQueryOptionsParams } from './QueryOptions.tsx'
+import { buildEnabledCheck } from '@internals/tanstack-query'
+import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
   name: string
