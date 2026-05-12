@@ -18,7 +18,7 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Pet', schemaName: 'Pet' }).print(node)).toMatchInlineSnapshot(
-      `"{"id": faker.number.int({ min: 1, max: 10 }),"name": faker.string.alpha(),"category": category()}"`,
+      `"{"id": faker.number.int({ min: 1, max: 10 }),"name": faker.string.alpha(),"category": createCategory()}"`,
     )
   })
 
@@ -81,7 +81,7 @@ describe('printerFaker', () => {
       }),
     })
 
-    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"episodeBase(data)"`)
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createEpisodeBase(data)"`)
   })
 
   test('uses tuple item types for nested enum members', () => {

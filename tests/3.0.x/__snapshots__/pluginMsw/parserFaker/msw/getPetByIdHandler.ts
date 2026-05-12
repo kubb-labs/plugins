@@ -4,7 +4,7 @@
 */
 
 import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
-import { getPetByIdResponse } from "../faker/getPetById.ts";
+import { createGetPetByIdResponse } from "../faker/createGetPetById.ts";
 import { http } from "msw";
 
 export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
@@ -37,7 +37,7 @@ export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters
   return http.get('/pet/:petId', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || getPetByIdResponse(data)), {
+      return new Response(JSON.stringify(data || createGetPetByIdResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

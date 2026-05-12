@@ -1,6 +1,6 @@
 import { aliasConflictingImports, rewriteAliasedImports } from '@internals/utils'
 import type { Config } from '@kubb/core'
-import { ast, FileProcessor } from '@kubb/core'
+import { ast, FileProcessor, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs } from '@kubb/plugin-ts'
@@ -130,6 +130,7 @@ const testConfig: Config = {
   plugins: [],
   parsers: [],
   adapter: createMockedAdapter(),
+  storage: memoryStorage(),
 }
 
 const defaultOptions: PluginFaker['resolvedOptions'] = {
@@ -218,7 +219,7 @@ describe('fakerGenerator — schema', () => {
       resolver: resolverFaker,
     })
 
-    const file = driver.fileManager.files.find((item) => item.baseName === 'emoji.ts')
+    const file = driver.fileManager.files.find((item) => item.baseName === 'createEmoji.ts')
     expect(file).toBeDefined()
 
     const fileProcessor = new FileProcessor()
@@ -228,7 +229,7 @@ describe('fakerGenerator — schema', () => {
       }),
     )
 
-    expect(output).toContain('export function emoji(data?: string): string')
+    expect(output).toContain('export function createEmoji(data?: string): string')
     expect(output).not.toContain('import type { Emoji }')
   })
 })
@@ -335,8 +336,8 @@ describe('fakerGenerator — operation', () => {
     expect(rewriteAliasedImports('return createWidgetResponse(data)', aliases)).toBe('return createWidgetResponseSchema(data)')
   })
 
-  test('default resolver prefixes reserved identifiers', () => {
-    expect(resolverFaker.resolveName('Eval')).toBe('_eval')
-    expect(resolverFaker.resolvePathName('Eval', 'file')).toBe('eval')
+  test('default resolver applies create prefix to names', () => {
+    expect(resolverFaker.resolveName('Eval')).toBe('createEval')
+    expect(resolverFaker.resolvePathName('Eval', 'file')).toBe('createEval')
   })
 })

@@ -7,7 +7,7 @@ import type { PluginMsw } from '../types.ts'
  *
  * Provides default naming helpers using camelCase with a `handler` suffix.
  */
-export const resolverMsw = defineResolver<PluginMsw>((ctx) => ({
+export const resolverMsw = defineResolver<PluginMsw>(() => ({
   name: 'default',
   pluginName: 'plugin-msw',
   default(name, type) {
@@ -17,10 +17,10 @@ export const resolverMsw = defineResolver<PluginMsw>((ctx) => ({
     return camelCase(name, { suffix: 'handler' })
   },
   resolvePathName(name, type) {
-    return ctx.default(name, type)
+    return this.default(name, type)
   },
   resolveHandlerName(node) {
-    return ctx.resolveName(node.operationId)
+    return this.resolveName(node.operationId)
   },
   resolveHandlersName() {
     return 'handlers'

@@ -10,7 +10,7 @@ import type { PluginZod } from '../types.ts'
  * @example
  * `resolverZod.default('list pets', 'function')  // → 'listPetsSchema'`
  */
-export const resolverZod = defineResolver<PluginZod>((ctx) => {
+export const resolverZod = defineResolver<PluginZod>(() => {
   return {
     name: 'default',
     pluginName: 'plugin-zod',
@@ -27,31 +27,31 @@ export const resolverZod = defineResolver<PluginZod>((ctx) => {
       return pascalCase(name)
     },
     resolvePathName(name, type) {
-      return ctx.default(name, type)
+      return this.default(name, type)
     },
     resolveParamName(node, param) {
-      return ctx.resolveSchemaName(`${node.operationId} ${param.in} ${param.name}`)
+      return this.resolveSchemaName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveResponseStatusName(node, statusCode) {
-      return ctx.resolveSchemaName(`${node.operationId} Status ${statusCode}`)
+      return this.resolveSchemaName(`${node.operationId} Status ${statusCode}`)
     },
     resolveDataName(node) {
-      return ctx.resolveSchemaName(`${node.operationId} Data`)
+      return this.resolveSchemaName(`${node.operationId} Data`)
     },
     resolveResponsesName(node) {
-      return ctx.resolveSchemaName(`${node.operationId} Responses`)
+      return this.resolveSchemaName(`${node.operationId} Responses`)
     },
     resolveResponseName(node) {
-      return ctx.resolveSchemaName(`${node.operationId} Response`)
+      return this.resolveSchemaName(`${node.operationId} Response`)
     },
     resolvePathParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
     resolveQueryParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
     resolveHeaderParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
   }
 })

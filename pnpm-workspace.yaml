@@ -21,14 +21,14 @@ minimumReleaseAgeExclude:
   - '@types/*'
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.7
-  '@kubb/agent': 5.0.0-beta.7
-  '@kubb/core': 5.0.0-beta.7
-  '@kubb/middleware-barrel': 5.0.0-beta.7
-  '@kubb/parser-ts': 5.0.0-beta.7
-  '@kubb/renderer-jsx': 5.0.0-beta.7
-  kubb: 5.0.0-beta.7
-  unplugin-kubb: 5.0.0-beta.7
+  '@kubb/adapter-oas': 5.0.0-beta.10
+  '@kubb/agent': 5.0.0-beta.10
+  '@kubb/core': 5.0.0-beta.10
+  '@kubb/middleware-barrel': 5.0.0-beta.10
+  '@kubb/parser-ts': 5.0.0-beta.10
+  '@kubb/renderer-jsx': 5.0.0-beta.10
+  kubb: 5.0.0-beta.10
+  unplugin-kubb: 5.0.0-beta.10
   '@types/node': ^22.19.18
   prettier: ^3.8.3
   '@types/react': ^19.2.14

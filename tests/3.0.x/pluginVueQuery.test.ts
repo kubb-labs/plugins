@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -29,6 +29,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -47,6 +48,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -66,6 +68,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -85,6 +88,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -107,6 +111,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
@@ -127,6 +132,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -146,6 +152,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -165,6 +172,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -185,6 +193,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -204,6 +213,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
@@ -223,6 +233,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({ output: { path: './clients', barrel: false } }),
