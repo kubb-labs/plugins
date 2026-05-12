@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, pascalCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginClient } from '../types.ts'
 
@@ -18,5 +18,21 @@ export const resolverClient = defineResolver<PluginClient>((ctx) => ({
   },
   resolveName(name) {
     return ctx.default(name, 'function')
+  },
+  resolvePathName(name, type) {
+    return ctx.default(name, type)
+  },
+  resolveClassName(name) {
+    return pascalCase(name)
+  },
+  resolveGroupName(name) {
+    return pascalCase(name)
+  },
+  resolveClientPropertyName(name) {
+    return camelCase(name)
+  },
+  resolveUrlName(node) {
+    const name = ctx.resolveName(node.operationId)
+    return `get${name.charAt(0).toUpperCase()}${name.slice(1)}Url`
   },
 }))

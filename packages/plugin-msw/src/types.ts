@@ -1,13 +1,25 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, ResolveNameParams, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
  */
 export type ResolverMsw = Resolver & {
   /**
-   * Resolves the handler function name for an operation.
+   * Resolves the base handler function name for an operation.
    */
   resolveName(this: ResolverMsw, name: string): string
+  /**
+   * Resolves the output file name for an MSW handler module.
+   */
+  resolvePathName(this: ResolverMsw, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+  /**
+   * Resolves the handler function name for an operation.
+   */
+  resolveHandlerName(this: ResolverMsw, node: ast.OperationNode): string
+  /**
+   * Resolves the exported handlers collection name.
+   */
+  resolveHandlersName(this: ResolverMsw): string
 }
 
 export type Options = {
@@ -33,12 +45,6 @@ export type Options = {
    * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
-  transformers?: {
-    /**
-     * Override the default naming for handlers.
-     */
-    name?: (name: ResolveNameParams['name'], type?: ResolveNameParams['type']) => string
-  }
   /**
    * Override naming conventions for function names and types.
    */
@@ -73,7 +79,6 @@ type ResolvedOptions = {
   parser: NonNullable<Options['parser']>
   baseURL: Options['baseURL'] | undefined
   handlers: boolean
-  transformers: NonNullable<Options['transformers']>
   resolver: ResolverMsw
 }
 

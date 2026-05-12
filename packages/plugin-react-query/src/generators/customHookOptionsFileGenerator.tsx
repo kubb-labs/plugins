@@ -4,29 +4,27 @@ import path from 'node:path'
 import { defineGenerator } from '@kubb/core'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-custom-hook-options-file',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { resolver, config, root } = ctx
-    const { output, customOptions, query, group, transformers } = ctx.options
+    const { output, customOptions, query, group } = ctx.options
 
     if (!customOptions) return null
 
     const override = output.override ?? config.output.override ?? false
     const { importPath, name } = customOptions
+    const hookOptionsName = resolver.resolveHookOptionsName()
+    const customHookOptionsName = resolver.resolveCustomHookOptionsName()
 
     const reactQueryImportPath = query ? query.importPath : '@tanstack/react-query'
-
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
     let hookFilePath: string
     const firstNode = nodes[0]
     if (firstNode) {
-      const baseName = resolver.resolveName(firstNode.operationId)
-      const hookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
+      const hookName = resolver.resolveQueryName(firstNode)
       const hookFile = resolver.resolveFile(
         { name: hookName, extname: '.ts', tag: firstNode.tags[0] ?? 'default', path: firstNode.path },
         { root, output, group },
@@ -55,9 +53,9 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
       <File baseName={file.baseName} path={file.path}>
         <File.Import name={['QueryClient']} path={reactQueryImportPath} isTypeOnly />
         <File.Import name={['useQueryClient']} path={reactQueryImportPath} />
-        <File.Import name={['HookOptions']} root={file.path} path={path.resolve(root, './index.ts')} />
+        <File.Import name={[hookOptionsName]} root={file.path} path={path.resolve(root, './index.ts')} />
         <File.Source name={file.name} isExportable isIndexable>
-          <Function name="getCustomHookOptions" params="{ queryClient }: { queryClient: QueryClient }" returnType="Partial<HookOptions>">
+          <Function name={customHookOptionsName} params="{ queryClient }: { queryClient: QueryClient }" returnType={`Partial<${hookOptionsName}>`}>
             {`return {
               // TODO: Define custom hook options here
               // Example:
@@ -70,13 +68,13 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
           </Function>
           <Function
             name={name}
-            generics="T extends keyof HookOptions"
+            generics={`T extends keyof ${hookOptionsName}`}
             params="{ hookName, operationId }: { hookName: T, operationId: string }"
-            returnType="HookOptions[T]"
+            returnType={`${hookOptionsName}[T]`}
             export
           >
             {`const queryClient = useQueryClient()
-            const customOptions = getCustomHookOptions({ queryClient })
+            const customOptions = ${customHookOptionsName}({ queryClient })
             return customOptions[hookName] ?? {}`}
           </Function>
         </File.Source>

@@ -7,27 +7,13 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { QueryKey, QueryOptions, SuspenseQuery } from '../components'
 import type { PluginReactQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-query',
   renderer: jsxRenderer,
   operation(node, ctx) {
     const { adapter, config, driver, resolver, root } = ctx
-    const {
-      output,
-      query,
-      mutation,
-      suspense,
-      paramsCasing,
-      paramsType,
-      pathParamsType,
-      parser,
-      client: clientOptions,
-      group,
-      transformers,
-      customOptions,
-    } = ctx.options
+    const { output, query, mutation, suspense, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -45,13 +31,11 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
-    const baseName = resolver.resolveName(node.operationId)
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    const queryName = transformName(`use${capitalize(baseName)}Suspense`, 'function', transformers)
-    const queryOptionsName = transformName(`${baseName}SuspenseQueryOptions`, 'function', transformers)
-    const queryKeyName = transformName(`${baseName}SuspenseQueryKey`, 'const', transformers)
-    const queryKeyTypeName = transformName(`${capitalize(baseName)}SuspenseQueryKey`, 'type', transformers)
-    const clientName = transformName(`${baseName}Suspense`, 'function', transformers)
+    const queryName = resolver.resolveSuspenseQueryName(node)
+    const queryOptionsName = resolver.resolveSuspenseQueryOptionsName(node)
+    const queryKeyName = resolver.resolveSuspenseQueryKeyName(node)
+    const queryKeyTypeName = resolver.resolveSuspenseQueryKeyTypeName(node)
+    const clientName = resolver.resolveSuspenseClientName(node)
 
     const meta = {
       file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),

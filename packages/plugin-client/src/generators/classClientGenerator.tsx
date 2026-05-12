@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { camelCase, pascalCase } from '@internals/utils'
+import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -22,6 +22,7 @@ type OperationData = {
 
 type Controller = {
   name: string
+  propertyName: string
   file: ast.FileNode
   operations: Array<OperationData>
 }
@@ -87,10 +88,10 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
     const controllers = nodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
-      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? pascalCase(tag)) : 'Client'
+      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
       if (!tag && !group) {
-        const name = 'ApiClient'
+        const name = resolver.resolveClassName('ApiClient')
         const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
@@ -98,7 +99,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         if (previous) {
           previous.operations.push(operationData)
         } else {
-          acc.push({ name, file, operations: [operationData] })
+          acc.push({ name, propertyName: resolver.resolveClientPropertyName(name), file, operations: [operationData] })
         }
       } else if (tag) {
         const name = groupName
@@ -109,7 +110,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         if (previous) {
           previous.operations.push(operationData)
         } else {
-          acc.push({ name, file, operations: [operationData] })
+          acc.push({ name, propertyName: resolver.resolveClientPropertyName(name), file, operations: [operationData] })
         }
       }
 
@@ -239,7 +240,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
           ))}
 
-          <WrapperClient name={sdk.className} classNames={controllers.map(({ name }) => name)} />
+          <WrapperClient name={sdk.className} controllers={controllers.map(({ name, propertyName }) => ({ className: name, propertyName }))} />
         </File>,
       )
     }

@@ -15,7 +15,6 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
     exclude = [],
     include,
     override = [],
-    transformers = {},
     handlers = false,
     parser = 'data',
     baseURL,
@@ -55,7 +54,6 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
           include,
           override,
           handlers,
-          transformers,
           resolver,
         })
         ctx.setResolver(resolver)

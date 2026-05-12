@@ -18,7 +18,6 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
   include: undefined,
   override: [],
   handlers: true,
-  transformers: {},
   resolver: resolverMsw,
 }
 

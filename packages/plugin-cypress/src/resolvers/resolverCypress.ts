@@ -19,4 +19,7 @@ export const resolverCypress = defineResolver<PluginCypress>((ctx) => ({
   resolveName(name) {
     return ctx.default(name, 'function')
   },
+  resolvePathName(name, type) {
+    return ctx.default(name, type)
+  },
 }))

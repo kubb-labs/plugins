@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { camelCase, pascalCase } from '@internals/utils'
+import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -86,10 +86,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
     const controllers = nodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
-      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? pascalCase(tag)) : 'Client'
+      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
       if (!tag && !group) {
-        const name = 'ApiClient'
+        const name = resolver.resolveClassName('ApiClient')
         const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)

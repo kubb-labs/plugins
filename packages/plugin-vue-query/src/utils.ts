@@ -11,10 +11,6 @@ export {
 } from '@internals/tanstack-query'
 export { buildOperationComments as getComments, buildRequestConfigType, getContentTypeInfo, resolveErrorNames, resolveStatusCodeNames } from '@internals/shared'
 
-export function transformName(name: string, type: string, transformers?: PluginVueQuery['resolvedOptions']['transformers']): string {
-  return transformers?.name?.(name, type) || name
-}
-
 function matchesPattern(node: ast.OperationNode, ov: { type: string; pattern: string | RegExp }): boolean {
   const { type, pattern } = ov
   const matches = (value: string) => (typeof pattern === 'string' ? value === pattern : pattern.test(value))

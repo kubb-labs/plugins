@@ -24,7 +24,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     override = [],
     parser = 'client',
     infinite = false,
-    transformers = {},
     paramsType = 'inline',
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     mutation = {},
@@ -69,7 +68,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
 
         ctx.setOptions({
           output,
-          transformers,
           client: {
             bundle: client?.bundle,
             baseURL: client?.baseURL,

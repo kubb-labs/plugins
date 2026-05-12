@@ -33,7 +33,6 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     parser = 'client',
     suspense = {},
     infinite = false,
-    transformers = {},
     paramsType = 'inline',
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     mutation = {},
@@ -87,7 +86,6 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
 
         ctx.setOptions({
           output,
-          transformers,
           client: {
             bundle: client?.bundle,
             baseURL: client?.baseURL,

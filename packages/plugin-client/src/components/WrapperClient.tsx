@@ -1,17 +1,21 @@
-import { camelCase } from '@internals/utils'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
+type ClientController = {
+  className: string
+  propertyName: string
+}
+
 type Props = {
   name: string
-  classNames: Array<string>
+  controllers: Array<ClientController>
   isExportable?: boolean
   isIndexable?: boolean
 }
 
-export function WrapperClient({ name, classNames, isExportable = true, isIndexable = true }: Props): KubbReactNode {
-  const properties = classNames.map((className) => `  readonly ${camelCase(className)}: ${className}`).join('\n')
-  const assignments = classNames.map((className) => `    this.${camelCase(className)} = new ${className}(config)`).join('\n')
+export function WrapperClient({ name, controllers, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+  const properties = controllers.map(({ className, propertyName }) => `  readonly ${propertyName}: ${className}`).join('\n')
+  const assignments = controllers.map(({ className, propertyName }) => `    this.${propertyName} = new ${className}(config)`).join('\n')
 
   const classCode = `export class ${name} {
 ${properties}
