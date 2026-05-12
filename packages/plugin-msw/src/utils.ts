@@ -1,24 +1,6 @@
 import type { ast } from '@kubb/core'
 import type { ResolverFaker } from '@kubb/plugin-faker'
-import type { ResolverTs } from '@kubb/plugin-ts'
 import type { PluginMsw } from './types.ts'
-
-/**
- * Filters responses to only those with 2xx status codes.
- */
-export function getSuccessResponses(node: ast.OperationNode): ast.ResponseNode[] {
-  return node.responses.filter((response) => {
-    const code = Number.parseInt(response.statusCode, 10)
-    return !Number.isNaN(code) && code >= 200 && code < 300
-  })
-}
-
-/**
- * Returns the first 2xx response for an operation, if any.
- */
-export function getPrimarySuccessResponse(node: ast.OperationNode): ast.ResponseNode | undefined {
-  return getSuccessResponses(node)[0]
-}
 
 /**
  * Gets the content type from a response, defaulting to 'application/json' if a schema exists.
@@ -38,32 +20,6 @@ function getResponseContentType(response: ast.ResponseNode | undefined): string 
   const contentType = response as unknown as { mediaType?: string | null; contentType?: string | null } | undefined
   const value = contentType?.mediaType ?? contentType?.contentType
   return typeof value === 'string' && value.length > 0 ? value : undefined
-}
-
-/**
- * Maps all operation responses to their type names, including status code or 'default' for default responses.
- */
-export function getResponseTypes(node: ast.OperationNode, tsResolver: ResolverTs): Array<[statusCode: number | 'default', typeName: string]> {
-  const types: Array<[number | 'default', string]> = []
-
-  for (const response of node.responses) {
-    if (response.statusCode === 'default') {
-      types.push(['default', tsResolver.resolveResponseName(node)])
-      continue
-    }
-
-    const code = Number.parseInt(response.statusCode, 10)
-    if (Number.isNaN(code)) continue
-
-    if (code >= 200 && code < 300) {
-      types.push([code, tsResolver.resolveResponseName(node)])
-      continue
-    }
-
-    types.push([code, tsResolver.resolveResponseStatusName(node, response.statusCode)])
-  }
-
-  return types
 }
 
 /**

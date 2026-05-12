@@ -1,11 +1,11 @@
-import { URLPath } from '@internals/utils'
-import { ast } from '@kubb/core'
+import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '../types.ts'
-import { buildQueryKeyParams } from '../utils.ts'
+import { buildQueryKeyParams, wrapWithMaybeRefOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -18,65 +18,16 @@ type Props = {
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
 
-function wrapWithMaybeRefOrGetter(paramsNode: ast.FunctionParametersNode): ast.FunctionParametersNode {
-  const wrappedParams = paramsNode.params.map((param) => {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      return {
-        ...group,
-        properties: group.properties.map((p) => ({
-          ...p,
-          type: p.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(p.type)}>` }) : p.type,
-        })),
-      }
-    }
-    const fp = param as ast.FunctionParameterNode
-    return {
-      ...fp,
-      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
-    }
-  })
-  return ast.createFunctionParameters({ params: wrappedParams })
-}
-
-function printType(typeNode: ast.ParamsTypeNode | undefined): string {
-  if (!typeNode) return 'unknown'
-  if (typeNode.variant === 'reference') return typeNode.name
-  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
-  if (typeNode.variant === 'struct') {
-    const parts = typeNode.properties.map((p) => {
-      const typeStr = printType(p.type)
-      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
-      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
-    })
-    return `{ ${parts.join('; ')} }`
-  }
-  return 'unknown'
-}
-
-function getParams(
+export function buildQueryKeyParamsNode(
   node: ast.OperationNode,
   options: { pathParamsType: 'object' | 'inline'; paramsCasing: 'camelcase' | undefined; resolver: ResolverTs },
 ): ast.FunctionParametersNode {
   return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
 }
 
-const getTransformer: Transformer = ({ node, casing }) => {
-  const path = new URLPath(node.path, { casing })
-  const hasQueryParams = node.parameters.some((p) => p.in === 'query')
-  const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
-
-  return [
-    path.toObject({ type: 'path', stringify: true }),
-    hasQueryParams ? '...(params ? [params] : [])' : undefined,
-    hasRequestBody ? '...(data ? [data] : [])' : undefined,
-  ].filter(Boolean) as string[]
-}
-
-export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer = getTransformer }: Props): KubbReactNode {
-  const paramsNode = getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer = queryKeyTransformer }: Props): KubbReactNode {
+  const paramsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({
     node,
@@ -98,7 +49,3 @@ export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType,
     </>
   )
 }
-
-QueryKey.getParams = getParams
-QueryKey.getTransformer = getTransformer
-QueryKey.callPrinter = callPrinter

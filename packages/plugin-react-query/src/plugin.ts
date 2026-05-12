@@ -7,8 +7,7 @@ import { source as fetchClientSource } from '@kubb/plugin-client/templates/clien
 import { source as configSource } from '@kubb/plugin-client/templates/config.source'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { MutationKey } from './components/MutationKey.tsx'
-import { QueryKey } from './components/QueryKey.tsx'
+import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import {
   customHookOptionsFileGenerator,
   hookOptionsGenerator,
@@ -37,8 +36,8 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     mutation = {},
     query = {},
-    mutationKey = MutationKey.getTransformer,
-    queryKey = QueryKey.getTransformer,
+    mutationKey = mutationKeyTransformer,
+    queryKey = queryKeyTransformer,
     customOptions,
     paramsCasing,
     client,

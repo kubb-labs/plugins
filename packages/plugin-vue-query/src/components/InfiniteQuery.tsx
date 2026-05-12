@@ -4,8 +4,8 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { getComments, resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { getComments, resolveErrorNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -26,7 +26,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-function getParams(
+function buildInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
     paramsType: PluginVueQuery['resolvedOptions']['paramsType']
@@ -64,44 +64,7 @@ function getParams(
     extraParams: [optionsParam],
   })
 
-  return wrapOperationParamsWithMaybeRef(baseParams)
-}
-
-function wrapOperationParamsWithMaybeRef(paramsNode: ast.FunctionParametersNode): ast.FunctionParametersNode {
-  const wrappedParams = paramsNode.params.map((param) => {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      return {
-        ...group,
-        properties: group.properties.map((p) => ({
-          ...p,
-          type: p.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(p.type)}>` }) : p.type,
-        })),
-      }
-    }
-    const fp = param as ast.FunctionParameterNode
-    if (fp.name === 'options') return fp
-    return {
-      ...fp,
-      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
-    }
-  })
-  return ast.createFunctionParameters({ params: wrappedParams })
-}
-
-function printType(typeNode: ast.ParamsTypeNode | undefined): string {
-  if (!typeNode) return 'unknown'
-  if (typeNode.variant === 'reference') return typeNode.name
-  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
-  if (typeNode.variant === 'struct') {
-    const parts = typeNode.properties.map((p) => {
-      const typeStr = printType(p.type)
-      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
-      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
-    })
-    return `{ ${parts.join('; ')} }`
-  }
-  return 'unknown'
+  return wrapWithMaybeRefOrGetter(baseParams, (name) => name === 'options')
 }
 
 export function InfiniteQuery({
@@ -124,13 +87,13 @@ export function InfiniteQuery({
   const returnType = `UseInfiniteQueryReturnType<${['TData', TError].join(', ')}> & { queryKey: TQueryKey }`
   const generics = [`TData = InfiniteData<${TData}>`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = getParams(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
+  const paramsNode = buildInfiniteQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -155,5 +118,3 @@ export function InfiniteQuery({
     </File.Source>
   )
 }
-
-InfiniteQuery.getParams = getParams

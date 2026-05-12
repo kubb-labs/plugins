@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { getNestedAccessor } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -5,9 +6,9 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
-import { buildEnabledCheck, getQueryOptionsParams } from './QueryOptions.tsx'
+import { buildQueryKeyParams, resolveErrorNames } from '../utils.ts'
+import { buildEnabledCheck } from '@internals/tanstack-query'
+import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
   name: string
@@ -65,7 +66,7 @@ export function InfiniteQueryOptions({
           ? 'boolean'
           : 'unknown'
 
-  const rawQueryParams = node.parameters.filter((p) => p.in === 'query')
+  const rawQueryParams = getOperationParameters(node).query
   const queryParamsTypeName =
     rawQueryParams.length > 0
       ? (() => {
@@ -83,7 +84,7 @@ export function InfiniteQueryOptions({
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
@@ -175,13 +176,3 @@ export function InfiniteQueryOptions({
     </File.Source>
   )
 }
-
-InfiniteQueryOptions.getParams = (
-  node: ast.OperationNode,
-  options: {
-    paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-    paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
-    resolver: ResolverTs
-  },
-) => getQueryOptionsParams(node, options)

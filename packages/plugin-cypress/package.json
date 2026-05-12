@@ -63,6 +63,7 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {

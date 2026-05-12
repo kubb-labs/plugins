@@ -7,7 +7,8 @@ import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
-import { MutationKey, QueryKey } from '../components'
+import { mutationKeyTransformer } from '@internals/tanstack-query'
+import { queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
@@ -26,8 +27,8 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   paramsType: 'inline',
   paramsCasing: undefined,
   pathParamsType: 'inline',
-  queryKey: QueryKey.getTransformer,
-  mutationKey: MutationKey.getTransformer,
+  queryKey: queryKeyTransformer,
+  mutationKey: mutationKeyTransformer,
   query: {
     importPath: '@tanstack/react-query',
     methods: ['get'],
@@ -97,7 +98,7 @@ describe('queryGenerator operation', () => {
         },
         queryKey(props) {
           const id = props.node.operationId
-          const keys = QueryKey.getTransformer(props)
+          const keys = queryKeyTransformer(props)
           return [`"${id}"`, ...keys]
         },
       },

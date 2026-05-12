@@ -7,8 +7,8 @@ import { source as fetchClientSource } from '@kubb/plugin-client/templates/clien
 import { source as configSource } from '@kubb/plugin-client/templates/config.source'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { MutationKey } from './components/MutationKey.tsx'
-import { QueryKey } from './components/QueryKey.tsx'
+import { mutationKeyTransformer } from '@internals/tanstack-query'
+import { queryKeyTransformer } from '@internals/tanstack-query'
 import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from './types.ts'
@@ -28,8 +28,8 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     mutation = {},
     query = {},
-    mutationKey = MutationKey.getTransformer,
-    queryKey = QueryKey.getTransformer,
+    mutationKey = mutationKeyTransformer,
+    queryKey = queryKeyTransformer,
     paramsCasing,
     client,
     resolver: userResolver,

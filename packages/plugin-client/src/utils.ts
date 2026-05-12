@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -51,10 +52,8 @@ export function buildClassClientParams({
   hasFormData: boolean
   headers: Array<string>
 }) {
-  const queryParamsName =
-    node.parameters.filter((p) => p.in === 'query').length > 0
-      ? tsResolver.resolveQueryParamsName(node, node.parameters.filter((p) => p.in === 'query')[0]!)
-      : undefined
+  const { query: queryParams } = getOperationParameters(node)
+  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : undefined
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
 
   return createFunctionParams({

@@ -3,9 +3,10 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildEnabledCheck } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { resolveErrorNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 
 type Props = {
   name: string
@@ -51,65 +52,7 @@ export function getQueryOptionsParams(
     ],
   })
 
-  return wrapOperationParamsWithMaybeRef(baseParams)
-}
-
-function wrapOperationParamsWithMaybeRef(paramsNode: ast.FunctionParametersNode): ast.FunctionParametersNode {
-  const wrappedParams = paramsNode.params.map((param) => {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      return {
-        ...group,
-        properties: group.properties.map((p) => ({
-          ...p,
-          type: p.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(p.type)}>` }) : p.type,
-        })),
-      }
-    }
-    const fp = param as ast.FunctionParameterNode
-    // Don't wrap 'config' param — it's not reactive
-    if (fp.name === 'config') return fp
-    return {
-      ...fp,
-      type: fp.type ? ast.createParamsType({ variant: 'reference', name: `MaybeRefOrGetter<${printType(fp.type)}>` }) : fp.type,
-    }
-  })
-  return ast.createFunctionParameters({ params: wrappedParams })
-}
-
-function printType(typeNode: ast.ParamsTypeNode | undefined): string {
-  if (!typeNode) return 'unknown'
-  if (typeNode.variant === 'reference') return typeNode.name
-  if (typeNode.variant === 'member') return `${typeNode.base}['${typeNode.key}']`
-  if (typeNode.variant === 'struct') {
-    const parts = typeNode.properties.map((p) => {
-      const typeStr = printType(p.type)
-      const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
-      return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
-    })
-    return `{ ${parts.join('; ')} }`
-  }
-  return 'unknown'
-}
-
-export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
-  const required: string[] = []
-  for (const param of paramsNode.params) {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      for (const child of group.properties) {
-        if (!child.optional && child.default === undefined) {
-          required.push(child.name)
-        }
-      }
-    } else {
-      const fp = param as ast.FunctionParameterNode
-      if (!fp.optional && fp.default === undefined) {
-        required.push(fp.name)
-      }
-    }
-  }
-  return required.join(' && ')
+  return wrapWithMaybeRefOrGetter(baseParams, (name) => name === 'config')
 }
 
 export function QueryOptions({
@@ -136,7 +79,7 @@ export function QueryOptions({
   // Transform: wrap non-config params with toValue(), add signal to config
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
@@ -189,5 +132,3 @@ function addToValueCalls(callStr: string): string {
 
   return result
 }
-
-QueryOptions.getParams = getQueryOptionsParams

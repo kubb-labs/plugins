@@ -1,4 +1,4 @@
-import { buildOperationComments, buildTransformedParamsMapping } from '@internals/shared'
+import { buildOperationComments, buildTransformedParamsMapping, getOperationParameters } from '@internals/shared'
 import { camelCase, isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -54,14 +54,8 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
-  const casedParams = ast.caseParams(node.parameters, paramsCasing)
-  const queryParams = casedParams.filter((p) => p.in === 'query')
-  const headerParams = casedParams.filter((p) => p.in === 'header')
-
-  // Use original (uncased) parameters for mapping so original→camelCase difference is detected
-  const originalPathParams = node.parameters.filter((p) => p.in === 'path')
-  const originalQueryParams = node.parameters.filter((p) => p.in === 'query')
-  const originalHeaderParams = node.parameters.filter((p) => p.in === 'header')
+  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
+  const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
 
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const responseName = resolver.resolveResponseName(node)
