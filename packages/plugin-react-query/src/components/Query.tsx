@@ -66,16 +66,24 @@ function buildUnwrapPrelude(pathParamNames: ReadonlySet<string>): string {
  */
 function buildArgRewriter(pathParamNames: ReadonlySet<string>): (expr: string) => string {
   if (pathParamNames.size === 0) return (expr) => expr
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const names = [...pathParamNames]
   return (expr) => {
-    let out = expr
+    // Step 1: inside any `{...}` block, expand shorthand `{ name }` to
+    // `{ name: name }`. Scoping to braced blocks avoids misfiring on the
+    // commas that separate function-call arguments.
+    let out = expr.replace(/\{[^{}]*\}/g, (block) => {
+      let inner = block
+      for (const n of names) {
+        const e = escape(n)
+        inner = inner.replace(new RegExp(`([{,]\\s*)\\b${e}\\b(\\s*[,}])`, 'g'), `$1${n}: ${n}$2`)
+      }
+      return inner
+    })
+    // Step 2: rename bare references to the shadow var, skipping object keys and member-access.
     for (const n of names) {
-      // Step 1: expand object-literal shorthand `{ id }` -> `{ id: id }`
-      out = out.replace(new RegExp(`([{,]\\s*)\\b${n}\\b(\\s*[,}])`, 'g'), `$1${n}: ${n}$2`)
-    }
-    for (const n of names) {
-      // Step 2: rename bare references to the shadow var, skipping object keys and member-access
-      out = out.replace(new RegExp(`(?<![.])\\b${n}\\b(?!\\s*:)`, 'g'), `${n}_`)
+      const e = escape(n)
+      out = out.replace(new RegExp(`(?<![.])\\b${e}\\b(?!\\s*:)`, 'g'), `${n}_`)
     }
     return out
   }

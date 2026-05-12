@@ -103,6 +103,18 @@ const createUsersWithListInputNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const getUserPetByIdNode = ast.createOperation({
+  operationId: 'getUserPetById',
+  method: 'GET',
+  path: '/user/{userId}/pet/{petId}',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({ name: 'userId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+    ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+  ],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -128,6 +140,13 @@ describe('queryGenerator operation', () => {
       // when the option is enabled — guards the short-circuit in getParams.
       name: 'findByTagsPathParamsAsGetters',
       node: findByTagsNode,
+      options: { pathParamsAsGetters: true },
+    },
+    {
+      // Multiple path params: prelude emits two unwrap lines, rewriter
+      // substitutes both names in the queryKey/queryOptions calls.
+      name: 'getUserPetByIdPathParamsAsGetters',
+      node: getUserPetByIdNode,
       options: { pathParamsAsGetters: true },
     },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
