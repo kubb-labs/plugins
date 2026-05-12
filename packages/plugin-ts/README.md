@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/typescript" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/ts" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,26 @@
 </h4>
 </div>
 
-Swagger integration for TypeScript to generate all the different types based on an OpenAPI specification.
+`@kubb/plugin-ts` generates TypeScript types from your OpenAPI specification. It produces interfaces, enums, union types, and string literals that other Kubb plugins import and build on.
+
+## Features
+
+- Generates interfaces, enums, union types, and string literals from OpenAPI schemas
+- Other plugins — `@kubb/plugin-client`, `@kubb/plugin-zod`, and the query plugins — import from its output
+- Supports strict typing mode for required vs optional fields
+- Controls output organization by tag, operation, or a custom grouping
+
+## Installation
+
+```bash
+npm install @kubb/plugin-ts
+# or
+pnpm add @kubb/plugin-ts
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/ts) for configuration options and examples.
 
 ## Supporting Kubb
 

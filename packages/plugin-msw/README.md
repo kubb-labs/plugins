@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/msw" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/msw" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,26 @@
 </h4>
 </div>
 
-Swagger integration to create mock data based on MSW
+`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers from your OpenAPI specification. The handlers work in both browser and Node.js environments via MSW v2.
+
+## Features
+
+- Generates one handler per OpenAPI operation
+- Infers request and response types from the spec
+- Works in both browser (via service worker) and Node.js test environments
+- Works with `@kubb/plugin-faker` to serve realistic response data
+
+## Installation
+
+```bash
+npm install @kubb/plugin-msw
+# or
+pnpm add @kubb/plugin-msw
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/msw) for configuration options and examples.
 
 ## Supporting Kubb
 

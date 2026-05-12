@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/typescript" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/redoc" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,25 @@
 </h4>
 </div>
 
-Create beautiful docs with Redoc.
+`@kubb/plugin-redoc` generates a ReDoc API reference page from your OpenAPI specification. The output is a standalone HTML file you can host without a build step or server.
+
+## Features
+
+- Produces a self-contained HTML file with the ReDoc three-panel layout
+- Supports theming and branding via ReDoc configuration options
+- Works with any valid OpenAPI 3.0 or 3.1 specification
+
+## Installation
+
+```bash
+npm install @kubb/plugin-redoc
+# or
+pnpm add @kubb/plugin-redoc
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/redoc) for configuration options and examples.
 
 ## Supporting Kubb
 

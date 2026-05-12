@@ -1,16 +1,15 @@
 {
   "name": "@kubb/plugin-redoc",
   "version": "5.0.0-beta.4",
-  "description": "Redoc documentation generator plugin for Kubb, creating beautiful, interactive API documentation from OpenAPI specifications.",
+  "description": "Generate a beautiful, interactive ReDoc API reference page from your OpenAPI specification. Produces a standalone HTML file with a responsive, developer-friendly UI.",
   "keywords": [
     "api-docs",
-    "code-generator",
+    "api-reference",
+    "code-generation",
     "codegen",
     "documentation",
-    "interactive-docs",
     "kubb",
     "openapi",
-    "plugins",
     "redoc",
     "swagger",
     "typescript"

@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/faker" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/faker" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,26 @@
 </h4>
 </div>
 
-Swagger integration to create mock data based on Faker.js
+`@kubb/plugin-faker` generates Faker.js factory functions from your OpenAPI schemas. Each schema produces a function that returns realistic mock data matching the schema's structure.
+
+## Features
+
+- Creates one factory function per schema with optional field overrides
+- Uses Faker.js to produce realistic values for common field types
+- Handles recursive schemas with lazy getters to avoid circular reference errors
+- Works with `@kubb/plugin-msw` to serve mock responses in the browser or Node.js
+
+## Installation
+
+```bash
+npm install @kubb/plugin-faker
+# or
+pnpm add @kubb/plugin-faker
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/faker) for configuration options and examples.
 
 ## Supporting Kubb
 

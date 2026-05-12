@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/react-query" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/react-query" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,26 @@
 </h4>
 </div>
 
-Swagger integration for React-Query to generate all the different hooks based on an OpenAPI specification.
+`@kubb/plugin-react-query` generates TanStack Query hooks from your OpenAPI specification. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` hook.
+
+## Features
+
+- Generates `useQuery`, `useMutation`, `useInfiniteQuery`, and `queryOptions` hooks
+- Infers request, response, and error types from the spec
+- Groups output files by tag, operation, or a custom strategy
+- Works with `@kubb/plugin-ts`, `@kubb/plugin-zod`, and `@kubb/plugin-client`
+
+## Installation
+
+```bash
+npm install @kubb/plugin-react-query
+# or
+pnpm add @kubb/plugin-react-query
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/react-query) for configuration options and examples.
 
 ## Supporting Kubb
 
@@ -37,87 +56,17 @@ Kubb uses an MIT-licensed open source project with its ongoing development made 
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/@kubb/plugin-tanstack-query?flat&colorA=18181B&colorB=f58517
-[npm-version-href]: https://npmjs.com/package/@kubb/plugin-tanstack-query
-[npm-downloads-src]: https://img.shields.io/npm/dm/@kubb/plugin-tanstack-query?flat&colorA=18181B&colorB=f58517
-[npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-tanstack-query
+[npm-version-src]: https://img.shields.io/npm/v/@kubb/plugin-react-query?flat&colorA=18181B&colorB=f58517
+[npm-version-href]: https://npmjs.com/package/@kubb/plugin-react-query
+[npm-downloads-src]: https://img.shields.io/npm/dm/@kubb/plugin-react-query?flat&colorA=18181B&colorB=f58517
+[npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-react-query
 [license-src]: https://img.shields.io/github/license/kubb-labs/kubb.svg?flat&colorA=18181B&colorB=f58517
 [license-href]: https://github.com/kubb-labs/kubb/blob/main/LICENSE
 [build-src]: https://img.shields.io/github/actions/workflow/status/kubb-labs/kubb/ci.yaml?style=flat&colorA=18181B&colorB=f58517
-[build-href]: https://www.npmjs.com/package/@kubb/plugin-tanstack-query
-[minified-src]: https://img.shields.io/bundlephobia/min/@kubb/plugin-tanstack-query?style=flat&colorA=18181B&colorB=f58517
-[minified-href]: https://www.npmjs.com/package/@kubb/plugin-tanstack-query
+[build-href]: https://www.npmjs.com/package/@kubb/plugin-react-query
+[minified-src]: https://img.shields.io/bundlephobia/min/@kubb/plugin-react-query?style=flat&colorA=18181B&colorB=f58517
+[minified-href]: https://www.npmjs.com/package/@kubb/plugin-react-query
 [coverage-src]: https://img.shields.io/codecov/c/github/kubb-labs/kubb?style=flat&colorA=18181B&colorB=f58517
-[coverage-href]: https://www.npmjs.com/package/@kubb/plugin-tanstack-query
+[coverage-href]: https://www.npmjs.com/package/@kubb/plugin-react-query
 [sponsors-src]: https://img.shields.io/github/sponsors/stijnvanhulle?style=flat&colorA=18181B&colorB=f58517
 [sponsors-href]: https://github.com/sponsors/stijnvanhulle/
-
-## options query
-
-### v4
-
-UseBaseQueryOptions => react-query only
-UseQueryOptions => vue-query only
-CreateQueryOptions => solid-query only
-CreateQueryOptions => svelte-query only
-
-### v5
-
-UseBaseQueryOptions => react-query only https://github.com/TanStack/query/blob/ce1305c27e7ac7988656d171d882a665a286cc6a/packages/react-query/src/types.ts#L18
-QueryObserverOptions => vue-query only https://github.com/TanStack/query/blob/main/packages/vue-query/src/useQuery.ts#L24
-UseQueryOptions => solid-query only
-
-## result query
-
-### v4
-
-UseQueryResult => react-query only
-UseQueryReturnType => vue-query only
-CreateQueryResult => solid-query only
-CreateQueryResult => svelte-query only
-
-### v5
-
-UseQueryResult => react-query only
-UseQueryReturnType => vue-query only
-
-## queryOptions() query
-
-### v5
-
-queryOptions => react-query only
-
-```typescript
-{
-  query: {
-    types: {
-      options: 'UseBaseQueryOptions'
-      result: 'UseQueryResult'
-    }
-  }
-}
-```
-
-## options mutation
-
-### v4
-
-UseMutationOptions => react-query only
-VueMutationObserverOptions => vue-query only
-
-### v5
-
-UseMutationOptions => react-query only
-MutationObserverOptions => vue-query only
-
-## result mutation
-
-### v4
-
-UseMutationResult => react-query only
-UseMutationReturnType => vue-query only
-
-### v5
-
-UseMutationResult => react-query only
-UseMutationReturnType => vue-query only

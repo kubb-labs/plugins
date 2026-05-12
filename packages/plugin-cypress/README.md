@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/cypress" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/cypress" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,25 @@
 </h4>
 </div>
 
-Swagger integration to create Cypress requests commands.
+`@kubb/plugin-cypress` generates Cypress request commands from your OpenAPI specification. Each operation in the spec becomes a typed Cypress command, ready to use in your test files.
+
+## Features
+
+- Generates Cypress request commands for each OpenAPI operation
+- Infers request and response types from OpenAPI schemas
+- Works with `@kubb/plugin-ts` for typed test utilities
+
+## Installation
+
+```bash
+npm install @kubb/plugin-cypress
+# or
+pnpm add @kubb/plugin-cypress
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/cypress) for configuration options and examples.
 
 ## Supporting Kubb
 

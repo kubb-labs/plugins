@@ -1,20 +1,16 @@
 {
   "name": "@kubb/plugin-zod",
   "version": "5.0.0-beta.4",
-  "description": "Zod schema generator plugin for Kubb, creating type-safe validation schemas from OpenAPI specifications for runtime data validation.",
+  "description": "Generate Zod validation schemas from your OpenAPI specification for runtime data parsing and type safety. Pairs perfectly with @kubb/plugin-ts for end-to-end type coverage.",
   "keywords": [
-    "code-generator",
+    "code-generation",
     "codegen",
     "kubb",
-    "oas",
     "openapi",
-    "plugins",
+    "parse",
     "runtime-validation",
     "schema",
-    "schema-validation",
     "swagger",
-    "type-safe",
-    "type-safety",
     "typescript",
     "validation",
     "zod"

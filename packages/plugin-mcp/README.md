@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/mcp" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/mcp" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,25 @@
 </h4>
 </div>
 
-Swagger integration to create MCP helpers.
+`@kubb/plugin-mcp` generates Model Context Protocol (MCP) tool definitions from your OpenAPI specification. Each API operation becomes a typed MCP tool that AI assistants can call directly.
+
+## Features
+
+- Converts OpenAPI operations to MCP-compatible tool definitions
+- Derives input and output schemas directly from the spec
+- Works with Claude, ChatGPT, and any MCP-compatible runtime
+
+## Installation
+
+```bash
+npm install @kubb/plugin-mcp
+# or
+pnpm add @kubb/plugin-mcp
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/mcp) for configuration options and examples.
 
 ## Supporting Kubb
 

@@ -11,9 +11,9 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/kubb/tree/main//examples/typescript" target="_blank">View Demo</a>
+<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/zod" target="_blank">View Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/zod" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -21,7 +21,25 @@
 </h4>
 </div>
 
-Swagger integration for Zod to generate all the different schemas based on an OpenAPI specification.
+`@kubb/plugin-zod` generates Zod validation schemas from your OpenAPI specification. Each schema becomes a Zod object you can use to parse and validate data at runtime.
+
+## Features
+
+- Generates one Zod schema per OpenAPI schema
+- Supports both `.parse()` for strict validation and `.safeParse()` for error handling
+- Derives schemas from the same OpenAPI source as `@kubb/plugin-ts`, so types stay in sync
+
+## Installation
+
+```bash
+npm install @kubb/plugin-zod
+# or
+pnpm add @kubb/plugin-zod
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/zod) for configuration options and examples.
 
 ## Supporting Kubb
 
