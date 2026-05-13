@@ -43,7 +43,7 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'types', barrelType: 'named' }"
+    default: "{ path: 'types', barrel: { type: 'named' } }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - name: path
@@ -53,13 +53,11 @@ options:
         tip: |
           if `output.path` is a file, `group` cannot be used.
         default: "'types'"
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
+      - name: barrel
+        type: "{ type: 'named' | 'all', nested?: boolean } | false"
         required: false
-        default: "'named'"
-        description: Specify what to export and optionally disable barrel-file generation.
-        tip: |
-          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        default: "{ type: 'named' }"
+        description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
         examples:
           - name: all
             files:
@@ -73,10 +71,15 @@ options:
                 code: |
                   export { PetService } from './gen/petService.ts'
                 twoslash: false
-          - name: propagate
+          - name: nested
             files:
-              - lang: typescript
-                code: ''
+              - name: kubb.config.ts
+                lang: typescript
+                code: |
+                  output: {
+                    path: './types',
+                    barrel: { type: 'named', nested: true },
+                  }
                 twoslash: false
           - name: 'false'
             files:
@@ -96,13 +99,6 @@ options:
         required: false
         default: 'false'
         description: Whether Kubb overrides existing external files that can be generated if they already exist.
-  - name: contentType
-    type: "'application/json' | (string & {})"
-    required: false
-    description: |
-      Define which content type to use.
-
-      By default, Kubb uses the first JSON-valid media type.
   - name: group
     type: Group
     required: false
@@ -215,11 +211,6 @@ options:
     body: |
       > [!TIP]
       > Consider `'inlineLiteral'` for the most idiomatic output — enum values are inlined directly into the property type instead of creating a separate named type.
-  - name: enumSuffix
-    required: false
-    description: ''
-    warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#enumSuffix). Use `adapterOas({ enumSuffix })` instead.
   - name: enumTypeSuffix
     type: string
     required: false
@@ -275,16 +266,6 @@ options:
       - `'pascalCase'`: `EnumValue`
       - `'camelCase'`: `enumValue`
       - `'none'`: Uses the enum value as-is
-  - name: dateType
-    required: false
-    description: ''
-    warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#dateType). Use `adapterOas({ dateType })` instead.
-  - name: integerType
-    required: false
-    description: ''
-    warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.
   - name: syntaxType
     type: "'type' | 'interface'"
     required: false
@@ -309,16 +290,6 @@ options:
                 name: string;
               }
             twoslash: false
-  - name: unknownType
-    required: false
-    description: ''
-    warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#unknownType). Use `adapterOas({ unknownType })` instead.
-  - name: emptySchemaType
-    required: false
-    description: ''
-    warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
   - name: optionalType
     type: "'questionToken' | 'undefined' | 'questionTokenAndUndefined'"
     required: false
