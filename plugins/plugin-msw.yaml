@@ -44,7 +44,7 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'handlers', barrelType: 'named' }"
+    default: "{ path: 'handlers', barrel: { type: 'named' } }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - extends: ./_shared/core/output-path.yaml
@@ -110,7 +110,7 @@ examples:
               pluginMsw({
                 output: {
                   path: './mocks',
-                  barrelType: 'named',
+                  barrel: { type: 'named' },
                   banner: '/* eslint-disable no-alert, no-console */',
                   footer: '',
                 },

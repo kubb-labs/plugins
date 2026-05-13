@@ -1,13 +1,11 @@
 # Shared option: core/output-barrel-type
 
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
-name: barrelType
-type: "'all' | 'named' | 'propagate' | false"
+name: barrel
+type: "{ type: 'named' | 'all', nested?: boolean } | false"
 required: false
-default: "'named'"
-description: Specify what to export and optionally disable barrel-file generation.
-tip: |
-  Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+default: "{ type: 'named' }"
+description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
 examples:
   - name: all
     files:
@@ -20,11 +18,6 @@ examples:
       - lang: typescript
         code: |
           export { PetService } from './gen/petService.ts'
-        twoslash: false
-  - name: propagate
-    files:
-      - lang: typescript
-        code: ''
         twoslash: false
   - name: 'false'
     files:
