@@ -42,7 +42,7 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'hooks', barrel: { type: 'named' } }"
+    default: "{ path: 'hooks', barrelType: 'named' }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - name: path
@@ -52,11 +52,13 @@ options:
         tip: |
           if `output.path` is a file, `group` cannot be used.
         default: "'hooks'"
-      - name: barrel
-        type: "{ type: 'named' | 'all', nested?: boolean } | false"
+      - name: barrelType
+        type: "'all' | 'named' | 'propagate' | false"
         required: false
-        default: "{ type: 'named' }"
-        description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
+        default: "'named'"
+        description: Specify what to export and optionally disable barrel-file generation.
+        tip: |
+          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
         examples:
           - name: all
             files:
@@ -69,6 +71,11 @@ options:
               - lang: typescript
                 code: |
                   export { PetService } from './gen/petService.ts'
+                twoslash: false
+          - name: propagate
+            files:
+              - lang: typescript
+                code: ''
                 twoslash: false
           - name: 'false'
             files:
@@ -88,6 +95,13 @@ options:
         required: false
         default: 'false'
         description: Whether Kubb overrides existing external files that can be generated if they already exist.
+  - name: contentType
+    type: "'application/json' | (string & {})"
+    required: false
+    description: |
+      Define which content type to use.
+
+      By default, Kubb uses the first JSON-valid media type.
   - name: group
     type: Group
     required: false
