@@ -21,17 +21,14 @@ minimumReleaseAgeExclude:
   - '@types/*'
 
 catalog:
-  # TEMPORARY: pin @kubb/* to the kubb-labs/kubb#3285 pkg.pr.new snapshot so this
-  # PR's stripe E2E job exercises the memory-reduction work. Revert to the next
-  # published beta (5.0.0-beta.11+) before merging.
-  '@kubb/adapter-oas': 'https://pkg.pr.new/@kubb/adapter-oas@3285'
-  '@kubb/agent': 'https://pkg.pr.new/@kubb/agent@3285'
-  '@kubb/core': 'https://pkg.pr.new/@kubb/core@3285'
-  '@kubb/middleware-barrel': 'https://pkg.pr.new/@kubb/middleware-barrel@3285'
-  '@kubb/parser-ts': 'https://pkg.pr.new/@kubb/parser-ts@3285'
-  '@kubb/renderer-jsx': 'https://pkg.pr.new/@kubb/renderer-jsx@3285'
-  kubb: 'https://pkg.pr.new/kubb@3285'
-  unplugin-kubb: 'https://pkg.pr.new/unplugin-kubb@3285'
+  '@kubb/adapter-oas': 5.0.0-beta.10
+  '@kubb/agent': 5.0.0-beta.10
+  '@kubb/core': 5.0.0-beta.10
+  '@kubb/middleware-barrel': 5.0.0-beta.10
+  '@kubb/parser-ts': 5.0.0-beta.10
+  '@kubb/renderer-jsx': 5.0.0-beta.10
+  kubb: 5.0.0-beta.10
+  unplugin-kubb: 5.0.0-beta.10
   '@types/node': ^22.19.18
   prettier: ^3.8.3
   '@types/react': ^19.2.14
