@@ -90,7 +90,10 @@ export function InfiniteQueryOptions({
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
   const enabledText = enabledSource
-    ? `enabled: () => ${enabledSource.split(' && ').map((n) => `!!toValue(${n.trim()})`).join(' && ')},`
+    ? `enabled: () => ${enabledSource
+        .split(' && ')
+        .map((n) => `!!toValue(${n.trim()})`)
+        .join(' && ')},`
     : ''
 
   const hasNewParams = nextParam !== undefined || previousParam !== undefined

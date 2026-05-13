@@ -84,7 +84,10 @@ export function QueryOptions({
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
   const enabledText = enabledSource
-    ? `enabled: () => ${enabledSource.split(' && ').map((n) => `!!toValue(${n.trim()})`).join(' && ')},`
+    ? `enabled: () => ${enabledSource
+        .split(' && ')
+        .map((n) => `!!toValue(${n.trim()})`)
+        .join(' && ')},`
     : ''
 
   return (
