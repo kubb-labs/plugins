@@ -295,7 +295,7 @@ jobs:
       - name: Run E2E tests (stripe)
         working-directory: ./tests/e2e
         env:
-          NODE_OPTIONS: '--max_old_space_size=3000'
+          NODE_OPTIONS: '--max_old_space_size=2048'
           KUBB_DISABLE_TELEMETRY: '1'
           KUBB_SCHEMA: 'stripe'
         run: |

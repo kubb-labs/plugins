@@ -34,6 +34,7 @@ const schemas = [
   { name: 'petStoreV3', path: 'https://petstore3.swagger.io/api/v3/openapi.json' },
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
   { name: 'vercel', path: 'https://openapi.vercel.sh/', strict: false },
+  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
 ]
 
 /** @type {import('@kubb/core').UserConfig} */
