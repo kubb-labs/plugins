@@ -42,7 +42,7 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'clients', barrelType: 'named' }"
+    default: "{ path: 'clients', barrel: { type: 'named' } }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - name: path
@@ -52,13 +52,11 @@ options:
         tip: |
           if `output.path` is a file, `group` cannot be used.
         default: "'clients'"
-      - name: barrelType
-        type: "'all' | 'named' | 'propagate' | false"
+      - name: barrel
+        type: "{ type: 'named' | 'all', nested?: boolean } | false"
         required: false
-        default: "'named'"
-        description: Specify what to export and optionally disable barrel-file generation.
-        tip: |
-          Using `propagate` will prevent a plugin from creating a barrel file, but it will still propagate, allowing [`output.barrelType`](https://kubb.dev/docs/5.x/configuration#output-barreltype) to export the specific function or type.
+        default: "{ type: 'named' }"
+        description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
         examples:
           - name: all
             files:
@@ -72,10 +70,15 @@ options:
                 code: |
                   export { PetService } from './gen/petService.ts'
                 twoslash: false
-          - name: propagate
+          - name: nested
             files:
-              - lang: typescript
-                code: ''
+              - name: kubb.config.ts
+                lang: typescript
+                code: |
+                  output: {
+                    path: './clients',
+                    barrel: { type: 'named', nested: true },
+                  }
                 twoslash: false
           - name: 'false'
             files:
@@ -95,13 +98,6 @@ options:
         required: false
         default: 'false'
         description: Whether Kubb overrides existing external files that can be generated if they already exist.
-  - name: contentType
-    type: "'application/json' | (string & {})"
-    required: false
-    description: |
-      Define which content type to use.
-
-      By default, Kubb uses the first JSON-valid media type.
   - name: group
     type: Group
     required: false
@@ -542,17 +538,17 @@ options:
               const petClient = new Pet()
               const pet = await petClient.getPetById({ petId: 1 })
             twoslash: false
-  - name: wrapper
+  - name: sdk
     type: '{ className: string }'
     required: false
-    description: Generate a wrapper class that composes all tag-based client classes into a single entry point.
+    description: Generate an SDK class that composes all tag-based client classes into a single entry point.
     properties:
       - name: className
         type: string
         required: true
-        description: Name of the generated wrapper class.
+        description: Name of the generated SDK class.
         examples:
-          - name: wrapper.className
+          - name: sdk.className
             files:
               - name: kubb.config.ts
                 lang: typescript
@@ -570,7 +566,7 @@ options:
                         output: { path: './clients' },
                         clientType: 'class',
                         group: { type: 'tag' },
-                        wrapper: { className: 'PetStoreClient' },
+                        sdk: { className: 'PetStoreClient' },
                       }),
                     ],
                   })
@@ -663,53 +659,15 @@ options:
       Define additional generators next to the built-in generators.
 
       See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
-  - name: transformers
-    type: Visitor
-    required: false
-    description: |
-      A single AST visitor applied to every node before code is printed. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the preset transformer's result is used as the fallback — so you only need to supply the methods you want to change.
-
-      Visitor methods receive the node and a context object. Return a modified node to replace it, or return `undefined`/`void` to leave it unchanged.
-    examples:
-      - name: Strip descriptions before printing
-        files:
-          - lang: typescript
-            code: |
-              import { pluginTs } from '@kubb/plugin-ts'
-
-              pluginTs({
-                transformer: {
-                  schema(node) {
-                    return { ...node, description: undefined }
-                  },
-                },
-              })
-            twoslash: false
-      - name: Prefix every operationId
-        files:
-          - lang: typescript
-            code: |
-              import { pluginTs } from '@kubb/plugin-ts'
-
-              pluginTs({
-                transformer: {
-                  operation(node) {
-                    return { ...node, operationId: `api_${node.operationId}` }
-                  },
-                },
-              })
-            twoslash: false
-    tip: |
-      Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.
   - name: resolver
     type: Partial<ResolverClient> & ThisType<ResolverClient>
     required: false
-    description: Override individual resolver methods to customize generated names. Any method you omit falls back to the preset resolver. Use `this.default(...)` to call the preset's implementation.
+    description: Customize helper naming on top of the active compatibility preset.
+    tip: |
+      Learn more in the [resolver docs](https://kubb.dev/plugins/plugin-client#resolver).
     codeBlock:
       lang: typescript
       code: |
-        import { pluginClient } from '@kubb/plugin-client'
-
         pluginClient({
           resolver: {
             resolveName(name) {
@@ -718,15 +676,12 @@ options:
           },
         })
   - name: transformer
-    type: Visitor
+    type: ast.Visitor
     required: false
-    experimental: true
-    description: Apply an AST `Visitor` to transform operation nodes before they are printed.
+    description: Apply a single AST visitor before the client operations are rendered.
     codeBlock:
       lang: typescript
       code: |
-        import { pluginClient } from '@kubb/plugin-client'
-
         pluginClient({
           transformer: {
             operation(node) {
@@ -751,7 +706,7 @@ examples:
               pluginClient({
                 output: {
                   path: './clients/axios',
-                  barrelType: 'named',
+                  barrel: { type: 'named' },
                   banner: '/* eslint-disable no-alert, no-console */',
                   footer: '',
                 },
