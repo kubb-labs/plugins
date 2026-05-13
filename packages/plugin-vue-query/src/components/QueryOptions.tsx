@@ -83,7 +83,12 @@ export function QueryOptions({
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
+  const enabledText = enabledSource
+    ? `enabled: () => ${enabledSource
+        .split(' && ')
+        .map((n) => `!!toValue(${n.trim()})`)
+        .join(' && ')},`
+    : ''
 
   return (
     <File.Source name={name} isExportable isIndexable>

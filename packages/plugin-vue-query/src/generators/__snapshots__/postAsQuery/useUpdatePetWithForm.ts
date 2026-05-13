@@ -52,7 +52,7 @@ export function updatePetWithFormQueryOptions(
 ) {
   const queryKey = updatePetWithFormQueryKey(petId, data, params)
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormResponse>({
-    enabled: () => !!petId,
+    enabled: () => !!toValue(petId),
     queryKey,
     queryFn: async ({ signal }) => {
       return updatePetWithForm(toValue(petId), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })
