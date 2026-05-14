@@ -17,7 +17,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { adapter, config, resolver, plugin, driver, root } = ctx
+    const { adapter, config, resolver, plugin, driver, root, inputNode } = ctx
     const { output, paramsCasing, group } = ctx.options
 
     const pluginZod = driver.getPlugin(pluginZodName)
@@ -108,8 +108,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={serverFile.baseName}
           path={serverFile.path}
           meta={serverFile.meta}
-          banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-          footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+          banner={resolver.resolveBanner(inputNode, { output, config })}
+          footer={resolver.resolveFooter(inputNode, { output, config })}
         >
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/sdk/server/mcp'} />
           <File.Import name={['z']} path={'zod'} />
@@ -118,8 +118,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           {imports}
           <Server
             name={name}
-            serverName={adapter.inputNode?.meta?.title ?? 'server'}
-            serverVersion={adapter.inputNode?.meta?.version ?? '0.0.0'}
+            serverName={inputNode.meta?.title ?? 'server'}
+            serverVersion={inputNode.meta?.version ?? '0.0.0'}
             paramsCasing={paramsCasing}
             operations={operationsMapped}
           />
@@ -130,7 +130,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
             {`
           {
             "mcpServers": {
-              "${adapter.inputNode?.meta?.title || 'server'}": {
+              "${inputNode.meta?.title || 'server'}": {
                 "type": "stdio",
                 "command": "npx",
                 "args": ["tsx", "${path.relative(path.dirname(jsonFile.path), serverFile.path)}"]

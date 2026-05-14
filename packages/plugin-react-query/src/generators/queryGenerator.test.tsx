@@ -141,9 +141,8 @@ describe('queryGenerator operation', () => {
 
     await renderGeneratorOperation(queryGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
-      }),
+      adapter: createMockedAdapter(),
+      inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
       driver,
       plugin,
       options,
