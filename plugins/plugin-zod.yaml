@@ -41,12 +41,12 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'zod', barrelType: 'named' }"
+    default: "{ path: 'zod', barrel: { type: 'named' } }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'zod'"
-      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-barrel.yaml
       - extends: ./_shared/core/output-banner.yaml
       - extends: ./_shared/core/output-footer.yaml
       - extends: ./_shared/core/output-override.yaml
