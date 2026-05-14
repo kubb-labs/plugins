@@ -205,6 +205,7 @@ describe('clientGenerator operation', () => {
     const options: PluginClient['resolvedOptions'] = {
       ...defaultOptions,
       ...props.options,
+      ...('baseURL' in props ? { baseURL: props.baseURL } : {}),
     }
     const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
@@ -215,7 +216,6 @@ describe('clientGenerator operation', () => {
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
       adapter: createMockedAdapter(),
-      inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
       driver,
       plugin,
       options,

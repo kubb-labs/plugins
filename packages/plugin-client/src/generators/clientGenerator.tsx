@@ -12,7 +12,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { adapter, config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
 

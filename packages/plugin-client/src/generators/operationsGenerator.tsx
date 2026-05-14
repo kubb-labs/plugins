@@ -7,7 +7,7 @@ export const operationsGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { config, resolver, adapter, root, inputNode } = ctx
+    const { config, resolver, root, inputNode } = ctx
     const { output, group } = ctx.options
 
     const name = 'operations'

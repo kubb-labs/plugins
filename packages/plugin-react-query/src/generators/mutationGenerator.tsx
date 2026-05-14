@@ -14,7 +14,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-mutation',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { adapter, config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)

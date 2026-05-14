@@ -14,7 +14,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
   name: 'react-suspense-infinite-query',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { adapter, config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const {
       output,
       query,

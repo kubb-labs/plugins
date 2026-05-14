@@ -7,7 +7,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { resolver, config, root, adapter, inputNode } = ctx
+    const { resolver, config, root, inputNode } = ctx
     const { output, group } = ctx.options
 
     const handlersName = resolver.resolveHandlersName()

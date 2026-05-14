@@ -13,7 +13,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { resolver, config, root, adapter } = ctx
+    const { resolver, config, root, inputNode } = ctx
     const { output, customOptions, query, mutation, suspense, infinite, group, override } = ctx.options
 
     if (!customOptions) return null
