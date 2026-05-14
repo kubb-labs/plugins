@@ -33,7 +33,7 @@ const schemas = [
   { name: 'dataset_api', path: './schemas/dataset_api.yaml' },
   { name: 'petStoreV3', path: 'https://petstore3.swagger.io/api/v3/openapi.json' },
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
-  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
+  // stripe omitted: its circular-reference expansion OOMs at parse time regardless of streaming
   { name: 'vercel', path: 'https://openapi.vercel.sh/', strict: false },
 ]
 
@@ -120,9 +120,9 @@ const baseConfig = {
  * @link https://apis.guru/
  *
  * Set KUBB_SCHEMA to a comma-separated list of schema names to only run those schemas.
- * Per-plugin file flushing reduces peak generation memory, so large schemas
- * (e.g. twitter, stripe) can run alongside others without hitting OOM.
- * Example: KUBB_SCHEMA=stripe kubb generate
+ * Per-plugin file flushing reduces peak generation memory, so large schemas like twitter
+ * run alongside others without OOM. Use isolation for schemas that also stress the parser.
+ * Example: KUBB_SCHEMA=openai kubb generate
  */
 const schemaFilter = process.env.KUBB_SCHEMA?.split(',').map((s) => s.trim())
 
