@@ -11,7 +11,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { driver, resolver, config, root, adapter, inputNode } = ctx
+    const { driver, resolver, config, root, inputNode } = ctx
     const { output, parser, baseURL, group } = ctx.options
 
     const fileName = resolver.resolveName(node.operationId)

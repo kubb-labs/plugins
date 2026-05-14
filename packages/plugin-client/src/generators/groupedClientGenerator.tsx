@@ -8,7 +8,7 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
   name: 'groupedClient',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { config, resolver, adapter, root, inputNode } = ctx
+    const { config, resolver, root, inputNode } = ctx
     const { output, group } = ctx.options
 
     const controllers = nodes.reduce(

@@ -9,7 +9,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { adapter, config, resolver, driver, root, inputNode } = ctx
+    const { config, resolver, driver, root, inputNode } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)

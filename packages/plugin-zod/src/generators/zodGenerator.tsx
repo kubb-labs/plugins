@@ -37,7 +37,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : undefined
 
-    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
+    const cyclicSchemas = ast.findCircularSchemas(adapter.inputNode?.schemas ?? inputNode.schemas)
 
     const schemaPrinter = mini
       ? printerZodMini({ guidType, wrapOutput, resolver, cyclicSchemas, nodes: printer?.nodes })
@@ -72,7 +72,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     } as const
 
-    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
+    const cyclicSchemas = ast.findCircularSchemas(adapter.inputNode?.schemas ?? inputNode.schemas)
 
     function renderSchemaEntry({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> }) {
       if (!schema) return null
@@ -171,7 +171,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     )
   },
   operations(nodes, ctx) {
-    const { adapter, config, resolver, root } = ctx
+    const { config, resolver, root, inputNode } = ctx
     const { output, importPath, group, operations, paramsCasing } = ctx.options
 
     if (!operations) {

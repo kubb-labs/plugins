@@ -14,7 +14,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-infinite',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { adapter, config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const { output, query, mutation, infinite, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)

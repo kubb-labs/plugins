@@ -17,7 +17,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { adapter, config, resolver, plugin, driver, root, inputNode } = ctx
+    const { config, resolver, plugin, driver, root, inputNode } = ctx
     const { output, paramsCasing, group } = ctx.options
 
     const pluginZod = driver.getPlugin(pluginZodName)
