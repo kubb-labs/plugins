@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, createKubb, type Plugin } from '@kubb/core'
+import { AsyncEventEmitter, createKubb, memoryStorage, type Plugin } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -22,6 +22,7 @@ const __dirname = path.dirname(__filename)
 
 describe('Plugin Generation Performance', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
+  const twitterPath = path.resolve(__dirname, '../e2e/schemas/twitter.json')
 
   bench(
     'single plugin generation (plugin-ts)',
@@ -35,8 +36,8 @@ describe('Plugin Generation Performance', () => {
         output: {
           path: './src/gen',
           clean: false,
-          write: false,
         },
+        storage: memoryStorage(),
         plugins: [
           pluginTs({
             output: {
@@ -68,8 +69,8 @@ describe('Plugin Generation Performance', () => {
         output: {
           path: './src/gen',
           clean: false,
-          write: false,
         },
+        storage: memoryStorage(),
         plugins: [
           pluginTs({
             output: {
@@ -106,8 +107,59 @@ describe('Plugin Generation Performance', () => {
         output: {
           path: './src/gen',
           clean: false,
-          write: false,
         },
+        storage: memoryStorage(),
+        plugins: [
+          pluginTs({
+            output: {
+              path: 'types',
+              barrel: false,
+            },
+            enumType: 'asConst',
+          }),
+          pluginClient({
+            output: {
+              path: 'clients',
+            },
+          }),
+          pluginZod({
+            output: {
+              path: 'zod',
+              barrel: false,
+            },
+            inferred: true,
+          }),
+          pluginFaker({
+            output: {
+              path: 'mocks',
+              barrel: false,
+            },
+          }),
+        ] as Plugin[],
+      })
+
+      const hooks = new AsyncEventEmitter()
+      await createKubb(config, { hooks }).build()
+    },
+    {
+      time: 10000,
+    },
+  )
+
+  bench(
+    'large schema streaming (twitter + multiple plugins)',
+    async () => {
+      const config = defineConfig({
+        root: '.',
+        input: {
+          path: twitterPath,
+        },
+        adapter: adapterOas({ validate: false }),
+        output: {
+          path: './src/gen',
+          clean: false,
+        },
+        storage: memoryStorage(),
         plugins: [
           pluginTs({
             output: {
