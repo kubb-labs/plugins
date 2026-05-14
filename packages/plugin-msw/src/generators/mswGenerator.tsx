@@ -11,7 +11,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { driver, resolver, config, root, adapter } = ctx
+    const { driver, resolver, config, root, adapter, inputNode } = ctx
     const { output, parser, baseURL, group } = ctx.options
 
     const fileName = resolver.resolveName(node.operationId)
@@ -54,8 +54,8 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         baseName={mock.file.baseName}
         path={mock.file.path}
         meta={mock.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />

@@ -214,9 +214,8 @@ describe('clientGenerator operation', () => {
 
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
-      }),
+      adapter: createMockedAdapter(),
+      inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
       driver,
       plugin,
       options,

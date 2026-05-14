@@ -8,7 +8,7 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
   name: 'groupedClient',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { config, resolver, adapter, root } = ctx
+    const { config, resolver, adapter, root, inputNode } = ctx
     const { output, group } = ctx.options
 
     const controllers = nodes.reduce(
@@ -55,8 +55,8 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-              footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+              banner={resolver.resolveBanner(inputNode, { output, config })}
+              footer={resolver.resolveFooter(inputNode, { output, config })}
             >
               {clients.map((client) => (
                 <File.Import key={client.name} name={[client.name]} root={file.path} path={client.file.path} />
