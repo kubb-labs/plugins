@@ -1,5 +1,62 @@
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
+import type { AdapterStreamSource } from '@kubb/core'
+
+const cyclicSchemasCache = new WeakMap<object, Promise<Set<string>>>()
+
+/**
+ * Resolves the set of schema names that participate in cycles. When the
+ * adapter exposes a streaming `source`, schemas are pulled one at a time
+ * (only their ref names are kept) so peak memory stays bounded; otherwise we
+ * fall back to `inputNode.schemas`. Result is memoized per source / input.
+ */
+function getCyclicSchemas(adapter: { source?: AdapterStreamSource | null; inputNode: ast.InputNode | null }): Promise<Set<string>> | undefined {
+  const source = adapter.source ?? null
+  if (source) {
+    let cached = cyclicSchemasCache.get(source)
+    if (!cached) {
+      cached = (async () => {
+        // Only the ref-name graph is retained; schema bodies are released after each iteration.
+        const graph = new Map<string, Set<string>>()
+        for await (const schema of source.schemas) {
+          if (!schema.name) continue
+          graph.set(schema.name, ast.collectReferencedSchemaNames(schema))
+        }
+        return resolveCyclesFromGraph(graph)
+      })()
+      cyclicSchemasCache.set(source, cached)
+    }
+    return cached
+  }
+
+  const inputNode = adapter.inputNode
+  if (!inputNode) return undefined
+  return Promise.resolve(ast.findCircularSchemas(inputNode.schemas))
+}
+
+/**
+ * Identifies which schemas participate in cycles given an adjacency graph
+ * of refs by name. Mirrors the inner loop of `ast.findCircularSchemas`.
+ */
+function resolveCyclesFromGraph(graph: Map<string, Set<string>>): Set<string> {
+  const circular = new Set<string>()
+  for (const start of graph.keys()) {
+    const visited = new Set<string>()
+    const stack: string[] = [...(graph.get(start) ?? [])]
+    while (stack.length > 0) {
+      const node = stack.pop()!
+      if (node === start) {
+        circular.add(start)
+        break
+      }
+      if (visited.has(node)) continue
+      visited.add(node)
+      const next = graph.get(node)
+      if (next) for (const r of next) stack.push(r)
+    }
+  }
+  return circular
+}
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations.tsx'
@@ -13,7 +70,7 @@ import { buildSchemaNames } from '../utils.ts'
 export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
   renderer: jsxRenderer,
-  schema(node, ctx) {
+  async schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
     const dateType = (adapter as Adapter<AdapterOas>).options.dateType
@@ -37,7 +94,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : undefined
 
-    const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
+    const cyclicSchemas = await getCyclicSchemas(adapter)
 
     const schemaPrinter = mini
       ? printerZodMini({ guidType, wrapOutput, resolver, cyclicSchemas, nodes: printer?.nodes })
@@ -58,7 +115,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       </File>
     )
   },
-  operation(node, ctx) {
+  async operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
     const dateType = (adapter as Adapter<AdapterOas>).options.dateType
@@ -72,7 +129,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
     } as const
 
-    const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
+    const cyclicSchemas = await getCyclicSchemas(adapter)
 
     function renderSchemaEntry({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> }) {
       if (!schema) return null
@@ -170,7 +227,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       </File>
     )
   },
-  operations(nodes, ctx) {
+  async operations(nodes, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, importPath, group, operations, paramsCasing } = ctx.options
 
@@ -183,7 +240,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root, output, group }),
     } as const
 
-    const transformedOperations = nodes.map((node) => {
+    const collectedNodes: ast.OperationNode[] = []
+    for await (const node of nodes) collectedNodes.push(node)
+
+    const transformedOperations = collectedNodes.map((node) => {
       const params = ast.caseParams(node.parameters, paramsCasing)
 
       return {

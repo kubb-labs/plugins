@@ -41,10 +41,13 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
 export const staticClassClientGenerator = defineGenerator<PluginClient>({
   name: 'staticClassClient',
   renderer: jsxRenderer,
-  operations(nodes, ctx) {
+  async operations(nodes, ctx) {
     const { adapter, config, driver, resolver, root } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath } = ctx.options
     const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
+
+    const collectedNodes: ast.OperationNode[] = []
+    for await (const node of nodes) collectedNodes.push(node)
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -77,7 +80,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
       }
     }
 
-    const controllers = nodes.reduce((acc, operationNode) => {
+    const controllers = collectedNodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
       const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 

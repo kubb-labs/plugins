@@ -1,5 +1,6 @@
 import { posix } from 'node:path'
 import { ast } from '@kubb/core'
+import type { AdapterStreamSource } from '@kubb/core'
 import type { ResolverFaker } from './types.ts'
 
 /**
@@ -55,14 +56,24 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
 }
 
 /**
- * Resolves a schema reference by looking up the referenced schema in the provided array.
- * Returns the original node if it's not a reference.
+ * Resolves a schema reference. Uses `adapter.source.loadSchema` when the
+ * adapter streams schemas; otherwise falls back to a linear scan of
+ * `inputNode.schemas`. Returns the original node if it's not a reference.
  */
-export function resolveSchemaRef(node: ast.SchemaNode, schemas: Array<ast.SchemaNode>): ast.SchemaNode {
-  if (node.type !== 'ref') {
+export async function resolveSchemaRef(
+  node: ast.SchemaNode,
+  adapter: { source?: AdapterStreamSource | null; inputNode: ast.InputNode | null },
+): Promise<ast.SchemaNode> {
+  if (node.type !== 'ref' || !node.name) {
     return node
   }
 
+  if (adapter.source) {
+    const resolved = await adapter.source.loadSchema(node.name)
+    return resolved && resolved.type !== 'ref' ? resolved : node
+  }
+
+  const schemas = adapter.inputNode?.schemas ?? []
   return schemas.find((schema) => schema.name === node.name && schema.type !== 'ref') ?? node
 }
 

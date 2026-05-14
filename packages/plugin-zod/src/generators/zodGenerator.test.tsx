@@ -306,12 +306,11 @@ describe('zodGenerator — Schema', () => {
       config: testConfig,
       adapter: createMockedAdapter({
         resolvedOptions: { dateType: 'string' },
-        inputNode: {
-          kind: 'Input',
+        inputNode: ast.createInput({
           schemas: [petPolySchema, catCycleSchema],
           operations: [],
           meta: {},
-        },
+        }),
       }),
       driver,
       plugin,

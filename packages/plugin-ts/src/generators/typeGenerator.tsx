@@ -1,10 +1,48 @@
 import { ast, defineGenerator } from '@kubb/core'
+import type { AdapterStreamSource } from '@kubb/core'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
 import { buildData, buildResponses, buildResponseUnion } from '../utils.ts'
+
+const enumSchemaNamesCache = new WeakMap<object, Promise<Set<string>>>()
+
+/**
+ * Resolves the set of top-level schema names that are enums. When the
+ * adapter exposes a streaming `source`, schemas are pulled from storage on
+ * demand and the result is memoized per-source; otherwise we fall back to
+ * `inputNode.schemas`.
+ */
+function getEnumSchemaNames(adapter: { source?: AdapterStreamSource | null; inputNode: ast.InputNode | null }): Promise<Set<string>> {
+  const source = adapter.source ?? null
+  if (source) {
+    let cached = enumSchemaNamesCache.get(source)
+    if (!cached) {
+      cached = (async () => {
+        const names = new Set<string>()
+        for await (const schema of source.schemas) {
+          if (schema.name && ast.narrowSchema(schema, ast.schemaTypes.enum)) {
+            names.add(schema.name)
+          }
+        }
+        return names
+      })()
+      enumSchemaNamesCache.set(source, cached)
+    }
+    return cached
+  }
+
+  const schemas = adapter.inputNode?.schemas ?? []
+  const names = new Set<string>()
+  for (const schema of schemas) {
+    if (schema.name && ast.narrowSchema(schema, ast.schemaTypes.enum)) {
+      names.add(schema.name)
+    }
+  }
+  return Promise.resolve(names)
+}
 
 function getContentTypeSuffix(contentType: string): string {
   const baseType = contentType.split(';')[0]!.trim()
@@ -27,7 +65,7 @@ function getPerContentTypeName(dataName: string, suffix: string): string {
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
-  schema(node, ctx) {
+  async schema(node, ctx) {
     const { enumType, enumTypeSuffix, enumKeyCasing, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
@@ -37,7 +75,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const mode = ctx.getMode(output)
     // Build a set of schema names that are enums so the ref handler and getImports
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = new Set((adapter.inputNode?.schemas ?? []).filter((s) => ast.narrowSchema(s, ast.schemaTypes.enum) && s.name).map((s) => s.name!))
+    const enumSchemaNames = await getEnumSchemaNames(adapter)
 
     function resolveImportName(schemaName: string): string {
       if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && enumTypeSuffix && enumSchemaNames.has(schemaName)) {
@@ -95,7 +133,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       </File>
     )
   },
-  operation(node, ctx) {
+  async operation(node, ctx) {
     const { enumType, enumTypeSuffix, enumKeyCasing, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
@@ -109,7 +147,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     // Build a set of schema names that are enums so the ref handler and getImports
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = new Set((adapter.inputNode?.schemas ?? []).filter((s) => ast.narrowSchema(s, ast.schemaTypes.enum) && s.name).map((s) => s.name!))
+    const enumSchemaNames = await getEnumSchemaNames(adapter)
 
     function resolveImportName(schemaName: string): string {
       if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && enumTypeSuffix && enumSchemaNames.has(schemaName)) {

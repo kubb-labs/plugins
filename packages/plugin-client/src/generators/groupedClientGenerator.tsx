@@ -7,11 +7,14 @@ import type { PluginClient } from '../types'
 export const groupedClientGenerator = defineGenerator<PluginClient>({
   name: 'groupedClient',
   renderer: jsxRenderer,
-  operations(nodes, ctx) {
+  async operations(nodes, ctx) {
     const { config, resolver, adapter, root } = ctx
     const { output, group } = ctx.options
 
-    const controllers = nodes.reduce(
+    const collectedNodes: ast.OperationNode[] = []
+    for await (const node of nodes) collectedNodes.push(node)
+
+    const controllers = collectedNodes.reduce(
       (acc, operationNode) => {
         if (group?.type === 'tag') {
           const tag = operationNode.tags[0]

@@ -1,5 +1,6 @@
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
+import type { AdapterStreamSource } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -14,10 +15,61 @@ import {
   resolveTypeReference,
 } from '../utils.ts'
 
+const cyclicSchemasCache = new WeakMap<object, Promise<Set<string>>>()
+
+/**
+ * Resolves the set of schema names that participate in cycles. When the
+ * adapter exposes a streaming `source`, schemas are pulled one at a time
+ * (only their ref names are kept) so peak memory stays bounded; otherwise we
+ * fall back to `inputNode.schemas`. Result is memoized per source / input.
+ */
+function getCyclicSchemas(adapter: { source?: AdapterStreamSource | null; inputNode: ast.InputNode | null }): Promise<Set<string>> | undefined {
+  const source = adapter.source ?? null
+  if (source) {
+    let cached = cyclicSchemasCache.get(source)
+    if (!cached) {
+      cached = (async () => {
+        const graph = new Map<string, Set<string>>()
+        for await (const schema of source.schemas) {
+          if (!schema.name) continue
+          graph.set(schema.name, ast.collectReferencedSchemaNames(schema))
+        }
+        return resolveCyclesFromGraph(graph)
+      })()
+      cyclicSchemasCache.set(source, cached)
+    }
+    return cached
+  }
+
+  const inputNode = adapter.inputNode
+  if (!inputNode) return undefined
+  return Promise.resolve(ast.findCircularSchemas(inputNode.schemas))
+}
+
+function resolveCyclesFromGraph(graph: Map<string, Set<string>>): Set<string> {
+  const circular = new Set<string>()
+  for (const start of graph.keys()) {
+    const visited = new Set<string>()
+    const stack: string[] = [...(graph.get(start) ?? [])]
+    while (stack.length > 0) {
+      const node = stack.pop()!
+      if (node === start) {
+        circular.add(start)
+        break
+      }
+      if (visited.has(node)) continue
+      visited.add(node)
+      const next = graph.get(node)
+      if (next) for (const r of next) stack.push(r)
+    }
+  }
+  return circular
+}
+
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRenderer,
-  schema(node, ctx) {
+  async schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
@@ -28,7 +80,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const schemaNode = resolveSchemaRef(node, adapter.inputNode.schemas)
+    const schemaNode = await resolveSchemaRef(node, adapter)
     const schemaName = schemaNode.name ?? node.name
     const mode = ctx.getMode(output)
     const meta = {
@@ -41,7 +93,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
-    const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
+    const cyclicSchemas = await getCyclicSchemas(adapter)
     const printerInstance = printerFaker({
       resolver,
       schemaName,
@@ -96,7 +148,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       </File>
     )
   },
-  operation(node, ctx) {
+  async operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
@@ -106,6 +158,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     }
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
+    const cyclicSchemasOuter = await getCyclicSchemas(adapter)
 
     const params = ast.caseParams(node.parameters, paramsCasing)
     const paramEntries = params.map((param) => ({
@@ -180,7 +233,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }
 
       const canOverride = canOverrideSchema(schema)
-      const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
+      const cyclicSchemas = cyclicSchemasOuter
       const printerInstance = printerFaker({
         resolver,
         schemaName: name,
