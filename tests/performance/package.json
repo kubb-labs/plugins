@@ -14,6 +14,9 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false",
+    "perf:synth-spec": "node --import tsx ./synth-spec.ts",
+    "perf:medium": "node --max-old-space-size=2048 --import tsx ./medium.ts",
+    "perf:medium:6g": "node --max-old-space-size=6144 --import tsx ./medium.ts",
     "perf:stripe": "node --max-old-space-size=2048 --import tsx ./stripe.ts",
     "perf:stripe:4g": "node --max-old-space-size=4096 --import tsx ./stripe.ts",
     "perf:stripe:6g": "node --max-old-space-size=6144 --import tsx ./stripe.ts"
