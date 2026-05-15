@@ -1,5 +1,5 @@
 import type { Adapter } from '@kubb/core'
-import { ast, collectOperations, defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations.tsx'
@@ -171,7 +171,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
     )
   },
   async operations(nodes, ctx) {
-    const allNodes = await collectOperations(nodes)
     const { config, resolver, root, inputNode } = ctx
     const { output, importPath, group, operations, paramsCasing } = ctx.options
 
@@ -184,7 +183,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root, output, group }),
     } as const
 
-    const transformedOperations = allNodes.map((node) => {
+    const transformedOperations = nodes.map((node) => {
       const params = ast.caseParams(node.parameters, paramsCasing)
 
       return {

@@ -2,7 +2,7 @@ import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
-import { collectOperations, defineGenerator } from '@kubb/core'
+import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -44,7 +44,6 @@ export const classClientGenerator = defineGenerator<PluginClient>({
   name: 'classClient',
   renderer: jsxRenderer,
   async operations(nodes, ctx) {
-    const allNodes = await collectOperations(nodes)
     const { config, driver, resolver, root, inputNode } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
     const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
@@ -80,7 +79,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
       }
     }
 
-    const controllers = allNodes.reduce((acc, operationNode) => {
+    const controllers = nodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
       const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
