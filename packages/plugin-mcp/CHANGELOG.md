@@ -1,5 +1,16 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.12
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
+- Updated dependencies [[`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f)]:
+  - @kubb/plugin-client@5.0.0-beta.12
+  - @kubb/plugin-ts@5.0.0-beta.12
+  - @kubb/plugin-zod@5.0.0-beta.12
+
 ## 5.0.0-beta.10
 
 ### Patch Changes

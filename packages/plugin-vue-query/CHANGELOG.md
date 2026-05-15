@@ -1,5 +1,20 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.12
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
+- [#152](https://github.com/kubb-labs/plugins/pull/152) [`1c6a76f`](https://github.com/kubb-labs/plugins/commit/1c6a76f69b305b14dfce521252fe16edec5b896d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `enabled` flag to unwrap `MaybeRefOrGetter` params using `toValue()`.
+
+  The `enabled` option in generated `queryOptions` and `infiniteQueryOptions` now correctly wraps each required parameter with `!!toValue(param)` instead of a plain `!!param` check. This ensures reactive refs and getter functions are properly resolved before evaluating whether a query should be enabled.
+
+- Updated dependencies [[`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f)]:
+  - @kubb/plugin-client@5.0.0-beta.12
+  - @kubb/plugin-ts@5.0.0-beta.12
+  - @kubb/plugin-zod@5.0.0-beta.12
+
 ## 5.0.0-beta.10
 
 ### Patch Changes
