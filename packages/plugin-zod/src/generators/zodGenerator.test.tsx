@@ -304,15 +304,13 @@ describe('zodGenerator — Schema', () => {
 
     await renderGeneratorSchema(zodGenerator, catCycleSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        resolvedOptions: { dateType: 'string' },
-        inputNode: {
-          kind: 'Input',
-          schemas: [petPolySchema, catCycleSchema],
-          operations: [],
-          meta: {},
-        },
-      }),
+      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
+      inputNode: {
+        kind: 'Input',
+        schemas: [petPolySchema, catCycleSchema],
+        operations: [],
+        meta: {},
+      },
       driver,
       plugin,
       options: defaultOptions,
