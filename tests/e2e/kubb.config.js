@@ -121,6 +121,10 @@ export default defineConfig(() => {
     return {
       ...baseConfig,
       name,
+      output: {
+        ...baseConfig.output,
+        path: `./gen/${name}`,
+      },
       input: {
         path,
       },
