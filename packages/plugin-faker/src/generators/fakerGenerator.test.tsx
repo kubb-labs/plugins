@@ -181,14 +181,13 @@ describe('fakerGenerator — schema', () => {
 
     await renderGeneratorSchema(fakerGenerator, node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: {
-          kind: 'Input',
-          schemas: [categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema],
-          operations: [],
-          meta: {},
-        },
-      }),
+      adapter: createMockedAdapter(),
+      inputNode: {
+        kind: 'Input',
+        schemas: [categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema],
+        operations: [],
+        meta: {},
+      },
       driver,
       plugin,
       options: resolvedOptions,
@@ -205,14 +204,13 @@ describe('fakerGenerator — schema', () => {
 
     await renderGeneratorSchema(fakerGenerator, emojiSchema, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: {
-          kind: 'Input',
-          schemas: [emojiSchema],
-          operations: [],
-          meta: {},
-        },
-      }),
+      adapter: createMockedAdapter(),
+      inputNode: {
+        kind: 'Input',
+        schemas: [emojiSchema],
+        operations: [],
+        meta: {},
+      },
       driver,
       plugin,
       options: resolvedOptions,
@@ -304,14 +302,13 @@ describe('fakerGenerator — operation', () => {
 
     await renderGeneratorOperation(fakerGenerator, node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: {
-          kind: 'Input',
-          schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
-          operations: [],
-          meta: {},
-        },
-      }),
+      adapter: createMockedAdapter(),
+      inputNode: {
+        kind: 'Input',
+        schemas: [categorySchema, errorSchema, petSchema, treeNodeSchema],
+        operations: [],
+        meta: {},
+      },
       driver,
       plugin,
       options: resolvedOptions,

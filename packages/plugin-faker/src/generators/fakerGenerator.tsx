@@ -28,7 +28,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const schemaNode = resolveSchemaRef(node, adapter.inputNode?.schemas ?? inputNode.schemas)
+    const schemaNode = resolveSchemaRef(node, inputNode.schemas)
     const schemaName = schemaNode.name ?? node.name
     const mode = ctx.getMode(output)
     const meta = {
@@ -41,7 +41,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
-    const cyclicSchemas = ast.findCircularSchemas(adapter.inputNode?.schemas ?? inputNode.schemas)
+    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
     const printerInstance = printerFaker({
       resolver,
       schemaName,
@@ -180,7 +180,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }
 
       const canOverride = canOverrideSchema(schema)
-      const cyclicSchemas = ast.findCircularSchemas(adapter.inputNode?.schemas ?? inputNode.schemas)
+      const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
       const printerInstance = printerFaker({
         resolver,
         schemaName: name,
