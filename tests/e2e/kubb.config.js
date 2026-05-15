@@ -116,19 +116,8 @@ const baseConfig = {
   ],
 }
 
-/**
- * @link https://apis.guru/
- *
- * Set KUBB_SCHEMA to a comma-separated list of schema names to only run those schemas.
- * Useful for running large schemas (e.g. stripe, openai) in isolation to avoid OOM.
- * Example: KUBB_SCHEMA=stripe kubb generate
- */
-const schemaFilter = process.env.KUBB_SCHEMA?.split(',').map((s) => s.trim())
-
 export default defineConfig(() => {
-  const filtered = schemaFilter ? schemas.filter(({ name }) => schemaFilter.includes(name)) : schemas
-
-  return filtered.map(({ name, path, strict, typecheck }) => {
+  return schemas.map(({ name, path, strict, typecheck }) => {
     return {
       ...baseConfig,
       name,
