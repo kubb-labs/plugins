@@ -1,4 +1,4 @@
-import { defineGenerator } from '@kubb/core'
+import { collectOperations, defineGenerator } from '@kubb/core'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations'
 import type { PluginClient } from '../types'
@@ -6,7 +6,8 @@ import type { PluginClient } from '../types'
 export const operationsGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRenderer,
-  operations(nodes, ctx) {
+  async operations(nodes, ctx) {
+    const allNodes = await collectOperations(nodes)
     const { config, resolver, root, inputNode } = ctx
     const { output, group } = ctx.options
 
@@ -21,7 +22,7 @@ export const operationsGenerator = defineGenerator<PluginClient>({
         banner={resolver.resolveBanner(inputNode, { output, config })}
         footer={resolver.resolveFooter(inputNode, { output, config })}
       >
-        <Operations name={name} nodes={nodes} />
+        <Operations name={name} nodes={allNodes} />
       </File>
     )
   },
