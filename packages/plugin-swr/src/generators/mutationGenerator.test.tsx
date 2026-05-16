@@ -55,6 +55,23 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   resolver: resolverTs,
 })
 
+const findByTagsNode = ast.createOperation({
+  operationId: 'findPetsByTags',
+  method: 'GET',
+  path: '/pet/findByTags',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      required: true,
+    }),
+    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+  ],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
 const updatePetWithFormNode = ast.createOperation({
   operationId: 'updatePetWithForm',
   method: 'POST',
@@ -94,6 +111,12 @@ describe('mutationGenerator operation', () => {
     { name: 'deletePet', node: deletePetNode, options: {} },
     { name: 'deletePetObject', node: deletePetNode, options: { pathParamsType: 'object' as const } },
     { name: 'clientImportPath', node: updatePetWithFormNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    { name: 'updatePetWithFormCamelCase', node: updatePetWithFormNode, options: { paramsCasing: 'camelcase' as const } },
+    {
+      name: 'getAsMutation',
+      node: findByTagsNode,
+      options: { mutation: { importPath: 'swr/mutation', methods: ['get'] }, query: { importPath: 'swr', methods: [] } },
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {
