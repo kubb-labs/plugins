@@ -35,9 +35,6 @@ const schemas = [
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
   { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
   { name: 'vercel', path: 'https://openapi.vercel.sh/', strict: false },
-  // Large specs — run in isolation via KUBB_SCHEMA=stripe (see e2e workflow step)
-  // Requires streaming adapter (adapter.count + adapter.stream) from @kubb/adapter-oas >= 5.0.0-beta.12
-  // and $ref memoization in createSchemaParser to stay within the 3 GB NODE_OPTIONS limit.
   { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
 ]
 
