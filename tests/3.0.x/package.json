@@ -26,6 +26,7 @@
     "@kubb/plugin-mcp": "workspace:*",
     "@kubb/plugin-msw": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
+    "@kubb/plugin-swr": "workspace:*",
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",

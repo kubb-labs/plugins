@@ -1036,6 +1036,9 @@ importers:
       '@kubb/plugin-redoc':
         specifier: workspace:*
         version: link:../../packages/plugin-redoc
+      '@kubb/plugin-swr':
+        specifier: workspace:*
+        version: link:../../packages/plugin-swr
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
