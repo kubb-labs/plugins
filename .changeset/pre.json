@@ -35,6 +35,7 @@
   },
   "changesets": [
     "circular-schema-detection-shared",
+    "core-plugins-beta-12-alignment",
     "multi-content-type-request-body",
     "oas-ts-resolve-options",
     "plugin-client-export-clients-barrel",
@@ -75,6 +76,7 @@
     "rename-plugin-manager-to-plugin-driver",
     "require-node-22",
     "ts-discriminator-string-types",
-    "ts-fix-request-body-description"
+    "ts-fix-request-body-description",
+    "vue-query-enabled-tovalue"
   ]
 }
