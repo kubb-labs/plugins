@@ -76,5 +76,10 @@
     "pnpm": ">=11.0.0"
   },
   "packageManager": "pnpm@11.0.5",
-  "namespace": "@kubb"
+  "namespace": "@kubb",
+  "pnpm": {
+    "patchedDependencies": {
+      "@kubb/cli@5.0.0-beta.13": "patches/@kubb__cli@5.0.0-beta.13.patch"
+    }
+  }
 }
