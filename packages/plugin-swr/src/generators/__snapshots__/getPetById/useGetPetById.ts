@@ -6,6 +6,7 @@
 import useSWR from 'swr'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
 import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400 } from './GetPetById'
+import type { SWRConfiguration } from 'swr'
 import { fetch } from './.kubb/fetch'
 
 export const getPetByIdQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
@@ -37,7 +38,7 @@ export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Parti
 export function useGetPetById(
   petId: GetPetByIdPathPetId,
   options: {
-    query?: Parameters<typeof useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>>>[2]
+    query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>>
     client?: Partial<RequestConfig> & { client?: Client }
     shouldFetch?: boolean
     immutable?: boolean

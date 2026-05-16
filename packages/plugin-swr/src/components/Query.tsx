@@ -46,7 +46,7 @@ function buildQueryParamsNode(
     type: ast.createParamsType({
       variant: 'reference',
       name: `{
-  query?: Parameters<typeof useSWR<${[TData, TError].join(', ')}>>[2],
+  query?: SWRConfiguration<${[TData, TError].join(', ')}>,
   client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'},
   shouldFetch?: boolean,
   immutable?: boolean

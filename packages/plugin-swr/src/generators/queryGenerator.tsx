@@ -152,7 +152,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
         {query && (
           <>
             <File.Import name={'useSWR'} path={importPath} />
-            <File.Import name={['SWRResponse']} path={importPath} isTypeOnly />
+            <File.Import name={['SWRConfiguration']} path={importPath} isTypeOnly />
             <Query
               name={queryName}
               queryOptionsName={queryOptionsName}

@@ -6,6 +6,7 @@
 import useSWR from 'swr'
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/fetch'
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus } from './FindPetsByTags'
+import type { SWRConfiguration } from 'swr'
 import { fetch } from './.kubb/fetch'
 
 export const findPetsByTagsQueryKey = (params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }) =>
@@ -44,7 +45,7 @@ export function findPetsByTagsQueryOptions(
 export function useFindPetsByTags(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
   options: {
-    query?: Parameters<typeof useSWR<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>>>[2]
+    query?: SWRConfiguration<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }
     shouldFetch?: boolean
     immutable?: boolean

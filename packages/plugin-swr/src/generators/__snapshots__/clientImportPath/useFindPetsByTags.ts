@@ -7,6 +7,7 @@ import fetch from 'axios'
 import useSWR from 'swr'
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus } from './FindPetsByTags'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
+import type { SWRConfiguration } from 'swr'
 
 export const findPetsByTagsQueryKey = (params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }) =>
   [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
@@ -44,7 +45,7 @@ export function findPetsByTagsQueryOptions(
 export function useFindPetsByTags(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
   options: {
-    query?: Parameters<typeof useSWR<FindPetsByTagsResponse, ResponseErrorConfig<Error>>>[2]
+    query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }
     shouldFetch?: boolean
     immutable?: boolean
