@@ -170,7 +170,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       </File>
     )
   },
-  async operations(nodes, ctx) {
+  operations(nodes, ctx) {
     const { config, resolver, root, inputNode } = ctx
     const { output, importPath, group, operations, paramsCasing } = ctx.options
 

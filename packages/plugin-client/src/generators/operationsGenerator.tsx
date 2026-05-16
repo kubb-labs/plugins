@@ -6,7 +6,7 @@ import type { PluginClient } from '../types'
 export const operationsGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRenderer,
-  async operations(nodes, ctx) {
+  operations(nodes, ctx) {
     const { config, resolver, root, inputNode } = ctx
     const { output, group } = ctx.options
 

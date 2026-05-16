@@ -8,7 +8,7 @@ import type { PluginReactQuery } from '../types'
 export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-custom-hook-options-file',
   renderer: jsxRenderer,
-  async operations(nodes, ctx) {
+  operations(nodes, ctx) {
     const { resolver, config, root } = ctx
     const { output, customOptions, query, group } = ctx.options
 

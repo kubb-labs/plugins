@@ -6,7 +6,7 @@ import type { PluginMsw } from '../types'
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   renderer: jsxRenderer,
-  async operations(nodes, ctx) {
+  operations(nodes, ctx) {
     const { resolver, config, root, inputNode } = ctx
     const { output, group } = ctx.options
 

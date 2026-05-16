@@ -16,7 +16,7 @@ import type { PluginMcp } from '../types.ts'
 export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRenderer,
-  async operations(nodes, ctx) {
+  operations(nodes, ctx) {
     const { config, resolver, plugin, driver, root, inputNode } = ctx
     const { output, paramsCasing, group } = ctx.options
 
