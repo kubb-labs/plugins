@@ -574,6 +574,40 @@ importers:
         specifier: ^4.4.3
         version: 4.4.3
 
+  examples/swr:
+    dependencies:
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.12(@kubb/renderer-jsx@5.0.0-beta.12)
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../../packages/plugin-client
+      '@kubb/plugin-swr':
+        specifier: workspace:*
+        version: link:../../packages/plugin-swr
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ts
+      axios:
+        specifier: ^1.16.0
+        version: 1.16.0
+      kubb:
+        specifier: 'catalog:'
+        version: 5.0.0-beta.12(@kubb/agent@5.0.0-beta.12(@kubb/renderer-jsx@5.0.0-beta.12))(typescript@6.0.3)
+      react:
+        specifier: ^19.2.6
+        version: 19.2.6
+      swr:
+        specifier: ^2.3.7
+        version: 2.4.1(react@19.2.6)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+    devDependencies:
+      '@types/react':
+        specifier: 'catalog:'
+        version: 19.2.14
+
   examples/typescript:
     dependencies:
       '@kubb/adapter-oas':
@@ -854,6 +888,37 @@ importers:
         specifier: ^4.7.9
         version: 4.7.9
     devDependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+
+  packages/plugin-swr:
+    dependencies:
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.12(@kubb/renderer-jsx@5.0.0-beta.12)
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../plugin-client
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../plugin-ts
+      '@kubb/plugin-zod':
+        specifier: workspace:*
+        version: link:../plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.12
+      remeda:
+        specifier: 'catalog:'
+        version: 2.34.0
+    devDependencies:
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
+      '@internals/tanstack-query':
+        specifier: workspace:*
+        version: link:../../internals/tanstack-query
       '@internals/utils':
         specifier: workspace:*
         version: link:../../internals/utils
