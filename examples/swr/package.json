@@ -1,0 +1,40 @@
+{
+  "name": "swr-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "SWR PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/swr"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "clean": "npx rimraf ./src/gen",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
+    "test": "vitest",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-swr": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
+    "axios": "^1.16.0",
+    "kubb": "catalog:",
+    "react": "^19.2.6",
+    "swr": "^2.3.7",
+    "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.30.1"
+}

@@ -1,0 +1,195 @@
+$schema: https://kubb.dev/schemas/extension.json
+kind: plugin
+id: plugin-swr
+name: SWR
+description: Generate SWR hooks (useSWR, useSWRMutation) from OpenAPI specifications.
+category: framework
+type: official
+npmPackage: '@kubb/plugin-swr'
+docsPath: /plugins/plugin-swr
+repo: https://github.com/kubb-labs/plugins
+maintainers:
+  - name: Stijn Van Hulle
+    github: stijnvanhulle
+compatibility:
+  kubb: '>=5.0.0'
+  node: '>=22'
+tags:
+  - swr
+  - react
+  - hooks
+  - data-fetching
+  - codegen
+  - openapi
+dependencies:
+  - plugin-ts
+  - plugin-client
+resources:
+  documentation: https://kubb.dev/plugins/plugin-swr
+  repository: https://github.com/kubb-labs/plugins
+  issues: https://github.com/kubb-labs/plugins/issues
+  changelog: https://github.com/kubb-labs/plugins/blob/main/packages/plugin-swr/CHANGELOG.md
+  codesandbox: https://codesandbox.io/p/github/kubb-labs/plugins/main/examples/swr
+featured: true
+intro: |
+  # @kubb/plugin-swr
+
+  Generate type-safe SWR hooks from your OpenAPI schema for data fetching, caching, and mutations.
+options:
+  - name: output
+    type: Output
+    required: false
+    default: "{ path: 'hooks', barrel: { type: 'named' } }"
+    description: Specify the export location for the files and define the behavior of the output.
+  - name: group
+    type: Group
+    required: false
+    description: Grouping combines files in a folder based on a specific `type`.
+  - name: client
+    type: ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle? }
+    required: false
+    description: Client configuration for HTTP request generation.
+  - name: paramsType
+    type: "'object' | 'inline'"
+    required: false
+    default: "'inline'"
+    description: Defines how parameters are passed to generated functions.
+  - name: paramsCasing
+    type: "'camelcase'"
+    required: false
+    description: Transform parameter names to a specific casing format.
+  - name: pathParamsType
+    type: "'object' | 'inline'"
+    required: false
+    default: "'inline'"
+    description: Defines how pathParams are passed to generated functions.
+  - name: parser
+    type: "'client' | 'zod'"
+    required: false
+    default: "'client'"
+    description: Parser used before returning data.
+  - name: query
+    type: Query
+    required: false
+    description: |
+      Override some `useSWR` behaviors. Pass `false` to disable query hook generation.
+    codeBlock:
+      lang: typescript
+      title: Query
+      code: |
+        type Query = {
+          methods: Array<HttpMethod>
+          importPath?: string
+        } | false
+    properties:
+      - name: methods
+        type: Array<HttpMethod>
+        required: false
+        default: "['get']"
+        description: Define which HttpMethods can be used for queries.
+      - name: importPath
+        type: string
+        required: false
+        default: "'swr'"
+        description: Path to the `useSWR` import.
+  - name: queryKey
+    type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
+    required: false
+    description: Customize the queryKey that will be used for the query.
+  - name: mutation
+    type: Mutation
+    required: false
+    description: |
+      Override some `useSWRMutation` behaviors. Pass `false` to disable mutation hook generation.
+    codeBlock:
+      lang: typescript
+      title: Mutation
+      code: |
+        type Mutation = {
+          methods: Array<HttpMethod>
+          importPath?: string
+        } | false
+    properties:
+      - name: methods
+        type: Array<HttpMethod>
+        required: false
+        default: "['post', 'put', 'delete', 'patch']"
+        description: Define which HttpMethods can be used for mutations.
+      - name: importPath
+        type: string
+        required: false
+        default: "'swr/mutation'"
+        description: Path to the `useSWRMutation` import.
+  - name: mutationKey
+    type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
+    required: false
+    description: Customize the mutationKey.
+  - name: include
+    type: Array<Include>
+    required: false
+    description: Array containing include parameters.
+  - name: exclude
+    type: Array<Exclude>
+    required: false
+    description: Array containing exclude parameters.
+  - name: override
+    type: Array<Override>
+    required: false
+    description: Array containing override parameters.
+  - name: generators
+    type: Array<Generator<PluginSwr>>
+    required: false
+    experimental: true
+    description: Define additional generators next to the built-in generators.
+  - name: resolver
+    type: Partial<ResolverSwr> & ThisType<ResolverSwr>
+    required: false
+    description: Override naming conventions for function names and types.
+  - name: transformer
+    type: Visitor
+    required: false
+    description: AST visitor to transform generated nodes.
+notes:
+  - type: tip
+    body: |
+      See [SWR](https://swr.vercel.app) for more information about SWR.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginSwr } from '@kubb/plugin-swr'
+
+          export default defineConfig({
+            input: {
+              path: './petStore.yaml',
+            },
+            output: {
+              path: './src/gen',
+            },
+            plugins: [
+              pluginTs(),
+              pluginSwr({
+                output: {
+                  path: './hooks',
+                },
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Hooks`,
+                },
+                client: {
+                  dataReturnType: 'data',
+                },
+                mutation: {
+                  methods: ['post', 'put', 'delete'],
+                },
+                query: {
+                  methods: ['get'],
+                  importPath: 'swr',
+                },
+              }),
+            ],
+          })
+        twoslash: false
