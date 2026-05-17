@@ -578,7 +578,7 @@ importers:
     dependencies:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-beta.12(@kubb/renderer-jsx@5.0.0-beta.12)
+        version: 5.0.0-beta.14(@kubb/renderer-jsx@5.0.0-beta.14)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -590,10 +590,10 @@ importers:
         version: link:../../packages/plugin-ts
       axios:
         specifier: ^1.16.0
-        version: 1.16.0
+        version: 1.16.1
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-beta.12(@kubb/agent@5.0.0-beta.12(@kubb/renderer-jsx@5.0.0-beta.12))(typescript@6.0.3)
+        version: 5.0.0-beta.14(@kubb/agent@5.0.0-beta.14(@kubb/renderer-jsx@5.0.0-beta.14))(typescript@6.0.3)
       react:
         specifier: ^19.2.6
         version: 19.2.6
@@ -899,7 +899,7 @@ importers:
     dependencies:
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-beta.12(@kubb/renderer-jsx@5.0.0-beta.12)
+        version: 5.0.0-beta.14(@kubb/renderer-jsx@5.0.0-beta.14)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../plugin-client
@@ -911,10 +911,10 @@ importers:
         version: link:../plugin-zod
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
-        version: 5.0.0-beta.12
+        version: 5.0.0-beta.14
       remeda:
         specifier: 'catalog:'
-        version: 2.34.0
+        version: 2.34.1
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
