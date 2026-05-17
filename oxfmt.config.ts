@@ -13,7 +13,6 @@ export default defineConfig({
   ignorePatterns: [
     '**/__snapshots__/**',
     '**/schemas/**',
-    '**/tests/e2e/schemas/**',
     '**/dist/**',
     '**/artifacts/**',
     '**/.next/**',

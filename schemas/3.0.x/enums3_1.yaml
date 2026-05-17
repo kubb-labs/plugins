@@ -1,5 +1,27 @@
+openapi: '3.1.0'
+info:
+  title: test
+  version: '1.0.0'
+
 components:
   schemas:
+    enumNullable:
+      type:
+        - 'string'
+        - 'null'
+      enum:
+        - Pending
+        - Received
+        - null
+    enumBooleanLiteral:
+      type: boolean
+      enum:
+        - true
+        - false
+    enumSingleLiteral:
+      type: number
+      enum:
+        - 0
     enumVarNames.Type:
       enum:
         - 0
@@ -58,7 +80,6 @@ components:
               enum:
                 - created_at
                 - description
-
     enum.Array:
       type: array
       items:
@@ -69,7 +90,6 @@ components:
           - 'SW'
           - 'SE'
         description: Wind direction
-
     enum.Items:
       type: array
       minItems: 1
@@ -99,10 +119,6 @@ components:
         - 0
         - 5
 
-openapi: '3.1.0'
-info:
-  title: test
-  version: '1.0.0'
 paths:
   /var-names:
     get:
@@ -112,7 +128,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/definitions/enumVarNames.Type'
+                $ref: '#/components/schemas/enumVarNames.Type'
   /names:
     get:
       responses:
@@ -121,4 +137,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/definitions/enumNames.Type'
+                $ref: '#/components/schemas/enumNames.Type'
+  /nullable:
+    get:
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/enumNullable'
