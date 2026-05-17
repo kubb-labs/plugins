@@ -1,5 +1,7 @@
 import path from 'node:path'
-import { ast, defineGenerator } from '@kubb/core'
+import { resolveOperationTypeNames } from '@internals/shared'
+import { resolveZodSchemaNames } from '@internals/tanstack-query'
+import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -7,14 +9,13 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { Mutation, MutationKey } from '../components'
 import type { PluginVueQuery } from '../types'
-import { transformName } from '../utils.ts'
 
 export const mutationGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-mutation',
   renderer: jsxRenderer,
   operation(node, ctx) {
-    const { adapter, config, driver, resolver, root } = ctx
-    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, transformers } = ctx.options
+    const { config, driver, resolver, root, inputNode } = ctx
+    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -30,12 +31,10 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
     const importPath = mutation ? mutation.importPath : '@tanstack/vue-query'
 
-    const baseName = resolver.resolveName(node.operationId)
-    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-    const mutationHookName = transformName(`use${capitalize(baseName)}`, 'function', transformers)
-    const mutationTypeName = transformName(`${capitalize(baseName)}`, 'type', transformers)
-    const mutationKeyName = transformName(`${baseName}MutationKey`, 'const', transformers)
-    const clientName = transformName(baseName, 'function', transformers)
+    const mutationHookName = resolver.resolveMutationName(node)
+    const mutationTypeName = resolver.resolveMutationTypeName(node)
+    const mutationKeyName = resolver.resolveMutationKeyName(node)
+    const clientName = resolver.resolveClientName(node)
 
     const meta = {
       file: resolver.resolveFile({ name: mutationHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
@@ -45,19 +44,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
       ),
     }
 
-    const casedParams = ast.caseParams(node.parameters, paramsCasing)
-    const pathParams = casedParams.filter((p) => p.in === 'path')
-    const queryParams = casedParams.filter((p) => p.in === 'query')
-    const headerParams = casedParams.filter((p) => p.in === 'header')
-
-    const importedTypeNames = [
-      node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
-      tsResolver.resolveResponseName(node),
-      ...pathParams.map((p) => tsResolver.resolvePathParamsName(node, p)),
-      ...queryParams.map((p) => tsResolver.resolveQueryParamsName(node, p)),
-      ...headerParams.map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-      ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-    ].filter((name): name is string => !!name)
+    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing, order: 'body-response-first' })
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
@@ -67,10 +54,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
           { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
         )
       : undefined
-    const zodSchemaNames =
-      zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(Boolean)
-        : []
+    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver)
 
     const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
@@ -95,12 +79,10 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
-        {parser === 'zod' && fileZod && zodSchemaNames.length > 0 && (
-          <File.Import name={zodSchemaNames as string[]} root={meta.file.path} path={fileZod.path} />
-        )}
+        {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
         {clientOptions.importPath ? (
           <>
             {!shouldUseClientPlugin && <File.Import name={'fetch'} path={clientOptions.importPath} />}

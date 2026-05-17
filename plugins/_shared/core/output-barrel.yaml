@@ -1,0 +1,37 @@
+# Shared option: core/output-barrel
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: barrel
+type: "{ type: 'named' | 'all', nested?: boolean } | false"
+required: false
+default: "{ type: 'named' }"
+description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
+
+examples:
+  - name: all
+    files:
+      - lang: typescript
+        code: |
+          export * from './gen/petService.ts'
+        twoslash: false
+  - name: named
+    files:
+      - lang: typescript
+        code: |
+          export { PetService } from './gen/petService.ts'
+        twoslash: false
+  - name: nested
+    files:
+      - name: kubb.config.ts
+        lang: typescript
+        code: |
+          output: {
+            path: './gen',
+            barrel: { type: 'named', nested: true },
+          }
+        twoslash: false
+  - name: 'false'
+    files:
+      - lang: typescript
+        code: ''
+        twoslash: false

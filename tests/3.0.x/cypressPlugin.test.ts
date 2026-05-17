@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, fsStorage, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-type BuildConfig = Omit<Config, 'plugins'> & { plugins: unknown }
+type BuildConfig = Omit<Config, 'plugins' | 'storage'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
   {
@@ -81,6 +81,7 @@ describe(`plugin-cypress options ${version}`, () => {
     const { files, failedPlugins, error } = await createKubb(
       {
         ...config,
+        storage: fsStorage(),
         output: {
           ...config.output,
           path: output,

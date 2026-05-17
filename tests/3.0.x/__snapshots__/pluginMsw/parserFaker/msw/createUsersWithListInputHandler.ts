@@ -5,7 +5,7 @@
 
 import type { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from "../types/CreateUsersWithListInput.ts";
 import type { HttpResponseResolver } from "msw";
-import { createUsersWithListInputResponse } from "../faker/createUsersWithListInput.ts";
+import { createCreateUsersWithListInputResponse } from "../faker/createCreateUsersWithListInput.ts";
 import { http } from "msw";
 
 export function createUsersWithListInputHandlerResponse200(data: CreateUsersWithListInputResponse) {
@@ -22,7 +22,7 @@ export function createUsersWithListInputHandler(data?: CreateUsersWithListInputR
   return http.post<Record<string, string>, CreateUsersWithListInputData, any>('/user/createWithList', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || createUsersWithListInputResponse(data)), {
+      return new Response(JSON.stringify(data || createCreateUsersWithListInputResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

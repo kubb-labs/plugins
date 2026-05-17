@@ -2,13 +2,13 @@
   "name": "@internals/utils",
   "version": "0.0.0",
   "private": true,
-  "description": "Internal utility helpers shared across Kubb workspace packages.",
+  "description": "Shared utility helpers used internally across all Kubb workspace packages. Not intended for direct use.",
   "keywords": [
-    "codegen",
     "internal",
     "kubb",
     "typescript",
-    "utils"
+    "utils",
+    "workspace"
   ],
   "license": "MIT",
   "author": "stijnvanhulle",

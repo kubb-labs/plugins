@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildMutationArgParams, buildRequestConfigType, resolveErrorNames } from '../utils.ts'
+import { buildRequestConfigType, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -22,7 +22,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
-function getConfigParam(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
+export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
   return ast.createFunctionParameters({
     params: [
       ast.createFunctionParameter({
@@ -53,10 +53,12 @@ export function MutationOptions({
   const errorNames = resolveErrorNames(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const configParamsNode = getConfigParam(node, tsResolver)
+  const configParamsNode = buildMutationConfigParamsNode(node, tsResolver)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
-  const mutationArgParamsNode = buildMutationArgParams(node, {
+  const mutationArgParamsNode = ast.createOperationParams(node, {
+    paramsType: 'inline',
+    pathParamsType: 'inline',
     paramsCasing,
     resolver: tsResolver,
   })
@@ -99,5 +101,3 @@ export function MutationOptions({
     </File.Source>
   )
 }
-
-MutationOptions.getParams = getConfigParam

@@ -21,12 +21,12 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -41,12 +41,12 @@ jobs:
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -66,12 +66,12 @@ jobs:
       TURBO_SCM_BASE: ${{ github.event.pull_request.base.sha }}
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -80,7 +80,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -91,12 +91,12 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -112,17 +112,17 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
       - name: Spell Check
-        uses: streetsidesoftware/cspell-action@v8
+        uses: streetsidesoftware/cspell-action@de2a73e963e7443969755b648a1008f77033c5b2 # v8
         with:
           files: |
             **/*.{ts,md}
@@ -137,12 +137,12 @@ jobs:
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -160,12 +160,12 @@ jobs:
     needs: build
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 2
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -182,12 +182,12 @@ jobs:
     if: github.actor != 'github-actions[bot]' && github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Analyze dependency changes
-        uses: e18e/action-dependency-diff@v1
+        uses: e18e/action-dependency-diff@5d3c6ac2ad2de2eaca1dc120c5accfd9590764b6 # v1
         continue-on-error: true
         with:
           duplicate-threshold: 5
@@ -206,12 +206,12 @@ jobs:
       pull-requests: write
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 1
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
@@ -237,7 +237,7 @@ jobs:
 
       - name: Create Pull Request with generated files
         if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           base: ${{ github.head_ref || github.ref_name }}
           branch: chore/update-generated-examples-${{ github.event.number }}
@@ -263,50 +263,22 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@main
+        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
         with:
           node-version: '22'
 
       - name: Build
         run: pnpm run build
 
-      - name: Run single E2E test for petStore
-        working-directory: ./tests/e2e
-        env:
-          NODE_OPTIONS: '--max_old_space_size=3000'
-          KUBB_DISABLE_TELEMETRY: '1'
-        run: |
-          pnpm run generate:petstore
-
       - name: Run E2E tests
         working-directory: ./tests/e2e
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
           KUBB_DISABLE_TELEMETRY: '1'
-          KUBB_SCHEMA: 'train-travel,discriminator,atlassian.com,optionalParameters,allOf,anyOf,petStoreContent,twitter,jokesOne,readme.io,worldtime,zalando,requestBody,box,enums,dataset_api,petStoreV3,Figma,spotify,vercel'
-        run: |
-          pnpm run generate --debug
-
-      - name: Run E2E tests (stripe)
-        working-directory: ./tests/e2e
-        env:
-          NODE_OPTIONS: '--max_old_space_size=3000'
-          KUBB_DISABLE_TELEMETRY: '1'
-          KUBB_SCHEMA: 'stripe'
-        run: |
-          pnpm run generate --debug
-
-      - name: Run E2E tests (openai)
-        if: runner.os != 'Windows'
-        working-directory: ./tests/e2e
-        env:
-          NODE_OPTIONS: '--max_old_space_size=3000'
-          KUBB_DISABLE_TELEMETRY: '1'
-          KUBB_SCHEMA: 'openai'
         run: |
           pnpm run generate --debug

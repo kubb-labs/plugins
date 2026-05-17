@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
@@ -11,7 +11,15 @@ import { resolverClient } from '../resolvers/resolverClient.ts'
 import type { PluginClient } from '../types.ts'
 import { clientGenerator } from './clientGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
@@ -197,6 +205,7 @@ describe('clientGenerator operation', () => {
     const options: PluginClient['resolvedOptions'] = {
       ...defaultOptions,
       ...props.options,
+      ...('baseURL' in props ? { baseURL: props.baseURL } : {}),
     }
     const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
     const driver = createMockedPluginDriver({
@@ -206,9 +215,7 @@ describe('clientGenerator operation', () => {
 
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
-      }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,

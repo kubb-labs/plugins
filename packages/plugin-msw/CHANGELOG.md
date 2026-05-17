@@ -1,5 +1,13 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.10
+
+### Patch Changes
+
+- Updated dependencies [[`752a6eb`](https://github.com/kubb-labs/plugins/commit/752a6eb6ab6a08d3c3422f826b2ed1f74f7a737e)]:
+  - @kubb/plugin-faker@5.0.0-beta.10
+  - @kubb/plugin-ts@5.0.0-beta.10
+
 ## 5.0.0-beta.4
 
 ### Minor Changes

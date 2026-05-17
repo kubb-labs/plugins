@@ -7,10 +7,34 @@ import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginF
 export type ResolverClient = Resolver & {
   /**
    * Resolves the function name for a given raw operation name.
+   *
    * @example Resolving operation names
    * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverClient, name: string): string
+  /**
+   * Resolves the output file name for a client module.
+   */
+  resolvePathName(this: ResolverClient, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+  /**
+   * Resolves the generated class name for class-based clients.
+   */
+  resolveClassName(this: ResolverClient, name: string): string
+  /**
+   * Resolves the generated class name for tag-based client groups.
+   */
+  resolveGroupName(this: ResolverClient, name: string): string
+  /**
+   * Resolves the generated SDK facade property name for a client class.
+   */
+  resolveClientPropertyName(this: ResolverClient, name: string): string
+  /**
+   * Resolves the URL helper function name for an operation.
+   *
+   * @example Resolving URL helper names
+   * `resolver.resolveUrlName(node) // -> 'getShowPetByIdUrl'`
+   */
+  resolveUrlName(this: ResolverClient, node: ast.OperationNode): string
 }
 
 /**

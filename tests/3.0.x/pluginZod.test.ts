@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { describe, expect, test } from 'vitest'
@@ -26,6 +26,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -42,6 +43,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -61,6 +63,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -78,6 +81,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -95,6 +99,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -112,6 +117,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -129,6 +135,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false, dateType: 'date' }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
@@ -145,6 +152,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },

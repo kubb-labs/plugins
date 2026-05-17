@@ -1,23 +1,17 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "5.0.0-beta.4",
-  "description": "API client generator plugin for Kubb, creating type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.",
+  "version": "5.0.0-beta.14",
+  "description": "Generate type-safe HTTP clients from your OpenAPI specification. Supports Axios, Fetch, and custom client adapters with full TypeScript inference and zero boilerplate.",
   "keywords": [
     "api-client",
     "axios",
-    "code-generator",
+    "code-generation",
     "codegen",
     "fetch",
     "http-client",
     "kubb",
-    "oas",
     "openapi",
-    "plugins",
-    "rest-api",
-    "sdk-generator",
     "swagger",
-    "type-safe",
-    "type-safety",
     "typescript"
   ],
   "license": "MIT",
@@ -30,7 +24,6 @@
   "files": [
     "src",
     "dist",
-    "templates",
     "extension.yaml",
     "*.d.ts",
     "*.d.cts",
@@ -111,8 +104,9 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "axios": "^1.16.0"
+    "axios": "^1.16.1"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:",

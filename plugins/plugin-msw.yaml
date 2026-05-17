@@ -44,12 +44,12 @@ options:
   - name: output
     type: Output
     required: false
-    default: "{ path: 'handlers', barrelType: 'named' }"
+    default: "{ path: 'handlers', barrel: { type: 'named' } }"
     description: Specify the export location for the files and define the behavior of the output.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'handlers'"
-      - extends: ./_shared/core/output-barrel-type.yaml
+      - extends: ./_shared/core/output-barrel.yaml
       - extends: ./_shared/core/output-banner.yaml
       - extends: ./_shared/core/output-footer.yaml
       - extends: ./_shared/core/output-override.yaml
@@ -89,19 +89,6 @@ options:
   - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginMsw>>'
 
-  - name: transformers
-    type: object
-    required: false
-    description: Customize the generated names based on the type provided by the plugin.
-    properties:
-      - name: name
-        type: '(name: string, type?: ResolveType) => string'
-        required: false
-        description: Customize the names based on the type that is provided by the plugin.
-        codeBlock:
-          lang: typescript
-          code: |
-            type ResolveType = 'file' | 'function' | 'type' | 'const'
 examples:
   - name: kubb.config.ts
     files:
@@ -123,7 +110,7 @@ examples:
               pluginMsw({
                 output: {
                   path: './mocks',
-                  barrelType: 'named',
+                  barrel: { type: 'named' },
                   banner: '/* eslint-disable no-alert, no-console */',
                   footer: '',
                 },

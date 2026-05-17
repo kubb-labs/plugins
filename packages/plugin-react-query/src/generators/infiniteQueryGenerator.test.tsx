@@ -1,16 +1,24 @@
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
-import { MutationKey, QueryKey } from '../components'
+import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
 import { infiniteQueryGenerator } from './infiniteQueryGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   client: {
@@ -24,8 +32,8 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   paramsType: 'inline',
   pathParamsType: 'inline',
   pathParamsAsGetters: false,
-  queryKey: QueryKey.getTransformer,
-  mutationKey: MutationKey.getTransformer,
+  queryKey: queryKeyTransformer,
+  mutationKey: mutationKeyTransformer,
   query: {
     importPath: '@tanstack/react-query',
     methods: ['get'],
@@ -43,7 +51,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   output: { path: '.' },
   group: undefined,
   resolver: resolverReactQuery,
-  transformers: {},
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({

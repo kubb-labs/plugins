@@ -369,91 +369,128 @@ export { getUserByNameQueryKey, getUserByNameQueryOptions, useGetUserByName } fr
 export { loginUserQueryKey, loginUserQueryOptions, useLoginUser } from './clients/hooks/userController/useLoginUser.ts'
 export { logoutUserQueryKey, logoutUserQueryOptions, useLogoutUser } from './clients/hooks/userController/useLogoutUser.ts'
 export { updateUserMutationKey, updateUserMutationOptions, useUpdateUser } from './clients/hooks/userController/useUpdateUser.ts'
-export { addPetRequestFaker } from './mocks/addPetRequest.ts'
-export { addressFaker } from './mocks/address.ts'
-export { animalFaker } from './mocks/animal.ts'
-export { apiResponseFaker } from './mocks/apiResponse.ts'
-export { catFaker } from './mocks/cat.ts'
-export { categoryFaker } from './mocks/category.ts'
-export { customerFaker } from './mocks/customer.ts'
-export { dogFaker } from './mocks/dog.ts'
-export { imageFaker } from './mocks/image.ts'
-export { orderFaker } from './mocks/order.ts'
-export { petFaker } from './mocks/pet.ts'
-export { addFilesData, addFilesResponse, addFilesStatus200, addFilesStatus405 } from './mocks/petController/addFiles.ts'
-export { addPetData, addPetResponse, addPetStatus405, addPetStatusDefault } from './mocks/petController/addPet.ts'
-export { deletePetHeaderApiKey, deletePetPathPetId, deletePetResponse, deletePetStatus400 } from './mocks/petController/deletePet.ts'
+export { createAddPetRequestFaker } from './mocks/createAddPetRequestFaker.ts'
+export { createAddressFaker } from './mocks/createAddressFaker.ts'
+export { createAnimalFaker } from './mocks/createAnimalFaker.ts'
+export { createApiResponseFaker } from './mocks/createApiResponseFaker.ts'
+export { createCatFaker } from './mocks/createCatFaker.ts'
+export { createCategoryFaker } from './mocks/createCategoryFaker.ts'
+export { createCustomerFaker } from './mocks/createCustomerFaker.ts'
+export { createDogFaker } from './mocks/createDogFaker.ts'
+export { createImageFaker } from './mocks/createImageFaker.ts'
+export { createOrderFaker } from './mocks/createOrderFaker.ts'
+export { createPetFaker } from './mocks/createPetFaker.ts'
+export { createPetNotFoundFaker } from './mocks/createPetNotFoundFaker.ts'
+export { createUserArrayFaker } from './mocks/createUserArrayFaker.ts'
+export { createUserFaker } from './mocks/createUserFaker.ts'
 export {
-  findPetsByStatusPathStepId,
-  findPetsByStatusResponse,
-  findPetsByStatusStatus200,
-  findPetsByStatusStatus400,
-} from './mocks/petController/findPetsByStatus.ts'
+  createAddFilesDataFaker,
+  createAddFilesResponseFaker,
+  createAddFilesStatus200Faker,
+  createAddFilesStatus405Faker,
+} from './mocks/petController/createAddFilesFaker.ts'
 export {
-  findPetsByTagsHeaderXEXAMPLE,
-  findPetsByTagsQueryPage,
-  findPetsByTagsQueryPageSize,
-  findPetsByTagsQueryTags,
-  findPetsByTagsResponse,
-  findPetsByTagsStatus200,
-  findPetsByTagsStatus400,
-} from './mocks/petController/findPetsByTags.ts'
-export { getPetByIdPathPetId, getPetByIdResponse, getPetByIdStatus200, getPetByIdStatus400, getPetByIdStatus404 } from './mocks/petController/getPetById.ts'
+  createAddPetDataFaker,
+  createAddPetResponseFaker,
+  createAddPetStatus405Faker,
+  createAddPetStatusDefaultFaker,
+} from './mocks/petController/createAddPetFaker.ts'
 export {
-  updatePetData,
-  updatePetResponse,
-  updatePetStatus200,
-  updatePetStatus202,
-  updatePetStatus400,
-  updatePetStatus404,
-  updatePetStatus405,
-} from './mocks/petController/updatePet.ts'
+  createDeletePetHeaderApiKeyFaker,
+  createDeletePetPathPetIdFaker,
+  createDeletePetResponseFaker,
+  createDeletePetStatus400Faker,
+} from './mocks/petController/createDeletePetFaker.ts'
 export {
-  updatePetWithFormPathPetId,
-  updatePetWithFormQueryName,
-  updatePetWithFormQueryStatus,
-  updatePetWithFormResponse,
-  updatePetWithFormStatus405,
-} from './mocks/petController/updatePetWithForm.ts'
+  createFindPetsByStatusPathStepIdFaker,
+  createFindPetsByStatusResponseFaker,
+  createFindPetsByStatusStatus200Faker,
+  createFindPetsByStatusStatus400Faker,
+} from './mocks/petController/createFindPetsByStatusFaker.ts'
 export {
-  uploadFileData,
-  uploadFilePathPetId,
-  uploadFileQueryAdditionalMetadata,
-  uploadFileResponse,
-  uploadFileStatus200,
-} from './mocks/petController/uploadFile.ts'
-export { petNotFoundFaker } from './mocks/petNotFound.ts'
+  createFindPetsByTagsHeaderXEXAMPLEFaker,
+  createFindPetsByTagsQueryPageFaker,
+  createFindPetsByTagsQueryPageSizeFaker,
+  createFindPetsByTagsQueryTagsFaker,
+  createFindPetsByTagsResponseFaker,
+  createFindPetsByTagsStatus200Faker,
+  createFindPetsByTagsStatus400Faker,
+} from './mocks/petController/createFindPetsByTagsFaker.ts'
 export {
-  createPetsData,
-  createPetsHeaderXEXAMPLE,
-  createPetsPathUuid,
-  createPetsQueryBoolParam,
-  createPetsQueryOffset,
-  createPetsResponse,
-  createPetsStatus201,
-  createPetsStatusDefault,
-} from './mocks/petsController/createPets.ts'
-export { tagTagFaker } from './mocks/tag/tag.ts'
-export { userFaker } from './mocks/user.ts'
-export { userArrayFaker } from './mocks/userArray.ts'
-export { createUserData, createUserResponse, createUserStatusDefault } from './mocks/userController/createUser.ts'
+  createGetPetByIdPathPetIdFaker,
+  createGetPetByIdResponseFaker,
+  createGetPetByIdStatus200Faker,
+  createGetPetByIdStatus400Faker,
+  createGetPetByIdStatus404Faker,
+} from './mocks/petController/createGetPetByIdFaker.ts'
 export {
-  createUsersWithListInputData,
-  createUsersWithListInputResponse,
-  createUsersWithListInputStatus200,
-  createUsersWithListInputStatusDefault,
-} from './mocks/userController/createUsersWithListInput.ts'
-export { deleteUserPathUsername, deleteUserResponse, deleteUserStatus400, deleteUserStatus404 } from './mocks/userController/deleteUser.ts'
+  createUpdatePetDataFaker,
+  createUpdatePetResponseFaker,
+  createUpdatePetStatus200Faker,
+  createUpdatePetStatus202Faker,
+  createUpdatePetStatus400Faker,
+  createUpdatePetStatus404Faker,
+  createUpdatePetStatus405Faker,
+} from './mocks/petController/createUpdatePetFaker.ts'
 export {
-  getUserByNamePathUsername,
-  getUserByNameResponse,
-  getUserByNameStatus200,
-  getUserByNameStatus400,
-  getUserByNameStatus404,
-} from './mocks/userController/getUserByName.ts'
-export { loginUserQueryPassword, loginUserQueryUsername, loginUserResponse, loginUserStatus200, loginUserStatus400 } from './mocks/userController/loginUser.ts'
-export { logoutUserResponse, logoutUserStatusDefault } from './mocks/userController/logoutUser.ts'
-export { updateUserData, updateUserPathUsername, updateUserResponse, updateUserStatusDefault } from './mocks/userController/updateUser.ts'
+  createUpdatePetWithFormPathPetIdFaker,
+  createUpdatePetWithFormQueryNameFaker,
+  createUpdatePetWithFormQueryStatusFaker,
+  createUpdatePetWithFormResponseFaker,
+  createUpdatePetWithFormStatus405Faker,
+} from './mocks/petController/createUpdatePetWithFormFaker.ts'
+export {
+  createUploadFileDataFaker,
+  createUploadFilePathPetIdFaker,
+  createUploadFileQueryAdditionalMetadataFaker,
+  createUploadFileResponseFaker,
+  createUploadFileStatus200Faker,
+} from './mocks/petController/createUploadFileFaker.ts'
+export {
+  createCreatePetsDataFaker,
+  createCreatePetsHeaderXEXAMPLEFaker,
+  createCreatePetsPathUuidFaker,
+  createCreatePetsQueryBoolParamFaker,
+  createCreatePetsQueryOffsetFaker,
+  createCreatePetsResponseFaker,
+  createCreatePetsStatus201Faker,
+  createCreatePetsStatusDefaultFaker,
+} from './mocks/petsController/createCreatePetsFaker.ts'
+export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
+export { createCreateUserDataFaker, createCreateUserResponseFaker, createCreateUserStatusDefaultFaker } from './mocks/userController/createCreateUserFaker.ts'
+export {
+  createCreateUsersWithListInputDataFaker,
+  createCreateUsersWithListInputResponseFaker,
+  createCreateUsersWithListInputStatus200Faker,
+  createCreateUsersWithListInputStatusDefaultFaker,
+} from './mocks/userController/createCreateUsersWithListInputFaker.ts'
+export {
+  createDeleteUserPathUsernameFaker,
+  createDeleteUserResponseFaker,
+  createDeleteUserStatus400Faker,
+  createDeleteUserStatus404Faker,
+} from './mocks/userController/createDeleteUserFaker.ts'
+export {
+  createGetUserByNamePathUsernameFaker,
+  createGetUserByNameResponseFaker,
+  createGetUserByNameStatus200Faker,
+  createGetUserByNameStatus400Faker,
+  createGetUserByNameStatus404Faker,
+} from './mocks/userController/createGetUserByNameFaker.ts'
+export {
+  createLoginUserQueryPasswordFaker,
+  createLoginUserQueryUsernameFaker,
+  createLoginUserResponseFaker,
+  createLoginUserStatus200Faker,
+  createLoginUserStatus400Faker,
+} from './mocks/userController/createLoginUserFaker.ts'
+export { createLogoutUserResponseFaker, createLogoutUserStatusDefaultFaker } from './mocks/userController/createLogoutUserFaker.ts'
+export {
+  createUpdateUserDataFaker,
+  createUpdateUserPathUsernameFaker,
+  createUpdateUserResponseFaker,
+  createUpdateUserStatusDefaultFaker,
+} from './mocks/userController/createUpdateUserFaker.ts'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.ts'
 export { animalTypeEnum } from './models/ts/Animal.ts'
 export { customerParamsStatusEnum } from './models/ts/Customer.ts'

@@ -4,7 +4,7 @@
 */
 
 import type { FindPetsByTagsResponse, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
-import { findPetsByTagsResponse } from "../faker/findPetsByTags.ts";
+import { createFindPetsByTagsResponse } from "../faker/createFindPetsByTags.ts";
 import { http } from "msw";
 
 export function findPetsByTagsHandlerResponse200(data: FindPetsByTagsResponse) {
@@ -29,7 +29,7 @@ export function findPetsByTagsHandler(data?: FindPetsByTagsResponse | ((info: Pa
   return http.get('/pet/findByTags', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || findPetsByTagsResponse(data)), {
+      return new Response(JSON.stringify(data || createFindPetsByTagsResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

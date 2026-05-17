@@ -1,12 +1,11 @@
-import { transformParamTypes } from '@internals/tanstack-query'
-import { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '../types.ts'
-import { buildQueryKeyParams } from '../utils.ts'
+import { buildQueryKeyParams, wrapWithMaybeRefOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -19,32 +18,16 @@ type Props = {
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
-const callPrinter = functionPrinter({ mode: 'call' })
 
-function getParams(
+export function buildQueryKeyParamsNode(
   node: ast.OperationNode,
   options: { pathParamsType: 'object' | 'inline'; paramsCasing: 'camelcase' | undefined; resolver: ResolverTs },
 ): ast.FunctionParametersNode {
-  return transformParamTypes(buildQueryKeyParams(node, options), {
-    wrapType: (inner) => `MaybeRefOrGetter<${inner}>`,
-    shouldWrap: () => true,
-  })
+  return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
 }
 
-const getTransformer: Transformer = ({ node, casing }) => {
-  const path = new URLPath(node.path, { casing })
-  const hasQueryParams = node.parameters.some((p) => p.in === 'query')
-  const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
-
-  return [
-    path.toObject({ type: 'path', stringify: true }),
-    hasQueryParams ? '...(params ? [params] : [])' : undefined,
-    hasRequestBody ? '...(data ? [data] : [])' : undefined,
-  ].filter(Boolean) as string[]
-}
-
-export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer = getTransformer }: Props): KubbReactNode {
-  const paramsNode = getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer = queryKeyTransformer }: Props): KubbReactNode {
+  const paramsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = transformer({
     node,
@@ -66,7 +49,3 @@ export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType,
     </>
   )
 }
-
-QueryKey.getParams = getParams
-QueryKey.getTransformer = getTransformer
-QueryKey.callPrinter = callPrinter

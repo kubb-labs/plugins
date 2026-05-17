@@ -1,5 +1,6 @@
 import path from 'node:path'
-import { camelCase, pascalCase } from '@internals/utils'
+import { resolveOperationTypeNames } from '@internals/shared'
+import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -22,20 +23,13 @@ type OperationData = {
 
 type Controller = {
   name: string
+  propertyName: string
   file: ast.FileNode
   operations: Array<OperationData>
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  const names: Array<string | undefined> = [
-    node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined,
-    tsResolver.resolveResponseName(node),
-    ...node.parameters.filter((p) => p.in === 'path').map((p) => tsResolver.resolvePathParamsName(node, p)),
-    ...node.parameters.filter((p) => p.in === 'query').map((p) => tsResolver.resolveQueryParamsName(node, p)),
-    ...node.parameters.filter((p) => p.in === 'header').map((p) => tsResolver.resolveHeaderParamsName(node, p)),
-    ...node.responses.map((res) => tsResolver.resolveResponseStatusName(node, res.statusCode)),
-  ]
-  return names.filter((n): n is string => Boolean(n))
+  return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
@@ -50,9 +44,9 @@ export const classClientGenerator = defineGenerator<PluginClient>({
   name: 'classClient',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { adapter, config, driver, resolver, root } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
-    const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
+    const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -87,10 +81,10 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
     const controllers = nodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
-      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? pascalCase(tag)) : 'Client'
+      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
       if (!tag && !group) {
-        const name = 'ApiClient'
+        const name = resolver.resolveClassName('ApiClient')
         const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
@@ -98,7 +92,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         if (previous) {
           previous.operations.push(operationData)
         } else {
-          acc.push({ name, file, operations: [operationData] })
+          acc.push({ name, propertyName: resolver.resolveClientPropertyName(name), file, operations: [operationData] })
         }
       } else if (tag) {
         const name = groupName
@@ -109,7 +103,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         if (previous) {
           previous.operations.push(operationData)
         } else {
-          acc.push({ name, file, operations: [operationData] })
+          acc.push({ name, propertyName: resolver.resolveClientPropertyName(name), file, operations: [operationData] })
         }
       }
 
@@ -167,8 +161,8 @@ export const classClientGenerator = defineGenerator<PluginClient>({
           baseName={file.baseName}
           path={file.path}
           meta={file.meta}
-          banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-          footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+          banner={resolver.resolveBanner(inputNode, { output, config })}
+          footer={resolver.resolveFooter(inputNode, { output, config })}
         >
           {importPath ? (
             <>
@@ -226,8 +220,8 @@ export const classClientGenerator = defineGenerator<PluginClient>({
           baseName={sdkFile.baseName}
           path={sdkFile.path}
           meta={sdkFile.meta}
-          banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-          footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+          banner={resolver.resolveBanner(inputNode, { output, config })}
+          footer={resolver.resolveFooter(inputNode, { output, config })}
         >
           {importPath ? (
             <File.Import name={['Client', 'RequestConfig']} path={importPath} isTypeOnly />
@@ -239,7 +233,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
           ))}
 
-          <WrapperClient name={sdk.className} classNames={controllers.map(({ name }) => name)} />
+          <WrapperClient name={sdk.className} controllers={controllers.map(({ name, propertyName }) => ({ className: name, propertyName }))} />
         </File>,
       )
     }

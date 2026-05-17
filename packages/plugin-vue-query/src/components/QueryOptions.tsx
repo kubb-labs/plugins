@@ -1,12 +1,12 @@
-import { transformParamTypes } from '@internals/tanstack-query'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildEnabledCheck } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { resolveErrorNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 
 type Props = {
   name: string
@@ -52,31 +52,7 @@ export function getQueryOptionsParams(
     ],
   })
 
-  return transformParamTypes(baseParams, {
-    wrapType: (inner) => `MaybeRefOrGetter<${inner}>`,
-    // 'config' is the trailing request-config bag, not a reactive value
-    shouldWrap: (p) => p.name !== 'config',
-  })
-}
-
-export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
-  const required: string[] = []
-  for (const param of paramsNode.params) {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      for (const child of group.properties) {
-        if (!child.optional && child.default === undefined) {
-          required.push(child.name)
-        }
-      }
-    } else {
-      const fp = param as ast.FunctionParameterNode
-      if (!fp.optional && fp.default === undefined) {
-        required.push(fp.name)
-      }
-    }
-  }
-  return required.join(' && ')
+  return wrapWithMaybeRefOrGetter(baseParams, (name) => name === 'config')
 }
 
 export function QueryOptions({
@@ -103,11 +79,16 @@ export function QueryOptions({
   // Transform: wrap non-config params with toValue(), add signal to config
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
+  const enabledText = enabledSource
+    ? `enabled: () => ${enabledSource
+        .split(' && ')
+        .map((n) => `!!toValue(${n.trim()})`)
+        .join(' && ')},`
+    : ''
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -156,5 +137,3 @@ function addToValueCalls(callStr: string): string {
 
   return result
 }
-
-QueryOptions.getParams = getQueryOptionsParams

@@ -1,5 +1,7 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.10
+
 ## 5.0.0-beta.4
 
 ### Minor Changes

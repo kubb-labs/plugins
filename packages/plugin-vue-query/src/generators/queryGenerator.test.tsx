@@ -1,18 +1,27 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
-import { MutationKey, QueryKey } from '../components'
+import { mutationKeyTransformer } from '@internals/tanstack-query'
+import { queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: {
@@ -26,8 +35,8 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   paramsType: 'inline',
   paramsCasing: undefined,
   pathParamsType: 'inline',
-  queryKey: QueryKey.getTransformer,
-  mutationKey: MutationKey.getTransformer,
+  queryKey: queryKeyTransformer,
+  mutationKey: mutationKeyTransformer,
   query: {
     importPath: '@tanstack/react-query',
     methods: ['get'],
@@ -43,7 +52,6 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   include: undefined,
   override: [],
   resolver: resolverVueQuery,
-  transformers: {},
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
@@ -98,7 +106,7 @@ describe('queryGenerator operation', () => {
         },
         queryKey(props) {
           const id = props.node.operationId
-          const keys = QueryKey.getTransformer(props)
+          const keys = queryKeyTransformer(props)
           return [`"${id}"`, ...keys]
         },
       },
@@ -131,9 +139,7 @@ describe('queryGenerator operation', () => {
 
     await renderGeneratorOperation(queryGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
-      }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,

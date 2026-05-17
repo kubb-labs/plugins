@@ -1,4 +1,5 @@
 import { jsStringEscape, stringify } from '@internals/utils'
+import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from './types.ts'
 
@@ -57,9 +58,7 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 }
 
 export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
-  const pathParams = node.parameters.filter((p) => p.in === 'path')
-  const queryParams = node.parameters.filter((p) => p.in === 'query')
-  const headerParams = node.parameters.filter((p) => p.in === 'header')
+  const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
   return ast.createSchema({
     type: 'object',

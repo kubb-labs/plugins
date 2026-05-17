@@ -19,7 +19,7 @@ import type { PluginTs } from '../types.ts'
  * resolver.resolvePathName('list pets', 'file')       // → 'listPets'
  * ```
  */
-export const resolverTs = defineResolver<PluginTs>((ctx) => {
+export const resolverTs = defineResolver<PluginTs>(() => {
   return {
     name: 'default',
     pluginName: 'plugin-ts',
@@ -33,34 +33,34 @@ export const resolverTs = defineResolver<PluginTs>((ctx) => {
       return pascalCase(name, { isFile: type === 'file' })
     },
     resolveParamName(node, param) {
-      return ctx.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)
+      return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveResponseStatusName(node, statusCode) {
-      return ctx.resolveTypeName(`${node.operationId} Status ${statusCode}`)
+      return this.resolveTypeName(`${node.operationId} Status ${statusCode}`)
     },
     resolveDataName(node) {
-      return ctx.resolveTypeName(`${node.operationId} Data`)
+      return this.resolveTypeName(`${node.operationId} Data`)
     },
     resolveRequestConfigName(node) {
-      return ctx.resolveTypeName(`${node.operationId} RequestConfig`)
+      return this.resolveTypeName(`${node.operationId} RequestConfig`)
     },
     resolveResponsesName(node) {
-      return ctx.resolveTypeName(`${node.operationId} Responses`)
+      return this.resolveTypeName(`${node.operationId} Responses`)
     },
     resolveResponseName(node) {
-      return ctx.resolveTypeName(`${node.operationId} Response`)
+      return this.resolveTypeName(`${node.operationId} Response`)
     },
     resolveEnumKeyName(node, enumTypeSuffix = 'key') {
-      return `${ctx.resolveTypeName(node.name ?? '')}${enumTypeSuffix}`
+      return `${this.resolveTypeName(node.name ?? '')}${enumTypeSuffix}`
     },
     resolvePathParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
     resolveQueryParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
     resolveHeaderParamsName(node, param) {
-      return ctx.resolveParamName(node, param)
+      return this.resolveParamName(node, param)
     },
   }
 })

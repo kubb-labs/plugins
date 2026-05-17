@@ -5,8 +5,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { getComments, resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
+import { buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -27,18 +26,11 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-/**
- * Path-parameter names for an operation, with `paramsCasing` applied so they
- * match the names emitted by {@link ast.createOperationParams}.
- */
 function collectPathParamNames(node: ast.OperationNode, paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']): Set<string> {
   const pathParams = (node.parameters ?? []).filter((p) => p.in === 'path')
   return new Set(ast.caseParams(pathParams, paramsCasing).map((p) => p.name))
 }
 
-/**
- * Widen path-parameter types to `T | (() => T) | undefined`.
- */
 function wrapPathParamsAsGetters(paramsNode: ast.FunctionParametersNode, pathParamNames: ReadonlySet<string>): ast.FunctionParametersNode {
   return transformParamTypes(paramsNode, {
     wrapType: (inner) => `${inner} | (() => ${inner}) | undefined`,
@@ -46,32 +38,16 @@ function wrapPathParamsAsGetters(paramsNode: ast.FunctionParametersNode, pathPar
   })
 }
 
-/**
- * Body prelude that unwraps each path-param getter into a `${name}_` shadow.
- */
 function buildUnwrapPrelude(pathParamNames: ReadonlySet<string>): string {
   if (pathParamNames.size === 0) return ''
   return [...pathParamNames].map((n) => `const ${n}_ = typeof ${n} === 'function' ? ${n}() : ${n}`).join('\n')
 }
 
-/**
- * Rewrite a printed call expression so each path-param identifier is
- * replaced by its shadow variable. Two passes: expand object-literal
- * shorthand (`{ id }` -> `{ id: id }`), then swap bare references for
- * `id_` while leaving keys and member accesses untouched.
- *
- * @note Relies on `callPrinter` only emitting path-param names as bare
- * identifiers or as object-literal shorthand; the snapshot tests pin this
- * contract.
- */
 function buildArgRewriter(pathParamNames: ReadonlySet<string>): (expr: string) => string {
   if (pathParamNames.size === 0) return (expr) => expr
   const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
   const names = [...pathParamNames]
   return (expr) => {
-    // Step 1: inside any `{...}` block, expand shorthand `{ name }` to
-    // `{ name: name }`. Scoping to braced blocks avoids misfiring on the
-    // commas that separate function-call arguments.
     let out = expr.replace(/\{[^{}]*\}/g, (block) => {
       let inner = block
       for (const n of names) {
@@ -80,7 +56,6 @@ function buildArgRewriter(pathParamNames: ReadonlySet<string>): (expr: string) =
       }
       return inner
     })
-    // Step 2: rename bare references to the shadow var, skipping object keys and member-access.
     for (const n of names) {
       const e = escape(n)
       out = out.replace(new RegExp(`(?<![.])\\b${e}\\b(?!\\s*:)`, 'g'), `${n}_`)
@@ -89,7 +64,7 @@ function buildArgRewriter(pathParamNames: ReadonlySet<string>): (expr: string) =
   }
 }
 
-function getParams(
+function buildQueryParamsNode(
   node: ast.OperationNode,
   options: {
     paramsType: PluginReactQuery['resolvedOptions']['paramsType']
@@ -156,13 +131,13 @@ export function Query({
 
   const pathParamNames = pathParamsAsGetters ? collectPathParamNames(node, paramsCasing) : new Set<string>()
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = getParams(node, { paramsType, paramsCasing, pathParamsType, pathParamNames, dataReturnType, resolver: tsResolver })
+  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, pathParamNames, dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   const prelude = buildUnwrapPrelude(pathParamNames)
@@ -191,5 +166,3 @@ export function Query({
     </File.Source>
   )
 }
-
-Query.getParams = getParams

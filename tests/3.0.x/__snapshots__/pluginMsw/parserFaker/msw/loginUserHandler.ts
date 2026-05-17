@@ -4,7 +4,7 @@
 */
 
 import type { LoginUserResponse, LoginUserStatus400 } from "../types/LoginUser.ts";
-import { loginUserResponse } from "../faker/loginUser.ts";
+import { createLoginUserResponse } from "../faker/createLoginUser.ts";
 import { http } from "msw";
 
 export function loginUserHandlerResponse200(data: LoginUserResponse) {
@@ -29,7 +29,7 @@ export function loginUserHandler(data?: LoginUserResponse | ((info: Parameters<P
   return http.get('/user/login', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || loginUserResponse(data)), {
+      return new Response(JSON.stringify(data || createLoginUserResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/xml'

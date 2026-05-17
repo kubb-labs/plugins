@@ -8,9 +8,65 @@ export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase'
  */
 export type ResolverVueQuery = Resolver & {
   /**
-   * Resolves the hook function name for an operation.
+   * Resolves the base function name for an operation.
    */
   resolveName(this: ResolverVueQuery, name: string): string
+  /**
+   * Resolves the output file name for a hook module.
+   */
+  resolvePathName(this: ResolverVueQuery, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
+  /**
+   * Resolves a query hook function name.
+   */
+  resolveQueryName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves an infinite query hook function name.
+   */
+  resolveInfiniteQueryName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves a mutation hook function name.
+   */
+  resolveMutationName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the query options helper name.
+   */
+  resolveQueryOptionsName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the infinite query options helper name.
+   */
+  resolveInfiniteQueryOptionsName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the query key helper name.
+   */
+  resolveQueryKeyName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the infinite query key helper name.
+   */
+  resolveInfiniteQueryKeyName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the mutation key helper name.
+   */
+  resolveMutationKeyName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the query key type name.
+   */
+  resolveQueryKeyTypeName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the infinite query key type name.
+   */
+  resolveInfiniteQueryKeyTypeName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the mutation type name.
+   */
+  resolveMutationTypeName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the client function name generated inline by query hooks.
+   */
+  resolveClientName(this: ResolverVueQuery, node: ast.OperationNode): string
+  /**
+   * Resolves the client function name generated inline by infinite query hooks.
+   */
+  resolveInfiniteClientName(this: ResolverVueQuery, node: ast.OperationNode): string
 }
 
 /**
@@ -142,12 +198,6 @@ export type Options = {
    * Parser to use for validating response data.
    */
   parser?: PluginClient['options']['parser']
-  transformers?: {
-    /**
-     * Override the default naming for hooks.
-     */
-    name?: (name: string, type?: string) => string
-  }
   /**
    * Override naming conventions for function names and types.
    */
@@ -182,7 +232,6 @@ type ResolvedOptions = {
   mutationKey: MutationKey | undefined
   mutation: NonNullable<Required<Mutation>> | false
   resolver: ResolverVueQuery
-  transformers: NonNullable<Options['transformers']>
 }
 
 export type PluginVueQuery = PluginFactoryOptions<'plugin-vue-query', Options, ResolvedOptions, ResolverVueQuery>

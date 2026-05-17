@@ -1,5 +1,15 @@
 # performance
 
+## 0.0.1-beta.7
+
+### Patch Changes
+
+- Updated dependencies [[`752a6eb`](https://github.com/kubb-labs/plugins/commit/752a6eb6ab6a08d3c3422f826b2ed1f74f7a737e)]:
+  - @kubb/plugin-faker@5.0.0-beta.10
+  - @kubb/plugin-client@5.0.0-beta.10
+  - @kubb/plugin-ts@5.0.0-beta.10
+  - @kubb/plugin-zod@5.0.0-beta.10
+
 ## 0.0.1-beta.6
 
 ### Patch Changes

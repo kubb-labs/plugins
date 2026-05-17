@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { camelCase, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -47,10 +48,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
   const responseType = resolver.resolveResponseName(node)
   const returnType = dataReturnType === 'data' ? `Cypress.Chainable<${responseType}>` : `Cypress.Chainable<Cypress.Response<${responseType}>>`
 
-  const casedPathParams = ast.caseParams(
-    node.parameters.filter((p) => p.in === 'path'),
-    paramsCasing,
-  )
+  const casedPathParams = getOperationParameters(node, { paramsCasing }).path
   // Build a lookup keyed by camelCase-normalized name so that path-template names
   // (e.g. `{pet_id}`) correctly resolve to the function-parameter name (`petId`)
   // even when the OpenAPI spec has inconsistent casing between the two.
@@ -64,9 +62,9 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
 
   const requestOptions: string[] = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
-  const queryParams = node.parameters.filter((p) => p.in === 'query')
+  const queryParams = getOperationParameters(node).query
   if (queryParams.length > 0) {
-    const casedQueryParams = ast.caseParams(queryParams, paramsCasing)
+    const casedQueryParams = getOperationParameters(node, { paramsCasing }).query
     // When paramsCasing renames query params (e.g. page_size → pageSize), we must remap
     // the camelCase keys back to the original API names before passing them to `qs`.
     const needsQsTransform = casedQueryParams.some((p, i) => p.name !== queryParams[i]!.name)
@@ -78,9 +76,9 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
     }
   }
 
-  const headerParams = node.parameters.filter((p) => p.in === 'header')
+  const headerParams = getOperationParameters(node).header
   if (headerParams.length > 0) {
-    const casedHeaderParams = ast.caseParams(headerParams, paramsCasing)
+    const casedHeaderParams = getOperationParameters(node, { paramsCasing }).header
     // When paramsCasing renames header params (e.g. x-api-key → xApiKey), we must remap
     // the camelCase keys back to the original API names before passing them to `headers`.
     const needsHeaderTransform = casedHeaderParams.some((p, i) => p.name !== headerParams[i]!.name)

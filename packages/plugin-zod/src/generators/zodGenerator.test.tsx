@@ -2,7 +2,7 @@ import path from 'node:path'
 import { camelCase } from '@internals/utils'
 
 import type { Config, Group } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { describe, expect, test } from 'vitest'
 import { matchFiles } from '#mocks'
@@ -10,7 +10,15 @@ import { resolverZod } from '../resolvers/resolverZod.ts'
 import type { PluginZod } from '../types.ts'
 import { zodGenerator } from './zodGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginZod['resolvedOptions'] = {
   typed: false,
@@ -298,13 +306,13 @@ describe('zodGenerator — Schema', () => {
       config: testConfig,
       adapter: createMockedAdapter({
         resolvedOptions: { dateType: 'string' },
-        inputNode: {
-          kind: 'Input',
-          schemas: [petPolySchema, catCycleSchema],
-          operations: [],
-          meta: {},
-        },
       }),
+      inputNode: {
+        kind: 'Input',
+        schemas: [petPolySchema, catCycleSchema],
+        operations: [],
+        meta: {},
+      },
       driver,
       plugin,
       options: defaultOptions,

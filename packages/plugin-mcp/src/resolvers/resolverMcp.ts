@@ -10,7 +10,7 @@ import type { PluginMcp } from '../types.ts'
  * @example
  * `resolverMcp.default('addPet', 'function')  // → 'addPetHandler'`
  */
-export const resolverMcp = defineResolver<PluginMcp>((ctx) => ({
+export const resolverMcp = defineResolver<PluginMcp>(() => ({
   name: 'default',
   pluginName: 'plugin-mcp',
   default(name, type) {
@@ -20,6 +20,12 @@ export const resolverMcp = defineResolver<PluginMcp>((ctx) => ({
     return camelCase(name, { suffix: 'handler' })
   },
   resolveName(name) {
-    return ctx.default(name, 'function')
+    return this.default(name, 'function')
+  },
+  resolvePathName(name, type) {
+    return this.default(name, type)
+  },
+  resolveHandlerName(node) {
+    return this.resolveName(node.operationId)
   },
 }))

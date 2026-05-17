@@ -1,11 +1,11 @@
-import { isValidVarName, URLPath } from '@internals/utils'
+import { buildOperationComments, buildTransformedParamsMapping, getOperationParameters } from '@internals/shared'
+import { camelCase, isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginMcp } from '../types.ts'
-import { getComments, getParamsMapping } from '../utils.ts'
 
 type Props = {
   /**
@@ -54,14 +54,8 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
-  const casedParams = ast.caseParams(node.parameters, paramsCasing)
-  const queryParams = casedParams.filter((p) => p.in === 'query')
-  const headerParams = casedParams.filter((p) => p.in === 'header')
-
-  // Use original (uncased) parameters for mapping so original→camelCase difference is detected
-  const originalPathParams = node.parameters.filter((p) => p.in === 'path')
-  const originalQueryParams = node.parameters.filter((p) => p.in === 'query')
-  const originalHeaderParams = node.parameters.filter((p) => p.in === 'header')
+  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
+  const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
 
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const responseName = resolver.resolveResponseName(node)
@@ -83,9 +77,9 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     ? `${baseParamsSignature}, request: RequestHandlerExtra<ServerRequest, ServerNotification>`
     : 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'
 
-  const pathParamsMapping = paramsCasing ? getParamsMapping(originalPathParams) : undefined
-  const queryParamsMapping = paramsCasing ? getParamsMapping(originalQueryParams) : undefined
-  const headerParamsMapping = paramsCasing ? getParamsMapping(originalHeaderParams) : undefined
+  const pathParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalPathParams, camelCase) : undefined
+  const queryParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalQueryParams, camelCase) : undefined
+  const headerParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalHeaderParams, camelCase) : undefined
 
   const contentTypeHeader =
     contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined
@@ -128,7 +122,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
         export
         params={paramsSignature}
         JSDoc={{
-          comments: getComments(node),
+          comments: buildOperationComments(node),
         }}
         returnType={'Promise<CallToolResult>'}
       >

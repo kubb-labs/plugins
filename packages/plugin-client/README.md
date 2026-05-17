@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>Plugin Client</h1>
+  <h1>@kubb/plugin-client</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
   </a>
@@ -15,7 +15,7 @@
 <span> · </span>
 <a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/client" target="_blank">View Client Demo</a>
 <span> · </span>
-<a href="https://kubb.dev/" target="_blank">Documentation</a>
+<a href="https://kubb.dev/plugins/client" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
 <span> · </span>
@@ -23,11 +23,31 @@
 </h4>
 </div>
 
-Swagger integration for Axios to generate all the different clients based on an OpenAPI specification.
+`@kubb/plugin-client` generates HTTP clients from your OpenAPI specification. It supports Axios, Fetch, and custom adapters, with request and response types inferred directly from the spec.
+
+## Features
+
+- Supports Axios, Fetch, and custom HTTP adapters
+- Infers request params, request body, and response types from the spec
+- Works with `@kubb/plugin-ts` and `@kubb/plugin-zod`
+
+## Installation
+
+```bash
+bun add @kubb/plugin-client
+# or
+pnpm add @kubb/plugin-client
+# or
+npm install @kubb/plugin-client
+```
+
+## Documentation
+
+See the [full documentation](https://kubb.dev/plugins/client) for configuration options and examples.
 
 ## Supporting Kubb
 
-Kubb uses an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 

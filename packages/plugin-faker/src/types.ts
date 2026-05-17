@@ -42,6 +42,13 @@ export type ResolverFaker = Resolver &
      */
     resolveResponseName(this: ResolverFaker, node: ast.OperationNode): string
     /**
+     * Resolves the faker function name for the response collection.
+     *
+     * @example Responses collection names
+     * `resolver.resolveResponsesName(node) // -> 'listPetsResponses'`
+     */
+    resolveResponsesName(this: ResolverFaker, node: ast.OperationNode): string
+    /**
      * Resolves the faker function name for path parameters.
      *
      * @example Path parameters names

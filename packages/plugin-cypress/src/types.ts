@@ -11,6 +11,10 @@ export type ResolverCypress = Resolver & {
    * `resolver.resolveName('show pet by id') // -> 'showPetById'`
    */
   resolveName(this: ResolverCypress, name: string): string
+  /**
+   * Resolves the output file name for a Cypress request module.
+   */
+  resolvePathName(this: ResolverCypress, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
 }
 
 /**

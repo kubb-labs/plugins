@@ -1,18 +1,4 @@
-import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
-
-/**
- * Find the first 2xx response status code from an operation's responses.
- */
-export function findSuccessStatusCode(responses: Array<{ statusCode: number | string }>): ast.StatusCode | undefined {
-  for (const res of responses) {
-    const code = Number(res.statusCode)
-    if (code >= 200 && code < 300) {
-      return res.statusCode as ast.StatusCode
-    }
-  }
-  return undefined
-}
 
 export type ZodParam = {
   name: string
@@ -29,41 +15,6 @@ export function zodGroupExpr(entry: string | Array<ZodParam>): string {
   }
   const entries = entry.map((p) => `${JSON.stringify(p.name)}: ${p.schemaName}`)
   return `z.object({ ${entries.join(', ')} })`
-}
-
-/**
- * Build JSDoc comment lines from an OperationNode.
- */
-export function getComments(node: ast.OperationNode): Array<string> {
-  return [
-    node.description && `@description ${node.description}`,
-    node.summary && `@summary ${node.summary}`,
-    node.deprecated && '@deprecated',
-    `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}`,
-  ].filter((x): x is string => Boolean(x))
-}
-
-/**
- * Build a mapping of original param names → camelCase names.
- * Returns `undefined` when no names actually change (no remapping needed).
- */
-export function getParamsMapping(params: Array<{ name: string }>): Record<string, string> | undefined {
-  if (!params.length) {
-    return undefined
-  }
-
-  const mapping: Record<string, string> = {}
-  let hasDifference = false
-
-  for (const p of params) {
-    const camelName = camelCase(p.name)
-    mapping[p.name] = camelName
-    if (p.name !== camelName) {
-      hasDifference = true
-    }
-  }
-
-  return hasDifference ? mapping : undefined
 }
 
 /**

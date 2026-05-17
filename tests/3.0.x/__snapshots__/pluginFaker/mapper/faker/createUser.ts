@@ -3,23 +3,14 @@
 * Do not edit manually.
 */
 
-import type { CreateUserData, CreateUserResponse, CreateUserStatusDefault } from "../types/CreateUser.ts";
-import { user } from "./user.ts";
+import type { User } from "../types/User.ts";
+import { faker } from "@faker-js/faker";
 
-/**
- * @description successful operation
- */
-export function createUserStatusDefault(data?: Partial<CreateUserStatusDefault>): CreateUserStatusDefault {
-  return user(data)
-}
-
-/**
- * @description Created user object
- */
-export function createUserData(data?: Partial<CreateUserData>): CreateUserData {
-  return user(data)
-}
-
-export function createUserResponse(data?: Partial<CreateUserResponse>): CreateUserResponse {
-  return createUserStatusDefault(data)
+export function createUser(data?: Partial<User>): Required<User>
+{
+  const defaultFakeData = {"id": faker.number.bigInt(),"username": faker.string.alpha(),"firstName": faker.string.alpha(),"lastName": faker.string.alpha(),"email": faker.string.alpha(),"password": faker.string.alpha(),"phone": faker.string.alpha(),"userStatus": faker.number.int()}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<User>
 }

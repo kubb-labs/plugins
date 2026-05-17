@@ -10,13 +10,16 @@ import type { PluginCypress } from '../types.ts'
  * @example
  * `resolverCypress.default('list pets', 'function')  // → 'listPets'`
  */
-export const resolverCypress = defineResolver<PluginCypress>((ctx) => ({
+export const resolverCypress = defineResolver<PluginCypress>(() => ({
   name: 'default',
   pluginName: 'plugin-cypress',
   default(name, type) {
     return camelCase(name, { isFile: type === 'file' })
   },
   resolveName(name) {
-    return ctx.default(name, 'function')
+    return this.default(name, 'function')
+  },
+  resolvePathName(name, type) {
+    return this.default(name, type)
   },
 }))

@@ -1,19 +1,17 @@
 {
   "name": "@kubb/plugin-mcp",
-  "version": "5.0.0-beta.4",
-  "description": "Model Context Protocol (MCP) plugin for Kubb, generating MCP-compatible tools and schemas from OpenAPI specifications for AI assistants.",
+  "version": "5.0.0-beta.14",
+  "description": "Generate Model Context Protocol (MCP) tool definitions from your OpenAPI specification. Expose your REST APIs as AI-callable tools for LLMs, Claude, ChatGPT, and other AI assistants.",
   "keywords": [
     "ai",
     "ai-tools",
-    "claude",
-    "code-generator",
+    "code-generation",
     "codegen",
     "kubb",
     "llm",
     "mcp",
     "model-context-protocol",
     "openapi",
-    "plugins",
     "swagger",
     "typescript"
   ],
@@ -67,6 +65,7 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
+    "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*"
   },
   "peerDependencies": {

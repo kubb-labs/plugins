@@ -1,3 +1,4 @@
+import { getOperationParameters } from '@internals/shared'
 import { getNestedAccessor } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -6,8 +7,9 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
 import { resolveErrorNames } from '../utils.ts'
-import { QueryKey } from './QueryKey.tsx'
-import { buildEnabledCheck, getQueryOptionsParams } from './QueryOptions.tsx'
+import { buildQueryKeyParamsNode } from './QueryKey.tsx'
+import { buildEnabledCheck } from '@internals/tanstack-query'
+import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
   name: string
@@ -65,7 +67,7 @@ export function InfiniteQueryOptions({
           ? 'boolean'
           : 'unknown'
 
-  const rawQueryParams = node.parameters.filter((p) => p.in === 'query')
+  const rawQueryParams = getOperationParameters(node).query
   const queryParamsTypeName =
     rawQueryParams.length > 0
       ? (() => {
@@ -83,11 +85,16 @@ export function InfiniteQueryOptions({
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = QueryKey.getParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: () => !!(${enabledSource}),` : ''
+  const enabledText = enabledSource
+    ? `enabled: () => ${enabledSource
+        .split(' && ')
+        .map((n) => `!!toValue(${n.trim()})`)
+        .join(' && ')},`
+    : ''
 
   const hasNewParams = nextParam !== undefined || previousParam !== undefined
 
@@ -197,13 +204,3 @@ function addToValueCalls(callStr: string): string {
 
   return result
 }
-
-InfiniteQueryOptions.getParams = (
-  node: ast.OperationNode,
-  options: {
-    paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
-    resolver: ResolverTs
-  },
-) => getQueryOptionsParams(node, options)
