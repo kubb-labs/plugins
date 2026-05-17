@@ -145,7 +145,7 @@ describe('Stream adapter — FileProcessor.run() vs runStream()', () => {
 // Suite 3 — first-write latency
 //
 // Tracks when the first file reaches storage after processing starts.
-// runStream() should win because file 1 is yielded before files 2–N start.
+// runStream() should win because file 1 is yielded before files 2-N start.
 // run() parallel must wait for the slowest file in the first concurrency
 // window (up to PARALLEL_CONCURRENCY_LIMIT = 16) before the update events
 // begin draining.
