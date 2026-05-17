@@ -1,5 +1,4 @@
 import path from 'node:path'
-import { performance } from 'node:perf_hooks'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
 import type { FileNode } from '@kubb/ast'
@@ -14,17 +13,16 @@ import { beforeAll, bench, describe } from 'vitest'
 /**
  * Stream adapter validation benchmarks
  *
- * Validates the streaming file-processing path (`FileProcessor.runStream`) against
+ * Validates the streaming file-processing path (`FileProcessor.stream`) against
  * the existing event-based batch path (`FileProcessor.run`) across the plugin
  * examples in this repository.
  *
- * The inline `runStream` helper below mirrors the implementation added to
- * `@kubb/core/packages/core/src/FileProcessor.ts` in the accompanying kubb-repo PR
- * and can be replaced with the published `fileProcessor.runStream()` once the package
- * is released.
+ * The inline `streamFiles` helper below mirrors the implementation added to
+ * `@kubb/core` (`FileProcessor.stream`) and can be replaced with a direct
+ * `fileProcessor.stream()` call once the package is released.
  *
  * Key differences measured:
- *  - Throughput (ops/s) — how many full processing passes per second
+ *  - Throughput (ops per second) — how many full processing passes per second
  *  - First-write latency — how quickly the first file reaches storage
  *  - Peak heap delta — maximum heap growth during the processing phase
  */
@@ -33,11 +31,11 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 // ---------------------------------------------------------------------------
-// Inline stream helper — equivalent to FileProcessor.runStream() from the PR.
+// Inline stream helper — equivalent to FileProcessor.stream() from the PR.
 // Yields one parsed file at a time, enabling writes to start before all files
 // are parsed.
 // ---------------------------------------------------------------------------
-async function* runStream(
+async function* streamFiles(
   files: ReadonlyArray<FileNode>,
   fp: FileProcessor,
 ): AsyncGenerator<{ file: FileNode; source: string; processed: number; total: number; percentage: number }> {
@@ -100,12 +98,12 @@ describe('Stream adapter — full pipeline (4 plugin examples)', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Suite 2 — FileProcessor: batch run() vs runStream()
+// Suite 2 — FileProcessor: event-driven run() vs stream()
 //
 // Both variants process the *same* FileNode array generated from the full
 // plugin suite. Differences are due solely to the processing pipeline.
 // ---------------------------------------------------------------------------
-describe('Stream adapter — FileProcessor.run() vs runStream()', () => {
+describe('Stream adapter — FileProcessor.run() vs stream()', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
   let sharedFiles: Array<FileNode> = []
 
@@ -116,24 +114,24 @@ describe('Stream adapter — FileProcessor.run() vs runStream()', () => {
   })
 
   bench(
-    'batch: run() parallel (current approach)',
+    'event-driven: run() (current approach)',
     async () => {
       const store = memoryStorage()
       const fp = new FileProcessor()
       fp.events.on('update', async ({ file, source }) => {
         if (source) await store.setItem(file.path, source)
       })
-      await fp.run(sharedFiles, { mode: 'parallel' })
+      await fp.run(sharedFiles)
     },
     { time: 10_000 },
   )
 
   bench(
-    'stream: runStream() sequential (new approach)',
+    'stream: stream() sequential (new approach)',
     async () => {
       const store = memoryStorage()
       const fp = new FileProcessor()
-      for await (const { file, source } of runStream(sharedFiles, fp)) {
+      for await (const { file, source } of streamFiles(sharedFiles, fp)) {
         if (source) await store.setItem(file.path, source)
       }
     },
@@ -145,10 +143,9 @@ describe('Stream adapter — FileProcessor.run() vs runStream()', () => {
 // Suite 3 — first-write latency
 //
 // Tracks when the first file reaches storage after processing starts.
-// runStream() should win because file 1 is yielded before files 2-N start.
-// run() parallel must wait for the slowest file in the first concurrency
-// window (up to PARALLEL_CONCURRENCY_LIMIT = 16) before the update events
-// begin draining.
+// stream() should win because file 1 is yielded before files 2-N start.
+// run() must wait for the first update event to fire, which happens only
+// after the first parse completes inside the sequential loop.
 // ---------------------------------------------------------------------------
 describe('Stream adapter — first-write latency', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
@@ -161,34 +158,34 @@ describe('Stream adapter — first-write latency', () => {
   })
 
   bench(
-    'first-write latency: run() parallel',
+    'first-write latency: run() event-driven',
     async () => {
       const store = memoryStorage()
       const fp = new FileProcessor()
-      let firstWriteMs = 0
+      let firstWriteTime = 0
       const t0 = performance.now()
       fp.events.on('update', async ({ file, source }) => {
-        if (source && firstWriteMs === 0) firstWriteMs = performance.now() - t0
+        if (source && firstWriteTime === 0) firstWriteTime = performance.now() - t0
         if (source) await store.setItem(file.path, source)
       })
-      await fp.run(sharedFiles, { mode: 'parallel' })
-      void firstWriteMs
+      await fp.run(sharedFiles)
+      void firstWriteTime
     },
     { time: 10_000 },
   )
 
   bench(
-    'first-write latency: runStream()',
+    'first-write latency: stream()',
     async () => {
       const store = memoryStorage()
       const fp = new FileProcessor()
-      let firstWriteMs = 0
+      let firstWriteTime = 0
       const t0 = performance.now()
-      for await (const { file, source } of runStream(sharedFiles, fp)) {
-        if (source && firstWriteMs === 0) firstWriteMs = performance.now() - t0
+      for await (const { file, source } of streamFiles(sharedFiles, fp)) {
+        if (source && firstWriteTime === 0) firstWriteTime = performance.now() - t0
         if (source) await store.setItem(file.path, source)
       }
-      void firstWriteMs
+      void firstWriteTime
     },
     { time: 10_000 },
   )
@@ -208,7 +205,7 @@ describe('Stream adapter — peak heap during file processing', () => {
   })
 
   bench(
-    'peak heap: run() parallel',
+    'peak heap: run() event-driven',
     async () => {
       const store = memoryStorage()
       const fp = new FileProcessor()
@@ -218,19 +215,19 @@ describe('Stream adapter — peak heap during file processing', () => {
         if (h > peak) peak = h
         if (source) await store.setItem(file.path, source)
       })
-      await fp.run(sharedFiles, { mode: 'parallel' })
+      await fp.run(sharedFiles)
       void peak
     },
     { time: 5_000, iterations: 5 },
   )
 
   bench(
-    'peak heap: runStream()',
+    'peak heap: stream()',
     async () => {
       let peak = heapMB()
       const store = memoryStorage()
       const fp = new FileProcessor()
-      for await (const { file, source } of runStream(sharedFiles, fp)) {
+      for await (const { file, source } of streamFiles(sharedFiles, fp)) {
         const h = heapMB()
         if (h > peak) peak = h
         if (source) await store.setItem(file.path, source)
