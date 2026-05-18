@@ -48,28 +48,30 @@ Both configurations write to an in-memory output (`write: false`) to eliminate I
 ## Results
 
 Timings are the mean of three measured iterations after one warmup iteration, in
-milliseconds. Lower is better.
+milliseconds. Lower is better. Results are from `measure.bench.ts` (beta.15 vs beta.16
+labeled runs) and `streaming.bench.ts` (stream vs batch labeled runs) run on the same
+machine back-to-back.
 
 ### twitter.json — 236 schemas
 
-| Configuration | Batch (ms) | Stream (ms) | Speedup |
+| Configuration | beta.15 batch (ms) | beta.16 stream (ms) | Speedup |
 |---|---|---|---|
-| `plugin-ts` | 993 | 779 | **1.27×** |
-| `plugin-ts + plugin-zod` | 1,622 | 1,046 | **1.55×** |
+| `plugin-ts` | 895 | 652 | **1.37×** |
+| `plugin-ts + plugin-zod` | 1,639 | 994 | **1.65×** |
 
 ### digitalocean.yaml — 312 schemas
 
-| Configuration | Batch (ms) | Stream (ms) | Speedup |
+| Configuration | beta.15 batch (ms) | beta.16 stream (ms) | Speedup |
 |---|---|---|---|
-| `plugin-ts` | 2,563 | 1,752 | **1.46×** |
-| `plugin-ts + plugin-zod` | 5,460 | 2,551 | **2.14×** |
+| `plugin-ts` | 2,552 | 1,776 | **1.44×** |
+| `plugin-ts + plugin-zod` | 5,765 | 2,989 | **1.93×** |
 
 ### bunq.com.json — 617 schemas
 
-| Configuration | Batch (ms) | Stream (ms) | Speedup |
+| Configuration | beta.15 batch (ms) | beta.16 stream (ms) | Speedup |
 |---|---|---|---|
-| `plugin-ts` | 2,661 | 2,589 | **1.03×** |
-| `plugin-ts + plugin-zod` | 6,260 | 4,465 | **1.40×** |
+| `plugin-ts` | 2,753 | 2,537 | **1.09×** |
+| `plugin-ts + plugin-zod` | 6,089 | 4,151 | **1.47×** |
 
 ---
 
@@ -125,6 +127,6 @@ path, making stream and batch configurations directly comparable on identical in
 
 | Spec | Schemas | Single plugin speedup | Two-plugin speedup |
 |---|---|---|---|
-| twitter.json | 236 | 1.27× | 1.55× |
-| digitalocean.yaml | 312 | 1.46× | **2.14×** |
-| bunq.com.json | 617 | 1.03× | 1.40× |
+| twitter.json | 236 | 1.37× | 1.65× |
+| digitalocean.yaml | 312 | 1.44× | **1.93×** |
+| bunq.com.json | 617 | 1.09× | 1.47× |
