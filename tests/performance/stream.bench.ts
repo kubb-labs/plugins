@@ -1,8 +1,7 @@
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
-import type { FileNode } from '@kubb/ast'
-import { AsyncEventEmitter, createKubb, FileProcessor, memoryStorage, type Plugin } from '@kubb/core'
+import { ast, AsyncEventEmitter, createKubb, FileProcessor, memoryStorage, type Plugin } from '@kubb/core'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -36,9 +35,9 @@ const __dirname = path.dirname(__filename)
 // are parsed.
 // ---------------------------------------------------------------------------
 async function* streamFiles(
-  files: ReadonlyArray<FileNode>,
+  files: ReadonlyArray<ast.FileNode>,
   fp: FileProcessor,
-): AsyncGenerator<{ file: FileNode; source: string; processed: number; total: number; percentage: number }> {
+): AsyncGenerator<{ file: ast.FileNode; source: string; processed: number; total: number; percentage: number }> {
   const total = files.length
   let processed = 0
   for (const file of files) {
@@ -100,12 +99,12 @@ describe('Stream adapter — full pipeline (4 plugin examples)', () => {
 // ---------------------------------------------------------------------------
 // Suite 2 — FileProcessor: event-driven run() vs stream()
 //
-// Both variants process the *same* FileNode array generated from the full
+// Both variants process the *same* ast.FileNode array generated from the full
 // plugin suite. Differences are due solely to the processing pipeline.
 // ---------------------------------------------------------------------------
 describe('Stream adapter — FileProcessor.run() vs stream()', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
-  let sharedFiles: Array<FileNode> = []
+  let sharedFiles: Array<ast.FileNode> = []
 
   beforeAll(async () => {
     const config = makeConfig(petStorePath)
@@ -149,7 +148,7 @@ describe('Stream adapter — FileProcessor.run() vs stream()', () => {
 // ---------------------------------------------------------------------------
 describe('Stream adapter — first-write latency', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
-  let sharedFiles: Array<FileNode> = []
+  let sharedFiles: Array<ast.FileNode> = []
 
   beforeAll(async () => {
     const config = makeConfig(petStorePath)
@@ -196,7 +195,7 @@ describe('Stream adapter — first-write latency', () => {
 // ---------------------------------------------------------------------------
 describe('Stream adapter — peak heap during file processing', () => {
   const petStorePath = path.resolve(__dirname, '../../schemas/3.0.x/petStore.yaml')
-  let sharedFiles: Array<FileNode> = []
+  let sharedFiles: Array<ast.FileNode> = []
 
   beforeAll(async () => {
     const config = makeConfig(petStorePath)
@@ -235,5 +234,69 @@ describe('Stream adapter — peak heap during file processing', () => {
       void peak
     },
     { time: 5_000, iterations: 5 },
+  )
+})
+
+// ---------------------------------------------------------------------------
+// Suite 5 — large spec: twitter.json (67 paths / 80 operations)
+//
+// Validates stream() output timing at real-world scale.
+// Measures: full build time, file count, first-write latency, and
+// per-file mean latency via stream().
+// ---------------------------------------------------------------------------
+describe('Stream adapter — large spec output timing (twitter.json)', () => {
+  const twitterPath = path.resolve(__dirname, '../../schemas/3.0.x/twitter.json')
+
+  bench(
+    'twitter.json: full build via stream flush path (ts + client + zod + faker)',
+    async () => {
+      const config = defineConfig({
+        root: '.',
+        input: { path: twitterPath },
+        adapter: adapterOas({ validate: false }),
+        storage: memoryStorage(),
+        output: { path: './src/gen', clean: false },
+        plugins: [
+          pluginTs({ output: { path: 'types', barrel: false }, enumType: 'asConst' }),
+          pluginClient({ output: { path: 'clients' } }),
+          pluginZod({ output: { path: 'zod', barrel: false }, inferred: true }),
+          pluginFaker({ output: { path: 'mocks', barrel: false } }),
+        ] as Plugin[],
+      })
+      const { files } = await createKubb(config, { hooks: new AsyncEventEmitter() }).build()
+      if (files.length === 0) throw new Error('twitter.json build produced no files')
+    },
+    { time: 10_000 },
+  )
+
+  bench(
+    'twitter.json: stream() per-file latency (FileProcessor only)',
+    async () => {
+      const config = defineConfig({
+        root: '.',
+        input: { path: twitterPath },
+        adapter: adapterOas({ validate: false }),
+        storage: memoryStorage(),
+        output: { path: './src/gen', clean: false },
+        plugins: [pluginTs({ output: { path: 'types', barrel: false }, enumType: 'asConst' })] as Plugin[],
+      })
+      const { files } = await createKubb(config, { hooks: new AsyncEventEmitter() }).build()
+
+      const store = memoryStorage()
+      const fp = new FileProcessor()
+      const t0 = performance.now()
+      let firstWriteTime = 0
+      let count = 0
+      for await (const { file, source } of streamFiles(files, fp)) {
+        if (source && firstWriteTime === 0) firstWriteTime = performance.now() - t0
+        if (source) await store.setItem(file.path, source)
+        count++
+      }
+      const totalMs = performance.now() - t0
+      void firstWriteTime
+      void totalMs
+      void count
+    },
+    { time: 10_000 },
   )
 })
