@@ -1,13 +1,13 @@
 import { resolveOperationTypeNames } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
 
 export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
     const { config, resolver, driver, root, inputNode } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options

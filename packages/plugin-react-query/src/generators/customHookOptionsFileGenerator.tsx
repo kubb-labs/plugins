@@ -2,12 +2,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 import { defineGenerator } from '@kubb/core'
-import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, Function, jsxRendererSync } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 
 export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-custom-hook-options-file',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operations(nodes, ctx) {
     const { resolver, config, root } = ctx
     const { output, customOptions, query, group } = ctx.options

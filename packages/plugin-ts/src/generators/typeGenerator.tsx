@@ -1,5 +1,5 @@
 import { ast, defineGenerator } from '@kubb/core'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
@@ -26,7 +26,7 @@ function getPerContentTypeName(dataName: string, suffix: string): string {
 
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   schema(node, ctx) {
     const { enumType, enumTypeSuffix, enumKeyCasing, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
     const { adapter, config, resolver, root, inputNode } = ctx

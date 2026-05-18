@@ -1,7 +1,7 @@
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations.tsx'
 import { Zod } from '../components/Zod.tsx'
 import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
@@ -12,7 +12,7 @@ import { buildSchemaNames } from '../utils.ts'
 
 export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   schema(node, ctx) {
     const { adapter, config, resolver, root, inputNode } = ctx
     const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
