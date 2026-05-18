@@ -68,3 +68,4 @@ packages/ui/static/**
 ## Nitro
 .output
 .nitro
+isolate-*.log
