@@ -1,4 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
+import { collectNodes } from '@internals/utils'
 import { defineGenerator } from '@kubb/core'
 import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -12,7 +13,8 @@ type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
 export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRenderer,
-  operations(nodes, ctx) {
+  async operations(nodes, ctx) {
+    const nodes_ = await collectNodes(nodes)
     const { resolver, config, root, inputNode } = ctx
     const { output, customOptions, query, mutation, suspense, infinite, group, override } = ctx.options
 
@@ -29,7 +31,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
     const imports: KubbReactNode[] = []
     const hookOptions: Record<string, string> = {}
 
-    for (const node of nodes) {
+    for (const node of nodes_) {
       const opOverrides = resolveOperationOverrides(node, override)
       const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
       const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation

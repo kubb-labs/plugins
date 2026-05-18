@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+import { collectNodes } from '@internals/utils'
 import { defineGenerator } from '@kubb/core'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
@@ -8,7 +9,8 @@ import type { PluginReactQuery } from '../types'
 export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-custom-hook-options-file',
   renderer: jsxRenderer,
-  operations(nodes, ctx) {
+  async operations(nodes, ctx) {
+    const nodes_ = await collectNodes(nodes)
     const { resolver, config, root } = ctx
     const { output, customOptions, query, group } = ctx.options
 
@@ -22,7 +24,7 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
     const reactQueryImportPath = query ? query.importPath : '@tanstack/react-query'
 
     let hookFilePath: string
-    const firstNode = nodes[0]
+    const firstNode = nodes_[0]
     if (firstNode) {
       const hookName = resolver.resolveQueryName(firstNode)
       const hookFile = resolver.resolveFile(
