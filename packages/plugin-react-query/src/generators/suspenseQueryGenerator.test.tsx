@@ -31,6 +31,7 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
+  pathParamsAsGetters: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

@@ -11,4 +11,5 @@ export {
   resolveQueryGroupType,
   resolveZodSchemaNames,
   transformName,
+  transformParamTypes,
 } from './utils.ts'

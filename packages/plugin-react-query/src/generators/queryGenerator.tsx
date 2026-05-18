@@ -15,7 +15,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
   renderer: jsxRendererSync,
   operation(node, ctx) {
     const { config, driver, resolver, root, inputNode } = ctx
-    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, customOptions } = ctx.options
+    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, pathParamsAsGetters, parser, client: clientOptions, group, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -169,6 +169,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
               paramsCasing={paramsCasing}
               paramsType={paramsType}
               pathParamsType={pathParamsType}
+              pathParamsAsGetters={pathParamsAsGetters}
               dataReturnType={clientOptions.dataReturnType || 'data'}
               customOptions={customOptions}
             />

@@ -254,6 +254,24 @@ export type Options = {
    */
   pathParamsType?: PluginClient['options']['pathParamsType']
   /**
+   * When `true`, widens path parameter signatures to `T | (() => T) | undefined`,
+   * letting callers pass a zero-arg getter alongside the value form. Inside the
+   * hook body, each path param is unwrapped once via
+   * `typeof v === 'function' ? v() : v` before it is forwarded to
+   * `queryKey(...)` and `queryOptions(...)`.
+   *
+   * Useful for reactive frameworks where reading a path param value at
+   * hook-call time captures only the initial value (Svelte 5 `$state`,
+   * Solid signals, MobX observables, etc.). Wrapping the read in a getter
+   * lets the closure re-evaluate on each access.
+   *
+   * Runtime cost: a single `typeof` check per generated hook call.
+   * Defaults to `false` — non-breaking, opt-in.
+   *
+   * @default false
+   */
+  pathParamsAsGetters?: boolean
+  /**
    * Add infinite query hooks.
    */
   infinite?: Partial<Infinite> | false
@@ -302,6 +320,7 @@ type ResolvedOptions = {
   client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'bundle' | 'paramsCasing'>
   parser: Required<NonNullable<Options['parser']>>
   pathParamsType: NonNullable<Options['pathParamsType']>
+  pathParamsAsGetters: boolean
   paramsCasing: Options['paramsCasing']
   paramsType: NonNullable<Options['paramsType']>
   /**

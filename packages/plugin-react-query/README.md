@@ -44,6 +44,46 @@ npm install @kubb/plugin-react-query
 
 See the [full documentation](https://kubb.dev/plugins/react-query) for configuration options and examples.
 
+## `pathParamsAsGetters`
+
+Opt-in option that widens the path parameter signature of generated `useQuery` hooks so callers can pass either the value or a zero-arg getter:
+
+```ts
+pluginReactQuery({
+  pathParamsAsGetters: true, // default: false
+})
+```
+
+When the option is enabled, a hook for `GET /pet/{petId}` is generated as:
+
+```ts
+// Signature accepts both forms
+useGetPetById(petId) // plain value
+useGetPetById(() => petId) // getter
+
+// Generated body unwraps the getter exactly once, then forwards the
+// plain value to the queryKey and queryOptions helpers:
+const petId_ = typeof petId === 'function' ? petId() : petId
+const queryKey = getPetByIdQueryKey(petId_)
+useQuery({ ...getPetByIdQueryOptions(petId_, config), ...resolvedOptions, queryKey })
+```
+
+The default is `false` and the generated output is byte-identical to previous releases when the option is omitted. The runtime cost when enabled is a single `typeof` check per hook call.
+
+### When to use it
+
+Reactive frameworks where reading a value at hook-call time captures only the initial snapshot can warn on, or silently break, kubb-generated hooks. The getter form keeps the read inside a closure that re-evaluates on each access:
+
+- **Svelte 5** — `$state` / `$derived` references emit a `state_referenced_locally` compiler warning when handed to a hook that reads them only at init.
+- **Solid** — signals (`createSignal`) must be invoked at read time; passing the value flattens the reactivity.
+- **MobX**, **Preact signals**, and similar observable systems — same closure-capture story.
+
+The option only affects the path-parameter slot. Query params, headers, and the request body retain their existing types and call-site shape.
+
+### Scope
+
+The current implementation covers the `useQuery` hook produced by `queryGenerator`. The infinite, suspense, and mutation variants are not affected by the option in this release — their generated signatures continue to take path params by value.
+
 ## Supporting Kubb
 
 Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:

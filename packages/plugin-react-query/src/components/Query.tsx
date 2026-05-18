@@ -1,3 +1,4 @@
+import { transformParamTypes } from '@internals/tanstack-query'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -17,6 +18,7 @@ type Props = {
   paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
+  pathParamsAsGetters: PluginReactQuery['resolvedOptions']['pathParamsAsGetters']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
 }
@@ -24,17 +26,56 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
+function collectPathParamNames(node: ast.OperationNode, paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']): Set<string> {
+  const pathParams = (node.parameters ?? []).filter((p) => p.in === 'path')
+  return new Set(ast.caseParams(pathParams, paramsCasing).map((p) => p.name))
+}
+
+function wrapPathParamsAsGetters(paramsNode: ast.FunctionParametersNode, pathParamNames: ReadonlySet<string>): ast.FunctionParametersNode {
+  return transformParamTypes(paramsNode, {
+    wrapType: (inner) => `${inner} | (() => ${inner}) | undefined`,
+    shouldWrap: (p) => pathParamNames.has(p.name),
+  })
+}
+
+function buildUnwrapPrelude(pathParamNames: ReadonlySet<string>): string {
+  if (pathParamNames.size === 0) return ''
+  return [...pathParamNames].map((n) => `const ${n}_ = typeof ${n} === 'function' ? ${n}() : ${n}`).join('\n')
+}
+
+function buildArgRewriter(pathParamNames: ReadonlySet<string>): (expr: string) => string {
+  if (pathParamNames.size === 0) return (expr) => expr
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const names = [...pathParamNames]
+  return (expr) => {
+    let out = expr.replace(/\{[^{}]*\}/g, (block) => {
+      let inner = block
+      for (const n of names) {
+        const e = escape(n)
+        inner = inner.replace(new RegExp(`([{,]\\s*)\\b${e}\\b(\\s*[,}])`, 'g'), `$1${n}: ${n}$2`)
+      }
+      return inner
+    })
+    for (const n of names) {
+      const e = escape(n)
+      out = out.replace(new RegExp(`(?<![.])\\b${e}\\b(?!\\s*:)`, 'g'), `${n}_`)
+    }
+    return out
+  }
+}
+
 function buildQueryParamsNode(
   node: ast.OperationNode,
   options: {
     paramsType: PluginReactQuery['resolvedOptions']['paramsType']
     paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
+    pathParamNames?: ReadonlySet<string>
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
+  const { paramsType, paramsCasing, pathParamsType, pathParamNames = new Set<string>(), dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
@@ -54,13 +95,16 @@ function buildQueryParamsNode(
     default: '{}',
   })
 
-  return ast.createOperationParams(node, {
+  const baseParams = ast.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver,
     extraParams: [optionsParam],
   })
+
+  if (pathParamNames.size === 0) return baseParams
+  return wrapPathParamsAsGetters(baseParams, pathParamNames)
 }
 
 export function Query({
@@ -71,6 +115,7 @@ export function Query({
   paramsType,
   paramsCasing,
   pathParamsType,
+  pathParamsAsGetters,
   dataReturnType,
   node,
   tsResolver,
@@ -84,26 +129,31 @@ export function Query({
   const returnType = `UseQueryResult<${'TData'}, ${TError}> & { queryKey: TQueryKey }`
   const generics = [`TData = ${TData}`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 
+  const pathParamNames = pathParamsAsGetters ? collectPathParamNames(node, paramsCasing) : new Set<string>()
+
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
+  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, pathParamNames, dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+
+  const prelude = buildUnwrapPrelude(pathParamNames)
+  const rewriteArgs = buildArgRewriter(pathParamNames)
 
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export generics={generics.join(', ')} params={paramsSignature} returnType={undefined} JSDoc={{ comments: getComments(node) }}>
         {`
-       const { query: queryConfig = {}, client: config = {} } = options ?? {}
+       ${prelude ? `${prelude}\n       ` : ''}const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig
-       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})
+       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${rewriteArgs(queryKeyParamsCall)})
        ${customOptions ? `const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
        const query = useQuery({
-        ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n...customOptions,' : ''}
+        ...${queryOptionsName}(${rewriteArgs(queryOptionsParamsCall)}),${customOptions ? '\n...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
        } as unknown as QueryObserverOptions, queryClient) as ${returnType}

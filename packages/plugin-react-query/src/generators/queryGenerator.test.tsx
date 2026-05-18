@@ -33,6 +33,7 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
+  pathParamsAsGetters: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -109,6 +110,18 @@ const createUsersWithListInputNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const getUserPetByIdNode = ast.createOperation({
+  operationId: 'getUserPetById',
+  method: 'GET',
+  path: '/user/{userId}/pet/{petId}',
+  tags: ['pet'],
+  parameters: [
+    ast.createParameter({ name: 'userId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+    ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+  ],
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -118,6 +131,31 @@ describe('queryGenerator operation', () => {
     { name: 'clientPostImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { paramsCasing: 'camelcase' as const } },
+    { name: 'getPetByIdPathParamsAsGetters', node: getPetByIdNode, options: { pathParamsAsGetters: true } },
+    {
+      name: 'getPetByIdPathParamsAsGettersObject',
+      node: getPetByIdNode,
+      options: { pathParamsAsGetters: true, pathParamsType: 'object' as const },
+    },
+    {
+      name: 'getPetByIdPathParamsAsGettersAllObject',
+      node: getPetByIdNode,
+      options: { pathParamsAsGetters: true, paramsType: 'object' as const },
+    },
+    {
+      // Operations without path params should be byte-identical to the baseline
+      // when the option is enabled — guards the short-circuit in getParams.
+      name: 'findByTagsPathParamsAsGetters',
+      node: findByTagsNode,
+      options: { pathParamsAsGetters: true },
+    },
+    {
+      // Multiple path params: prelude emits two unwrap lines, rewriter
+      // substitutes both names in the queryKey/queryOptions calls.
+      name: 'getUserPetByIdPathParamsAsGetters',
+      node: getUserPetByIdNode,
+      options: { pathParamsAsGetters: true },
+    },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const } },
     { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const } },
