@@ -12,11 +12,19 @@ export default defineConfig({
       '@internals/utils': path.resolve(__dirname, '../internals/utils/src/index.ts'),
     },
   },
+  oxc: {
+    transform: {
+      jsx: {
+        runtime: 'automatic',
+        importSource: 'react',
+      },
+    },
+  },
   test: {
-    include: ['**/*.bench.ts'],
+    include: ['**/*.bench.{ts,tsx}'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/mocks/**'],
     benchmark: {
-      include: ['**/*.bench.ts'],
+      include: ['**/*.bench.{ts,tsx}'],
     },
   },
 })

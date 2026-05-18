@@ -1,0 +1,40 @@
+{
+  "name": "@kubb/renderer-jsx",
+  "version": "5.0.0-beta.16",
+  "description": "JSX renderer for Kubb (local workspace fork)",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./jsx-dev-runtime": {
+      "development": "./src/jsx-dev-runtime.ts",
+      "default": "./src/jsx-dev-runtime.ts"
+    },
+    "./jsx-runtime": {
+      "development": "./src/jsx-runtime.ts",
+      "default": "./src/jsx-runtime.ts"
+    },
+    "./types": {
+      "development": "./src/types.ts",
+      "default": "./src/types.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@internals/utils": "workspace:*",
+    "@kubb/ast": "5.0.0-beta.16",
+    "react": "^19.2.0",
+    "react-reconciler": "^0.33.0"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@types/react": "^19.0.0",
+    "@types/react-reconciler": "^0.28.0"
+  }
+}

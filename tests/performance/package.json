@@ -19,11 +19,13 @@
     "@internals/utils": "workspace:*",
     "@kubb/adapter-oas": "catalog:",
     "@kubb/core": "catalog:",
+    "@kubb/renderer-jsx": "workspace:*",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "kubb": "catalog:"
+    "kubb": "catalog:",
+    "react": "^19.2.0"
   },
   "devDependencies": {
     "typescript": "catalog:",

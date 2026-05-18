@@ -936,6 +936,31 @@ importers:
         specifier: workspace:*
         version: link:../../internals/utils
 
+  packages/renderer-jsx:
+    dependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+      '@kubb/ast':
+        specifier: 5.0.0-beta.16
+        version: 5.0.0-beta.16
+      react:
+        specifier: ^19.2.0
+        version: 19.2.6
+      react-reconciler:
+        specifier: ^0.33.0
+        version: 0.33.0(react@19.2.6)
+    devDependencies:
+      '@types/react':
+        specifier: ^19.0.0
+        version: 19.2.14
+      '@types/react-reconciler':
+        specifier: ^0.28.0
+        version: 0.28.9(@types/react@19.2.14)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   tests/3.0.x:
     dependencies:
       '@internals/utils':
@@ -1062,10 +1087,10 @@ importers:
         version: link:../../internals/utils
       '@kubb/adapter-oas':
         specifier: 'catalog:'
-        version: 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+        version: 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
       '@kubb/core':
         specifier: 'catalog:'
-        version: 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+        version: 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
       '@kubb/plugin-client':
         specifier: workspace:*
         version: link:../../packages/plugin-client
@@ -1078,9 +1103,15 @@ importers:
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: workspace:*
+        version: link:../../packages/renderer-jsx
       kubb:
         specifier: 'catalog:'
-        version: 5.0.0-beta.16(@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16))(typescript@6.0.3)
+        version: 5.0.0-beta.16(@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))(typescript@6.0.3)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.6
     devDependencies:
       typescript:
         specifier: 'catalog:'
@@ -2743,6 +2774,11 @@ packages:
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
     peerDependencies:
       '@types/react': ^19.2.0
+
+  '@types/react-reconciler@0.28.9':
+    resolution: {integrity: sha512-HHM3nxyUZ3zAylX8ZEyrDNd2XZOnQ0D5XfunJF5FLQnZbHHYq4UWvW1QfelQNXv1ICNkwYhfxjwfnqivYB6bFg==}
+    peerDependencies:
+      '@types/react': '*'
 
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
@@ -4807,6 +4843,12 @@ packages:
     peerDependencies:
       react: ^19.2.6
 
+  react-reconciler@0.33.0:
+    resolution: {integrity: sha512-KetWRytFv1epdpJc3J4G75I4WrplZE5jOL7Yq0p34+OVOKF4Se7WrdIdVC45XsSSmUTlht2FM/fM1FZb1mfQeA==}
+    engines: {node: '>=0.10.0'}
+    peerDependencies:
+      react: ^19.2.0
+
   react@19.2.6:
     resolution: {integrity: sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q==}
     engines: {node: '>=0.10.0'}
@@ -6560,6 +6602,17 @@ snapshots:
       - '@kubb/renderer-jsx'
       - encoding
 
+  '@kubb/adapter-oas@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)':
+    dependencies:
+      '@kubb/core': 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
+      '@redocly/openapi-core': 2.31.0
+      oas: 32.1.18
+      oas-normalize: 16.0.4
+      swagger2openapi: 7.0.8
+    transitivePeerDependencies:
+      - '@kubb/renderer-jsx'
+      - encoding
+
   '@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)':
     dependencies:
       '@kubb/ast': 5.0.0-beta.16
@@ -6595,6 +6648,42 @@ snapshots:
       - uploadthing
       - utf-8-validate
 
+  '@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)':
+    dependencies:
+      '@kubb/ast': 5.0.0-beta.16
+      '@kubb/core': 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
+      '@logtail/node': 0.5.8
+      consola: 3.4.2
+      jiti: 2.7.0
+      remeda: 2.34.1
+      tinyexec: 1.1.2
+      unstorage: 1.17.5
+      ws: 8.20.1
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@kubb/renderer-jsx'
+      - '@netlify/blobs'
+      - '@planetscale/database'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/functions'
+      - '@vercel/kv'
+      - aws4fetch
+      - bufferutil
+      - db0
+      - idb-keyval
+      - ioredis
+      - uploadthing
+      - utf-8-validate
+    optional: true
+
   '@kubb/ast@5.0.0-beta.16': {}
 
   '@kubb/cli@5.0.0-beta.16(@kubb/adapter-oas@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16))(@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16))(@kubb/renderer-jsx@5.0.0-beta.16)(typescript@6.0.3)':
@@ -6612,6 +6701,21 @@ snapshots:
       - '@kubb/renderer-jsx'
       - typescript
 
+  '@kubb/cli@5.0.0-beta.16(@kubb/adapter-oas@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))(@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))(@kubb/renderer-jsx@5.0.0-beta.16)(typescript@6.0.3)':
+    dependencies:
+      '@clack/prompts': 1.4.0
+      '@kubb/core': 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+      chokidar: 5.0.0
+      cosmiconfig: 9.0.1(typescript@6.0.3)
+      jiti: 2.7.0
+      tinyexec: 1.1.2
+    optionalDependencies:
+      '@kubb/adapter-oas': 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
+      '@kubb/agent': 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
+    transitivePeerDependencies:
+      - '@kubb/renderer-jsx'
+      - typescript
+
   '@kubb/core@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)':
     dependencies:
       '@kubb/ast': 5.0.0-beta.16
@@ -6619,10 +6723,22 @@ snapshots:
       fflate: 0.8.2
       tinyexec: 1.1.2
 
+  '@kubb/core@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)':
+    dependencies:
+      '@kubb/ast': 5.0.0-beta.16
+      '@kubb/renderer-jsx': link:packages/renderer-jsx
+      fflate: 0.8.2
+      tinyexec: 1.1.2
+
   '@kubb/middleware-barrel@5.0.0-beta.16(@kubb/core@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16))':
     dependencies:
       '@kubb/ast': 5.0.0-beta.16
       '@kubb/core': 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+
+  '@kubb/middleware-barrel@5.0.0-beta.16(@kubb/core@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))':
+    dependencies:
+      '@kubb/ast': 5.0.0-beta.16
+      '@kubb/core': 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
 
   '@kubb/parser-ts@5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)':
     dependencies:
@@ -7323,6 +7439,10 @@ snapshots:
   '@types/range-parser@1.2.7': {}
 
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
+    dependencies:
+      '@types/react': 19.2.14
+
+  '@types/react-reconciler@0.28.9(@types/react@19.2.14)':
     dependencies:
       '@types/react': 19.2.14
 
@@ -8914,6 +9034,20 @@ snapshots:
       - encoding
       - typescript
 
+  kubb@5.0.0-beta.16(@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))(typescript@6.0.3):
+    dependencies:
+      '@kubb/adapter-oas': 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+      '@kubb/cli': 5.0.0-beta.16(@kubb/adapter-oas@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))(@kubb/agent@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))(@kubb/renderer-jsx@5.0.0-beta.16)(typescript@6.0.3)
+      '@kubb/core': 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+      '@kubb/middleware-barrel': 5.0.0-beta.16(@kubb/core@5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx))
+      '@kubb/parser-ts': 5.0.0-beta.16(@kubb/renderer-jsx@5.0.0-beta.16)
+      '@kubb/renderer-jsx': 5.0.0-beta.16
+    optionalDependencies:
+      '@kubb/agent': 5.0.0-beta.16(@kubb/renderer-jsx@packages+renderer-jsx)
+    transitivePeerDependencies:
+      - encoding
+      - typescript
+
   leven@3.1.0: {}
 
   leven@4.1.0: {}
@@ -9564,6 +9698,11 @@ snapshots:
       destr: 2.0.5
 
   react-dom@19.2.6(react@19.2.6):
+    dependencies:
+      react: 19.2.6
+      scheduler: 0.27.0
+
+  react-reconciler@0.33.0(react@19.2.6):
     dependencies:
       react: 19.2.6
       scheduler: 0.27.0
