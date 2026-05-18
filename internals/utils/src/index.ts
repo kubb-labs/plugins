@@ -1,5 +1,4 @@
 export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
-export { collectNodes } from './nodes.ts'
 export { getRelativePath } from './fs.ts'
 export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'
 export { buildJSDoc } from './jsdoc.ts'

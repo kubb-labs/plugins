@@ -1,4 +1,4 @@
-import { camelCase, collectNodes } from '@internals/utils'
+import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import { File, Function, jsxRenderer } from '@kubb/renderer-jsx'
@@ -7,12 +7,11 @@ import type { PluginClient } from '../types'
 export const groupedClientGenerator = defineGenerator<PluginClient>({
   name: 'groupedClient',
   renderer: jsxRenderer,
-  async operations(nodes, ctx) {
-    const nodes_ = await collectNodes(nodes)
+  operations(nodes, ctx) {
     const { config, resolver, root, inputNode } = ctx
     const { output, group } = ctx.options
 
-    const controllers = nodes_.reduce(
+    const controllers = nodes.reduce(
       (acc, operationNode) => {
         if (group?.type === 'tag') {
           const tag = operationNode.tags[0]

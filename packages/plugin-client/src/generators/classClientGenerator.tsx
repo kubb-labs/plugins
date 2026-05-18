@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
-import { camelCase, collectNodes } from '@internals/utils'
+import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -43,8 +43,7 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
 export const classClientGenerator = defineGenerator<PluginClient>({
   name: 'classClient',
   renderer: jsxRenderer,
-  async operations(nodes, ctx) {
-    const nodes_ = await collectNodes(nodes)
+  operations(nodes, ctx) {
     const { config, driver, resolver, root, inputNode } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
     const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
@@ -80,7 +79,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
       }
     }
 
-    const controllers = nodes_.reduce((acc, operationNode) => {
+    const controllers = nodes.reduce((acc, operationNode) => {
       const tag = operationNode.tags[0]
       const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
