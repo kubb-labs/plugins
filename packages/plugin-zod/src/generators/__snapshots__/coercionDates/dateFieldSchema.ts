@@ -5,4 +5,4 @@
 
 import * as z from 'zod'
 
-export const dateFieldSchema = z.date()
+export const dateFieldSchema = z.coerce.date()

@@ -5,4 +5,4 @@
 
 import * as z from 'zod'
 
-export const petAgeSchema = z.number()
+export const petAgeSchema = z.coerce.number()

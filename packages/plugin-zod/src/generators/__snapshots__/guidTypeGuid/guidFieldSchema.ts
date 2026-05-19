@@ -5,4 +5,4 @@
 
 import * as z from 'zod'
 
-export const guidFieldSchema = z.uuid()
+export const guidFieldSchema = z.guid()
