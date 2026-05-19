@@ -37,6 +37,9 @@ export default defineConfig({
       { find: '@kubb/plugin-ts', replacement: pkgDist('plugin-ts') },
       { find: '@kubb/plugin-zod', replacement: pkgDist('plugin-zod') },
       { find: '@kubb/plugin-react-query', replacement: pkgDist('plugin-react-query') },
+      { find: '@kubb/plugin-vue-query', replacement: pkgDist('plugin-vue-query') },
+      { find: '@kubb/plugin-msw', replacement: pkgDist('plugin-msw') },
+      { find: '@kubb/plugin-faker', replacement: pkgDist('plugin-faker') },
       // remeda is a direct dep of plugin-react-query but is not hoisted
       {
         find: 'remeda',
