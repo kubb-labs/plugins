@@ -177,9 +177,12 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
             const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
             // Inside a getter the getter itself defers evaluation, so suppress
             // z.lazy() wrapping on nested refs by temporarily clearing cyclicSchemas.
+            // Save before clearing: this.options === options (same reference via definePrinter),
+            // so reading options.cyclicSchemas after mutation would return undefined.
+            const savedCyclicSchemas = this.options.cyclicSchemas
             if (hasSelfRef) this.options.cyclicSchemas = undefined
             const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
-            if (hasSelfRef) this.options.cyclicSchemas = options.cyclicSchemas
+            if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
 
             const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
 

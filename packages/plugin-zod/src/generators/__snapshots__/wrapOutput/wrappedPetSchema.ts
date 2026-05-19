@@ -6,6 +6,6 @@
 import * as z from 'zod'
 
 export const wrappedPetSchema = z.object({
-  name: z.string().openapi('WrappedPet'),
-  age: z.int().openapi('WrappedPet').optional(),
+  name: z.string(),
+  age: z.int().optional(),
 })

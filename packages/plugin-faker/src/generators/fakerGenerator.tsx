@@ -136,6 +136,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...(dataEntry ? [dataEntry.name] : []),
       responseName,
     ])
+    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
+
     const meta = {
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       typeFile: tsResolver.resolveFile(
@@ -180,7 +182,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }
 
       const canOverride = canOverrideSchema(schema)
-      const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
       const printerInstance = printerFaker({
         resolver,
         schemaName: name,
