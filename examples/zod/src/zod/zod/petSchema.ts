@@ -9,9 +9,7 @@ import { tagSchema } from './tagSchema.ts'
 
 export const petSchema = z.object({
   id: z.bigint().optional(),
-  get parent() {
-    return z.array(petSchema).optional()
-  },
+  parent: z.array(petSchema).optional(),
   internalId: z
     .string()
     .regex(/^[0-9]{1,19}$/)

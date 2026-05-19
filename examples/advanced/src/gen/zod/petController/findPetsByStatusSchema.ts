@@ -6,7 +6,7 @@ export const findPetsByStatusPathStepIdSchema = z.string()
 export type FindPetsByStatusPathStepIdSchema = z.infer<typeof findPetsByStatusPathStepIdSchema>
 
 export const findPetsByStatusStatus200Schema = z
-  .array(z.lazy(() => petSchema))
+  .array(petSchema)
   .min(1)
   .max(3)
   .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
