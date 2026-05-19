@@ -28,10 +28,14 @@
     "tests-3.0.x": "0.0.1-alpha.0",
     "e2e": "0.0.0",
     "performance": "0.0.1-alpha.0",
-    "sdk-pet-store": "0.0.1"
+    "sdk-pet-store": "0.0.1",
+    "@internals/shared": "0.0.0",
+    "@internals/tanstack-query": "0.0.0",
+    "@internals/utils": "0.0.0"
   },
   "changesets": [
     "circular-schema-detection-shared",
+    "core-plugins-beta-12-alignment",
     "multi-content-type-request-body",
     "oas-ts-resolve-options",
     "plugin-client-export-clients-barrel",
@@ -72,6 +76,7 @@
     "rename-plugin-manager-to-plugin-driver",
     "require-node-22",
     "ts-discriminator-string-types",
-    "ts-fix-request-body-description"
+    "ts-fix-request-body-description",
+    "vue-query-enabled-tovalue"
   ]
 }
