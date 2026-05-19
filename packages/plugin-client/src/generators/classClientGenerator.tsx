@@ -94,7 +94,10 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         } else {
           acc.push({ name, propertyName: resolver.resolveClientPropertyName(name), file, operations: [operationData] })
         }
-      } else if (tag) {
+        return acc
+      }
+
+      if (tag) {
         const name = groupName
         const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
         const operationData = buildOperationData(operationNode)

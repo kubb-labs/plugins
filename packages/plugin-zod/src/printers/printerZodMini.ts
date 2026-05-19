@@ -70,6 +70,13 @@ function strictOneOfMember(member: string, node: ast.SchemaNode): string {
   return member
 }
 
+function getMemberConstraintMini(member: ast.SchemaNode): string | undefined {
+  if (member.primitive === 'string') return lengthChecksMini(ast.narrowSchema(member, 'string') ?? {}) || undefined
+  if (member.primitive === 'number' || member.primitive === 'integer')
+    return numberChecksMini(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
+  if (member.primitive === 'array') return lengthChecksMini(ast.narrowSchema(member, 'array') ?? {}) || undefined
+}
+
 /**
  * Zod v4 **Mini** printer built with `definePrinter`.
  *
@@ -206,13 +213,9 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
       array(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
         const inner = items.join(', ') || this.transform(ast.createSchema({ type: 'unknown' }))!
-        let result = `z.array(${inner})${lengthChecksMini(node)}`
+        const base = `z.array(${inner})${lengthChecksMini(node)}`
 
-        if (node.unique) {
-          result += `.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })`
-        }
-
-        return result
+        return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
       },
       tuple(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
@@ -245,61 +248,37 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
         const [first, ...rest] = members
         if (!first) return ''
 
-        let base = this.transform(first)
-        if (!base) return ''
+        const firstBase = this.transform(first)
+        if (!firstBase) return ''
 
-        for (const member of rest) {
-          if (member.primitive === 'string') {
-            const s = ast.narrowSchema(member, 'string')
-            const c = lengthChecksMini(s ?? {})
-            if (c) {
-              base += c
-              continue
-            }
-          } else if (member.primitive === 'number' || member.primitive === 'integer') {
-            const n = ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer')
-            const c = numberChecksMini(n ?? {})
-            if (c) {
-              base += c
-              continue
-            }
-          } else if (member.primitive === 'array') {
-            const a = ast.narrowSchema(member, 'array')
-            const c = lengthChecksMini(a ?? {})
-            if (c) {
-              base += c
-              continue
-            }
-          }
+        return rest.reduce((acc, member) => {
+          const constraint = getMemberConstraintMini(member)
+          if (constraint) return acc + constraint
           const transformed = this.transform(member)
-          if (transformed) base = `z.intersection(${base}, ${transformed})`
-        }
-
-        return base
+          return transformed ? `z.intersection(${acc}, ${transformed})` : acc
+        }, firstBase)
       },
       ...options.nodes,
     },
     print(node) {
       const { keysToOmit } = this.options
 
-      let base = this.transform(node)
-      if (!base) return null
+      const transformed = this.transform(node)
+      if (!transformed) return null
 
       const meta = ast.syncSchemaRef(node)
 
-      if (keysToOmit?.length && meta.primitive === 'object' && !(meta.type === 'union' && meta.discriminatorPropertyName)) {
+      const base = (() => {
+        if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed
         // Mirror printerTs `nonNullable: true`: when omitting keys, the resulting
         // schema is a new non-nullable object type — skip optional/nullable/nullish.
         // Discriminated unions (z.discriminatedUnion) do not support .omit(), so skip them.
 
         // If this is a lazy reference, apply omit inside the lazy function
-        const lazyMatch = base.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
-        if (lazyMatch) {
-          base = `z.lazy(() => ${lazyMatch[1]}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }))`
-        } else {
-          base = `${base}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
-        }
-      }
+        const lazyMatch = transformed.match(/^z\.lazy\(\(\)\s*=>\s*(.+)\)$/)
+        if (lazyMatch) return `z.lazy(() => ${lazyMatch[1]}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} }))`
+        return `${transformed}.omit({ ${keysToOmit.map((k: string) => `"${k}": true`).join(', ')} })`
+      })()
 
       return applyMiniModifiers({
         value: base,

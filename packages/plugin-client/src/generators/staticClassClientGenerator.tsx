@@ -92,7 +92,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
         } else {
           acc.push({ name, file, operations: [operationData] })
         }
-      } else if (tag) {
+        return acc
+      }
+
+      if (tag) {
         const name = groupName
         const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
         const operationData = buildOperationData(operationNode)

@@ -372,13 +372,8 @@ export function createImportDeclaration({
   isNameSpace?: boolean
 }) {
   if (!Array.isArray(name)) {
-    let importPropertyName: ts.Identifier | undefined = factory.createIdentifier(name)
-    let importName: ts.NamedImportBindings | undefined
-
-    if (isNameSpace) {
-      importPropertyName = undefined
-      importName = factory.createNamespaceImport(factory.createIdentifier(name))
-    }
+    const importPropertyName = isNameSpace ? undefined : factory.createIdentifier(name)
+    const importName = isNameSpace ? factory.createNamespaceImport(factory.createIdentifier(name)) : undefined
 
     return factory.createImportDeclaration(
       undefined,
