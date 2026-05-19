@@ -4,7 +4,7 @@
 */
 
 import type { GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
-import { getUserByNameResponse } from "../faker/getUserByName.ts";
+import { createGetUserByNameResponse } from "../faker/createGetUserByName.ts";
 import { http } from "msw";
 
 export function getUserByNameHandlerResponse200(data: GetUserByNameResponse) {
@@ -37,7 +37,7 @@ export function getUserByNameHandler(data?: GetUserByNameResponse | ((info: Para
   return http.get('/user/:username', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || getUserByNameResponse(data)), {
+      return new Response(JSON.stringify(data || createGetUserByNameResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

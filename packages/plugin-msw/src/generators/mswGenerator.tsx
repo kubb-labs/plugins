@@ -2,16 +2,16 @@ import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/s
 import { defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
 import { resolveFakerMeta } from '../utils.ts'
 
 export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { driver, resolver, config, root, adapter } = ctx
+    const { driver, resolver, config, root, inputNode } = ctx
     const { output, parser, baseURL, group } = ctx.options
 
     const fileName = resolver.resolveName(node.operationId)
@@ -54,8 +54,8 @@ export const mswGenerator = defineGenerator<PluginMsw>({
         baseName={mock.file.baseName}
         path={mock.file.path}
         meta={mock.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />

@@ -1,12 +1,12 @@
 import { defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 
 const toURL = (path: string) => path.replaceAll('{', ':').replaceAll('}', '')
 
 export const clientOperationReactGenerator = defineGenerator<PluginClient>({
   name: 'client-operation',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
     const { resolver, root } = ctx
     const { output } = ctx.options

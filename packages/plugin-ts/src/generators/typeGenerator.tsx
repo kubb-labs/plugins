@@ -1,5 +1,5 @@
 import { ast, defineGenerator } from '@kubb/core'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
@@ -26,10 +26,10 @@ function getPerContentTypeName(dataName: string, suffix: string): string {
 
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   schema(node, ctx) {
     const { enumType, enumTypeSuffix, enumKeyCasing, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
-    const { adapter, config, resolver, root } = ctx
+    const { adapter, config, resolver, root, inputNode } = ctx
 
     if (!node.name) {
       return
@@ -37,7 +37,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const mode = ctx.getMode(output)
     // Build a set of schema names that are enums so the ref handler and getImports
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = new Set((adapter.inputNode?.schemas ?? []).filter((s) => ast.narrowSchema(s, ast.schemaTypes.enum) && s.name).map((s) => s.name!))
+    const enumSchemaNames = new Set(inputNode.schemas.filter((s) => ast.narrowSchema(s, ast.schemaTypes.enum) && s.name).map((s) => s.name!))
 
     function resolveImportName(schemaName: string): string {
       if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && enumTypeSuffix && enumSchemaNames.has(schemaName)) {
@@ -76,8 +76,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         {mode === 'split' &&
           imports.map((imp) => (
@@ -97,7 +97,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   },
   operation(node, ctx) {
     const { enumType, enumTypeSuffix, enumKeyCasing, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
-    const { adapter, config, resolver, root } = ctx
+    const { adapter, config, resolver, root, inputNode } = ctx
 
     const mode = ctx.getMode(output)
 
@@ -109,7 +109,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     // Build a set of schema names that are enums so the ref handler and getImports
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
-    const enumSchemaNames = new Set((adapter.inputNode?.schemas ?? []).filter((s) => ast.narrowSchema(s, ast.schemaTypes.enum) && s.name).map((s) => s.name!))
+    const enumSchemaNames = new Set(inputNode.schemas.filter((s) => ast.narrowSchema(s, ast.schemaTypes.enum) && s.name).map((s) => s.name!))
 
     function resolveImportName(schemaName: string): string {
       if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && enumTypeSuffix && enumSchemaNames.has(schemaName)) {
@@ -281,8 +281,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         {paramTypes}
         {responseTypes}

@@ -4,7 +4,7 @@
  */
 
 import type { ListPetsResponse, ListPetsStatus400 } from './ListPets'
-import { listPetsResponse } from './listPets'
+import { createListPetsResponse } from './createListPets'
 import { http } from 'msw'
 
 export function listPetsHandlerResponse200(data: ListPetsResponse) {
@@ -26,7 +26,7 @@ export function listPetsHandler(data?: ListPetsResponse | ((info: Parameters<Par
   return http.get('/pets', function handler(info) {
     if (typeof data === 'function') return data(info)
 
-    return new Response(JSON.stringify(data || listPetsResponse(data)), {
+    return new Response(JSON.stringify(data || createListPetsResponse(data)), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',

@@ -1,0 +1,74 @@
+swagger: '2.0'
+info:
+  title: test
+  version: '1.0.0'
+paths:
+  /var-names:
+    get:
+      consumes:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/enumVarNames.Type'
+  /names:
+    get:
+      consumes:
+        - application/json
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/enumNames.Type'
+  /adopt-pet:
+    post:
+      consumes:
+        - application/json
+      responses:
+        400:
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/PetAdoption400'
+definitions:
+  enum.Array:
+    type: object
+    properties:
+      identifier:
+        type: array
+        prefixItems:
+          - type: integer
+            description: Number of items
+          - type: string
+            description: Description
+          - enum:
+              - 'NW'
+              - 'NE'
+              - 'SW'
+              - 'SE'
+            description: Wind direction
+  enumVarNames.Type:
+    enum:
+      - 0
+      - 1
+    type: integer
+    x-enum-varnames:
+      - Pending
+      - Received
+  enumNames.Type:
+    enum:
+      - 0
+      - 1
+    x-enumNames:
+      - Pending
+      - Received
+  PetAdoptionError:
+    type: string
+    description: Pet adoption error codes
+    enum:
+      - pet_not_found
+      - already_adopted
+      - age_restriction
+  PetAdoption400:
+    description: Bad Request
+    $ref: '#/definitions/PetAdoptionError'

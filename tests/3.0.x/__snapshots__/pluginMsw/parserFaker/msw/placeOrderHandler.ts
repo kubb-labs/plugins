@@ -5,7 +5,7 @@
 
 import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderData } from "../types/PlaceOrder.ts";
 import type { HttpResponseResolver } from "msw";
-import { placeOrderResponse } from "../faker/placeOrder.ts";
+import { createPlaceOrderResponse } from "../faker/createPlaceOrder.ts";
 import { http } from "msw";
 
 export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
@@ -30,7 +30,7 @@ export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolv
   return http.post<Record<string, string>, PlaceOrderData, any>('/store/order', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || placeOrderResponse(data)), {
+      return new Response(JSON.stringify(data || createPlaceOrderResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

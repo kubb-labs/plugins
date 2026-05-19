@@ -1,6 +1,6 @@
 import { defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
-import { Const, File, Function, Jsx, jsxRenderer } from '@kubb/renderer-jsx'
+import { Const, File, Function, Jsx, jsxRendererSync } from '@kubb/renderer-jsx'
 
 const pascalCase = (str: string) =>
   str
@@ -12,7 +12,7 @@ const toURL = (path: string) => path.replaceAll('{', ':').replaceAll('}', '')
 
 export const example3 = defineGenerator<PluginClient>({
   name: 'client-operation',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
     const { resolver, root } = ctx
     const { output } = ctx.options

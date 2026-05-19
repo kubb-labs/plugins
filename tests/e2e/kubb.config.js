@@ -10,30 +10,31 @@ import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
 
 const schemas = [
-  // { name: 'test', path: './schemas/test.json' },
+  // { name: 'test', path: '../../schemas/3.0.x/test.json' },
   // OpenAPI 3.1
-  { name: 'train-travel', path: './schemas/train-travel.yaml' },
+  { name: 'train-travel', path: '../../schemas/3.0.x/train-travel.yaml' },
   { name: 'Figma', path: 'https://raw.githubusercontent.com/figma/rest-api-spec/refs/heads/main/openapi/openapi.yaml' },
   { name: 'spotify', path: 'https://raw.githubusercontent.com/sonallux/spotify-web-api/refs/heads/main/official-spotify-open-api.yml', strict: false },
   // OpenAPI 3.0
-  { name: 'discriminator', path: './schemas/discriminator.yaml' },
-  // { name: 'bunq.com', path: './schemas/bunq.com.json', strict: false },  // TS2300: duplicate barrel exports in hook index files
+  { name: 'discriminator', path: '../../schemas/3.0.x/discriminator.yaml' },
+  // { name: 'bunq.com', path: '../../schemas/3.0.x/bunq.com.json', strict: false },  // TS2300: duplicate barrel exports in hook index files
   { name: 'atlassian.com', path: 'https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json', strict: false },
-  { name: 'optionalParameters', path: './schemas/optionalParameters.json' },
-  { name: 'allOf', path: './schemas/allOf.json' },
-  { name: 'anyOf', path: './schemas/anyOf.json' },
-  { name: 'petStoreContent', path: './schemas/petStoreContent.json' },
-  { name: 'twitter', path: './schemas/twitter.json' },
-  { name: 'jokesOne', path: './schemas/jokesOne.yaml' },
-  { name: 'readme.io', path: './schemas/readme.io.yaml' },
-  { name: 'worldtime', path: './schemas/worldtime.yaml' },
-  { name: 'zalando', path: './schemas/zalando.yaml' },
-  { name: 'requestBody', path: './schemas/requestBody.yaml' },
-  { name: 'box', path: './schemas/box.json' },
-  { name: 'enums', path: './schemas/enums.yaml' },
-  { name: 'dataset_api', path: './schemas/dataset_api.yaml' },
+  { name: 'optionalParameters', path: '../../schemas/3.0.x/optionalParameters.json' },
+  { name: 'allOf', path: '../../schemas/3.0.x/allOf.json' },
+  { name: 'anyOf', path: '../../schemas/3.0.x/anyOf.json' },
+  { name: 'petStoreContent', path: '../../schemas/3.0.x/petStoreContent.json' },
+  { name: 'twitter', path: '../../schemas/3.0.x/twitter.json' },
+  { name: 'jokesOne', path: '../../schemas/3.0.x/jokesOne.yaml' },
+  { name: 'readme.io', path: '../../schemas/3.0.x/readme.io.yaml' },
+  { name: 'worldtime', path: '../../schemas/3.0.x/worldtime.yaml' },
+  { name: 'zalando', path: '../../schemas/3.0.x/zalando.yaml' },
+  { name: 'requestBody', path: '../../schemas/3.0.x/requestBody.yaml' },
+  { name: 'box', path: '../../schemas/3.0.x/box.json' },
+  { name: 'enums', path: '../../schemas/3.0.x/enums.yaml' },
+  { name: 'dataset_api', path: '../../schemas/3.0.x/dataset_api.yaml' },
   { name: 'petStoreV3', path: 'https://petstore3.swagger.io/api/v3/openapi.json' },
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
+  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
   { name: 'vercel', path: 'https://openapi.vercel.sh/', strict: false },
 ]
 
@@ -126,22 +127,15 @@ const baseConfig = {
   ],
 }
 
-/**
- * @link https://apis.guru/
- *
- * Set KUBB_SCHEMA to a comma-separated list of schema names to only run those schemas.
- * Useful for running large schemas (e.g. stripe, openai) in isolation to avoid OOM.
- * Example: KUBB_SCHEMA=stripe kubb generate
- */
-const schemaFilter = process.env.KUBB_SCHEMA?.split(',').map((s) => s.trim())
-
 export default defineConfig(() => {
-  const filtered = schemaFilter ? schemas.filter(({ name }) => schemaFilter.includes(name)) : schemas
-
-  return filtered.map(({ name, path, strict, typecheck }) => {
+  return schemas.map(({ name, path, strict, typecheck }) => {
     return {
       ...baseConfig,
       name,
+      output: {
+        ...baseConfig.output,
+        path: `./gen/${name}`,
+      },
       input: {
         path,
       },

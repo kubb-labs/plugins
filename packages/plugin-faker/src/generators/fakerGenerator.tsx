@@ -1,7 +1,7 @@
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
@@ -16,19 +16,19 @@ import {
 
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   schema(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
+    const { adapter, config, resolver, root, inputNode } = ctx
     const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
-    if (!node.name || !pluginTs || !adapter.inputNode) {
+    if (!node.name || !pluginTs) {
       return
     }
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const schemaNode = resolveSchemaRef(node, adapter.inputNode.schemas)
+    const schemaNode = resolveSchemaRef(node, inputNode.schemas)
     const schemaName = schemaNode.name ?? node.name
     const mode = ctx.getMode(output)
     const meta = {
@@ -41,7 +41,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     } as const
     const canOverride = canOverrideSchema(schemaNode)
-    const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
+    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
     const printerInstance = printerFaker({
       resolver,
       schemaName,
@@ -75,8 +75,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -97,7 +97,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     )
   },
   operation(node, ctx) {
-    const { adapter, config, resolver, root } = ctx
+    const { adapter, config, resolver, root, inputNode } = ctx
     const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
@@ -136,6 +136,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...(dataEntry ? [dataEntry.name] : []),
       responseName,
     ])
+    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
+
     const meta = {
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
       typeFile: tsResolver.resolveFile(
@@ -180,7 +182,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       }
 
       const canOverride = canOverrideSchema(schema)
-      const cyclicSchemas = adapter.inputNode ? ast.findCircularSchemas(adapter.inputNode.schemas) : undefined
       const printerInstance = printerFaker({
         resolver,
         schemaName: name,
@@ -228,8 +229,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}

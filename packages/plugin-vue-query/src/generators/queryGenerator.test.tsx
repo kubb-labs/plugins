@@ -1,7 +1,7 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
 import type { Config } from '@kubb/core'
-import { ast } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
@@ -13,7 +13,15 @@ import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from '../types.ts'
 import { queryGenerator } from './queryGenerator.tsx'
 
-const testConfig: Config = { root: '.', input: { path: '' }, output: { path: 'test' }, plugins: [], parsers: [], adapter: createMockedAdapter() }
+const testConfig: Config = {
+  root: '.',
+  input: { path: '' },
+  output: { path: 'test' },
+  plugins: [],
+  parsers: [],
+  adapter: createMockedAdapter(),
+  storage: memoryStorage(),
+}
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   client: {
@@ -131,9 +139,7 @@ describe('queryGenerator operation', () => {
 
     await renderGeneratorOperation(queryGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter({
-        inputNode: { kind: 'Input', schemas: [], operations: [], meta: { baseURL: 'baseURL' in props ? props.baseURL : undefined } },
-      }),
+      adapter: createMockedAdapter(),
       driver,
       plugin,
       options,

@@ -5,7 +5,7 @@
 
 import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetData } from "../types/UpdatePet.ts";
 import type { HttpResponseResolver } from "msw";
-import { updatePetResponse } from "../faker/updatePet.ts";
+import { createUpdatePetResponse } from "../faker/createUpdatePet.ts";
 import { http } from "msw";
 
 export function updatePetHandlerResponse200(data: UpdatePetResponse) {
@@ -46,7 +46,7 @@ export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver
   return http.put<Record<string, string>, UpdatePetData, any>('/pet', function handler(info) {
       if(typeof data === 'function') return data(info)
 
-      return new Response(JSON.stringify(data || updatePetResponse(data)), {
+      return new Response(JSON.stringify(data || createUpdatePetResponse(data)), {
         status: 200,
           headers: {
           'Content-Type': 'application/json'

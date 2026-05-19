@@ -7,7 +7,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { StaticClassClient } from '../components/StaticClassClient'
 import type { PluginClient } from '../types'
 
@@ -40,11 +40,11 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
 
 export const staticClassClientGenerator = defineGenerator<PluginClient>({
   name: 'staticClassClient',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { adapter, config, driver, resolver, root } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath } = ctx.options
-    const baseURL = ctx.options.baseURL ?? adapter.inputNode?.meta?.baseURL
+    const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -161,8 +161,8 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-              footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+              banner={resolver.resolveBanner(inputNode, { output, config })}
+              footer={resolver.resolveFooter(inputNode, { output, config })}
             >
               {importPath ? (
                 <>

@@ -7,7 +7,7 @@ Improve faker function code generation with cleaner type signatures and better s
 **Changes:**
 - Refactor generated faker functions to use explicit `defaultFakeData` variable for clarity
 - Simplify return types to `Required<T>` (removes unnecessary generic type tracking)
-- Function signature: `export function fake(data?: Partial<T>): Required<T>`
+- Function signature: `export function createPet(data?: Partial<T>): Required<T>`
 - Use spread operator pattern: `{ ...defaultFakeData, ...(data || {}) } as Required<T>`
 
 **Benefits:**

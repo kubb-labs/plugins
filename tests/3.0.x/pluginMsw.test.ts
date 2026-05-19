@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, type KubbHooks } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
@@ -28,6 +28,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
@@ -46,6 +47,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({ output: { path: './faker', barrel: false } }),
@@ -66,6 +68,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
@@ -85,6 +88,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
@@ -104,6 +108,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
@@ -124,6 +129,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({
@@ -143,6 +149,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       output: { path: './gen', barrel: false },
       adapter: adapterOas({ validate: false }),
       parsers: [parserTs],
+      storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginMsw({

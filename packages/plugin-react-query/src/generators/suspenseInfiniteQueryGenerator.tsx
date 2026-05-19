@@ -5,16 +5,16 @@ import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { QueryKey, SuspenseInfiniteQuery, SuspenseInfiniteQueryOptions } from '../components'
 import type { PluginReactQuery } from '../types'
 
 export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-infinite-query',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { adapter, config, driver, resolver, root } = ctx
+    const { config, driver, resolver, root, inputNode } = ctx
     const {
       output,
       query,
@@ -103,8 +103,8 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(adapter.inputNode, { output, config })}
-        footer={resolver.resolveFooter(adapter.inputNode, { output, config })}
+        banner={resolver.resolveBanner(inputNode, { output, config })}
+        footer={resolver.resolveFooter(inputNode, { output, config })}
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
         {clientOptions.importPath ? (

@@ -11,34 +11,34 @@ allowBuilds:
   msw: true
   vue-demi: true
 
+catalog:
+  '@kubb/adapter-oas': 5.0.0-beta.19
+  '@kubb/agent': 5.0.0-beta.19
+  '@kubb/core': 5.0.0-beta.19
+  '@kubb/middleware-barrel': 5.0.0-beta.19
+  '@kubb/parser-ts': 5.0.0-beta.19
+  '@kubb/renderer-jsx': 5.0.0-beta.19
+  '@size-limit/file': ^12.1.0
+  '@types/node': ^22.19.19
+  '@types/react': ^19.2.14
+  '@vitest/coverage-v8': ^4.1.6
+  '@vitest/ui': ^4.1.6
+  kubb: 5.0.0-beta.19
+  oxfmt: ^0.47.0
+  oxlint: ^1.65.0
+  prettier: ^3.8.3
+  remeda: ^2.34.1
+  'size-limit': ^12.1.0
+  tsdown: ^0.22.0
+  typescript: ^6.0.3
+  unplugin-kubb: 5.0.0-beta.19
+  vitest: ^4.1.6
+
 minimumReleaseAge: 4320 # 72 hours, matches .npmrc min-package-age
-pmOnFail: warn
-resolutionMode: highest
 minimumReleaseAgeExclude:
   - '@kubb/*'
   - 'kubb'
   - 'unplugin-kubb'
   - '@types/*'
-
-catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.7
-  '@kubb/agent': 5.0.0-beta.7
-  '@kubb/core': 5.0.0-beta.7
-  '@kubb/middleware-barrel': 5.0.0-beta.7
-  '@kubb/parser-ts': 5.0.0-beta.7
-  '@kubb/renderer-jsx': 5.0.0-beta.7
-  kubb: 5.0.0-beta.7
-  unplugin-kubb: 5.0.0-beta.7
-  '@types/node': ^22.19.18
-  prettier: ^3.8.3
-  '@types/react': ^19.2.14
-  '@size-limit/file': ^12.1.0
-  'size-limit': ^12.1.0
-  remeda: ^2.34.0
-  tsdown: ^0.22.0
-  typescript: ^6.0.3
-  vitest: ^4.1.5
-  '@vitest/coverage-v8': ^4.1.5
-  '@vitest/ui': ^4.1.5
-  oxfmt: ^0.47.0
-  oxlint: ^1.63.0
+pmOnFail: warn
+resolutionMode: highest
