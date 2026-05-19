@@ -105,10 +105,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const schemaPrinter = mini
         ? keysToOmit?.length
           ? printerZodMini({ guidType, wrapOutput, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
-          : zodMiniPrinterCache.get(resolver) ?? printerZodMini({ guidType, wrapOutput, resolver, cyclicSchemas, nodes: printer?.nodes })
+          : (zodMiniPrinterCache.get(resolver) ?? printerZodMini({ guidType, wrapOutput, resolver, cyclicSchemas, nodes: printer?.nodes }))
         : keysToOmit?.length
           ? printerZod({ coercion, guidType, dateType, wrapOutput, resolver, keysToOmit, cyclicSchemas, nodes: printer?.nodes })
-          : zodPrinterCache.get(resolver) ?? printerZod({ coercion, guidType, dateType, wrapOutput, resolver, cyclicSchemas, nodes: printer?.nodes })
+          : (zodPrinterCache.get(resolver) ?? printerZod({ coercion, guidType, dateType, wrapOutput, resolver, cyclicSchemas, nodes: printer?.nodes }))
 
       return (
         <>
