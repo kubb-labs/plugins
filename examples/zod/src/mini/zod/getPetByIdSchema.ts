@@ -8,7 +8,7 @@ import { petSchema } from './petSchema.ts'
 
 export const getPetByIdPathPetIdSchema = z.bigint()
 
-export const getPetByIdStatus200Schema = petSchema
+export const getPetByIdStatus200Schema = z.lazy(() => petSchema)
 
 export const getPetByIdStatus400Schema = z.any()
 

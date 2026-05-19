@@ -5,4 +5,4 @@
 
 import * as z from 'zod'
 
-export const petNameSchema = z.coerce.string()
+export const petNameSchema = z.string()

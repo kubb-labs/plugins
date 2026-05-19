@@ -7,8 +7,6 @@ import * as z from 'zod'
 
 export const catSchema = z.object({
   id: z.int(),
-  get archEnemy() {
-    return z.union([z.null(), petSchema]).optional()
-  },
+  archEnemy: z.union([z.null(), petSchema]).optional(),
   friends: z.array(petSchema).optional(),
 })

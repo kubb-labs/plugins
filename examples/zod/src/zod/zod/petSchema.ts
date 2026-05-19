@@ -9,13 +9,17 @@ import { tagSchema } from './tagSchema.ts'
 
 export const petSchema = z.object({
   id: z.bigint().optional(),
-  parent: z.array(petSchema).optional(),
+  get parent() {
+    return z.array(petSchema).optional()
+  },
   internalId: z
     .string()
     .regex(/^[0-9]{1,19}$/)
     .optional(),
   name: z.string(),
-  category: categorySchema.optional(),
+  get category() {
+    return categorySchema.optional()
+  },
   photoUrls: z.array(z.string()),
   tags: z.array(tagSchema).optional(),
   status: z.enum(['available', 'pending', 'sold']).optional().describe('pet status in the store'),

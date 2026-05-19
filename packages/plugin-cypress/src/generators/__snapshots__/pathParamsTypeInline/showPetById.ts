@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { ShowPetByIdPathPetId, ShowPetByIdQueryLimit, ShowPetByIdResponse } from './ShowPetById'
+import type { ShowPetByIdPathPetId, ShowPetByIdResponse } from './ShowPetById'
 
 export function showPetById(
   petId: ShowPetByIdPathPetId,
