@@ -155,11 +155,23 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
   return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }
 
+const typeNamesByResolver = new WeakMap<OperationTypeNameResolver, Map<string, string[]>>()
+
 export function resolveOperationTypeNames(
   node: ast.OperationNode,
   resolver: OperationTypeNameResolver,
   options: ResolveOperationTypeNameOptions = {},
 ): string[] {
+  const cacheKey = `${node.operationId}\0${options.paramsCasing ?? ''}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${(options.exclude ?? []).join(',')}`
+  let byResolver = typeNamesByResolver.get(resolver)
+  if (byResolver) {
+    const cached = byResolver.get(cacheKey)
+    if (cached) return cached
+  } else {
+    byResolver = new Map()
+    typeNamesByResolver.set(resolver, byResolver)
+  }
+
   const { path, query, header } = getOperationParameters(node, { paramsCasing: options.paramsCasing })
   const responseStatusNames =
     options.responseStatusNames === 'error'
@@ -179,7 +191,9 @@ export function resolveOperationTypeNames(
       ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
       : [...paramNames, ...bodyAndResponseNames, ...responseStatusNames]
 
-  return names.filter((name): name is string => Boolean(name) && !exclude.has(name))
+  const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name))
+  byResolver.set(cacheKey, result)
+  return result
 }
 
 export function resolveResponseTypes(node: ast.OperationNode, resolver: ResponseNameResolver): Array<[statusCode: number | 'default', typeName: string]> {
