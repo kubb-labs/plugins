@@ -5,14 +5,14 @@ import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
 import { Mutation, MutationKey } from '../components'
 import type { PluginVueQuery } from '../types'
 
 export const mutationGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-mutation',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
     const { config, driver, resolver, root, inputNode } = ctx
     const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options

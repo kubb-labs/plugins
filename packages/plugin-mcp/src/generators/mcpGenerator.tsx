@@ -2,13 +2,13 @@ import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
 
 export const mcpGenerator = defineGenerator<PluginMcp>({
   name: 'mcp',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operation(node, ctx) {
     const { resolver, driver, root } = ctx
     const { output, client, paramsCasing, group } = ctx.options

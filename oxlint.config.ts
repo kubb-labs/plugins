@@ -6,7 +6,6 @@ export default defineConfig({
     '**/node_modules/**',
     '**/__snapshots__/**',
     '**/schemas/**',
-    '**/tests/e2e/schemas/**',
     '**/coverage/**',
     '**/assets/**',
     '**/public/**',

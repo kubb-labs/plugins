@@ -1,11 +1,11 @@
 import { defineGenerator } from '@kubb/core'
-import { File, jsxRenderer } from '@kubb/renderer-jsx'
+import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Handlers } from '../components/Handlers.tsx'
 import type { PluginMsw } from '../types'
 
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
-  renderer: jsxRenderer,
+  renderer: jsxRendererSync,
   operations(nodes, ctx) {
     const { resolver, config, root, inputNode } = ctx
     const { output, group } = ctx.options
