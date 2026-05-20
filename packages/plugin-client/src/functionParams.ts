@@ -25,14 +25,14 @@ function isGroup(spec: ParamSpec): spec is ParamGroup {
 }
 
 function createType(type?: string) {
-  return type ? ast.createParamsType({ variant: 'reference', name: type }) : undefined
+  return type ? ast.createParamsType({ variant: 'reference', name: type }) : null
 }
 
 function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParameterNode {
   if (spec.default !== undefined) {
     return ast.createFunctionParameter({
       name,
-      type: createType(spec.type),
+      type: createType(spec.type) ?? undefined,
       default: spec.default,
       rest: spec.mode === 'inlineSpread',
     })
@@ -40,7 +40,7 @@ function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParam
 
   return ast.createFunctionParameter({
     name,
-    type: createType(spec.type),
+    type: createType(spec.type) ?? undefined,
     optional: !!spec.optional,
     rest: spec.mode === 'inlineSpread',
   })

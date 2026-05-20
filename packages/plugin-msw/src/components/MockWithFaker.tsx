@@ -9,7 +9,7 @@ import { getContentType, getMswMethod, getMswUrl } from '../utils.ts'
 type Props = {
   name: string
   typeName: string
-  requestTypeName?: string
+  requestTypeName?: string | null
   fakerName: string
   baseURL: string | null | undefined
   node: ast.OperationNode

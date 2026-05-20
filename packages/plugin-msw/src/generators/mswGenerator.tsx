@@ -27,7 +27,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
             root,
             fakerResolver: driver.getResolver(pluginFakerName),
             fakerOutput: fakerPlugin.options?.output ?? output,
-            fakerGroup: fakerPlugin.options?.group,
+            fakerGroup: fakerPlugin.options?.group ?? null,
           })
         : null
 

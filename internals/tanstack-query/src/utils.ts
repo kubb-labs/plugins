@@ -46,7 +46,7 @@ type ZodSchemaNameResolverLike = {
  *
  * Returns an empty array when no resolver is provided or the operation has no request body schema.
  */
-export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | undefined): string[] {
+export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined): string[] {
   if (!zodResolver) return []
   return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
     (n): n is string => Boolean(n),

@@ -14,7 +14,7 @@ type Props = {
   tsResolver: ResolverTs
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'
-  transformer: Transformer | undefined
+  transformer: Transformer | null | undefined
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -26,10 +26,10 @@ export function buildQueryKeyParamsNode(
   return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
 }
 
-export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer = queryKeyTransformer }: Props): KubbReactNode {
+export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer }: Props): KubbReactNode {
   const paramsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = transformer({
+  const keys = (transformer ?? queryKeyTransformer)({
     node,
     casing: paramsCasing,
   })

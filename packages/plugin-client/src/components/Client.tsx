@@ -26,7 +26,7 @@ type Props = {
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   tsResolver: ResolverTs
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
   children?: KubbReactNode
 }
 

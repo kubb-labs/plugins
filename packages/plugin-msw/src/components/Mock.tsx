@@ -9,7 +9,7 @@ import { getContentType, getMswMethod, getMswUrl, hasResponseSchema } from '../u
 type Props = {
   name: string
   typeName: string
-  requestTypeName?: string
+  requestTypeName?: string | null
   baseURL: string | null | undefined
   node: ast.OperationNode
 }
