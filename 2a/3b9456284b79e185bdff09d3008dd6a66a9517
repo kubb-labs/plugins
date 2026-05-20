@@ -1,0 +1,50 @@
+packages/plugin-ts/src/components/Type.tsx
+  s_8426d7284cabe4::t_d8ca2a61cd0df1 12-16,19-20,27,35-37
+packages/plugin-faker/src/components/Faker.tsx
+  s_8426d7284cabe4::t_68fbbc00f963f4 50-51
+  s_8426d7284cabe4::t_f8bd6d602f4ba2 15-19,22-23
+  s_8426d7284cabe4::t_4ebd320541471d 14,20
+  s_8426d7284cabe4::t_1b0ffef718a1a0 24-25
+packages/plugin-ts/src/generators/typeGenerator.tsx
+  s_8426d7284cabe4::t_5ed71ca4c42777 29,32-34
+  s_8426d7284cabe4::t_4d22c32685a110 6
+  s_8426d7284cabe4::t_8adc4af4ffa314 10-13
+  s_8426d7284cabe4::t_872dce6139463c 18-24,26
+  s_8426d7284cabe4::t_3d25f8bcf955c0 174-175
+  s_8426d7284cabe4::t_05a1baa2607262 154-155
+  s_8426d7284cabe4::t_453299c3fb7e72 5,9,14-17,28,30-31
+  s_8426d7284cabe4::t_ec51ebcd158db7 87-88
+  s_8426d7284cabe4::t_ef76f576a6fd42 113
+  s_8426d7284cabe4::t_e81e3ac7a6da24 25,27
+packages/plugin-client/src/components/Client.tsx
+  s_8426d7284cabe4::t_32ce3f584fd861 43
+packages/plugin-faker/src/generators/fakerGenerator.tsx
+  s_8426d7284cabe4::t_48ae529c68cc5a 71
+  s_8426d7284cabe4::t_3fd89a479f7a7a 26-27
+  s_8426d7284cabe4::t_bbe769da8ceb2a 119
+  s_8426d7284cabe4::t_dd109dc0451955 120
+  s_8426d7284cabe4::t_4b67e524e8aaa7 6,8-17,28,30-31
+  s_8426d7284cabe4::t_9135354da0ee20 247
+  s_8426d7284cabe4::t_c94b7553b2616a 213
+  s_8426d7284cabe4::t_1f14b837c466bb 248
+  s_8426d7284cabe4::t_af661e4236c9ad 29,32-33
+  s_8426d7284cabe4::t_04dc6888d7fe0e 249
+  s_8426d7284cabe4::t_ecf8c1ce46ff0e 7
+  s_8426d7284cabe4::t_03b12d82ef997c 18-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "2a3b9456284b79e185bdff09d3008dd6a66a9517",
+  "prompts": {},
+  "sessions": {
+    "s_8426d7284cabe4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "14fa5b73-d51c-4e38-88fd-1a04917d10c1",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "Stijn Van Hulle <stijn.vanhulle@robovision.eu>"
+    }
+  }
+}
