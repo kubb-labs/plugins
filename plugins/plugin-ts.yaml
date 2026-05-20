@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-ts
 name: TypeScript
-description: Generate TypeScript types and interfaces from OpenAPI schemas with type-safe representations.
+description: Generate TypeScript types and interfaces from OpenAPI schemas with full type safety end to end.
 category: types
 type: official
 npmPackage: '@kubb/plugin-ts'
@@ -34,7 +34,9 @@ icon:
 intro: |
   # @kubb/plugin-ts
 
-  Generate TypeScript types from your OpenAPI schema. Use this plugin to produce type-safe representations of your API's request and response shapes, giving your TypeScript project compile-time guarantees over every API interaction.
+  `@kubb/plugin-ts` turns your OpenAPI schema into TypeScript `type` aliases and `interface` declarations. It is the foundation that every other Kubb plugin builds on — clients, query hooks, mocks, and validators all reference the names this plugin produces.
+
+  Add it once and every request payload, response, path parameter, and enum becomes a compile-time check.
 
   **See also**
 
@@ -46,7 +48,7 @@ options:
     type: Output
     required: false
     default: "{ path: 'types', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated `.ts` files are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'types'"
@@ -64,305 +66,335 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name, this will be used for the file and name generation.
+        description: |
+          Function that turns a group key (the operation's first tag) into a folder/identifier name.
+
+          The result is used as both the subdirectory name under `output.path` and as a suffix when naming aggregate files.
 
   - name: enumType
     type: "'enum' | 'asConst' | 'asPascalConst' | 'constEnum' | 'literal' | 'inlineLiteral'"
     required: false
     default: "'asConst'"
-    description: Choose to use `enum` or `as const` for enums.
-    tip: |
-      The difference between `asConst` and `asPascalConst` is the casing of the constant variable name:
+    description: |
+      How OpenAPI enums are represented in the generated TypeScript.
 
-      - `asConst`: generates a camelCase constant name (e.g., `petType`)
-      - `asPascalConst`: generates a PascalCase constant name (e.g., `PetType`)
+      - `'asConst'` (default) — `as const` object plus a key/value type. Tree-shakeable, no enum runtime.
+      - `'asPascalConst'` — same as `asConst`, but the const is named in PascalCase.
+      - `'enum'` — a regular TypeScript `enum`. Produces JavaScript runtime code.
+      - `'constEnum'` — a `const enum`. Inlines at compile time; not compatible with `--isolatedModules`.
+      - `'literal'` — a plain union type (`'dog' | 'cat'`). No runtime value.
+      - `'inlineLiteral'` — the union is inlined at every usage site instead of giving it a name.
+    tip: |
+      `'asConst'` vs `'asPascalConst'` differs only in the casing of the const variable: `petType` vs `PetType`. The type alias is always PascalCase.
     examples:
       - name: "'enum'"
         files:
           - lang: typescript
+            twoslash: false
             code: |
               enum PetType {
                 Dog = 'dog',
                 Cat = 'cat',
               }
-            twoslash: false
-      - name: "'asConst'"
+      - name: "'asConst' (default)"
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              const petType = {
+              export const petType = {
                 Dog: 'dog',
                 Cat: 'cat',
-              } as const;
-            twoslash: false
+              } as const
+
+              export type PetTypeKey = (typeof petType)[keyof typeof petType]
       - name: "'asPascalConst'"
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              const PetType = {
+              export const PetType = {
                 Dog: 'dog',
                 Cat: 'cat',
-              } as const;
-            twoslash: false
+              } as const
+
+              export type PetTypeKey = (typeof PetType)[keyof typeof PetType]
       - name: "'constEnum'"
         files:
           - lang: typescript
+            twoslash: false
             code: |
               const enum PetType {
                 Dog = 'dog',
                 Cat = 'cat',
               }
-            twoslash: false
       - name: "'literal'"
         files:
           - lang: typescript
-            code: |
-              type PetType = 'dog' | 'cat';
             twoslash: false
+            code: |
+              export type PetType = 'dog' | 'cat'
       - name: "'inlineLiteral'"
         files:
           - lang: typescript
-            code: |
-              // Enum values are inlined directly into the type
-              export interface Pet {
-                status?: 'available' | 'pending' | 'sold';
-              }
             twoslash: false
+            code: |
+              // No separate enum type — values are inlined wherever PetType would have been used
+              export interface Pet {
+                status?: 'available' | 'pending' | 'sold'
+              }
     body: |
       > [!TIP]
-      > Consider `'inlineLiteral'` for the most idiomatic output — enum values are inlined directly into the property type instead of creating a separate named type.
+      > `'inlineLiteral'` produces the cleanest output for small enums — the values appear directly where they are used instead of via a named alias.
 
   - name: enumSuffix
     required: false
     description: ''
     warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#enumSuffix). Use `adapterOas({ enumSuffix })` instead.
+      Moved to [`adapterOas`](/adapters/adapter-oas#enumSuffix). Use `adapterOas({ enumSuffix })` instead.
 
   - name: enumTypeSuffix
     type: string
     required: false
     default: "'Key'"
     description: |
-      Suffix appended to the generated type alias name when `enumType` is `asConst` or `asPascalConst`.
+      Suffix appended to the type alias generated for enums when `enumType` is `'asConst'` or `'asPascalConst'`.
 
-      Only the type alias is affected — the const object name stays unchanged.
+      The const object name (e.g. `petType`) is unaffected — only the companion type alias is renamed.
     examples:
       - name: "'Key' (default)"
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              const petType = {
+              export const petType = {
                 Dog: 'dog',
                 Cat: 'cat',
-              } as const;
+              } as const
 
-              export type PetTypeKey = (typeof petType)[keyof typeof petType];
-            twoslash: false
+              export type PetTypeKey = (typeof petType)[keyof typeof petType]
       - name: "'Value'"
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              // enumTypeSuffix: 'Value'
-              const petType = {
+              export const petType = {
                 Dog: 'dog',
                 Cat: 'cat',
-              } as const;
+              } as const
 
-              export type PetTypeValue = (typeof petType)[keyof typeof petType];
-            twoslash: false
+              export type PetTypeValue = (typeof petType)[keyof typeof petType]
       - name: "'' (no suffix)"
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              // enumTypeSuffix: ''
-              const petType = {
+              export const petType = {
                 Dog: 'dog',
                 Cat: 'cat',
-              } as const;
+              } as const
 
-              export type PetType = (typeof petType)[keyof typeof petType];
-            twoslash: false
+              export type PetType = (typeof petType)[keyof typeof petType]
 
   - name: enumKeyCasing
     type: "'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'"
     required: false
     default: "'none'"
-    description: Control the casing applied to enum key names in generated TypeScript. Use this to align generated enum keys with your project's naming conventions.
+    description: |
+      Casing applied to enum key names. By default the key is the raw value from the spec; switch to a project convention when needed.
     body: |
-      - `'screamingSnakeCase'`: `ENUM_VALUE`
-      - `'snakeCase'`: `enum_value`
-      - `'pascalCase'`: `EnumValue`
-      - `'camelCase'`: `enumValue`
-      - `'none'`: Uses the enum value as-is
+      | Value | Example key |
+      | --- | --- |
+      | `'screamingSnakeCase'` | `ENUM_VALUE` |
+      | `'snakeCase'` | `enum_value` |
+      | `'pascalCase'` | `EnumValue` |
+      | `'camelCase'` | `enumValue` |
+      | `'none'` (default) | as-is |
 
   - name: dateType
     required: false
     description: ''
     warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#dateType). Use `adapterOas({ dateType })` instead.
+      Moved to [`adapterOas`](/adapters/adapter-oas#dateType). Use `adapterOas({ dateType })` instead.
 
   - name: integerType
     required: false
     description: ''
     warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.
+      Moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.
 
   - name: syntaxType
     type: "'type' | 'interface'"
     required: false
     default: "'type'"
     description: |
-      Control whether the TypeScript generator emits `type` aliases or `interface` declarations for object schemas.
-      See [Type vs Interface: Which Should You Use](https://www.totaltypescript.com/type-vs-interface-which-should-you-use).
+      Whether object schemas are emitted as `type` aliases or `interface` declarations.
+
+      `type` is the safer default for generated code: declarations are closed, intersections work cleanly, and unions are fine. Pick `interface` when consumers need to use declaration merging (rare for generated code).
+
+      For more background, see [Type vs Interface](https://www.totaltypescript.com/type-vs-interface-which-should-you-use).
     examples:
-      - name: "'type'"
+      - name: "'type' (default)"
         files:
           - lang: typescript
-            code: |
-              type Pet = {
-                name: string;
-              };
             twoslash: false
+            code: |
+              export type Pet = {
+                name: string
+              }
       - name: "'interface'"
         files:
           - lang: typescript
-            code: |
-              interface Pet {
-                name: string;
-              }
             twoslash: false
+            code: |
+              export interface Pet {
+                name: string
+              }
 
   - name: unknownType
     required: false
     description: ''
     warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#unknownType). Use `adapterOas({ unknownType })` instead.
+      Moved to [`adapterOas`](/adapters/adapter-oas#unknownType). Use `adapterOas({ unknownType })` instead.
 
   - name: emptySchemaType
     required: false
     description: ''
     warning: |
-      This option has been moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
+      Moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
 
   - name: optionalType
     type: "'questionToken' | 'undefined' | 'questionTokenAndUndefined'"
     required: false
     default: "'questionToken'"
-    description: Control how optional properties are represented in generated TypeScript types.
+    description: |
+      How optional properties are written in generated types.
+
+      - `'questionToken'` (default) — `type?: string`. The property may be missing.
+      - `'undefined'` — `type: string | undefined`. The property is required to exist but may be `undefined`.
+      - `'questionTokenAndUndefined'` — `type?: string | undefined`. Strictest — the property may be missing or explicitly set to `undefined`.
+    tip: |
+      Choose `'questionTokenAndUndefined'` when your project enables `"exactOptionalPropertyTypes": true` in `tsconfig.json` — it keeps generated types compatible with that setting.
     examples:
-      - name: "'questionToken'"
+      - name: "'questionToken' (default)"
         files:
           - lang: typescript
-            code: |
-              type Pet = {
-                type?: string;
-              };
             twoslash: false
+            code: |
+              export type Pet = {
+                type?: string
+              }
       - name: "'undefined'"
         files:
           - lang: typescript
-            code: |
-              type Pet = {
-                type: string | undefined;
-              };
             twoslash: false
+            code: |
+              export type Pet = {
+                type: string | undefined
+              }
       - name: "'questionTokenAndUndefined'"
         files:
           - lang: typescript
-            code: |
-              type Pet = {
-                type?: string | undefined;
-              };
             twoslash: false
+            code: |
+              export type Pet = {
+                type?: string | undefined
+              }
 
   - name: arrayType
     type: "'array' | 'generic'"
     required: false
     default: "'array'"
-    description: Choose between `Array<Type>` or `Type[]` syntax for array types.
+    description: |
+      Syntax used for array types in generated code.
+
+      - `'array'` (default) — postfix `Type[]`. Slightly shorter.
+      - `'generic'` — `Array<Type>`. More readable for complex element types (`Array<{ id: number }>`).
     examples:
-      - name: "'array'"
+      - name: "'array' (default)"
         files:
           - lang: typescript
-            code: |
-              type Pet = {
-                tags: string[];
-              };
             twoslash: false
+            code: |
+              export type Pet = {
+                tags: string[]
+              }
       - name: "'generic'"
         files:
           - lang: typescript
-            code: |
-              type Pet = {
-                tags: Array<string>;
-              };
             twoslash: false
+            code: |
+              export type Pet = {
+                tags: Array<string>
+              }
 
   - name: paramsCasing
     type: "'camelcase'"
     required: false
-    default: 'undefined'
-    description: Transform parameter names to a specific casing format for path, query, and header parameters.
+    description: |
+      Renames properties inside `PathParams`, `QueryParams`, and `HeaderParams` types. Response and request body types are not touched.
+
+      Use this when your OpenAPI parameters use snake_case or kebab-case but you want camelCase in TypeScript.
     important: |
-      When enabled, this option transforms property names in `PathParams`, `QueryParams`, and `HeaderParams` types to the specified casing. Response and request body types are **not** affected.
-
-      All plugins that reference parameters (like `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-swr`, `@kubb/plugin-faker`, `@kubb/plugin-mcp`) should use the same `paramsCasing` setting to ensure type compatibility.
+      Every plugin that references parameters must use the same `paramsCasing` value — `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-faker`, `@kubb/plugin-mcp`. Mismatched casing breaks the generated type chain.
     examples:
-      - name: Original API
+      - name: Without `paramsCasing`
         files:
           - lang: typescript
-            code: |
-              // OpenAPI spec has: step_id, X-Custom-Header, bool_param
-
-              // Without paramsCasing
-              type FindPetsByStatusPathParams = {
-                step_id: string;
-              };
-
-              type FindPetsByStatusQueryParams = {
-                bool_param?: boolean;
-              };
-
-              type FindPetsByStatusHeaderParams = {
-                'X-Custom-Header'?: string;
-              };
             twoslash: false
-      - name: "With paramsCasing: 'camelcase'"
+            code: |
+              // OpenAPI spec: step_id, bool_param, X-Custom-Header
+              export type FindPetsByStatusPathParams = {
+                step_id: string
+              }
+
+              export type FindPetsByStatusQueryParams = {
+                bool_param?: boolean
+              }
+
+              export type FindPetsByStatusHeaderParams = {
+                'X-Custom-Header'?: string
+              }
+      - name: "With `paramsCasing: 'camelcase'`"
         files:
           - lang: typescript
-            code: |
-              // Properties are transformed to camelCase
-
-              type FindPetsByStatusPathParams = {
-                stepId: string;  // ✓ camelCase
-              };
-
-              type FindPetsByStatusQueryParams = {
-                boolParam?: boolean;  // ✓ camelCase
-              };
-
-              type FindPetsByStatusHeaderParams = {
-                xCustomHeader?: string;  // ✓ camelCase
-              };
             twoslash: false
+            code: |
+              export type FindPetsByStatusPathParams = {
+                stepId: string
+              }
+
+              export type FindPetsByStatusQueryParams = {
+                boolParam?: boolean
+              }
+
+              export type FindPetsByStatusHeaderParams = {
+                xCustomHeader?: string
+              }
 
   - extends: ./_shared/core/resolver.yaml
     type: 'Partial<ResolverTs> & ThisType<ResolverTs>'
     examples:
-      - name: Custom prefix for operation names
+      - name: Add a Custom prefix to every name
         files:
           - lang: typescript
+            twoslash: false
             code: |
+              import { defineConfig } from 'kubb'
               import { pluginTs } from '@kubb/plugin-ts'
 
-              pluginTs({
-                resolver: {
-                  resolveName(name) {
-                    return `Custom${this.default(name, 'function')}`
-                  },
-                },
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginTs({
+                    resolver: {
+                      resolveName(name) {
+                        return `Custom${this.default(name, 'function')}`
+                      },
+                    },
+                  }),
+                ],
               })
-            twoslash: false
 
   - extends: ./_shared/core/include.yaml
   - extends: ./_shared/core/exclude.yaml
@@ -373,76 +405,80 @@ options:
 
   - extends: ./_shared/core/transformer.yaml
     note: |
-      `@kubb/plugin-ts` uses AST `Visitor` transformers for schema/operation node transforms. For output naming customization, use `resolver` instead.
+      `@kubb/plugin-ts` uses AST visitors for schema/operation node transforms. For renaming generated symbols, use `resolver` instead.
 
   - name: printer
     type: '{ nodes?: PrinterTsNodes }'
     required: false
     description: |
-      Override individual printer node handlers to customize how specific schema types are rendered.
+      Replaces the TypeScript node handler for a specific schema type (e.g. `'integer'`, `'date'`, `'string'`). Each handler is a function that builds a TypeScript AST node for that schema type.
 
-      Each key is a `SchemaType` (e.g. `'integer'`, `'date'`). The function you provide replaces the built-in handler for that type. Use `this.transform` to recurse into nested schema nodes and `this.options` to read printer options.
+      Use `this.transform` to recurse into nested schema nodes and `this.options` to read printer options.
     examples:
-      - name: Override the date node to use the Date object
+      - name: Use the JavaScript Date object for date schemas
         files:
           - lang: typescript
+            twoslash: false
             code: |
               import ts from 'typescript'
+              import { defineConfig } from 'kubb'
               import { pluginTs } from '@kubb/plugin-ts'
 
-              pluginTs({
-                printer: {
-                  nodes: {
-                    date(node) {
-                      return ts.factory.createTypeReferenceNode('Date', [])
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginTs({
+                    printer: {
+                      nodes: {
+                        date() {
+                          return ts.factory.createTypeReferenceNode('Date', [])
+                        },
+                      },
                     },
-                  },
-                },
+                  }),
+                ],
               })
-            twoslash: false
-      - name: Override integer to bigint
+      - name: Use bigint for integers
         files:
           - lang: typescript
+            twoslash: false
             code: |
               import ts from 'typescript'
+              import { defineConfig } from 'kubb'
               import { pluginTs } from '@kubb/plugin-ts'
 
-              pluginTs({
-                printer: {
-                  nodes: {
-                    integer() {
-                      return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginTs({
+                    printer: {
+                      nodes: {
+                        integer() {
+                          return ts.factory.createKeywordTypeNode(ts.SyntaxKind.BigIntKeyword)
+                        },
+                      },
                     },
-                  },
-                },
+                  }),
+                ],
               })
-            twoslash: false
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
-          import { defineConfig } from 'kubb';
-          import { pluginTs } from '@kubb/plugin-ts';
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
 
           export default defineConfig({
-            input: {
-              path: './petStore.yaml',
-            },
-            output: {
-              path: './src/gen',
-            },
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
             plugins: [
               pluginTs({
-                output: {
-                  path: './types',
-                },
-                exclude: [
-                  {
-                    type: 'tag',
-                    pattern: 'store',
-                  },
-                ],
+                output: { path: './types' },
+                exclude: [{ type: 'tag', pattern: 'store' }],
                 group: {
                   type: 'tag',
                   name: ({ group }) => `${group}Controller`,
@@ -453,4 +489,3 @@ examples:
               }),
             ],
           })
-        twoslash: false

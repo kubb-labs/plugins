@@ -1,42 +1,57 @@
 # Shared option: core/transformer
 
-# ─────────────────────────── transformer ───────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: transformer
 type: Visitor
 required: false
 description: |
-  A single AST visitor applied to every node before code is printed. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the preset transformer's result is used as the fallback — so you only need to supply the methods you want to change.
+  Modifies AST nodes before they are printed to source code. Use this when you need to rewrite operation IDs, drop descriptions, or change schema metadata without forking the generator.
 
-  Visitor methods receive the node and a context object. Return a modified node to replace it, or return `undefined`/`void` to leave it unchanged.
+  Each visitor method (e.g. `schema`, `operation`) receives the node and a context object. Return a new node to replace it, or return `undefined` to leave it untouched. Methods you omit keep the plugin's default behavior.
 examples:
   - name: Strip descriptions before printing
     files:
-      - lang: typescript
+      - name: kubb.config.ts
+        lang: typescript
+        twoslash: false
         code: |
+          import { defineConfig } from 'kubb'
           import { pluginTs } from '@kubb/plugin-ts'
 
-          pluginTs({
-            transformer: {
-              schema(node) {
-                return { ...node, description: undefined }
-              },
-            },
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                transformer: {
+                  schema(node) {
+                    return { ...node, description: undefined }
+                  },
+                },
+              }),
+            ],
           })
-        twoslash: false
   - name: Prefix every operationId
     files:
-      - lang: typescript
+      - name: kubb.config.ts
+        lang: typescript
+        twoslash: false
         code: |
+          import { defineConfig } from 'kubb'
           import { pluginTs } from '@kubb/plugin-ts'
 
-          pluginTs({
-            transformer: {
-              operation(node) {
-                return { ...node, operationId: `api_${node.operationId}` }
-              },
-            },
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                transformer: {
+                  operation(node) {
+                    return { ...node, operationId: `api_${node.operationId}` }
+                  },
+                },
+              }),
+            ],
           })
-        twoslash: false
 tip: |
-  Use `transformer` to rewrite node properties before printing. For output naming customization, use `resolver` instead.
+  Use `transformer` to rewrite node properties before printing. For changing the names of generated symbols and files, use `resolver` instead.

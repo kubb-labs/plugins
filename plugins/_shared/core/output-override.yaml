@@ -5,4 +5,28 @@ name: override
 type: boolean
 required: false
 default: 'false'
-description: Whether Kubb overrides existing external files that can be generated if they already exist.
+description: |
+  Allows the plugin to overwrite hand-written files that share a name with a generated file.
+
+  - `false` (default): Kubb skips a file if it already exists and is not marked as generated. This protects manual edits.
+  - `true`: Kubb overwrites any file at the target path, including hand-written ones.
+warning: |
+  Enable this only when you are sure the target folder contains nothing you need to keep. Local edits are lost on the next generation.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { override: true },
+              }),
+            ],
+          })

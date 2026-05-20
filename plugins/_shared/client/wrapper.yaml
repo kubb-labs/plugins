@@ -1,21 +1,24 @@
 # Shared option: client/wrapper
 
-# ────────────────────────── client.wrapper ──────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: wrapper
 type: '{ className: string }'
 required: false
-description: Generate a wrapper class that composes all tag-based client classes into a single entry point.
+description: |
+  Generates a single top-level class that composes the per-tag client classes into one entry point. Only meaningful when `clientType: 'class'` (or `'staticClass'`) and `group: { type: 'tag' }` are also set.
+
+  Use this when you want a single object to hand around your app (`api.pet.findById`, `api.user.login`) instead of importing each tag client separately.
 properties:
   - name: className
     type: string
     required: true
-    description: Name of the generated wrapper class.
+    description: Name of the generated wrapper class — used as the export name and file name.
     examples:
-      - name: wrapper.className
+      - name: A composed PetStoreClient
         files:
           - name: kubb.config.ts
             lang: typescript
+            twoslash: false
             code: |
               import { defineConfig } from 'kubb'
               import { pluginClient } from '@kubb/plugin-client'
@@ -34,14 +37,14 @@ properties:
                   }),
                 ],
               })
-            twoslash: false
-          - name: PetStoreClient.ts
+          - name: Generated PetStoreClient.ts
             lang: typescript
+            twoslash: false
             code: |
-              import type { Client, RequestConfig } from './.kubb/fetch.js'
-              import { Pet } from './petController/Pet.js'
-              import { Store } from './storeController/Store.js'
-              import { User } from './userController/User.js'
+              import type { Client, RequestConfig } from './.kubb/fetch'
+              import { Pet } from './petController/Pet'
+              import { Store } from './storeController/Store'
+              import { User } from './userController/User'
 
               export class PetStoreClient {
                 readonly pet: Pet
@@ -54,14 +57,13 @@ properties:
                   this.user = new User(config)
                 }
               }
-            twoslash: false
           - name: usage.ts
             lang: typescript
+            twoslash: false
             code: |
               import { PetStoreClient } from './gen/clients/PetStoreClient'
 
-              const client = new PetStoreClient({ baseURL: 'https://petstore.swagger.io/v2' })
+              const api = new PetStoreClient({ baseURL: 'https://petstore.swagger.io/v2' })
 
-              const pets = await client.pet.findPetsByTags({ tags: ['available'] })
-              const user = await client.user.getUserByName({ username: 'john' })
-            twoslash: false
+              const pets = await api.pet.findPetsByTags({ tags: ['available'] })
+              const user = await api.user.getUserByName({ username: 'john' })

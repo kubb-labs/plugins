@@ -73,80 +73,86 @@ export type ResolverFaker = Resolver &
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output.
-   * @default { path: 'mocks', barrelType: 'named' }
+   * Where the generated mock factories are written and how they are exported.
+   *
+   * @default { path: 'mocks', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Group the Faker mocks based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Parser to use when formatting date/time values as strings.
+   * Library used to format string-represented date, time, and datetime fields.
+   * Any library exporting a default function works; Kubb adds the import for you.
    *
    * @default 'faker'
    */
   dateParser?: 'faker' | 'dayjs' | 'moment' | (string & {})
   /**
-   * Generator to use for RegExp patterns.
+   * Library used to generate strings that satisfy a regex `pattern` keyword.
+   * - `'faker'` uses `faker.helpers.fromRegExp`. No extra dependency.
+   * - `'randexp'` uses the `randexp` package. Supports a wider regex grammar.
    *
    * @default 'faker'
    */
   regexGenerator?: 'faker' | 'randexp'
   /**
-   * Provide per-property faker expressions keyed by property name.
+   * Map a schema name to a custom Faker expression. Use this when the schema name
+   * does not give Faker enough context (`'email'`, `'avatarUrl'`, `'phoneNumber'`).
    */
   mapper?: Record<string, string>
   /**
-   * Locale for generating mock data.
-   * Imports the matching localized `@faker-js/faker` instance so names, addresses,
-   * and phone numbers reflect the target region.
+   * Faker locale code. Switches the named import to `fakerXX` from `@faker-js/faker`
+   * so names, addresses, and phone numbers reflect the target region.
    *
    * @default 'en'
-   *
    * @example German
    * `locale: 'de'`
-   *
    * @example Austrian German
    * `locale: 'de_AT'`
-   *
    * @see https://fakerjs.dev/api/localization.html
    */
   locale?: string
   /**
-   * Seed faker for deterministic output.
+   * Value passed to `faker.seed(...)`. Set this for deterministic mock output —
+   * useful for snapshot tests.
    */
   seed?: number | number[]
   /**
-   * Apply casing to parameter names to match your configuration.
+   * Rename properties inside path/query/header mocks. Body mocks are unaffected.
+   *
+   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in Faker generators.
    */
   generators?: Array<Generator<PluginFaker>>
   /**
-   * Override naming conventions for function names and types.
+   * Override the naming of generated factory helpers. Common use: append `Mock` or
+   * `Factory` so helpers do not clash with imported types.
    */
   resolver?: Partial<ResolverFaker> & ThisType<ResolverFaker>
   /**
-   * AST visitor to transform generated nodes.
+   * AST visitor applied to schema and operation nodes before printing.
    */
   transformer?: ast.Visitor
   /**
-   * Override individual faker printer node handlers.
+   * Replace the Faker handler for a specific schema type (`'integer'`, `'date'`, ...).
+   * Each handler returns the Faker expression as a string.
    */
   printer?: {
     nodes?: PrinterFakerNodes
