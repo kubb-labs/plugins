@@ -14,7 +14,7 @@ export const pluginMswName = 'plugin-msw' satisfies PluginMsw['name']
 
 /**
  * Generates MSW request handlers from an OpenAPI spec. Drop them into your
- * test setup or service worker to mock the API end-to-end — request path,
+ * test setup or service worker to mock the API end-to-end. Request path,
  * method, status, and response body all stay in sync with the spec. Combine
  * with `@kubb/plugin-faker` (via `parser: 'faker'`) to seed handlers with
  * realistic data.

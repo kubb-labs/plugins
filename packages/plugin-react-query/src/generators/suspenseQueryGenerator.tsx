@@ -10,6 +10,12 @@ import { difference } from 'remeda'
 import { QueryKey, QueryOptions, SuspenseQuery } from '../components'
 import type { PluginReactQuery } from '../types'
 
+/**
+ * Built-in generator for `useSuspenseQuery` hooks. Enabled when
+ * `pluginReactQuery({ suspense: {} })`. Emits one `useFooSuspenseQuery` hook
+ * per query operation. Suspense queries throw promises while loading and
+ * require a `<Suspense>` boundary in the React tree. TanStack Query v5+ only.
+ */
 export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-query',
   renderer: jsxRendererSync,

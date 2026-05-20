@@ -10,6 +10,12 @@ import { difference } from 'remeda'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import type { PluginReactQuery } from '../types'
 
+/**
+ * Built-in generator for `useInfiniteQuery` hooks. Enabled when
+ * `pluginReactQuery({ infinite: { ... } })`. Emits one `useFooInfiniteQuery`
+ * hook per query operation, wiring the configured `nextParam` /
+ * `previousParam` paths into TanStack Query's cursor-based pagination.
+ */
 export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-infinite-query',
   renderer: jsxRendererSync,

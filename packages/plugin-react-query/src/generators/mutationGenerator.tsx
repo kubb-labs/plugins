@@ -10,6 +10,11 @@ import { difference } from 'remeda'
 import { Mutation, MutationKey, MutationOptions } from '../components'
 import type { PluginReactQuery } from '../types'
 
+/**
+ * Built-in generator for `useMutation` hooks. Emits one `useFooMutation` hook
+ * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
+ * the matching `fooMutationKey` / `fooMutationOptions` helpers.
+ */
 export const mutationGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-mutation',
   renderer: jsxRendererSync,

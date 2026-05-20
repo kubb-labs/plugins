@@ -12,7 +12,7 @@ export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
 
 /**
  * Generates TypeScript `type` aliases and `interface` declarations from an
- * OpenAPI spec. The foundation that every other Kubb plugin builds on —
+ * OpenAPI spec. The foundation that every other Kubb plugin builds on:
  * clients, query hooks, mocks, and validators all reference the names this
  * plugin produces.
  *

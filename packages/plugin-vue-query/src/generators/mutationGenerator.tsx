@@ -10,6 +10,11 @@ import { difference } from 'remeda'
 import { Mutation, MutationKey } from '../components'
 import type { PluginVueQuery } from '../types'
 
+/**
+ * Built-in generator for `useMutation` composables. Emits one
+ * `useFooMutation` composable per POST/PUT/DELETE operation (configurable
+ * via `mutation.methods`) plus the matching `fooMutationKey` helper.
+ */
 export const mutationGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-mutation',
   renderer: jsxRendererSync,

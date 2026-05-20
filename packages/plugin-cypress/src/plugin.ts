@@ -13,8 +13,8 @@ export const pluginCypressName = 'plugin-cypress' satisfies PluginCypress['name'
 
 /**
  * Generates one typed `cy.request()` wrapper per OpenAPI operation. Each helper
- * has typed path params, body, query, and a typed response — failing API calls
- * in Cypress show up at compile time instead of inside the test runner.
+ * has typed path params, body, query, and a typed response, so failing API
+ * calls in Cypress show up at compile time instead of inside the test runner.
  *
  * @example
  * ```ts

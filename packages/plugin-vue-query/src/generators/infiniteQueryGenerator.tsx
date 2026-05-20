@@ -10,6 +10,12 @@ import { difference } from 'remeda'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import type { PluginVueQuery } from '../types'
 
+/**
+ * Built-in generator for `useInfiniteQuery` composables. Enabled when
+ * `pluginVueQuery({ infinite: { ... } })`. Emits one `useFooInfiniteQuery`
+ * composable per query operation, wiring the configured cursor path into
+ * TanStack Query's cursor-based pagination.
+ */
 export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-infinite',
   renderer: jsxRendererSync,

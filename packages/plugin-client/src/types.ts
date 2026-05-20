@@ -164,7 +164,7 @@ export type Options = {
   dataReturnType?: 'data' | 'full'
   /**
    * Rename parameter properties in the generated client (path, query, headers).
-   * The HTTP request still uses the original spec names — Kubb writes the mapping for you.
+   * The HTTP request still uses the original spec names; Kubb writes the mapping for you.
    *
    * @note Use the same value on `@kubb/plugin-ts` so types stay compatible.
    */

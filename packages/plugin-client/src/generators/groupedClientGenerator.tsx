@@ -4,6 +4,12 @@ import { defineGenerator } from '@kubb/core'
 import { File, Function, jsxRendererSync } from '@kubb/renderer-jsx'
 import type { PluginClient } from '../types'
 
+/**
+ * Emits one aggregate file per tag/group when `group` is configured. Each
+ * file re-exports every client function for that group, so callers can
+ * `import { petController } from './gen/clients'` instead of importing
+ * each operation individually.
+ */
 export const groupedClientGenerator = defineGenerator<PluginClient>({
   name: 'groupedClient',
   renderer: jsxRendererSync,

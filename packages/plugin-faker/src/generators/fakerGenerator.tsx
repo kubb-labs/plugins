@@ -7,6 +7,12 @@ import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveParamNameByLocation, resolveTypeReference } from '../utils.ts'
 
+/**
+ * Built-in generator for `@kubb/plugin-faker`. Emits one `createX` factory
+ * per schema in the spec plus per-operation request/response factories. Each
+ * factory returns a value matching the corresponding TypeScript type from
+ * `@kubb/plugin-ts`.
+ */
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRendererSync,

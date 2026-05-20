@@ -5,6 +5,11 @@ import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
 
+/**
+ * Built-in generator for `@kubb/plugin-cypress`. Emits one typed
+ * `cy.request()` wrapper per OpenAPI operation, ready to call inside Cypress
+ * test specs and custom commands.
+ */
 export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
   renderer: jsxRendererSync,
