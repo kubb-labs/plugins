@@ -9,6 +9,12 @@ import { resolveOperationOverrides } from '../utils.ts'
 type QueryOption = PluginReactQuery['resolvedOptions']['query']
 type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
 
+/**
+ * Emits the `HookOptions` type used by `customOptions`. Enabled when
+ * `pluginReactQuery({ customOptions: { ... } })`. The generated type lists
+ * every hook keyed by name so user-supplied options stay in sync with the
+ * generated hooks at compile time.
+ */
 export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRendererSync,

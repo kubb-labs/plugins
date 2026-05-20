@@ -3,6 +3,12 @@ import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations'
 import type { PluginClient } from '../types'
 
+/**
+ * Generates an `operations.ts` file that re-exports every operation grouped
+ * by HTTP method. Enabled when `pluginClient({ operations: true })`. Useful
+ * for building meta-tooling on top of the generated client (route
+ * registries, API explorers).
+ */
 export const operationsGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,

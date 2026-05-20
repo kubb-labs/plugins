@@ -127,8 +127,8 @@ export type Options = {
    */
   locale?: string
   /**
-   * Value passed to `faker.seed(...)`. Set this for deterministic mock output —
-   * useful for snapshot tests.
+   * Value passed to `faker.seed(...)`. Set this for deterministic mock output,
+   * which is useful for snapshot tests.
    */
   seed?: number | number[]
   /**

@@ -24,6 +24,12 @@ function getPerContentTypeName(dataName: string, suffix: string): string {
   return dataName + suffix
 }
 
+/**
+ * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
+ * schema in the spec plus per-operation request, response, and parameter
+ * types. Drop-replace with a custom `Generator<PluginTs>` to change how
+ * TypeScript output is produced.
+ */
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRendererSync,

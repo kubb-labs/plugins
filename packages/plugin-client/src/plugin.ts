@@ -23,9 +23,9 @@ export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 
 /**
  * Generates one HTTP client function per OpenAPI operation. Each function has
- * typed path params, query params, body, and response — call the API like any
- * other typed function. Ships with `axios` and `fetch` runtimes; bring your own
- * by setting `importPath`.
+ * typed path params, query params, body, and response, so callers use the API
+ * like any other typed function. Ships with `axios` and `fetch` runtimes; bring
+ * your own by setting `importPath`.
  *
  * @example
  * ```ts

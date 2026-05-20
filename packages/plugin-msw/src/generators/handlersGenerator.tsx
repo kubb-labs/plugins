@@ -3,6 +3,12 @@ import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Handlers } from '../components/Handlers.tsx'
 import type { PluginMsw } from '../types'
 
+/**
+ * Aggregate generator enabled by `pluginMsw({ handlers: true })`. Emits a
+ * `handlers.ts` file that re-exports every generated handler grouped by HTTP
+ * method, ready to spread into `setupServer(...handlers)` or
+ * `setupWorker(...handlers)`.
+ */
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   renderer: jsxRendererSync,

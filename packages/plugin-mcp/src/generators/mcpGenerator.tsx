@@ -6,6 +6,12 @@ import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
 
+/**
+ * Built-in operation generator for `@kubb/plugin-mcp`. Emits one MCP tool
+ * handler per OpenAPI operation, wiring the input Zod schema, the HTTP call,
+ * and the response shape into a single function that an MCP server can
+ * register as a callable tool.
+ */
 export const mcpGenerator = defineGenerator<PluginMcp>({
   name: 'mcp',
   renderer: jsxRendererSync,

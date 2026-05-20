@@ -7,6 +7,12 @@ import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
 import { resolveFakerMeta } from '../utils.ts'
 
+/**
+ * Built-in operation generator for `@kubb/plugin-msw`. Emits one MSW handler
+ * per OpenAPI operation. With `parser: 'faker'` the handler returns a value
+ * from `@kubb/plugin-faker`; with `parser: 'data'` it returns a typed empty
+ * payload for tests to fill in.
+ */
 export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
   renderer: jsxRendererSync,

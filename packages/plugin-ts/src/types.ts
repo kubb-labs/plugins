@@ -115,7 +115,7 @@ type EnumTypeOptions =
       /**
        * Suffix appended to the generated type alias name.
        *
-       * Only affects the type alias — the const object name is unchanged.
+       * Only affects the type alias; the const object name is unchanged.
        *
        * @default 'Key'
        * @example enumTypeSuffix: 'Value' → `export type PetStatusValue = …`
@@ -172,7 +172,7 @@ type EnumTypeOptions =
       enumTypeSuffix?: never
       /**
        * `enumKeyCasing` has no effect for this `enumType`.
-       * Literal and inlineLiteral modes emit only values — keys are discarded entirely.
+       * Literal and inlineLiteral modes emit only values; keys are discarded entirely.
        */
       enumKeyCasing?: never
     }

@@ -13,7 +13,7 @@ export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
 
 /**
  * Generates one mock-data factory per OpenAPI schema using Faker.js. Call
- * `createPet()` to get a realistic `Pet` object — useful for tests, Storybook,
+ * `createPet()` to get a realistic `Pet` object. Useful for tests, Storybook,
  * and local development without a running backend.
  *
  * @example

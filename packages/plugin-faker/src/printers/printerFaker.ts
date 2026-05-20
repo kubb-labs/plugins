@@ -3,12 +3,30 @@ import { ast } from '@kubb/core'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
 /**
- * Partial printer nodes for Faker generation, mapping schema types to output strings.
+ * Partial map of node-type overrides for the Faker printer. Each key is a
+ * `SchemaType` (`'string'`, `'date'`, ...) and each handler returns the
+ * Faker expression for that schema as a string. Use `this.transform` to
+ * recurse into nested schema nodes and `this.options` to read printer options.
+ *
+ * @example Override the integer handler
+ * ```ts
+ * pluginFaker({
+ *   printer: {
+ *     nodes: {
+ *       integer() {
+ *         return 'faker.number.float()'
+ *       },
+ *     },
+ *   },
+ * })
+ * ```
  */
 export type PrinterFakerNodes = ast.PrinterPartial<string, PrinterFakerOptions>
 
 /**
- * Configuration options for the Faker printer, including resolvers, mappers, and cyclic schema tracking.
+ * Options passed to the Faker printer at instantiation: the parser library
+ * for date strings, the regex generator, the user-supplied schema-name
+ * mapper, and the resolver used to compute identifiers.
  */
 export type PrinterFakerOptions = {
   dateParser?: PluginFaker['resolvedOptions']['dateParser']

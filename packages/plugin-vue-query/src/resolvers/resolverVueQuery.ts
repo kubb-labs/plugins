@@ -7,9 +7,20 @@ function capitalize(name: string): string {
 }
 
 /**
- * Naming convention resolver for Vue Query plugin.
+ * Default resolver used by `@kubb/plugin-vue-query`. Decides the names and
+ * file paths for every generated TanStack Query composable (`useFooQuery`,
+ * `useFooMutation`, `useFooInfiniteQuery`) and its companion helpers.
  *
- * Provides default naming helpers using camelCase for functions and file paths.
+ * Functions and files use camelCase; composables get the `use` prefix.
+ *
+ * @example Resolve composable and helper names
+ * ```ts
+ * import { resolverVueQuery } from '@kubb/plugin-vue-query'
+ *
+ * resolverVueQuery.resolveQueryName(operationNode)       // 'useGetPetById'
+ * resolverVueQuery.resolveQueryKeyName(operationNode)    // 'getPetByIdQueryKey'
+ * resolverVueQuery.resolveQueryOptionsName(operationNode) // 'getPetByIdQueryOptions'
+ * ```
  */
 export const resolverVueQuery = defineResolver<PluginVueQuery>(() => ({
   name: 'default',

@@ -36,7 +36,7 @@ export type Options = {
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
    * Rename parameter properties in the generated handlers. The HTTP layer still
-   * uses the original spec names — Kubb writes the mapping for you.
+   * uses the original spec names; Kubb writes the mapping for you.
    *
    * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */

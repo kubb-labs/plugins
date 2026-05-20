@@ -17,6 +17,12 @@ type ZodMiniPrinterEntry = { printer: ReturnType<typeof printerZodMini>; guidTyp
 const zodPrinterCache = new WeakMap<ResolverZod, ZodPrinterEntry>()
 const zodMiniPrinterCache = new WeakMap<ResolverZod, ZodMiniPrinterEntry>()
 
+/**
+ * Built-in generator for `@kubb/plugin-zod`. Emits one Zod schema per
+ * schema in the spec plus per-operation request/response/parameter schemas.
+ * When `mini: true`, schemas use the Zod Mini functional API instead of
+ * chainable methods.
+ */
 export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
   renderer: jsxRendererSync,

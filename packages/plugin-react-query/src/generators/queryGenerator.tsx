@@ -10,6 +10,11 @@ import { difference } from 'remeda'
 import { Query, QueryKey, QueryOptions } from '../components'
 import type { PluginReactQuery } from '../types'
 
+/**
+ * Built-in generator for `useQuery` hooks. Emits one `useFooQuery` hook per
+ * GET operation (configurable via `query.methods`) plus the matching
+ * `fooQueryKey` / `fooQueryOptions` helpers.
+ */
 export const queryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query',
   renderer: jsxRendererSync,

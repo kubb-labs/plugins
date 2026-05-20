@@ -8,6 +8,11 @@ import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
 import type { PluginClient } from '../types'
 
+/**
+ * Built-in operation generator for `@kubb/plugin-client`. Emits one async
+ * function per OpenAPI operation, plus the matching URL helper. Used when
+ * `clientType: 'function'` (the default).
+ */
 export const clientGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,

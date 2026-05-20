@@ -5,12 +5,16 @@ import { defineResolver, KubbDriver } from '@kubb/core'
 import type { PluginFaker } from '../types.ts'
 
 /**
- * Naming convention resolver for Faker plugin.
+ * Default resolver used by `@kubb/plugin-faker`. Decides the names and file
+ * paths for every generated mock factory. Functions and files are prefixed
+ * with `create` so `Pet` becomes `createPet`.
  *
- * Provides default naming helpers using camelCase with a `create` prefix for factory functions and files.
+ * @example Resolve a factory name
+ * ```ts
+ * import { resolverFaker } from '@kubb/plugin-faker'
  *
- * @example
- * `resolverFaker.default('list pets', 'function')  // → 'createListPets'`
+ * resolverFaker.default('list pets', 'function') // 'createListPets'
+ * ```
  */
 export const resolverFaker = defineResolver<PluginFaker>(() => {
   return {

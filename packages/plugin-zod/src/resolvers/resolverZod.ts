@@ -3,12 +3,17 @@ import { defineResolver } from '@kubb/core'
 import type { PluginZod } from '../types.ts'
 
 /**
- * Naming convention resolver for Zod plugin.
+ * Default resolver used by `@kubb/plugin-zod`. Decides the names and file
+ * paths for every generated Zod schema. Schemas use camelCase with a
+ * `Schema` suffix (`listPetsSchema`); their inferred types use PascalCase.
  *
- * Provides default naming helpers using camelCase with a `Schema` suffix for schemas.
+ * @example Resolve schema and type names
+ * ```ts
+ * import { resolverZod } from '@kubb/plugin-zod'
  *
- * @example
- * `resolverZod.default('list pets', 'function')  // → 'listPetsSchema'`
+ * resolverZod.default('list pets', 'function') // 'listPetsSchema'
+ * resolverZod.resolveSchemaTypeName('pet')     // 'PetSchema'
+ * ```
  */
 export const resolverZod = defineResolver<PluginZod>(() => {
   return {

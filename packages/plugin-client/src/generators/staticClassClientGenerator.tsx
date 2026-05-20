@@ -38,6 +38,12 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
   return names.filter((n): n is string => Boolean(n))
 }
 
+/**
+ * Built-in `operations` generator for `@kubb/plugin-client` when
+ * `clientType: 'staticClass'`. Emits one class per tag, with a static method
+ * per operation so callers can use `Pet.getPetById(...)` without
+ * instantiating the class.
+ */
 export const staticClassClientGenerator = defineGenerator<PluginClient>({
   name: 'staticClassClient',
   renderer: jsxRendererSync,

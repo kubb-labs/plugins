@@ -3,12 +3,18 @@ import { defineResolver } from '@kubb/core'
 import type { PluginClient } from '../types.ts'
 
 /**
- * Naming convention resolver for client plugin.
+ * Default resolver used by `@kubb/plugin-client`. Decides the names and file
+ * paths for every generated client function or class. Functions and files use
+ * camelCase; classes and tag groups use PascalCase.
  *
- * Provides default naming helpers using camelCase for functions and file paths.
+ * @example Resolve client function and class names
+ * ```ts
+ * import { resolverClient } from '@kubb/plugin-client'
  *
- * @example
- * `resolverClient.default('list pets', 'function')  // → 'listPets'`
+ * resolverClient.default('list pets', 'function') // 'listPets'
+ * resolverClient.resolveClassName('pet')          // 'Pet'
+ * resolverClient.resolveUrlName(operationNode)    // 'getShowPetByIdUrl'
+ * ```
  */
 export const resolverClient = defineResolver<PluginClient>(() => ({
   name: 'default',
