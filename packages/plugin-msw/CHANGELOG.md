@@ -1,5 +1,13 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-faker@5.0.0-beta.23
+  - @kubb/plugin-ts@5.0.0-beta.23
+
 ## 5.0.0-beta.22
 
 ### Patch Changes

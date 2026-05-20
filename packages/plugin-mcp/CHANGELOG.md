@@ -1,5 +1,14 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- Updated dependencies [[`9de6534`](https://github.com/kubb-labs/plugins/commit/9de653476daefd588633ec4b12551c72b8c88965)]:
+  - @kubb/plugin-client@5.0.0-beta.23
+  - @kubb/plugin-ts@5.0.0-beta.23
+  - @kubb/plugin-zod@5.0.0-beta.23
+
 ## 5.0.0-beta.22
 
 ### Patch Changes

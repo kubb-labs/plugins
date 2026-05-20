@@ -1,5 +1,7 @@
 # @kubb/plugin-redoc
 
+## 5.0.0-beta.23
+
 ## 5.0.0-beta.22
 
 ### Patch Changes
