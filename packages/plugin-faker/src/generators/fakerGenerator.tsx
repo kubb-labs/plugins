@@ -131,7 +131,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       typeFile: tsResolver.resolveFile(
         {
           name: node.operationId,

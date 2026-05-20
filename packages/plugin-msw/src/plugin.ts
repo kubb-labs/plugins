@@ -40,7 +40,7 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
   return {
     name: pluginMswName,
     options,
-    dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverMsw, ...userResolver } : resolverMsw

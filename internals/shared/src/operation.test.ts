@@ -151,7 +151,7 @@ describe('response status helpers', () => {
 
   test('parses numeric status codes', () => {
     expect(getStatusCodeNumber('201')).toBe(201)
-    expect(getStatusCodeNumber('default')).toBeUndefined()
+    expect(getStatusCodeNumber('default')).toBeNull()
   })
 
   test('detects success and error status codes', () => {

@@ -63,8 +63,8 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     options.generators ??
     [
       clientType === 'staticClass' ? staticClassClientGenerator : clientType === 'class' ? classClientGenerator : clientGenerator,
-      group && clientType === 'function' ? groupedClientGenerator : undefined,
-      operations ? operationsGenerator : undefined,
+      group && clientType === 'function' ? groupedClientGenerator : null,
+      operations ? operationsGenerator : null,
     ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
   const groupConfig = group
@@ -84,7 +84,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
   return {
     name: pluginClientName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverClient, ...userResolver } : resolverClient

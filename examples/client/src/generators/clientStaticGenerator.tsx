@@ -26,28 +26,28 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
 
     const clientFile = resolver.resolveFile(
       { name: transformedNode.operationId, extname: '.ts', tag: transformedNode.tags[0] ?? 'default', path: transformedNode.path },
-      { root, output, group: ctx.options.group },
+      { root, output, group: ctx.options.group ?? undefined },
     )
 
     const typeFile = tsResolver.resolveFile(
       { name: transformedNode.operationId, extname: '.ts', tag: transformedNode.tags[0] ?? 'default', path: transformedNode.path },
-      { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+      { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
     )
 
-    const requestName = transformedNode.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(transformedNode) : undefined
+    const requestName = transformedNode.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(transformedNode) : null
     const responseName = tsResolver.resolveResponseName(transformedNode)
     const pathParamsName =
       transformedNode.parameters.filter((p) => p.in === 'path').length > 0
         ? tsResolver.resolvePathParamsName(transformedNode, transformedNode.parameters.filter((p) => p.in === 'path')[0]!)
-        : undefined
+        : null
     const queryParamsName =
       transformedNode.parameters.filter((p) => p.in === 'query').length > 0
         ? tsResolver.resolveQueryParamsName(transformedNode, transformedNode.parameters.filter((p) => p.in === 'query')[0]!)
-        : undefined
+        : null
     const headerParamsName =
       transformedNode.parameters.filter((p) => p.in === 'header').length > 0
         ? tsResolver.resolveHeaderParamsName(transformedNode, transformedNode.parameters.filter((p) => p.in === 'header')[0]!)
-        : undefined
+        : null
 
     const errorTypeNames = transformedNode.responses
       .filter((r) => {
@@ -93,7 +93,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
           node={transformedNode}
           tsResolver={tsResolver}
           parser={parser}
-          zodResolver={undefined}
+          zodResolver={null}
         />
         <File.Source>
           {`${name}.method = "${transformedNode.method}" as const

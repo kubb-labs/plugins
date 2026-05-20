@@ -14,7 +14,7 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
 }
 
 type Props = {
@@ -35,7 +35,7 @@ type GenerateMethodProps = {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
@@ -62,7 +62,7 @@ function generateMethod({
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const { header: headerParams } = getOperationParameters(node)
-  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : undefined
+  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
   const generics = buildGenerics(node, tsResolver)
   const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })

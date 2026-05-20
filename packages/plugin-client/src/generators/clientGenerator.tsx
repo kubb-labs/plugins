@@ -24,14 +24,14 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
 
     const importedZodNames =
       zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(
+        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
             (name): name is string => Boolean(name),
           )
         : []
@@ -39,7 +39,10 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const meta = {
       name: resolver.resolveName(node.operationId),
       urlName: resolver.resolveUrlName(node),
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
@@ -58,7 +61,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
                 group: pluginZod.options?.group ?? undefined,
               },
             )
-          : undefined,
+          : null,
     } as const
 
     const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false

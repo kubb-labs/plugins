@@ -104,7 +104,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const params = ast.caseParams(node.parameters, paramsCasing)
 
     const meta = {
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
     } as const
 
     // Build a set of schema names that are enums so the ref handler and getImports

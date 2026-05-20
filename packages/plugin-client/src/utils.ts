@@ -12,8 +12,8 @@ import type { PluginClient } from './types.ts'
  */
 export function buildHeaders(contentType: string, hasHeaderParams: boolean): Array<string> {
   return [
-    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
-    hasHeaderParams ? '...headers' : undefined,
+    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
+    hasHeaderParams ? '...headers' : null,
   ].filter(Boolean) as Array<string>
 }
 
@@ -73,8 +73,8 @@ export function buildClassClientParams({
           ? {
               value: JSON.stringify(baseURL),
             }
-          : undefined,
-        params: queryParamsName ? {} : undefined,
+          : null,
+        params: queryParamsName ? {} : null,
         data: requestName
           ? {
               value:
@@ -84,13 +84,13 @@ export function buildClassClientParams({
                     ? 'formData as FormData'
                     : 'requestData',
             }
-          : undefined,
-        contentType: isMultipleContentTypes ? {} : undefined,
+          : null,
+        contentType: isMultipleContentTypes ? {} : null,
         headers: headers.length
           ? {
               value: `{ ${headers.join(', ')}, ...requestConfig.headers }`,
             }
-          : undefined,
+          : null,
       },
     },
   })
@@ -107,7 +107,7 @@ export function buildRequestDataLine({
 }: {
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
 }): string {
   const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
   if (parser === 'zod' && zodRequestName) {
@@ -140,7 +140,7 @@ export function buildReturnStatement({
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
 }): string {
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
   if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {

@@ -65,7 +65,7 @@ function buildMutationParamsNode(
         type: ast.createParamsType({
           variant: 'reference',
           name: `{
-  mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'void', 'TContext'].join(', ')}> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'undefined', 'TContext'].join(', ')}> & { client?: QueryClient },
   client?: ${buildRequestConfigType(node, resolver)},
 }`,
         }),
@@ -100,7 +100,7 @@ export function Mutation({
   const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
 
-  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
+  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'undefined', 'TContext'].join(', ')
 
   const mutationKeyParamsNode = ast.createFunctionParameters({ params: [] })
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''

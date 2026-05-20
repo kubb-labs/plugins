@@ -132,7 +132,7 @@ export class URLPath {
   /**
    * Iterates over every `{param}` token in `path`, calling `fn` with the raw token and transformed name.
    */
-  #eachParam(fn: (raw: string, param: string) => void): void {
+  #eachParam(fn: (raw: string, param: string) => undefined): undefined {
     for (const match of this.path.matchAll(/\{([^}]+)\}/g)) {
       const raw = match[1]!
       fn(raw, this.#transformParam(raw))

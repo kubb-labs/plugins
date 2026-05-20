@@ -102,11 +102,11 @@ export function Client({
 
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const responseName = tsResolver.resolveResponseName(node)
-  const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : undefined
-  const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : undefined
+  const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
+  const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
 
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : undefined
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined
+  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
 
   const errorNames = node.responses
     .filter((r) => {
@@ -116,8 +116,8 @@ export function Client({
     .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
 
   const headers = [
-    !isMultipleContentTypes && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
-    headerParamsName ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : undefined,
+    !isMultipleContentTypes && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
+    headerParamsName ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : null,
   ].filter(Boolean)
 
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -158,8 +158,8 @@ export function Client({
             ? {
                 value: `\`${baseURL}\``,
               }
-            : undefined,
-        params: queryParamsName ? (queryParamsMapping ? { value: 'mappedParams' } : {}) : undefined,
+            : null,
+        params: queryParamsName ? (queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
         data: requestName
           ? {
               value:
@@ -169,18 +169,18 @@ export function Client({
                     ? 'formData as FormData'
                     : 'requestData',
             }
-          : undefined,
-        contentType: isConfigurable && isMultipleContentTypes ? {} : undefined,
+          : null,
+        contentType: isConfigurable && isMultipleContentTypes ? {} : null,
         requestConfig: isConfigurable
           ? {
               mode: 'inlineSpread',
             }
-          : undefined,
+          : null,
         headers: headers.length
           ? {
               value: isConfigurable ? `{ ${headers.join(', ')}, ...requestConfig.headers }` : `{ ${headers.join(', ')} }`,
             }
-          : undefined,
+          : null,
       },
     },
   })

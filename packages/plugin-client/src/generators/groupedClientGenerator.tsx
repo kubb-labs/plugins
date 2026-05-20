@@ -15,7 +15,7 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
       (acc, operationNode) => {
         if (group?.type === 'tag') {
           const tag = operationNode.tags[0]
-          const name = tag ? group?.name?.({ group: camelCase(tag) }) : undefined
+          const name = tag ? group?.name?.({ group: camelCase(tag) }) : null
 
           if (!tag || !name) {
             return acc

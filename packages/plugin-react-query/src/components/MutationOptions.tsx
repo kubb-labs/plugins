@@ -90,7 +90,7 @@ export function MutationOptions({
       <Function name={name} export params={paramsSignature} generics={['TContext = unknown']}>
         {`
       const mutationKey = ${mutationKeyName}()
-      return mutationOptions<${TData}, ${TError}, ${TRequest ? `{${TRequest}}` : 'void'}, TContext>({
+      return mutationOptions<${TData}, ${TError}, ${TRequest ? `{${TRequest}}` : 'undefined'}, TContext>({
         mutationKey,
         mutationFn: async(${hasMutationParams ? `{ ${argKeysStr} }` : '_'}) => {
           return ${clientName}(${clientCallStr})

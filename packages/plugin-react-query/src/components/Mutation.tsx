@@ -58,7 +58,7 @@ function buildMutationParamsNode(
     resolver,
   })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
-  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
+  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'undefined', 'TContext'].join(', ')
 
   return ast.createFunctionParameters({
     params: [
@@ -89,7 +89,7 @@ export function Mutation({ name, mutationOptionsName, paramsCasing, dataReturnTy
     resolver: tsResolver,
   })
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
-  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'void', 'TContext'].join(', ')
+  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'undefined', 'TContext'].join(', ')
   const returnType = `UseMutationResult<${generics}>`
 
   const mutationOptionsConfigNode = buildMutationConfigParamsNode(node, tsResolver)

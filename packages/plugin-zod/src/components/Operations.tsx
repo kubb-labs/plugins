@@ -4,11 +4,11 @@ import { Const, File, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
 type SchemaNames = {
-  request: string | undefined
+  request: string | null
   parameters: {
-    path: string | undefined
-    query: string | undefined
-    header: string | undefined
+    path: string | null
+    query: string | null
+    header: string | null
   }
   responses: { default?: string } & Record<number | string, string>
   errors: Record<number | string, string>

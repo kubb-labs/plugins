@@ -43,13 +43,13 @@ type Props = {
       /**
        * Query params — individual schemas to compose into `z.object({ ... })`.
        */
-      queryParams?: string | Array<ZodParam>
+      queryParams?: string | Array<ZodParam> | null
       /**
        * Header params — individual schemas to compose into `z.object({ ... })`.
        */
-      headerParams?: string | Array<ZodParam>
-      requestName?: string
-      responseName?: string
+      headerParams?: string | Array<ZodParam> | null
+      requestName?: string | null
+      responseName?: string | null
     }
     node: ast.OperationNode
   }>
@@ -104,10 +104,10 @@ export function Server({ name, serverName, serverVersion, paramsCasing, operatio
                   }),
                 ],
               })
-            : undefined
+            : null
 
           const destructured = paramsNode ? (keysPrinter.print(paramsNode) ?? '') : ''
-          const inputSchema = entries.length ? `{ ${entries.map((e) => `${e.key}: ${e.value}`).join(', ')} }` : undefined
+          const inputSchema = entries.length ? `{ ${entries.map((e) => `${e.key}: ${e.value}`).join(', ')} }` : null
           const outputSchema = zod.responseName
 
           const config = [
