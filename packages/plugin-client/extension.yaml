@@ -5,15 +5,15 @@ name: Client
 description: Generate type-safe HTTP clients (axios or fetch) from OpenAPI — one async function per operation, fully typed end to end.
 category: client
 type: official
-npmPackage: "@kubb/plugin-client"
+npmPackage: '@kubb/plugin-client'
 docsPath: /plugins/plugin-client
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: ">=5.0.0"
-  node: ">=22"
+  kubb: '>=5.0.0'
+  node: '>=22'
 tags:
   - api-client
   - axios
@@ -175,7 +175,7 @@ options:
                   └── storeController/
                       ├── index.ts
                       └── Store.ts
-          - name: "false"
+          - name: 'false'
             files:
               - name: kubb.config.ts
                 lang: typescript
@@ -200,7 +200,7 @@ options:
                   # No index.ts is generated for this plugin.
                   # Its files are also excluded from the root index.ts.
       - name: banner
-        type: "string | ((node: RootNode) => string)"
+        type: 'string | ((node: RootNode) => string)'
         required: false
         description: |
           Text prepended to every generated file. Useful for license headers, lint disables, or `@ts-nocheck` directives.
@@ -258,7 +258,7 @@ options:
                     ],
                   })
       - name: footer
-        type: "string | ((node: RootNode) => string)"
+        type: 'string | ((node: RootNode) => string)'
         required: false
         description: |
           Text appended at the end of every generated file. The mirror of `banner` — use it for closing comments, re-enabling lint rules, or marker lines.
@@ -289,7 +289,7 @@ options:
       - name: override
         type: boolean
         required: false
-        default: "false"
+        default: 'false'
         description: |
           Allows the plugin to overwrite hand-written files that share a name with a generated file.
 
@@ -393,7 +393,7 @@ options:
         note: |
           `Required: true*` is conditional — only required when the parent `group` option is used. `group` itself stays optional.
       - name: name
-        type: "(context: GroupContext) => string"
+        type: '(context: GroupContext) => string'
         required: false
         default: (ctx) => `${ctx.group}Controller`
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
@@ -505,7 +505,7 @@ options:
   - name: operations
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: |
       Emits an `operations.ts` file that re-exports every generated function grouped by HTTP method. Useful for building meta-tooling (route registries, API explorers) on top of the generated code.
   - name: dataReturnType
@@ -557,7 +557,7 @@ options:
   - name: urlType
     type: "'export' | false"
     required: false
-    default: "false"
+    default: 'false'
     description: |
       Controls whether the URL builder helpers (`get<Operation>Url`) are exported alongside each client function.
 
@@ -896,7 +896,7 @@ options:
               const petClient = new Pet()
               const pet = await petClient.getPetById({ petId: 1 })
   - name: wrapper
-    type: "{ className: string }"
+    type: '{ className: string }'
     required: false
     description: |
       Generates a single top-level class that composes the per-tag client classes into one entry point. Only meaningful when `clientType: 'class'` (or `'staticClass'`) and `group: { type: 'tag' }` are also set.
@@ -964,7 +964,7 @@ options:
   - name: bundle
     type: boolean
     required: false
-    default: "false"
+    default: 'false'
     description: |
       Copies the HTTP client runtime into the generated output, so the consuming app does not need `@kubb/plugin-client` installed at runtime.
 
