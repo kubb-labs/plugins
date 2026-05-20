@@ -7,7 +7,7 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { resolver, config, root, inputNode } = ctx
+    const { resolver, config, root } = ctx
     const { output, group } = ctx.options
 
     const handlersName = resolver.resolveHandlersName()
@@ -30,8 +30,8 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         baseName={file.baseName}
         path={file.path}
         meta={file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         {imports}
         <Handlers name={handlersName} handlers={handlers} />

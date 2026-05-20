@@ -35,8 +35,8 @@ export const config = {
       output: {
         path: 'models',
         barrel: { type: 'named' },
-        banner(oas) {
-          return `// version: ${oas?.meta?.version || 'unknown'}`
+        banner(meta) {
+          return `// version: ${meta?.version || 'unknown'}`
         },
       },
     }),

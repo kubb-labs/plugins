@@ -9,7 +9,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
   renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { config, resolver, driver, root, inputNode } = ctx
+    const { config, resolver, driver, root } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -40,8 +40,8 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <Request

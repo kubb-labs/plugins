@@ -1,5 +1,27 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync between core with same version
+
+- Updated dependencies [[`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b)]:
+  - @kubb/plugin-client@5.0.0-beta.22
+  - @kubb/plugin-ts@5.0.0-beta.22
+  - @kubb/plugin-zod@5.0.0-beta.22
+
+## 5.0.0-beta.15
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
+- Updated dependencies [[`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f)]:
+  - @kubb/plugin-client@5.0.0-beta.15
+  - @kubb/plugin-ts@5.0.0-beta.15
+  - @kubb/plugin-zod@5.0.0-beta.15
+
 ## 5.0.0-beta.10
 
 ### Patch Changes

@@ -158,21 +158,14 @@ export function lengthChecksMini({ min, max, pattern }: LengthConstraints): stri
  * to a schema value string using the chainable Zod v4 API.
  */
 export function applyModifiers({ value, nullable, optional, nullish, defaultValue, description }: ModifierOptions): string {
-  let result = value
-  if (nullish || (nullable && optional)) {
-    result = `${result}.nullish()`
-  } else if (optional) {
-    result = `${result}.optional()`
-  } else if (nullable) {
-    result = `${result}.nullable()`
-  }
-  if (defaultValue !== undefined) {
-    result = `${result}.default(${formatDefault(defaultValue)})`
-  }
-  if (description) {
-    result = `${result}.describe(${stringify(description)})`
-  }
-  return result
+  const withModifier = (() => {
+    if (nullish || (nullable && optional)) return `${value}.nullish()`
+    if (optional) return `${value}.optional()`
+    if (nullable) return `${value}.nullable()`
+    return value
+  })()
+  const withDefault = defaultValue !== undefined ? `${withModifier}.default(${formatDefault(defaultValue)})` : withModifier
+  return description ? `${withDefault}.describe(${stringify(description)})` : withDefault
 }
 
 /**
@@ -180,21 +173,12 @@ export function applyModifiers({ value, nullable, optional, nullish, defaultValu
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).
  */
 export function applyMiniModifiers({ value, nullable, optional, nullish, defaultValue }: Omit<ModifierOptions, 'description'>): string {
-  let result = value
-  if (nullish) {
-    result = `z.nullish(${result})`
-  } else {
-    if (nullable) {
-      result = `z.nullable(${result})`
-    }
-    if (optional) {
-      result = `z.optional(${result})`
-    }
-  }
-  if (defaultValue !== undefined) {
-    result = `z._default(${result}, ${formatDefault(defaultValue)})`
-  }
-  return result
+  const withModifier = (() => {
+    if (nullish) return `z.nullish(${value})`
+    const withNullable = nullable ? `z.nullable(${value})` : value
+    return optional ? `z.optional(${withNullable})` : withNullable
+  })()
+  return defaultValue !== undefined ? `z._default(${withModifier}, ${formatDefault(defaultValue)})` : withModifier
 }
 
 type BuildGroupedParamsSchemaOptions = {

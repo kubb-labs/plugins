@@ -22,43 +22,27 @@ export function zodGroupExpr(entry: string | Array<ZodParam>): string {
  * Used as fallback when no named zod schema is available for a path parameter.
  */
 export function zodExprFromSchemaNode(schema: ast.SchemaNode): string {
-  let expr: string
-  switch (schema.type) {
-    case 'enum': {
-      // namedEnumValues takes priority over enumValues
+  const baseExpr = (() => {
+    if (schema.type === 'enum') {
       const rawValues: Array<string | number | boolean> = schema.namedEnumValues?.length
         ? schema.namedEnumValues.map((v) => v.value)
         : (schema.enumValues ?? []).filter((v): v is string | number | boolean => v !== null)
 
       if (rawValues.length > 0 && rawValues.every((v) => typeof v === 'string')) {
-        expr = `z.enum([${rawValues.map((v) => JSON.stringify(v)).join(', ')}])`
-      } else if (rawValues.length > 0) {
-        const literals = rawValues.map((v) => `z.literal(${JSON.stringify(v)})`)
-        expr = literals.length === 1 ? literals[0]! : `z.union([${literals.join(', ')}])`
-      } else {
-        expr = 'z.string()'
+        return `z.enum([${rawValues.map((v) => JSON.stringify(v)).join(', ')}])`
       }
-      break
+      if (rawValues.length > 0) {
+        const literals = rawValues.map((v) => `z.literal(${JSON.stringify(v)})`)
+        return literals.length === 1 ? literals[0]! : `z.union([${literals.join(', ')}])`
+      }
+      return 'z.string()'
     }
-    case 'integer':
-      expr = 'z.coerce.number()'
-      break
-    case 'number':
-      expr = 'z.number()'
-      break
-    case 'boolean':
-      expr = 'z.boolean()'
-      break
-    case 'array':
-      expr = 'z.array(z.unknown())'
-      break
-    default:
-      expr = 'z.string()'
-  }
+    if (schema.type === 'integer') return 'z.coerce.number()'
+    if (schema.type === 'number') return 'z.number()'
+    if (schema.type === 'boolean') return 'z.boolean()'
+    if (schema.type === 'array') return 'z.array(z.unknown())'
+    return 'z.string()'
+  })()
 
-  if (schema.nullable) {
-    expr = `${expr}.nullable()`
-  }
-
-  return expr
+  return schema.nullable ? `${baseExpr}.nullable()` : baseExpr
 }

@@ -247,22 +247,8 @@
               },
               responses: {
                 405: {
-                  content: {
-                    'application/json': {
-                      schema: {
-                        properties: {
-                          code: {
-                            format: 'int32',
-                            type: 'integer',
-                          },
-                          message: {
-                            type: 'string',
-                          },
-                        },
-                      },
-                    },
-                  },
-                  description: 'Pet not found',
+                  description: 'Invalid input',
+                  $ref: '#/components/responses/PetNotFound',
                 },
                 default: {
                   description: 'Successful operation',

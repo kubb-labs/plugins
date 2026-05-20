@@ -7,7 +7,7 @@ export const operationsGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { config, resolver, root, inputNode } = ctx
+    const { config, resolver, root } = ctx
     const { output, group } = ctx.options
 
     const name = 'operations'
@@ -18,8 +18,8 @@ export const operationsGenerator = defineGenerator<PluginClient>({
         baseName={file.baseName}
         path={file.path}
         meta={file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         <Operations name={name} nodes={nodes} />
       </File>

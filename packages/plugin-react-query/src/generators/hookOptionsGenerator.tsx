@@ -13,7 +13,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { resolver, config, root, inputNode } = ctx
+    const { resolver, config, root } = ctx
     const { output, customOptions, query, mutation, suspense, infinite, group, override } = ctx.options
 
     if (!customOptions) return null
@@ -116,8 +116,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         baseName={hookOptionsFile.baseName}
         path={hookOptionsFile.path}
         meta={hookOptionsFile.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         {imports}
         <File.Source name={name} isExportable isIndexable isTypeOnly>

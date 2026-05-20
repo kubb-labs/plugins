@@ -148,7 +148,7 @@ describe('printerTs', () => {
     it('ref without name returns undefined', () => {
       const result = printer.transform(ast.createSchema({ type: 'ref' }))
 
-      expect(result).toBeUndefined()
+      expect(result).toBeNull()
     })
 
     it('ref with $ref path uses canonical name from path, not node.name (Bug 1: allOf name override)', async () => {

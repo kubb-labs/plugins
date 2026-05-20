@@ -89,7 +89,7 @@ export type PrinterTsOptions = {
    * Properties to exclude using `Omit<Type, Keys>`.
    * Forces type alias syntax regardless of `syntaxType` setting.
    */
-  keysToOmit?: Array<string>
+  keysToOmit?: Array<string> | null
   /**
    * Transforms raw schema names into valid TypeScript identifiers.
    */
@@ -167,7 +167,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
       time: factory.dateOrStringNode,
       ref(node) {
         if (!node.name) {
-          return undefined
+          return null
         }
         // Parser-generated refs (with $ref) carry raw schema names that need resolving.
         // Use the canonical name from the $ref path — node.name may have been overridden
@@ -236,15 +236,15 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         return factory.createUnionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(members, this.transform) }) ?? undefined
       },
       intersection(node) {
-        return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) }) ?? undefined
+        return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) }) ?? null
       },
       array(node) {
         const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(isNonNullable)
 
-        return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType }) ?? undefined
+        return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType }) ?? null
       },
       tuple(node) {
-        return factory.buildTupleNode(node, this.transform)
+        return factory.buildTupleNode(node, this.transform) ?? null
       },
       object(node) {
         const { transform, options } = this
@@ -279,36 +279,33 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
     print(node) {
       const { name, syntaxType = 'type', description, keysToOmit } = this.options
 
-      let base = this.transform(node)
-      if (!base) return null
+      const transformed = this.transform(node)
+      if (!transformed) return null
 
       // For ref nodes, structural metadata lives on node.schema rather than the ref node itself.
       const meta = ast.syncSchemaRef(node)
 
       // Without name, apply modifiers inline and return.
       if (!name) {
-        if (meta.nullable) {
-          base = factory.createUnionDeclaration({ nodes: [base, factory.keywordTypeNodes.null] })
-        }
-        if ((meta.nullish || meta.optional) && addsUndefined) {
-          base = factory.createUnionDeclaration({ nodes: [base, factory.keywordTypeNodes.undefined] })
-        }
-        return safePrint(base)
+        const withNullable = meta.nullable ? factory.createUnionDeclaration({ nodes: [transformed, factory.keywordTypeNodes.null] }) : transformed
+        const result =
+          (meta.nullish || meta.optional) && addsUndefined
+            ? factory.createUnionDeclaration({ nodes: [withNullable, factory.keywordTypeNodes.undefined] })
+            : withNullable
+        return safePrint(result)
       }
 
       // When keysToOmit is present, wrap with Omit first, then apply nullable/optional
       // modifiers so they are not swallowed by NonNullable inside createOmitDeclaration.
-      let inner: ts.TypeNode = keysToOmit?.length ? factory.createOmitDeclaration({ keys: keysToOmit, type: base, nonNullable: true }) : base
-
-      if (meta.nullable) {
-        inner = factory.createUnionDeclaration({ nodes: [inner, factory.keywordTypeNodes.null] })
-      }
-
-      // For named type declarations (type aliases), optional/nullish always produces | undefined
-      // regardless of optionalType — the questionToken ? modifier only applies to object properties.
-      if (meta.nullish || meta.optional) {
-        inner = factory.createUnionDeclaration({ nodes: [inner, factory.keywordTypeNodes.undefined] })
-      }
+      const inner = (() => {
+        const omitted: ts.TypeNode = keysToOmit?.length
+          ? factory.createOmitDeclaration({ keys: keysToOmit, type: transformed, nonNullable: true })
+          : transformed
+        const withNullable = meta.nullable ? factory.createUnionDeclaration({ nodes: [omitted, factory.keywordTypeNodes.null] }) : omitted
+        // For named type declarations (type aliases), optional/nullish always produces | undefined
+        // regardless of optionalType — the questionToken ? modifier only applies to object properties.
+        return meta.nullish || meta.optional ? factory.createUnionDeclaration({ nodes: [withNullable, factory.keywordTypeNodes.undefined] }) : withNullable
+      })()
 
       const useTypeGeneration = syntaxType === 'type' || inner.kind === factory.syntaxKind.union || !!keysToOmit?.length
 

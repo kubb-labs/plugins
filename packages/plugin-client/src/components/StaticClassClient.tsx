@@ -22,7 +22,7 @@ type Props = {
   isExportable?: boolean
   isIndexable?: boolean
   operations: Array<OperationData>
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
@@ -36,7 +36,7 @@ type GenerateMethodProps = {
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   paramsType: PluginClient['resolvedOptions']['paramsType']
