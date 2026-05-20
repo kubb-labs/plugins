@@ -106,9 +106,6 @@ options:
   - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginClient>>'
 
-  - extends: ./_shared/core/transformer.yaml
-    name: transformers
-
   - name: resolver
     type: 'Partial<ResolverClient> & ThisType<ResolverClient>'
     required: false
