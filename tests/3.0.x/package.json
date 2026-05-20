@@ -1,6 +1,6 @@
 {
   "name": "tests-3.0.x",
-  "version": "0.0.1-beta.8",
+  "version": "0.0.1-beta.9",
   "private": true,
   "description": "Integration tests for OpenAPI 3.0.x",
   "repository": {
