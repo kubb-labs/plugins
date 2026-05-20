@@ -5,33 +5,115 @@ name: barrel
 type: "{ type: 'named' | 'all', nested?: boolean } | false"
 required: false
 default: "{ type: 'named' }"
-description: "Configure barrel file export strategy. Use `type` to control named vs. wildcard exports; set `nested: true` to generate hierarchical barrels in subdirectories."
+description: |
+  Controls how the generated `index.ts` (barrel) file re-exports the plugin's output.
 
+  - `{ type: 'named' }` re-exports each symbol by name. Best for tree-shaking and explicit imports.
+  - `{ type: 'all' }` uses `export *`. Smaller barrel file, but exports everything.
+  - `{ nested: true }` creates a barrel in every subdirectory, so callers can import from any depth.
+  - `false` skips the barrel entirely. The plugin's files are also excluded from the root `index.ts`.
+tip: |
+  Pick `'named'` when consumers care about which symbols they import (better tree-shaking, friendlier auto-import). Pick `'all'` when the file count is small and you want a one-line barrel.
 examples:
-  - name: all
+  - name: "'named' (default)"
     files:
-      - lang: typescript
-        code: |
-          export * from './gen/petService.ts'
+      - name: kubb.config.ts
+        lang: typescript
         twoslash: false
-  - name: named
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { barrel: { type: 'named' } },
+              }),
+            ],
+          })
+      - name: src/gen/types/index.ts
+        lang: typescript
+        twoslash: false
+        code: |
+          export { Pet, PetStatus } from './Pet'
+          export { Store } from './Store'
+  - name: "'all'"
     files:
-      - lang: typescript
-        code: |
-          export { PetService } from './gen/petService.ts'
+      - name: kubb.config.ts
+        lang: typescript
         twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { barrel: { type: 'all' } },
+              }),
+            ],
+          })
+      - name: src/gen/types/index.ts
+        lang: typescript
+        twoslash: false
+        code: |
+          export * from './Pet'
+          export * from './Store'
   - name: nested
     files:
       - name: kubb.config.ts
         lang: typescript
-        code: |
-          output: {
-            path: './gen',
-            barrel: { type: 'named', nested: true },
-          }
         twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { barrel: { type: 'named', nested: true } },
+              }),
+            ],
+          })
+      - name: Generated tree
+        lang: text
+        twoslash: false
+        code: |
+          src/gen/types/
+          ├── index.ts          # re-exports ./petController and ./storeController
+          ├── petController/
+          │   ├── index.ts      # re-exports Pet, Store, ...
+          │   └── Pet.ts
+          └── storeController/
+              ├── index.ts
+              └── Store.ts
   - name: 'false'
     files:
-      - lang: typescript
-        code: ''
+      - name: kubb.config.ts
+        lang: typescript
         twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { barrel: false },
+              }),
+            ],
+          })
+      - name: Result
+        lang: text
+        twoslash: false
+        code: |
+          # No index.ts is generated for this plugin.
+          # Its files are also excluded from the root index.ts.

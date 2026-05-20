@@ -46,9 +46,10 @@ export type ResolverClient = Resolver & {
 export type ClientImportPath =
   | {
       /**
-       * Which client should be used to do the HTTP calls.
-       * - 'axios' uses axios client for HTTP requests.
-       * - 'fetch' uses native fetch API for HTTP requests.
+       * HTTP client used by the generated code.
+       * - `'axios'` — imports from `@kubb/plugin-client/clients/axios`. Requires `axios` at runtime.
+       * - `'fetch'` — imports from `@kubb/plugin-client/clients/fetch`. Uses the global `fetch`.
+       *
        * @default 'axios'
        */
       client?: 'axios' | 'fetch'
@@ -57,9 +58,12 @@ export type ClientImportPath =
   | {
       client?: never
       /**
-       * Client import path for API calls.
-       * Used as `import client from '${importPath}'`.
-       * Accepts relative and absolute paths; path changes are not performed.
+       * Path to a custom client module. Generated files import their HTTP runtime from here
+       * instead of `@kubb/plugin-client/clients/{client}`. Accepts both relative paths and
+       * bare module specifiers; the value is used as-is.
+       *
+       * @note When combined with a query plugin, the module must export `Client`,
+       * `RequestConfig`, and `ResponseErrorConfig` types.
        */
       importPath: string
       /**
@@ -81,29 +85,28 @@ export type ClientImportPath =
 type ParamsTypeOptions =
   | {
       /**
-       * All parameters — path, query, headers, and body — are merged into a single
+       * Every operation parameter (path, query, headers, body) is wrapped in a single
        * destructured object argument.
-       * - 'object' returns the params and pathParams as an object.
-       * @default 'inline'
        */
       paramsType: 'object'
       /**
        * `pathParamsType` has no effect when `paramsType` is `'object'`.
-       * Path params are already inside the single destructured object.
+       * Path params already live inside the single destructured object.
        */
       pathParamsType?: never
     }
   | {
       /**
-       * Each parameter group is emitted as a separate function argument.
-       * - 'inline' returns the params as comma separated params.
+       * Each parameter group is emitted as a separate positional function argument.
+       *
        * @default 'inline'
        */
       paramsType?: 'inline'
       /**
-       * Controls how path parameters are arranged within the inline argument list.
-       * - 'object' groups path params into a destructured object: `{ petId }: PathParams`.
-       * - 'inline' emits each path param as its own argument: `petId: string`.
+       * How URL path parameters are arranged inside the inline argument list.
+       * - `'object'` groups them into one destructured object: `{ petId }: PathParams`.
+       * - `'inline'` emits each path param as its own argument: `petId: string`.
+       *
        * @default 'inline'
        */
       pathParamsType?: 'object' | 'inline'
@@ -111,87 +114,96 @@ type ParamsTypeOptions =
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output.
-   * @default { path: 'clients', barrelType: 'named' }
+   * Where the generated client files are written and how they are exported.
+   *
+   * @default { path: 'clients', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Group the clients based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Create `operations.ts` file with all operations grouped by methods.
+   * Emit an `operations.ts` file that re-exports every generated function grouped by HTTP method.
+   *
    * @default false
    */
   operations?: boolean
   /**
-   * Export urls that are used by operation x.
-   * - 'export' makes them part of your barrel file.
-   * - false does not make them exportable.
+   * Whether to also export the URL builder helpers (`get<Operation>Url`).
+   * - `'export'` exposes them via the barrel.
+   * - `false` keeps them private.
+   *
    * @default false
-   * @example getGetPetByIdUrl
    */
   urlType?: 'export' | false
   /**
-   * Allows you to set a custom base url for all generated calls.
+   * Base URL prepended to every request. When omitted, falls back to the adapter's
+   * server URL (typically `servers[0].url`).
    */
   baseURL?: string
   /**
-   * ReturnType that is used when calling the client.
-   * - 'data' returns ResponseConfig[data].
-   * - 'full' returns ResponseConfig.
+   * Shape of the value returned by each generated client function.
+   * - `'data'` — only the response body.
+   * - `'full'` — the full response config (body, status, headers, request).
+   *
    * @default 'data'
    */
   dataReturnType?: 'data' | 'full'
   /**
-   * How to style your params, by default no casing is applied.
-   * - 'camelcase' uses camelCase for pathParams, queryParams and headerParams names
-   * @note response types (data/body) are not affected by this option
+   * Rename parameter properties in the generated client (path, query, headers).
+   * The HTTP request still uses the original spec names — Kubb writes the mapping for you.
+   *
+   * @note Use the same value on `@kubb/plugin-ts` so types stay compatible.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Which parser can be used before returning the data.
-   * - 'client' returns the data as-is from the client.
-   * - 'zod' uses @kubb/plugin-zod to parse the data.
+   * Validator applied to response bodies before they are returned to the caller.
+   * - `'client'` — no validation. Trusts the API.
+   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
+   *
    * @default 'client'
    */
   parser?: 'client' | 'zod'
   /**
-   * How to generate the client code.
-   * - 'function' generates standalone functions for each operation.
-   * - 'class' generates a class with methods for each operation.
-   * - 'staticClass' generates a class with static methods for each operation.
+   * Shape of the generated client.
+   * - `'function'` — one standalone async function per operation.
+   * - `'class'` — one class per tag with instance methods.
+   * - `'staticClass'` — one class per tag with static methods.
+   *
    * @default 'function'
+   * @note Only `'function'` is compatible with query plugins.
    */
   clientType?: 'function' | 'class' | 'staticClass'
   /**
-   * Bundle the selected client into the generated `.kubb` directory.
-   * When disabled the generated clients will import the shared runtime from `@kubb/plugin-client/clients/*`.
+   * Copy the HTTP client runtime into the generated output so consumers do not need
+   * `@kubb/plugin-client` at runtime. When `false`, generated files import from
+   * `@kubb/plugin-client/clients/{client}`.
+   *
    * @default false
-   * In version 5 of Kubb this is by default true
    */
   bundle?: boolean
   /**
-   * Generate an SDK facade class that composes all tag-based client classes into a single entry point.
-   * Setting this option automatically enables `clientType: 'class'`.
+   * Generate a single SDK class composing every tag-based client into one entry point.
+   * Automatically enables `clientType: 'class'`.
+   *
    * @example
    * ```ts
    * pluginClient({
    *   sdk: { className: 'PetStoreSDK' },
    * })
-   * // Generates a class with a shared constructor config and one property per tag:
    * // class PetStoreSDK {
    * //   readonly petController: petController
    * //   readonly storeController: storeController
@@ -201,22 +213,23 @@ export type Options = {
    */
   sdk?: {
     /**
-     * Name of the generated SDK facade class.
+     * Name of the generated SDK facade class. Also the file name.
      */
     className: string
   }
   /**
-   * Override individual resolver methods. Any method you omit falls back to the
-   * preset resolver's implementation. Use `this.default(...)` to call it.
+   * Override how names and file paths are built for the generated client.
+   * Methods you omit fall back to the default resolver. `this` is bound to the
+   * full resolver, so `this.default(name)` delegates to the built-in implementation.
    */
   resolver?: Partial<ResolverClient> & ThisType<ResolverClient>
   /**
-   * Single AST visitor applied to each node before printing.
-   * Return `null` or `undefined` from a method to leave the node unchanged.
+   * AST visitor applied to each operation node before code is printed.
+   * Return `null` or `undefined` to leave the node unchanged.
    */
   transformer?: ast.Visitor
   /**
-   * Define some generators next to the client generators.
+   * Custom generators that run alongside the built-in client generators.
    */
   generators?: Array<Generator<PluginClient>>
 } & ClientImportPath &

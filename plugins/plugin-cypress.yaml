@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-cypress
 name: Cypress
-description: Generate Cypress end-to-end tests from OpenAPI specifications.
+description: Generate typed `cy.request()` wrappers from OpenAPI so end-to-end tests reuse one source of truth for API calls.
 category: testing
 type: official
 npmPackage: '@kubb/plugin-cypress'
@@ -36,14 +36,16 @@ icon:
 intro: |
   # @kubb/plugin-cypress
 
-  Generate typed `cy.request()` wrappers from your OpenAPI schema. Each API operation becomes a reusable function you can call in Cypress tests, with full TypeScript support.
+  Generate one typed `cy.request()` wrapper per OpenAPI operation. Each helper has typed path params, body, query, and a typed response — so failing API calls in Cypress show up at compile time instead of inside the test runner.
+
+  Use these helpers in `before`/`beforeEach` hooks to seed data, in custom commands, or in API-only test specs.
 
 options:
   - name: output
     type: Output
     required: false
     default: "{ path: 'cypress', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated Cypress helpers are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'cypress'"
@@ -68,7 +70,7 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Requests`"
-        description: Return the name of a group based on the group name. This is used for file and identifier generation.
+        description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - extends: ./_shared/core/include.yaml
   - extends: ./_shared/core/exclude.yaml
@@ -82,25 +84,22 @@ examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginTs } from '@kubb/plugin-ts'
           import { pluginCypress } from '@kubb/plugin-cypress'
 
           export default defineConfig({
-            input: {
-              path: './petStore.yaml',
-            },
-            output: {
-              path: './src/gen',
-            },
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
             plugins: [
               pluginTs(),
               pluginCypress({
                 output: {
                   path: './cypress',
                   barrel: { type: 'named' },
-                  banner: '/* eslint-disable no-alert, no-console */',
+                  banner: '/* eslint-disable */',
                 },
                 group: {
                   type: 'tag',
@@ -109,4 +108,18 @@ examples:
               }),
             ],
           })
+  - name: Using a generated helper
+    files:
+      - lang: typescript
         twoslash: false
+        code: |
+          import { getPetByIdRequest } from '../gen/cypress/petRequests'
+
+          describe('Pet API', () => {
+            it('returns the pet by id', () => {
+              getPetByIdRequest(1).then((response) => {
+                expect(response.status).to.eq(200)
+                expect(response.body.id).to.eq(1)
+              })
+            })
+          })

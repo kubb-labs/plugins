@@ -23,21 +23,23 @@ export type ResolverCypress = Resolver & {
 type ParamsTypeOptions =
   | {
       /**
-       * All parameters merged into a single destructured object.
+       * Every operation parameter is wrapped in a single destructured object argument.
        */
       paramsType: 'object'
       /**
-       * Not applicable when all parameters are merged into a single object.
+       * `pathParamsType` has no effect when `paramsType` is `'object'`.
        */
       pathParamsType?: never
     }
   | {
       /**
-       * Each parameter group emitted as a separate function argument.
+       * Each parameter group is emitted as a separate positional function argument.
        */
       paramsType?: 'inline'
       /**
-       * How path parameters are arranged: grouped in an object or spread inline.
+       * How URL path parameters are arranged inside the inline argument list.
+       * - `'object'` groups them into one destructured object.
+       * - `'inline'` emits each path param as its own argument.
        *
        * @default 'inline'
        */
@@ -46,50 +48,56 @@ type ParamsTypeOptions =
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output.
-   * @default { path: 'cypress', barrelType: 'named' }
+   * Where the generated Cypress helpers are written and how they are exported.
+   *
+   * @default { path: 'cypress', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Return type when calling cy.request: response data only or full response.
+   * Shape of the value returned from each helper.
+   * - `'data'` — only the response body.
+   * - `'full'` — the full Cypress response object (headers, status, body).
    *
    * @default 'data'
    */
   dataReturnType?: 'data' | 'full'
   /**
-   * Apply casing to parameter names.
+   * Rename parameter properties in the generated helpers (path, query, headers).
+   *
+   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Base URL prepended to every generated request URL.
+   * Base URL prepended to every request URL. When omitted, falls back to the
+   * adapter's server URL (typically `servers[0].url`).
    */
   baseURL?: string
   /**
-   * Group the Cypress requests based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Override naming conventions for function names and types.
+   * Override how helper names and file paths are built.
    */
   resolver?: Partial<ResolverCypress> & ThisType<ResolverCypress>
   /**
-   * AST visitor to transform generated nodes.
+   * AST visitor applied to each operation node before printing.
    */
   transformer?: ast.Visitor
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in Cypress generators.
    */
   generators?: Array<Generator<PluginCypress>>
 } & ParamsTypeOptions

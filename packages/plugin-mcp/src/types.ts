@@ -24,44 +24,50 @@ export type ResolverMcp = Resolver & {
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output.
-   * @default { path: 'mcp', barrelType: 'named' }
+   * Where the generated MCP tool handlers are written and how they are exported.
+   *
+   * @default { path: 'mcp', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Client configuration for HTTP request generation.
+   * HTTP client used by each MCP handler to call the underlying API. Mirrors a
+   * subset of `pluginClient` options.
    */
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
-   * Apply casing to parameter names to match your configuration.
+   * Rename parameter properties in the generated handlers. The HTTP layer still
+   * uses the original spec names — Kubb writes the mapping for you.
+   *
+   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Group the MCP requests based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Override naming conventions for function names and types.
+   * Override how handler names and file paths are built. Methods you omit fall
+   * back to the default `resolverMcp`.
    */
   resolver?: Partial<ResolverMcp> & ThisType<ResolverMcp>
   /**
-   * AST visitor to transform generated nodes.
+   * AST visitor applied to each operation node before printing.
    */
   transformer?: ast.Visitor
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in MCP generators.
    */
   generators?: Array<Generator<PluginMcp>>
 }

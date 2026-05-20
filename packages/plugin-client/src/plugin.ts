@@ -16,20 +16,33 @@ import { source as configSource } from './templates/config.source.ts'
 import type { PluginClient } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-client`, used in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-client`. Used for driver lookups and
+ * cross-plugin dependency references.
  */
 export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 
 /**
- * Generates type-safe HTTP client functions or classes from an OpenAPI specification.
- * Creates client APIs by walking operations and delegating to generators.
- * Writes barrel files based on the configured `barrelType`.
+ * Generates one HTTP client function per OpenAPI operation. Each function has
+ * typed path params, query params, body, and response — call the API like any
+ * other typed function. Ships with `axios` and `fetch` runtimes; bring your own
+ * by setting `importPath`.
  *
- * @example Client generator
+ * @example
  * ```ts
- * import pluginClient from '@kubb/plugin-client'
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginClient } from '@kubb/plugin-client'
+ *
  * export default defineConfig({
- *   plugins: [pluginClient({ output: { path: 'clients' } })]
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginClient({
+ *       output: { path: './clients' },
+ *       client: 'fetch',
+ *     }),
+ *   ],
  * })
  * ```
  */

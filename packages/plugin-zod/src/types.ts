@@ -75,85 +75,106 @@ export type ResolverZod = Resolver &
 
 export type Options = {
   /**
-   * @default 'zod'
+   * Where the generated Zod schemas are written and how they are exported.
+   *
+   * @default { path: 'zod', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Group the Zod schemas based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Import path for Zod package.
+   * Module specifier used in the `import { z } from '...'` statement.
+   * Use `'zod/mini'` for the tree-shakeable bundle.
    *
    * @default 'zod'
    */
   importPath?: 'zod' | 'zod/mini' | (string & {})
   /**
-   * Add TypeScript type annotations to generated schemas.
+   * Tie each Zod schema to its TypeScript type from `@kubb/plugin-ts`. Requires
+   * `@kubb/plugin-ts` in the plugins list. TypeScript fails compilation when the
+   * schema drifts from the type.
    */
   typed?: boolean
   /**
-   * Return schemas as inferred types using `z.infer`.
+   * Export a `z.infer<typeof schema>` type alias next to every generated schema.
+   * Lets the Zod schema act as the single source of truth.
    */
   inferred?: boolean
   /**
-   * Apply coercion to string values or configure coercion per type.
+   * Wrap schemas in `z.coerce` so input is coerced before validation. Useful for
+   * form data and query params where everything arrives as a string.
+   * - `true` coerces strings, numbers, and dates.
+   * - Object form picks per-primitive coercion.
+   *
+   * @default false
+   * @see https://zod.dev/?id=coercion-for-primitives
    */
   coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
   /**
-   * Generate operation-level schemas (grouped by operationId).
+   * Emit an `operations.ts` file with request body, query/path params, and per-status
+   * response schemas grouped by operation.
    */
   operations?: boolean
   /**
-   * Validator to use for UUID format: `uuid` or `guid`.
+   * Validator for `format: uuid` properties.
+   * - `'uuid'` — `z.uuid()`. Standard RFC 4122.
+   * - `'guid'` — `z.guid()`. Accepts Microsoft-style GUIDs.
    *
    * @default 'uuid'
    */
   guidType?: 'uuid' | 'guid'
   /**
-   * Use Zod Mini's functional API for better tree-shaking.
+   * Switch to Zod Mini's functional API for better tree-shaking. Also defaults
+   * `importPath` to `'zod/mini'`.
    *
    * @default false
+   * @beta
    */
   mini?: boolean
   /**
-   * Callback to wrap the generated schema output.
-   *
-   * Useful for adding metadata like `.openapi()` or extension helpers.
+   * Wrap the generated Zod schema string with extra calls. Receives the raw output
+   * and the originating `SchemaNode`. Useful for round-tripping OpenAPI metadata
+   * back into Zod (e.g. `.openapi(...)`).
    */
   wrapOutput?: (arg: { output: string; schema: ast.SchemaNode }) => string | undefined
   /**
-   * Apply casing to parameter names.
+   * Rename properties inside path/query/header schemas. Body schemas are unaffected.
+   *
+   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in Zod generators.
    */
   generators?: Array<Generator<PluginZod>>
   /**
-   * Override naming conventions for schema names and types.
+   * Override how schema and operation names are built. Methods you omit fall back
+   * to the default `resolverZod`.
    */
   resolver?: Partial<ResolverZod> & ThisType<ResolverZod>
   /**
-   * Override printer node handlers to customize rendering of specific schema types.
+   * Replace the Zod handler for a specific schema type (`'integer'`, `'date'`, ...).
+   * When `mini: true`, overrides target the Zod Mini printer instead.
    */
   printer?: {
     nodes?: PrinterZodNodes | PrinterZodMiniNodes
   }
   /**
-   * AST visitor to transform schema and operation nodes.
+   * AST visitor applied to each schema or operation node before printing.
    */
   transformer?: ast.Visitor
 }

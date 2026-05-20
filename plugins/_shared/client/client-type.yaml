@@ -1,24 +1,24 @@
 # Shared option: client/client-type
 
-# ─────────────────────── client.clientType (full) ───────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: clientType
 type: "'function' | 'class' | 'staticClass'"
 required: false
 default: "'function'"
 description: |
-  Defines the client code generation style.
+  Shape of the generated client code.
 
-  - `'function'` generates standalone functions for each operation.
-  - `'class'` generates a class with instance methods for each operation.
-  - `'staticClass'` generates a class with static methods for each operation. Use this style to call methods like `Pet.getPetById(...)` without instantiating the class.
+  - `'function'` (default) — one standalone async function per operation. Tree-shakes cleanly and works with every query plugin.
+  - `'class'` — one class per group/tag with an instance method per operation. Use this to share configuration (auth, headers) through the constructor.
+  - `'staticClass'` — one class per group/tag with static methods. Call as `Pet.getPetById(...)` without instantiating. Good for app-wide singleton clients.
 warning: |
-  When using `clientType: 'class'` or `clientType: 'staticClass'`, these are not compatible with query plugins like `@kubb/plugin-react-query` or `@kubb/plugin-vue-query`. These plugins are designed to work with function-based clients. If you need to use both class-based or static-class clients and query hooks, configure separate `pluginClient` instances: one with `clientType: 'class'` or `clientType: 'staticClass'` for your needs, and another with `clientType: 'function'` (or omit it for the default) that the query plugins will reference.
+  Only `'function'` is compatible with query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`). To use both classes and query hooks, register two `pluginClient` instances — one with `clientType: 'function'` for the query plugins to consume, and a second with `clientType: 'class'` or `'staticClass'` for your direct usage.
 examples:
-  - name: staticClass
+  - name: "'staticClass'"
     files:
       - name: kubb.config.ts
         lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginClient } from '@kubb/plugin-client'
@@ -36,30 +36,23 @@ examples:
               }),
             ],
           })
-        twoslash: false
-      - name: Pet.ts
+      - name: Generated Pet.ts (excerpt)
         lang: typescript
+        twoslash: false
         code: |
           import fetch from '@kubb/plugin-client/clients/fetch'
-          import type { GetPetByIdQueryResponse, GetPetByIdPathParams, GetPetById400, GetPetById404 } from '../../../models/ts/petController/GetPetById.js'
-          import type { AddPetMutationRequest, AddPetMutationResponse, AddPet405 } from '../../../models/ts/petController/AddPet.js'
-          import type { RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+          import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
+          import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
           export class Pet {
             static #client: typeof fetch = fetch
 
-            /**
-             * @description Returns a single pet
-             * @summary Find pet by ID
-             * {@link /pet/:petId}
-             */
             static async getPetById(
               { petId }: { petId: GetPetByIdPathParams['petId'] },
-              config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+              config: Partial<RequestConfig> & { client?: typeof fetch } = {},
             ) {
-              const request = this.#client || fetch
-              const { client: _request = this.#client, ...requestConfig } = config
-              const res = await request<GetPetByIdQueryResponse, ResponseErrorConfig<GetPetById400 | GetPetById404>, unknown>({
+              const { client: request = this.#client, ...requestConfig } = config
+              const res = await request<GetPetByIdQueryResponse>({
                 method: 'GET',
                 url: `/pet/${petId}`,
                 ...requestConfig,
@@ -67,18 +60,18 @@ examples:
               return res.data
             }
           }
-        twoslash: false
       - name: usage.ts
         lang: typescript
+        twoslash: false
         code: |
           import { Pet } from './gen/clients/Pet'
 
           const pet = await Pet.getPetById({ petId: 1 })
-        twoslash: false
-  - name: class
+  - name: "'class'"
     files:
       - name: kubb.config.ts
         lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginClient } from '@kubb/plugin-client'
@@ -96,13 +89,13 @@ examples:
               }),
             ],
           })
-        twoslash: false
-      - name: Pet.ts
+      - name: Generated Pet.ts (excerpt)
         lang: typescript
+        twoslash: false
         code: |
           import fetch from '@kubb/plugin-client/clients/fetch'
-          import type { GetPetByIdQueryResponse, GetPetByIdPathParams, GetPetById400, GetPetById404 } from '../../../models/ts/petController/GetPetById.js'
-          import type { RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+          import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
+          import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
           export class Pet {
             #client: typeof fetch
@@ -113,10 +106,10 @@ examples:
 
             async getPetById(
               { petId }: { petId: GetPetByIdPathParams['petId'] },
-              config: Partial<RequestConfig> & { client?: typeof fetch } = {}
+              config: Partial<RequestConfig> & { client?: typeof fetch } = {},
             ) {
               const { client: request = this.#client, ...requestConfig } = config
-              const res = await request<GetPetByIdQueryResponse, ResponseErrorConfig<GetPetById400 | GetPetById404>, unknown>({
+              const res = await request<GetPetByIdQueryResponse>({
                 method: 'GET',
                 url: `/pet/${petId}`,
                 ...requestConfig,
@@ -124,12 +117,11 @@ examples:
               return res.data
             }
           }
-        twoslash: false
       - name: usage.ts
         lang: typescript
+        twoslash: false
         code: |
           import { Pet } from './gen/clients/Pet'
 
           const petClient = new Pet()
           const pet = await petClient.getPetById({ petId: 1 })
-        twoslash: false

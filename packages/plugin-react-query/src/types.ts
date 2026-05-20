@@ -128,27 +128,34 @@ export type ResolverReactQuery = Resolver & {
 type Suspense = object
 
 /**
- * Customize the queryKey.
+ * Builds the `queryKey` used by each generated query hook.
+ *
+ * @note String values are inlined verbatim into generated code. Wrap literal
+ * strings in `JSON.stringify(...)`.
  */
 type QueryKey = Transformer
 
 /**
- * Customize the mutationKey.
+ * Builds the `mutationKey` used by each generated mutation hook.
+ *
+ * @note String values are inlined verbatim into generated code. Wrap literal
+ * strings in `JSON.stringify(...)`.
  */
 type MutationKey = Transformer
 
 type Query = {
   /**
-   * HTTP methods to use for queries.
+   * HTTP methods treated as queries. Operations using these methods produce
+   * `useQuery`-style hooks.
    *
    * @default ['get']
    */
   methods?: Array<string>
   /**
-   * Path to the useQuery hook for useQuery functionality.
-   * Used as `import { useQuery } from '${importPath}'`.
-   * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Module specifier used in the `import { useQuery } from '...'` statement at
+   * the top of every generated hook file. Useful for routing through a wrapper
+   * that injects a default `queryClient`.
+   *
    * @default '@tanstack/react-query'
    */
   importPath?: string
@@ -156,16 +163,16 @@ type Query = {
 
 type Mutation = {
   /**
-   * HTTP methods to use for mutations.
+   * HTTP methods treated as mutations. Operations using these methods produce
+   * `useMutation`-style hooks.
    *
    * @default ['post', 'put', 'delete']
    */
   methods?: Array<string>
   /**
-   * Path to the useMutation hook for useMutation functionality.
-   * Used as `import { useMutation } from '${importPath}'`.
-   * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Module specifier used in the `import { useMutation } from '...'` statement
+   * at the top of every generated hook file.
+   *
    * @default '@tanstack/react-query'
    */
   importPath?: string
@@ -173,42 +180,45 @@ type Mutation = {
 
 export type Infinite = {
   /**
-   * Specify the params key used for `pageParam`.
+   * Name of the query parameter that holds the page cursor.
+   *
    * @default 'id'
    */
-  queryParam: string
+  queryParam?: string
   /**
-   * Which field of the data is used, set it to undefined when no cursor is known.
-   * @deprecated Use `nextParam` and `previousParam` instead for more flexible pagination handling.
+   * Path to the cursor field on the response. Leave undefined when the cursor
+   * is not known.
+   *
+   * @deprecated Use `nextParam` and `previousParam` for richer pagination control.
    */
   cursorParam?: string | null
   /**
-   * Which field of the data is used to get the cursor for the next page.
-   * Supports dot notation (e.g. 'pagination.next.id') or array path (e.g. ['pagination', 'next', 'id']) to access nested fields.
+   * Path to the next-page cursor on the response. Supports dot notation
+   * (`'pagination.next.id'`) or array form (`['pagination', 'next', 'id']`).
    */
   nextParam?: string | string[] | null
   /**
-   * Which field of the data is used to get the cursor for the previous page.
-   * Supports dot notation (e.g. 'pagination.prev.id') or array path (e.g. ['pagination', 'prev', 'id']) to access nested fields.
+   * Path to the previous-page cursor on the response. Supports dot notation
+   * or array form.
    */
   previousParam?: string | string[] | null
   /**
-   * The initial value, the value of the first page.
+   * Initial value for `pageParam` on the first fetch.
+   *
    * @default 0
    */
-  initialPageParam: unknown
+  initialPageParam?: unknown
 }
 
 type CustomOptions = {
   /**
-   * Path to the hook that is used to customize the hook options.
-   * It used as `import ${customOptions.name} from '${customOptions.importPath}'`.
-   * It allows both relative and absolute paths but be aware that we will not change the path.
+   * Module specifier of your custom-options hook. Imported as
+   * `import ${name} from '${importPath}'`.
    */
   importPath: string
   /**
-   * Name of the exported hook that is used to customize the hook options.
-   * It used as `import ${customOptions.name} from '${customOptions.importPath}'`.
+   * Exported function name of your custom-options hook.
+   *
    * @default 'useCustomHookOptions'
    */
   name?: string
@@ -216,79 +226,106 @@ type CustomOptions = {
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'hooks', barrelType: 'named' }
+   * Where the generated hooks are written and how they are exported.
+   *
+   * @default { path: 'hooks', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Group the @tanstack/query hooks based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
+  /**
+   * HTTP client used inside every generated hook. Mirrors a subset of
+   * `pluginClient` options.
+   */
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Apply casing to parameter names.
+   * Rename parameter properties in the generated hooks.
+   *
+   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
   /**
-   * How parameters are passed: grouped in an object or spread inline.
+   * How operation parameters appear in the generated hook signature.
+   * - `'inline'` — positional arguments.
+   * - `'object'` — single destructured object argument.
    *
    * @default 'inline'
    */
   paramsType?: 'object' | 'inline'
   /**
-   * How path parameters are passed: grouped in an object or spread inline.
+   * How URL path parameters are arranged inside the inline argument list.
    *
    * @default 'inline'
    */
   pathParamsType?: PluginClient['options']['pathParamsType']
   /**
-   * Add infinite query hooks.
+   * Enables `useInfiniteQuery` hooks for cursor- or page-based pagination.
+   * Pass an object to configure how the cursor is read; pass `false` to skip.
+   *
+   * @default false
    */
   infinite?: Partial<Infinite> | false
   /**
-   * Add suspense query hooks.
+   * Adds `useSuspenseQuery` hooks alongside the regular `useQuery` ones.
+   * Pass an empty object (`{}`) to enable. TanStack Query v5+ only.
    */
   suspense?: Partial<Suspense> | false
+  /**
+   * Custom `queryKey` builder. Use to add a version namespace, swap to
+   * operation IDs, or shape keys to match an existing invalidation strategy.
+   */
   queryKey?: QueryKey
   /**
-   * Configure useQuery behavior.
+   * Configures query hooks. Set to `false` to skip generating hooks entirely
+   * and emit only `queryOptions(...)` helpers.
    */
   query?: Partial<Query> | false
+  /**
+   * Custom `mutationKey` builder. Useful when you batch invalidations or read
+   * mutation state via `useMutationState`.
+   */
   mutationKey?: MutationKey
   /**
-   * Configure useMutation behavior.
+   * Configures mutation hooks. Set to `false` to skip mutation generation.
    */
   mutation?: Partial<Mutation> | false
   /**
-   * Use a custom hook to customize hook options and generate a HookOptions type.
+   * Wires every generated hook through a user-supplied function that returns
+   * extra options (`onSuccess`, `onError`, `select`, ...). Also emits a
+   * `HookOptions` type so the wrapper stays in sync with generated hooks.
    */
   customOptions?: CustomOptions
   /**
-   * Parser to use for validating response data.
+   * Validator applied to response bodies before they reach the caller.
+   * - `'client'` — no validation. Trusts the API.
+   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
    */
   parser?: PluginClient['options']['parser']
   /**
-   * Override naming conventions for function names and types.
+   * Override how hook names and file paths are built. Methods you omit fall
+   * back to the default `resolverReactQuery`.
    */
   resolver?: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
   /**
-   * AST visitor to transform generated nodes.
+   * AST visitor applied to each operation node before printing.
    */
   transformer?: ast.Visitor
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in React Query generators.
    */
   generators?: Array<Generator<PluginReactQuery>>
 }

@@ -1,11 +1,14 @@
 # Shared option: core/client-client-type
 
-# ───────────────────────── clientClientType ─────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: clientType
 type: "'function' | 'class'"
 required: false
 default: "'function'"
-description: Specify whether to use function-based or class-based clients.
+description: |
+  Style of the HTTP client that this plugin imports from `@kubb/plugin-client`.
+
+  - `'function'` — imports the function client (`getPetById(...)`). Required for query plugins.
+  - `'class'` — also generates a wrapper class on top, but only usable inside `@kubb/plugin-client`.
 warning: |
-  This plugin is only compatible with `clientType: 'function'` (the default). If `clientType: 'class'` is detected, the plugin will automatically generate its own inline function-based client instead of importing from `@kubb/plugin-client`.
+  Query plugins (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-svelte-query`, `@kubb/plugin-solid-query`) work only with `clientType: 'function'`. If you set `clientType: 'class'` here, the plugin falls back to generating its own inline function-based client instead of importing from `@kubb/plugin-client`.

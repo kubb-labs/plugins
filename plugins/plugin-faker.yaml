@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-faker
 name: Faker
-description: Generate realistic mock data using Faker.js from OpenAPI specifications.
+description: Generate Faker.js mock-data factories from OpenAPI for tests, Storybook, and seeded local data.
 category: mocks
 type: official
 npmPackage: '@kubb/plugin-faker'
@@ -37,14 +37,16 @@ icon:
 intro: |
   # @kubb/plugin-faker
 
-  Generate mock data factories from your OpenAPI schema using [Faker.js](https://fakerjs.dev/). Create realistic test data that matches your API's types.
+  Generate a mock-data factory function for every schema in your OpenAPI spec, powered by [Faker.js](https://fakerjs.dev/). Call `createPet()` to get a realistic `Pet` object — useful for tests, Storybook, and local development without a running backend.
+
+  Pair with `@kubb/plugin-msw` to mock entire endpoints, or use the factories directly in your test suite.
 
 options:
   - name: output
     type: Output
     required: false
     default: "{ path: 'mocks', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated mock factories are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'mocks'"
@@ -60,82 +62,137 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. This is used for file and helper name generation.
+        description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: dateParser
     type: "'faker' | 'dayjs' | 'moment' | string"
     required: false
     default: "'faker'"
-    description: Choose which formatter to use for `date`, `time`, or `datetime` fields represented as strings.
+    description: |
+      Library used to format `date`, `time`, and `datetime` fields that are represented as strings.
+
+      Use a value other than `'faker'` when you already have a date library in the project and want consistent formatting across mocks and runtime. The plugin auto-imports the default export of the library you choose.
     tip: |
-      You can use another library that exposes a default export. Kubb adds the import automatically.
+      Any library exporting a default function works (`dayjs`, `moment`, `luxon`, ...). Kubb adds the import statement for you.
     examples:
-      - name: "'faker'"
+      - name: "'faker' (default)"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               faker.date.anytime().toISOString().substring(0, 10)
       - name: "'dayjs'"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               dayjs(faker.date.anytime()).format('YYYY-MM-DD')
       - name: "'moment'"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               moment(faker.date.anytime()).format('YYYY-MM-DD')
 
   - name: mapper
     type: 'Record<string, string>'
     required: false
-    description: Override individual properties with custom Faker expressions.
+    description: |
+      Maps OpenAPI schema names to specific Faker expressions. Use this when the schema name does not give Faker enough context to pick a sensible value (`'email'`, `'phone'`, `'avatarUrl'`).
+
+      Keys are the schema name (case-sensitive); values are the JavaScript expression that produces the mock value.
+    codeBlock:
+      lang: typescript
+      title: kubb.config.ts
+      code: |
+        import { defineConfig } from 'kubb'
+        import { pluginFaker } from '@kubb/plugin-faker'
+
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginFaker({
+              mapper: {
+                email: 'faker.internet.email()',
+                avatarUrl: 'faker.image.avatar()',
+              },
+            }),
+          ],
+        })
 
   - name: paramsCasing
     type: "'camelcase'"
     required: false
-    description: Transform parameter property names in generated mocks for path, query, and headers.
+    description: |
+      Renames properties inside the generated path/query/header mocks. Body mocks are unaffected.
     important: |
-      Use the same `paramsCasing` value in `@kubb/plugin-ts` so the generated mock objects stay compatible with the generated types.
+      Set the same `paramsCasing` here as on `@kubb/plugin-ts` so the generated mocks stay assignable to the generated types.
 
   - name: regexGenerator
     type: "'faker' | 'randexp'"
     required: false
     default: "'faker'"
-    description: Generate strings from regex patterns using Faker or randexp.
+    description: |
+      Library used to generate strings that satisfy a regex `pattern` keyword in the OpenAPI spec.
+
+      - `'faker'` (default) — `faker.helpers.fromRegExp(...)`. No extra dependency.
+      - `'randexp'` — uses the `randexp` package, which supports a wider regex grammar (lookaheads, named groups) but adds a runtime dependency.
     examples:
-      - name: "'faker'"
+      - name: "'faker' (default)"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               faker.helpers.fromRegExp('^[A-Z]+$')
       - name: "'randexp'"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               new RandExp(/^[A-Z]+$/).gen()
 
   - name: seed
     type: 'number | number[]'
     required: false
-    description: Seed faker for deterministic output.
+    description: |
+      Seed value passed to `faker.seed(...)`. Set this to get deterministic output across runs — handy for snapshot tests and reproducible local data.
+    examples:
+      - name: Deterministic seed
+        files:
+          - lang: typescript
+            twoslash: false
+            code: |
+              import { defineConfig } from 'kubb'
+              import { pluginFaker } from '@kubb/plugin-faker'
+
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginFaker({ seed: 100 }),
+                ],
+              })
 
   - name: locale
     type: string
     required: false
     default: "'en'"
-    description: Generate mock data using a locale-specific Faker instance.
+    description: |
+      Faker locale used for generated mock values. Switches the named import to `fakerXX` from `@faker-js/faker`.
     tip: |
-      See the [Faker.js localization docs](https://fakerjs.dev/api/localization.html) for the full list of supported locales.
+      See [Faker.js localization](https://fakerjs.dev/api/localization.html) for the full list of locale codes.
     examples:
       - name: "'de'"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               import { fakerDE as faker } from '@faker-js/faker'
       - name: "'de_AT'"
         files:
-          - lang: ts
+          - lang: typescript
+            twoslash: false
             code: |
               import { fakerDE_AT as faker } from '@faker-js/faker'
 
@@ -151,107 +208,134 @@ options:
   - name: resolver
     type: 'Partial<ResolverFaker>'
     required: false
-    description: Customize helper naming on top of the active compatibility preset.
+    description: |
+      Customizes the naming of the generated factory helpers. Common use case: append `Mock` or `Factory` so the helpers do not clash with the imported types.
     codeBlock:
       lang: typescript
+      title: Append "Mock" to every factory name
       code: |
-        pluginFaker({
-          resolver: {
-            resolveName(name) {
-              return `${this.default(name)}Mock`
-            },
-          },
+        import { defineConfig } from 'kubb'
+        import { pluginFaker } from '@kubb/plugin-faker'
+
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginFaker({
+              resolver: {
+                resolveName(name) {
+                  return `${this.default(name)}Mock`
+                },
+              },
+            }),
+          ],
         })
 
   - name: transformer
     type: ast.Visitor
     required: false
-    description: Apply a single AST visitor before the faker helpers are rendered.
+    description: |
+      AST visitor applied to schema/operation nodes before code is printed. Use this to drop descriptions or rewrite metadata before the mock factory is built.
     codeBlock:
       lang: typescript
+      title: Strip schema descriptions
       code: |
-        pluginFaker({
-          transformer: {
-            schema(node) {
-              return { ...node, description: undefined }
-            },
-          },
+        import { defineConfig } from 'kubb'
+        import { pluginFaker } from '@kubb/plugin-faker'
+
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginFaker({
+              transformer: {
+                schema(node) {
+                  return { ...node, description: undefined }
+                },
+              },
+            }),
+          ],
         })
 
   - name: printer
     type: '{ nodes?: PrinterFakerNodes }'
     required: false
     description: |
-      Override individual printer node handlers to customize how specific schema types are rendered.
+      Replaces the Faker handler for a specific schema type (e.g. `'integer'`, `'date'`, `'ref'`). Each handler returns the Faker expression as a string.
 
-      Each key is a `SchemaType` (for example `'integer'`, `'date'`, or `'ref'`). The function you provide replaces the built-in handler for that type. Use `this.transform` to recurse into nested schema nodes and `this.options` to read printer options.
+      Use `this.transform` to recurse into nested schema nodes and `this.options` to read printer options.
     examples:
-      - name: Override integer to float()
+      - name: Use faker.number.float() for integers
         files:
           - lang: typescript
+            twoslash: false
             code: |
+              import { defineConfig } from 'kubb'
               import { pluginFaker } from '@kubb/plugin-faker'
 
-              pluginFaker({
-                printer: {
-                  nodes: {
-                    integer() {
-                      return 'faker.number.float()'
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginFaker({
+                    printer: {
+                      nodes: {
+                        integer() {
+                          return 'faker.number.float()'
+                        },
+                      },
                     },
-                  },
-                },
+                  }),
+                ],
               })
-            twoslash: false
       - name: Override date strings
         files:
           - lang: typescript
+            twoslash: false
             code: |
+              import { defineConfig } from 'kubb'
               import { pluginFaker } from '@kubb/plugin-faker'
 
-              pluginFaker({
-                printer: {
-                  nodes: {
-                    date(node) {
-                      if (node.representation === 'string') {
-                        return 'new Date().toISOString().substring(0, 10)'
-                      }
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginFaker({
+                    printer: {
+                      nodes: {
+                        date(node) {
+                          if (node.representation === 'string') {
+                            return 'new Date().toISOString().substring(0, 10)'
+                          }
 
-                      return 'new Date()'
+                          return 'new Date()'
+                        },
+                      },
                     },
-                  },
-                },
+                  }),
+                ],
               })
-            twoslash: false
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginFaker } from '@kubb/plugin-faker'
           import { pluginTs } from '@kubb/plugin-ts'
 
           export default defineConfig({
-            input: {
-              path: './petStore.yaml',
-            },
-            output: {
-              path: './src/gen',
-            },
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
             plugins: [
               pluginTs({
-                output: {
-                  path: './types',
-                },
+                output: { path: './types' },
               }),
               pluginFaker({
-                output: {
-                  path: './mocks',
-                  barrel: { type: 'named' },
-                },
+                output: { path: './mocks' },
                 seed: [100],
                 paramsCasing: 'camelcase',
               }),
             ],
           })
-        twoslash: false

@@ -2,7 +2,7 @@ $schema: https://kubb.dev/schemas/extension.json
 kind: plugin
 id: plugin-redoc
 name: Redoc
-description: Generate API documentation with Redoc from OpenAPI specifications.
+description: Render your OpenAPI spec as a single-file HTML page using Redoc, regenerated as part of the Kubb build.
 category: documentation
 type: official
 npmPackage: '@kubb/plugin-redoc'
@@ -32,25 +32,60 @@ featured: false
 icon:
   light: https://kubb.dev/feature/openapi.svg
 intro: |
-  Generate interactive API documentation from your OpenAPI schema using [Redoc](https://redocly.com/).
+  # @kubb/plugin-redoc
+
+  Generate a static HTML documentation page for your OpenAPI spec using [Redoc](https://redocly.com/). The page is self-contained — drop it on any static host or open it locally.
+
+  Because the file is regenerated on every Kubb build, your docs stay in lockstep with the spec your code was generated from.
 options:
   - name: output
     type: '{ path: string }'
     required: false
-    description: Specify the output path for the generated documentation HTML file.
+    description: Output location of the generated HTML file.
     properties:
       - name: path
         type: string
         required: true
         description: |
-          The output file path for the generated documentation HTML.
+          File path of the generated HTML, relative to the global `output.path`.
+
+          Use a `.html` extension. Unlike most plugins, this option points at a single file rather than a directory.
         tip: |
-          if `output.path` is a file, `group` cannot be used.
+          When `output.path` points to a single file, the `group` option cannot be used because every operation ends up in the same file.
+        examples:
+          - name: kubb.config.ts
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  import { defineConfig } from 'kubb'
+                  import { pluginTs } from '@kubb/plugin-ts'
+
+                  export default defineConfig({
+                    input: { path: './petStore.yaml' },
+                    output: { path: './src/gen' },
+                    plugins: [
+                      pluginTs({
+                        output: { path: './types' },
+                      }),
+                    ],
+                  })
+          - name: Resulting tree
+            files:
+              - lang: text
+                twoslash: false
+                code: |
+                  src/
+                  └── gen/
+                      └── types/
+                          ├── Pet.ts
+                          └── Store.ts
         default: "'docs.html'"
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginRedoc } from '@kubb/plugin-redoc'
@@ -64,4 +99,3 @@ examples:
               }),
             ],
           })
-        twoslash: false

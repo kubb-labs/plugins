@@ -13,8 +13,36 @@ import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './gen
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-vue-query`. Used for driver lookups
+ * and cross-plugin dependency references.
+ */
 export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['name']
 
+/**
+ * Generates one TanStack Query composable per OpenAPI operation for Vue's
+ * Composition API. Queries become `useFooQuery` (and optionally
+ * `useFooInfiniteQuery`); mutations become `useFooMutation`. Each composable
+ * is fully typed end to end.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginVueQuery } from '@kubb/plugin-vue-query'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginVueQuery({
+ *       output: { path: './hooks' },
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   const {
     output = { path: 'hooks', barrelType: 'named' },

@@ -70,27 +70,32 @@ export type ResolverVueQuery = Resolver & {
 }
 
 /**
- * Customize the queryKey.
+ * Builds the `queryKey` used by each generated query composable.
+ *
+ * @note String values are inlined verbatim into generated code. Wrap literal
+ * strings in `JSON.stringify(...)`.
  */
 type QueryKey = Transformer
 
 /**
- * Customize the mutationKey.
+ * Builds the `mutationKey` used by each generated mutation composable.
+ *
+ * @note String values are inlined verbatim into generated code. Wrap literal
+ * strings in `JSON.stringify(...)`.
  */
 type MutationKey = Transformer
 
 type Query = {
   /**
-   * HTTP methods to use for queries.
+   * HTTP methods treated as queries.
    *
    * @default ['get']
    */
   methods?: Array<string>
   /**
-   * Path to the useQuery hook for useQuery functionality.
-   * Used as `import { useQuery } from '${importPath}'`.
-   * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Module specifier used in the `import { useQuery } from '...'` statement at
+   * the top of every generated composable file.
+   *
    * @default '@tanstack/vue-query'
    */
   importPath?: string
@@ -98,16 +103,15 @@ type Query = {
 
 type Mutation = {
   /**
-   * HTTP methods to use for mutations.
+   * HTTP methods treated as mutations.
    *
    * @default ['post', 'put', 'delete']
    */
   methods?: Array<string>
   /**
-   * Path to the useMutation hook for useMutation functionality.
-   * Used as `import { useMutation } from '${importPath}'`.
-   * Accepts relative and absolute paths.
-   * Path is used as-is; relative paths are based on the generated file location.
+   * Module specifier used in the `import { useMutation } from '...'` statement
+   * at the top of every generated composable file.
+   *
    * @default '@tanstack/vue-query'
    */
   importPath?: string
@@ -115,99 +119,122 @@ type Mutation = {
 
 export type Infinite = {
   /**
-   * Specify the params key used for `pageParam`.
+   * Name of the query parameter that holds the page cursor.
+   *
    * @default 'id'
    */
-  queryParam: string
+  queryParam?: string
   /**
-   * Which field of the data is used, set it to undefined when no cursor is known.
-   * @deprecated Use `nextParam` and `previousParam` instead for more flexible pagination handling.
+   * Path to the cursor field on the response. Leave undefined when the cursor
+   * is not known.
+   *
+   * @deprecated Use `nextParam` and `previousParam` for richer pagination control.
    */
   cursorParam?: string | null
   /**
-   * Which field of the data is used to get the cursor for the next page.
-   * Supports dot notation (e.g. 'pagination.next.id') or array path (e.g. ['pagination', 'next', 'id']) to access nested fields.
+   * Path to the next-page cursor on the response. Supports dot notation
+   * (`'pagination.next.id'`) or array form.
    */
   nextParam?: string | string[] | null
   /**
-   * Which field of the data is used to get the cursor for the previous page.
-   * Supports dot notation (e.g. 'pagination.prev.id') or array path (e.g. ['pagination', 'prev', 'id']) to access nested fields.
+   * Path to the previous-page cursor on the response. Supports dot notation
+   * or array form.
    */
   previousParam?: string | string[] | null
   /**
-   * The initial value, the value of the first page.
+   * Initial value for `pageParam` on the first fetch.
+   *
    * @default 0
    */
-  initialPageParam: unknown
+  initialPageParam?: unknown
 }
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'hooks', barrelType: 'named' }
+   * Where the generated composables are written and how they are exported.
+   *
+   * @default { path: 'hooks', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Group the @tanstack/query hooks based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
+  /**
+   * HTTP client used inside every generated composable. Mirrors a subset of
+   * `pluginClient` options.
+   */
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Apply casing to parameter names.
+   * Rename parameter properties in the generated composables.
+   *
+   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
   /**
-   * How parameters are passed: grouped in an object or spread inline.
+   * How operation parameters appear in the generated composable signature.
    *
    * @default 'inline'
    */
   paramsType?: 'object' | 'inline'
   /**
-   * How path parameters are passed: grouped in an object or spread inline.
+   * How URL path parameters are arranged inside the inline argument list.
    *
    * @default 'inline'
    */
   pathParamsType?: PluginClient['options']['pathParamsType']
   /**
-   * Add infinite query hooks.
+   * Enables `useInfiniteQuery` composables for cursor- or page-based pagination.
+   * Pass an object to configure how the cursor is read; pass `false` to skip.
+   *
+   * @default false
    */
   infinite?: Partial<Infinite> | false
+  /**
+   * Custom `queryKey` builder.
+   */
   queryKey?: QueryKey
   /**
-   * Configure useQuery behavior.
+   * Configures query composables. Set to `false` to skip composable generation
+   * and emit only `queryOptions(...)` helpers.
    */
   query?: Partial<Query> | false
+  /**
+   * Custom `mutationKey` builder.
+   */
   mutationKey?: MutationKey
   /**
-   * Configure useMutation behavior.
+   * Configures mutation composables. Set to `false` to skip mutation generation.
    */
   mutation?: Partial<Mutation> | false
   /**
-   * Parser to use for validating response data.
+   * Validator applied to response bodies before they reach the caller.
+   * - `'client'` — no validation.
+   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
    */
   parser?: PluginClient['options']['parser']
   /**
-   * Override naming conventions for function names and types.
+   * Override how composable names and file paths are built.
    */
   resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
   /**
-   * AST visitor to transform generated nodes.
+   * AST visitor applied to each operation node before printing.
    */
   transformer?: ast.Visitor
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in Vue Query generators.
    */
   generators?: Array<Generator<PluginVueQuery>>
 }

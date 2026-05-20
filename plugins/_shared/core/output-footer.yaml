@@ -4,4 +4,29 @@ $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/
 name: footer
 type: 'string | ((node: RootNode) => string)'
 required: false
-description: Add a footer comment at the end of every generated file. Accepts a static string or a function that receives the `RootNode` and returns a string.
+description: |
+  Text appended at the end of every generated file. The mirror of `banner` — use it for closing comments, re-enabling lint rules, or marker lines.
+
+  Pass a string for a static footer, or a function that receives the file's `RootNode` and returns the footer text.
+examples:
+  - name: Re-enable lint after a banner disable
+    files:
+      - name: kubb.config.ts
+        lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: {
+                  banner: '/* eslint-disable */',
+                  footer: '/* eslint-enable */',
+                },
+              }),
+            ],
+          })

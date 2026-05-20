@@ -1,12 +1,36 @@
 # Shared option: client/parser
 
-# ────────────────────────── client.parser ──────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: parser
 type: "'client' | 'zod'"
 required: false
 default: "'client'"
-description: Parser used before returning data.
-body: |
-  - `'zod'` uses `@kubb/plugin-zod` to parse data.
-  - `'client'` returns data without parsing.
+description: |
+  Runtime validator applied to the response body before it is returned to the caller.
+
+  - `'client'` (default) — no validation. The response is cast to the generated TypeScript type and returned as-is. Fastest path, trusts the API.
+  - `'zod'` — pipes the response through the Zod schema produced by `@kubb/plugin-zod`. Catches mismatches between spec and API at runtime, at the cost of a parse on every call.
+
+  Use `'zod'` when you want a defensive boundary against drift between your OpenAPI spec and the live API. Requires `@kubb/plugin-zod` in the plugins list.
+examples:
+  - name: Validate responses with Zod
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginClient } from '@kubb/plugin-client'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginZod } from '@kubb/plugin-zod'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs(),
+              pluginZod(),
+              pluginClient({
+                parser: 'zod',
+              }),
+            ],
+          })
