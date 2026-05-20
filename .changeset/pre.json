@@ -38,6 +38,7 @@
     "core-plugins-beta-12-alignment",
     "multi-content-type-request-body",
     "oas-ts-resolve-options",
+    "plugin-client-drop-dead-transformers-yaml",
     "plugin-client-export-clients-barrel",
     "plugin-client-params-casing-unused-var",
     "plugin-client-v5-migration",
