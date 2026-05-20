@@ -6,8 +6,38 @@ import { handlersGenerator, mswGenerator } from './generators'
 import { resolverMsw } from './resolvers/resolverMsw.ts'
 import type { PluginMsw } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-msw`. Used for driver lookups and
+ * cross-plugin dependency references.
+ */
 export const pluginMswName = 'plugin-msw' satisfies PluginMsw['name']
 
+/**
+ * Generates MSW request handlers from an OpenAPI spec. Drop them into your
+ * test setup or service worker to mock the API end-to-end — request path,
+ * method, status, and response body all stay in sync with the spec. Combine
+ * with `@kubb/plugin-faker` (via `parser: 'faker'`) to seed handlers with
+ * realistic data.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginMsw } from '@kubb/plugin-msw'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginMsw({
+ *       output: { path: './handlers' },
+ *       handlers: true,
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginMsw = definePlugin<PluginMsw>((options) => {
   const {
     output = { path: 'handlers', barrelType: 'named' },

@@ -20,8 +20,37 @@ import {
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-react-query`. Used for driver lookups
+ * and cross-plugin dependency references.
+ */
 export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQuery['name']
 
+/**
+ * Generates one TanStack Query hook per OpenAPI operation for React. Queries
+ * become `useFooQuery`/`useFooSuspenseQuery`/`useFooInfiniteQuery`; mutations
+ * become `useFooMutation`. Each hook is fully typed: query keys, input
+ * variables, response data, and error shape all come from the spec.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginReactQuery } from '@kubb/plugin-react-query'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginReactQuery({
+ *       output: { path: './hooks' },
+ *       suspense: {},
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   const {
     output = { path: 'hooks', barrelType: 'named' },

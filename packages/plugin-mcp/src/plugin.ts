@@ -13,8 +13,40 @@ import { serverGenerator } from './generators/serverGenerator.tsx'
 import { resolverMcp } from './resolvers/resolverMcp.ts'
 import type { PluginMcp } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-mcp`. Used for driver lookups and
+ * cross-plugin dependency references.
+ */
 export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
 
+/**
+ * Generates a Model Context Protocol (MCP) server from an OpenAPI spec. Every
+ * operation becomes a typed MCP tool that AI assistants (Claude Desktop, Claude
+ * Code, MCP-compatible clients) can call directly.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginClient } from '@kubb/plugin-client'
+ * import { pluginZod } from '@kubb/plugin-zod'
+ * import { pluginMcp } from '@kubb/plugin-mcp'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginClient(),
+ *     pluginZod(),
+ *     pluginMcp({
+ *       output: { path: './mcp' },
+ *       client: { baseURL: 'https://petstore.swagger.io/v2' },
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginMcp = definePlugin<PluginMcp>((options) => {
   const {
     output = { path: 'mcp', barrelType: 'named' },

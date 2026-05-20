@@ -6,17 +6,34 @@ import { resolverFaker } from './resolvers/resolverFaker.ts'
 import type { PluginFaker } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-faker`, used in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-faker`. Used for driver lookups and
+ * cross-plugin dependency references.
  */
 export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
 
 /**
- * Generates Faker mock data factories from OpenAPI/AST specification.
- *
- * Creates randomized test data and mock helpers from schema definitions.
+ * Generates one mock-data factory per OpenAPI schema using Faker.js. Call
+ * `createPet()` to get a realistic `Pet` object — useful for tests, Storybook,
+ * and local development without a running backend.
  *
  * @example
- * `import pluginFaker from '@kubb/plugin-faker'; export default defineConfig({ plugins: [pluginFaker({ output: { path: 'mocks' } })], })`
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginFaker } from '@kubb/plugin-faker'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginFaker({
+ *       output: { path: './mocks' },
+ *       seed: [100],
+ *     }),
+ *   ],
+ * })
+ * ```
  */
 export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {
