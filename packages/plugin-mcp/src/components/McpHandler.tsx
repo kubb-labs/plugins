@@ -23,7 +23,7 @@ type Props = {
   /**
    * Base URL prepended to every generated request URL.
    */
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   /**
    * Return type when calling fetch.
    * - 'data' returns response data only.

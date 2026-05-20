@@ -11,7 +11,7 @@ type Props = {
   typeName: string
   requestTypeName?: string
   fakerName: string
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   node: ast.OperationNode
 }
 

@@ -97,7 +97,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
-    function renderSchemaEntry({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> }) {
+    function renderSchemaEntry({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
 
       const inferTypeName = inferred ? resolver.resolveTypeName(name) : undefined

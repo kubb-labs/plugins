@@ -18,7 +18,7 @@ type Props = {
   isConfigurable?: boolean
   returnType?: string
 
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']

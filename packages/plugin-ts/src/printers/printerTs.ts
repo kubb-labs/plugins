@@ -89,7 +89,7 @@ export type PrinterTsOptions = {
    * Properties to exclude using `Omit<Type, Keys>`.
    * Forces type alias syntax regardless of `syntaxType` setting.
    */
-  keysToOmit?: Array<string>
+  keysToOmit?: Array<string> | null
   /**
    * Transforms raw schema names into valid TypeScript identifiers.
    */
@@ -167,7 +167,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
       time: factory.dateOrStringNode,
       ref(node) {
         if (!node.name) {
-          return undefined
+          return null
         }
         // Parser-generated refs (with $ref) carry raw schema names that need resolving.
         // Use the canonical name from the $ref path — node.name may have been overridden
@@ -236,15 +236,15 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         return factory.createUnionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(members, this.transform) }) ?? undefined
       },
       intersection(node) {
-        return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) }) ?? undefined
+        return factory.createIntersectionDeclaration({ withParentheses: true, nodes: factory.buildMemberNodes(node.members, this.transform) }) ?? null
       },
       array(node) {
         const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(isNonNullable)
 
-        return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType }) ?? undefined
+        return factory.createArrayDeclaration({ nodes: itemNodes, arrayType: this.options.arrayType }) ?? null
       },
       tuple(node) {
-        return factory.buildTupleNode(node, this.transform)
+        return factory.buildTupleNode(node, this.transform) ?? null
       },
       object(node) {
         const { transform, options } = this

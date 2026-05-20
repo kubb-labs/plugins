@@ -118,7 +118,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       return resolver.resolveTypeName(schemaName)
     }
 
-    function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> }) {
+    function renderSchemaType({ schema, name, keysToOmit }: { schema: ast.SchemaNode | null; name: string; keysToOmit?: Array<string> | null }) {
       if (!schema) return null
 
       const imports = adapter.getImports(schema, (schemaName) => ({
