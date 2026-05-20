@@ -1,0 +1,19 @@
+packages/plugin-zod/src/generators/zodGenerator.test.tsx
+  s_f786084865badb::t_ac24a82e54800a 251-252
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "2a2a605ee935c34cc0c7b02712311bec5cc57274",
+  "prompts": {},
+  "sessions": {
+    "s_f786084865badb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c46178e7-6b87-48e3-8bf8-69fb8ec4f3d2",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Stijn Van Hulle <stijn.vanhulle@robovision.eu>"
+    }
+  }
+}
