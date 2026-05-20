@@ -1,0 +1,41 @@
+packages/plugin-mcp/src/generators/serverGenerator.tsx
+  s_f786084865badb::t_91a86b47e3b4c9 20
+packages/plugin-faker/src/resolvers/resolverFaker.ts
+  s_f786084865badb::t_367db0a9e45bf2 4
+  s_f786084865badb::t_6b5a57e20b9b84 35
+packages/plugin-zod/src/generators/zodGenerator.test.tsx
+  s_f786084865badb::t_86d083dffabbb1 299-300
+packages/plugin-zod/src/generators/zodGenerator.tsx
+  s_f786084865badb::t_e802f74ead277e 215,232,237-239
+  s_f786084865badb::t_35447b78bcddcd 192-194
+  s_f786084865badb::t_749da4eeed6e66 94,98,127
+  s_f786084865badb::t_f4781b9a4cbfb8 40,47,71-75,78,80
+packages/plugin-client/src/generators/staticClassClientGenerator.tsx
+  s_f786084865badb::t_bec1b3f166cbbf 47
+packages/plugin-faker/src/generators/fakerGenerator.test.tsx
+  s_f786084865badb::t_bb7b45c4945dc2 128-129,131,142
+packages/plugin-faker/src/generators/fakerGenerator.tsx
+  s_f786084865badb::t_08b3c8aca0efe4 168,191
+  s_f786084865badb::t_c9508990c20f06 231-232,237,239,258-260
+  s_f786084865badb::t_787d65b446d7b0 59,69,73,84-87,95,100-104,109,111,113
+packages/plugin-client/src/generators/clientGenerator.tsx
+  s_f786084865badb::t_70f669df738db1 17
+packages/plugin-client/src/generators/classClientGenerator.tsx
+  s_f786084865badb::t_47660a55f2f8e8 49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.10",
+  "base_commit_sha": "d18abfc36bbed6e62e5a71eeefe3e31521346c85",
+  "prompts": {},
+  "sessions": {
+    "s_f786084865badb": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "c46178e7-6b87-48e3-8bf8-69fb8ec4f3d2",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Stijn Van Hulle <stijn.vanhulle@robovision.eu>"
+    }
+  }
+}
