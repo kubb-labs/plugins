@@ -56,7 +56,7 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
               return `${camelCase(ctx.group)}Requests`
             },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginCypressName,

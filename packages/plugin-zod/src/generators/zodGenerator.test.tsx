@@ -34,7 +34,7 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  group: undefined,
+  group: null,
   printer: undefined,
 }
 
@@ -602,9 +602,9 @@ describe('zodGenerator — Operation — group', () => {
       expectedBaseName: 'listPetsSchema.ts',
       expectedDir: 'petsController',
     },
-    { group: undefined, expectedBaseName: 'listPetsSchema.ts', expectedDir: undefined },
+    { group: null, expectedBaseName: 'listPetsSchema.ts', expectedDir: undefined },
   ] satisfies Array<{
-    group: Group | undefined
+    group: Group | null
     expectedBaseName: string
     expectedDir: string | undefined
   }>)('group=$group.type — file path is computed correctly', async ({ group, expectedBaseName, expectedDir }) => {

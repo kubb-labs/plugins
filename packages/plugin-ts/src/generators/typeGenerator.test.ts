@@ -32,7 +32,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  group: undefined,
+  group: null,
   printer: undefined,
 }
 
@@ -292,9 +292,9 @@ describe('typeGenerator — Operation — group', () => {
       expectedBaseName: 'ListPets.ts',
       expectedDir: 'petsController',
     },
-    { group: undefined, expectedBaseName: 'ListPets.ts', expectedDir: undefined },
+    { group: null, expectedBaseName: 'ListPets.ts', expectedDir: undefined },
   ] satisfies Array<{
-    group: Group | undefined
+    group: Group | null
     expectedBaseName: string
     expectedDir: string | undefined
   }>)('group=$group.type — file path is computed correctly', async ({ group, expectedBaseName, expectedDir }) => {

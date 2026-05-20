@@ -11,13 +11,13 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
     const { output, group } = ctx.options
 
     const handlersName = resolver.resolveHandlersName()
-    const file = resolver.resolveFile({ name: resolver.resolvePathName(handlersName, 'file'), extname: '.ts' }, { root, output, group })
+    const file = resolver.resolveFile({ name: resolver.resolvePathName(handlersName, 'file'), extname: '.ts' }, { root, output, group: group ?? undefined })
 
     const imports = nodes.map((node) => {
       const operationName = resolver.resolveHandlerName(node)
       const operationFile = resolver.resolveFile(
         { name: resolver.resolveName(node.operationId), extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group },
+        { root, output, group: group ?? undefined },
       )
 
       return <File.Import key={operationFile.path} name={[operationName]} root={file.path} path={operationFile.path} />

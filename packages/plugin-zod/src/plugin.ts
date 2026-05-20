@@ -54,7 +54,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           return `${camelCase(ctx.group)}Controller`
         },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginZodName,

@@ -48,14 +48,14 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolveImportName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
 
     const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
 
     const meta = {
       name: ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && isEnumSchema ? resolver.resolveEnumKeyName(node, enumTypeSuffix) : resolver.resolveTypeName(node.name),
-      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group }),
+      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const schemaPrinter = printerTs({
@@ -104,7 +104,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const params = ast.caseParams(node.parameters, paramsCasing)
 
     const meta = {
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
     } as const
 
     // Build a set of schema names that are enums so the ref handler and getImports
@@ -123,7 +126,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: resolveImportName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
       const schemaPrinter = printerTs({

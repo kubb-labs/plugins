@@ -3,7 +3,7 @@ import { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'
 
 describe('buildParamsMapping', () => {
   test('returns undefined when names did not change', () => {
-    expect(buildParamsMapping([{ name: 'petId' }], [{ name: 'petId' }])).toBeUndefined()
+    expect(buildParamsMapping([{ name: 'petId' }], [{ name: 'petId' }])).toBeNull()
   })
 
   test('returns original to mapped names when at least one name changed', () => {
@@ -16,7 +16,7 @@ describe('buildParamsMapping', () => {
 
 describe('buildTransformedParamsMapping', () => {
   test('returns undefined for empty params', () => {
-    expect(buildTransformedParamsMapping([], (name) => name.toUpperCase())).toBeUndefined()
+    expect(buildTransformedParamsMapping([], (name) => name.toUpperCase())).toBeNull()
   })
 
   test('maps params through the provided transform', () => {

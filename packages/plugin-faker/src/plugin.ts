@@ -50,7 +50,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
               return `${camelCase(ctx.group)}Controller`
             },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginFakerName,

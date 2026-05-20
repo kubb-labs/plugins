@@ -15,9 +15,9 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
-  zodResolver: ResolverZod | undefined
+  zodResolver: ResolverZod | null
   typeFile: ast.FileNode
-  zodFile: ast.FileNode | undefined
+  zodFile: ast.FileNode | null
 }
 
 type Controller = {
@@ -31,9 +31,9 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
-  const names: Array<string | undefined> = [
+  const names: Array<string | null | undefined> = [
     zodResolver.resolveResponseName?.(node),
-    node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined,
+    node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
 }
@@ -51,8 +51,8 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
     const tsResolver = driver.getResolver(pluginTsName)
     const tsPluginOptions = pluginTs.options
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     function buildOperationData(node: ast.OperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(
@@ -63,9 +63,9 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
         zodResolver && pluginZod?.options
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group },
+              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group ?? undefined },
             )
-          : undefined
+          : null
 
       return {
         node: node,
@@ -83,7 +83,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
       if (!tag && !group) {
         const name = resolver.resolveClassName('ApiClient')
-        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
+        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group: group ?? undefined })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
 
@@ -97,7 +97,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
       if (tag) {
         const name = groupName
-        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
+        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
 

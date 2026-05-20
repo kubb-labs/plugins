@@ -21,7 +21,7 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
   output: { path: '.' },
   parser: 'data',
   baseURL: undefined,
-  group: undefined,
+  group: null,
   exclude: [],
   include: undefined,
   override: [],

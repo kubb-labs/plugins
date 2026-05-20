@@ -225,7 +225,7 @@ export function resolveFakerTypeUsage(
   canOverride: boolean,
 ): {
   dataType: string
-  returnType: string | undefined
+  returnType: string | null
   usesTypeName: boolean
 } {
   const isArray = ARRAY_TYPES.has(node.type)
@@ -242,7 +242,7 @@ export function resolveFakerTypeUsage(
     dataType = getScalarType(node, typeName)
   }
 
-  let returnType = canOverride ? typeName : undefined
+  let returnType = canOverride ? typeName : null
 
   if (isScalar) {
     returnType = getScalarType(node, typeName)

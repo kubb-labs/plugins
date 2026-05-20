@@ -76,7 +76,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
           name={name}
           JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
           params={canOverride ? paramsSignature : undefined}
-          returnType={returnType}
+          returnType={returnType ?? undefined}
         >
           {seed ? (
             <>

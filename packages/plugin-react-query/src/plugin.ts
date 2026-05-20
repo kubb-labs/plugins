@@ -73,7 +73,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
               return `${camelCase(ctx.group)}Controller`
             },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginReactQueryName,
@@ -116,14 +116,14 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
             ? {
                 queryParam: 'id',
                 initialPageParam: 0,
-                cursorParam: undefined,
-                nextParam: undefined,
-                previousParam: undefined,
+                cursorParam: null,
+                nextParam: null,
+                previousParam: null,
                 ...infinite,
               }
             : false,
           suspense,
-          customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : undefined,
+          customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : null,
           parser,
           paramsType,
           pathParamsType,

@@ -307,7 +307,7 @@ describe('buildSchemaNames', () => {
   test('returns undefined for request when no request body', () => {
     const result = buildSchemaNames(node, { params: [], resolver: resolverZod })
 
-    expect(result.request).toBeUndefined()
+    expect(result.request).toBeNull()
   })
 
   test('resolves request name when request body exists', () => {
@@ -331,7 +331,7 @@ describe('buildSchemaNames', () => {
 
     expect(result.parameters.path).toBe('listPetsPathPetIdSchema')
     expect(result.parameters.query).toBe('listPetsQueryLimitSchema')
-    expect(result.parameters.header).toBeUndefined()
+    expect(result.parameters.header).toBeNull()
   })
 })
 

@@ -99,7 +99,7 @@ type ResolvedOptions = {
   exclude: Array<Exclude>
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
-  group: Group | undefined
+  group: Group | null
   baseURL: Options['baseURL'] | undefined
   dataReturnType: NonNullable<Options['dataReturnType']>
   pathParamsType: NonNullable<NonNullable<Options['pathParamsType']>>

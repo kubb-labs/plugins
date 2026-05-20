@@ -33,7 +33,7 @@ export function getQueryOptionsParams(
   },
 ): ast.FunctionParametersNode {
   const { paramsType, paramsCasing, pathParamsType, resolver } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   const baseParams = ast.createOperationParams(node, {
     paramsType,

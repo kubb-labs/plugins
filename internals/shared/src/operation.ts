@@ -49,17 +49,17 @@ export type ResolveOperationTypeNameOptions = {
   order?: 'params-first' | 'body-response-first'
 }
 
-function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): string | undefined {
+function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): string | null {
   if (!link) {
-    return undefined
+    return null
   }
 
   if (typeof link === 'function') {
-    return link(node)
+    return link(node) ?? null
   }
 
   if (link === 'urlPath') {
-    return node.path ? `{@link ${new URLPath(node.path).URL}}` : undefined
+    return node.path ? `{@link ${new URLPath(node.path).URL}}` : null
   }
 
   return `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}`
@@ -79,10 +79,10 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
 }
 
 export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
   const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : undefined].filter(Boolean).join('; ')
+  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null].filter(Boolean).join('; ')
 
   return `${configType} & { ${configProps} }`
 }
@@ -115,22 +115,22 @@ export function getOperationParameters(node: ast.OperationNode, options: { param
   }
 }
 
-export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string): number | undefined {
+export function getStatusCodeNumber(statusCode: ast.StatusCode | number | string): number | null {
   const code = Number(statusCode)
 
-  return Number.isNaN(code) ? undefined : code
+  return Number.isNaN(code) ? null : code
 }
 
 export function isSuccessStatusCode(statusCode: ast.StatusCode | number | string): boolean {
   const code = getStatusCodeNumber(statusCode)
 
-  return code !== undefined && code >= 200 && code < 300
+  return code !== null && code >= 200 && code < 300
 }
 
 export function isErrorStatusCode(statusCode: ast.StatusCode | number | string): boolean {
   const code = getStatusCodeNumber(statusCode)
 
-  return code !== undefined && code >= 400
+  return code !== null && code >= 400
 }
 
 export function getSuccessResponses<TResponse extends ResponseLike>(responses: ReadonlyArray<TResponse>): Array<TResponse> {
@@ -141,8 +141,8 @@ export function getOperationSuccessResponses(node: ast.OperationNode): Array<ast
   return getSuccessResponses(node.responses)
 }
 
-export function getPrimarySuccessResponse(node: ast.OperationNode): ast.ResponseNode | undefined {
-  return getOperationSuccessResponses(node)[0]
+export function getPrimarySuccessResponse(node: ast.OperationNode): ast.ResponseNode | null {
+  return getOperationSuccessResponses(node)[0] ?? null
 }
 
 export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
@@ -185,13 +185,13 @@ export function resolveOperationTypeNames(
     ...query.map((param) => resolver.resolveQueryParamsName(node, param)),
     ...header.map((param) => resolver.resolveHeaderParamsName(node, param)),
   ]
-  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined, resolver.resolveResponseName(node)]
+  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null, resolver.resolveResponseName(node)]
   const names =
     options.order === 'body-response-first'
       ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
       : [...paramNames, ...bodyAndResponseNames, ...responseStatusNames]
 
-  const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name))
+  const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
   byResolver.set(cacheKey, result)
   return result
 }
@@ -206,7 +206,7 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
     }
 
     const code = getStatusCodeNumber(response.statusCode)
-    if (code === undefined) {
+    if (code === null) {
       continue
     }
 
@@ -216,12 +216,12 @@ export function resolveResponseTypes(node: ast.OperationNode, resolver: Response
   return types
 }
 
-export function findSuccessStatusCode(responses: Array<{ statusCode: ast.StatusCode | number | string }>): ast.StatusCode | undefined {
+export function findSuccessStatusCode(responses: Array<{ statusCode: ast.StatusCode | number | string }>): ast.StatusCode | null {
   for (const response of responses) {
     if (isSuccessStatusCode(response.statusCode)) {
       return response.statusCode as ast.StatusCode
     }
   }
 
-  return undefined
+  return null
 }

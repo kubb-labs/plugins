@@ -40,7 +40,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       !isQuery &&
       difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
     const isSuspense = !!suspense
-    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : undefined
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
 
     if (!isQuery || isMutation || !isSuspense || !infiniteOptions) return null
 
@@ -61,29 +61,32 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const clientBaseName = resolver.resolveSuspenseInfiniteClientName(node)
 
     const meta = {
-      file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile(
+        { name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
     }
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing, order: 'body-response-first' })
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
     const fileZod = zodResolver
       ? zodResolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
+          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group ?? undefined },
         )
-      : undefined
+      : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver)
 
     const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
-    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : undefined
+    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : null
 
     const clientFile = shouldUseClientPlugin
       ? clientResolver?.resolveFile(
@@ -91,10 +94,10 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
           {
             root,
             output: clientPlugin?.options?.output ?? output,
-            group: clientPlugin?.options?.group,
+            group: clientPlugin?.options?.group ?? undefined,
           },
         )
-      : undefined
+      : null
 
     const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientBaseName) : clientBaseName
 

@@ -16,19 +16,19 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string
   const isArray = meta?.primitive === 'array'
 
   return [
-    meta && 'description' in meta && meta.description ? `@description ${jsStringEscape(meta.description)}` : undefined,
-    meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : undefined,
+    meta && 'description' in meta && meta.description ? `@description ${jsStringEscape(meta.description)}` : null,
+    meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
-    !isArray && meta && 'min' in meta && meta.min !== undefined ? `@minLength ${meta.min}` : undefined,
-    !isArray && meta && 'max' in meta && meta.max !== undefined ? `@maxLength ${meta.max}` : undefined,
-    meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : undefined,
+    !isArray && meta && 'min' in meta && meta.min !== undefined ? `@minLength ${meta.min}` : null,
+    !isArray && meta && 'max' in meta && meta.max !== undefined ? `@maxLength ${meta.max}` : null,
+    meta && 'pattern' in meta && meta.pattern ? `@pattern ${meta.pattern}` : null,
     meta && 'default' in meta && meta.default !== undefined
       ? `@default ${'primitive' in meta && meta.primitive === 'string' ? stringify(meta.default as string) : meta.default}`
-      : undefined,
-    meta && 'example' in meta && meta.example !== undefined ? `@example ${meta.example}` : undefined,
+      : null,
+    meta && 'example' in meta && meta.example !== undefined ? `@example ${meta.example}` : null,
     meta && 'primitive' in meta && meta.primitive
-      ? [`@type ${meta.primitive}`, 'optional' in schema && schema.optional ? ' | undefined' : undefined].filter(Boolean).join('')
-      : undefined,
+      ? [`@type ${meta.primitive}`, 'optional' in schema && schema.optional ? ' | undefined' : null].filter(Boolean).join('')
+      : null,
   ].filter(Boolean)
 }
 

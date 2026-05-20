@@ -12,8 +12,8 @@ import type { PluginClient } from './types.ts'
  */
 export function buildHeaders(contentType: string, hasHeaderParams: boolean): Array<string> {
   return [
-    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined,
-    hasHeaderParams ? '...headers' : undefined,
+    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
+    hasHeaderParams ? '...headers' : null,
   ].filter(Boolean) as Array<string>
 }
 
@@ -23,7 +23,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  */
 export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const responseName = tsResolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   return [responseName, TError, requestName || 'unknown'].filter(Boolean)
@@ -53,8 +53,8 @@ export function buildClassClientParams({
   headers: Array<string>
 }) {
   const { query: queryParams } = getOperationParameters(node)
-  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : undefined
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
 
   return createFunctionParams({
     config: {
@@ -73,8 +73,8 @@ export function buildClassClientParams({
           ? {
               value: JSON.stringify(baseURL),
             }
-          : undefined,
-        params: queryParamsName ? {} : undefined,
+          : null,
+        params: queryParamsName ? {} : null,
         data: requestName
           ? {
               value:
@@ -84,13 +84,13 @@ export function buildClassClientParams({
                     ? 'formData as FormData'
                     : 'requestData',
             }
-          : undefined,
-        contentType: isMultipleContentTypes ? {} : undefined,
+          : null,
+        contentType: isMultipleContentTypes ? {} : null,
         headers: headers.length
           ? {
               value: `{ ${headers.join(', ')}, ...requestConfig.headers }`,
             }
-          : undefined,
+          : null,
       },
     },
   })
@@ -107,9 +107,9 @@ export function buildRequestDataLine({
 }: {
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
 }): string {
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined
+  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
   if (parser === 'zod' && zodRequestName) {
     return `const requestData = ${zodRequestName}.parse(data)`
   }
@@ -140,9 +140,9 @@ export function buildReturnStatement({
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
 }): string {
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : undefined
+  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
   if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {
     return `return {...res, data: ${zodResponseName}.parse(res.data)}`
   }

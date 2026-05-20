@@ -25,11 +25,11 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const mode = ctx.getMode(output)
     const meta = {
       name: resolver.resolveName(schemaName),
-      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }),
+      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
       typeName: tsResolver.resolveTypeName(schemaName),
       typeFile: tsResolver.resolveFile(
         { name: schemaName, extname: '.ts' },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
     } as const
     const canOverride = canOverrideSchema(node)
@@ -57,7 +57,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const imports = adapter
       .getImports(node, (schemaName) => ({
         name: resolver.resolveName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
       .filter((entry) => entry.path !== meta.file.path)
     const usedImports = filterUsedImports(imports, fakerText)
@@ -131,7 +131,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       typeFile: tsResolver.resolveFile(
         {
           name: node.operationId,
@@ -142,7 +145,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group ?? undefined,
         },
       ),
     } as const
@@ -151,7 +154,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return adapter
         .getImports(schema, (schemaName) => ({
           name: resolver.resolveName(schemaName),
-          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
         .filter((entry) => entry.path !== meta.file.path)
     }

@@ -39,7 +39,7 @@ function buildSuspenseInfiniteQueryParamsNode(
   },
 ): ast.FunctionParametersNode {
   const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
@@ -104,11 +104,11 @@ export function SuspenseInfiniteQuery({
       ? (() => {
           const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : undefined
+          return groupName !== individualName ? groupName : null
         })()
-      : undefined
+      : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
   const returnType = 'UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }'

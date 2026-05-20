@@ -9,7 +9,7 @@ import { getContentType, getMswMethod, getMswUrl, hasResponseSchema } from '../u
 type Props = {
   name: string
   typeName: string
-  requestTypeName?: string
+  requestTypeName?: string | null
   baseURL: string | null | undefined
   node: ast.OperationNode
 }
@@ -23,7 +23,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
   const contentType = getContentType(successResponse)
   const url = new URLPath(getMswUrl(node)).toURLPath()
 
-  const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
+  const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
   const responseHasSchema = hasResponseSchema(successResponse)
   const dataType = responseHasSchema ? typeName : 'string | number | boolean | null | object'
 

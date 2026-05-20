@@ -46,20 +46,23 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const operationsMapped = nodes.map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
 
-      const mcpFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group })
+      const mcpFile = resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      )
 
       const zodFile = zodResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
           output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group,
+          group: pluginZod.options?.group ?? undefined,
         },
       )
 
-      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName(node) : undefined
+      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName(node) : null
       const successStatus = findSuccessStatusCode(node.responses)
-      const responseName = successStatus ? zodResolver.resolveResponseStatusName(node, successStatus) : undefined
+      const responseName = successStatus ? zodResolver.resolveResponseStatusName(node, successStatus) : null
 
       const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.resolveParamName(node, p) }))
 
@@ -75,8 +78,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         },
         zod: {
           pathParams: resolveParams(pathParams),
-          queryParams: queryParams.length ? resolveParams(queryParams) : undefined,
-          headerParams: headerParams.length ? resolveParams(headerParams) : undefined,
+          queryParams: queryParams.length ? resolveParams(queryParams) : null,
+          headerParams: headerParams.length ? resolveParams(headerParams) : null,
           requestName,
           responseName,
           file: zodFile,

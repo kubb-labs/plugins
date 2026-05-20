@@ -70,7 +70,7 @@ export function Url({
 
   const { path: originalPathParams } = getOperationParameters(node)
   const { path: casedPathParams } = getOperationParameters(node, { paramsCasing })
-  const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : undefined
+  const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : null
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
