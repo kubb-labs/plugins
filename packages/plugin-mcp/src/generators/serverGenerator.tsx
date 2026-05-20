@@ -46,14 +46,14 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     const operationsMapped = nodes.map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
 
-      const mcpFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group })
+      const mcpFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined })
 
       const zodFile = zodResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
           output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group,
+          group: pluginZod.options?.group ?? undefined,
         },
       )
 

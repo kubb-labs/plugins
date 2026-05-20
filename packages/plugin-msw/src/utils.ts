@@ -5,21 +5,21 @@ import type { PluginMsw } from './types.ts'
 /**
  * Gets the content type from a response, defaulting to 'application/json' if a schema exists.
  */
-export function getContentType(response: ast.ResponseNode | undefined): string | undefined {
-  return getResponseContentType(response) ?? (hasResponseSchema(response) ? 'application/json' : undefined)
+export function getContentType(response: ast.ResponseNode | null | undefined): string | null {
+  return getResponseContentType(response) ?? (hasResponseSchema(response) ? 'application/json' : null)
 }
 
 /**
  * Determines if a response has a schema that is not void or any.
  */
-export function hasResponseSchema(response: ast.ResponseNode | undefined): boolean {
+export function hasResponseSchema(response: ast.ResponseNode | null | undefined): boolean {
   return !!getResponseContentType(response) || (!!response?.schema && response.schema.type !== 'void' && response.schema.type !== 'any')
 }
 
-function getResponseContentType(response: ast.ResponseNode | undefined): string | undefined {
+function getResponseContentType(response: ast.ResponseNode | null | undefined): string | null {
   const contentType = response as unknown as { mediaType?: string | null; contentType?: string | null } | undefined
   const value = contentType?.mediaType ?? contentType?.contentType
-  return typeof value === 'string' && value.length > 0 ? value : undefined
+  return typeof value === 'string' && value.length > 0 ? value : null
 }
 
 /**

@@ -45,7 +45,7 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
   },
   infinite: false,
   output: { path: '.' },
-  group: undefined,
+  group: null,
   exclude: [],
   include: undefined,
   override: [],
@@ -54,7 +54,7 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
@@ -84,7 +84,7 @@ const findByTagsNode = ast.createOperation({
 const infiniteOptions = {
   queryParam: 'pageSize',
   initialPageParam: 0,
-  cursorParam: undefined,
+  cursorParam: null,
 } as const
 
 describe('infiniteQueryGenerator operation', () => {

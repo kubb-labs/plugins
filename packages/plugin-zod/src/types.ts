@@ -163,7 +163,7 @@ type ResolvedOptions = {
   exclude: Array<Exclude>
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
-  group: Group | undefined
+  group: Group | null
   typed: NonNullable<Options['typed']>
   inferred: NonNullable<Options['inferred']>
   importPath: NonNullable<Options['importPath']>

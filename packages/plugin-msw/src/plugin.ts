@@ -35,7 +35,7 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
               return `${camelCase(ctx.group)}Controller`
             },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginMswName,

@@ -39,13 +39,13 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const meta = {
       name: resolver.resolveName(node.operationId),
       urlName: resolver.resolveUrlName(node),
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group ?? undefined,
         },
       ),
       fileZod:
@@ -55,7 +55,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
               {
                 root,
                 output: pluginZod.options.output ?? output,
-                group: pluginZod.options?.group,
+                group: pluginZod.options?.group ?? undefined,
               },
             )
           : undefined,

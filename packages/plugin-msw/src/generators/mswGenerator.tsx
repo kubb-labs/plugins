@@ -17,10 +17,10 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const fileName = resolver.resolveName(node.operationId)
     const mock = {
       name: resolver.resolveHandlerName(node),
-      file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile({ name: fileName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
     }
 
-    const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : undefined
+    const fakerPlugin = parser === 'faker' ? driver.getPlugin(pluginFakerName) : null
     const faker =
       parser === 'faker' && fakerPlugin
         ? resolveFakerMeta(node, {
@@ -29,7 +29,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
             fakerOutput: fakerPlugin.options?.output ?? output,
             fakerGroup: fakerPlugin.options?.group,
           })
-        : undefined
+        : null
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -38,7 +38,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const type = {
       file: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
       responseName: tsResolver.resolveResponseName(node),
     }
@@ -47,7 +47,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
     const successResponses = getOperationSuccessResponses(node)
     const hasSuccessSchema = successResponses.some((response) => !!response.schema)
 
-    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+    const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
 
     return (
       <File

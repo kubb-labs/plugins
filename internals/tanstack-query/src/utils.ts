@@ -48,7 +48,7 @@ type ZodSchemaNameResolverLike = {
  */
 export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | undefined): string[] {
   if (!zodResolver) return []
-  return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(
+  return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
     (n): n is string => Boolean(n),
   )
 }
@@ -70,18 +70,18 @@ export function resolvePathParamType(node: ast.OperationNode, param: ast.Paramet
   return ast.createParamsType({ variant: 'reference', name: individualName })
 }
 
-type QueryGroupResult = { type: ast.ParamsTypeNode; optional: boolean } | undefined
+type QueryGroupResult = { type: ast.ParamsTypeNode; optional: boolean } | null
 
 /**
  * Derive a query-params group type from the resolver.
- * Returns `undefined` when no query params exist or when the group name
+ * Returns `null` when no query params exist or when the group name
  * equals the individual param name (no real group).
  */
 export function resolveQueryGroupType(node: ast.OperationNode, params: ast.ParameterNode[], resolver: PluginTs['resolver']): QueryGroupResult {
-  if (!params.length) return undefined
+  if (!params.length) return null
   const firstParam = params[0]!
   const groupName = resolver.resolveQueryParamsName(node, firstParam)
-  if (groupName === resolver.resolveParamName(node, firstParam)) return undefined
+  if (groupName === resolver.resolveParamName(node, firstParam)) return null
   return { type: ast.createParamsType({ variant: 'reference', name: groupName }), optional: params.every((p) => !p.required) }
 }
 
@@ -89,10 +89,10 @@ export function resolveQueryGroupType(node: ast.OperationNode, params: ast.Param
  * Derive a header-params group type from the resolver.
  */
 export function resolveHeaderGroupType(node: ast.OperationNode, params: ast.ParameterNode[], resolver: PluginTs['resolver']): QueryGroupResult {
-  if (!params.length) return undefined
+  if (!params.length) return null
   const firstParam = params[0]!
   const groupName = resolver.resolveHeaderParamsName(node, firstParam)
-  if (groupName === resolver.resolveParamName(node, firstParam)) return undefined
+  if (groupName === resolver.resolveParamName(node, firstParam)) return null
   return { type: ast.createParamsType({ variant: 'reference', name: groupName }), optional: params.every((p) => !p.required) }
 }
 
@@ -145,7 +145,7 @@ export function buildQueryKeyParams(
 
   const queryGroupType = resolveQueryGroupType(node, queryParams, resolver)
 
-  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
+  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : null
   const bodyRequired = node.requestBody?.required ?? false
 
   const params: Array<ast.FunctionParameterNode | ast.ParameterGroupNode> = []

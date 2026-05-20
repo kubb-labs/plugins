@@ -16,7 +16,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 export function Response({ name, typeName, response }: Props): KubbReactNode {
   const statusCode = Number(response.statusCode)
   const contentType = getContentType(response)
-  const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
+  const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
 
   const params = declarationPrinter.print(
     ast.createFunctionParameters({

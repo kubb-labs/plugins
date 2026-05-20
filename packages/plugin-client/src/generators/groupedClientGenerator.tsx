@@ -21,10 +21,10 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
             return acc
           }
 
-          const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
+          const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
           const clientFile = resolver.resolveFile(
             { name: operationNode.operationId, extname: '.ts', tag: operationNode.tags[0] ?? 'default', path: operationNode.path },
-            { root, output, group },
+            { root, output, group: group ?? undefined },
           )
 
           const client = {

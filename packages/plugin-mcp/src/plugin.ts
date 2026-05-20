@@ -44,7 +44,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
               return `${camelCase(ctx.group)}Requests`
             },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginMcpName,

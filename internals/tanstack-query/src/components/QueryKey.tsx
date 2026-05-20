@@ -27,8 +27,8 @@ export const queryKeyTransformer: Transformer = ({ node, casing }) => {
 
   return [
     path.toObject({ type: 'path', stringify: true }),
-    hasQueryParams ? '...(params ? [params] : [])' : undefined,
-    hasRequestBody ? '...(data ? [data] : [])' : undefined,
+    hasQueryParams ? '...(params ? [params] : [])' : null,
+    hasRequestBody ? '...(data ? [data] : [])' : null,
   ].filter(Boolean) as string[]
 }
 

@@ -181,17 +181,17 @@ export type Infinite = {
    * Which field of the data is used, set it to undefined when no cursor is known.
    * @deprecated Use `nextParam` and `previousParam` instead for more flexible pagination handling.
    */
-  cursorParam?: string | undefined
+  cursorParam?: string | null
   /**
    * Which field of the data is used to get the cursor for the next page.
    * Supports dot notation (e.g. 'pagination.next.id') or array path (e.g. ['pagination', 'next', 'id']) to access nested fields.
    */
-  nextParam?: string | string[] | undefined
+  nextParam?: string | string[] | null
   /**
    * Which field of the data is used to get the cursor for the previous page.
    * Supports dot notation (e.g. 'pagination.prev.id') or array path (e.g. ['pagination', 'prev', 'id']) to access nested fields.
    */
-  previousParam?: string | string[] | undefined
+  previousParam?: string | string[] | null
   /**
    * The initial value, the value of the first page.
    * @default 0
@@ -295,7 +295,7 @@ export type Options = {
 
 type ResolvedOptions = {
   output: Output
-  group: Group | undefined
+  group: Group | null
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
@@ -309,11 +309,11 @@ type ResolvedOptions = {
    */
   infinite: NonNullable<Infinite> | false
   suspense: Suspense | false
-  queryKey: QueryKey | undefined
+  queryKey: QueryKey | null
   query: NonNullable<Required<Query>> | false
-  mutationKey: MutationKey | undefined
+  mutationKey: MutationKey | null
   mutation: NonNullable<Required<Mutation>> | false
-  customOptions: NonNullable<Required<CustomOptions>> | undefined
+  customOptions: NonNullable<Required<CustomOptions>> | null
   resolver: ResolverReactQuery
 }
 

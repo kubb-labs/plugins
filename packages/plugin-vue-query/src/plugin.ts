@@ -56,7 +56,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
               return `${camelCase(ctx.group)}Controller`
             },
       } satisfies Group)
-    : undefined
+    : null
 
   return {
     name: pluginVueQueryName,
@@ -99,9 +99,9 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
             ? {
                 queryParam: 'id',
                 initialPageParam: 0,
-                cursorParam: undefined,
-                nextParam: undefined,
-                previousParam: undefined,
+                cursorParam: null,
+                nextParam: null,
+                previousParam: null,
                 ...infinite,
               }
             : false,

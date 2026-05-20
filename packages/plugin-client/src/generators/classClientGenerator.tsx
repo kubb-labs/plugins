@@ -65,7 +65,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         zodResolver && pluginZod?.options
           ? zodResolver.resolveFile(
               { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group },
+              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group ?? undefined },
             )
           : undefined
 
@@ -85,7 +85,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
       if (!tag && !group) {
         const name = resolver.resolveClassName('ApiClient')
-        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
+        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group: group ?? undefined })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
 
@@ -99,7 +99,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
       if (tag) {
         const name = groupName
-        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
+        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
 
@@ -215,7 +215,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     })
 
     if (sdk) {
-      const sdkFile = resolver.resolveFile({ name: sdk.className, extname: '.ts' }, { root, output, group })
+      const sdkFile = resolver.resolveFile({ name: sdk.className, extname: '.ts' }, { root, output, group: group ?? undefined })
 
       files.push(
         <File

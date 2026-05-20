@@ -23,7 +23,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  */
 export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
   const responseName = tsResolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   return [responseName, TError, requestName || 'unknown'].filter(Boolean)
@@ -53,8 +53,8 @@ export function buildClassClientParams({
   headers: Array<string>
 }) {
   const { query: queryParams } = getOperationParameters(node)
-  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : undefined
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : undefined
+  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
+  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
 
   return createFunctionParams({
     config: {
@@ -109,7 +109,7 @@ export function buildRequestDataLine({
   node: ast.OperationNode
   zodResolver?: ResolverZod
 }): string {
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined
+  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
   if (parser === 'zod' && zodRequestName) {
     return `const requestData = ${zodRequestName}.parse(data)`
   }
@@ -142,7 +142,7 @@ export function buildReturnStatement({
   node: ast.OperationNode
   zodResolver?: ResolverZod
 }): string {
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : undefined
+  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
   if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {
     return `return {...res, data: ${zodResponseName}.parse(res.data)}`
   }

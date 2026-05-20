@@ -72,11 +72,11 @@ export function InfiniteQueryOptions({
       ? (() => {
           const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : undefined
+          return groupName !== individualName ? groupName : null
         })()
-      : undefined
+      : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
   const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
@@ -90,15 +90,15 @@ export function InfiniteQueryOptions({
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
   const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
 
-  const hasNewParams = nextParam !== undefined || previousParam !== undefined
+  const hasNewParams = nextParam != null || previousParam != null
 
   const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
     if (hasNewParams) {
-      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : undefined
-      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : undefined
+      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
+      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
       return [
-        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : undefined,
-        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : undefined,
+        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
+        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,
       ] as const
     }
     if (cursorParam) {

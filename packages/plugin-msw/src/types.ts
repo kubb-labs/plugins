@@ -72,7 +72,7 @@ export type Options = {
 
 type ResolvedOptions = {
   output: Output
-  group: Group | undefined
+  group: Group | null
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>

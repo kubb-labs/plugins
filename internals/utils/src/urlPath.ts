@@ -7,9 +7,9 @@ export type URLObject = {
    */
   url: string
   /**
-   * Extracted path parameters as a key-value map, or `undefined` when the path has none.
+   * Extracted path parameters as a key-value map, or `null` when the path has none.
    */
-  params?: Record<string, string>
+  params: Record<string, string> | null
 }
 
 type ObjectOptions = {
@@ -112,15 +112,15 @@ export class URLPath {
     return this.toObject()
   }
 
-  /** Returns a map of path parameter names, or `undefined` when the path has no parameters.
+  /** Returns a map of path parameter names, or `null` when the path has no parameters.
    *
    * @example
    * ```ts
    * new URLPath('/pet/{petId}').params // { petId: 'petId' }
-   * new URLPath('/pet').params         // undefined
+   * new URLPath('/pet').params         // null
    * ```
    */
-  get params(): Record<string, string> | undefined {
+  get params(): Record<string, string> | null {
     return this.toParamsObject()
   }
 
@@ -191,7 +191,7 @@ export class URLPath {
    * // { petId: 'petId', tagId: 'tagId' }
    * ```
    */
-  toParamsObject(replacer?: (pathParam: string) => string): Record<string, string> | undefined {
+  toParamsObject(replacer?: (pathParam: string) => string): Record<string, string> | null {
     const params: Record<string, string> = {}
 
     this.#eachParam((_raw, param) => {
@@ -199,7 +199,7 @@ export class URLPath {
       params[key] = key
     })
 
-    return Object.keys(params).length > 0 ? params : undefined
+    return Object.keys(params).length > 0 ? params : null
   }
 
   /** Converts the OpenAPI path to Express-style colon syntax.

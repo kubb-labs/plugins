@@ -286,7 +286,7 @@ type ResolvedOptions = {
   exclude: Array<Exclude>
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
-  group: Group | undefined
+  group: Group | null
   enumType: NonNullable<Options['enumType']>
   enumTypeSuffix: NonNullable<Options['enumTypeSuffix']>
   enumKeyCasing: EnumKeyCasing

@@ -11,7 +11,7 @@ export const operationsGenerator = defineGenerator<PluginClient>({
     const { output, group } = ctx.options
 
     const name = 'operations'
-    const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
+    const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group: group ?? undefined })
 
     return (
       <File

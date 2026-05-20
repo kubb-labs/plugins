@@ -34,12 +34,12 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const imports = adapter.getImports(node, (schemaName) => ({
       name: resolver.resolveSchemaName(schemaName),
-      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
 
     const meta = {
       name: resolver.resolveSchemaName(node.name),
-      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group }),
+      file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const inferTypeName = inferred ? resolver.resolveSchemaTypeName(node.name) : undefined
@@ -92,7 +92,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const params = ast.caseParams(node.parameters, paramsCasing)
 
     const meta = {
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined }),
     } as const
 
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
@@ -104,7 +104,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: resolver.resolveSchemaName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
       const cachedStd = zodPrinterCache.get(resolver)
@@ -213,7 +213,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
 
     const meta = {
-      file: resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root, output, group }),
+      file: resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const transformedOperations = nodes.map((node) => {
@@ -227,7 +227,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const imports = transformedOperations.flatMap(({ node, data }) => {
       const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as string[]
-      const opFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group })
+      const opFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group: group ?? undefined })
 
       return names.map((name) => <File.Import key={[name, opFile.path].join('-')} name={[name]} root={meta.file.path} path={opFile.path} />)
     })

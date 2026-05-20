@@ -227,7 +227,7 @@ type ResolvedOptions = {
   exclude: Array<Exclude>
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
-  group: Group | undefined
+  group: Group | null
   client: Options['client']
   clientType: NonNullable<Options['clientType']>
   bundle: NonNullable<Options['bundle']>
