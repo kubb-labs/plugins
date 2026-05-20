@@ -14,7 +14,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query',
   renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root } = ctx
     const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -84,8 +84,8 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
         {clientOptions.importPath ? (

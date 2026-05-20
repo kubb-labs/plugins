@@ -11,9 +11,9 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { config, driver, resolver, inputNode } = ctx
+    const { config, driver, resolver } = ctx
     const { output, importPath, dataReturnType, pathParamsType, paramsType, paramsCasing, parser } = ctx.options
-    const baseURL = inputNode.meta?.baseURL
+    const baseURL = ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -59,8 +59,8 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
 
     const typeImportNames = [requestName, responseName, pathParamsName, queryParamsName, headerParamsName, ...errorTypeNames].filter(Boolean) as string[]
 
-    const banner = resolver.resolveBanner(null, { output, config })
-    const footer = resolver.resolveFooter(null, { output, config })
+    const banner = resolver.resolveBanner(ctx.meta, { output, config })
+    const footer = resolver.resolveFooter(ctx.meta, { output, config })
 
     return (
       <File baseName={clientFile.baseName} path={clientFile.path} meta={clientFile.meta} banner={banner} footer={footer}>

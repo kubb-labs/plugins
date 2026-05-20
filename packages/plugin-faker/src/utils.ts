@@ -55,18 +55,6 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
 }
 
 /**
- * Resolves a schema reference by looking up the referenced schema in the provided array.
- * Returns the original node if it's not a reference.
- */
-export function resolveSchemaRef(node: ast.SchemaNode, schemas: Array<ast.SchemaNode>): ast.SchemaNode {
-  if (node.type !== 'ref') {
-    return node
-  }
-
-  return schemas.find((schema) => schema.name === node.name && schema.type !== 'ref') ?? node
-}
-
-/**
  * Resolves a parameter name based on its location (path, query, header, etc.) using the provided resolver.
  */
 export function resolveParamNameByLocation(

@@ -42,9 +42,9 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
   name: 'staticClassClient',
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath } = ctx.options
-    const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
+    const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -164,8 +164,8 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(inputNode, { output, config })}
-              footer={resolver.resolveFooter(inputNode, { output, config })}
+              banner={resolver.resolveBanner(ctx.meta, { output, config })}
+              footer={resolver.resolveFooter(ctx.meta, { output, config })}
             >
               {importPath ? (
                 <>

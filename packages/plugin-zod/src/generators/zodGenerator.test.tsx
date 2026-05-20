@@ -307,11 +307,9 @@ describe('zodGenerator — Schema', () => {
       adapter: createMockedAdapter({
         resolvedOptions: { dateType: 'string' },
       }),
-      inputNode: {
-        kind: 'Input',
-        schemas: [petPolySchema, catCycleSchema],
-        operations: [],
-        meta: {},
+      meta: {
+        circularNames: [...ast.findCircularSchemas([petPolySchema, catCycleSchema])],
+        enumNames: [],
       },
       driver,
       plugin,
