@@ -71,6 +71,7 @@
     "plugin-zod-oneof-union",
     "plugin-zod-v5-rewrite",
     "printer-options-api",
+    "rare-birds-beg",
     "remove-plugin-key-use-name",
     "rename-define-to-create",
     "rename-plugin-manager-to-plugin-driver",
