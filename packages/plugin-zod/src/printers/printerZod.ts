@@ -53,7 +53,7 @@ export type PrinterZodOptions = {
   /**
    * Properties to exclude using `.omit({ key: true })`.
    */
-  keysToOmit?: Array<string>
+  keysToOmit?: Array<string> | null
   /**
    * Schema names that form circular dependency chains.
    * Properties referencing these emit lazy getters wrapping refs in `z.lazy(() => …)`.
@@ -191,7 +191,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         return `z.enum([${nonNullValues.map(formatLiteral).join(', ')}])`
       },
       ref(node) {
-        if (!node.name) return undefined
+        if (!node.name) return null
         const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
         const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
 

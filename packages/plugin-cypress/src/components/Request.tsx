@@ -20,7 +20,7 @@ type Props = {
    * TypeScript resolver for resolving param/data/response type names
    */
   resolver: ResolverTs
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   dataReturnType: PluginCypress['resolvedOptions']['dataReturnType']
   paramsCasing: PluginCypress['resolvedOptions']['paramsCasing']
   paramsType: PluginCypress['resolvedOptions']['paramsType']

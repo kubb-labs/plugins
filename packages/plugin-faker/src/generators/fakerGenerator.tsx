@@ -5,20 +5,13 @@ import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
-import {
-  buildResponseUnionSchema,
-  canOverrideSchema,
-  localeToFakerImport,
-  resolveParamNameByLocation,
-  resolveSchemaRef,
-  resolveTypeReference,
-} from '../utils.ts'
+import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveParamNameByLocation, resolveTypeReference } from '../utils.ts'
 
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRendererSync,
   schema(node, ctx) {
-    const { adapter, config, resolver, root, inputNode } = ctx
+    const { adapter, config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
@@ -28,8 +21,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const schemaNode = resolveSchemaRef(node, inputNode.schemas)
-    const schemaName = schemaNode.name ?? node.name
+    const schemaName = node.name
     const mode = ctx.getMode(output)
     const meta = {
       name: resolver.resolveName(schemaName),
@@ -40,8 +32,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
       ),
     } as const
-    const canOverride = canOverrideSchema(schemaNode)
-    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
+    const canOverride = canOverrideSchema(node)
+    const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
     const printerInstance = printerFaker({
       resolver,
       schemaName,
@@ -52,9 +44,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       nodes: printer?.nodes,
       cyclicSchemas,
     })
-    const fakerText = printerInstance.print(schemaNode) ?? 'undefined'
+    const fakerText = printerInstance.print(node) ?? 'undefined'
     const typeReference = resolveTypeReference({
-      node: schemaNode,
+      node,
       canOverride,
       name: meta.name,
       typeName: meta.typeName,
@@ -63,7 +55,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     })
 
     const imports = adapter
-      .getImports(schemaNode, (schemaName) => ({
+      .getImports(node, (schemaName) => ({
         name: resolver.resolveName(schemaName),
         path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
       }))
@@ -75,8 +67,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -87,8 +79,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         <Faker
           name={meta.name}
           typeName={typeReference.typeName}
-          description={schemaNode.description}
-          node={schemaNode}
+          description={node.description}
+          node={node}
           printer={printerInstance}
           seed={seed}
           canOverride={canOverride}
@@ -97,7 +89,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     )
   },
   operation(node, ctx) {
-    const { adapter, config, resolver, root, inputNode } = ctx
+    const { adapter, config, resolver, root } = ctx
     const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
@@ -136,7 +128,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ...(dataEntry ? [dataEntry.name] : []),
       responseName,
     ])
-    const cyclicSchemas = ast.findCircularSchemas(inputNode.schemas)
+    const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
       file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
@@ -229,8 +221,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}

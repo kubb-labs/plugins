@@ -12,7 +12,7 @@ type Props = {
   isExportable?: boolean
   isIndexable?: boolean
 
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']

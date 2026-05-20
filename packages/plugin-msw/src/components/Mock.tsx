@@ -10,7 +10,7 @@ type Props = {
   name: string
   typeName: string
   requestTypeName?: string
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   node: ast.OperationNode
 }
 

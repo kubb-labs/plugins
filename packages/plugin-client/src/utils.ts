@@ -45,7 +45,7 @@ export function buildClassClientParams({
 }: {
   node: ast.OperationNode
   path: URLPath
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   tsResolver: ResolverTs
   isFormData: boolean
   isMultipleContentTypes: boolean
