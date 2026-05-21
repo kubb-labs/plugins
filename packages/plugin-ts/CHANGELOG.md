@@ -1,5 +1,15 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Use `parserTs.print` instead of the removed standalone `print` / `safePrint` exports from `@kubb/parser-ts`. Requires `@kubb/parser-ts@^5.0.0-beta.24`.
+
 ## 5.0.0-beta.22
 
 ### Patch Changes

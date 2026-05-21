@@ -1,5 +1,19 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [#183](https://github.com/kubb-labs/plugins/pull/183) [`9de6534`](https://github.com/kubb-labs/plugins/commit/9de653476daefd588633ec4b12551c72b8c88965) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the duplicate `transformers` option from the plugin-client extension YAML. The TypeScript option type only defines `transformer` (singular), so the duplicate was dead metadata that bloated the published registry. The `transformer` option itself is unchanged.
+
+- Updated dependencies [[`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac), [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c), [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3)]:
+  - @kubb/plugin-ts@5.0.0-beta.23
+  - @kubb/plugin-zod@5.0.0-beta.23
+
 ## 5.0.0-beta.22
 
 ### Patch Changes
