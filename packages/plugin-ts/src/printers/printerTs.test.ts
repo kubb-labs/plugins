@@ -1,5 +1,5 @@
 import { ast } from '@kubb/core'
-import { print } from '@kubb/parser-ts'
+import { parserTs } from '@kubb/parser-ts'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
@@ -14,7 +14,7 @@ const formatTS = async (node: ts.Node | null | undefined): Promise<string> => {
   if (!node) return ''
 
   const alias = ts.factory.createTypeAliasDeclaration(undefined, '_', undefined, node as ts.TypeNode)
-  const source = print(alias)
+  const source = parserTs.print(alias)
   const formatted = await format(source)
 
   return formatted
