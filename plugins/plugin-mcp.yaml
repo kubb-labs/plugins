@@ -112,7 +112,7 @@ options:
     important: |
       Set the same `paramsCasing` here as on `@kubb/plugin-ts` so the handlers' parameter types line up with the generated request types.
     examples:
-      - name: "With paramsCasing: 'camelcase'"
+      - name: "With `paramsCasing: 'camelcase'`"
         files:
           - lang: typescript
             twoslash: false
@@ -131,7 +131,7 @@ options:
                 })
                 // ...
               }
-      - name: Without paramsCasing
+      - name: Without `paramsCasing`
         files:
           - lang: typescript
             twoslash: false

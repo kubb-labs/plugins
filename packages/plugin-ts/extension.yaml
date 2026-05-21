@@ -5,15 +5,15 @@ name: TypeScript
 description: Generate TypeScript types and interfaces from OpenAPI schemas with full type safety end to end.
 category: types
 type: official
-npmPackage: '@kubb/plugin-ts'
+npmPackage: "@kubb/plugin-ts"
 docsPath: /plugins/plugin-ts
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - typescript
   - types
@@ -178,7 +178,7 @@ options:
                   └── storeController/
                       ├── index.ts
                       └── Store.ts
-          - name: 'false'
+          - name: "false"
             files:
               - name: kubb.config.ts
                 lang: typescript
@@ -203,7 +203,7 @@ options:
                   # No index.ts is generated for this plugin.
                   # Its files are also excluded from the root index.ts.
       - name: banner
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: |
           Text prepended to every generated file. Useful for license headers, lint disables, or `@ts-nocheck` directives.
@@ -261,7 +261,7 @@ options:
                     ],
                   })
       - name: footer
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: |
           Text appended at the end of every generated file. The mirror of `banner` — use it for closing comments, re-enabling lint rules, or marker lines.
@@ -292,7 +292,7 @@ options:
       - name: override
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: |
           Allows the plugin to overwrite hand-written files that share a name with a generated file.
 
@@ -396,7 +396,7 @@ options:
         note: |
           `Required: true*` is conditional — only required when the parent `group` option is used. `group` itself stays optional.
       - name: name
-        type: '(context: GroupContext) => string'
+        type: "(context: GroupContext) => string"
         required: false
         default: (ctx) => `${ctx.group}Controller`
         description: |
@@ -479,7 +479,7 @@ options:
       > `'inlineLiteral'` produces the cleanest output for small enums — the values appear directly where they are used instead of via a named alias.
   - name: enumSuffix
     required: false
-    description: ''
+    description: ""
     warning: |
       Moved to [`adapterOas`](/adapters/adapter-oas#enumSuffix). Use `adapterOas({ enumSuffix })` instead.
   - name: enumTypeSuffix
@@ -540,12 +540,12 @@ options:
       | `'none'` (default) | as-is |
   - name: dateType
     required: false
-    description: ''
+    description: ""
     warning: |
       Moved to [`adapterOas`](/adapters/adapter-oas#dateType). Use `adapterOas({ dateType })` instead.
   - name: integerType
     required: false
-    description: ''
+    description: ""
     warning: |
       Moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.
   - name: syntaxType
@@ -577,12 +577,12 @@ options:
               }
   - name: unknownType
     required: false
-    description: ''
+    description: ""
     warning: |
       Moved to [`adapterOas`](/adapters/adapter-oas#unknownType). Use `adapterOas({ unknownType })` instead.
   - name: emptySchemaType
     required: false
-    description: ''
+    description: ""
     warning: |
       Moved to [`adapterOas`](/adapters/adapter-oas#emptySchemaType). Use `adapterOas({ emptySchemaType })` instead.
   - name: optionalType
@@ -658,7 +658,7 @@ options:
     important: |
       Every plugin that references parameters must use the same `paramsCasing` value — `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-faker`, `@kubb/plugin-mcp`. Mismatched casing breaks the generated type chain.
     examples:
-      - name: Without paramsCasing
+      - name: Without `paramsCasing`
         files:
           - lang: typescript
             twoslash: false
@@ -675,7 +675,7 @@ options:
               export type FindPetsByStatusHeaderParams = {
                 'X-Custom-Header'?: string
               }
-      - name: "With paramsCasing: 'camelcase'"
+      - name: "With `paramsCasing: 'camelcase'`"
         files:
           - lang: typescript
             twoslash: false
@@ -995,7 +995,7 @@ options:
     note: |
       `@kubb/plugin-ts` uses AST visitors for schema/operation node transforms. For renaming generated symbols, use `resolver` instead.
   - name: printer
-    type: '{ nodes?: PrinterTsNodes }'
+    type: "{ nodes?: PrinterTsNodes }"
     required: false
     description: |
       Replaces the TypeScript node handler for a specific schema type (e.g. `'integer'`, `'date'`, `'string'`). Each handler is a function that builds a TypeScript AST node for that schema type.

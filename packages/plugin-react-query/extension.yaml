@@ -5,15 +5,15 @@ name: React Query
 description: Generate TanStack Query hooks for React (useQuery, useMutation, useSuspenseQuery, useInfiniteQuery) from OpenAPI.
 category: framework
 type: official
-npmPackage: '@kubb/plugin-react-query'
+npmPackage: "@kubb/plugin-react-query"
 docsPath: /plugins/plugin-react-query
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - react-query
   - tanstack-query
@@ -177,7 +177,7 @@ options:
                   └── storeController/
                       ├── index.ts
                       └── Store.ts
-          - name: 'false'
+          - name: "false"
             files:
               - name: kubb.config.ts
                 lang: typescript
@@ -202,7 +202,7 @@ options:
                   # No index.ts is generated for this plugin.
                   # Its files are also excluded from the root index.ts.
       - name: banner
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: |
           Text prepended to every generated file. Useful for license headers, lint disables, or `@ts-nocheck` directives.
@@ -260,7 +260,7 @@ options:
                     ],
                   })
       - name: footer
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: |
           Text appended at the end of every generated file. The mirror of `banner` — use it for closing comments, re-enabling lint rules, or marker lines.
@@ -291,7 +291,7 @@ options:
       - name: override
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: |
           Allows the plugin to overwrite hand-written files that share a name with a generated file.
 
@@ -395,7 +395,7 @@ options:
         note: |
           `Required: true*` is conditional — only required when the parent `group` option is used. `group` itself stays optional.
       - name: name
-        type: '(context: GroupContext) => string'
+        type: "(context: GroupContext) => string"
         required: false
         default: (ctx) => `${ctx.group}Controller`
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
@@ -597,7 +597,7 @@ options:
       - name: bundle
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: |
           Copies the HTTP client runtime into the generated output, so the consuming app does not need `@kubb/plugin-client` installed at runtime.
 
@@ -798,7 +798,7 @@ options:
   - name: infinite
     type: Infinite | false
     required: false
-    default: 'false'
+    default: "false"
     description: |
       Enables `useInfiniteQuery` hooks for cursor- or page-based pagination. Pass an object to configure how the cursor is read from the response; pass `false` (default) to skip infinite query generation.
     codeBlock:
@@ -826,13 +826,13 @@ options:
       - name: initialPageParam
         type: unknown
         required: false
-        default: '0'
+        default: "0"
         description: Initial value for `pageParam` on the first fetch.
       - name: cursorParam
         type: string | undefined
         required: false
         deprecated:
-          note: '`cursorParam` is deprecated. Use `nextParam` and `previousParam` for richer pagination control.'
+          note: "`cursorParam` is deprecated. Use `nextParam` and `previousParam` for richer pagination control."
         description: Path to the cursor field on the response. Leave undefined when the cursor is not known.
       - name: nextParam
         type: string | string[] | undefined
@@ -914,7 +914,7 @@ options:
         description: |
           Module specifier used in the `import { useQuery } from '...'` statement at the top of every generated hook file. Use this to point at your own re-export of TanStack Query (for example a wrapper that injects a default `queryClient`).
   - name: queryKey
-    type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
+    type: "(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]"
     required: false
     description: |
       Builds the `queryKey` for each generated hook. Use this to add a version namespace, swap to operation IDs, or shape keys to match an existing `queryClient.invalidateQueries` strategy.
@@ -952,7 +952,7 @@ options:
               export const getUserByNameQueryKey = ({ username }: { username: GetUserByNamePathParams['username'] }) =>
                 ['user', username] as const
       - title: Extend the default transformer
-        body: 'Prepend a version prefix to the default query key:'
+        body: "Prepend a version prefix to the default query key:"
         codeBlock:
           - lang: typescript
             code: |-
@@ -994,7 +994,7 @@ options:
               ],
             })
       - title: Conditional keys based on params
-        body: 'Include query params in the key only when they are present:'
+        body: "Include query params in the key only when they are present:"
         codeBlock:
           lang: typescript
           code: |-
@@ -1076,7 +1076,7 @@ options:
         description: |
           Module specifier used in the `import { useMutation } from '...'` statement at the top of every generated hook file. Useful for routing through your own wrapper.
   - name: mutationKey
-    type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
+    type: "(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]"
     required: false
     description: |
       Builds the `mutationKey` for each mutation hook. Useful when you batch invalidations or read mutation state via `useMutationState`.

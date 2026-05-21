@@ -74,7 +74,7 @@ options:
 
       Use `'zod/mini'` to import from the tree-shakeable Mini bundle, or a custom path when re-exporting Zod from your own module.
     examples:
-      - name: Use the Zod mini bundle
+      - name: Use Zod's mini bundle
         files:
           - lang: typescript
             twoslash: false
