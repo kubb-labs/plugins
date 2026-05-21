@@ -5,15 +5,15 @@ name: MCP
 description: Generate a Model Context Protocol (MCP) server from OpenAPI so AI assistants like Claude can call your API as tools.
 category: ai
 type: official
-npmPackage: '@kubb/plugin-mcp'
+npmPackage: "@kubb/plugin-mcp"
 docsPath: /plugins/plugin-mcp
 repo: https://github.com/kubb-labs/plugins
 maintainers:
   - name: Stijn Van Hulle
     github: stijnvanhulle
 compatibility:
-  kubb: '>=5.0.0'
-  node: '>=22'
+  kubb: ">=5.0.0"
+  node: ">=22"
 tags:
   - mcp
   - model-context-protocol
@@ -192,7 +192,7 @@ options:
                   └── storeController/
                       ├── index.ts
                       └── Store.ts
-          - name: 'false'
+          - name: "false"
             files:
               - name: kubb.config.ts
                 lang: typescript
@@ -217,7 +217,7 @@ options:
                   # No index.ts is generated for this plugin.
                   # Its files are also excluded from the root index.ts.
       - name: banner
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: |
           Text prepended to every generated file. Useful for license headers, lint disables, or `@ts-nocheck` directives.
@@ -275,7 +275,7 @@ options:
                     ],
                   })
       - name: footer
-        type: 'string | ((node: RootNode) => string)'
+        type: "string | ((node: RootNode) => string)"
         required: false
         description: |
           Text appended at the end of every generated file. The mirror of `banner` — use it for closing comments, re-enabling lint rules, or marker lines.
@@ -306,7 +306,7 @@ options:
       - name: override
         type: boolean
         required: false
-        default: 'false'
+        default: "false"
         description: |
           Allows the plugin to overwrite hand-written files that share a name with a generated file.
 
@@ -426,7 +426,7 @@ options:
         note: |
           `Required: true*` is conditional — only required when the parent `group` option is used. `group` itself stays optional.
       - name: name
-        type: '(context: GroupContext) => string'
+        type: "(context: GroupContext) => string"
         required: false
         default: (ctx) => `${ctx.group}Requests`
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
@@ -438,7 +438,7 @@ options:
     important: |
       Set the same `paramsCasing` here as on `@kubb/plugin-ts` so the handlers' parameter types line up with the generated request types.
     examples:
-      - name: "With `paramsCasing: 'camelcase'`"
+      - name: "With paramsCasing: 'camelcase'"
         files:
           - lang: typescript
             twoslash: false
@@ -457,7 +457,7 @@ options:
                 })
                 // ...
               }
-      - name: Without `paramsCasing`
+      - name: Without paramsCasing
         files:
           - lang: typescript
             twoslash: false

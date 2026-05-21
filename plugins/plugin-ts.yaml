@@ -337,7 +337,7 @@ options:
     important: |
       Every plugin that references parameters must use the same `paramsCasing` value — `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`, `@kubb/plugin-faker`, `@kubb/plugin-mcp`. Mismatched casing breaks the generated type chain.
     examples:
-      - name: Without `paramsCasing`
+      - name: Without paramsCasing
         files:
           - lang: typescript
             twoslash: false
@@ -354,7 +354,7 @@ options:
               export type FindPetsByStatusHeaderParams = {
                 'X-Custom-Header'?: string
               }
-      - name: "With `paramsCasing: 'camelcase'`"
+      - name: "With paramsCasing: 'camelcase'"
         files:
           - lang: typescript
             twoslash: false
