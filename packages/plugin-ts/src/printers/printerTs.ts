@@ -1,5 +1,5 @@
 import { ast } from '@kubb/core'
-import { safePrint } from '@kubb/parser-ts'
+import { parserTs } from '@kubb/parser-ts'
 import type ts from 'typescript'
 import { ENUM_TYPES_WITH_KEY_SUFFIX, OPTIONAL_ADDS_QUESTION_TOKEN, OPTIONAL_ADDS_UNDEFINED } from '../constants.ts'
 import * as factory from '../factory.ts'
@@ -292,7 +292,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
           (meta.nullish || meta.optional) && addsUndefined
             ? factory.createUnionDeclaration({ nodes: [withNullable, factory.keywordTypeNodes.undefined] })
             : withNullable
-        return safePrint(result)
+        return parserTs.print(result)
       }
 
       // When keysToOmit is present, wrap with Omit first, then apply nullable/optional
@@ -320,7 +320,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         }),
       })
 
-      return safePrint(typeNode)
+      return parserTs.print(typeNode)
     },
   }
 })

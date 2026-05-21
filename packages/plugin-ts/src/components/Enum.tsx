@@ -1,6 +1,6 @@
 import { camelCase, trimQuotes } from '@internals/utils'
 import type { ast } from '@kubb/core'
-import { safePrint } from '@kubb/parser-ts'
+import { parserTs } from '@kubb/parser-ts'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { ENUM_TYPES_WITH_KEY_SUFFIX, ENUM_TYPES_WITH_RUNTIME_VALUE, ENUM_TYPES_WITH_TYPE_ONLY } from '../constants.ts'
@@ -72,11 +72,11 @@ export function Enum({ node, enumType, enumTypeSuffix, enumKeyCasing, resolver }
     <>
       {nameNode && (
         <File.Source name={enumName} isExportable isIndexable isTypeOnly={false}>
-          {safePrint(nameNode)}
+          {parserTs.print(nameNode)}
         </File.Source>
       )}
       <File.Source name={typeName} isIndexable isExportable={ENUM_TYPES_WITH_RUNTIME_VALUE.has(enumType)} isTypeOnly={ENUM_TYPES_WITH_TYPE_ONLY.has(enumType)}>
-        {safePrint(typeNode)}
+        {parserTs.print(typeNode)}
       </File.Source>
     </>
   )
