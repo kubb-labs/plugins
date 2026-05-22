@@ -17,7 +17,7 @@ export type DeletePetPathPetId = bigint
 /**
  * @type array
  */
-export type DeletePetStatus200 = ('TYPE1' | 'TYPE2' | 'TYPE3')[]
+export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
 
 /**
  * @type any

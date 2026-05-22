@@ -198,7 +198,7 @@ export function createParameterSignature(
  * Creates a JSDoc comment node from an array of comment strings.
  * Returns null if no comments are provided.
  */
-export function createJSDoc({ comments }: { comments: string[] }) {
+export function createJSDoc({ comments }: { comments: Array<string> }) {
   if (!comments.length) {
     return null
   }
@@ -338,7 +338,7 @@ export function createTypeDeclaration({
 /**
  * Creates a TypeScript namespace declaration (exported module).
  */
-export function createNamespaceDeclaration({ statements, name }: { name: string; statements: ts.Statement[] }) {
+export function createNamespaceDeclaration({ statements, name }: { name: string; statements: Array<ts.Statement> }) {
   return factory.createModuleDeclaration(
     [factory.createToken(ts.SyntaxKind.ExportKeyword)],
     factory.createIdentifier(name),
@@ -519,7 +519,7 @@ export function createEnumDeclaration({
    * Enum name in PascalCase.
    */
   typeName: string
-  enums: [key: string | number, value: string | number | boolean][]
+  enums: Array<[key: string | number, value: string | number | boolean]>
   /**
    * Choose the casing for enum key names.
    * @default 'none'
@@ -740,8 +740,8 @@ export function createUrlTemplateType(path: string): ts.TypeNode {
   }
 
   const segments = normalized.split(/(\{[^}]+\})/)
-  const parts: string[] = []
-  const parameterIndices: number[] = []
+  const parts: Array<string> = []
+  const parameterIndices: Array<number> = []
 
   segments.forEach((segment) => {
     if (segment.startsWith('{') && segment.endsWith('}')) {
@@ -753,7 +753,7 @@ export function createUrlTemplateType(path: string): ts.TypeNode {
   })
 
   const head = ts.factory.createTemplateHead(parts[0] || '')
-  const templateSpans: ts.TemplateLiteralTypeSpan[] = []
+  const templateSpans: Array<ts.TemplateLiteralTypeSpan> = []
 
   parameterIndices.forEach((paramIndex, i) => {
     const isLast = i === parameterIndices.length - 1

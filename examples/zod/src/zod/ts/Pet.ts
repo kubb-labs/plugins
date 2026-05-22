@@ -26,7 +26,7 @@ export type Pet = {
   /**
    * @type array | undefined
    */
-  parent?: Pet[]
+  parent?: Array<Pet>
   /**
    * @pattern ^[0-9]{1,19}$
    * @example 10
@@ -45,11 +45,11 @@ export type Pet = {
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  tags?: Tag[]
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
    * @type string | undefined

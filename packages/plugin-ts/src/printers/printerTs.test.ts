@@ -1019,7 +1019,7 @@ describe('printerTs', () => {
         enumType: 'inlineLiteral',
         nodes: {
           array(node) {
-            const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean) as ts.TypeNode[]
+            const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean) as Array<ts.TypeNode>
             return ts.factory.createTypeReferenceNode('Set', [ts.factory.createUnionTypeNode(itemNodes)])
           },
         },

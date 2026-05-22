@@ -7,7 +7,7 @@ type HandlersProps = {
    */
   name: string
   // custom
-  handlers: string[]
+  handlers: Array<string>
 }
 
 export function Handlers({ name, handlers }: HandlersProps): KubbReactNode {

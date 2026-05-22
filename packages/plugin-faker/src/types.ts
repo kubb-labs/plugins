@@ -130,7 +130,7 @@ export type Options = {
    * Value passed to `faker.seed(...)`. Set this for deterministic mock output,
    * which is useful for snapshot tests.
    */
-  seed?: number | number[]
+  seed?: number | Array<number>
   /**
    * Rename properties inside path/query/header mocks. Body mocks are unaffected.
    *

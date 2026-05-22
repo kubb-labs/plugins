@@ -32,7 +32,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       path: resolvedFile.path.replace(/[^/\\]+\.ts$/, `${name}.ts`),
     }
 
-    const imports: KubbReactNode[] = []
+    const imports: Array<KubbReactNode> = []
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {

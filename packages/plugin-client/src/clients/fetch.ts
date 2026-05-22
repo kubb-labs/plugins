@@ -14,7 +14,7 @@ export type RequestConfig<TData = unknown> = {
   data?: TData | FormData
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
-  headers?: [string, string][] | Record<string, string>
+  headers?: Array<[string, string]> | Record<string, string>
   credentials?: RequestCredentials
   contentType?: string
 }

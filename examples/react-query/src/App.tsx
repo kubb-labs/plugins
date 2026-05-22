@@ -10,7 +10,7 @@ function Pets() {
   const { data: pets, queryKey } = useFindPetsByStatusHook({ status }, { query: { enabled: true } })
   const { data } = useUpdatePetWithFormHook(2)
   const { queryKey: _queryKey, initialData } = findPetsByStatusQueryOptionsHook()
-  const statuses: FindPetsByStatusQueryStatus[] = ['available', 'pending']
+  const statuses: Array<FindPetsByStatusQueryStatus> = ['available', 'pending']
 
   const queries = useQueries({
     queries: statuses.map((status) => findPetsByStatusQueryOptionsHook({ status })),
@@ -91,7 +91,7 @@ function Pets() {
     <>
       <h1>Pets: {status}</h1>
       <ul>
-        {(pets as Pet[] | undefined)?.map((pet) => (
+        {(pets as Array<Pet> | undefined)?.map((pet) => (
           <li key={pet.id}>{pet.name}</li>
         ))}
       </ul>

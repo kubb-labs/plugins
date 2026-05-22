@@ -118,7 +118,7 @@ export type Customer = {
   /**
    * @type array | undefined
    */
-  address?: Address[]
+  address?: Array<Address>
 }
 
 export type HappyCustomer = Customer & {
@@ -281,11 +281,11 @@ export type Pet = (
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  readonly tags?: Tag[]
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    * @type string | undefined
@@ -325,11 +325,11 @@ export type AddPetRequest = {
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  tags?: Tag[]
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
    * @type string | undefined
@@ -372,7 +372,7 @@ export type PetNotFound = {
 /**
  * @type array
  */
-export type UserArray = User[]
+export type UserArray = Array<User>
 
 export type UpdatePetStatus200 = Pet
 
@@ -508,7 +508,7 @@ export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | u
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200 = Pet[]
+export type FindPetsByStatusStatus200 = Array<Pet>
 
 /**
  * @type any
@@ -551,7 +551,7 @@ export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsBySta
  * @description Tags to filter by
  * @type array | undefined
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
+export type FindPetsByTagsQueryTags = Array<string> | undefined
 
 /**
  * @description to request with required page number or pagination
@@ -568,7 +568,7 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Pet[]
+export type FindPetsByTagsStatus200 = Array<Pet>
 
 /**
  * @type any
@@ -734,7 +734,7 @@ export type DeletePetPathPetId = bigint
 /**
  * @type array
  */
-export type DeletePetStatus200 = ('TYPE1' | 'TYPE2' | 'TYPE3')[]
+export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
 
 /**
  * @type any
@@ -1144,7 +1144,7 @@ export type CreateUsersWithListInputStatusDefault = any
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputData = User[] | undefined
+export type CreateUsersWithListInputData = Array<User> | undefined
 
 /**
  * @type object
