@@ -15,7 +15,7 @@ export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | u
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200 = Pet[]
+export type FindPetsByStatusStatus200 = Array<Pet>
 
 /**
  * @type any

@@ -133,7 +133,7 @@ export function lengthConstraints({ min, max, pattern }: LengthConstraints): str
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
 export function numberChecksMini({ min, max, exclusiveMinimum, exclusiveMaximum, multipleOf }: NumericConstraints): string {
-  const checks: string[] = []
+  const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minimum(${min})`)
   if (max !== undefined) checks.push(`z.maximum(${max})`)
   if (exclusiveMinimum !== undefined) checks.push(`z.minimum(${exclusiveMinimum}, { exclusive: true })`)
@@ -146,7 +146,7 @@ export function numberChecksMini({ min, max, exclusiveMinimum, exclusiveMaximum,
  * Build `.check(z.minLength(), z.maxLength(), z.regex())` for `zod/mini` length constraints.
  */
 export function lengthChecksMini({ min, max, pattern }: LengthConstraints): string {
-  const checks: string[] = []
+  const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minLength(${min})`)
   if (max !== undefined) checks.push(`z.maxLength(${max})`)
   if (pattern !== undefined) checks.push(`z.regex(${toRegExpString(pattern, null)})`)

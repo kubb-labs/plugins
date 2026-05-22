@@ -22,7 +22,7 @@ import {
 
 const { factory } = ts
 
-const formatTS = (elements: ts.Node | (ts.Node | undefined)[]) => {
+const formatTS = (elements: ts.Node | Array<ts.Node | undefined>) => {
   return format(parserTs.print(...[elements].flat().filter(Boolean)))
 }
 

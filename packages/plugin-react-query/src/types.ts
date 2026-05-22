@@ -196,12 +196,12 @@ export type Infinite = {
    * Path to the next-page cursor on the response. Supports dot notation
    * (`'pagination.next.id'`) or array form (`['pagination', 'next', 'id']`).
    */
-  nextParam?: string | string[] | null
+  nextParam?: string | Array<string> | null
   /**
    * Path to the previous-page cursor on the response. Supports dot notation
    * or array form.
    */
-  previousParam?: string | string[] | null
+  previousParam?: string | Array<string> | null
   /**
    * Initial value for `pageParam` on the first fetch.
    *

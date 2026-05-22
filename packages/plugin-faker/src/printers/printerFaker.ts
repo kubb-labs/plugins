@@ -103,7 +103,7 @@ const fakerKeywordMapper = {
   },
   boolean: () => 'faker.datatype.boolean()',
   null: () => 'null',
-  array: (items: string[] = [], min?: number, max?: number) => {
+  array: (items: Array<string> = [], min?: number, max?: number) => {
     if (items.length > 1) {
       return `faker.helpers.arrayElements([${items.join(', ')}])`
     }
@@ -124,9 +124,9 @@ const fakerKeywordMapper = {
 
     return `faker.helpers.multiple(() => (${item}))`
   },
-  tuple: (items: string[] = []) => `[${items.join(', ')}]`,
+  tuple: (items: Array<string> = []) => `[${items.join(', ')}]`,
   enum: (items: Array<string | number | boolean | undefined> = [], type = 'any') => `faker.helpers.arrayElement<${type}>([${items.join(', ')}])`,
-  union: (items: string[] = []) => `faker.helpers.arrayElement<any>([${items.join(', ')}])`,
+  union: (items: Array<string> = []) => `faker.helpers.arrayElement<any>([${items.join(', ')}])`,
   datetime: () => 'faker.date.anytime().toISOString()',
   date: (representation: 'date' | 'string' = 'string', parser: PluginFaker['resolvedOptions']['dateParser'] = 'faker') => {
     if (representation === 'string') {
@@ -160,7 +160,7 @@ const fakerKeywordMapper = {
   },
   uuid: () => 'faker.string.uuid()',
   url: () => 'faker.internet.url()',
-  and: (items: string[] = []) => {
+  and: (items: Array<string> = []) => {
     if (items.length === 0) {
       return '{}'
     }
@@ -276,7 +276,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
-        const items: string[] = (node.members ?? [])
+        const items: Array<string> = (node.members ?? [])
           .map((member) =>
             printNested(member, {
               nestedInObject: true,
@@ -287,7 +287,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.union(items)
       },
       intersection(node): string {
-        const items: string[] = (node.members ?? [])
+        const items: Array<string> = (node.members ?? [])
           .map((member) =>
             printNested(member, {
               nestedInObject: true,
@@ -298,7 +298,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.and(items)
       },
       array(node): string {
-        const items: string[] = (node.items ?? [])
+        const items: Array<string> = (node.items ?? [])
           .map((member) =>
             printNested(member, {
               typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
@@ -310,7 +310,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.array(items, node.min, node.max)
       },
       tuple(node): string {
-        const items: string[] = (node.items ?? [])
+        const items: Array<string> = (node.items ?? [])
           .map((member, index) =>
             printNested(member, {
               typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${index}]` : undefined,

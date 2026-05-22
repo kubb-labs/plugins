@@ -85,7 +85,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null
   const headers = [headerParams.length ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : null, contentTypeHeader].filter(Boolean)
 
-  const fetchConfig: string[] = []
+  const fetchConfig: Array<string> = []
   fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
   fetchConfig.push(`url: ${urlPath.template}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
