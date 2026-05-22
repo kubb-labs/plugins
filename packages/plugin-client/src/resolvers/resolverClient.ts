@@ -1,4 +1,4 @@
-import { camelCase, pascalCase } from '@internals/utils'
+import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginClient } from '../types.ts'
 
@@ -20,7 +20,8 @@ export const resolverClient = defineResolver<PluginClient>(() => ({
   name: 'default',
   pluginName: 'plugin-client',
   default(name, type) {
-    return camelCase(name, { isFile: type === 'file' })
+    const resolved = camelCase(name, { isFile: type === 'file' })
+    return type === 'file' ? resolved : ensureValidVarName(resolved)
   },
   resolveName(name) {
     return this.default(name, 'function')
@@ -29,13 +30,13 @@ export const resolverClient = defineResolver<PluginClient>(() => ({
     return this.default(name, type)
   },
   resolveClassName(name) {
-    return pascalCase(name)
+    return ensureValidVarName(pascalCase(name))
   },
   resolveGroupName(name) {
-    return pascalCase(name)
+    return ensureValidVarName(pascalCase(name))
   },
   resolveClientPropertyName(name) {
-    return camelCase(name)
+    return ensureValidVarName(camelCase(name))
   },
   resolveUrlName(node) {
     const name = this.resolveName(node.operationId)
