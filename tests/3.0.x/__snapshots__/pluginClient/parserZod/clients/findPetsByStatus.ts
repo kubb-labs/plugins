@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { findPetsByStatusResponseSchema } from "../zod/findPetsByStatusSchema.ts";
 
@@ -25,7 +25,7 @@ export async function findPetsByStatus(params?: { status?: FindPetsByStatusQuery
 
 
 
-  const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: getFindPetsByStatusUrl().url.toString(), params, ...requestConfig })
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: getFindPetsByStatusUrl().url.toString(), params, ...requestConfig })
 
   return findPetsByStatusResponseSchema.parse(res.data)
 }

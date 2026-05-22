@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { placeOrderResponseSchema, placeOrderDataSchema } from "../zod/placeOrderSchema.ts";
@@ -24,7 +24,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
   const requestData = placeOrderDataSchema.parse(data)
 
 
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
   return placeOrderResponseSchema.parse(res.data)
 }
@@ -32,7 +32,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
 
         const mutationKey = placeOrderMutationKey()
-        return mutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
+        return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
           mutationKey,
           mutationFn: async({ data }) => {
             return placeOrder(data, config)
@@ -47,7 +47,7 @@ export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Re
  * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
-  mutation?: UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
@@ -55,13 +55,13 @@ export function usePlaceOrder<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
 
-          const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
+          const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
 
 
-          return useMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
+          return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
+          }, queryClient) as UseMutationResult<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
 
 }

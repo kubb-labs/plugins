@@ -6,7 +6,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
+import { resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { buildEnabledCheck } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -47,7 +47,8 @@ export function InfiniteQueryOptions({
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`

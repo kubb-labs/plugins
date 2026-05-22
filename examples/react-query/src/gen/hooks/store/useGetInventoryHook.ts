@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { GetInventoryResponse } from '../../models/GetInventory.ts'
+import type { GetInventoryStatus200 } from '../../models/GetInventory.ts'
 import { fetch } from '../../.kubb/fetch.ts'
 import { queryOptions } from '@tanstack/react-query'
 
@@ -20,14 +20,14 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export async function getInventoryHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }
 
 export function getInventoryQueryOptionsHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getInventoryQueryKey()
-  return queryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryResponse, typeof queryKey>({
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getInventoryHook({ ...config, signal: config.signal ?? signal })

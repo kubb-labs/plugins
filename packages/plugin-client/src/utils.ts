@@ -1,4 +1,4 @@
-import { getOperationParameters } from '@internals/shared'
+import { getOperationParameters, resolveSuccessNames } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -22,7 +22,8 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  * Includes response type, error type, and optional request type.
  */
 export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`

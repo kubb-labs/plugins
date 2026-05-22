@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
+import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useQuery } from "@tanstack/react-query";
@@ -24,7 +24,7 @@ export async function findPetsByTags({ params }: { params?: { tags?: FindPetsByT
 
 
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: "GET", url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: "GET", url: `/pet/findByTags`, params, ...requestConfig })
 
   return res.data
 }
@@ -32,7 +32,7 @@ export async function findPetsByTags({ params }: { params?: { tags?: FindPetsByT
 export function findPetsByTagsQueryOptions({ params }: { params?: { tags?: FindPetsByTagsQueryTags } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = findPetsByTagsQueryKey(params)
-        return queryOptions<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsResponse, typeof queryKey>({
+        return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
 
          queryKey,
          queryFn: async ({ signal }) => {
@@ -47,8 +47,8 @@ export function findPetsByTagsQueryOptions({ params }: { params?: { tags?: FindP
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTags<TData = FindPetsByTagsResponse, TQueryData = FindPetsByTagsResponse, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>({ params }: { params?: { tags?: FindPetsByTagsQueryTags } } = {}, options: {
-  query?: Partial<QueryObserverOptions<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>({ params }: { params?: { tags?: FindPetsByTagsQueryTags } } = {}, options: {
+  query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

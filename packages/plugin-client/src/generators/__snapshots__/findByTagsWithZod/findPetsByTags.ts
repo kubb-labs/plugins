@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsResponse } from './FindPetsByTags'
+import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import { fetch } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 
@@ -20,7 +20,7 @@ export async function findPetsByTags(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getFindPetsByTagsUrl().url.toString(),
     params,

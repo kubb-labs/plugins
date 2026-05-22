@@ -5,7 +5,7 @@ import type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsResponse,
+  FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
 import { findPetsByTagsResponseSchema } from '../../../zod/petController/findPetsByTagsSchema.ts'
@@ -35,7 +35,7 @@ export async function findPetsByTags(
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByTagsUrl().url.toString(),
     params,

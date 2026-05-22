@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from "@tanstack/vue-query";
 import type { MaybeRefOrGetter } from "vue";
@@ -18,7 +18,7 @@ export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKe
 export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = findPetsByStatusQueryKey(params)
-        return queryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusResponse>({
+        return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
 
          queryKey,
          queryFn: async ({ signal }) => {
@@ -33,8 +33,8 @@ export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<{ status?
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus<TData = FindPetsByStatusResponse, TQueryData = FindPetsByStatusResponse, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, options: {
-  query?: Partial<UseQueryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, options: {
+  query?: Partial<UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 
@@ -46,7 +46,7 @@ export function useFindPetsByStatus<TData = FindPetsByStatusResponse, TQueryData
           ...findPetsByStatusQueryOptions(params, config),
           ...resolvedOptions,
           queryKey
-         } as unknown as UseQueryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, FindPetsByStatusResponse, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
+         } as unknown as UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, FindPetsByStatusStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
          query.queryKey = queryKey as TQueryKey
 

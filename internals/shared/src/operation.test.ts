@@ -16,6 +16,7 @@ import {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveStatusCodeNames,
+  resolveSuccessNames,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
   type ResponseNameResolver,
@@ -173,6 +174,10 @@ describe('response status helpers', () => {
 
   test('resolves error response names', () => {
     expect(resolveErrorNames(node, resolver)).toStrictEqual(['Status400'])
+  })
+
+  test('resolves success response names', () => {
+    expect(resolveSuccessNames(node, resolver)).toStrictEqual(['Status201'])
   })
 
   test('resolves all response status names', () => {

@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from "../types/UploadFile.ts";
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from "../types/UploadFile.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getUploadFileUrl(petId: UploadFilePathPetId) {
@@ -24,7 +24,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
   const requestData = data
 
 
-  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({ method: "POST", url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: "POST", url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return res
 }

@@ -4,7 +4,13 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
+import type {
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryStatus,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
+} from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
@@ -27,7 +33,7 @@ export async function findPetsByTagsInfinite(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return FindPetsByTagsResponse.parse(res.data)
 }
@@ -37,7 +43,7 @@ export function findPetsByTagsInfiniteQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
-  return infiniteQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsResponse>, typeof queryKey, number>({
+  return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, typeof queryKey, number>({
     enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -53,7 +59,7 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = FindPetsByTagsResponse,
+  TQueryFnData = FindPetsByTagsStatus200,
   TError = ResponseErrorConfig<Error>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,

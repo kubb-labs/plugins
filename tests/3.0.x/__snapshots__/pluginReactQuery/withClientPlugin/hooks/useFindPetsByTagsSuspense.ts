@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
+import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { findPetsByTags } from "../clients/findPetsByTags.ts";
@@ -16,7 +16,7 @@ type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQu
 export function findPetsByTagsSuspenseQueryOptions(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = findPetsByTagsSuspenseQueryKey(params)
-        return queryOptions<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsResponse, typeof queryKey>({
+        return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
 
          queryKey,
          queryFn: async ({ signal }) => {
@@ -31,8 +31,8 @@ export function findPetsByTagsSuspenseQueryOptions(params?: { tags?: FindPetsByT
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTagsSuspense<TData = FindPetsByTagsResponse, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(params?: { tags?: FindPetsByTagsQueryTags }, options: {
-  query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(params?: { tags?: FindPetsByTagsQueryTags }, options: {
+  query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

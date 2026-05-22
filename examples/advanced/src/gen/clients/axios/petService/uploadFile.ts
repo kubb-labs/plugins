@@ -1,6 +1,11 @@
 import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../../models/ts/petController/UploadFile.ts'
+import type {
+  UploadFilePathPetId,
+  UploadFileQueryAdditionalMetadata,
+  UploadFileData,
+  UploadFileStatus200,
+} from '../../../models/ts/petController/UploadFile.ts'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../../../zod/petController/uploadFileSchema.ts'
 
 export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
@@ -21,7 +26,7 @@ export async function uploadFile(
 
   const requestData = uploadFileDataSchema.parse(data)
 
-  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl({ petId }).url.toString(),
     params,

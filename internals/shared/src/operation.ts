@@ -151,6 +151,12 @@ export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseSta
     .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }
 
+export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+  return node.responses
+    .filter((response) => isSuccessStatusCode(response.statusCode))
+    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+}
+
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
   return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }

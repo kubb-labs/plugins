@@ -4,7 +4,13 @@
  */
 
 import fetch from 'axios'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
+import type {
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryStatus,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
+} from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
@@ -27,7 +33,7 @@ export async function findPetsByTagsSuspense(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return FindPetsByTagsResponse.parse(res.data)
 }
@@ -37,7 +43,7 @@ export function findPetsByTagsSuspenseQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey(params)
-  return queryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsResponse, typeof queryKey>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, typeof queryKey>({
     enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -49,10 +55,10 @@ export function findPetsByTagsSuspenseQueryOptions(
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTagsSuspense<TData = FindPetsByTagsResponse, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
+export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
-    query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

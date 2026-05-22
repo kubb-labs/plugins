@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus } from './FindPetsByStatus'
+import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
 import { FindPetsByStatusResponse } from './FindPetsByStatus'
@@ -24,7 +24,7 @@ export async function findPetsByStatus(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: `/pet/findByStatus`,
     params,
@@ -39,7 +39,7 @@ export function findPetsByStatusQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByStatusQueryKey(params)
-  return queryOptions<FindPetsByStatusResponse, ResponseErrorConfig<Error>, FindPetsByStatusResponse, typeof queryKey>({
+  return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByStatus({ params }, { ...config, signal: config.signal ?? signal })
@@ -51,13 +51,13 @@ export function findPetsByStatusQueryOptions(
  * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus<
-  TData = FindPetsByStatusResponse,
-  TQueryData = FindPetsByStatusResponse,
+  TData = FindPetsByStatusStatus200,
+  TQueryData = FindPetsByStatusStatus200,
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
   { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   options: {
-    query?: Partial<QueryObserverOptions<FindPetsByStatusResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

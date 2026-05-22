@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { GetUserByNameResponse, GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/GetUserByName.ts'
+import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/GetUserByName.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { fetch } from '../../.kubb/fetch.ts'
@@ -22,7 +22,7 @@ type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 export async function getUserByNameHook({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',
     url: `/user/${username}`,
     ...requestConfig,
@@ -36,7 +36,7 @@ export function getUserByNameQueryOptionsHook(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = getUserByNameQueryKey({ username })
-  return queryOptions<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameResponse, typeof queryKey>({
+  return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
     enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -49,11 +49,11 @@ export function getUserByNameQueryOptionsHook(
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export function useGetUserByNameHook<TData = GetUserByNameResponse, TQueryData = GetUserByNameResponse, TQueryKey extends QueryKey = GetUserByNameQueryKey>(
+export function useGetUserByNameHook<TData = GetUserByNameStatus200, TQueryData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameQueryKey>(
   { username }: { username: GetUserByNamePathUsername },
   options: {
     query?: Partial<
-      QueryObserverOptions<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>
+      QueryObserverOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

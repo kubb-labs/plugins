@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetItemPathItemId, GetItemResponse } from './GetItem'
+import type { GetItemPathItemId, GetItemStatus200 } from './GetItem'
 import { fetch } from './.kubb/client'
 
 export function getGetItemUrl(itemId: GetItemPathItemId) {
@@ -18,7 +18,7 @@ export function getGetItemUrl(itemId: GetItemPathItemId) {
 export async function getItem(itemId: GetItemPathItemId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetItemResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<GetItemStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getGetItemUrl(itemId).url.toString(),
     ...requestConfig,

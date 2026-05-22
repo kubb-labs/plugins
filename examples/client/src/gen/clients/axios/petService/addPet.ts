@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/petController/AddPet.js'
+import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../../models/ts/petController/AddPet.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getAddPetUrl() {
@@ -26,7 +26,7 @@ export async function addPet(
 
   const requestData = data
 
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
     data: requestData,

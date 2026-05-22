@@ -1,4 +1,11 @@
-import { buildOperationComments, buildParamsMapping, buildRequestConfigType, getContentTypeInfo, getOperationParameters } from '@internals/shared'
+import {
+  buildOperationComments,
+  buildParamsMapping,
+  buildRequestConfigType,
+  getContentTypeInfo,
+  getOperationParameters,
+  resolveSuccessNames,
+} from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -101,7 +108,8 @@ export function Client({
   const headerParamsMapping = paramsCasing ? buildParamsMapping(originalHeaderParams, casedHeaderParams) : null
 
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
 

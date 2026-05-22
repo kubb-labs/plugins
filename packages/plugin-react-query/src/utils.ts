@@ -7,4 +7,11 @@ export {
   resolveQueryGroupType,
   resolveZodSchemaNames,
 } from '@internals/tanstack-query'
-export { buildOperationComments as getComments, buildRequestConfigType, getContentTypeInfo, resolveErrorNames, resolveStatusCodeNames } from '@internals/shared'
+export {
+  buildOperationComments as getComments,
+  buildRequestConfigType,
+  getContentTypeInfo,
+  resolveErrorNames,
+  resolveStatusCodeNames,
+  resolveSuccessNames,
+} from '@internals/shared'

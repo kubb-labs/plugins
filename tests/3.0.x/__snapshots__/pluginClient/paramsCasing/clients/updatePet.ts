@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetData, UpdatePetResponse } from "../types/UpdatePet.ts";
+import type { UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetData, UpdatePetStatus200 } from "../types/UpdatePet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getUpdatePetUrl(petId: UpdatePetPathPetId) {
@@ -28,7 +28,7 @@ export async function updatePet(petId: UpdatePetPathPetId, data: UpdatePetData, 
   const requestData = data
 
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: getUpdatePetUrl(petId).url.toString(), params: mappedParams, data: requestData, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: getUpdatePetUrl(petId).url.toString(), params: mappedParams, data: requestData, ...requestConfig })
 
   return res.data
 }
