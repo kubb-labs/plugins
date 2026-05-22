@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0-beta.22",
+  "version": "5.0.0-beta.24",
   "description": "Generate Cypress request commands and e2e test fixtures from your OpenAPI specification, enabling automated API testing with zero manual setup.",
   "keywords": [
     "code-generation",
