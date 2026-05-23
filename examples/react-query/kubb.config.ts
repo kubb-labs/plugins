@@ -105,7 +105,7 @@ export const config = {
           path.toObject({ type: 'path', stringify: true }),
           hasQueryParams ? '...(params ? [params] : [])' : undefined,
           hasRequestBody ? '...(data ? [data] : [])' : undefined,
-        ].filter(Boolean) as [string, ...string[]]
+        ].filter(Boolean) as [string, ...Array<string>]
       },
       customOptions: {
         importPath: '../../../useCustomHookOptions.ts',

@@ -235,7 +235,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     })
 
     const imports = transformedOperations.flatMap(({ node, data }) => {
-      const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as string[]
+      const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as Array<string>
       const opFile = resolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },

@@ -55,7 +55,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
         return code >= 400 || r.statusCode === 'default'
       })
       .map((r) => tsResolver.resolveResponseStatusName(transformedNode, r.statusCode))
-      .filter(Boolean) as string[]
+      .filter(Boolean) as Array<string>
 
     const successTypeNames = transformedNode.responses
       .filter((r) => {
@@ -63,11 +63,11 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
         return code >= 200 && code < 300
       })
       .map((r) => tsResolver.resolveResponseStatusName(transformedNode, r.statusCode))
-      .filter(Boolean) as string[]
+      .filter(Boolean) as Array<string>
 
     const typeImportNames = [requestName, responseName, pathParamsName, queryParamsName, headerParamsName, ...errorTypeNames, ...successTypeNames].filter(
       Boolean,
-    ) as string[]
+    ) as Array<string>
 
     const banner = resolver.resolveBanner(ctx.meta, { output, config })
     const footer = resolver.resolveFooter(ctx.meta, { output, config })

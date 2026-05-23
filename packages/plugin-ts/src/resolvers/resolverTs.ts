@@ -1,4 +1,4 @@
-import { pascalCase } from '@internals/utils'
+import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginTs } from '../types.ts'
 
@@ -25,13 +25,15 @@ export const resolverTs = defineResolver<PluginTs>(() => {
     name: 'default',
     pluginName: 'plugin-ts',
     default(name, type) {
-      return pascalCase(name, { isFile: type === 'file' })
+      const resolved = pascalCase(name, { isFile: type === 'file' })
+      return type === 'file' ? resolved : ensureValidVarName(resolved)
     },
     resolveTypeName(name) {
-      return pascalCase(name)
+      return ensureValidVarName(pascalCase(name))
     },
     resolvePathName(name, type) {
-      return pascalCase(name, { isFile: type === 'file' })
+      const resolved = pascalCase(name, { isFile: type === 'file' })
+      return type === 'file' ? resolved : ensureValidVarName(resolved)
     },
     resolveParamName(node, param) {
       return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)

@@ -40,11 +40,11 @@ export type Pet = (
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  readonly tags?: Tag[]
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    * @type string | undefined

@@ -1,7 +1,7 @@
 import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
-export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => unknown[]
+export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => Array<unknown>
 
 /**
  * Resolver for Vue Query that provides naming methods for hook functions.
@@ -135,12 +135,12 @@ export type Infinite = {
    * Path to the next-page cursor on the response. Supports dot notation
    * (`'pagination.next.id'`) or array form.
    */
-  nextParam?: string | string[] | null
+  nextParam?: string | Array<string> | null
   /**
    * Path to the previous-page cursor on the response. Supports dot notation
    * or array form.
    */
-  previousParam?: string | string[] | null
+  previousParam?: string | Array<string> | null
   /**
    * Initial value for `pageParam` on the first fetch.
    *
