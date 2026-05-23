@@ -61,8 +61,8 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(ctx.meta, { output, config })}
-              footer={resolver.resolveFooter(ctx.meta, { output, config })}
+              banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName, isAggregation: true } })}
+              footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName, isAggregation: true } })}
             >
               {clients.map((client) => (
                 <File.Import key={client.name} name={[client.name]} root={file.path} path={client.file.path} />
