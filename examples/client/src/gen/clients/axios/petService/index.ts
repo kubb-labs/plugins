@@ -1,3 +1,5 @@
+/* eslint-disable no-alert, no-console */
+
 export * from './addPet.js'
 export * from './deletePet.js'
 export * from './findPetsByStatus.js'
