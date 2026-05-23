@@ -648,7 +648,7 @@ options:
                 // ...mapped back to the original API name internally
                 const pet_id = petId
 
-                return fetch({
+                return client({
                   method: 'DELETE',
                   url: `/pet/${pet_id}`,
                   ...config,
@@ -671,7 +671,7 @@ options:
                 headers?: DeletePetHeaderParams,
                 config: Partial<RequestConfig> = {},
               ) {
-                return fetch({
+                return client({
                   method: 'DELETE',
                   url: `/pet/${pet_id}`,
                   ...config,
@@ -810,16 +810,16 @@ options:
             lang: typescript
             twoslash: false
             code: |
-              import fetch from '@kubb/plugin-client/clients/fetch'
+              import client from '@kubb/plugin-client/clients/fetch'
               import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
               import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
               export class Pet {
-                static #client: typeof fetch = fetch
+                static #client: typeof client = client
 
                 static async getPetById(
                   { petId }: { petId: GetPetByIdPathParams['petId'] },
-                  config: Partial<RequestConfig> & { client?: typeof fetch } = {},
+                  config: Partial<RequestConfig> & { client?: typeof client } = {},
                 ) {
                   const { client: request = this.#client, ...requestConfig } = config
                   const res = await request<GetPetByIdQueryResponse>({
@@ -863,20 +863,20 @@ options:
             lang: typescript
             twoslash: false
             code: |
-              import fetch from '@kubb/plugin-client/clients/fetch'
+              import client from '@kubb/plugin-client/clients/fetch'
               import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
               import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
               export class Pet {
-                #client: typeof fetch
+                #client: typeof client
 
-                constructor(config: Partial<RequestConfig> & { client?: typeof fetch } = {}) {
-                  this.#client = config.client || fetch
+                constructor(config: Partial<RequestConfig> & { client?: typeof client } = {}) {
+                  this.#client = config.client || client
                 }
 
                 async getPetById(
                   { petId }: { petId: GetPetByIdPathParams['petId'] },
-                  config: Partial<RequestConfig> & { client?: typeof fetch } = {},
+                  config: Partial<RequestConfig> & { client?: typeof client } = {},
                 ) {
                   const { client: request = this.#client, ...requestConfig } = config
                   const res = await request<GetPetByIdQueryResponse>({
@@ -935,7 +935,7 @@ options:
                 lang: typescript
                 twoslash: false
                 code: |
-                  import type { Client, RequestConfig } from './.kubb/fetch'
+                  import type { Client, RequestConfig } from './.kubb/client'
                   import { Pet } from './petController/Pet'
                   import { Store } from './storeController/Store'
                   import { User } from './userController/User'
@@ -969,7 +969,7 @@ options:
       Copies the HTTP client runtime into the generated output, so the consuming app does not need `@kubb/plugin-client` installed at runtime.
 
       - `false` (default) — generated files import from `@kubb/plugin-client/clients/{client}`. Smaller diff, but the package must be a runtime dependency.
-      - `true` — Kubb writes a `.kubb/fetch.ts` (or `.kubb/axios.ts`) file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
+      - `true` — Kubb writes a `.kubb/client.ts` file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
       - Setting `client.importPath` overrides both behaviors and uses your custom client instead.
     examples:
       - name: Bundle the runtime
