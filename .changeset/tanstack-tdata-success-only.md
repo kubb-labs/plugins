@@ -2,7 +2,6 @@
 "@kubb/plugin-client": minor
 "@kubb/plugin-vue-query": minor
 "@kubb/plugin-react-query": minor
-"@internals/shared": patch
 ---
 
 **Breaking:** Client functions and TanStack mutation/query `TData` now reference the union of `2xx` response types only (e.g. `AddPetStatus200`) instead of the full response alias (`AddPetMutation` / `AddPetQueryResponse`), which previously also included `4xx`/`5xx` shapes.
