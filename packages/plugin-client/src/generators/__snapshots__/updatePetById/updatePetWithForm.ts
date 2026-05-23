@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormPathPetId, UpdatePetWithFormData, UpdatePetWithFormResponse } from './UpdatePetWithForm'
+import type { UpdatePetWithFormPathPetId, UpdatePetWithFormData, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import { fetch } from './.kubb/client'
 
 export function getUpdatePetWithFormUrl(petId: UpdatePetWithFormPathPetId) {
@@ -22,7 +22,7 @@ export async function updatePetWithForm(
 
   const requestData = data
 
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
+  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
     url: getUpdatePetWithFormUrl(petId).url.toString(),
     data: requestData,

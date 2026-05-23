@@ -35,6 +35,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './models/ts/petController/FindPetsByStatus.js'
 export type {
   FindPetsByTagsQueryPage,
@@ -206,3 +207,4 @@ export { userService } from './clients/axios/userService/userService.js'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.js'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.js'
 export { petStatusEnum } from './models/ts/Pet.js'
+export { findPetsByStatusStatus } from './models/ts/petController/FindPetsByStatus.js'

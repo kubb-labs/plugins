@@ -4,7 +4,13 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
+import type {
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryStatus,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
+} from './FindPetsByTags'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
@@ -24,7 +30,7 @@ export async function findPetsByTags(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return FindPetsByTagsResponse.parse(res.data)
 }
@@ -34,7 +40,7 @@ export function findPetsByTagsQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
-  return queryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsResponse, typeof queryKey>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, typeof queryKey>({
     enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -46,10 +52,10 @@ export function findPetsByTagsQueryOptions(
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTags<TData = FindPetsByTagsResponse, TQueryData = FindPetsByTagsResponse, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
+export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
   { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   options: {
-    query?: Partial<QueryObserverOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

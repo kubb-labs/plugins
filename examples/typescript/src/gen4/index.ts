@@ -160,4 +160,14 @@ export type {
   User,
   UserArray,
 } from './modelsConstEnum.ts'
-export { AddPetRequestStatusEnum, CustomerParamsStatusEnum, OrderHttpStatusEnum, OrderParamsStatusEnum, PetStatusEnum, PetTypeEnum } from './modelsConstEnum.ts'
+export {
+  AddPetRequestStatusEnum,
+  CustomerParamsStatusEnum,
+  DeletePetStatus200Enum,
+  FindPetsByStatusStatus,
+  OrderHttpStatusEnum,
+  OrderParamsStatusEnum,
+  OrderStatus,
+  PetStatusEnum,
+  PetTypeEnum,
+} from './modelsConstEnum.ts'

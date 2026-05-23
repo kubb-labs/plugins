@@ -23,6 +23,7 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
+  CreatePetsXEXAMPLEKey,
 } from './CreatePets.ts'
 export type {
   CreateUserData,
@@ -74,6 +75,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './FindPetsByStatus.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLE,
@@ -85,6 +87,7 @@ export type {
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
+  FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.ts'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.ts'
 export type {
@@ -207,5 +210,8 @@ export type {
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
 export { addPetRequestStatusEnum } from './AddPetRequest.ts'
+export { createPetsXEXAMPLE } from './CreatePets.ts'
+export { findPetsByStatusStatus } from './FindPetsByStatus.ts'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTags.ts'
 export { orderHttpStatusEnum, orderStatusEnum, orderValueEnum } from './Order.ts'
 export { petStatusEnum } from './Pet.ts'

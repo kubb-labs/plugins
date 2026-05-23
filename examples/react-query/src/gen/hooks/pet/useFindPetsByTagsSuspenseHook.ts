@@ -5,10 +5,10 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../.kubb/fetch.ts'
 import type {
-  FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags.ts'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
@@ -35,7 +35,7 @@ export async function findPetsByTagsSuspenseHook(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: `/pet/findByTags`,
     params,
@@ -51,9 +51,9 @@ export function findPetsByTagsSuspenseQueryOptionsHook(
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey(params)
   return queryOptions<
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     typeof queryKey
   >({
     queryKey,
@@ -68,10 +68,10 @@ export function findPetsByTagsSuspenseQueryOptionsHook(
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTagsSuspenseHook<TData = ResponseConfig<FindPetsByTagsResponse>, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
+export function useFindPetsByTagsSuspenseHook<TData = ResponseConfig<FindPetsByTagsStatus200>, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
   params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
-    query?: Partial<UseSuspenseQueryOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryKey>> & {
+    query?: Partial<UseSuspenseQueryOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryKey>> & {
       client?: QueryClient
     }
     client?: Partial<RequestConfig> & { client?: Client }

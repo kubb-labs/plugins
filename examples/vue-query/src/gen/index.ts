@@ -70,6 +70,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryTags,
@@ -195,5 +196,6 @@ export { updatePetWithForm, updatePetWithFormMutationKey, useUpdatePetWithForm }
 export { updateUser, updateUserMutationKey, useUpdateUser } from './hooks/useUpdateUser.ts'
 export { uploadFile, uploadFileMutationKey, useUploadFile } from './hooks/useUploadFile.ts'
 export { addressIdentifierEnum } from './models/Address.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
 export { orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'

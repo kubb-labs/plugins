@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from "@tanstack/vue-query";
 import type { MaybeRefOrGetter } from "vue";
@@ -27,7 +27,7 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
 
 
 
-  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: `/pet/${petId}`, ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: `/pet/${petId}`, ...requestConfig })
 
   return getPetByIdResponseSchema.parse(res.data)
 }
@@ -35,7 +35,7 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
 export function getPetByIdQueryOptions(petId: MaybeRefOrGetter<GetPetByIdPathPetId>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getPetByIdQueryKey(petId)
-        return queryOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdResponse>({
+        return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
          enabled: () => !!toValue(petId),
          queryKey,
          queryFn: async ({ signal }) => {
@@ -50,8 +50,8 @@ export function getPetByIdQueryOptions(petId: MaybeRefOrGetter<GetPetByIdPathPet
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetById<TData = GetPetByIdResponse, TQueryData = GetPetByIdResponse, TQueryKey extends QueryKey = GetPetByIdQueryKey>(petId: MaybeRefOrGetter<GetPetByIdPathPetId>, options: {
-  query?: Partial<UseQueryOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(petId: MaybeRefOrGetter<GetPetByIdPathPetId>, options: {
+  query?: Partial<UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 
@@ -63,7 +63,7 @@ export function useGetPetById<TData = GetPetByIdResponse, TQueryData = GetPetByI
           ...getPetByIdQueryOptions(petId, config),
           ...resolvedOptions,
           queryKey
-         } as unknown as UseQueryOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, GetPetByIdResponse, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
+         } as unknown as UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, GetPetByIdStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
          query.queryKey = queryKey as TQueryKey
 

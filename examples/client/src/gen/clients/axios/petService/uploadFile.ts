@@ -1,7 +1,12 @@
 /* eslint-disable no-alert, no-console */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../../models/ts/petController/UploadFile.js'
+import type {
+  UploadFilePathPetId,
+  UploadFileQueryAdditionalMetadata,
+  UploadFileData,
+  UploadFileStatus200,
+} from '../../../models/ts/petController/UploadFile.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from '../../../.kubb/config.js'
 
@@ -27,7 +32,7 @@ export async function uploadFile(
 
   const formData = buildFormData(requestData)
 
-  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl({ petId }).url.toString(),
     params,

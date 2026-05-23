@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreateOrderData, CreateOrderResponse } from './CreateOrder'
+import type { CreateOrderData, CreateOrderStatus200 } from './CreateOrder'
 import { fetch } from './.kubb/client'
 
 export function getCreateOrderUrl() {
@@ -18,7 +18,7 @@ export async function createOrder(data: CreateOrderData, config: Partial<Request
 
   const requestData = data
 
-  const res = await request<CreateOrderResponse, ResponseErrorConfig<Error>, CreateOrderData>({
+  const res = await request<CreateOrderStatus200, ResponseErrorConfig<Error>, CreateOrderData>({
     method: 'POST',
     url: getCreateOrderUrl().url.toString(),
     data: requestData,

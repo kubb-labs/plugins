@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/UpdatePet.ts'
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/UpdatePet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { fetch } from '../../.kubb/fetch.ts'
@@ -28,7 +28,7 @@ export async function updatePetHook(
 
   const requestData = data
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: `/pet`,
     data: requestData,
@@ -47,7 +47,7 @@ export function updatePetMutationOptionsHook<TContext = unknown>(
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
-    UpdatePetResponse,
+    UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext
@@ -67,7 +67,7 @@ export function updatePetMutationOptionsHook<TContext = unknown>(
 export function useUpdatePetHook<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      UpdatePetResponse,
+      UpdatePetStatus200,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
       { data: UpdatePetData },
       TContext
@@ -83,19 +83,19 @@ export function useUpdatePetHook<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
   const baseOptions = updatePetMutationOptionsHook(config) as UseMutationOptions<
-    UpdatePetResponse,
+    UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useUpdatePetHook', operationId: 'updatePet' }) as UseMutationOptions<
-    UpdatePetResponse,
+    UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext
   >
 
-  return useMutation<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, { data: UpdatePetData }, TContext>(
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, { data: UpdatePetData }, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -104,7 +104,7 @@ export function useUpdatePetHook<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    UpdatePetResponse,
+    UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext

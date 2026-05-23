@@ -59,6 +59,7 @@ export type {
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
+  FindPetsByTagsXEXAMPLEKey,
 } from './petController/FindPetsByTags.ts'
 export type {
   GetPetByIdPathPetId,
@@ -102,6 +103,7 @@ export type {
   UploadFileStatus200,
 } from './petController/UploadFile.ts'
 export type {
+  CreatePetsBoolParamKey,
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
@@ -112,6 +114,7 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
+  CreatePetsXEXAMPLEKey,
 } from './petsController/CreatePets.ts'
 export type {
   DeleteOrderPathOrderId,
@@ -215,3 +218,5 @@ export { animalTypeEnum } from './Animal.ts'
 export { customerParamsStatusEnum } from './Customer.ts'
 export { orderHttpStatusEnum, orderOrderTypeEnum, orderParamsStatusEnum, orderStatusEnum } from './Order.ts'
 export { petStatusEnum } from './Pet.ts'
+export { findPetsByTagsXEXAMPLE } from './petController/FindPetsByTags.ts'
+export { createPetsBoolParam, createPetsXEXAMPLE } from './petsController/CreatePets.ts'

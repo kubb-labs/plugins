@@ -14,6 +14,7 @@ export {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveStatusCodeNames,
+  resolveSuccessNames,
   type BuildOperationCommentsOptions,
   type ContentTypeInfo,
   type OperationCommentLink,

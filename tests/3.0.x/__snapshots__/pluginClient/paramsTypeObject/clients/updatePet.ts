@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getUpdatePetUrl() {
@@ -25,7 +25,7 @@ export async function updatePet({ data }: { data: UpdatePetData }, config: Parti
   const requestData = data
 
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

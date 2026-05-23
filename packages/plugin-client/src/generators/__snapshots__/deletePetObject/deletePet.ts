@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse } from './DeletePet'
+import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
 import { fetch } from './.kubb/client'
 
 export function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
@@ -20,7 +20,7 @@ export async function deletePet(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<DeletePetResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'DELETE',
     url: getDeletePetUrl({ petId }).url.toString(),
     ...requestConfig,

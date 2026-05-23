@@ -1,5 +1,5 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../../../models/ts/petController/AddFiles.ts'
+import type { AddFilesData, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/petController/AddFiles.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addFiles } from '../../axios/petService/addFiles.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -10,7 +10,7 @@ export function addFilesMutationOptions<TContext = unknown>(
   config: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const mutationKey = addFilesMutationKey()
-  return mutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>({
+  return mutationOptions<ResponseConfig<AddFilesStatus200>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>({
     mutationKey,
     mutationFn: async ({ data }) => {
       return addFiles({ data }, config)
@@ -25,7 +25,7 @@ export function addFilesMutationOptions<TContext = unknown>(
  */
 export function useAddFiles<TContext>(
   options: {
-    mutation?: UseMutationOptions<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext> & {
+    mutation?: UseMutationOptions<ResponseConfig<AddFilesStatus200>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext> & {
       client?: QueryClient
     }
     client?: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' }
@@ -36,18 +36,18 @@ export function useAddFiles<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addFilesMutationKey()
 
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<AddFilesResponse>,
+    ResponseConfig<AddFilesStatus200>,
     ResponseErrorConfig<AddFilesStatus405>,
     { data: AddFilesData },
     TContext
   >
 
-  return useMutation<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>(
+  return useMutation<ResponseConfig<AddFilesStatus200>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<ResponseConfig<AddFilesResponse>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>
+  ) as UseMutationResult<ResponseConfig<AddFilesStatus200>, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>
 }

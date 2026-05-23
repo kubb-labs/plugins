@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetOrganizationPathOrganizationId, GetOrganizationResponse } from './GetOrganization'
+import type { GetOrganizationPathOrganizationId, GetOrganizationStatus200 } from './GetOrganization'
 import { fetch } from './.kubb/client'
 
 export function getGetOrganizationUrl({ organizationId }: { organizationId: GetOrganizationPathOrganizationId }) {
@@ -19,7 +19,7 @@ export async function getOrganization(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetOrganizationResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<GetOrganizationStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getGetOrganizationUrl({ organizationId }).url.toString(),
     ...requestConfig,

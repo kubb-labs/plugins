@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UploadFilePathPetId, UploadFileData, UploadFileResponse } from './UploadFile'
+import type { UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from './UploadFile'
 import { fetch } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
 
@@ -21,7 +21,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
 
   const formData = buildFormData(requestData)
 
-  const res = await request<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl(petId).url.toString(),
     data: formData as FormData,

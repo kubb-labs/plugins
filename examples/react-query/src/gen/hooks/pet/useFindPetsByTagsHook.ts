@@ -5,10 +5,10 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../.kubb/fetch.ts'
 import type {
-  FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
@@ -32,7 +32,7 @@ export async function findPetsByTagsHook(
 ) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: `/pet/findByTags`,
     params,
@@ -48,9 +48,9 @@ export function findPetsByTagsQueryOptionsHook(
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     typeof queryKey
   >({
     queryKey,
@@ -66,14 +66,14 @@ export function findPetsByTagsQueryOptionsHook(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsHook<
-  TData = ResponseConfig<FindPetsByTagsResponse>,
-  TQueryData = ResponseConfig<FindPetsByTagsResponse>,
+  TData = ResponseConfig<FindPetsByTagsStatus200>,
+  TQueryData = ResponseConfig<FindPetsByTagsStatus200>,
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
   params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
     query?: Partial<
-      QueryObserverOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>
+      QueryObserverOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

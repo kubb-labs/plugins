@@ -6,7 +6,7 @@ import type {
   CreatePetsQueryOffset,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsData,
-  CreatePetsResponse,
+  CreatePetsStatus201,
 } from '../../../models/ts/petsController/CreatePets.ts'
 import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/petsController/createPetsSchema.ts'
 
@@ -42,7 +42,7 @@ export async function createPets(
 
   const requestData = createPetsDataSchema.parse(data)
 
-  const res = await request<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
+  const res = await request<CreatePetsStatus201, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,

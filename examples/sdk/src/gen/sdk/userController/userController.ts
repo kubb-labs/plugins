@@ -5,15 +5,15 @@
 
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type { CreateUserData, CreateUserResponse } from '../../models/userController/CreateUser.ts'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../models/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../models/userController/CreateUsersWithListInput.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/userController/DeleteUser.ts'
 import type {
-  GetUserByNameResponse,
   GetUserByNamePathUsername,
+  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from '../../models/userController/GetUserByName.ts'
-import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../models/userController/LoginUser.ts'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../models/userController/LoginUser.ts'
 import type { LogoutUserResponse } from '../../models/userController/LogoutUser.ts'
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../models/userController/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
@@ -58,7 +58,7 @@ export class userController {
   async createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+    const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
       ...requestConfig,
       method: 'POST',
       url: `/user/createWithList`,
@@ -76,7 +76,7 @@ export class userController {
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
+    const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({
       ...requestConfig,
       method: 'GET',
       url: `/user/login`,
@@ -101,7 +101,7 @@ export class userController {
    */
   async getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
+    const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
       url: `/user/${username}`,

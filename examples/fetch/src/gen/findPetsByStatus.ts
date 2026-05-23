@@ -4,7 +4,7 @@
  */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from './models.ts'
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getFindPetsByStatusUrl() {
@@ -21,7 +21,7 @@ function getFindPetsByStatusUrl() {
 export async function findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByStatusUrl().url.toString(),
     params,

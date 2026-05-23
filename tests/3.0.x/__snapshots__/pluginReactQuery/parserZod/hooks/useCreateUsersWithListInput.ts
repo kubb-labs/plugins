@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from "../zod/createUsersWithListInputSchema.ts";
@@ -24,7 +24,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
   const requestData = createUsersWithListInputDataSchema.parse(data)
 
 
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData, ...requestConfig })
 
   return createUsersWithListInputResponseSchema.parse(res.data)
 }
@@ -32,7 +32,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 export function createUsersWithListInputMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
 
         const mutationKey = createUsersWithListInputMutationKey()
-        return mutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
+        return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
           mutationKey,
           mutationFn: async({ data }) => {
             return createUsersWithListInput(data, config)
@@ -47,7 +47,7 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(conf
  * {@link /user/createWithList}
  */
 export function useCreateUsersWithListInput<TContext>(options: {
-  mutation?: UseMutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client },
 } = {}) {
 
@@ -55,13 +55,13 @@ export function useCreateUsersWithListInput<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions.mutationKey ?? createUsersWithListInputMutationKey()
 
-          const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
+          const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
 
 
-          return useMutation<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
+          return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
             ...baseOptions,
             mutationKey,
             ...mutationOptions,
-          }, queryClient) as UseMutationResult<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
+          }, queryClient) as UseMutationResult<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
 
 }

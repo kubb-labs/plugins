@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400 } from './GetPetById'
+import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { fetch } from './.kubb/fetch'
 import { GetPetByIdResponse } from './GetPetById'
@@ -20,14 +20,14 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
 
   return GetPetByIdResponse.parse(res.data)
 }
 
 export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey(petId)
-  return queryOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdResponse, typeof queryKey>({
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdStatus200, typeof queryKey>({
     enabled: !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -39,10 +39,12 @@ export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Parti
 /**
  * {@link /pet/:petId}
  */
-export function useGetPetById<TData = GetPetByIdResponse, TQueryData = GetPetByIdResponse, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
+export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
   petId: GetPetByIdPathPetId,
   options: {
-    query?: Partial<QueryObserverOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, TData, TQueryData, TQueryKey>> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

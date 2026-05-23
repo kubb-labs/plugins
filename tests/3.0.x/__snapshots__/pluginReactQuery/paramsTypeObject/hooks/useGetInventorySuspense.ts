@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetInventoryResponse } from "../types/GetInventory.ts";
+import type { GetInventoryStatus200 } from "../types/GetInventory.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
@@ -24,7 +24,7 @@ export async function getInventorySuspense(config: Partial<RequestConfig> & { cl
 
 
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory`, ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }
@@ -32,7 +32,7 @@ export async function getInventorySuspense(config: Partial<RequestConfig> & { cl
 export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getInventorySuspenseQueryKey()
-        return queryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryResponse, typeof queryKey>({
+        return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
 
          queryKey,
          queryFn: async ({ signal }) => {
@@ -47,8 +47,8 @@ export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> 
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function useGetInventorySuspense<TData = GetInventoryResponse, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
-  query?: Partial<UseSuspenseQueryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
+export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
+  query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

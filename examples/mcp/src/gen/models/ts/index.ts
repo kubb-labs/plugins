@@ -33,6 +33,7 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
+  CreatePetsXEXAMPLEKey,
 } from './CreatePets.js'
 export type {
   CreateUserData,
@@ -95,6 +96,7 @@ export type {
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
+  FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.js'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
 export type {
@@ -197,5 +199,7 @@ export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
 export type { TagTag } from './tag/Tag.js'
 export { addPetRequestStatusEnum } from './AddPetRequest.js'
+export { createPetsXEXAMPLE } from './CreatePets.js'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTags.js'
 export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
 export { petStatusEnum } from './Pet.js'

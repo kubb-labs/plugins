@@ -160,4 +160,14 @@ export type {
   User,
   UserArray,
 } from './models.ts'
-export { AddPetRequestStatusEnum, CustomerParamsStatusEnum, OrderHttpStatusEnum, OrderParamsStatusEnum, PetStatusEnum, PetTypeEnum } from './models.ts'
+export {
+  AddPetRequestStatusEnum,
+  CustomerParamsStatusEnum,
+  DeletePetStatus200Enum,
+  FindPetsByStatusStatus,
+  OrderHttpStatusEnum,
+  OrderParamsStatusEnum,
+  OrderStatus,
+  PetStatusEnum,
+  PetTypeEnum,
+} from './models.ts'

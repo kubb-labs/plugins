@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
@@ -24,7 +24,7 @@ export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, conf
 
 
 
-  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: getGetPetByIdUrl({ petId }).url.toString(), ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: getGetPetByIdUrl({ petId }).url.toString(), ...requestConfig })
 
   return res.data
 }

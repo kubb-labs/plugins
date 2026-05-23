@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { fetch } from '../../.kubb/fetch.ts'
@@ -22,7 +22,7 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export async function getPetByIdHook({ pet_id }: { pet_id: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
     url: `/pet/${pet_id}`,
     ...requestConfig,
@@ -33,7 +33,7 @@ export async function getPetByIdHook({ pet_id }: { pet_id: GetPetByIdPathPetId }
 
 export function getPetByIdQueryOptionsHook({ pet_id }: { pet_id: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ pet_id })
-  return queryOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdResponse, typeof queryKey>({
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
     enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -47,10 +47,10 @@ export function getPetByIdQueryOptionsHook({ pet_id }: { pet_id: GetPetByIdPathP
  * @summary Find pet by ID
  * {@link /pet/:pet_id}
  */
-export function useGetPetByIdHook<TData = GetPetByIdResponse, TQueryData = GetPetByIdResponse, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
+export function useGetPetByIdHook<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
   { pet_id }: { pet_id: GetPetByIdPathPetId },
   options: {
-    query?: Partial<QueryObserverOptions<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & {
+    query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
     client?: Partial<RequestConfig> & { client?: Client }

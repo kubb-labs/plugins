@@ -24,6 +24,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -77,3 +78,4 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './UploadFile.ts'
+export { findPetsByStatusStatus } from './FindPetsByStatus.ts'

@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from "../types/AddPet.ts";
+import type { AddPetData, AddPetStatus200, AddPetStatus405 } from "../types/AddPet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getAddPetUrl() {
@@ -25,7 +25,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
   const requestData = data
 
 
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: getAddPetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: getAddPetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res
 }

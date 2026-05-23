@@ -4,7 +4,7 @@
 */
 
 import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetInventoryResponse } from "../../types/GetInventory.ts";
+import type { GetInventoryStatus200 } from "../../types/GetInventory.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getGetInventoryUrl() {
@@ -24,7 +24,7 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
 
 
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: getGetInventoryUrl().url.toString(), ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: getGetInventoryUrl().url.toString(), ...requestConfig })
 
   return res.data
 }

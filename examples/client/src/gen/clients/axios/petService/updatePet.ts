@@ -3,7 +3,7 @@
 import fetch from '@kubb/plugin-client/clients/fetch'
 import type {
   UpdatePetData,
-  UpdatePetResponse,
+  UpdatePetStatus200,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -32,7 +32,7 @@ export async function updatePet(
 
   const requestData = data
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: getUpdatePetUrl().url.toString(),
     data: requestData,

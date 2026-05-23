@@ -1,6 +1,6 @@
 import fetch from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../../../models/ts/petController/AddFiles.ts'
+import type { AddFilesData, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/petController/AddFiles.ts'
 import { buildFormData } from '../../../.kubb/config.ts'
 
 export function getAddFilesUrl() {
@@ -24,7 +24,7 @@ export async function addFiles(
 
   const formData = buildFormData(requestData)
 
-  const res = await request<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
+  const res = await request<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
     method: 'POST',
     url: getAddFilesUrl().url.toString(),
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,

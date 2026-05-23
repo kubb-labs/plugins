@@ -4,7 +4,7 @@
  */
 
 import fetch from '@kubb/plugin-client/clients/fetch'
-import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from './models.ts'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
@@ -21,7 +21,7 @@ function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
 export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = fetch, ...requestConfig } = config
 
-  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
     url: getGetPetByIdUrl(petId).url.toString(),
     ...requestConfig,

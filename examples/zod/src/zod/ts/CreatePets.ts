@@ -17,11 +17,19 @@ export type CreatePetsPathUuid = string
  */
 export type CreatePetsQueryOffset = number | undefined
 
+export const createPetsXEXAMPLE = {
+  ONE: 'ONE',
+  TWO: 'TWO',
+  THREE: 'THREE',
+} as const
+
+export type CreatePetsXEXAMPLEKey = (typeof createPetsXEXAMPLE)[keyof typeof createPetsXEXAMPLE]
+
 /**
  * @description Header parameters
  * @type string
  */
-export type CreatePetsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type any

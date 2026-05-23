@@ -5,6 +5,8 @@
 
 export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
+export type OrderStatus = 'accepted'
+
 export type OrderHttpStatusEnum = 200 | 400 | 500
 
 /**
@@ -48,7 +50,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: 'accepted' | (string & {})
+  status?: OrderStatus | (string & {})
   /**
    * @description HTTP Status
    * @example 200
@@ -284,9 +286,6 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
   /**
    * @type array
@@ -308,6 +307,7 @@ export type FullAddress = Address & {
    * @type string
    */
   streetNumber: string
+} & {
   /**
    * @type string
    */
@@ -510,12 +510,14 @@ export type AddPetResponses = {
  */
 export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
+export type FindPetsByStatusStatus = 'available' | 'pending' | 'sold'
+
 /**
  * @description Status values that need to be considered for filter
  * @default "available"
  * @type string | undefined
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatus | undefined
 
 /**
  * @type array
@@ -743,10 +745,12 @@ export type DeletePetHeaderApiKey = string | undefined
  */
 export type DeletePetPathPetId = bigint
 
+export type DeletePetStatus200Enum = 'TYPE1' | 'TYPE2' | 'TYPE3'
+
 /**
  * @type array
  */
-export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
+export type DeletePetStatus200 = Array<DeletePetStatus200Enum>
 
 /**
  * @type any
