@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { useMutation } from '@tanstack/vue-query'
 
@@ -21,7 +21,7 @@ export async function updatePetWithForm(
   data?: UpdatePetWithFormData,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = UpdatePetWithFormData.parse(data)
 

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/storeController/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from '../../models/storeController/GetInventory.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/storeController/GetOrderById.ts'
@@ -25,7 +25,7 @@ export class storeController {
    * {@link /store/inventory}
    */
   async getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/store/inventory` })
     return res.data
   }
@@ -42,7 +42,7 @@ export class storeController {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
       ...requestConfig,
@@ -66,7 +66,7 @@ export class storeController {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
       ...requestConfig,
@@ -84,7 +84,7 @@ export class storeController {
    * {@link /store/order/:orderId}
    */
   async getOrderById({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
@@ -99,7 +99,7 @@ export class storeController {
    * {@link /store/order/:orderId}
    */
   async deleteOrder({ orderId }: { orderId: DeleteOrderPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
       ...requestConfig,
       method: 'DELETE',

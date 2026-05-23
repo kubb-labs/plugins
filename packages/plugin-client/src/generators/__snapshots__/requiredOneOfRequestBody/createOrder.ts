@@ -2,7 +2,7 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { CreateOrderData, CreateOrderStatus200 } from './CreateOrder'
-import { fetch } from './.kubb/client'
+import { client } from './.kubb/client'
 
 export function getCreateOrderUrl() {
   const res = { method: 'POST', url: `/orders` as const }
@@ -14,7 +14,7 @@ export function getCreateOrderUrl() {
  * {@link /orders}
  */
 export async function createOrder(data: CreateOrderData, config: Partial<RequestConfig<CreateOrderData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = data
 

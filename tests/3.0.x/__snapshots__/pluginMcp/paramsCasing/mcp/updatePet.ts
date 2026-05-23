@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetResponse } from "../types/UpdatePet.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -19,7 +19,7 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
   const requestData = data
 
 
-  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
+  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
 
   return {
               content: [

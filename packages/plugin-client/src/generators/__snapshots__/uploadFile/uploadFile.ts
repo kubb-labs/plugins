@@ -2,7 +2,7 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from './UploadFile'
-import { fetch } from './.kubb/client'
+import { client } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
 
 export function getUploadFileUrl(petId: UploadFilePathPetId) {
@@ -15,7 +15,7 @@ export function getUploadFileUrl(petId: UploadFilePathPetId) {
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = data
 

@@ -174,13 +174,13 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         >
           {importPath ? (
             <>
-              <File.Import name={'fetch'} path={importPath} />
+              <File.Import name={'client'} path={importPath} />
               <File.Import name={['mergeConfig']} path={importPath} />
               <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={importPath} isTypeOnly />
             </>
           ) : (
             <>
-              <File.Import name={['fetch']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
+              <File.Import name={['client']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
               <File.Import name={['mergeConfig']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
               <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
             </>

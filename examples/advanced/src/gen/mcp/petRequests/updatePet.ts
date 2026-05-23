@@ -1,4 +1,4 @@
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/ts/petController/UpdatePet.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -15,7 +15,7 @@ export async function updatePetHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>(
+  const res = await client<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>(
     { method: 'PUT', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
     request,
   )

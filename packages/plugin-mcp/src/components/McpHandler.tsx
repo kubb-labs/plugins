@@ -158,7 +158,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
         <br />
         {isFormData && requestName && 'const formData = buildFormData(requestData)'}
         <br />
-        {`const res = await fetch<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
+        {`const res = await client<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
         <br />
         {callToolResult}
       </Function>

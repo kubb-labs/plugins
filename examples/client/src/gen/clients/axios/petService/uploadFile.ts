@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import client from '@kubb/plugin-client/clients/fetch'
 import type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
@@ -26,7 +26,7 @@ export async function uploadFile(
   params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 

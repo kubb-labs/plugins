@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { FindPetsByStatusResponse } from './FindPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -22,7 +22,7 @@ export async function findPetsByStatus(
   { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',

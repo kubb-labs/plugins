@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/client'
 import type {
   FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
@@ -12,7 +12,7 @@ import type {
   FindPetsByTagsStatus200,
 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
@@ -31,7 +31,7 @@ export async function findPetsByTagsSuspense(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 

@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type {
   FindPetsByTagsHeaderXEXAMPLE,
@@ -26,7 +26,7 @@ export async function findPetsByTagsHandler(
   },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
+  const res = await client<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
     { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, params, headers: { ...headers } },
     request,
   )

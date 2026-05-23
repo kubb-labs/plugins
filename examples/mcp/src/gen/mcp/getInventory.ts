@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { GetInventoryResponse } from '../models/ts/GetInventory.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -10,7 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /store/inventory}
  */
 export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await fetch<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>(
+  const res = await client<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>(
     { method: 'GET', url: `/store/inventory`, baseURL: `https://petstore.swagger.io/v2` },
     request,
   )

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWi
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
   const requestData = data

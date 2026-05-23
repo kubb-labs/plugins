@@ -142,7 +142,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
             path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
-                name: 'fetch',
+                name: 'client',
                 nodes: isInlineSource ? [ast.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
                 isExportable: true,
                 isIndexable: true,

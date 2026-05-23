@@ -220,7 +220,7 @@ export function Client({
           returnType={returnType}
         >
           {isConfigurable
-            ? `const { client: request = fetch, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
+            ? `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
             : ''}
           <br />
           <br />
@@ -259,7 +259,7 @@ export function Client({
           <br />
           {isConfigurable
             ? `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`
-            : `const res = await fetch<${generics.join(', ')}>(${clientParams.toCall()})`}
+            : `const res = await client<${generics.join(', ')}>(${clientParams.toCall()})`}
           <br />
           {childrenElement}
         </Function>

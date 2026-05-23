@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from "../types/AddPet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
@@ -17,7 +17,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { CreateUserData, CreateUserResponse } from '../../models/userController/CreateUser.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../models/userController/CreateUsersWithListInput.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/userController/DeleteUser.ts'
@@ -38,7 +38,7 @@ export class userController {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
       ...requestConfig,
@@ -56,7 +56,7 @@ export class userController {
    * {@link /user/createWithList}
    */
   async createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
       ...requestConfig,
@@ -75,7 +75,7 @@ export class userController {
     params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({
       ...requestConfig,
       method: 'GET',
@@ -90,7 +90,7 @@ export class userController {
    * {@link /user/logout}
    */
   async logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/user/logout` })
     return res.data
   }
@@ -100,7 +100,7 @@ export class userController {
    * {@link /user/:username}
    */
   async getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
@@ -122,7 +122,7 @@ export class userController {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
       ...requestConfig,
@@ -140,7 +140,7 @@ export class userController {
    * {@link /user/:username}
    */
   async deleteUser({ username }: { username: DeleteUserPathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({
       ...requestConfig,
       method: 'DELETE',

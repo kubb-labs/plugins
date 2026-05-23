@@ -1,4 +1,4 @@
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from '../../models/ts/userController/UpdateUser.ts'
 import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -15,7 +15,7 @@ export async function updateUserHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>(
+  const res = await client<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>(
     { method: 'PUT', url: `/user/${username}`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
     request,
   )

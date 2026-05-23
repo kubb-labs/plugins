@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -15,7 +15,7 @@ export async function createUserHandler({ data }: { data?: CreateUserData } = {}
   const requestData = data
 
 
-  const res = await fetch<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData }, request)
+  const res = await client<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData }, request)
 
   return {
               content: [

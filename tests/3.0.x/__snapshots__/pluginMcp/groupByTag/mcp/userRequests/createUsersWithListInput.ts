@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../../types/CreateUsersWithListInput.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -15,7 +15,7 @@ export async function createUsersWithListInputHandler({ data }: { data?: CreateU
   const requestData = data
 
 
-  const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData }, request)
+  const res = await client<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData }, request)
 
   return {
               content: [
