@@ -37,6 +37,7 @@
     "circular-schema-detection-shared",
     "core-plugins-beta-12-alignment",
     "enforce-array-type-syntax",
+    "faker-discriminated-union-variant-types",
     "fix-object-header-serialization",
     "kubb-core-beta-23-alignment",
     "kubb-core-beta-24-alignment",

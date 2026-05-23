@@ -1,5 +1,16 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.28
+
+### Patch Changes
+
+- [#207](https://github.com/kubb-labs/plugins/pull/207) [`c029564`](https://github.com/kubb-labs/plugins/commit/c02956455485aecd496e4e00603ded5c0d0fbfea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `TS2322` errors in mocks generated for discriminated `oneOf` schemas (reported in kubb-labs/plugins#200).
+
+  Each union variant was annotated with the whole-union indexed-access type (`NonNullable<Union>["prop"]`), which TypeScript collapses to a single union member and rejects the other variants' values. The faker printer now narrows each variant to its own discriminated branch via `Extract<NonNullable<Union>, { "<discriminator>": "<value>" }>`. Undiscriminated unions of objects fall back to `any` instead of leaking the whole-union index (also resolving the related `TS2339` symptom).
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.28
+
 ## 5.0.0-beta.27
 
 ### Patch Changes
