@@ -36,6 +36,12 @@ export type PrinterFakerOptions = {
   typeName?: string
   schemaName?: string
   nestedInObject?: boolean
+  /**
+   * Set while printing the members of a union (`oneOf`). Object properties then index their
+   * type as `(NonNullable<T> & Record<K, unknown>)[K]` instead of `NonNullable<T>[K]`, so a key
+   * carried by only some branches stays valid (a plain index would be a TS2339).
+   */
+  nestedInUnion?: boolean
   nodes?: PrinterFakerNodes
   /**
    * Names of schemas that participate in a circular dependency chain.
@@ -207,6 +213,24 @@ function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName
 }
 
 /**
+ * Type expression for an object property's value, indexed off the parent `typeName`.
+ *
+ * In a union (`oneOf`), a key that only some branches declare turns a plain `NonNullable<T>[K]`
+ * into a TS2339 error, so union members guard the access. The breakdown is below.
+ */
+function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?: boolean): string {
+  const key = JSON.stringify(propertyName)
+
+  // `(NonNullable<T> & Record<K, unknown>)[K]`, read inside-out:
+  //   NonNullable<T>          strips null and undefined from the parent type T.
+  //   & Record<K, unknown>    forces every branch to have key K. A branch that already declares K
+  //                           keeps it (`T[K] & unknown` is `T[K]`); a branch missing K gains it as `unknown`.
+  //   [K]                     reads the key, which is now always present, so it never hits TS2339.
+  // For a single object T the intersection does nothing, leaving `T[K]`.
+  return nestedInUnion ? `(NonNullable<${typeName}> & Record<${key}, unknown>)[${key}]` : `NonNullable<${typeName}>[${key}]`
+}
+
+/**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
@@ -289,16 +313,20 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
         const items: Array<string> = (node.members ?? [])
           .map((member) => {
-            // Narrow each variant to its own discriminated branch so nested `NonNullable<T>[K]`
-            // indexes resolve against that branch instead of the whole union (which would reject
-            // the other members' values). Without a discriminator, fall back to `any`.
+            // For a discriminated union, narrow each variant to its own branch so nested
+            // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
             const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
-            const typeName =
-              baseTypeName && value !== undefined
-                ? `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
-                : undefined
 
-            return printNested(member, { typeName, nestedInObject: true })
+            if (baseTypeName && value !== undefined) {
+              const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+
+              return printNested(member, { typeName, nestedInObject: true })
+            }
+
+            // Without a discriminator, keep the union type but guard each indexed access (see
+            // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
+            // rather than erroring with TS2339.
+            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
           })
           .filter((item): item is string => Boolean(item))
 
@@ -349,7 +377,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
             const value: string =
               printNested(property.schema, {
-                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
+                typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
                 nestedInObject: true,
               }) ?? 'undefined'
 

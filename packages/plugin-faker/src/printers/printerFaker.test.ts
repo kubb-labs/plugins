@@ -132,22 +132,31 @@ describe('printerFaker', () => {
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
   })
 
-  test('falls back to any for non-discriminated unions of objects', () => {
+  test('guards member property access in non-discriminated unions of objects', () => {
+    // A `oneOf` without a discriminator carries `+order` on only one branch, so a plain
+    // `NonNullable<Filter>["+order"]` would be a TS2339. Members index via
+    // `(NonNullable<Filter> & Record<"+order", unknown>)["+order"]`, which stays valid and
+    // resolves to `unknown` rather than `any`.
     const node = ast.createSchema({
       type: 'union',
+      name: 'Filter',
       members: [
+        ast.createSchema({ type: 'object', properties: [] }),
         ast.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'a', schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['x', 'y'] }) })],
+          properties: [
+            ast.createProperty({
+              name: '+order',
+              schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['asc', 'desc'] }),
+            }),
+          ],
         }),
       ],
     })
 
-    const result = printerFaker({ resolver: resolverFaker, typeName: 'Thing' }).print(node)
-
-    // The whole-union indexed-access type must not leak into the members.
-    expect(result).not.toContain('NonNullable<Thing>')
-    expect(result).toContain('faker.helpers.arrayElement<any>(["x", "y"])')
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
+      `"faker.helpers.arrayElement<any>([{}, {"+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"])}])"`,
+    )
   })
 
   test('memoizing getters return a stable reference and data overrides replace the getter', () => {
