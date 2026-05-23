@@ -40,16 +40,16 @@ examples:
         lang: typescript
         twoslash: false
         code: |
-          import fetch from '@kubb/plugin-client/clients/fetch'
+          import client from '@kubb/plugin-client/clients/fetch'
           import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
           import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
           export class Pet {
-            static #client: typeof fetch = fetch
+            static #client: typeof client = client
 
             static async getPetById(
               { petId }: { petId: GetPetByIdPathParams['petId'] },
-              config: Partial<RequestConfig> & { client?: typeof fetch } = {},
+              config: Partial<RequestConfig> & { client?: typeof client } = {},
             ) {
               const { client: request = this.#client, ...requestConfig } = config
               const res = await request<GetPetByIdQueryResponse>({
@@ -93,20 +93,20 @@ examples:
         lang: typescript
         twoslash: false
         code: |
-          import fetch from '@kubb/plugin-client/clients/fetch'
+          import client from '@kubb/plugin-client/clients/fetch'
           import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
           import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
           export class Pet {
-            #client: typeof fetch
+            #client: typeof client
 
-            constructor(config: Partial<RequestConfig> & { client?: typeof fetch } = {}) {
-              this.#client = config.client || fetch
+            constructor(config: Partial<RequestConfig> & { client?: typeof client } = {}) {
+              this.#client = config.client || client
             }
 
             async getPetById(
               { petId }: { petId: GetPetByIdPathParams['petId'] },
-              config: Partial<RequestConfig> & { client?: typeof fetch } = {},
+              config: Partial<RequestConfig> & { client?: typeof client } = {},
             ) {
               const { client: request = this.#client, ...requestConfig } = config
               const res = await request<GetPetByIdQueryResponse>({
