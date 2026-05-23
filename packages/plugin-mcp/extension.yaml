@@ -500,7 +500,7 @@ options:
               Without `importPath`:
 
               - `bundle: false` (default) — generated code imports from `@kubb/plugin-client/clients/{axios|fetch}`.
-              - `bundle: true` — Kubb writes `.kubb/fetch.ts` (or `.kubb/axios.ts`) and generated code imports from there.
+              - `bundle: true` — Kubb writes `.kubb/client.ts` and generated code imports from there.
           - title: Required exports
             body: |
               The module pointed to by `importPath` must satisfy the same shape as the built-in client. At minimum:
@@ -512,7 +512,7 @@ options:
               When used together with a query plugin (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`), it must also export a `Client` type alias.
           - title: How generated files import it
             body: |
-              Generated code imports the client as a default import and the runtime types as named type imports:
+              Generated code imports the client as a default import (bound to the local name `client`) and the runtime types as named type imports:
             codeBlock:
               lang: typescript
               code: |

@@ -101,7 +101,7 @@ export const client = async <TResponseData, _TError = unknown, RequestData = unk
     targetUrl += `?${normalizedParams}`
   }
 
-  const response = await fetch(targetUrl, {
+  const response = await globalThis.fetch(targetUrl, {
     credentials: config.credentials || 'same-origin',
     method: config.method?.toUpperCase(),
     body: config.data instanceof FormData ? config.data : JSON.stringify(config.data),

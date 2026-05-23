@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../models/ts/DeleteUser.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -13,7 +13,7 @@ export async function deleteUserHandler(
   { username }: { username: DeleteUserPathUsername },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>(
+  const res = await client<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>(
     { method: 'DELETE', url: `/user/${username}`, baseURL: `https://petstore.swagger.io/v2` },
     request,
   )

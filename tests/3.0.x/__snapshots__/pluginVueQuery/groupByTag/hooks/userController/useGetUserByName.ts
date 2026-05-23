@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../../types/GetUserByName.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from "@tanstack/vue-query";
@@ -20,7 +20,7 @@ export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
  * {@link /user/:username}
  */
 export async function getUserByName(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

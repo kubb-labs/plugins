@@ -434,7 +434,7 @@ options:
                 // ...mapped back to the original API name internally
                 const pet_id = petId
 
-                return fetch({
+                return client({
                   method: 'DELETE',
                   url: `/pet/${pet_id}`,
                   ...config,
@@ -457,7 +457,7 @@ options:
                 headers?: DeletePetHeaderParams,
                 config: Partial<RequestConfig> = {},
               ) {
-                return fetch({
+                return client({
                   method: 'DELETE',
                   url: `/pet/${pet_id}`,
                   ...config,

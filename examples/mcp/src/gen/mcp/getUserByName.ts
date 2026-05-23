@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { GetUserByNamePathUsername, GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../models/ts/GetUserByName.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -12,7 +12,7 @@ export async function getUserByNameHandler(
   { username }: { username: GetUserByNamePathUsername },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>(
+  const res = await client<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>(
     { method: 'GET', url: `/user/${username}`, baseURL: `https://petstore.swagger.io/v2` },
     request,
   )

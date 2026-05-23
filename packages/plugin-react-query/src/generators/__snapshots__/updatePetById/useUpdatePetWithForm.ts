@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -20,7 +20,7 @@ export async function updatePetWithForm(
   data?: UpdatePetWithFormData,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = UpdatePetWithFormData.parse(data)
 

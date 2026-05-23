@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from "../types/AddPet.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -15,7 +15,7 @@ export async function addPetHandler({ data }: { data: AddPetData }, request: Req
   const requestData = data
 
 
-  const res = await fetch<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, data: requestData }, request)
+  const res = await client<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, data: requestData }, request)
 
   return {
               content: [

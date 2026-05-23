@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type {
   UpdatePetWithFormData,
   UpdatePetWithFormResponse,
@@ -13,7 +13,7 @@ import type {
 } from './UpdatePetWithForm'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
@@ -35,7 +35,7 @@ export async function updatePetWithForm(
   params?: { status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = UpdatePetWithFormData.parse(data)
 

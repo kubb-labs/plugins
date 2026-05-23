@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import client from '@kubb/plugin-client/clients/fetch'
 import type {
   UpdatePetData,
   UpdatePetStatus200,
@@ -28,7 +28,7 @@ export async function updatePet(
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 

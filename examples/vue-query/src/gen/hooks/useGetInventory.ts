@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type { GetInventoryStatus200 } from '../models/GetInventory.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
@@ -20,7 +20,7 @@ export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
  * {@link /store/inventory}
  */
 export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 

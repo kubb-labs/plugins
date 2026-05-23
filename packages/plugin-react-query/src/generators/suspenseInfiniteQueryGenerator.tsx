@@ -118,21 +118,21 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
         {clientOptions.importPath ? (
           <>
-            {!shouldUseClientPlugin && <File.Import name={'fetch'} path={clientOptions.importPath} />}
+            {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
             {clientOptions.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={clientOptions.importPath} isTypeOnly />}
           </>
         ) : (
           <>
-            {!shouldUseClientPlugin && <File.Import name={['fetch']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} />}
+            {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
             <File.Import
               name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
               root={meta.file.path}
-              path={path.resolve(root, '.kubb/fetch.ts')}
+              path={path.resolve(root, '.kubb/client.ts')}
               isTypeOnly
             />
             {clientOptions.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
             )}
           </>
         )}

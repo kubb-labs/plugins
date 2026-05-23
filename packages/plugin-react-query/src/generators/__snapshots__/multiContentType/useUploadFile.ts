@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileStatus200 } from './UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { client } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
-import { fetch } from './.kubb/fetch'
 import { UploadFileResponse, UploadFileData } from './UploadFile'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -21,7 +21,7 @@ export async function uploadFile(
   data?: UploadFileData,
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = UploadFileData.parse(data)
 

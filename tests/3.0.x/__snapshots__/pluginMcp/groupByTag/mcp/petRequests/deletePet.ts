@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from "../../types/DeletePet.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -14,7 +14,7 @@ export async function deletePetHandler({ petId, headers }: { petId: DeletePetPat
 
 
 
-  const res = await fetch<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, headers: { ...headers } }, request)
+  const res = await client<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, headers: { ...headers } }, request)
 
   return {
               content: [

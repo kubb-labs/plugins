@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from 'axios'
+import client from 'axios'
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/react-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
@@ -24,7 +24,7 @@ export async function findPetsByTags(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 

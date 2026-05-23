@@ -2,7 +2,7 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { GetOrganizationPathOrganizationId, GetOrganizationStatus200 } from './GetOrganization'
-import { fetch } from './.kubb/client'
+import { client } from './.kubb/client'
 
 export function getGetOrganizationUrl({ organizationId }: { organizationId: GetOrganizationPathOrganizationId }) {
   const res = { method: 'GET', url: `/organizations/${organizationId}` as const }
@@ -17,7 +17,7 @@ export async function getOrganization(
   { organizationId }: { organizationId: GetOrganizationPathOrganizationId },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrganizationStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',

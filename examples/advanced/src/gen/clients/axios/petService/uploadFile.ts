@@ -1,4 +1,4 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
   UploadFilePathPetId,
@@ -22,7 +22,7 @@ export async function uploadFile(
   { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = uploadFileDataSchema.parse(data)
 

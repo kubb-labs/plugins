@@ -428,7 +428,7 @@ options:
               Without `importPath`:
 
               - `bundle: false` (default) — generated code imports from `@kubb/plugin-client/clients/{axios|fetch}`.
-              - `bundle: true` — Kubb writes `.kubb/fetch.ts` (or `.kubb/axios.ts`) and generated code imports from there.
+              - `bundle: true` — Kubb writes `.kubb/client.ts` and generated code imports from there.
           - title: Required exports
             body: |
               The module pointed to by `importPath` must satisfy the same shape as the built-in client. At minimum:
@@ -440,7 +440,7 @@ options:
               When used together with a query plugin (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`), it must also export a `Client` type alias.
           - title: How generated files import it
             body: |
-              Generated code imports the client as a default import and the runtime types as named type imports:
+              Generated code imports the client as a default import (bound to the local name `client`) and the runtime types as named type imports:
             codeBlock:
               lang: typescript
               code: |
@@ -602,7 +602,7 @@ options:
           Copies the HTTP client runtime into the generated output, so the consuming app does not need `@kubb/plugin-client` installed at runtime.
 
           - `false` (default) — generated files import from `@kubb/plugin-client/clients/{client}`. Smaller diff, but the package must be a runtime dependency.
-          - `true` — Kubb writes a `.kubb/fetch.ts` (or `.kubb/axios.ts`) file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
+          - `true` — Kubb writes a `.kubb/client.ts` file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
           - Setting `client.importPath` overrides both behaviors and uses your custom client instead.
         examples:
           - name: Bundle the runtime
@@ -701,7 +701,7 @@ options:
                 // ...mapped back to the original API name internally
                 const pet_id = petId
 
-                return fetch({
+                return client({
                   method: 'DELETE',
                   url: `/pet/${pet_id}`,
                   ...config,
@@ -724,7 +724,7 @@ options:
                 headers?: DeletePetHeaderParams,
                 config: Partial<RequestConfig> = {},
               ) {
-                return fetch({
+                return client({
                   method: 'DELETE',
                   url: `/pet/${pet_id}`,
                   ...config,

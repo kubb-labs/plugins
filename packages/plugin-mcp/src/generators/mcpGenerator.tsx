@@ -56,7 +56,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         {client.importPath ? (
           <>
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={client.importPath} isTypeOnly />
-            <File.Import name={'fetch'} path={client.importPath} />
+            <File.Import name={'client'} path={client.importPath} />
             {client.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={client.importPath} isTypeOnly />}
           </>
         ) : (
@@ -64,12 +64,12 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
             <File.Import
               name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
               root={meta.file.path}
-              path={path.resolve(root, '.kubb/fetch.ts')}
+              path={path.resolve(root, '.kubb/client.ts')}
               isTypeOnly
             />
-            <File.Import name={['fetch']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} />
+            <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
             {client.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
             )}
           </>
         )}

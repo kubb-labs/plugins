@@ -160,11 +160,11 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
 
         if (client?.bundle && !hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
-            baseName: 'fetch.ts',
-            path: path.resolve(root, '.kubb/fetch.ts'),
+            baseName: 'client.ts',
+            path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
-                name: 'fetch',
+                name: 'client',
                 nodes: [ast.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
                 isExportable: true,
                 isIndexable: true,

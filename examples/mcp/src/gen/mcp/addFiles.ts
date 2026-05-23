@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../models/ts/AddFiles.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -15,7 +15,7 @@ export async function addFilesHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
+  const res = await client<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
     { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
     request,
   )

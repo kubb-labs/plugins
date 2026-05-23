@@ -2,7 +2,7 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { GetItemPathItemId, GetItemStatus200 } from './GetItem'
-import { fetch } from './.kubb/client'
+import { client } from './.kubb/client'
 
 export function getGetItemUrl({ itemId }: { itemId: GetItemPathItemId }) {
   const item_id = itemId
@@ -16,7 +16,7 @@ export function getGetItemUrl({ itemId }: { itemId: GetItemPathItemId }) {
  * {@link /v1/items/:item_id}
  */
 export async function getItem({ itemId }: { itemId: GetItemPathItemId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetItemStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',

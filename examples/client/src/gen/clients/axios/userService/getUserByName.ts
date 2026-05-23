@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import client from '@kubb/plugin-client/clients/fetch'
 import type {
   GetUserByNamePathUsername,
   GetUserByNameStatus200,
@@ -20,7 +20,7 @@ function getGetUserByNameUrl({ username }: { username: GetUserByNamePathUsername
  * {@link /user/:username}
  */
 export async function getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from 'axios'
+import client from 'axios'
 import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
@@ -21,7 +21,7 @@ export async function updatePetWithForm(
   data?: UpdatePetWithFormData,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = UpdatePetWithFormData.parse(data)
 

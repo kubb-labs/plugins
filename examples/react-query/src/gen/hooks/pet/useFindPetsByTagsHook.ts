@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../.kubb/fetch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../.kubb/client.ts'
 import type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
@@ -13,7 +13,7 @@ import type {
 } from '../../models/FindPetsByTags.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }) =>
@@ -30,7 +30,7 @@ export async function findPetsByTagsHook(
   params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/fetch'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../models/petController/AddPet.ts'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../models/petController/DeletePet.ts'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/petController/FindPetsByStatus.ts'
@@ -47,7 +47,7 @@ export class petController {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
       ...requestConfig,
@@ -71,7 +71,7 @@ export class petController {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
       ...requestConfig,
@@ -89,7 +89,7 @@ export class petController {
    * {@link /pet/findByStatus}
    */
   async findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
       ...requestConfig,
       method: 'GET',
@@ -108,7 +108,7 @@ export class petController {
     params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
       ...requestConfig,
       method: 'GET',
@@ -124,7 +124,7 @@ export class petController {
    * {@link /pet/:petId}
    */
   async getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
@@ -142,7 +142,7 @@ export class petController {
     params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
       ...requestConfig,
       method: 'POST',
@@ -162,7 +162,7 @@ export class petController {
     headers?: { api_key?: DeletePetHeaderApiKey },
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
       ...requestConfig,
       method: 'DELETE',
@@ -182,7 +182,7 @@ export class petController {
     params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
     config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
   ) {
-    const { client: request = fetch, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const formData = buildFormData(requestData)
     const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({

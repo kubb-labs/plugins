@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../models/LoginUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
@@ -24,7 +24,7 @@ export async function loginUser(
   params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',

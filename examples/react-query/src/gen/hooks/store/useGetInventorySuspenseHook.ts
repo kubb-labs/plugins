@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetInventoryStatus200 } from '../../models/GetInventory.ts'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => ['v5', { url: '/store/inventory' }] as const
@@ -20,7 +20,7 @@ type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryK
  * {@link /store/inventory}
  */
 export async function getInventorySuspenseHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/storeController/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from './models/ts/storeController/GetInventory.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/storeController/GetOrderById.ts'
@@ -23,7 +23,7 @@ function getGetInventoryUrl() {
  * {@link /store/inventory}
  */
 export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
@@ -52,7 +52,7 @@ export async function placeOrder(
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -85,7 +85,7 @@ export async function placeOrderPatch(
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
@@ -112,7 +112,7 @@ function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
  * {@link /store/order/:orderId}
  */
 export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
     method: 'GET',
@@ -135,7 +135,7 @@ function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
  * {@link /store/order/:orderId}
  */
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',

@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/DeleteOrder.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
@@ -18,7 +18,7 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
  * {@link /store/order/:orderId}
  */
 export async function deleteOrderHook({ orderId }: { orderId: DeleteOrderPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',
