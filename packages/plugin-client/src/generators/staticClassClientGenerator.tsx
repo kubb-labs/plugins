@@ -170,8 +170,8 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(ctx.meta, { output, config })}
-              footer={resolver.resolveFooter(ctx.meta, { output, config })}
+              banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
+              footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
             >
               {importPath ? (
                 <>
