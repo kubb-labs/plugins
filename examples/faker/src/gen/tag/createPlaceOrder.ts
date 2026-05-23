@@ -3,28 +3,9 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../models/PlaceOrder.ts'
+import type { PlaceOrderData } from '../models/PlaceOrder.ts'
 import { createOrder } from './createOrder.ts'
-import { faker } from '@faker-js/faker'
-
-/**
- * @description successful operation
- */
-export function createPlaceOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
-  return createOrder(data)
-}
-
-/**
- * @description Invalid input
- */
-export function createPlaceOrderStatus405() {
-  return undefined
-}
 
 export function createPlaceOrderData(data?: Partial<PlaceOrderData>): PlaceOrderData {
   return createOrder(data)
-}
-
-export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {
-  return faker.helpers.arrayElement<any>([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
 }

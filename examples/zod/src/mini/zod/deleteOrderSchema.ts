@@ -6,9 +6,3 @@
 import * as z from 'zod/mini'
 
 export const deleteOrderPathOrderIdSchema = z.bigint()
-
-export const deleteOrderStatus400Schema = z.any()
-
-export const deleteOrderStatus404Schema = z.any()
-
-export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])

@@ -7,25 +7,6 @@ import type { AddPetRequest } from './AddPetRequest.js'
 import type { Pet } from './Pet.js'
 
 /**
- * @type object
- */
-export type AddPetStatus200 = Omit<NonNullable<Pet>, 'name'>
-
-/**
- * @type object
- */
-export type AddPetStatus405 = {
-  /**
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
-}
-
-/**
  * @description Create a new pet in the store
  * @type object
  */
@@ -66,8 +47,3 @@ export type AddPetResponses = {
   '200': AddPetStatus200
   '405': AddPetStatus405
 }
-
-/**
- * @description Union of all possible responses
- */
-export type AddPetResponse = AddPetStatus200 | AddPetStatus405

@@ -6,26 +6,6 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema.ts'
 
-export const updatePetStatus200Schema = z.lazy(() => petSchema)
-
-export type UpdatePetStatus200Schema = z.infer<typeof updatePetStatus200Schema>
-
-export const updatePetStatus400Schema = z.any()
-
-export type UpdatePetStatus400Schema = z.infer<typeof updatePetStatus400Schema>
-
-export const updatePetStatus404Schema = z.any()
-
-export type UpdatePetStatus404Schema = z.infer<typeof updatePetStatus404Schema>
-
-export const updatePetStatus405Schema = z.any()
-
-export type UpdatePetStatus405Schema = z.infer<typeof updatePetStatus405Schema>
-
-export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
-
-export type UpdatePetResponseSchema = z.infer<typeof updatePetResponseSchema>
-
 export const updatePetDataSchema = z.lazy(() => petSchema).describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchema = z.infer<typeof updatePetDataSchema>

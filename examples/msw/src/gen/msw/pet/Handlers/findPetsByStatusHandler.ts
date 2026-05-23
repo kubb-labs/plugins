@@ -6,12 +6,9 @@
 import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../../models/FindPetsByStatus.ts'
 import { http } from 'msw'
 
-export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {
+export function findPetsByStatusHandlerResponse200(data?: FindPetsByStatusResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
@@ -22,16 +19,13 @@ export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus
 }
 
 export function findPetsByStatusHandler(
-  data?: FindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
 ) {
   return http.get(`http://localhost:3000/pet/findByStatus`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
   })
 }

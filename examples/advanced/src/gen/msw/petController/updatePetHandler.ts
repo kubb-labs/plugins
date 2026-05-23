@@ -2,21 +2,15 @@ import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdateP
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function updatePetHandlerResponse200(data: UpdatePetResponse) {
+export function updatePetHandlerResponse200(data?: UpdatePetResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
-export function updatePetHandlerResponse202(data: UpdatePetResponse) {
+export function updatePetHandlerResponse202(data?: UpdatePetResponse) {
   return new Response(JSON.stringify(data), {
     status: 202,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
@@ -38,15 +32,12 @@ export function updatePetHandlerResponse405(data?: UpdatePetStatus405) {
   })
 }
 
-export function updatePetHandler(data?: UpdatePetResponse | HttpResponseResolver<Record<string, string>, UpdatePetData, any>) {
+export function updatePetHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, UpdatePetData, any>) {
   return http.put<Record<string, string>, UpdatePetData, any>(`/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
   })
 }

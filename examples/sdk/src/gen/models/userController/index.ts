@@ -3,54 +3,20 @@ export type {
   CreateUserFormUrlEncodedData,
   CreateUserJsonData,
   CreateUserRequestConfig,
-  CreateUserResponse,
   CreateUserResponses,
-  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './CreateUser.ts'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatusDefault,
-} from './CreateUsersWithListInput.ts'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './DeleteUser.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './GetUserByName.ts'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus400,
-} from './LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
+export type { CreateUsersWithListInputData, CreateUsersWithListInputRequestConfig, CreateUsersWithListInputResponses } from './CreateUsersWithListInput.ts'
+export type { DeleteUserPathUsername, DeleteUserRequestConfig, DeleteUserResponses } from './DeleteUser.ts'
+export type { GetUserByNamePathUsername, GetUserByNameRequestConfig, GetUserByNameResponses } from './GetUserByName.ts'
+export type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserRequestConfig, LoginUserResponses } from './LoginUser.ts'
+export type { LogoutUserRequestConfig, LogoutUserResponses } from './LogoutUser.ts'
 export type {
   UpdateUserData,
   UpdateUserFormUrlEncodedData,
   UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
-  UpdateUserResponse,
   UpdateUserResponses,
-  UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './UpdateUser.ts'

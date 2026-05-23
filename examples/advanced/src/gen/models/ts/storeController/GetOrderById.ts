@@ -1,25 +1,8 @@
-import type { Order } from '../Order.ts'
-
 /**
  * @description ID of order that needs to be fetched
  * @type integer
  */
 export type GetOrderByIdPathOrderId = number
-
-/**
- * @type object
- */
-export type GetOrderByIdStatus200 = Order
-
-/**
- * @type any
- */
-export type GetOrderByIdStatus400 = any
-
-/**
- * @type any
- */
-export type GetOrderByIdStatus404 = any
 
 /**
  * @type object
@@ -48,8 +31,3 @@ export type GetOrderByIdResponses = {
   '400': GetOrderByIdStatus400
   '404': GetOrderByIdStatus404
 }
-
-/**
- * @description Union of all possible responses
- */
-export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404

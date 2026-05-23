@@ -22,18 +22,3 @@ export function createUpdatePetWithFormQueryStatus(data?: string): string {
 
   return data ?? faker.string.alpha()
 }
-
-/**
- * @description Invalid input
- */
-export function createUpdatePetWithFormStatus405() {
-  faker.seed([220])
-
-  return undefined
-}
-
-export function createUpdatePetWithFormResponse() {
-  faker.seed([220])
-
-  return undefined
-}

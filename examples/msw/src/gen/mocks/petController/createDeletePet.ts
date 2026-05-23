@@ -16,18 +16,3 @@ export function createDeletePetPathPetId(data?: bigint): bigint {
 
   return data ?? faker.number.bigInt()
 }
-
-/**
- * @description Invalid pet value
- */
-export function createDeletePetStatus400() {
-  faker.seed([220])
-
-  return undefined
-}
-
-export function createDeletePetResponse() {
-  faker.seed([220])
-
-  return undefined
-}

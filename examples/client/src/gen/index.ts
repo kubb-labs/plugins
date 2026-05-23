@@ -14,27 +14,14 @@ export type {
   AddPetFormUrlEncodedData,
   AddPetJsonData,
   AddPetRequestConfig,
-  AddPetResponse,
   AddPetResponses,
-  AddPetStatus200,
-  AddPetStatus405,
   AddPetXmlData,
 } from './models/ts/petController/AddPet.js'
-export type {
-  DeletePetHeaderApiKey,
-  DeletePetPathPetId,
-  DeletePetRequestConfig,
-  DeletePetResponse,
-  DeletePetResponses,
-  DeletePetStatus400,
-} from './models/ts/petController/DeletePet.js'
+export type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetRequestConfig, DeletePetResponses } from './models/ts/petController/DeletePet.js'
 export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
-  FindPetsByStatusResponse,
   FindPetsByStatusResponses,
-  FindPetsByStatusStatus200,
-  FindPetsByStatusStatus400,
   FindPetsByStatusStatusKey,
 } from './models/ts/petController/FindPetsByStatus.js'
 export type {
@@ -42,31 +29,15 @@ export type {
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
   FindPetsByTagsRequestConfig,
-  FindPetsByTagsResponse,
   FindPetsByTagsResponses,
-  FindPetsByTagsStatus200,
-  FindPetsByTagsStatus400,
 } from './models/ts/petController/FindPetsByTags.js'
-export type {
-  GetPetByIdPathPetId,
-  GetPetByIdRequestConfig,
-  GetPetByIdResponse,
-  GetPetByIdResponses,
-  GetPetByIdStatus200,
-  GetPetByIdStatus400,
-  GetPetByIdStatus404,
-} from './models/ts/petController/GetPetById.js'
+export type { GetPetByIdPathPetId, GetPetByIdRequestConfig, GetPetByIdResponses } from './models/ts/petController/GetPetById.js'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
   UpdatePetRequestConfig,
-  UpdatePetResponse,
   UpdatePetResponses,
-  UpdatePetStatus200,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
   UpdatePetXmlData,
 } from './models/ts/petController/UpdatePet.js'
 export type {
@@ -74,9 +45,7 @@ export type {
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormRequestConfig,
-  UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
-  UpdatePetWithFormStatus405,
 } from './models/ts/petController/UpdatePetWithForm.js'
 export type {
   UploadFileData,
@@ -85,37 +54,17 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './models/ts/petController/UploadFile.js'
-export type {
-  DeleteOrderPathOrderId,
-  DeleteOrderRequestConfig,
-  DeleteOrderResponse,
-  DeleteOrderResponses,
-  DeleteOrderStatus400,
-  DeleteOrderStatus404,
-} from './models/ts/storeController/DeleteOrder.js'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/storeController/GetInventory.js'
-export type {
-  GetOrderByIdPathOrderId,
-  GetOrderByIdRequestConfig,
-  GetOrderByIdResponse,
-  GetOrderByIdResponses,
-  GetOrderByIdStatus200,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
-} from './models/ts/storeController/GetOrderById.js'
+export type { DeleteOrderPathOrderId, DeleteOrderRequestConfig, DeleteOrderResponses } from './models/ts/storeController/DeleteOrder.js'
+export type { GetInventoryRequestConfig, GetInventoryResponses } from './models/ts/storeController/GetInventory.js'
+export type { GetOrderByIdPathOrderId, GetOrderByIdRequestConfig, GetOrderByIdResponses } from './models/ts/storeController/GetOrderById.js'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
   PlaceOrderJsonData,
   PlaceOrderRequestConfig,
-  PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
-  PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/ts/storeController/PlaceOrder.js'
 export type {
@@ -123,10 +72,7 @@ export type {
   PlaceOrderPatchFormUrlEncodedData,
   PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
-  PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
-  PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/ts/storeController/PlaceOrderPatch.js'
 export type {
@@ -134,55 +80,25 @@ export type {
   CreateUserFormUrlEncodedData,
   CreateUserJsonData,
   CreateUserRequestConfig,
-  CreateUserResponse,
   CreateUserResponses,
-  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './models/ts/userController/CreateUser.js'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatusDefault,
 } from './models/ts/userController/CreateUsersWithListInput.js'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './models/ts/userController/DeleteUser.js'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './models/ts/userController/GetUserByName.js'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus400,
-} from './models/ts/userController/LoginUser.js'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/userController/LogoutUser.js'
+export type { DeleteUserPathUsername, DeleteUserRequestConfig, DeleteUserResponses } from './models/ts/userController/DeleteUser.js'
+export type { GetUserByNamePathUsername, GetUserByNameRequestConfig, GetUserByNameResponses } from './models/ts/userController/GetUserByName.js'
+export type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserRequestConfig, LoginUserResponses } from './models/ts/userController/LoginUser.js'
+export type { LogoutUserRequestConfig, LogoutUserResponses } from './models/ts/userController/LogoutUser.js'
 export type {
   UpdateUserData,
   UpdateUserFormUrlEncodedData,
   UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
-  UpdateUserResponse,
   UpdateUserResponses,
-  UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.js'
 export { client } from './.kubb/client.js'

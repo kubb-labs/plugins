@@ -4,19 +4,12 @@
  */
 
 import * as z from 'zod/mini'
-import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
 export const createPetsPathUuidSchema = z.string()
 
 export const createPetsQueryOffsetSchema = z.optional(z.int())
 
 export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
-
-export const createPetsStatus201Schema = z.any()
-
-export const createPetsStatusDefaultSchema = petNotFoundSchema
-
-export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
 
 export const createPetsDataSchema = z.object({
   name: z.string(),

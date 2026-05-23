@@ -1,5 +1,4 @@
 import * as z from 'zod'
-import { petSchema } from '../petSchema.ts'
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
@@ -16,15 +15,3 @@ export type FindPetsByTagsQueryPageSizeSchema = z.infer<typeof findPetsByTagsQue
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
 export type FindPetsByTagsHeaderXEXAMPLESchema = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
-
-export const findPetsByTagsStatus200Schema = z.array(z.lazy(() => petSchema))
-
-export type FindPetsByTagsStatus200Schema = z.infer<typeof findPetsByTagsStatus200Schema>
-
-export const findPetsByTagsStatus400Schema = z.any()
-
-export type FindPetsByTagsStatus400Schema = z.infer<typeof findPetsByTagsStatus400Schema>
-
-export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])
-
-export type FindPetsByTagsResponseSchema = z.infer<typeof findPetsByTagsResponseSchema>

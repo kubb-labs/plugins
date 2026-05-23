@@ -8,9 +8,3 @@ import * as z from 'zod/mini'
 export const loginUserQueryUsernameSchema = z.optional(z.string())
 
 export const loginUserQueryPasswordSchema = z.optional(z.string())
-
-export const loginUserStatus200Schema = z.string()
-
-export const loginUserStatus400Schema = z.any()
-
-export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])

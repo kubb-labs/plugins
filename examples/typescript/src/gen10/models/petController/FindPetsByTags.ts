@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import type { Pet } from '../Pet.ts'
-
 /**
  * @description Tags to filter by
  * @type array | undefined
@@ -22,16 +20,6 @@ export type FindPetsByTagsQueryPage = string | undefined
  * @type string | undefined
  */
 export type FindPetsByTagsQueryPageSize = string | undefined
-
-/**
- * @type array
- */
-export type FindPetsByTagsStatus200 = Array<Pet>
-
-/**
- * @type any
- */
-export type FindPetsByTagsStatus400 = any
 
 /**
  * @type object
@@ -61,8 +49,3 @@ export type FindPetsByTagsResponses = {
   '200': FindPetsByTagsStatus200
   '400': FindPetsByTagsStatus400
 }
-
-/**
- * @description Union of all possible responses
- */
-export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400

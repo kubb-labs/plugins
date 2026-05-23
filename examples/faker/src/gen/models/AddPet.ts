@@ -6,16 +6,6 @@
 import type { Pet } from './Pet.ts'
 
 /**
- * @type object
- */
-export type AddPetStatus200 = Pet
-
-/**
- * @type any
- */
-export type AddPetStatus405 = any
-
-/**
  * @description Create a new pet in the store
  * @type object
  */
@@ -56,8 +46,3 @@ export type AddPetResponses = {
   '200': AddPetStatus200
   '405': AddPetStatus405
 }
-
-/**
- * @description Union of all possible responses
- */
-export type AddPetResponse = AddPetStatus200 | AddPetStatus405

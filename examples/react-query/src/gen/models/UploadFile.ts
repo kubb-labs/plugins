@@ -1,7 +1,5 @@
 // version: 1.0.11
 
-import type { ApiResponse } from './ApiResponse.ts'
-
 /**
  * @description ID of pet to update
  * @type integer
@@ -13,11 +11,6 @@ export type UploadFilePathPetId = number
  * @type string | undefined
  */
 export type UploadFileQueryAdditionalMetadata = string | undefined
-
-/**
- * @type object
- */
-export type UploadFileStatus200 = ApiResponse
 
 /**
  * @type string | undefined
@@ -54,8 +47,3 @@ export type UploadFileRequestConfig = {
 export type UploadFileResponses = {
   '200': UploadFileStatus200
 }
-
-/**
- * @description Union of all possible responses
- */
-export type UploadFileResponse = UploadFileStatus200

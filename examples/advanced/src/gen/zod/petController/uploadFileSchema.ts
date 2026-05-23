@@ -1,5 +1,4 @@
 import * as z from 'zod'
-import { apiResponseSchema } from '../apiResponseSchema.ts'
 
 export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
 
@@ -8,14 +7,6 @@ export type UploadFilePathPetIdSchema = z.infer<typeof uploadFilePathPetIdSchema
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
 export type UploadFileQueryAdditionalMetadataSchema = z.infer<typeof uploadFileQueryAdditionalMetadataSchema>
-
-export const uploadFileStatus200Schema = apiResponseSchema
-
-export type UploadFileStatus200Schema = z.infer<typeof uploadFileStatus200Schema>
-
-export const uploadFileResponseSchema = uploadFileStatus200Schema
-
-export type UploadFileResponseSchema = z.infer<typeof uploadFileResponseSchema>
 
 export const uploadFileDataSchema = z.instanceof(File)
 

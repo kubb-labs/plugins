@@ -12,15 +12,3 @@ export type LoginUserQueryUsernameSchema = z.infer<typeof loginUserQueryUsername
 export const loginUserQueryPasswordSchema = z.string().optional().describe('The password for login in clear text')
 
 export type LoginUserQueryPasswordSchema = z.infer<typeof loginUserQueryPasswordSchema>
-
-export const loginUserStatus200Schema = z.string()
-
-export type LoginUserStatus200Schema = z.infer<typeof loginUserStatus200Schema>
-
-export const loginUserStatus400Schema = z.any()
-
-export type LoginUserStatus400Schema = z.infer<typeof loginUserStatus400Schema>
-
-export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])
-
-export type LoginUserResponseSchema = z.infer<typeof loginUserResponseSchema>

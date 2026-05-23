@@ -89,26 +89,7 @@ export const petNotFoundSchema = z.object({
 
 export const userArraySchema = z.array(userSchema)
 
-export const updatePetStatus200Schema = petSchema
-
-export const updatePetStatus400Schema = z.any()
-
-export const updatePetStatus404Schema = z.any()
-
-export const updatePetStatus405Schema = z.any()
-
-export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
-
 export const updatePetDataSchema = petSchema.describe('Update an existent pet in the store')
-
-export const addPetStatus200Schema = petSchema
-
-export const addPetStatus405Schema = z.object({
-  code: z.int().optional(),
-  message: z.string().optional(),
-})
-
-export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
 export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
 
@@ -118,33 +99,13 @@ export const findPetsByStatusQueryStatusSchema = z
   .default('available')
   .describe('Status values that need to be considered for filter')
 
-export const findPetsByStatusStatus200Schema = z.array(petSchema)
-
-export const findPetsByStatusStatus400Schema = z.any()
-
-export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])
-
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
 export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export const findPetsByTagsStatus200Schema = z.array(petSchema)
-
-export const findPetsByTagsStatus400Schema = z.any()
-
-export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])
-
 export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
-
-export const getPetByIdStatus200Schema = petSchema
-
-export const getPetByIdStatus400Schema = z.any()
-
-export const getPetByIdStatus404Schema = z.any()
-
-export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export const updatePetWithFormPathPetIdSchema = z.bigint().describe('ID of pet that needs to be updated')
 
@@ -152,77 +113,25 @@ export const updatePetWithFormQueryNameSchema = z.string().optional().describe('
 
 export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
-export const updatePetWithFormStatus405Schema = z.any()
-
-export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema
-
 export const deletePetHeaderApiKeySchema = z.string().optional()
 
 export const deletePetPathPetIdSchema = z.bigint().describe('Pet id to delete')
-
-export const deletePetStatus400Schema = z.any()
-
-export const deletePetResponseSchema = deletePetStatus400Schema
 
 export const uploadFilePathPetIdSchema = z.bigint().describe('ID of pet to update')
 
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
-export const uploadFileStatus200Schema = apiResponseSchema
-
-export const uploadFileResponseSchema = uploadFileStatus200Schema
-
 export const uploadFileDataSchema = z.instanceof(File).optional()
 
-export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
-
-export const getInventoryResponseSchema = getInventoryStatus200Schema
-
-export const placeOrderStatus200Schema = orderSchema
-
-export const placeOrderStatus405Schema = z.any()
-
-export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
-
 export const placeOrderDataSchema = orderSchema.optional()
-
-export const placeOrderPatchStatus200Schema = orderSchema
-
-export const placeOrderPatchStatus405Schema = z.any()
-
-export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
 export const placeOrderPatchDataSchema = orderSchema.optional()
 
 export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
-export const getOrderByIdStatus200Schema = orderSchema
-
-export const getOrderByIdStatus400Schema = z.any()
-
-export const getOrderByIdStatus404Schema = z.any()
-
-export const getOrderByIdResponseSchema = z.union([getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
-
 export const deleteOrderPathOrderIdSchema = z.bigint().describe('ID of the order that needs to be deleted')
 
-export const deleteOrderStatus400Schema = z.any()
-
-export const deleteOrderStatus404Schema = z.any()
-
-export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
-
-export const createUserStatusDefaultSchema = userSchema
-
-export const createUserResponseSchema = createUserStatusDefaultSchema
-
 export const createUserDataSchema = userSchema.optional().describe('Created user object')
-
-export const createUsersWithListInputStatus200Schema = userSchema
-
-export const createUsersWithListInputStatusDefaultSchema = z.any()
-
-export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
 
 export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
@@ -230,38 +139,10 @@ export const loginUserQueryUsernameSchema = z.string().optional().describe('The 
 
 export const loginUserQueryPasswordSchema = z.string().optional().describe('The password for login in clear text')
 
-export const loginUserStatus200Schema = z.string()
-
-export const loginUserStatus400Schema = z.any()
-
-export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])
-
-export const logoutUserStatusDefaultSchema = z.any()
-
-export const logoutUserResponseSchema = logoutUserStatusDefaultSchema
-
 export const getUserByNamePathUsernameSchema = z.string().describe('The name that needs to be fetched. Use user1 for testing. ')
 
-export const getUserByNameStatus200Schema = userSchema
-
-export const getUserByNameStatus400Schema = z.any()
-
-export const getUserByNameStatus404Schema = z.any()
-
-export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])
-
 export const updateUserPathUsernameSchema = z.string().describe('name that need to be deleted')
-
-export const updateUserStatusDefaultSchema = z.any()
-
-export const updateUserResponseSchema = updateUserStatusDefaultSchema
 
 export const updateUserDataSchema = userSchema.optional().describe('Update an existent user in the store')
 
 export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
-
-export const deleteUserStatus400Schema = z.any()
-
-export const deleteUserStatus404Schema = z.any()
-
-export const deleteUserResponseSchema = z.union([deleteUserStatus400Schema, deleteUserStatus404Schema])

@@ -7,33 +7,24 @@ import type { AddPetResponse, AddPetStatus405, AddPetData } from '../../../model
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function addPetHandlerResponse200(data: AddPetResponse) {
+export function addPetHandlerResponse200(data?: AddPetResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
-export function addPetHandlerResponse405(data: AddPetStatus405) {
+export function addPetHandlerResponse405(data?: AddPetStatus405) {
   return new Response(JSON.stringify(data), {
     status: 405,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
-export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetData, any>) {
+export function addPetHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, AddPetData, any>) {
   return http.post<Record<string, string>, AddPetData, any>(`http://localhost:3000/pet`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
   })
 }

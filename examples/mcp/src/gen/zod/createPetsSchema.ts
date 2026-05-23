@@ -4,19 +4,12 @@
  */
 
 import * as z from 'zod'
-import { petNotFoundSchema } from './petNotFoundSchema.js'
 
 export const createPetsPathUuidSchema = z.string().describe('UUID')
 
 export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset */')
 
 export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
-
-export const createPetsStatus201Schema = z.any()
-
-export const createPetsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
-
-export const createPetsResponseSchema = z.union([createPetsStatus201Schema, createPetsStatusDefaultSchema])
 
 export const createPetsDataSchema = z.object({
   name: z.string(),

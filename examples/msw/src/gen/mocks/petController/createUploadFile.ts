@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import type { UploadFileResponse, UploadFileStatus200 } from '../../models/UploadFile.ts'
-import { createApiResponse } from '../createApiResponse.ts'
 import { faker } from '@faker-js/faker'
 
 export function createUploadFilePathPetId(data?: bigint): bigint {
@@ -19,23 +17,8 @@ export function createUploadFileQueryAdditionalMetadata(data?: string): string {
   return data ?? faker.string.alpha()
 }
 
-/**
- * @description successful operation
- */
-export function createUploadFileStatus200(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
-  faker.seed([220])
-
-  return createApiResponse(data)
-}
-
 export function createUploadFileData(data?: Blob): Blob {
   faker.seed([220])
 
   return data ?? (faker.image.url() as unknown as Blob)
-}
-
-export function createUploadFileResponse(data?: Partial<UploadFileResponse>): UploadFileResponse {
-  faker.seed([220])
-
-  return createUploadFileStatus200(data)
 }

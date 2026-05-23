@@ -3,8 +3,6 @@
  * Do not edit manually.
  */
 
-import type { Pet } from '../Pet.ts'
-
 export const findPetsByStatusStatus = {
   available: 'available',
   pending: 'pending',
@@ -19,16 +17,6 @@ export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof ty
  * @type string | undefined
  */
 export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
-
-/**
- * @type array
- */
-export type FindPetsByStatusStatus200 = Array<Pet>
-
-/**
- * @type any
- */
-export type FindPetsByStatusStatus400 = any
 
 /**
  * @type object
@@ -56,8 +44,3 @@ export type FindPetsByStatusResponses = {
   '200': FindPetsByStatusStatus200
   '400': FindPetsByStatusStatus400
 }
-
-/**
- * @description Union of all possible responses
- */
-export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
