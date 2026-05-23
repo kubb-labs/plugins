@@ -119,7 +119,7 @@ function mapResponseType(contentType: string): ResponseType | undefined {
  */
 export function getResponseContentTypeInfo(node: ast.OperationNode): ResponseContentTypeInfo {
   const primary = getPrimarySuccessResponse(node)
-  const responseContentTypes = primary?.content?.map((e) => e.contentType) ?? (primary?.mediaType ? [primary.mediaType] : [])
+  const responseContentTypes = primary?.content?.map((e) => e.contentType) ?? []
   const isMultipleResponseContentTypes = responseContentTypes.length > 1
   const defaultResponseType = !isMultipleResponseContentTypes && responseContentTypes[0] ? mapResponseType(responseContentTypes[0]) : undefined
 

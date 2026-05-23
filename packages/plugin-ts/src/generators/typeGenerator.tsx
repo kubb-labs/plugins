@@ -247,10 +247,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (variants.length > 1) {
         return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
       }
+      const primary = res.content?.[0]
       return renderSchemaType({
-        schema: res.schema,
+        schema: primary?.schema ?? null,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
-        keysToOmit: res.keysToOmit,
+        keysToOmit: primary?.keysToOmit,
       })
     })
 
@@ -265,23 +266,26 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     function buildResponseType() {
-      if (!node.responses.some((res) => res.schema)) {
+      const hasSchema = (res: ast.ResponseNode) => (res.content ?? []).some((entry) => entry.schema)
+      if (!node.responses.some(hasSchema)) {
         return null
       }
 
       const responseName = resolver.resolveResponseName(node)
 
-      const responsesWithSchema = node.responses.filter((res) => res.schema)
+      const responsesWithSchema = node.responses.filter(hasSchema)
       const importedNames = new Set(
         responsesWithSchema.flatMap((res) =>
-          res.schema
-            ? adapter
-                .getImports(res.schema, (schemaName) => ({
-                  name: resolveImportName(schemaName),
-                  path: '',
-                }))
-                .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-            : [],
+          (res.content ?? []).flatMap((entry) =>
+            entry.schema
+              ? adapter
+                  .getImports(entry.schema, (schemaName) => ({
+                    name: resolveImportName(schemaName),
+                    path: '',
+                  }))
+                  .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+              : [],
+          ),
         ),
       )
 
