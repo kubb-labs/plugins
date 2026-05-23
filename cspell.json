@@ -74,6 +74,7 @@
     "monorepo",
     "APIV",
     "dedupe",
+    "inlines",
     "Oxlint",
     "Oxfmt",
     "whatwg",

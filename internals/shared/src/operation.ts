@@ -296,7 +296,7 @@ export function resolveOperationTypeImports(
   const requestImport: OperationTypeImport | null = node.requestBody?.content?.[0]?.schema
     ? (() => {
         const schema = node.requestBody!.content![0]!.schema!
-        if (!operationTypes) {
+        if (operationTypes === false) {
           const refName = ast.resolveRefName(schema)
           if (refName) {
             return { name: resolver.resolveTypeName(refName), schemaName: refName }
@@ -313,7 +313,7 @@ export function resolveOperationTypeImports(
       ? []
       : (options.responseStatusNames === 'error' ? node.responses.filter((response) => isErrorStatusCode(response.statusCode)) : node.responses).map(
           (response) => {
-            if (!operationTypes && response.schema) {
+            if (operationTypes === false && response.schema) {
               const refName = ast.resolveRefName(response.schema)
               if (refName) {
                 return { name: resolver.resolveTypeName(refName), schemaName: refName }
