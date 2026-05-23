@@ -302,6 +302,42 @@ describe('typeGenerator — Operation', () => {
         ],
       }),
     },
+    {
+      name: 'multiContentType — GET with json and xml response body',
+      node: ast.createOperation({
+        operationId: 'getPetById',
+        method: 'GET',
+        path: '/pet/{petId}',
+        tags: ['pet'],
+        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.createResponse({
+            statusCode: '200',
+            description: 'Successful operation',
+            schema: ast.createSchema({
+              type: 'object',
+              properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+            }),
+            content: [
+              {
+                contentType: 'application/json',
+                schema: ast.createSchema({
+                  type: 'object',
+                  properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+                }),
+              },
+              {
+                contentType: 'application/xml',
+                schema: ast.createSchema({
+                  type: 'object',
+                  properties: [ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) })],
+                }),
+              },
+            ],
+          }),
+        ],
+      }),
+    },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode }>
 
   test.each(operations)('$name', async (props) => {

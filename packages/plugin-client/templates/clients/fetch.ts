@@ -74,6 +74,79 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
   return result
 }
 
+/**
+ * Serializes the request body into the form `fetch` expects.
+ * `FormData`, `URLSearchParams`, `Blob`, `ArrayBuffer` and string bodies are passed through
+ * untouched. Plain objects are encoded as `URLSearchParams` for `application/x-www-form-urlencoded`
+ * and JSON-serialized otherwise.
+ */
+function serializeBody(data: unknown, contentType?: string): BodyInit | undefined {
+  if (data === undefined || data === null) return undefined
+  if (data instanceof FormData || data instanceof URLSearchParams || data instanceof Blob || data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    return data as BodyInit
+  }
+  if (typeof data === 'string') return data
+  if (contentType?.includes('application/x-www-form-urlencoded')) {
+    return new URLSearchParams(data as Record<string, string>)
+  }
+  return JSON.stringify(data)
+}
+
+/**
+ * Parses a `fetch` response body.
+ *
+ * - Empty responses (204/205/304 or no body) resolve to `{}`.
+ * - An explicit `responseType` forces the matching `Response` method.
+ * - Otherwise the `Content-Type` response header decides: JSON, text or blob.
+ * - As a last resort the body is read as text and `JSON.parse`d, falling back to the raw text.
+ */
+async function parseResponse<TData>(response: Response, responseType?: RequestConfig['responseType']): Promise<TData> {
+  if ([204, 205, 304].includes(response.status) || !response.body) {
+    return {} as TData
+  }
+
+  if (responseType) {
+    switch (responseType) {
+      case 'json':
+        return (await response.json()) as TData
+      case 'text':
+      case 'document':
+        return (await response.text()) as TData
+      case 'blob':
+        return (await response.blob()) as TData
+      case 'arraybuffer':
+        return (await response.arrayBuffer()) as TData
+      case 'stream':
+        return response.body as TData
+      default:
+        return (await response.json()) as TData
+    }
+  }
+
+  const contentType = response.headers.get('Content-Type')
+  if (contentType) {
+    if (contentType.includes('application/json') || contentType.includes('text/json')) {
+      return (await response.json()) as TData
+    }
+    if (contentType.includes('text/')) {
+      return (await response.text()) as TData
+    }
+    if (contentType.includes('image/') || contentType.includes('application/octet-stream')) {
+      return (await response.blob()) as TData
+    }
+  }
+
+  const text = await response.text()
+  if (!text) {
+    return {} as TData
+  }
+  try {
+    return JSON.parse(text) as TData
+  } catch {
+    return text as TData
+  }
+}
+
 export type ResponseErrorConfig<TError = unknown> = TError
 
 export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>, request?: unknown) => Promise<ResponseConfig<TData>>
@@ -98,21 +171,23 @@ export const client = async <TData, _TError = unknown, TVariables = unknown>(
     targetUrl += `?${normalizedParams}`
   }
 
+  const headers: Record<string, string> = {
+    ...(config.contentType && config.contentType !== 'multipart/form-data' ? { 'Content-Type': config.contentType } : {}),
+    ...serializeHeaders(config.headers),
+  }
+
   const response = await globalThis.fetch(targetUrl, {
     credentials: config.credentials || 'same-origin',
     method: config.method?.toUpperCase(),
-    body: config.data instanceof FormData ? config.data : JSON.stringify(config.data),
+    body: serializeBody(config.data, headers['Content-Type'] ?? headers['content-type']),
     signal: config.signal,
-    headers: {
-      ...(config.contentType && config.contentType !== 'multipart/form-data' ? { 'Content-Type': config.contentType } : {}),
-      ...serializeHeaders(config.headers),
-    },
+    headers,
   })
 
-  const data = [204, 205, 304].includes(response.status) || !response.body ? {} : await response.json()
+  const data = await parseResponse<TData>(response, config.responseType)
 
   return {
-    data: data as TData,
+    data,
     status: response.status,
     statusText: response.statusText,
     headers: response.headers as Headers,

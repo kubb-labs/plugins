@@ -14,7 +14,14 @@ export type GetPetByIdPathPetId = bigint;
 /**
  * @type object
 */
-export type GetPetByIdStatus200 = Pet;
+export type GetPetByIdStatus200Json = Pet;
+
+/**
+ * @type object
+*/
+export type GetPetByIdStatus200Xml = Pet;
+
+export type GetPetByIdStatus200 = (GetPetByIdStatus200Json | GetPetByIdStatus200Xml);
 
 /**
  * @type any

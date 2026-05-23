@@ -1,4 +1,4 @@
-import { getOperationParameters, resolveSuccessNames } from '@internals/shared'
+import { getOperationParameters, getResponseContentTypeInfo, resolveSuccessNames } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -56,6 +56,7 @@ export function buildClassClientParams({
   const { query: queryParams } = getOperationParameters(node)
   const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
+  const { defaultResponseType } = getResponseContentTypeInfo(node)
 
   return createFunctionParams({
     config: {
@@ -87,6 +88,7 @@ export function buildClassClientParams({
             }
           : null,
         contentType: isMultipleContentTypes ? {} : null,
+        responseType: defaultResponseType ? { value: JSON.stringify(defaultResponseType) } : null,
         headers: headers.length
           ? {
               value: `{ ${headers.join(', ')}, ...requestConfig.headers }`,

@@ -78,6 +78,54 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
   }
 }
 
+export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
+
+export type ResponseContentTypeInfo = {
+  responseContentTypes: string[]
+  isMultipleResponseContentTypes: boolean
+  defaultResponseType: ResponseType | undefined
+}
+
+/**
+ * Maps a response content type to the `responseType` the runtime client should use.
+ *
+ * - JSON (`application/json`, `*+json`, `text/json`) → `undefined` (the client's JSON default).
+ * - Binary types (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`) → `'blob'`.
+ * - Other `text/*` → `'text'`.
+ * - Anything else → `undefined`, leaving runtime `Content-Type` auto-detection in charge.
+ */
+function mapResponseType(contentType: string): ResponseType | undefined {
+  const baseType = contentType.split(';')[0]!.trim().toLowerCase()
+  if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
+  if (
+    baseType === 'application/octet-stream' ||
+    baseType === 'application/pdf' ||
+    baseType.startsWith('image/') ||
+    baseType.startsWith('audio/') ||
+    baseType.startsWith('video/')
+  ) {
+    return 'blob'
+  }
+  if (baseType.startsWith('text/')) return 'text'
+  return undefined
+}
+
+/**
+ * Inspects the primary success response and derives a default `responseType` for the operation.
+ *
+ * A default is only inferred when the success response declares a single non-JSON content type
+ * (e.g. a binary download). When multiple content types are present the value stays `undefined`
+ * so the runtime client relies on `Content-Type` header auto-detection instead.
+ */
+export function getResponseContentTypeInfo(node: ast.OperationNode): ResponseContentTypeInfo {
+  const primary = getPrimarySuccessResponse(node)
+  const responseContentTypes = primary?.content?.map((e) => e.contentType) ?? (primary?.mediaType ? [primary.mediaType] : [])
+  const isMultipleResponseContentTypes = responseContentTypes.length > 1
+  const defaultResponseType = !isMultipleResponseContentTypes && responseContentTypes[0] ? mapResponseType(responseContentTypes[0]) : undefined
+
+  return { responseContentTypes, isMultipleResponseContentTypes, defaultResponseType }
+}
+
 export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)

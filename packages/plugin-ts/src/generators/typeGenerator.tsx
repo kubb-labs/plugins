@@ -168,6 +168,47 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
+    /**
+     * Emits an individual type per content type plus a union alias under `baseName`.
+     * Shared by the request body and multi-content-type responses.
+     */
+    function buildContentTypeVariants(
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+      baseName: string,
+      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+    ) {
+      const usedNames = new Set<string>()
+      const individualItems = entries
+        .filter((entry) => entry.schema)
+        .map((entry) => {
+          const baseSuffix = getContentTypeSuffix(entry.contentType)
+          let individualName = getPerContentTypeName(baseName, baseSuffix)
+          let counter = 2
+          while (usedNames.has(individualName)) {
+            individualName = getPerContentTypeName(baseName, `${baseSuffix}${counter++}`)
+          }
+          usedNames.add(individualName)
+          return {
+            name: individualName,
+            rendered: renderSchemaType({
+              schema: decorate ? decorate(entry.schema!) : entry.schema!,
+              name: individualName,
+              keysToOmit: entry.keysToOmit,
+            }),
+          }
+        })
+      const unionSchema = ast.createSchema({
+        type: 'union',
+        members: individualItems.map((item) => ast.createSchema({ type: 'ref', name: item.name })),
+      })
+      return (
+        <>
+          {individualItems.map((item) => item.rendered)}
+          {renderSchemaType({ schema: unionSchema, name: baseName })}
+        </>
+      )
+    }
+
     const paramTypes = params.map((param) =>
       renderSchemaType({
         schema: param.schema,
@@ -192,52 +233,26 @@ export const typeGenerator = defineGenerator<PluginTs>({
         })
       }
       // Multiple content types — generate individual types + union alias
-      const dataName = resolver.resolveDataName(node)
-      const usedNames = new Set<string>()
-      const individualItems = requestBodyContent
-        .filter((entry) => entry.schema)
-        .map((entry) => {
-          const baseSuffix = getContentTypeSuffix(entry.contentType)
-          let individualName = getPerContentTypeName(dataName, baseSuffix)
-          let counter = 2
-          while (usedNames.has(individualName)) {
-            individualName = getPerContentTypeName(dataName, `${baseSuffix}${counter++}`)
-          }
-          usedNames.add(individualName)
-          return {
-            name: individualName,
-            rendered: renderSchemaType({
-              schema: {
-                ...entry.schema!,
-                description: node.requestBody!.description ?? entry.schema!.description,
-              },
-              name: individualName,
-              keysToOmit: entry.keysToOmit,
-            }),
-          }
-        })
-      const unionSchema = ast.createSchema({
-        type: 'union',
-        members: individualItems.map((item) => ast.createSchema({ type: 'ref', name: item.name })),
-      })
-      const unionType = renderSchemaType({ schema: unionSchema, name: dataName })
-      return (
-        <>
-          {individualItems.map((item) => item.rendered)}
-          {unionType}
-        </>
-      )
+      return buildContentTypeVariants(requestBodyContent, resolver.resolveDataName(node), (schema) => ({
+        ...schema,
+        description: node.requestBody!.description ?? schema.description,
+      }))
     }
 
     const requestType = buildRequestType()
 
-    const responseTypes = node.responses.map((res) =>
-      renderSchemaType({
+    const responseTypes = node.responses.map((res) => {
+      const variants = (res.content ?? []).filter((entry) => entry.schema)
+      // Multiple content types for a single status code — generate a union of the variants.
+      if (variants.length > 1) {
+        return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
+      }
+      return renderSchemaType({
         schema: res.schema,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
         keysToOmit: res.keysToOmit,
-      }),
-    )
+      })
+    })
 
     const dataType = renderSchemaType({
       schema: buildData({ ...node, parameters: params }, { resolver }),

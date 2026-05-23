@@ -6,6 +6,7 @@ export {
   getOperationParameters,
   getOperationSuccessResponses,
   getPrimarySuccessResponse,
+  getResponseContentTypeInfo,
   getStatusCodeNumber,
   getSuccessResponses,
   isErrorStatusCode,
@@ -21,8 +22,10 @@ export {
   type OperationParameterGroups,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
+  type ResponseContentTypeInfo,
   type ResponseNameResolver,
   type ResponseStatusNameResolver,
+  type ResponseType,
   type ResolveOperationTypeNameOptions,
 } from './operation.ts'
 export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'
