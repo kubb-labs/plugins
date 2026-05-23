@@ -9,7 +9,7 @@ description: |
   Copies the HTTP client runtime into the generated output, so the consuming app does not need `@kubb/plugin-client` installed at runtime.
 
   - `false` (default) — generated files import from `@kubb/plugin-client/clients/{client}`. Smaller diff, but the package must be a runtime dependency.
-  - `true` — Kubb writes a `.kubb/fetch.ts` (or `.kubb/axios.ts`) file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
+  - `true` — Kubb writes a `.kubb/client.ts` file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
   - Setting `client.importPath` overrides both behaviors and uses your custom client instead.
 examples:
   - name: Bundle the runtime

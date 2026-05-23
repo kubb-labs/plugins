@@ -41,7 +41,7 @@ properties:
             lang: typescript
             twoslash: false
             code: |
-              import type { Client, RequestConfig } from './.kubb/fetch'
+              import type { Client, RequestConfig } from './.kubb/client'
               import { Pet } from './petController/Pet'
               import { Store } from './storeController/Store'
               import { User } from './userController/User'
