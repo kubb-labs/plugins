@@ -121,7 +121,7 @@ describe('printerFaker', () => {
     const node = ast.createSchema({
       type: 'union',
       discriminatorPropertyName: 'protocol',
-      members: [makeVariant('udp', ['roundrobin', 'leastconn']), makeVariant('tcp', ['source'])],
+      members: [makeVariant('udp', ['random', 'rotate']), makeVariant('tcp', ['source'])],
     })
 
     const result = printerFaker({ resolver: resolverFaker, typeName: 'NodeBalancerConfig' }).print(node)
@@ -132,7 +132,7 @@ describe('printerFaker', () => {
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
   })
 
-  test('falls back to any for undiscriminated unions of objects', () => {
+  test('falls back to any for non-discriminated unions of objects', () => {
     const node = ast.createSchema({
       type: 'union',
       members: [
