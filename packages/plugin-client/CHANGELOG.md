@@ -1,5 +1,31 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.27
+
+### Minor Changes
+
+- [#204](https://github.com/kubb-labs/plugins/pull/204) [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Client functions and TanStack mutation/query `TData` now reference the union of `2xx` response types only (e.g. `AddPetStatus200`) instead of the full response alias (`AddPetMutation` / `AddPetQueryResponse`), which previously also included `4xx`/`5xx` shapes.
+
+  This aligns the generated code with TanStack Query's contract that `TData` is the resolved success value while errors flow through `TError`. The previous behavior forced `as` casts at call sites because the success body was unioned with error bodies.
+
+  If your HTTP client returns non-`2xx` bodies as resolved data instead of throwing, narrow with a type guard at the call site or wrap the client to throw on error responses. Fixes [#16](https://github.com/kubb-labs/plugins/issues/16).
+
+### Patch Changes
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Serialize object header values to JSON in the generated `fetch` and `axios` clients so headers like `X-Filter` (which OpenAPI specs declare as a JSON object) are sent in their canonical form instead of being coerced to `[object Object]` by the runtime. `RequestConfig.headers` now widens to a shared `HeadersInit` type that accepts primitive and object values, matching what spec authors actually pass.
+
+  A new `serializeHeaders()` helper turns non-string values into JSON before they reach `globalThis.fetch` or `axios.request`. Existing string-valued headers behave unchanged.
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Sanitize generated identifiers that would otherwise start with a digit so they're valid JavaScript names.
+
+  OpenAPI schemas/operations named `409`, `504AccountCancel`, etc. previously produced invalid output like `export const 409Schema = …` and `export interface 409 { … }`. Resolvers in `plugin-ts`, `plugin-zod`, `plugin-client`, and `plugin-faker` now run their PascalCase/camelCase results through a new `ensureValidVarName` helper, which prefixes the name with `_` when it isn't a syntactically valid identifier (leading digit or reserved word). File paths are unaffected.
+
+  Reported in kubb-labs/plugins#196.
+
+- Updated dependencies [[`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877)]:
+  - @kubb/plugin-ts@5.0.0-beta.27
+  - @kubb/plugin-zod@5.0.0-beta.27
+
 ## 5.0.0-beta.25
 
 ### Patch Changes

@@ -76,12 +76,12 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
       <File baseName={clientFile.baseName} path={clientFile.path} meta={clientFile.meta} banner={banner} footer={footer}>
         {importPath ? (
           <>
-            <File.Import name={'fetch'} path={importPath} />
+            <File.Import name={'client'} path={importPath} />
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={importPath} isTypeOnly />
           </>
         ) : (
           <>
-            <File.Import name={'fetch'} root={clientFile.path} path={path.resolve(config.root, config.output.path, '.kubb/fetcher.ts')} />
+            <File.Import name={'client'} root={clientFile.path} path={path.resolve(config.root, config.output.path, '.kubb/fetcher.ts')} />
             <File.Import
               name={['RequestConfig', 'ResponseErrorConfig']}
               root={clientFile.path}

@@ -1,4 +1,4 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { AddFilesData, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/petController/AddFiles.ts'
 import { buildFormData } from '../../../.kubb/config.ts'
@@ -18,7 +18,7 @@ export async function addFiles(
   { data }: { data: AddFilesData },
   config: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 

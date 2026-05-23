@@ -1,4 +1,4 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
 import { createUserResponseSchema, createUserDataSchema } from '../../../zod/userController/createUserSchema.ts'
@@ -21,7 +21,7 @@ export async function createUser(
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = createUserDataSchema.parse(data)
 

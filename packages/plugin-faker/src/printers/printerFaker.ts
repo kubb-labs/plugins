@@ -204,6 +204,14 @@ function parseEnumValue(value: string | number | boolean | undefined) {
   return value
 }
 
+/** Reads the discriminator literal off a variant, or `undefined` when it can't be determined. */
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
+  const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
+  const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
+
+  return enumNode ? getEnumValues(enumNode)[0] : undefined
+}
+
 /**
  * Type expression for an object property's value, indexed off the parent `typeName`.
  *
@@ -300,13 +308,26 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
+        const { discriminatorPropertyName } = node
+        const baseTypeName = this.options.typeName
+
         const items: Array<string> = (node.members ?? [])
-          .map((member) =>
-            printNested(member, {
-              nestedInObject: true,
-              nestedInUnion: true,
-            }),
-          )
+          .map((member) => {
+            // For a discriminated union, narrow each variant to its own branch so nested
+            // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
+            const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
+
+            if (baseTypeName && value !== undefined) {
+              const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+
+              return printNested(member, { typeName, nestedInObject: true })
+            }
+
+            // Without a discriminator, keep the union type but guard each indexed access (see
+            // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
+            // rather than erroring with TS2339.
+            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
+          })
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.union(items)

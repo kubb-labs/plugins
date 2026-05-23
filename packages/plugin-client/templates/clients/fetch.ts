@@ -78,7 +78,7 @@ export type ResponseErrorConfig<TError = unknown> = TError
 
 export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>, request?: unknown) => Promise<ResponseConfig<TData>>
 
-export const fetch = async <TData, _TError = unknown, TVariables = unknown>(
+export const client = async <TData, _TError = unknown, TVariables = unknown>(
   paramsConfig: RequestConfig<TVariables>,
   _request?: unknown,
 ): Promise<ResponseConfig<TData>> => {
@@ -119,5 +119,5 @@ export const fetch = async <TData, _TError = unknown, TVariables = unknown>(
   }
 }
 
-fetch.getConfig = getConfig
-fetch.setConfig = setConfig
+client.getConfig = getConfig
+client.setConfig = setConfig

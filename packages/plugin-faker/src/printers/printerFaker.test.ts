@@ -108,10 +108,35 @@ describe('printerFaker', () => {
     )
   })
 
-  test('indexes union member properties through a union-safe access (oneOf branches)', () => {
-    // A `oneOf` of objects carries `+order` on only one branch, so a plain
-    // `NonNullable<Filter>["+order"]` would be a TS2339. Union members index via
-    // `(NonNullable<Filter> & Record<"+order", unknown>)["+order"]`, which stays valid.
+  test('narrows discriminated oneOf variants to their own branch', () => {
+    const makeVariant = (protocol: string, algorithms: Array<string>) =>
+      ast.createSchema({
+        type: 'object',
+        properties: [
+          ast.createProperty({ name: 'protocol', required: true, schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: [protocol] }) }),
+          ast.createProperty({ name: 'algorithm', schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: algorithms }) }),
+        ],
+      })
+
+    const node = ast.createSchema({
+      type: 'union',
+      discriminatorPropertyName: 'protocol',
+      members: [makeVariant('udp', ['random', 'rotate']), makeVariant('tcp', ['source'])],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'NodeBalancerConfig' }).print(node)
+
+    // Each variant indexes through its own discriminated branch, not the bare union.
+    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "udp" }>')
+    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "tcp" }>')
+    expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
+  })
+
+  test('guards member property access in non-discriminated unions of objects', () => {
+    // A `oneOf` without a discriminator carries `+order` on only one branch, so a plain
+    // `NonNullable<Filter>["+order"]` would be a TS2339. Members index via
+    // `(NonNullable<Filter> & Record<"+order", unknown>)["+order"]`, which stays valid and
+    // resolves to `unknown` rather than `any`.
     const node = ast.createSchema({
       type: 'union',
       name: 'Filter',

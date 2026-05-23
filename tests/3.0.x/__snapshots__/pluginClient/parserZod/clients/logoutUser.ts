@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { LogoutUserResponse } from "../types/LogoutUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { logoutUserResponseSchema } from "../zod/logoutUserSchema.ts";
@@ -19,7 +19,7 @@ function getLogoutUserUrl() {
  * {@link /user/logout}
  */
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

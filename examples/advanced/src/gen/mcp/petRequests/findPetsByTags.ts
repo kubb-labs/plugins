@@ -1,4 +1,4 @@
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
@@ -28,7 +28,7 @@ export async function findPetsByTagsHandler(
 ): Promise<Promise<CallToolResult>> {
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await fetch<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
+  const res = await client<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
     { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, params, headers: { ...mappedHeaders } },
     request,
   )

@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../models/ts/CreateUsersWithListInput.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -15,7 +15,7 @@ export async function createUsersWithListInputHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>(
+  const res = await client<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>(
     { method: 'POST', url: `/user/createWithList`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
     request,
   )

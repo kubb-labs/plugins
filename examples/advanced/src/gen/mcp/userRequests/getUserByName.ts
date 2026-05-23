@@ -1,4 +1,4 @@
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type {
   GetUserByNamePathUsername,
   GetUserByNameResponse,
@@ -17,7 +17,7 @@ export async function getUserByNameHandler(
   { username }: { username: GetUserByNamePathUsername },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>(
+  const res = await client<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>(
     { method: 'GET', url: `/user/${username}`, baseURL: `https://petstore.swagger.io/v2` },
     request,
   )
