@@ -14,7 +14,7 @@ export function createPet(data?: Partial<Pet>): Required<Pet> {
     code: faker.helpers.fromRegExp('^[A-Z]{3}$'),
     shipDate: dayjs(faker.date.anytime()).format('YYYY-MM-DD'),
     category: createCategory(),
-    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+    status: faker.helpers.arrayElement<(NonNullable<Pet> & Record<'status', unknown>)['status']>(['available', 'pending', 'sold']),
   }
   return {
     ...defaultFakeData,

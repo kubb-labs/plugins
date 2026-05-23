@@ -108,6 +108,32 @@ describe('printerFaker', () => {
     )
   })
 
+  test('indexes object property types through a union-safe access (oneOf branches)', () => {
+    // When `typeName` resolves to a union (a `oneOf` of objects), only some branches carry
+    // a given key. A plain `NonNullable<T>[K]` triggers TS2339 on the branches missing K, so
+    // the property type is indexed via `(NonNullable<T> & Record<K, unknown>)[K]` instead.
+    const node = ast.createSchema({
+      type: 'union',
+      name: 'Filter',
+      members: [
+        ast.createSchema({ type: 'object', properties: [] }),
+        ast.createSchema({
+          type: 'object',
+          properties: [
+            ast.createProperty({
+              name: '+order',
+              schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['asc', 'desc'] }),
+            }),
+          ],
+        }),
+      ],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
+      `"faker.helpers.arrayElement<any>([{}, {"+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"])}])"`,
+    )
+  })
+
   test('memoizing getters return a stable reference and data overrides replace the getter', () => {
     // Simulate the runtime object-literal pattern the printer generates for cyclic
     // properties (e.g. Cat.friends → Pet → Cat).  The getter must memoize its value

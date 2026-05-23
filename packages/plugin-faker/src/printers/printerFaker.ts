@@ -331,7 +331,14 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
             const value: string =
               printNested(property.schema, {
-                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
+                // Intersect with `Record<K, unknown>` before indexing so the access stays valid when
+                // `typeName` resolves to a union (e.g. a `oneOf` of objects) where only some branches
+                // carry the key — a plain `NonNullable<T>[K]` triggers TS2339 on the branches missing K.
+                // For a single object the intersection is a no-op (`T[K] & unknown` is `T[K]`); for a
+                // union the missing branches contribute `unknown`, widening the result instead of erroring.
+                typeName: this.options.typeName
+                  ? `(NonNullable<${this.options.typeName}> & Record<${JSON.stringify(property.name)}, unknown>)[${JSON.stringify(property.name)}]`
+                  : undefined,
                 nestedInObject: true,
               }) ?? 'undefined'
 
