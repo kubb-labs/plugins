@@ -1,5 +1,35 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+### Patch Changes
+
+- [#212](https://github.com/kubb-labs/plugins/pull/212) [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Standardize the generated HTTP-client runtime on the export name `client`.
+
+  Previously the request function was exported under mismatched names (`fetch` in some places, `client` in others), so with `bundle: true` the generated root barrel emitted `export { client } from './.kubb/client.ts'` while the runtime only exported `fetch`, causing `TS2724`. The runtime now consistently exports `client` across the `fetch` and `axios` adapters, and the bundled client file is always written to `.kubb/client.ts` (react-query, vue-query, and mcp previously wrote `.kubb/fetch.ts`). Generated code imports and calls `client` accordingly.
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d), [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd)]:
+  - @kubb/plugin-client@5.0.0-beta.28
+  - @kubb/plugin-ts@5.0.0-beta.28
+  - @kubb/plugin-zod@5.0.0-beta.28
+
 ## 5.0.0-beta.27
 
 ### Minor Changes
