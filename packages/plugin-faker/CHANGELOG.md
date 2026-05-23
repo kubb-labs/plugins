@@ -1,5 +1,20 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.28
+
+### Patch Changes
+
+- [#207](https://github.com/kubb-labs/plugins/pull/207) [`c029564`](https://github.com/kubb-labs/plugins/commit/c02956455485aecd496e4e00603ded5c0d0fbfea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `TS2322` errors in mocks generated for discriminated `oneOf` schemas (reported in kubb-labs/plugins#200).
+
+  Each union variant was annotated with the whole-union indexed-access type (`NonNullable<Union>["prop"]`), which TypeScript collapses to a single union member and rejects the other variants' values. The faker printer now narrows each variant to its own discriminated branch via `Extract<NonNullable<Union>, { "<discriminator>": "<value>" }>`. Undiscriminated unions of objects fall back to `any` instead of leaking the whole-union index (also resolving the related `TS2339` symptom).
+
+- [#209](https://github.com/kubb-labs/plugins/pull/209) [`3e114d1`](https://github.com/kubb-labs/plugins/commit/3e114d1101d58a567da223e2c14cb61d078c67c2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep mocks for non-discriminated `oneOf` unions type-safe (kubb-labs/plugins#199).
+
+  Building on the discriminated-union fix, members of a union without a discriminator now index each property via `(NonNullable<Union> & Record<K, unknown>)[K]` instead of falling back to `any`. A key carried by only some branches resolves to `unknown` rather than `any`, so the generated value stays type-checked. Single-object schemas keep their plain `NonNullable<T>[K]` types.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.28
+
 ## 5.0.0-beta.27
 
 ### Patch Changes

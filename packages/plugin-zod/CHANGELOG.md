@@ -1,5 +1,7 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.28
+
 ## 5.0.0-beta.27
 
 ### Patch Changes

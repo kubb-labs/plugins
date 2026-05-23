@@ -1,5 +1,18 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.28
+
+### Patch Changes
+
+- [#212](https://github.com/kubb-labs/plugins/pull/212) [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Standardize the generated HTTP-client runtime on the export name `client`.
+
+  Previously the request function was exported under mismatched names (`fetch` in some places, `client` in others), so with `bundle: true` the generated root barrel emitted `export { client } from './.kubb/client.ts'` while the runtime only exported `fetch`, causing `TS2724`. The runtime now consistently exports `client` across the `fetch` and `axios` adapters, and the bundled client file is always written to `.kubb/client.ts` (react-query, vue-query, and mcp previously wrote `.kubb/fetch.ts`). Generated code imports and calls `client` accordingly.
+
+- Updated dependencies [[`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd)]:
+  - @kubb/plugin-client@5.0.0-beta.28
+  - @kubb/plugin-ts@5.0.0-beta.28
+  - @kubb/plugin-zod@5.0.0-beta.28
+
 ## 5.0.0-beta.27
 
 ### Minor Changes
