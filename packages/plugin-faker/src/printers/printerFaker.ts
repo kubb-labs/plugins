@@ -36,6 +36,12 @@ export type PrinterFakerOptions = {
   typeName?: string
   schemaName?: string
   nestedInObject?: boolean
+  /**
+   * Set while printing the members of a union (`oneOf`). Object properties then index their
+   * type as `(NonNullable<T> & Record<K, unknown>)[K]` instead of `NonNullable<T>[K]`, so a key
+   * carried by only some branches stays valid (a plain index would be a TS2339).
+   */
+  nestedInUnion?: boolean
   nodes?: PrinterFakerNodes
   /**
    * Names of schemas that participate in a circular dependency chain.
@@ -199,6 +205,20 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 }
 
 /**
+ * Type expression for an object property's value, indexed off the parent `typeName`.
+ *
+ * Inside a union (`oneOf`) the parent type is a union of branches, and a key carried by only some
+ * of them makes a plain `NonNullable<T>[K]` a TS2339. Intersecting with `Record<K, unknown>` first
+ * keeps the access valid: branches with `K` keep their precise type, branches without it contribute
+ * `unknown`. For a single object the intersection is a no-op (`T[K] & unknown` is `T[K]`).
+ */
+function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?: boolean): string {
+  const key = JSON.stringify(propertyName)
+
+  return nestedInUnion ? `(NonNullable<${typeName}> & Record<${key}, unknown>)[${key}]` : `NonNullable<${typeName}>[${key}]`
+}
+
+/**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
@@ -279,10 +299,8 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const items: Array<string> = (node.members ?? [])
           .map((member) =>
             printNested(member, {
-              // Don't index member properties against the union's own `typeName`: a key present on
-              // only some branches (e.g. a `oneOf` of objects) makes `NonNullable<Union>[K]` a TS2339.
-              typeName: undefined,
               nestedInObject: true,
+              nestedInUnion: true,
             }),
           )
           .filter((item): item is string => Boolean(item))
@@ -334,7 +352,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
             const value: string =
               printNested(property.schema, {
-                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
+                typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
                 nestedInObject: true,
               }) ?? 'undefined'
 

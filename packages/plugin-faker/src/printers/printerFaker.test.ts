@@ -108,10 +108,10 @@ describe('printerFaker', () => {
     )
   })
 
-  test('does not index union member properties against the union type (oneOf branches)', () => {
-    // A `oneOf` of objects carries `+order` on only one branch, so indexing it as
-    // `NonNullable<Filter>["+order"]` would be a TS2339. Union members drop the parent
-    // `typeName`, so the nested enum falls back to an `any` generic instead.
+  test('indexes union member properties through a union-safe access (oneOf branches)', () => {
+    // A `oneOf` of objects carries `+order` on only one branch, so a plain
+    // `NonNullable<Filter>["+order"]` would be a TS2339. Union members index via
+    // `(NonNullable<Filter> & Record<"+order", unknown>)["+order"]`, which stays valid.
     const node = ast.createSchema({
       type: 'union',
       name: 'Filter',
@@ -130,7 +130,7 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
-      `"faker.helpers.arrayElement<any>([{}, {"+order": faker.helpers.arrayElement<any>(["asc", "desc"])}])"`,
+      `"faker.helpers.arrayElement<any>([{}, {"+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"])}])"`,
     )
   })
 
