@@ -512,11 +512,11 @@ options:
               When used together with a query plugin (`@kubb/plugin-react-query`, `@kubb/plugin-vue-query`), it must also export a `Client` type alias.
           - title: How generated files import it
             body: |
-              Generated code imports the client as a default import and the runtime types as named type imports:
+              Generated code imports the client as a default import (bound to the local name `fetch`) and the runtime types as named type imports:
             codeBlock:
               lang: typescript
               code: |
-                import client from '${client.importPath}'
+                import fetch from '${client.importPath}'
                 import type { RequestConfig, ResponseErrorConfig } from '${client.importPath}'
                 // ... rest of the generated file
         important: |
