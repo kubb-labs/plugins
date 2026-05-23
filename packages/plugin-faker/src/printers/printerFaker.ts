@@ -199,6 +199,26 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 }
 
 /**
+ * Extracts the discriminator literal that identifies a single union member.
+ * Members may be inlined `object` nodes or `intersection` nodes wrapping
+ * `[ref, object]`; returns `undefined` when the value can't be determined.
+ */
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | undefined {
+  let objectNode = ast.narrowSchema(member, 'object')
+
+  if (!objectNode) {
+    for (const m of ast.narrowSchema(member, 'intersection')?.members ?? []) {
+      objectNode ??= ast.narrowSchema(m, 'object')
+    }
+  }
+
+  const prop = objectNode?.properties?.find((p) => p.name === discriminatorPropertyName)
+  const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
+
+  return enumNode ? getEnumValues(enumNode)[0] : undefined
+}
+
+/**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
@@ -276,12 +296,30 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
+        const discriminatorPropertyName = node.discriminatorPropertyName
+        const baseTypeName = this.options.typeName
+
         const items: Array<string> = (node.members ?? [])
-          .map((member) =>
-            printNested(member, {
+          .map((member) => {
+            // Narrow each variant to its own discriminated branch so nested indexed-access
+            // types (`NonNullable<T>[K]`) don't resolve against the whole union and reject
+            // the other members' values. Without a discriminator there's no safe per-variant
+            // narrowing, so drop the union typeName and fall back to `any`.
+            let typeName: string | undefined
+
+            if (baseTypeName && discriminatorPropertyName) {
+              const value = getDiscriminatorValue(member, discriminatorPropertyName)
+
+              if (value !== undefined) {
+                typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+              }
+            }
+
+            return printNested(member, {
+              typeName,
               nestedInObject: true,
-            }),
-          )
+            })
+          })
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.union(items)
