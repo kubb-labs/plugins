@@ -5,12 +5,20 @@
 
 import type { Pet } from '../Pet.js'
 
+export const findPetsByStatusStatus = {
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+} as const
+
+export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
+
 /**
  * @description Status values that need to be considered for filter
  * @default "available"
  * @type string | undefined
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
 
 /**
  * @type array

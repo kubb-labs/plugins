@@ -1,9 +1,15 @@
 import type { PetNotFound } from '../PetNotFound.ts'
 
+export const createPetsBoolParam = {
+  true: true,
+} as const
+
+export type CreatePetsBoolParamKey = (typeof createPetsBoolParam)[keyof typeof createPetsBoolParam]
+
 /**
  * @type boolean | undefined
  */
-export type CreatePetsQueryBoolParam = true | undefined
+export type CreatePetsQueryBoolParam = CreatePetsBoolParamKey | undefined
 
 /**
  * @description UUID
@@ -17,11 +23,19 @@ export type CreatePetsPathUuid = string
  */
 export type CreatePetsQueryOffset = number | undefined
 
+export const createPetsXEXAMPLE = {
+  ONE: 'ONE',
+  TWO: 'TWO',
+  THREE: 'THREE',
+} as const
+
+export type CreatePetsXEXAMPLEKey = (typeof createPetsXEXAMPLE)[keyof typeof createPetsXEXAMPLE]
+
 /**
  * @description Header parameters
  * @type string
  */
-export type CreatePetsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type any

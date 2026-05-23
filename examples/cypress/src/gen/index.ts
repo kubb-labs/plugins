@@ -52,6 +52,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -183,4 +184,4 @@ export { getUserByName } from './cypress/userRequests/getUserByName.ts'
 export { loginUser } from './cypress/userRequests/loginUser.ts'
 export { logoutUser } from './cypress/userRequests/logoutUser.ts'
 export { updateUser } from './cypress/userRequests/updateUser.ts'
-export { addPetRequestStatusEnum, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
+export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'

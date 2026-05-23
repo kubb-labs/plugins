@@ -35,6 +35,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './petController/FindPetsByStatus.js'
 export type {
   FindPetsByTagsQueryPage,
@@ -187,3 +188,4 @@ export type {
 export { addPetRequestStatusEnum } from './AddPetRequest.js'
 export { orderHttpStatusEnum, orderStatusEnum } from './Order.js'
 export { petStatusEnum } from './Pet.js'
+export { findPetsByStatusStatus } from './petController/FindPetsByStatus.js'

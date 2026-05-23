@@ -42,6 +42,7 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus200,
+  DeletePetStatus200EnumenumType,
   DeletePetStatus400,
   DeleteUserPathUsername,
   DeleteUserRequestConfig,
@@ -56,6 +57,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusenumType,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -105,6 +107,7 @@ export type {
   Order,
   OrderHttpStatusEnumenumType,
   OrderParamsStatusEnumenumType,
+  OrderStatusenumType,
   Pet,
   PetNotFound,
   PetStatusEnumenumType,
@@ -166,4 +169,14 @@ export type {
   User,
   UserArray,
 } from './modelsConst.ts'
-export { addPetRequestStatusEnum, customerParamsStatusEnum, orderHttpStatusEnum, orderParamsStatusEnum, petStatusEnum, petTypeEnum } from './modelsConst.ts'
+export {
+  addPetRequestStatusEnum,
+  customerParamsStatusEnum,
+  deletePetStatus200Enum,
+  findPetsByStatusStatus,
+  orderHttpStatusEnum,
+  orderParamsStatusEnum,
+  orderStatus,
+  petStatusEnum,
+  petTypeEnum,
+} from './modelsConst.ts'

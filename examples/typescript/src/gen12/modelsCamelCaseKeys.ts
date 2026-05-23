@@ -11,6 +11,12 @@ export const orderParamsStatusEnum = {
 
 export type OrderParamsStatusEnumKey = (typeof orderParamsStatusEnum)[keyof typeof orderParamsStatusEnum]
 
+export const orderStatus = {
+  accepted: 'accepted',
+} as const
+
+export type OrderStatusKey = (typeof orderStatus)[keyof typeof orderStatus]
+
 export const orderHttpStatusEnum = {
   '200': 200,
   '400': 400,
@@ -60,7 +66,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: 'accepted' | (string & {})
+  status?: OrderStatusKey | (string & {})
   /**
    * @description HTTP Status
    * @example 200
@@ -334,6 +340,7 @@ export type FullAddress = Address & {
    * @type string
    */
   streetNumber: string
+} & {
   /**
    * @type string
    */
@@ -543,12 +550,20 @@ export type AddPetResponses = {
  */
 export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
+export const findPetsByStatusStatus = {
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+} as const
+
+export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
+
 /**
  * @description Status values that need to be considered for filter
  * @default "available"
  * @type string | undefined
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
 
 /**
  * @type array
@@ -776,10 +791,18 @@ export type DeletePetHeaderApiKey = string | undefined
  */
 export type DeletePetPathPetId = bigint
 
+export const deletePetStatus200Enum = {
+  TYPE1: 'TYPE1',
+  TYPE2: 'TYPE2',
+  TYPE3: 'TYPE3',
+} as const
+
+export type DeletePetStatus200EnumKey = (typeof deletePetStatus200Enum)[keyof typeof deletePetStatus200Enum]
+
 /**
  * @type array
  */
-export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
+export type DeletePetStatus200 = Array<DeletePetStatus200EnumKey>
 
 /**
  * @type any

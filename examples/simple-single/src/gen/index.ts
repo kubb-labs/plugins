@@ -52,6 +52,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -273,7 +274,7 @@ export {
   useUpdateUser,
   useUploadFile,
 } from './hooks'
-export { addPetRequestStatusEnum, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
+export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
 export {
   addPetDataSchema,
   addPetRequestSchema,

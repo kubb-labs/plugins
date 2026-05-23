@@ -23,11 +23,19 @@ export type FindPetsByTagsQueryPage = string | undefined
  */
 export type FindPetsByTagsQueryPageSize = string | undefined
 
+export const findPetsByTagsXEXAMPLE = {
+  ONE: 'ONE',
+  TWO: 'TWO',
+  THREE: 'THREE',
+} as const
+
+export type FindPetsByTagsXEXAMPLEKey = (typeof findPetsByTagsXEXAMPLE)[keyof typeof findPetsByTagsXEXAMPLE]
+
 /**
  * @description Header parameters
  * @type string
  */
-export type FindPetsByTagsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type FindPetsByTagsHeaderXEXAMPLE = FindPetsByTagsXEXAMPLEKey
 
 /**
  * @type array

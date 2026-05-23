@@ -35,6 +35,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './models/petController/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -188,6 +189,7 @@ export { client } from './.kubb/client.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'
+export { findPetsByStatusStatus } from './models/petController/FindPetsByStatus.ts'
 export { petController } from './sdk/petController/petController.ts'
 export { PetStoreSDK } from './sdk/petStoreSDK.ts'
 export { storeController } from './sdk/storeController/storeController.ts'

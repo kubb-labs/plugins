@@ -48,6 +48,7 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus200,
+  DeletePetStatus200EnumKey,
   DeletePetStatus400,
 } from './DeletePet.ts'
 export type {
@@ -66,6 +67,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -117,7 +119,7 @@ export type {
   LoginUserStatus400,
 } from './LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderParamsStatusEnumKey } from './Order.ts'
+export type { Order, OrderHttpStatusEnumKey, OrderParamsStatusEnumKey, OrderStatusKey } from './Order.ts'
 export type { Pet, PetStatusEnumKey, PetTypeEnumKey } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
 export type {
@@ -190,5 +192,7 @@ export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
 export { addPetRequestStatusEnum } from './AddPetRequest.ts'
 export { customerParamsStatusEnum } from './Customer.ts'
-export { orderHttpStatusEnum, orderParamsStatusEnum } from './Order.ts'
+export { deletePetStatus200Enum } from './DeletePet.ts'
+export { findPetsByStatusStatus } from './FindPetsByStatus.ts'
+export { orderHttpStatusEnum, orderParamsStatusEnum, orderStatus } from './Order.ts'
 export { petStatusEnum, petTypeEnum } from './Pet.ts'

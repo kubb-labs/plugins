@@ -62,6 +62,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryTags,
@@ -187,5 +188,6 @@ export {
   createUpdatePetWithFormStatus405,
 } from './faker/createUpdatePetWithForm.ts'
 export { addressIdentifierEnum } from './models/Address.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
 export { orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'

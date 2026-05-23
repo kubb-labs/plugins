@@ -52,6 +52,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -175,7 +176,7 @@ export { getPetById } from './getPetById.ts'
 export { getUserByName } from './getUserByName.ts'
 export { loginUser } from './loginUser.ts'
 export { logoutUser } from './logoutUser.ts'
-export { addPetRequestStatusEnum, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
+export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
 export { placeOrder } from './placeOrder.ts'
 export { placeOrderPatch } from './placeOrderPatch.ts'
 export { updatePet } from './updatePet.ts'

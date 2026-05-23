@@ -64,6 +64,7 @@ export type {
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -291,5 +292,6 @@ export {
 } from './hooks/user/useLogoutUserSuspenseHook.ts'
 export { updateUserHook, updateUserMutationKey, updateUserMutationOptionsHook, useUpdateUserHook } from './hooks/user/useUpdateUserHook.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/Pet.ts'
