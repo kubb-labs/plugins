@@ -6,8 +6,8 @@ import { faker } from '@faker-js/faker'
 export function createAnimalFaker(data?: Partial<Animal>): Required<Animal> {
   const defaultFakeData = {
     ...faker.helpers.arrayElement<any>([
-      { ...createCatFaker(), ...{ type: faker.helpers.arrayElement<NonNullable<Animal>['type']>(['cat']) } },
-      { ...createDogFaker(), ...{ type: faker.helpers.arrayElement<NonNullable<Animal>['type']>(['dog']) } },
+      { ...createCatFaker(), ...{ type: faker.helpers.arrayElement<NonNullable<Extract<NonNullable<Animal>, { type: 'cat' }>>['type']>(['cat']) } },
+      { ...createDogFaker(), ...{ type: faker.helpers.arrayElement<NonNullable<Extract<NonNullable<Animal>, { type: 'dog' }>>['type']>(['dog']) } },
     ]),
     ...{ type: faker.helpers.arrayElement<NonNullable<Animal>['type']>(['cat', 'dog']) },
   }
