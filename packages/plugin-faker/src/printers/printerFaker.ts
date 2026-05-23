@@ -198,21 +198,9 @@ function parseEnumValue(value: string | number | boolean | undefined) {
   return value
 }
 
-/**
- * Extracts the discriminator literal that identifies a single union member.
- * Members may be inlined `object` nodes or `intersection` nodes wrapping
- * `[ref, object]`; returns `undefined` when the value can't be determined.
- */
-function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string): string | number | boolean | undefined {
-  let objectNode = ast.narrowSchema(member, 'object')
-
-  if (!objectNode) {
-    for (const m of ast.narrowSchema(member, 'intersection')?.members ?? []) {
-      objectNode ??= ast.narrowSchema(m, 'object')
-    }
-  }
-
-  const prop = objectNode?.properties?.find((p) => p.name === discriminatorPropertyName)
+/** Reads the discriminator literal off a variant, or `undefined` when it can't be determined. */
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
+  const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
   const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
 
   return enumNode ? getEnumValues(enumNode)[0] : undefined
@@ -296,29 +284,21 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
-        const discriminatorPropertyName = node.discriminatorPropertyName
+        const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
         const items: Array<string> = (node.members ?? [])
           .map((member) => {
-            // Narrow each variant to its own discriminated branch so nested indexed-access
-            // types (`NonNullable<T>[K]`) don't resolve against the whole union and reject
-            // the other members' values. Without a discriminator there's no safe per-variant
-            // narrowing, so drop the union typeName and fall back to `any`.
-            let typeName: string | undefined
+            // Narrow each variant to its own discriminated branch so nested `NonNullable<T>[K]`
+            // indexes resolve against that branch instead of the whole union (which would reject
+            // the other members' values). Without a discriminator, fall back to `any`.
+            const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
+            const typeName =
+              baseTypeName && value !== undefined
+                ? `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+                : undefined
 
-            if (baseTypeName && discriminatorPropertyName) {
-              const value = getDiscriminatorValue(member, discriminatorPropertyName)
-
-              if (value !== undefined) {
-                typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
-              }
-            }
-
-            return printNested(member, {
-              typeName,
-              nestedInObject: true,
-            })
+            return printNested(member, { typeName, nestedInObject: true })
           })
           .filter((item): item is string => Boolean(item))
 
