@@ -4,6 +4,13 @@
 export type RequestCredentials = 'omit' | 'same-origin' | 'include'
 
 /**
+ * Header values may be objects (e.g. JSON-encoded headers like `X-Filter` in the Linode API).
+ * Non-string values are JSON-serialized before the request is sent.
+ */
+export type HeaderValue = string | number | boolean | null | undefined | object
+export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
+
+/**
  * Subset of FetchRequestConfig
  */
 export type RequestConfig<TData = unknown> = {
@@ -14,7 +21,7 @@ export type RequestConfig<TData = unknown> = {
   data?: TData | FormData
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
-  headers?: Array<[string, string]> | Record<string, string>
+  headers?: HeadersInit
   credentials?: RequestCredentials
   contentType?: string
 }
@@ -51,6 +58,22 @@ export const mergeConfig = <T extends RequestConfig>(...configs: Array<Partial<T
   }, {})
 }
 
+/**
+ * Serializes header values into the string form `fetch` expects.
+ * Objects (including arrays) are JSON-stringified so spec-defined object headers like `X-Filter`
+ * are sent in their canonical JSON-string form rather than `[object Object]`.
+ */
+function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
+  if (!headers) return {}
+  const entries = Array.isArray(headers) ? headers : Object.entries(headers)
+  const result: Record<string, string> = {}
+  for (const [key, value] of entries) {
+    if (value === undefined || value === null) continue
+    result[key] = typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value)
+  }
+  return result
+}
+
 export type ResponseErrorConfig<TError = unknown> = TError
 
 export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>, request?: unknown) => Promise<ResponseConfig<TData>>
@@ -82,7 +105,7 @@ export const fetch = async <TData, _TError = unknown, TVariables = unknown>(
     signal: config.signal,
     headers: {
       ...(config.contentType && config.contentType !== 'multipart/form-data' ? { 'Content-Type': config.contentType } : {}),
-      ...(Array.isArray(config.headers) ? Object.fromEntries(config.headers) : config.headers),
+      ...serializeHeaders(config.headers),
     },
   })
 

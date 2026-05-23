@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 import path from 'node:path'
-import { camelCase, isValidVarName } from '@internals/utils'
+import { camelCase, ensureValidVarName } from '@internals/utils'
 import { defineResolver, KubbDriver } from '@kubb/core'
 import type { PluginFaker } from '../types.ts'
 
@@ -22,12 +22,7 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
     pluginName: 'plugin-faker',
     default(name, type) {
       const resolvedName = camelCase(name, { isFile: type === 'file', prefix: 'create' })
-
-      if (type === 'file' || isValidVarName(resolvedName)) {
-        return resolvedName
-      }
-
-      return `_${resolvedName}`
+      return type === 'file' ? resolvedName : ensureValidVarName(resolvedName)
     },
     resolveName(name, type) {
       return this.default(name, type)

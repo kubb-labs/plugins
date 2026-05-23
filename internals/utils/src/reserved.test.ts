@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { isValidVarName } from './reserved.ts'
+import { ensureValidVarName, isValidVarName } from './reserved.ts'
 
 describe('isValidVarName', () => {
   test('valid identifiers return true', () => {
@@ -30,5 +30,28 @@ describe('isValidVarName', () => {
     expect(isValidVarName('foo-bar')).toBe(false)
     expect(isValidVarName('foo bar')).toBe(false)
     expect(isValidVarName('foo.bar')).toBe(false)
+  })
+})
+
+describe('ensureValidVarName', () => {
+  test('valid identifiers pass through unchanged', () => {
+    expect(ensureValidVarName('status')).toBe('status')
+    expect(ensureValidVarName('Pet')).toBe('Pet')
+    expect(ensureValidVarName('_private')).toBe('_private')
+  })
+
+  test('identifiers starting with a digit are prefixed with _', () => {
+    expect(ensureValidVarName('409')).toBe('_409')
+    expect(ensureValidVarName('504AccountCancel')).toBe('_504AccountCancel')
+    expect(ensureValidVarName('409Schema')).toBe('_409Schema')
+  })
+
+  test('reserved words are prefixed with _', () => {
+    expect(ensureValidVarName('class')).toBe('_class')
+    expect(ensureValidVarName('return')).toBe('_return')
+  })
+
+  test('empty string passes through unchanged', () => {
+    expect(ensureValidVarName('')).toBe('')
   })
 })
