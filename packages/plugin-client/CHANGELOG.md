@@ -1,5 +1,23 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.26
+
+### Patch Changes
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Serialize object header values to JSON in the generated `fetch` and `axios` clients so headers like `X-Filter` (which OpenAPI specs declare as a JSON object) are sent in their canonical form instead of being coerced to `[object Object]` by the runtime. `RequestConfig.headers` now widens to a shared `HeadersInit` type that accepts primitive and object values, matching what spec authors actually pass.
+
+  A new `serializeHeaders()` helper turns non-string values into JSON before they reach `globalThis.fetch` or `axios.request`. Existing string-valued headers behave unchanged.
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Sanitize generated identifiers that would otherwise start with a digit so they're valid JavaScript names.
+
+  OpenAPI schemas/operations named `409`, `504AccountCancel`, etc. previously produced invalid output like `export const 409Schema = …` and `export interface 409 { … }`. Resolvers in `plugin-ts`, `plugin-zod`, `plugin-client`, and `plugin-faker` now run their PascalCase/camelCase results through a new `ensureValidVarName` helper, which prefixes the name with `_` when it isn't a syntactically valid identifier (leading digit or reserved word). File paths are unaffected.
+
+  Reported in kubb-labs/plugins#196.
+
+- Updated dependencies [[`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877)]:
+  - @kubb/plugin-ts@5.0.0-beta.26
+  - @kubb/plugin-zod@5.0.0-beta.26
+
 ## 5.0.0-beta.25
 
 ### Patch Changes

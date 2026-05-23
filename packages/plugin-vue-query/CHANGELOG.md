@@ -1,5 +1,14 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.26
+
+### Patch Changes
+
+- Updated dependencies [[`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7), [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877)]:
+  - @kubb/plugin-client@5.0.0-beta.26
+  - @kubb/plugin-ts@5.0.0-beta.26
+  - @kubb/plugin-zod@5.0.0-beta.26
+
 ## 5.0.0-beta.25
 
 ### Patch Changes

@@ -37,6 +37,7 @@
     "circular-schema-detection-shared",
     "core-plugins-beta-12-alignment",
     "enforce-array-type-syntax",
+    "fix-object-header-serialization",
     "kubb-core-beta-23-alignment",
     "kubb-core-beta-24-alignment",
     "multi-content-type-request-body",
@@ -82,6 +83,7 @@
     "rename-define-to-create",
     "rename-plugin-manager-to-plugin-driver",
     "require-node-22",
+    "sanitize-leading-digit-identifiers",
     "ts-discriminator-string-types",
     "ts-fix-request-body-description",
     "vue-query-enabled-tovalue"
