@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import fetch from 'axios'
+import client from 'axios'
 import type {
   FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
@@ -28,7 +28,7 @@ export async function findPetsByTags(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 

@@ -81,7 +81,7 @@ export type Client = <TResponseData, _TError = unknown, TRequestData = unknown>(
   request?: unknown,
 ) => Promise<ResponseConfig<TResponseData>>
 
-export const fetch = async <TResponseData, _TError = unknown, RequestData = unknown>(
+export const client = async <TResponseData, _TError = unknown, RequestData = unknown>(
   paramsConfig: RequestConfig<RequestData>,
   _request?: unknown,
 ): Promise<ResponseConfig<TResponseData>> => {
@@ -122,7 +122,7 @@ export const fetch = async <TResponseData, _TError = unknown, RequestData = unkn
   }
 }
 
-fetch.getConfig = getConfig
-fetch.setConfig = setConfig
+client.getConfig = getConfig
+client.setConfig = setConfig
 
-export default fetch
+export default client

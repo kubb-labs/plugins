@@ -1,4 +1,4 @@
-import fetch from '@kubb/plugin-client/clients/axios'
+import client from '@kubb/plugin-client/clients/axios'
 import type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
@@ -18,7 +18,7 @@ export async function updatePetWithFormHandler(
   { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>(
+  const res = await client<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>(
     { method: 'POST', url: `/pet/${petId}:search`, baseURL: `https://petstore.swagger.io/v2`, params },
     request,
   )

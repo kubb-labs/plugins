@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from "../types/UpdateUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
@@ -19,7 +19,7 @@ function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
  * {@link /user/:username}
  */
 export async function updateUser({ username }: { username: UpdateUserPathUsername }, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data

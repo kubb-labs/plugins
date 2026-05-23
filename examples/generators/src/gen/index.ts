@@ -1,1 +1,1 @@
-export { fetch } from './.kubb/client.ts'
+export { client } from './.kubb/client.ts'

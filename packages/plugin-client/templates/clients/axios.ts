@@ -84,7 +84,7 @@ function serializeHeaders(headers: HeadersInit | undefined): Record<string, stri
 
 export const axiosInstance = axios.create(getConfig() as AxiosRequestConfig)
 
-export const fetch = async <TData, TError = unknown, TVariables = unknown>(
+export const client = async <TData, TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>,
   _request?: unknown,
 ): Promise<ResponseConfig<TData>> => {
@@ -103,5 +103,5 @@ export const fetch = async <TData, TError = unknown, TVariables = unknown>(
     })
 }
 
-fetch.getConfig = getConfig
-fetch.setConfig = setConfig
+client.getConfig = getConfig
+client.setConfig = setConfig

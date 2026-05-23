@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { CreatePetsData, CreatePetsHeaderXEXAMPLE, CreatePetsPathUuid, CreatePetsQueryOffset, CreatePetsResponse } from '../models/ts/CreatePets.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -19,7 +19,7 @@ export async function createPetsHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>(
+  const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>(
     { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, params, data: requestData, headers: { ...headers } },
     request,
   )
