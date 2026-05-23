@@ -4,14 +4,5 @@
  */
 
 import * as z from 'zod'
-import { petSchema } from './petSchema.js'
 
 export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
-
-export const getPetByIdStatus200Schema = petSchema.omit({ name: true })
-
-export const getPetByIdStatus400Schema = z.any()
-
-export const getPetByIdStatus404Schema = z.any()
-
-export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])

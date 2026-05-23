@@ -1,5 +1,3 @@
-import type { UploadFileResponse, UploadFileStatus200 } from '../../models/ts/petController/UploadFile.ts'
-import { createApiResponseFaker } from '../createApiResponseFaker.ts'
 import { faker } from '@faker-js/faker'
 
 export function createUploadFilePathPetIdFaker(data?: number): number {
@@ -10,17 +8,6 @@ export function createUploadFileQueryAdditionalMetadataFaker(data?: string): str
   return data ?? faker.string.alpha()
 }
 
-/**
- * @description successful operation
- */
-export function createUploadFileStatus200Faker(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
-  return createApiResponseFaker(data)
-}
-
 export function createUploadFileDataFaker(data?: Blob): Blob {
   return data ?? (faker.image.url() as unknown as Blob)
-}
-
-export function createUploadFileResponseFaker(data?: Partial<UploadFileResponse>): UploadFileResponse {
-  return createUploadFileStatus200Faker(data)
 }

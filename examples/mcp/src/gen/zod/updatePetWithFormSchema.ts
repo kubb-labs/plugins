@@ -10,7 +10,3 @@ export const updatePetWithFormPathPetIdSchema = z.int().describe('ID of pet that
 export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
 export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
-
-export const updatePetWithFormStatus405Schema = z.any()
-
-export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema

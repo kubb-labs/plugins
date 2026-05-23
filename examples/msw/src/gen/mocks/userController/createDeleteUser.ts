@@ -3,35 +3,10 @@
  * Do not edit manually.
  */
 
-import type { DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/DeleteUser.ts'
 import { faker } from '@faker-js/faker'
 
 export function createDeleteUserPathUsername(data?: string): string {
   faker.seed([220])
 
   return data ?? faker.string.alpha()
-}
-
-/**
- * @description Invalid username supplied
- */
-export function createDeleteUserStatus400() {
-  faker.seed([220])
-
-  return undefined
-}
-
-/**
- * @description User not found
- */
-export function createDeleteUserStatus404() {
-  faker.seed([220])
-
-  return undefined
-}
-
-export function createDeleteUserResponse(_data?: DeleteUserResponse): DeleteUserResponse {
-  faker.seed([220])
-
-  return faker.helpers.arrayElement<any>([createDeleteUserStatus400(), createDeleteUserStatus404()])
 }

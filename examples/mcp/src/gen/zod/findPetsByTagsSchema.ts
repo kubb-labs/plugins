@@ -4,7 +4,6 @@
  */
 
 import * as z from 'zod'
-import { petSchema } from './petSchema.js'
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
@@ -13,9 +12,3 @@ export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to 
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
-
-export const findPetsByTagsStatus200Schema = z.array(petSchema)
-
-export const findPetsByTagsStatus400Schema = z.any()
-
-export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])

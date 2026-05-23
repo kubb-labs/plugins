@@ -4,11 +4,3 @@
  */
 
 import { z } from '../../zod.ts'
-
-export const logoutUserStatusDefaultSchema = z.any()
-
-export type LogoutUserStatusDefaultSchema = z.infer<typeof logoutUserStatusDefaultSchema>
-
-export const logoutUserResponseSchema = logoutUserStatusDefaultSchema
-
-export type LogoutUserResponseSchema = z.infer<typeof logoutUserResponseSchema>

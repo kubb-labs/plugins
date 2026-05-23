@@ -3,8 +3,7 @@
  * Do not edit manually.
  */
 
-import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/FindPetsByTags.ts'
-import { createPet } from '../createPet.ts'
+import type { FindPetsByTagsQueryTags } from '../../models/FindPetsByTags.ts'
 import { faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
@@ -23,28 +22,4 @@ export function createFindPetsByTagsQueryPageSize(data?: string): string {
   faker.seed([220])
 
   return data ?? faker.string.alpha()
-}
-
-/**
- * @description successful operation
- */
-export function createFindPetsByTagsStatus200(data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
-  faker.seed([220])
-
-  return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
-}
-
-/**
- * @description Invalid tag value
- */
-export function createFindPetsByTagsStatus400() {
-  faker.seed([220])
-
-  return undefined
-}
-
-export function createFindPetsByTagsResponse(_data?: FindPetsByTagsResponse): FindPetsByTagsResponse {
-  faker.seed([220])
-
-  return faker.helpers.arrayElement<any>([createFindPetsByTagsStatus200(), createFindPetsByTagsStatus400()])
 }

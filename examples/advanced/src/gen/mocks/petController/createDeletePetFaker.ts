@@ -7,14 +7,3 @@ export function createDeletePetHeaderApiKeyFaker(data?: string): string {
 export function createDeletePetPathPetIdFaker(data?: number): number {
   return data ?? faker.number.int()
 }
-
-/**
- * @description Invalid pet value
- */
-export function createDeletePetStatus400Faker() {
-  return undefined
-}
-
-export function createDeletePetResponseFaker() {
-  return undefined
-}

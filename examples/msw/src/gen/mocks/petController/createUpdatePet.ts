@@ -3,52 +3,9 @@
  * Do not edit manually.
  */
 
-import type {
-  UpdatePetData,
-  UpdatePetResponse,
-  UpdatePetStatus200,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../../models/UpdatePet.ts'
+import type { UpdatePetData } from '../../models/UpdatePet.ts'
 import { createPet } from '../createPet.ts'
 import { faker } from '@faker-js/faker'
-
-/**
- * @description Successful operation
- */
-export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
-  faker.seed([220])
-
-  return createPet(data)
-}
-
-/**
- * @description Invalid ID supplied
- */
-export function createUpdatePetStatus400() {
-  faker.seed([220])
-
-  return undefined
-}
-
-/**
- * @description Pet not found
- */
-export function createUpdatePetStatus404() {
-  faker.seed([220])
-
-  return undefined
-}
-
-/**
- * @description Validation exception
- */
-export function createUpdatePetStatus405() {
-  faker.seed([220])
-
-  return undefined
-}
 
 /**
  * @description Update an existent pet in the store
@@ -57,10 +14,4 @@ export function createUpdatePetData(data?: Partial<UpdatePetData>): UpdatePetDat
   faker.seed([220])
 
   return createPet(data)
-}
-
-export function createUpdatePetResponse(_data?: UpdatePetResponse): UpdatePetResponse {
-  faker.seed([220])
-
-  return faker.helpers.arrayElement<any>([createUpdatePetStatus200(), createUpdatePetStatus400(), createUpdatePetStatus404(), createUpdatePetStatus405()])
 }

@@ -10,7 +10,3 @@ export const updatePetWithFormPathPetIdSchema = z.bigint()
 export const updatePetWithFormQueryNameSchema = z.optional(z.string())
 
 export const updatePetWithFormQueryStatusSchema = z.optional(z.string())
-
-export const updatePetWithFormStatus405Schema = z.any()
-
-export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema

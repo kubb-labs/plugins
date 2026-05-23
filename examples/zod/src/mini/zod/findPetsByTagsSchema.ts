@@ -4,7 +4,6 @@
  */
 
 import * as z from 'zod/mini'
-import { petSchema } from './petSchema.ts'
 
 export const findPetsByTagsQueryTagsSchema = z.optional(z.array(z.string()))
 
@@ -13,9 +12,3 @@ export const findPetsByTagsQueryPageSchema = z.optional(z.string())
 export const findPetsByTagsQueryPageSizeSchema = z.optional(z.string())
 
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
-
-export const findPetsByTagsStatus200Schema = z.array(z.lazy(() => petSchema))
-
-export const findPetsByTagsStatus400Schema = z.any()
-
-export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])

@@ -4,14 +4,5 @@
  */
 
 import * as z from 'zod/mini'
-import { petSchema } from './petSchema.ts'
 
 export const getPetByIdPathPetIdSchema = z.bigint()
-
-export const getPetByIdStatus200Schema = z.lazy(() => petSchema)
-
-export const getPetByIdStatus400Schema = z.any()
-
-export const getPetByIdStatus404Schema = z.any()
-
-export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])

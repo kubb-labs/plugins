@@ -303,26 +303,6 @@ export type PetNotFound = {
 export type UserArray = User[]
 
 /**
- * @type object
- */
-export type UpdatePetStatus200 = Pet
-
-/**
- * @type any
- */
-export type UpdatePetStatus400 = any
-
-/**
- * @type any
- */
-export type UpdatePetStatus404 = any
-
-/**
- * @type any
- */
-export type UpdatePetStatus405 = any
-
-/**
  * @description Update an existent pet in the store
  * @type object
  */
@@ -364,30 +344,6 @@ export type UpdatePetResponses = {
   '400': UpdatePetStatus400
   '404': UpdatePetStatus404
   '405': UpdatePetStatus405
-}
-
-/**
- * @description Union of all possible responses
- */
-export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405
-
-/**
- * @type object
- */
-export type AddPetStatus200 = Pet
-
-/**
- * @type object
- */
-export type AddPetStatus405 = {
-  /**
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
 }
 
 /**
@@ -433,16 +389,6 @@ export type AddPetResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type AddPetResponse = AddPetStatus200 | AddPetStatus405
-
-/**
- * @type array
- */
-export type OptionsFindPetsByStatusStatus200 = Pet[]
-
-/**
  * @type object
  */
 export type OptionsFindPetsByStatusRequestConfig = {
@@ -463,11 +409,6 @@ export type OptionsFindPetsByStatusResponses = {
   '200': OptionsFindPetsByStatusStatus200
 }
 
-/**
- * @description Union of all possible responses
- */
-export type OptionsFindPetsByStatusResponse = OptionsFindPetsByStatusStatus200
-
 export const findPetsByStatusStatus = {
   available: 'available',
   pending: 'pending',
@@ -482,16 +423,6 @@ export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof ty
  * @type string | undefined
  */
 export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
-
-/**
- * @type array
- */
-export type FindPetsByStatusStatus200 = Pet[]
-
-/**
- * @type any
- */
-export type FindPetsByStatusStatus400 = any
 
 /**
  * @type object
@@ -521,11 +452,6 @@ export type FindPetsByStatusResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
-
-/**
  * @description Tags to filter by
  * @type array | undefined
  */
@@ -542,16 +468,6 @@ export type FindPetsByTagsQueryPage = string | undefined
  * @type string | undefined
  */
 export type FindPetsByTagsQueryPageSize = string | undefined
-
-/**
- * @type array
- */
-export type FindPetsByTagsStatus200 = Pet[]
-
-/**
- * @type any
- */
-export type FindPetsByTagsStatus400 = any
 
 /**
  * @type object
@@ -583,30 +499,10 @@ export type FindPetsByTagsResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400
-
-/**
  * @description ID of pet to return
  * @type integer
  */
 export type GetPetByIdPathPetId = bigint
-
-/**
- * @type object
- */
-export type GetPetByIdStatus200 = Pet
-
-/**
- * @type any
- */
-export type GetPetByIdStatus400 = any
-
-/**
- * @type any
- */
-export type GetPetByIdStatus404 = any
 
 /**
  * @type object
@@ -637,11 +533,6 @@ export type GetPetByIdResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
-
-/**
  * @description ID of pet that needs to be updated
  * @type integer
  */
@@ -658,11 +549,6 @@ export type UpdatePetWithFormQueryName = string | undefined
  * @type string | undefined
  */
 export type UpdatePetWithFormQueryStatus = string | undefined
-
-/**
- * @type any
- */
-export type UpdatePetWithFormStatus405 = any
 
 /**
  * @type object
@@ -697,11 +583,6 @@ export type UpdatePetWithFormResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type UpdatePetWithFormResponse = UpdatePetWithFormStatus405
-
-/**
  * @type string | undefined
  */
 export type DeletePetHeaderApiKey = string | undefined
@@ -711,11 +592,6 @@ export type DeletePetHeaderApiKey = string | undefined
  * @type integer
  */
 export type DeletePetPathPetId = bigint
-
-/**
- * @type any
- */
-export type DeletePetStatus400 = any
 
 /**
  * @type object
@@ -749,11 +625,6 @@ export type DeletePetResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type DeletePetResponse = DeletePetStatus400
-
-/**
  * @description ID of pet to update
  * @type integer
  */
@@ -764,11 +635,6 @@ export type UploadFilePathPetId = bigint
  * @type string | undefined
  */
 export type UploadFileQueryAdditionalMetadata = string | undefined
-
-/**
- * @type object
- */
-export type UploadFileStatus200 = ApiResponse
 
 /**
  * @type string | undefined
@@ -807,18 +673,6 @@ export type UploadFileResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type UploadFileResponse = UploadFileStatus200
-
-/**
- * @type object
- */
-export type GetInventoryStatus200 = {
-  [key: string]: number
-}
-
-/**
  * @type object
  */
 export type GetInventoryRequestConfig = {
@@ -838,21 +692,6 @@ export type GetInventoryRequestConfig = {
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
 }
-
-/**
- * @description Union of all possible responses
- */
-export type GetInventoryResponse = GetInventoryStatus200
-
-/**
- * @type object
- */
-export type PlaceOrderStatus200 = Order
-
-/**
- * @type any
- */
-export type PlaceOrderStatus405 = any
 
 /**
  * @type object | undefined
@@ -894,21 +733,6 @@ export type PlaceOrderResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
-
-/**
- * @type object
- */
-export type PlaceOrderPatchStatus200 = Order
-
-/**
- * @type any
- */
-export type PlaceOrderPatchStatus405 = any
-
-/**
  * @type object | undefined
  */
 export type PlaceOrderPatchJsonData = Order | undefined
@@ -948,30 +772,10 @@ export type PlaceOrderPatchResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
-
-/**
  * @description ID of order that needs to be fetched
  * @type integer
  */
 export type GetOrderByIdPathOrderId = bigint
-
-/**
- * @type object
- */
-export type GetOrderByIdStatus200 = Order
-
-/**
- * @type any
- */
-export type GetOrderByIdStatus400 = any
-
-/**
- * @type any
- */
-export type GetOrderByIdStatus404 = any
 
 /**
  * @type object
@@ -1002,25 +806,10 @@ export type GetOrderByIdResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
-
-/**
  * @description ID of the order that needs to be deleted
  * @type integer
  */
 export type DeleteOrderPathOrderId = bigint
-
-/**
- * @type any
- */
-export type DeleteOrderStatus400 = any
-
-/**
- * @type any
- */
-export type DeleteOrderStatus404 = any
 
 /**
  * @type object
@@ -1048,16 +837,6 @@ export type DeleteOrderResponses = {
   '400': DeleteOrderStatus400
   '404': DeleteOrderStatus404
 }
-
-/**
- * @description Union of all possible responses
- */
-export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
-
-/**
- * @type object
- */
-export type CreateUserStatusDefault = User
 
 /**
  * @description Created user object
@@ -1101,21 +880,6 @@ export type CreateUserResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type CreateUserResponse = CreateUserStatusDefault
-
-/**
- * @type object
- */
-export type CreateUsersWithListInputStatus200 = User
-
-/**
- * @type any
- */
-export type CreateUsersWithListInputStatusDefault = any
-
-/**
  * @type array | undefined
  */
 export type CreateUsersWithListInputData = User[] | undefined
@@ -1143,11 +907,6 @@ export type CreateUsersWithListInputResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault
-
-/**
  * @description The user name for login
  * @type string | undefined
  */
@@ -1158,16 +917,6 @@ export type LoginUserQueryUsername = string | undefined
  * @type string | undefined
  */
 export type LoginUserQueryPassword = string | undefined
-
-/**
- * @type string
- */
-export type LoginUserStatus200 = string
-
-/**
- * @type any
- */
-export type LoginUserStatus400 = any
 
 /**
  * @type object
@@ -1198,16 +947,6 @@ export type LoginUserResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type LoginUserResponse = LoginUserStatus200 | LoginUserStatus400
-
-/**
- * @type any
- */
-export type LogoutUserStatusDefault = any
-
-/**
  * @type object
  */
 export type LogoutUserRequestConfig = {
@@ -1229,30 +968,10 @@ export type LogoutUserResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type LogoutUserResponse = LogoutUserStatusDefault
-
-/**
  * @description The name that needs to be fetched. Use user1 for testing.
  * @type string
  */
 export type GetUserByNamePathUsername = string
-
-/**
- * @type object
- */
-export type GetUserByNameStatus200 = User
-
-/**
- * @type any
- */
-export type GetUserByNameStatus400 = any
-
-/**
- * @type any
- */
-export type GetUserByNameStatus404 = any
 
 /**
  * @type object
@@ -1283,20 +1002,10 @@ export type GetUserByNameResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type GetUserByNameResponse = GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404
-
-/**
  * @description name that need to be deleted
  * @type string
  */
 export type UpdateUserPathUsername = string
-
-/**
- * @type any
- */
-export type UpdateUserStatusDefault = any
 
 /**
  * @description Update an existent user in the store
@@ -1345,25 +1054,10 @@ export type UpdateUserResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type UpdateUserResponse = UpdateUserStatusDefault
-
-/**
  * @description The name that needs to be deleted
  * @type string
  */
 export type DeleteUserPathUsername = string
-
-/**
- * @type any
- */
-export type DeleteUserStatus400 = any
-
-/**
- * @type any
- */
-export type DeleteUserStatus404 = any
 
 /**
  * @type object
@@ -1391,8 +1085,3 @@ export type DeleteUserResponses = {
   '400': DeleteUserStatus400
   '404': DeleteUserStatus404
 }
-
-/**
- * @description Union of all possible responses
- */
-export type DeleteUserResponse = DeleteUserStatus400 | DeleteUserStatus404

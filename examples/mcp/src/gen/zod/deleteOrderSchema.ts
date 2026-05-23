@@ -6,9 +6,3 @@
 import * as z from 'zod'
 
 export const deleteOrderPathOrderIdSchema = z.int().describe('ID of the order that needs to be deleted')
-
-export const deleteOrderStatus400Schema = z.any()
-
-export const deleteOrderStatus404Schema = z.any()
-
-export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])

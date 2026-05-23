@@ -1,18 +1,6 @@
 import * as z from 'zod'
 import { userSchema } from '../userSchema.ts'
 
-export const createUsersWithListInputStatus200Schema = userSchema
-
-export type CreateUsersWithListInputStatus200Schema = z.infer<typeof createUsersWithListInputStatus200Schema>
-
-export const createUsersWithListInputStatusDefaultSchema = z.any()
-
-export type CreateUsersWithListInputStatusDefaultSchema = z.infer<typeof createUsersWithListInputStatusDefaultSchema>
-
-export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
-
-export type CreateUsersWithListInputResponseSchema = z.infer<typeof createUsersWithListInputResponseSchema>
-
 export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
 export type CreateUsersWithListInputDataSchema = z.infer<typeof createUsersWithListInputDataSchema>

@@ -14,24 +14,6 @@ export type DeletePetHeaderApiKey = string | undefined
  */
 export type DeletePetPathPetId = bigint
 
-export const deletePetStatus200Enum = {
-  TYPE1: 'TYPE1',
-  TYPE2: 'TYPE2',
-  TYPE3: 'TYPE3',
-} as const
-
-export type DeletePetStatus200EnumKey = (typeof deletePetStatus200Enum)[keyof typeof deletePetStatus200Enum]
-
-/**
- * @type array
- */
-export type DeletePetStatus200 = Array<DeletePetStatus200EnumKey>
-
-/**
- * @type any
- */
-export type DeletePetStatus400 = any
-
 /**
  * @type object
  */
@@ -63,8 +45,3 @@ export type DeletePetResponses = {
   '200': DeletePetStatus200
   '400': DeletePetStatus400
 }
-
-/**
- * @description Union of all possible responses
- */
-export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400

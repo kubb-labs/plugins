@@ -3,45 +3,10 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
-import { createOrder } from '../createOrder.ts'
 import { faker } from '@faker-js/faker'
 
 export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
   faker.seed([220])
 
   return data ?? faker.number.bigInt()
-}
-
-/**
- * @description successful operation
- */
-export function createGetOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
-  faker.seed([220])
-
-  return createOrder(data)
-}
-
-/**
- * @description Invalid ID supplied
- */
-export function createGetOrderByIdStatus400() {
-  faker.seed([220])
-
-  return undefined
-}
-
-/**
- * @description Order not found
- */
-export function createGetOrderByIdStatus404() {
-  faker.seed([220])
-
-  return undefined
-}
-
-export function createGetOrderByIdResponse(_data?: GetOrderByIdResponse): GetOrderByIdResponse {
-  faker.seed([220])
-
-  return faker.helpers.arrayElement<any>([createGetOrderByIdStatus200(), createGetOrderByIdStatus400(), createGetOrderByIdStatus404()])
 }

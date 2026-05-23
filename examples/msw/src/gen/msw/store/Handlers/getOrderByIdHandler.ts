@@ -6,12 +6,9 @@
 import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/GetOrderById.ts'
 import { http } from 'msw'
 
-export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
+export function getOrderByIdHandlerResponse200(data?: GetOrderByIdResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   })
 }
 
@@ -27,15 +24,14 @@ export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
   })
 }
 
-export function getOrderByIdHandler(data?: GetOrderByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
+export function getOrderByIdHandler(
+  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
+) {
   return http.get(`http://localhost:3000/store/order/:orderId`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
     })
   })
 }
