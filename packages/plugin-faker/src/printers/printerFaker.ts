@@ -207,19 +207,18 @@ function parseEnumValue(value: string | number | boolean | undefined) {
 /**
  * Type expression for an object property's value, indexed off the parent `typeName`.
  *
- * Inside a union (`oneOf`) a key carried by only some branches makes a plain `NonNullable<T>[K]`
- * a TS2339, so the access is guarded (see the breakdown below).
+ * In a union (`oneOf`), a key that only some branches declare turns a plain `NonNullable<T>[K]`
+ * into a TS2339 error, so union members guard the access. The breakdown is below.
  */
 function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?: boolean): string {
   const key = JSON.stringify(propertyName)
 
   // `(NonNullable<T> & Record<K, unknown>)[K]`, read inside-out:
-  //   NonNullable<T>          strip null/undefined from the parent type T
-  //   & Record<K, unknown>    intersect so every branch is guaranteed to have key K
-  //                           (a branch already declaring K keeps it as `T[K] & unknown` = `T[K]`;
-  //                            a branch lacking K gains it as `unknown`)
-  //   [K]                     index that key — now always present, so it never errors with TS2339
-  // For a single object T the intersection is a no-op and this is just `T[K]`.
+  //   NonNullable<T>          strips null and undefined from the parent type T.
+  //   & Record<K, unknown>    forces every branch to have key K. A branch that already declares K
+  //                           keeps it (`T[K] & unknown` is `T[K]`); a branch missing K gains it as `unknown`.
+  //   [K]                     reads the key, which is now always present, so it never hits TS2339.
+  // For a single object T the intersection does nothing, leaving `T[K]`.
   return nestedInUnion ? `(NonNullable<${typeName}> & Record<${key}, unknown>)[${key}]` : `NonNullable<${typeName}>[${key}]`
 }
 
