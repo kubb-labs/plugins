@@ -1,5 +1,22 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.27
+
+### Minor Changes
+
+- [#204](https://github.com/kubb-labs/plugins/pull/204) [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Client functions and TanStack mutation/query `TData` now reference the union of `2xx` response types only (e.g. `AddPetStatus200`) instead of the full response alias (`AddPetMutation` / `AddPetQueryResponse`), which previously also included `4xx`/`5xx` shapes.
+
+  This aligns the generated code with TanStack Query's contract that `TData` is the resolved success value while errors flow through `TError`. The previous behavior forced `as` casts at call sites because the success body was unioned with error bodies.
+
+  If your HTTP client returns non-`2xx` bodies as resolved data instead of throwing, narrow with a type guard at the call site or wrap the client to throw on error responses. Fixes [#16](https://github.com/kubb-labs/plugins/issues/16).
+
+### Patch Changes
+
+- Updated dependencies [[`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7), [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877), [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c)]:
+  - @kubb/plugin-client@5.0.0-beta.27
+  - @kubb/plugin-ts@5.0.0-beta.27
+  - @kubb/plugin-zod@5.0.0-beta.27
+
 ## 5.0.0-beta.25
 
 ### Patch Changes
