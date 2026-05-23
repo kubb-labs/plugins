@@ -15,7 +15,7 @@ describe('axios client', () => {
   })
 
   it('sets the Content-Type header from config.contentType', async () => {
-    const { client } = await import('./axios.ts')
+    const { fetch: client } = await import('./axios.ts')
 
     request.mockResolvedValue({
       data: { ok: true },
@@ -41,7 +41,7 @@ describe('axios client', () => {
   })
 
   it('does not set Content-Type for multipart/form-data', async () => {
-    const { client } = await import('./axios.ts')
+    const { fetch: client } = await import('./axios.ts')
 
     request.mockResolvedValue({
       data: { ok: true },

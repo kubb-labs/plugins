@@ -1,1 +1,1 @@
-export { client } from './client.ts'
+export { fetch } from './client.ts'
