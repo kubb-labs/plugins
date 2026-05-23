@@ -16,20 +16,21 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
-export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
+export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs, operationTypes = true): ast.FunctionParametersNode {
   return ast.createFunctionParameters({
     params: [
       ast.createFunctionParameter({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: buildRequestConfigType(node, resolver),
+          name: buildRequestConfigType(node, resolver, { operationTypes }),
         }),
         default: '{}',
       }),
@@ -41,6 +42,7 @@ export function MutationOptions({
   name,
   clientName,
   dataReturnType,
+  operationTypes,
   node,
   tsResolver,
   paramsCasing,
@@ -48,13 +50,13 @@ export function MutationOptions({
   pathParamsType,
   mutationKeyName,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
+  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
-  const errorNames = resolveErrorNames(node, tsResolver)
+  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const configParamsNode = buildMutationConfigParamsNode(node, tsResolver)
+  const configParamsNode = buildMutationConfigParamsNode(node, tsResolver, operationTypes)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
   const mutationArgParamsNode = ast.createOperationParams(node, {
@@ -78,7 +80,7 @@ export function MutationOptions({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: buildRequestConfigType(node, tsResolver),
+          name: buildRequestConfigType(node, tsResolver, { operationTypes }),
         }),
         default: '{}',
       }),

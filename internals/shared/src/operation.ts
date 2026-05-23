@@ -13,6 +13,10 @@ export type RequestConfigResolver = {
   resolveDataName(node: ast.OperationNode): string
 }
 
+export type TypeNameResolver = {
+  resolveTypeName(name: string): string
+}
+
 export type ResponseStatusNameResolver = {
   resolveResponseStatusName(node: ast.OperationNode, statusCode: ast.StatusCode): string
 }
@@ -22,11 +26,24 @@ export type ResponseNameResolver = ResponseStatusNameResolver & {
 }
 
 export type OperationTypeNameResolver = RequestConfigResolver &
-  ResponseNameResolver & {
+  ResponseNameResolver &
+  TypeNameResolver & {
     resolvePathParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
     resolveQueryParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
     resolveHeaderParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
   }
+
+export type OperationTypesOptions = {
+  /**
+   * When `false`, a response or request body backed by a single `$ref` resolves to the
+   * referenced component type (e.g. `Pet`) instead of the per-operation alias
+   * (`AddPetStatus200`, `AddPetData`). Inline, array, and union schemas keep the alias
+   * because no single base type exists.
+   *
+   * @default true
+   */
+  operationTypes?: boolean
+}
 
 export type OperationCommentLink = 'pathTemplate' | 'urlPath' | false | ((node: ast.OperationNode) => string | undefined)
 
@@ -42,7 +59,7 @@ type ResponseLike = {
 
 export type OperationParameterGroups = Record<ast.ParameterNode['in'], Array<ast.ParameterNode>>
 
-export type ResolveOperationTypeNameOptions = {
+export type ResolveOperationTypeNameOptions = OperationTypesOptions & {
   paramsCasing?: 'camelcase'
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
@@ -78,8 +95,12 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
   }
 }
 
-export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+export function buildRequestConfigType(
+  node: ast.OperationNode,
+  resolver: RequestConfigResolver & TypeNameResolver,
+  { operationTypes }: OperationTypesOptions = {},
+): string {
+  const requestName = resolveRequestTypeName({ node, resolver, operationTypes })
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
   const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
   const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null].filter(Boolean).join('; ')
@@ -145,20 +166,198 @@ export function getPrimarySuccessResponse(node: ast.OperationNode): ast.Response
   return getOperationSuccessResponses(node)[0] ?? null
 }
 
-export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+export type ResolveResponseTypeNameOptions = OperationTypesOptions & {
+  node: ast.OperationNode
+  response: ast.ResponseNode
+  resolver: ResponseStatusNameResolver & TypeNameResolver
+}
+
+/**
+ * Resolves the type name for a single response status.
+ *
+ * With `operationTypes: false`, a response whose schema is a single `$ref` resolves to the
+ * referenced component type (e.g. `Pet`); otherwise it falls back to the per-operation alias.
+ */
+export function resolveResponseTypeName({ node, response, resolver, operationTypes = true }: ResolveResponseTypeNameOptions): string {
+  if (!operationTypes && response.schema) {
+    const refName = ast.resolveRefName(response.schema)
+    if (refName) {
+      return resolver.resolveTypeName(refName)
+    }
+  }
+
+  return resolver.resolveResponseStatusName(node, response.statusCode)
+}
+
+export type ResolveRequestTypeNameOptions = OperationTypesOptions & {
+  node: ast.OperationNode
+  resolver: RequestConfigResolver & TypeNameResolver
+}
+
+/**
+ * Resolves the request body type name, or `null` when the operation has no body.
+ *
+ * With `operationTypes: false`, a body backed by a single `$ref` resolves to the referenced
+ * component type (e.g. `Pet`); otherwise it falls back to the `XxxData` alias.
+ */
+export function resolveRequestTypeName({ node, resolver, operationTypes = true }: ResolveRequestTypeNameOptions): string | null {
+  const schema = node.requestBody?.content?.[0]?.schema
+  if (!schema) {
+    return null
+  }
+
+  if (!operationTypes) {
+    const refName = ast.resolveRefName(schema)
+    if (refName) {
+      return resolver.resolveTypeName(refName)
+    }
+  }
+
+  return resolver.resolveDataName(node)
+}
+
+/**
+ * Wraps a resolver so `resolveDataName` returns the inlined base type for a `$ref` request
+ * body when `operationTypes` is false. Use it for `ast.createOperationParams`, which types the
+ * `data` parameter via `resolveDataName` and cannot otherwise see the inlining decision.
+ *
+ * Returns the resolver unchanged when `operationTypes` is not false.
+ */
+export function inlineOperationResolver<T extends RequestConfigResolver & TypeNameResolver>(resolver: T, operationTypes: boolean | undefined): T {
+  if (operationTypes !== false) {
+    return resolver
+  }
+
+  return {
+    ...resolver,
+    resolveDataName(node: ast.OperationNode): string {
+      return resolveRequestTypeName({ node, resolver, operationTypes }) ?? resolver.resolveDataName(node)
+    },
+  }
+}
+
+export function resolveErrorNames(
+  node: ast.OperationNode,
+  resolver: ResponseStatusNameResolver & TypeNameResolver,
+  { operationTypes }: OperationTypesOptions = {},
+): string[] {
   return node.responses
     .filter((response) => isErrorStatusCode(response.statusCode))
-    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+    .map((response) => resolveResponseTypeName({ node, response, resolver, operationTypes }))
 }
 
-export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+export function resolveSuccessNames(
+  node: ast.OperationNode,
+  resolver: ResponseStatusNameResolver & TypeNameResolver,
+  { operationTypes }: OperationTypesOptions = {},
+): string[] {
   return node.responses
     .filter((response) => isSuccessStatusCode(response.statusCode))
-    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+    .map((response) => resolveResponseTypeName({ node, response, resolver, operationTypes }))
 }
 
-export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
-  return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
+export function resolveStatusCodeNames(
+  node: ast.OperationNode,
+  resolver: ResponseStatusNameResolver & TypeNameResolver,
+  { operationTypes }: OperationTypesOptions = {},
+): string[] {
+  return node.responses.map((response) => resolveResponseTypeName({ node, response, resolver, operationTypes }))
+}
+
+/**
+ * A type name needed by an operation, paired with the schema it originates from.
+ *
+ * `schemaName` is `null` for operation-local types (params, `RequestConfig`, the response
+ * union, and aliases for inline schemas), which live in the operation's own generated file.
+ * When `operationTypes: false` inlines a `$ref`, `schemaName` holds the referenced component
+ * name so the consumer can import it from that component's file instead.
+ */
+export type OperationTypeImport = {
+  name: string
+  schemaName: string | null
+}
+
+export function resolveOperationTypeImports(
+  node: ast.OperationNode,
+  resolver: OperationTypeNameResolver,
+  options: ResolveOperationTypeNameOptions = {},
+): OperationTypeImport[] {
+  const { operationTypes } = options
+  const { path, query, header } = getOperationParameters(node, { paramsCasing: options.paramsCasing })
+
+  const local = (name: string | null): OperationTypeImport | null => (name ? { name, schemaName: null } : null)
+
+  const paramImports: Array<OperationTypeImport | null> = [
+    ...path.map((param) => local(resolver.resolvePathParamsName(node, param))),
+    ...query.map((param) => local(resolver.resolveQueryParamsName(node, param))),
+    ...header.map((param) => local(resolver.resolveHeaderParamsName(node, param))),
+  ]
+
+  const requestImport: OperationTypeImport | null = node.requestBody?.content?.[0]?.schema
+    ? (() => {
+        const schema = node.requestBody!.content![0]!.schema!
+        if (!operationTypes) {
+          const refName = ast.resolveRefName(schema)
+          if (refName) {
+            return { name: resolver.resolveTypeName(refName), schemaName: refName }
+          }
+        }
+        return { name: resolver.resolveDataName(node), schemaName: null }
+      })()
+    : null
+
+  const bodyAndResponseImports: Array<OperationTypeImport | null> = [requestImport, local(resolver.resolveResponseName(node))]
+
+  const responseImports: Array<OperationTypeImport | null> =
+    options.responseStatusNames === false
+      ? []
+      : (options.responseStatusNames === 'error' ? node.responses.filter((response) => isErrorStatusCode(response.statusCode)) : node.responses).map(
+          (response) => {
+            if (!operationTypes && response.schema) {
+              const refName = ast.resolveRefName(response.schema)
+              if (refName) {
+                return { name: resolver.resolveTypeName(refName), schemaName: refName }
+              }
+            }
+            return { name: resolver.resolveResponseStatusName(node, response.statusCode), schemaName: null }
+          },
+        )
+
+  const ordered =
+    options.order === 'body-response-first'
+      ? [...bodyAndResponseImports, ...paramImports, ...responseImports]
+      : [...paramImports, ...bodyAndResponseImports, ...responseImports]
+
+  const exclude = new Set(options.exclude ?? [])
+  return ordered.filter((imp): imp is OperationTypeImport => Boolean(imp) && !exclude.has(imp!.name))
+}
+
+export type OperationTypeImportGroup = {
+  path: string
+  names: string[]
+}
+
+/**
+ * Groups operation type imports by source file.
+ *
+ * Operation-local names map to `operationFilePath`; inlined base components map to the file
+ * returned by `resolveSchemaFilePath`. Names are de-duplicated per file.
+ */
+export function groupOperationTypeImports(
+  imports: OperationTypeImport[],
+  operationFilePath: string,
+  resolveSchemaFilePath: (schemaName: string) => string,
+): OperationTypeImportGroup[] {
+  const byPath = new Map<string, Set<string>>()
+
+  for (const imp of imports) {
+    const filePath = imp.schemaName ? resolveSchemaFilePath(imp.schemaName) : operationFilePath
+    const names = byPath.get(filePath) ?? new Set<string>()
+    names.add(imp.name)
+    byPath.set(filePath, names)
+  }
+
+  return Array.from(byPath, ([path, names]) => ({ path, names: Array.from(names) }))
 }
 
 const typeNamesByResolver = new WeakMap<OperationTypeNameResolver, Map<string, string[]>>()
@@ -168,7 +367,7 @@ export function resolveOperationTypeNames(
   resolver: OperationTypeNameResolver,
   options: ResolveOperationTypeNameOptions = {},
 ): string[] {
-  const cacheKey = `${node.operationId}\0${options.paramsCasing ?? ''}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${(options.exclude ?? []).join(',')}`
+  const cacheKey = `${node.operationId}\0${options.paramsCasing ?? ''}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.operationTypes === false ? '0' : '1'}\0${(options.exclude ?? []).join(',')}`
   let byResolver = typeNamesByResolver.get(resolver)
   if (byResolver) {
     const cached = byResolver.get(cacheKey)
@@ -178,26 +377,7 @@ export function resolveOperationTypeNames(
     typeNamesByResolver.set(resolver, byResolver)
   }
 
-  const { path, query, header } = getOperationParameters(node, { paramsCasing: options.paramsCasing })
-  const responseStatusNames =
-    options.responseStatusNames === 'error'
-      ? resolveErrorNames(node, resolver)
-      : options.responseStatusNames === false
-        ? []
-        : resolveStatusCodeNames(node, resolver)
-  const exclude = new Set(options.exclude ?? [])
-  const paramNames = [
-    ...path.map((param) => resolver.resolvePathParamsName(node, param)),
-    ...query.map((param) => resolver.resolveQueryParamsName(node, param)),
-    ...header.map((param) => resolver.resolveHeaderParamsName(node, param)),
-  ]
-  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null, resolver.resolveResponseName(node)]
-  const names =
-    options.order === 'body-response-first'
-      ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
-      : [...paramNames, ...bodyAndResponseNames, ...responseStatusNames]
-
-  const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
+  const result = resolveOperationTypeImports(node, resolver, options).map((imp) => imp.name)
   byResolver.set(cacheKey, result)
   return result
 }

@@ -121,6 +121,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
             clientType: client?.clientType ?? 'function',
             importPath: clientImportPath,
             dataReturnType: client?.dataReturnType ?? 'data',
+            operationTypes: client?.operationTypes ?? true,
             paramsCasing,
           },
           queryKey,

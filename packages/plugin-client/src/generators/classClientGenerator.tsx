@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { inlineOperationResolver, resolveOperationTypeImports } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
@@ -28,10 +28,6 @@ type Controller = {
   operations: Array<OperationData>
 }
 
-function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
-}
-
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
   const names: Array<string | null | undefined> = [
     zodResolver.resolveResponseName?.(node),
@@ -50,14 +46,16 @@ export const classClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
+    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, operationTypes, parser, importPath, sdk } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
-    const tsResolver = driver.getResolver(pluginTsName)
+    const tsResolver = inlineOperationResolver(driver.getResolver(pluginTsName), operationTypes)
     const tsPluginOptions = pluginTs.options
+    const resolveSchemaFilePath = (schemaName: string) =>
+      tsResolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group }).path
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
@@ -120,21 +118,18 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
     function collectTypeImports(ops: Array<OperationData>) {
       const typeImportsByFile = new Map<string, Set<string>>()
-      const typeFilesByPath = new Map<string, ast.FileNode>()
 
       ops.forEach((op) => {
-        const names = resolveTypeImportNames(op.node, tsResolver)
-        if (!typeImportsByFile.has(op.typeFile.path)) {
-          typeImportsByFile.set(op.typeFile.path, new Set())
-        }
-        const imports = typeImportsByFile.get(op.typeFile.path)!
-        names.forEach((n) => {
-          imports.add(n)
+        const imports = resolveOperationTypeImports(op.node, tsResolver, { order: 'body-response-first', operationTypes })
+        imports.forEach((imp) => {
+          const filePath = imp.schemaName ? resolveSchemaFilePath(imp.schemaName) : op.typeFile.path
+          const names = typeImportsByFile.get(filePath) ?? new Set<string>()
+          names.add(imp.name)
+          typeImportsByFile.set(filePath, names)
         })
-        typeFilesByPath.set(op.typeFile.path, op.typeFile)
       })
 
-      return { typeImportsByFile, typeFilesByPath }
+      return { typeImportsByFile }
     }
 
     function collectZodImports(ops: Array<OperationData>) {
@@ -158,7 +153,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     }
 
     const files = controllers.map(({ name, file, operations: ops }) => {
-      const { typeImportsByFile, typeFilesByPath } = collectTypeImports(ops)
+      const { typeImportsByFile } = collectTypeImports(ops)
       const { zodImportsByFile, zodFilesByPath } =
         parser === 'zod' ? collectZodImports(ops) : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
       const hasFormData = ops.some((op) => op.node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false)
@@ -189,11 +184,9 @@ export const classClientGenerator = defineGenerator<PluginClient>({
           {hasFormData && <File.Import name={['buildFormData']} root={file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
           {Array.from(typeImportsByFile.entries()).map(([filePath, importSet]) => {
-            const typeFile = typeFilesByPath.get(filePath)
-            if (!typeFile) return null
             const importNames = Array.from(importSet).filter(Boolean)
             if (importNames.length === 0) return null
-            return <File.Import key={filePath} name={importNames} root={file.path} path={typeFile.path} isTypeOnly />
+            return <File.Import key={filePath} name={importNames} root={file.path} path={filePath} isTypeOnly />
           })}
 
           {parser === 'zod' &&
@@ -213,6 +206,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             pathParamsType={pathParamsType}
             paramsCasing={paramsCasing}
             paramsType={paramsType}
+            operationTypes={operationTypes}
             parser={parser}
           />
         </File>

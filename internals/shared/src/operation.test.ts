@@ -12,8 +12,11 @@ import {
   getSuccessResponses,
   isErrorStatusCode,
   isSuccessStatusCode,
+  groupOperationTypeImports,
   resolveErrorNames,
+  resolveOperationTypeImports,
   resolveOperationTypeNames,
+  resolveRequestTypeName,
   resolveResponseTypes,
   resolveStatusCodeNames,
   resolveSuccessNames,
@@ -42,7 +45,57 @@ const resolver: RequestConfigResolver & ResponseNameResolver & ResponseStatusNam
   resolveResponseStatusName(_node, statusCode) {
     return `Status${statusCode}`
   },
+  resolveTypeName(name) {
+    return name
+  },
 }
+
+describe('operationTypes inlining', () => {
+  const refOperation = ast.createOperation({
+    operationId: 'addPet',
+    method: 'POST',
+    path: '/pet',
+    requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }) }] },
+    responses: [
+      ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }) }),
+      ast.createResponse({
+        statusCode: '422',
+        schema: ast.createSchema({ type: 'ref', name: 'HttpValidationError', ref: '#/components/schemas/HttpValidationError' }),
+      }),
+      ast.createResponse({ statusCode: '500', schema: ast.createSchema({ type: 'object', properties: [] }) }),
+    ],
+  })
+
+  test('resolveSuccessNames inlines $ref responses when operationTypes is false', () => {
+    expect(resolveSuccessNames(refOperation, resolver)).toEqual(['Status200'])
+    expect(resolveSuccessNames(refOperation, resolver, { operationTypes: false })).toEqual(['Pet'])
+  })
+
+  test('resolveErrorNames inlines $ref responses but keeps inline aliases', () => {
+    expect(resolveErrorNames(refOperation, resolver)).toEqual(['Status422', 'Status500'])
+    expect(resolveErrorNames(refOperation, resolver, { operationTypes: false })).toEqual(['HttpValidationError', 'Status500'])
+  })
+
+  test('resolveRequestTypeName inlines a $ref request body', () => {
+    expect(resolveRequestTypeName({ node: refOperation, resolver })).toBe('addPetData')
+    expect(resolveRequestTypeName({ node: refOperation, resolver, operationTypes: false })).toBe('Pet')
+  })
+
+  test('resolveOperationTypeImports tags inlined names with their schema', () => {
+    const imports = resolveOperationTypeImports(refOperation, resolver, { operationTypes: false })
+    expect(imports).toContainEqual({ name: 'Pet', schemaName: 'Pet' })
+    expect(imports).toContainEqual({ name: 'HttpValidationError', schemaName: 'HttpValidationError' })
+    expect(imports).toContainEqual({ name: 'Status500', schemaName: null })
+  })
+
+  test('groupOperationTypeImports groups inlined names by their schema file', () => {
+    const imports = resolveOperationTypeImports(refOperation, resolver, { operationTypes: false })
+    const groups = groupOperationTypeImports(imports, '/operations/AddPet.ts', (schemaName) => `/models/${schemaName}.ts`)
+    const operationGroup = groups.find((group) => group.path === '/operations/AddPet.ts')
+    expect(operationGroup?.names).toContain('Status500')
+    expect(groups.find((group) => group.path === '/models/Pet.ts')?.names).toEqual(['Pet'])
+  })
+})
 
 describe('getContentTypeInfo', () => {
   test('returns defaults for operations without a request body', () => {

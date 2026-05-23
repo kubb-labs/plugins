@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { groupOperationTypeImports, inlineOperationResolver, resolveOperationTypeImports } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -18,7 +18,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRendererSync,
   operation(node, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
+    const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, operationTypes, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -27,12 +27,12 @@ export const clientGenerator = defineGenerator<PluginClient>({
       return null
     }
 
-    const tsResolver = driver.getResolver(pluginTsName)
+    const tsResolver = inlineOperationResolver(driver.getResolver(pluginTsName), operationTypes)
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
+    const typeImports = resolveOperationTypeImports(node, tsResolver, { paramsCasing, operationTypes })
 
     const importedZodNames =
       zodResolver && parser === 'zod'
@@ -100,9 +100,16 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as Array<string>} root={meta.file.path} path={meta.fileZod.path} />}
 
-        {meta.fileTs && importedTypeNames.length > 0 && (
-          <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {meta.fileTs &&
+          groupOperationTypeImports(
+            typeImports,
+            meta.fileTs.path,
+            (schemaName) =>
+              tsResolver.resolveFile(
+                { name: schemaName, extname: '.ts' },
+                { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+              ).path,
+          ).map((typeImport) => <File.Import key={typeImport.path} name={typeImport.names} root={meta.file.path} path={typeImport.path} isTypeOnly />)}
 
         <Url
           name={meta.urlName}
@@ -124,6 +131,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           pathParamsType={pathParamsType}
           paramsCasing={paramsCasing}
           paramsType={paramsType}
+          operationTypes={operationTypes}
           node={node}
           tsResolver={tsResolver}
           zodResolver={zodResolver}

@@ -28,6 +28,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   arrayType: 'array',
   syntaxType: 'type',
   paramsCasing: undefined,
+  operationTypes: true,
   output: { path: '.' },
   exclude: [],
   include: undefined,
@@ -318,6 +319,63 @@ describe('typeGenerator — Operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+})
+
+describe('typeGenerator — Operation — operationTypes', () => {
+  // 200 + 422 are `$ref`s to named components; 500 is an inline object that has no base type.
+  const addPet: ast.OperationNode = ast.createOperation({
+    operationId: 'addPet',
+    method: 'POST',
+    path: '/pet',
+    tags: ['pet'],
+    requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }) }] },
+    responses: [
+      ast.createResponse({
+        statusCode: '200',
+        schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+        description: 'Created',
+      }),
+      ast.createResponse({
+        statusCode: '422',
+        schema: ast.createSchema({ type: 'ref', name: 'HttpValidationError', ref: '#/components/schemas/HttpValidationError' }),
+        description: 'Validation error',
+      }),
+      ast.createResponse({ statusCode: '500', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Server error' }),
+    ],
+  })
+
+  test('operationTypes=false inlines $ref responses and request body to base types', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, operationTypes: false }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'operationTypesFalse' })
+
+    await renderGeneratorOperation(typeGenerator, addPet, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'operationTypesFalse')
+  })
+
+  test('operationTypes=true keeps per-operation aliases', async () => {
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'operationTypesTrue' })
+
+    await renderGeneratorOperation(typeGenerator, addPet, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'operationTypesTrue')
   })
 })
 

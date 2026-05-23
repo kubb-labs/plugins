@@ -23,6 +23,7 @@ const testConfig: Config = {
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
+  operationTypes: true,
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
@@ -172,6 +173,26 @@ const underscoredPathParamsNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const refResponseNode = ast.createOperation({
+  operationId: 'addPet',
+  method: 'POST',
+  path: '/pet',
+  tags: ['pet'],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }) }] },
+  responses: [
+    ast.createResponse({
+      statusCode: '200',
+      schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+      description: 'successful operation',
+    }),
+    ast.createResponse({
+      statusCode: '422',
+      schema: ast.createSchema({ type: 'ref', name: 'HttpValidationError', ref: '#/components/schemas/HttpValidationError' }),
+      description: 'validation error',
+    }),
+  ],
+})
+
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -199,6 +220,8 @@ describe('clientGenerator operation', () => {
       node: underscoredPathParamsNode,
       options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const },
     },
+    { name: 'operationTypesDefault', node: refResponseNode, options: {} },
+    { name: 'operationTypesFalse', node: refResponseNode, options: { operationTypes: false } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginClient['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {

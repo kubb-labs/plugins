@@ -77,6 +77,7 @@ options:
     properties:
       - extends: ./_shared/client/import-path.yaml
       - extends: ./_shared/client/data-return-type.yaml
+      - extends: ./_shared/core/operation-types.yaml
       - extends: ./_shared/client/base-url.yaml
       - extends: ./_shared/core/client-client-type.yaml
       - extends: ./_shared/client/bundle.yaml

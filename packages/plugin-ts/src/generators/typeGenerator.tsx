@@ -102,7 +102,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enumType, enumTypeSuffix, enumKeyCasing, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
+    const { enumType, enumTypeSuffix, enumKeyCasing, optionalType, arrayType, syntaxType, paramsCasing, operationTypes, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
     const mode = ctx.getMode(output)
@@ -182,6 +182,11 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (requestBodyContent.length === 1) {
         const entry = requestBodyContent[0]!
         if (!entry.schema) return null
+        // With `operationTypes: false`, a `$ref`-backed body references the base component
+        // (e.g. `Pet`) directly, so the per-operation `XxxData` alias is not emitted.
+        if (!operationTypes && ast.resolveRefName(entry.schema)) {
+          return null
+        }
         return renderSchemaType({
           schema: {
             ...entry.schema,
@@ -231,21 +236,27 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const requestType = buildRequestType()
 
-    const responseTypes = node.responses.map((res) =>
-      renderSchemaType({
+    const responseTypes = node.responses.map((res) => {
+      // With `operationTypes: false`, a `$ref`-backed response references the base component
+      // (e.g. `Pet`) directly, so the per-operation `XxxStatus<code>` alias is not emitted.
+      if (!operationTypes && res.schema && ast.resolveRefName(res.schema)) {
+        return null
+      }
+
+      return renderSchemaType({
         schema: res.schema,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
         keysToOmit: res.keysToOmit,
-      }),
-    )
+      })
+    })
 
     const dataType = renderSchemaType({
-      schema: buildData({ ...node, parameters: params }, { resolver }),
+      schema: buildData({ ...node, parameters: params }, { resolver, operationTypes }),
       name: resolver.resolveRequestConfigName(node),
     })
 
     const responsesType = renderSchemaType({
-      schema: buildResponses(node, { resolver }),
+      schema: buildResponses(node, { resolver, operationTypes }),
       name: resolver.resolveResponsesName(node),
     })
 
@@ -276,7 +287,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       return renderSchemaType({
         schema: {
-          ...buildResponseUnion(node, { resolver })!,
+          ...buildResponseUnion(node, { resolver, operationTypes })!,
           description: 'Union of all possible responses',
         },
         name: responseName,

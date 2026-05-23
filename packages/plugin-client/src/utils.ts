@@ -1,4 +1,4 @@
-import { getOperationParameters, resolveSuccessNames } from '@internals/shared'
+import { getOperationParameters, resolveErrorNames, resolveRequestTypeName, resolveSuccessNames } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -21,11 +21,11 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  * Builds TypeScript generic parameters for a client method.
  * Includes response type, error type, and optional request type.
  */
-export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  const successNames = resolveSuccessNames(node, tsResolver)
+export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs, operationTypes = true): Array<string> {
+  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
-  const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
+  const requestName = resolveRequestTypeName({ node, resolver: tsResolver, operationTypes })
+  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   return [responseName, TError, requestName || 'unknown'].filter(Boolean)
 }

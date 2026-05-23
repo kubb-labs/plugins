@@ -240,6 +240,19 @@ export type Options = {
    */
   paramsCasing?: 'camelcase'
   /**
+   * Reference base schema types directly instead of adding a per-operation alias layer.
+   *
+   * When `false`, a response or request body backed by a single `$ref` resolves to the
+   * referenced component type (e.g. `Pet`) instead of emitting `AddPetStatus200` /
+   * `AddPetData`. Inline, array, and union schemas keep their per-operation alias because
+   * no single base type exists.
+   *
+   * @default true
+   * @note Set the same value on every plugin that references operation types
+   * (`plugin-client`, `plugin-react-query`, `plugin-vue-query`, ...).
+   */
+  operationTypes?: boolean
+  /**
    * Custom generators that run alongside the built-in TypeScript generators.
    */
   generators?: Array<Generator<PluginTs>>
@@ -301,6 +314,7 @@ type ResolvedOptions = {
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
   paramsCasing: Options['paramsCasing']
+  operationTypes: NonNullable<Options['operationTypes']>
   printer: Options['printer']
 }
 

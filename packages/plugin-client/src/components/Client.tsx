@@ -4,6 +4,8 @@ import {
   buildRequestConfigType,
   getContentTypeInfo,
   getOperationParameters,
+  resolveErrorNames,
+  resolveRequestTypeName,
   resolveSuccessNames,
 } from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
@@ -30,6 +32,7 @@ type Props = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
+  operationTypes: PluginClient['resolvedOptions']['operationTypes']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   tsResolver: ResolverTs
@@ -41,6 +44,7 @@ type GetParamsProps = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['paramsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
+  operationTypes: PluginClient['resolvedOptions']['operationTypes']
   node: ast.OperationNode
   tsResolver: ResolverTs
   isConfigurable: boolean
@@ -52,6 +56,7 @@ export function buildClientParamsNode({
   paramsType,
   paramsCasing,
   pathParamsType,
+  operationTypes,
   node,
   tsResolver,
   isConfigurable,
@@ -68,7 +73,7 @@ export function buildClientParamsNode({
               name: 'config',
               type: ast.createParamsType({
                 variant: 'reference',
-                name: buildRequestConfigType(node, tsResolver),
+                name: buildRequestConfigType(node, tsResolver, { operationTypes }),
               }),
               default: '{}',
             }),
@@ -89,6 +94,7 @@ export function Client({
   paramsType,
   paramsCasing,
   pathParamsType,
+  operationTypes,
   node,
   tsResolver,
   zodResolver,
@@ -107,8 +113,8 @@ export function Client({
   const queryParamsMapping = paramsCasing ? buildParamsMapping(originalQueryParams, casedQueryParams) : null
   const headerParamsMapping = paramsCasing ? buildParamsMapping(originalHeaderParams, casedHeaderParams) : null
 
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
-  const successNames = resolveSuccessNames(node, tsResolver)
+  const requestName = resolveRequestTypeName({ node, resolver: tsResolver, operationTypes })
+  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
@@ -116,12 +122,7 @@ export function Client({
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
   const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
 
-  const errorNames = node.responses
-    .filter((r) => {
-      const code = Number.parseInt(r.statusCode, 10)
-      return code >= 400
-    })
-    .map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
+  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
 
   const headers = [
     !isMultipleContentTypes && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
@@ -135,6 +136,7 @@ export function Client({
     paramsType,
     paramsCasing,
     pathParamsType,
+    operationTypes,
     node,
     tsResolver,
     isConfigurable,

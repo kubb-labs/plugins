@@ -59,6 +59,8 @@ options:
 
   - extends: ./_shared/core/content-type.yaml
 
+  - extends: ./_shared/core/operation-types.yaml
+
   - extends: ./_shared/core/group.yaml
     properties:
       - extends: ./_shared/core/group-type.yaml

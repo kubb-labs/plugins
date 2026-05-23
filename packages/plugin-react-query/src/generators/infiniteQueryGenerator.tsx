@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, resolveOperationTypeNames } from '@internals/shared'
+import { getOperationParameters, groupOperationTypeImports, inlineOperationResolver, resolveOperationTypeImports } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
@@ -25,7 +25,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
-    const tsResolver = driver.getResolver(pluginTsName)
+    const tsResolver = inlineOperationResolver(driver.getResolver(pluginTsName), clientOptions.operationTypes)
 
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
     const isMutation =
@@ -64,10 +64,16 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       ),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
+    const resolveSchemaFilePath = (schemaName: string) =>
+      tsResolver.resolveFile(
+        { name: schemaName, extname: '.ts' },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+      ).path
+    const typeImports = resolveOperationTypeImports(node, tsResolver, {
       paramsCasing,
       exclude: [queryKeyTypeName],
       order: 'body-response-first',
+      operationTypes: clientOptions.operationTypes,
     })
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
@@ -130,9 +136,10 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
         {shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
         {!shouldUseClientPlugin && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
-        {meta.fileTs && importedTypeNames.length > 0 && (
-          <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {meta.fileTs &&
+          groupOperationTypeImports(typeImports, meta.fileTs.path, resolveSchemaFilePath).map((typeImport) => (
+            <File.Import key={typeImport.path} name={typeImport.names} root={meta.file.path} path={typeImport.path} isTypeOnly />
+          ))}
 
         <QueryKey
           name={queryKeyName}
@@ -152,6 +159,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
             paramsCasing={clientOptions.paramsCasing || paramsCasing}
             paramsType={paramsType}
             pathParamsType={pathParamsType}
+            operationTypes={clientOptions.operationTypes ?? true}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -172,6 +180,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           paramsType={paramsType}
           pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
+          operationTypes={clientOptions.operationTypes ?? true}
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
@@ -193,6 +202,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           paramsType={paramsType}
           pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
+          operationTypes={clientOptions.operationTypes ?? true}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
           customOptions={customOptions}

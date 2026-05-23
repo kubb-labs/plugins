@@ -5,7 +5,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildQueryKeyParams, getComments, resolveErrorNames, resolveRequestTypeName, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -19,6 +19,7 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
@@ -34,12 +35,13 @@ function buildInfiniteQueryParamsNode(
     paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+    operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
     resolver: ResolverTs
     pageParamGeneric: string
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+  const { paramsType, paramsCasing, pathParamsType, operationTypes, resolver, pageParamGeneric } = options
+  const requestName = resolveRequestTypeName({ node, resolver, operationTypes })
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
@@ -71,15 +73,16 @@ export function InfiniteQuery({
   paramsCasing,
   pathParamsType,
   dataReturnType,
+  operationTypes,
   node,
   tsResolver,
   initialPageParam,
   queryParam,
   customOptions,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
+  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const errorNames = resolveErrorNames(node, tsResolver)
+  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
 
   const responseType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -124,7 +127,7 @@ export function InfiniteQuery({
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, operationTypes, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
   const paramsNode = buildInfiniteQueryParamsNode(node, {
@@ -132,6 +135,7 @@ export function InfiniteQuery({
     paramsCasing,
     pathParamsType,
     dataReturnType,
+    operationTypes,
     resolver: tsResolver,
     pageParamGeneric: 'TPageParam',
   })

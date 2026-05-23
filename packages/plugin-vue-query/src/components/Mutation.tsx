@@ -16,6 +16,7 @@ type Props = {
   paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
   paramsType: PluginVueQuery['resolvedOptions']['paramsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+  operationTypes: PluginVueQuery['resolvedOptions']['client']['operationTypes']
   pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
 }
 
@@ -43,13 +44,14 @@ function buildMutationParamsNode(
   options: {
     paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
     dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+    operationTypes: PluginVueQuery['resolvedOptions']['client']['operationTypes']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsCasing, dataReturnType, resolver } = options
-  const successNames = resolveSuccessNames(node, resolver)
+  const { paramsCasing, dataReturnType, operationTypes, resolver } = options
+  const successNames = resolveSuccessNames(node, resolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
-  const errorNames = resolveErrorNames(node, resolver)
+  const errorNames = resolveErrorNames(node, resolver, { operationTypes })
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -67,7 +69,7 @@ function buildMutationParamsNode(
           variant: 'reference',
           name: `{
   mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'undefined', 'TContext'].join(', ')}> & { client?: QueryClient },
-  client?: ${buildRequestConfigType(node, resolver)},
+  client?: ${buildRequestConfigType(node, resolver, { operationTypes })},
 }`,
         }),
         default: '{}',
@@ -83,13 +85,14 @@ export function Mutation({
   paramsType,
   pathParamsType,
   dataReturnType,
+  operationTypes,
   node,
   tsResolver,
   mutationKeyName,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
+  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const errorNames = resolveErrorNames(node, tsResolver)
+  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -117,7 +120,7 @@ export function Mutation({
         name: 'config',
         type: ast.createParamsType({
           variant: 'reference',
-          name: buildRequestConfigType(node, tsResolver),
+          name: buildRequestConfigType(node, tsResolver, { operationTypes }),
         }),
         default: '{}',
       }),
@@ -125,7 +128,7 @@ export function Mutation({
   })
   const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
 
-  const paramsNode = buildMutationParamsNode(node, { paramsCasing, dataReturnType, resolver: tsResolver })
+  const paramsNode = buildMutationParamsNode(node, { paramsCasing, dataReturnType, operationTypes, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

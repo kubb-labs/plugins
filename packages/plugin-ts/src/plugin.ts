@@ -48,6 +48,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     arrayType = 'array',
     syntaxType = 'type',
     paramsCasing,
+    operationTypes = true,
     printer,
     resolver: userResolver,
     transformer: userTransformer,
@@ -84,6 +85,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           enumKeyCasing,
           syntaxType,
           paramsCasing,
+          operationTypes,
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverTs, ...userResolver } : resolverTs)

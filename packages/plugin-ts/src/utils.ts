@@ -39,6 +39,28 @@ type BuildParamsSchemaOptions = {
 
 type BuildOperationSchemaOptions = {
   resolver: ResolverTs
+  /**
+   * When `false`, a response or request body backed by a single `$ref` references the base
+   * component type (e.g. `Pet`) instead of the per-operation alias.
+   *
+   * @default true
+   */
+  operationTypes?: boolean
+}
+
+/**
+ * Returns the schema node used to reference a response status type.
+ *
+ * With `operationTypes: false`, a `$ref`-backed response reuses its own ref node so it
+ * renders as the base component (e.g. `Pet`); otherwise it references the `XxxStatus<code>`
+ * alias.
+ */
+function responseRefSchema(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs, operationTypes: boolean): ast.SchemaNode {
+  if (!operationTypes && res.schema && ast.resolveRefName(res.schema)) {
+    return ast.createSchema({ ...res.schema })
+  }
+
+  return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })
 }
 
 export function buildParams(node: ast.OperationNode, { params, resolver }: BuildParamsSchemaOptions): ast.SchemaNode {
@@ -57,8 +79,11 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
   })
 }
 
-export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
+export function buildData(node: ast.OperationNode, { resolver, operationTypes = true }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+
+  const requestBodySchema = node.requestBody?.content?.[0]?.schema
+  const inlinedRequestRef = !operationTypes && requestBodySchema && ast.resolveRefName(requestBodySchema) ? requestBodySchema : null
 
   return ast.createSchema({
     type: 'object',
@@ -66,8 +91,10 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
     properties: [
       ast.createProperty({
         name: 'data',
-        schema: node.requestBody?.content?.[0]?.schema
-          ? ast.createSchema({ type: 'ref', name: resolver.resolveDataName(node), optional: true })
+        schema: requestBodySchema
+          ? inlinedRequestRef
+            ? ast.createSchema({ ...inlinedRequestRef, optional: true })
+            : ast.createSchema({ type: 'ref', name: resolver.resolveDataName(node), optional: true })
           : ast.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.createProperty({
@@ -98,7 +125,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
   })
 }
 
-export function buildResponses(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
+export function buildResponses(node: ast.OperationNode, { resolver, operationTypes = true }: BuildOperationSchemaOptions): ast.SchemaNode | null {
   if (node.responses.length === 0) {
     return null
   }
@@ -109,13 +136,13 @@ export function buildResponses(node: ast.OperationNode, { resolver }: BuildOpera
       ast.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+        schema: responseRefSchema(node, res, resolver, operationTypes),
       }),
     ),
   })
 }
 
-export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
+export function buildResponseUnion(node: ast.OperationNode, { resolver, operationTypes = true }: BuildOperationSchemaOptions): ast.SchemaNode | null {
   const responsesWithSchema = node.responses.filter((res) => res.schema)
 
   if (responsesWithSchema.length === 0) {
@@ -124,6 +151,6 @@ export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildO
 
   return ast.createSchema({
     type: 'union',
-    members: responsesWithSchema.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })),
+    members: responsesWithSchema.map((res) => responseRefSchema(node, res, resolver, operationTypes)),
   })
 }

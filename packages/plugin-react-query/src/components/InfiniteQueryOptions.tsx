@@ -20,6 +20,7 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
@@ -42,14 +43,15 @@ export function InfiniteQueryOptions({
   paramsCasing,
   paramsType,
   dataReturnType,
+  operationTypes,
   pathParamsType,
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver)
+  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
-  const errorNames = resolveErrorNames(node, tsResolver)
+  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
@@ -80,7 +82,7 @@ export function InfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, operationTypes, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
