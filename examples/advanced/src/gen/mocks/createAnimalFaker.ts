@@ -9,7 +9,7 @@ export function createAnimalFaker(data?: Partial<Animal>): Required<Animal> {
       { ...createCatFaker(), ...{ type: faker.helpers.arrayElement<(NonNullable<Animal> & Record<'type', unknown>)['type']>(['cat']) } },
       { ...createDogFaker(), ...{ type: faker.helpers.arrayElement<(NonNullable<Animal> & Record<'type', unknown>)['type']>(['dog']) } },
     ]),
-    ...{ type: faker.helpers.arrayElement<(NonNullable<Animal> & Record<'type', unknown>)['type']>(['cat', 'dog']) },
+    ...{ type: faker.helpers.arrayElement<NonNullable<Animal>['type']>(['cat', 'dog']) },
   }
   return {
     ...defaultFakeData,
