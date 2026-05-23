@@ -105,19 +105,23 @@ export function buildRequestDataLine({
   parser,
   node,
   zodResolver,
+  requestSerializeName,
 }: {
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
+  requestSerializeName?: string | null
 }): string {
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
-  if (parser === 'zod' && zodRequestName) {
-    return `const requestData = ${zodRequestName}.parse(data)`
+  if (!node.requestBody?.content?.[0]?.schema) {
+    return ''
   }
-  if (node.requestBody?.content?.[0]?.schema) {
-    return 'const requestData = data'
+  const zodRequestName = zodResolver && parser === 'zod' ? zodResolver.resolveDataName?.(node) : null
+  // Validate the typed input first (Zod), then serialize Dates to ISO strings for the wire.
+  let value = parser === 'zod' && zodRequestName ? `${zodRequestName}.parse(data)` : 'data'
+  if (requestSerializeName) {
+    value = `${requestSerializeName}(${value})`
   }
-  return ''
+  return `const requestData = ${value}`
 }
 
 /**
@@ -137,20 +141,25 @@ export function buildReturnStatement({
   parser,
   node,
   zodResolver,
+  responseTransformName,
 }: {
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
+  responseTransformName?: string | null
 }): string {
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
-  if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {
-    return `return {...res, data: ${zodResponseName}.parse(res.data)}`
+  // Convert ISO strings to Dates first, so a Zod schema validating `Date` fields still passes.
+  const data = responseTransformName ? `${responseTransformName}(res.data)` : 'res.data'
+
+  if (parser === 'zod' && zodResponseName) {
+    return dataReturnType === 'full' ? `return {...res, data: ${zodResponseName}.parse(${data})}` : `return ${zodResponseName}.parse(${data})`
   }
-  if (dataReturnType === 'data' && parser === 'zod' && zodResponseName) {
-    return `return ${zodResponseName}.parse(res.data)`
+  if (responseTransformName) {
+    return dataReturnType === 'full' ? `return {...res, data: ${data}}` : `return ${data}`
   }
-  if (dataReturnType === 'full' && parser === 'client') {
+  if (dataReturnType === 'full') {
     return 'return res'
   }
   return 'return res.data'

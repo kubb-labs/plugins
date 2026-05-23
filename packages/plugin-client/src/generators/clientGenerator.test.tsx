@@ -31,6 +31,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   importPath: undefined,
   bundle: false,
   parser: 'client',
+  coerceDates: false,
   output: {
     path: '.',
     banner: '/* eslint-disable no-alert, no-console */',
@@ -172,6 +173,48 @@ const underscoredPathParamsNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const coerceDatesNode = ast.createOperation({
+  operationId: 'getPet',
+  method: 'GET',
+  path: '/pet/{petId}',
+  tags: ['pet'],
+  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.createResponse({
+      statusCode: '200',
+      schema: ast.createSchema({
+        type: 'object',
+        properties: [
+          ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'string' }) }),
+          ast.createProperty({ name: 'createdAt', required: false, schema: ast.createSchema({ type: 'date', representation: 'date', format: 'date-time' }) }),
+        ],
+      }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
+const coerceDatesRequestNode = ast.createOperation({
+  operationId: 'addPet',
+  method: 'POST',
+  path: '/pet',
+  tags: ['pet'],
+  requestBody: {
+    content: [
+      {
+        contentType: 'application/json',
+        schema: ast.createSchema({
+          type: 'object',
+          properties: [
+            ast.createProperty({ name: 'bornAt', required: false, schema: ast.createSchema({ type: 'date', representation: 'date', format: 'date' }) }),
+          ],
+        }),
+      },
+    ],
+  },
+  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+})
+
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -199,6 +242,10 @@ describe('clientGenerator operation', () => {
       node: underscoredPathParamsNode,
       options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const },
     },
+    { name: 'coerceDates', node: coerceDatesNode, options: { coerceDates: true } },
+    { name: 'coerceDatesFull', node: coerceDatesNode, options: { coerceDates: true, dataReturnType: 'full' as const } },
+    { name: 'coerceDatesWithZod', node: coerceDatesNode, options: { coerceDates: true, parser: 'zod' as const } },
+    { name: 'coerceDatesRequest', node: coerceDatesRequestNode, options: { coerceDates: true } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginClient['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {

@@ -6,6 +6,7 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { classClientGenerator } from './generators/classClientGenerator.tsx'
 import { clientGenerator } from './generators/clientGenerator.tsx'
+import { dateTransformerGenerator } from './generators/dateTransformerGenerator.tsx'
 import { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 import { operationsGenerator } from './generators/operationsGenerator.tsx'
 import { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
@@ -13,6 +14,7 @@ import { resolverClient } from './resolvers/resolverClient.ts'
 import { source as axiosClientSource } from './templates/clients/axios.source.ts'
 import { source as fetchClientSource } from './templates/clients/fetch.source.ts'
 import { source as configSource } from './templates/config.source.ts'
+import { source as datesSource } from './templates/dates.source.ts'
 import type { PluginClient } from './types.ts'
 
 /**
@@ -61,6 +63,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     paramsCasing,
     clientType = options.sdk ? 'class' : 'function',
     parser = 'client',
+    coerceDates = false,
     client = 'axios',
     importPath,
     bundle = false,
@@ -78,6 +81,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
       clientType === 'staticClass' ? staticClassClientGenerator : clientType === 'class' ? classClientGenerator : clientGenerator,
       group && clientType === 'function' ? groupedClientGenerator : null,
       operations ? operationsGenerator : null,
+      coerceDates ? dateTransformerGenerator : null,
     ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
   const groupConfig = group
@@ -112,6 +116,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           override,
           group: groupConfig,
           parser,
+          coerceDates,
           dataReturnType,
           importPath: resolvedImportPath,
           baseURL,
@@ -164,6 +169,21 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
             }),
           ],
         })
+
+        if (coerceDates) {
+          ctx.injectFile({
+            baseName: 'dates.ts',
+            path: path.resolve(root, '.kubb/dates.ts'),
+            sources: [
+              ast.createSource({
+                name: 'dates',
+                nodes: [ast.createText(datesSource)],
+                isExportable: true,
+                isIndexable: false,
+              }),
+            ],
+          })
+        }
       },
     },
   }

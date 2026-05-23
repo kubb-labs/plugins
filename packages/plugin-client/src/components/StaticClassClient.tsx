@@ -15,6 +15,8 @@ type OperationData = {
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
+  responseTransformName?: string | null
+  requestSerializeName?: string | null
 }
 
 type Props = {
@@ -36,6 +38,8 @@ type GenerateMethodProps = {
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
+  responseTransformName?: string | null
+  requestSerializeName?: string | null
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
@@ -51,6 +55,8 @@ function generateMethod({
   name,
   tsResolver,
   zodResolver,
+  responseTransformName,
+  requestSerializeName,
   baseURL,
   dataReturnType,
   parser,
@@ -70,9 +76,10 @@ function generateMethod({
   const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers })
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
+  const effectiveRequestSerializeName = isFormData || (isMultipleContentTypes && hasFormData) ? null : requestSerializeName
+  const requestDataLine = buildRequestDataLine({ parser, node, zodResolver, requestSerializeName: effectiveRequestSerializeName })
   const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
-  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
+  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver, responseTransformName })
 
   const methodBody = [
     `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
@@ -102,12 +109,14 @@ export function StaticClassClient({
   pathParamsType,
   children,
 }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver }) =>
+  const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver, responseTransformName, requestSerializeName }) =>
     generateMethod({
       node,
       name: methodName,
       tsResolver,
       zodResolver,
+      responseTransformName,
+      requestSerializeName,
       baseURL,
       dataReturnType,
       parser,
