@@ -108,6 +108,48 @@ describe('printerFaker', () => {
     )
   })
 
+  test('narrows discriminated oneOf variants to their own branch', () => {
+    const makeVariant = (protocol: string, algorithms: Array<string>) =>
+      ast.createSchema({
+        type: 'object',
+        properties: [
+          ast.createProperty({ name: 'protocol', required: true, schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: [protocol] }) }),
+          ast.createProperty({ name: 'algorithm', schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: algorithms }) }),
+        ],
+      })
+
+    const node = ast.createSchema({
+      type: 'union',
+      discriminatorPropertyName: 'protocol',
+      members: [makeVariant('udp', ['random', 'rotate']), makeVariant('tcp', ['source'])],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'NodeBalancerConfig' }).print(node)
+
+    // Each variant indexes through its own discriminated branch, not the bare union.
+    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "udp" }>')
+    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "tcp" }>')
+    expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
+  })
+
+  test('falls back to any for non-discriminated unions of objects', () => {
+    const node = ast.createSchema({
+      type: 'union',
+      members: [
+        ast.createSchema({
+          type: 'object',
+          properties: [ast.createProperty({ name: 'a', schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['x', 'y'] }) })],
+        }),
+      ],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'Thing' }).print(node)
+
+    // The whole-union indexed-access type must not leak into the members.
+    expect(result).not.toContain('NonNullable<Thing>')
+    expect(result).toContain('faker.helpers.arrayElement<any>(["x", "y"])')
+  })
+
   test('memoizing getters return a stable reference and data overrides replace the getter', () => {
     // Simulate the runtime object-literal pattern the printer generates for cyclic
     // properties (e.g. Cat.friends → Pet → Cat).  The getter must memoize its value

@@ -198,6 +198,14 @@ function parseEnumValue(value: string | number | boolean | undefined) {
   return value
 }
 
+/** Reads the discriminator literal off a variant, or `undefined` when it can't be determined. */
+function getDiscriminatorValue(member: ast.SchemaNode, discriminatorPropertyName: string) {
+  const prop = ast.narrowSchema(member, 'object')?.properties?.find((p) => p.name === discriminatorPropertyName)
+  const enumNode = prop ? ast.narrowSchema(prop.schema, 'enum') : null
+
+  return enumNode ? getEnumValues(enumNode)[0] : undefined
+}
+
 /**
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
@@ -276,12 +284,22 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         return fakerKeywordMapper.enum(getEnumValues(node).map(parseEnumValue), this.options.typeName)
       },
       union(node): string {
+        const { discriminatorPropertyName } = node
+        const baseTypeName = this.options.typeName
+
         const items: Array<string> = (node.members ?? [])
-          .map((member) =>
-            printNested(member, {
-              nestedInObject: true,
-            }),
-          )
+          .map((member) => {
+            // Narrow each variant to its own discriminated branch so nested `NonNullable<T>[K]`
+            // indexes resolve against that branch instead of the whole union (which would reject
+            // the other members' values). Without a discriminator, fall back to `any`.
+            const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
+            const typeName =
+              baseTypeName && value !== undefined
+                ? `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+                : undefined
+
+            return printNested(member, { typeName, nestedInObject: true })
+          })
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.union(items)
