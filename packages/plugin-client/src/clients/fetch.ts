@@ -81,7 +81,7 @@ export type Client = <TResponseData, _TError = unknown, TRequestData = unknown>(
   request?: unknown,
 ) => Promise<ResponseConfig<TResponseData>>
 
-export const client = async <TResponseData, _TError = unknown, RequestData = unknown>(
+export const fetch = async <TResponseData, _TError = unknown, RequestData = unknown>(
   paramsConfig: RequestConfig<RequestData>,
   _request?: unknown,
 ): Promise<ResponseConfig<TResponseData>> => {
@@ -101,7 +101,7 @@ export const client = async <TResponseData, _TError = unknown, RequestData = unk
     targetUrl += `?${normalizedParams}`
   }
 
-  const response = await fetch(targetUrl, {
+  const response = await globalThis.fetch(targetUrl, {
     credentials: config.credentials || 'same-origin',
     method: config.method?.toUpperCase(),
     body: config.data instanceof FormData ? config.data : JSON.stringify(config.data),
@@ -122,7 +122,7 @@ export const client = async <TResponseData, _TError = unknown, RequestData = unk
   }
 }
 
-client.getConfig = getConfig
-client.setConfig = setConfig
+fetch.getConfig = getConfig
+fetch.setConfig = setConfig
 
-export default client
+export default fetch
