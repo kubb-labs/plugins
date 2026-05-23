@@ -8,7 +8,7 @@ import { faker } from "@faker-js/faker";
 
 export function createOrder(data?: Partial<Order>): Required<Order>
 {
-  const defaultFakeData = {"id": faker.number.bigInt(),"petId": faker.number.bigInt(),"quantity": faker.number.int(),"shipDate": faker.date.anytime().toISOString(),"status": faker.helpers.arrayElement<(NonNullable<Order> & Record<"status", unknown>)["status"]>(["placed", "approved", "delivered"]),"complete": faker.datatype.boolean()}
+  const defaultFakeData = {"id": faker.number.bigInt(),"petId": faker.number.bigInt(),"quantity": faker.number.int(),"shipDate": faker.date.anytime().toISOString(),"status": faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),"complete": faker.datatype.boolean()}
   return {
     ...defaultFakeData,
     ...(data || {}),

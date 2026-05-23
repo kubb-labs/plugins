@@ -13,8 +13,8 @@ export function createOrder(data?: Partial<Order>): Required<Order> {
     petId: faker.number.bigInt(),
     quantity: faker.number.int(),
     shipDate: faker.date.anytime().toISOString(),
-    status: faker.helpers.arrayElement<(NonNullable<Order> & Record<'status', unknown>)['status']>(['placed', 'approved', 'delivered']),
-    http_status: faker.helpers.arrayElement<(NonNullable<Order> & Record<'http_status', unknown>)['http_status']>([200, 400, 500]),
+    status: faker.helpers.arrayElement<NonNullable<Order>['status']>(['placed', 'approved', 'delivered']),
+    http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
     complete: faker.datatype.boolean(),
   }
   return {

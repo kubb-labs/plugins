@@ -10,7 +10,7 @@ import { fakerDE as faker } from "@faker-js/faker";
 
 export function createAddPetRequest(data?: Partial<AddPetRequest>): Required<AddPetRequest>
 {
-  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha(),"category": createCategory(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (createTag())),"status": faker.helpers.arrayElement<(NonNullable<AddPetRequest> & Record<"status", unknown>)["status"]>(["available", "pending", "sold"])}
+  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha(),"category": createCategory(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (createTag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])}
   return {
     ...defaultFakeData,
     ...(data || {}),

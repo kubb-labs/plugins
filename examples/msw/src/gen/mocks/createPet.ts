@@ -16,7 +16,7 @@ export function createPet(data?: Partial<Pet>): Required<Pet> {
     category: createCategory(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
     tags: faker.helpers.multiple(() => createTag()),
-    status: faker.helpers.arrayElement<(NonNullable<Pet> & Record<'status', unknown>)['status']>(['available', 'pending', 'sold']),
+    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
   }
   return {
     ...defaultFakeData,

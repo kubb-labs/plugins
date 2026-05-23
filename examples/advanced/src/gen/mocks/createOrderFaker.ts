@@ -7,11 +7,11 @@ export function createOrderFaker(data?: Partial<Order>): Required<Order> {
     petId: faker.number.int(),
     params: { status: faker.helpers.arrayElement<any>(['working', 'idle']), type: faker.string.alpha() },
     quantity: faker.number.int(),
-    orderType: faker.helpers.arrayElement<(NonNullable<Order> & Record<'orderType', unknown>)['orderType']>(['foo', 'bar']),
+    orderType: faker.helpers.arrayElement<NonNullable<Order>['orderType']>(['foo', 'bar']),
     type: faker.string.alpha(),
     shipDate: faker.date.anytime().toISOString(),
     status: faker.helpers.arrayElement<any>(['working', 'idle']),
-    http_status: faker.helpers.arrayElement<(NonNullable<Order> & Record<'http_status', unknown>)['http_status']>([200, 400, 500]),
+    http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
     complete: faker.datatype.boolean(),
   }
   return {

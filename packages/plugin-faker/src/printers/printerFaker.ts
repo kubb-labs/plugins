@@ -279,6 +279,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const items: Array<string> = (node.members ?? [])
           .map((member) =>
             printNested(member, {
+              // Don't index member properties against the union's own `typeName`: a key present on
+              // only some branches (e.g. a `oneOf` of objects) makes `NonNullable<Union>[K]` a TS2339.
+              typeName: undefined,
               nestedInObject: true,
             }),
           )
@@ -331,11 +334,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
 
             const value: string =
               printNested(property.schema, {
-                // Intersect with `Record<K, unknown>` so indexing stays valid when `typeName` is a
-                // union (`oneOf`) whose branches don't all carry the key — plain `NonNullable<T>[K]` is TS2339.
-                typeName: this.options.typeName
-                  ? `(NonNullable<${this.options.typeName}> & Record<${JSON.stringify(property.name)}, unknown>)[${JSON.stringify(property.name)}]`
-                  : undefined,
+                typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[${JSON.stringify(property.name)}]` : undefined,
                 nestedInObject: true,
               }) ?? 'undefined'
 
