@@ -17,6 +17,12 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string
 
   return [
     meta && 'description' in meta && meta.description ? `@description ${jsStringEscape(meta.description)}` : null,
+    meta && 'format' in meta && meta.format && !('description' in meta && meta.description)
+      ? `@description Format: \`${meta.format}\``
+      : null,
+    ...(meta && 'format' in meta && meta.format && 'description' in meta && meta.description
+      ? [' ', `Format: \`${meta.format}\``]
+      : []),
     meta && 'deprecated' in meta && meta.deprecated ? '@deprecated' : null,
     // minItems/maxItems on arrays should not be emitted as @minLength/@maxLength
     !isArray && meta && 'min' in meta && meta.min !== undefined ? `@minLength ${meta.min}` : null,

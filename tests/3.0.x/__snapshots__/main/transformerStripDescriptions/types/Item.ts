@@ -9,6 +9,7 @@
 */
 export type Item = {
     /**
+     * @description Format: `int64`
      * @example test
      * @type integer
     */
@@ -19,6 +20,7 @@ export type Item = {
     */
     name: string;
     /**
+     * @description Format: `int32`
      * @example test
      * @type integer | undefined
     */

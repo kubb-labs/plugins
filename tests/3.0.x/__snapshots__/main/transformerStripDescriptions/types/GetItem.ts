@@ -6,6 +6,7 @@
 import type { Item } from "./Item.ts";
 
 /**
+ * @description Format: `int64`
  * @example test
  * @type integer
 */

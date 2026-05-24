@@ -19,6 +19,7 @@ export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof 
 */
 export type AddPetRequest = {
     /**
+     * @description Format: `int64`
      * @example 10
      * @type integer | undefined
     */
