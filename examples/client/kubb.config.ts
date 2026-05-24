@@ -128,7 +128,7 @@ export default defineConfig([
       tsPlugin,
       pluginClient({
         output: { path: './tag.ts' },
-        parser: 'client',
+        parser: false,
         include: [{ type: 'tag', pattern: 'store' }],
         group: {
           type: 'tag',

@@ -1283,7 +1283,7 @@ examples:
                   },
                 },
                 operations: true,
-                parser: 'client',
+                parser: false,
                 exclude: [{ type: 'tag', pattern: 'store' }],
                 pathParamsType: 'object',
                 dataReturnType: 'full',
