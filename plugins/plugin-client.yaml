@@ -97,7 +97,6 @@ options:
   - extends: ./_shared/client/params-casing.yaml
   - extends: ./_shared/client/path-params-type.yaml
   - extends: ./_shared/client/parser.yaml
-  - extends: ./_shared/client/coerce-dates.yaml
   - extends: ./_shared/client/client.yaml
   - extends: ./_shared/client/client-type.yaml
   - extends: ./_shared/client/wrapper.yaml

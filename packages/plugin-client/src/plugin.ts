@@ -6,7 +6,6 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { classClientGenerator } from './generators/classClientGenerator.tsx'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { dateTransformerGenerator } from './generators/dateTransformerGenerator.tsx'
 import { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 import { operationsGenerator } from './generators/operationsGenerator.tsx'
 import { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
@@ -14,7 +13,6 @@ import { resolverClient } from './resolvers/resolverClient.ts'
 import { source as axiosClientSource } from './templates/clients/axios.source.ts'
 import { source as fetchClientSource } from './templates/clients/fetch.source.ts'
 import { source as configSource } from './templates/config.source.ts'
-import { source as datesSource } from './templates/dates.source.ts'
 import type { PluginClient } from './types.ts'
 
 /**
@@ -62,8 +60,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     operations = false,
     paramsCasing,
     clientType = options.sdk ? 'class' : 'function',
-    parser = 'client',
-    coerceDates = false,
+    parser = false,
     client = 'axios',
     importPath,
     bundle = false,
@@ -75,17 +72,12 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
 
   const resolvedImportPath = importPath ?? (!bundle ? `@kubb/plugin-client/clients/${client}` : undefined)
 
-  // The custom runtime date parser is only generated for the `'client'` parser.
-  // With `parser: 'zod'`, Zod owns response validation/coercion, so coerceDates is ignored.
-  const coerceDatesEnabled = coerceDates && parser !== 'zod'
-
   const selectedGenerators =
     options.generators ??
     [
       clientType === 'staticClass' ? staticClassClientGenerator : clientType === 'class' ? classClientGenerator : clientGenerator,
       group && clientType === 'function' ? groupedClientGenerator : null,
       operations ? operationsGenerator : null,
-      coerceDatesEnabled ? dateTransformerGenerator : null,
     ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
   const groupConfig = group
@@ -120,7 +112,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           override,
           group: groupConfig,
           parser,
-          coerceDates: coerceDatesEnabled,
           dataReturnType,
           importPath: resolvedImportPath,
           baseURL,
@@ -173,21 +164,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
             }),
           ],
         })
-
-        if (coerceDatesEnabled) {
-          ctx.injectFile({
-            baseName: 'dates.ts',
-            path: path.resolve(root, '.kubb/dates.ts'),
-            sources: [
-              ast.createSource({
-                name: 'dates',
-                nodes: [ast.createText(datesSource)],
-                isExportable: true,
-                isIndexable: false,
-              }),
-            ],
-          })
-        }
       },
     },
   }

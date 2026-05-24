@@ -6,7 +6,6 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
-import { resolveRequestSerializeName, resolveResponseTransformName, resolveTransformerOutput } from '../dateTransformer.ts'
 import type { PluginClient } from '../types'
 
 /**
@@ -19,7 +18,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRendererSync,
   operation(node, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, coerceDates, importPath, group } = ctx.options
+    const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -72,18 +71,6 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
 
-    // The custom runtime date parser is incompatible with the Zod parser, which owns response validation/coercion.
-    const coerceActive = coerceDates && parser !== 'zod'
-    const transformerFile = coerceActive
-      ? tsResolver.resolveFile(
-          { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: resolveTransformerOutput(output), group: group ?? undefined },
-        )
-      : null
-    const responseTransformName = coerceActive ? resolveResponseTransformName(node, (n, code) => tsResolver.resolveResponseStatusName(n, code)) : null
-    const requestSerializeName = coerceActive ? resolveRequestSerializeName(node, (n) => tsResolver.resolveDataName(n)) : null
-    const coerceImportNames = [responseTransformName, requestSerializeName].filter((name): name is string => Boolean(name))
-
     return (
       <File
         baseName={meta.file.baseName}
@@ -117,8 +104,6 @@ export const clientGenerator = defineGenerator<PluginClient>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        {transformerFile && coerceImportNames.length > 0 && <File.Import name={coerceImportNames} root={meta.file.path} path={transformerFile.path} />}
-
         <Url
           name={meta.urlName}
           baseURL={baseURL}
@@ -143,8 +128,6 @@ export const clientGenerator = defineGenerator<PluginClient>({
           tsResolver={tsResolver}
           zodResolver={zodResolver}
           parser={parser}
-          responseTransformName={responseTransformName}
-          requestSerializeName={requestSerializeName}
         />
       </File>
     )

@@ -171,23 +171,13 @@ export type Options = {
   paramsCasing?: 'camelcase'
   /**
    * Validator applied to response bodies before they are returned to the caller.
-   * - `'client'` — no validation. Trusts the API.
+   * - `false` (default) — no validation. The client has no runtime parser; the response is
+   *   returned as-is, cast to the generated TypeScript type.
    * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
-   *
-   * @default 'client'
-   */
-  parser?: 'client' | 'zod'
-  /**
-   * Convert date values at runtime in the generated client, so they match the `Date`
-   * types emitted by `@kubb/plugin-ts`. Requires the adapter to run with `dateType: 'date'`.
-   *
-   * Generates a transformer per schema (response: ISO `string` → `Date`; request body:
-   * `Date` → ISO `string`) and applies it inside each operation. Independent of `parser`:
-   * the same conversion happens whether validation runs through `'client'` or `'zod'`.
    *
    * @default false
    */
-  coerceDates?: boolean
+  parser?: false | 'zod'
   /**
    * Shape of the generated client.
    * - `'function'` — one standalone async function per operation.
@@ -256,7 +246,6 @@ type ResolvedOptions = {
   clientType: NonNullable<Options['clientType']>
   bundle: NonNullable<Options['bundle']>
   parser: NonNullable<Options['parser']>
-  coerceDates: NonNullable<Options['coerceDates']>
   urlType: NonNullable<Options['urlType']>
   importPath: Options['importPath']
   baseURL: Options['baseURL']

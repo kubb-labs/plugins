@@ -2,13 +2,13 @@
 
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: parser
-type: "'client' | 'zod'"
+type: "false | 'zod'"
 required: false
-default: "'client'"
+default: 'false'
 description: |
   Runtime validator applied to the response body before it is returned to the caller.
 
-  - `'client'` (default) — no validation. The response is cast to the generated TypeScript type and returned as-is. Fastest path, trusts the API.
+  - `false` (default) — no validation. The client has no runtime parser; the response is cast to the generated TypeScript type and returned as-is. Fastest path, trusts the API.
   - `'zod'` — pipes the response through the Zod schema produced by `@kubb/plugin-zod`. Catches mismatches between spec and API at runtime, at the cost of a parse on every call.
 
   Use `'zod'` when you want a defensive boundary against drift between your OpenAPI spec and the live API. Requires `@kubb/plugin-zod` in the plugins list.

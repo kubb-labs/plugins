@@ -15,7 +15,6 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildRequestDataLine, buildReturnStatement } from '../utils.ts'
 import { buildUrlParamsNode } from './Url.tsx'
 
 type Props = {
@@ -32,8 +31,6 @@ type Props = {
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
-  responseTransformName?: string | null
-  requestSerializeName?: string | null
   node: ast.OperationNode
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
@@ -89,8 +86,6 @@ export function Client({
   baseURL,
   dataReturnType,
   parser,
-  responseTransformName,
-  requestSerializeName,
   paramsType,
   paramsCasing,
   pathParamsType,
@@ -118,8 +113,8 @@ export function Client({
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
 
-  // FormData requests already serialize Dates via buildFormData, so skip the serializer there.
-  const effectiveRequestSerializeName = isFormData || (isMultipleContentTypes && hasFormData) ? null : requestSerializeName
+  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
 
   const errorNames = node.responses
     .filter((r) => {
@@ -198,7 +193,16 @@ export function Client({
     },
   })
 
-  const childrenElement = children ?? buildReturnStatement({ dataReturnType, parser, node, zodResolver, responseTransformName })
+  const childrenElement = children ? (
+    children
+  ) : (
+    <>
+      {dataReturnType === 'full' && parser === 'zod' && zodResponseName && `return {...res, data: ${zodResponseName}.parse(res.data)}`}
+      {dataReturnType === 'data' && parser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
+      {dataReturnType === 'full' && parser !== 'zod' && 'return res'}
+      {dataReturnType === 'data' && parser !== 'zod' && 'return res.data'}
+    </>
+  )
 
   return (
     <>
@@ -249,7 +253,7 @@ export function Client({
               <br />
             </>
           )}
-          {buildRequestDataLine({ parser, node, zodResolver, requestSerializeName: effectiveRequestSerializeName })}
+          {parser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
           <br />
           {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
           <br />
