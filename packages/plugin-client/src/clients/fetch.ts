@@ -93,11 +93,22 @@ function serializeBody(data: unknown, contentType?: string): BodyInit | undefine
 }
 
 /**
+ * Picks a `responseType` from a `Content-Type` header, or `undefined` when it is not recognized.
+ */
+function detectResponseType(contentType: string | null): RequestConfig['responseType'] {
+  if (!contentType) return undefined
+  if (contentType.includes('application/json') || contentType.includes('text/json')) return 'json'
+  if (contentType.includes('text/')) return 'text'
+  if (contentType.includes('image/') || contentType.includes('application/octet-stream')) return 'blob'
+  return undefined
+}
+
+/**
  * Parses a `fetch` response body.
  *
  * - Empty responses (204/205/304 or no body) resolve to `{}`.
- * - An explicit `responseType` forces the matching `Response` method.
- * - Otherwise the `Content-Type` response header decides: JSON, text or blob.
+ * - An explicit `responseType` (or one detected from the `Content-Type` header) forces the matching
+ *   `Response` method.
  * - As a last resort the body is read as text and `JSON.parse`d, falling back to the raw text.
  */
 async function parseResponse<TData>(response: Response, responseType?: RequestConfig['responseType']): Promise<TData> {
@@ -105,37 +116,24 @@ async function parseResponse<TData>(response: Response, responseType?: RequestCo
     return {} as TData
   }
 
-  if (responseType) {
-    switch (responseType) {
-      case 'json':
-        return (await response.json()) as TData
-      case 'text':
-      case 'document':
-        return (await response.text()) as TData
-      case 'blob':
-        return (await response.blob()) as TData
-      case 'arraybuffer':
-        return (await response.arrayBuffer()) as TData
-      case 'stream':
-        return response.body as TData
-      default:
-        return (await response.json()) as TData
-    }
-  }
-
-  const contentType = response.headers.get('Content-Type')
-  if (contentType) {
-    if (contentType.includes('application/json') || contentType.includes('text/json')) {
-      return (await response.json()) as TData
-    }
-    if (contentType.includes('text/')) {
+  switch (responseType ?? detectResponseType(response.headers.get('Content-Type'))) {
+    case 'text':
+    case 'document':
       return (await response.text()) as TData
-    }
-    if (contentType.includes('image/') || contentType.includes('application/octet-stream')) {
+    case 'blob':
       return (await response.blob()) as TData
-    }
+    case 'arraybuffer':
+      return (await response.arrayBuffer()) as TData
+    case 'stream':
+      return response.body as TData
+    case 'json':
+      return (await response.json()) as TData
   }
 
+  // Explicit but unrecognized responseType keeps the JSON default; otherwise read text and parse it.
+  if (responseType) {
+    return (await response.json()) as TData
+  }
   const text = await response.text()
   if (!text) {
     return {} as TData

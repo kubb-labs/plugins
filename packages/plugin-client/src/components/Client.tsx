@@ -4,7 +4,7 @@ import {
   buildRequestConfigType,
   getContentTypeInfo,
   getOperationParameters,
-  getResponseContentTypeInfo,
+  getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
 import { isValidVarName, URLPath } from '@internals/utils'
@@ -100,7 +100,7 @@ export function Client({
   const path = new URLPath(node.path)
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
-  const { defaultResponseType } = getResponseContentTypeInfo(node)
+  const responseType = getResponseType(node)
 
   const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
   const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing })
@@ -181,7 +181,7 @@ export function Client({
             }
           : null,
         contentType: isConfigurable && isMultipleContentTypes ? {} : null,
-        responseType: defaultResponseType ? { value: JSON.stringify(defaultResponseType) } : null,
+        responseType: responseType ? { value: JSON.stringify(responseType) } : null,
         requestConfig: isConfigurable
           ? {
               mode: 'inlineSpread',

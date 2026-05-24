@@ -80,50 +80,23 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
 
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
 
-export type ResponseContentTypeInfo = {
-  responseContentTypes: string[]
-  isMultipleResponseContentTypes: boolean
-  defaultResponseType: ResponseType | undefined
-}
-
 /**
- * Maps a response content type to the `responseType` the runtime client should use.
+ * Derives the default `responseType` for an operation from its primary success response.
  *
- * - JSON (`application/json`, `*+json`, `text/json`) → `undefined` (the client's JSON default).
- * - Binary types (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`) → `'blob'`.
- * - Other `text/*` → `'text'`.
- * - Anything else → `undefined`, leaving runtime `Content-Type` auto-detection in charge.
+ * Returns a value only when that response declares a single non-JSON content type — a binary type
+ * (`application/octet-stream`, `application/pdf`, `image/*`, `audio/*`, `video/*`) maps to `'blob'`
+ * and other `text/*` maps to `'text'`. Otherwise `undefined`, leaving the runtime client's
+ * `Content-Type` auto-detection in charge.
  */
-function mapResponseType(contentType: string): ResponseType | undefined {
-  const baseType = contentType.split(';')[0]!.trim().toLowerCase()
+export function getResponseType(node: ast.OperationNode): ResponseType | undefined {
+  const contentTypes = getPrimarySuccessResponse(node)?.content?.map((entry) => entry.contentType) ?? []
+  if (contentTypes.length !== 1) return undefined
+
+  const baseType = contentTypes[0]!.split(';')[0]!.trim().toLowerCase()
   if (baseType === 'application/json' || baseType.endsWith('+json') || baseType === 'text/json') return undefined
-  if (
-    baseType === 'application/octet-stream' ||
-    baseType === 'application/pdf' ||
-    baseType.startsWith('image/') ||
-    baseType.startsWith('audio/') ||
-    baseType.startsWith('video/')
-  ) {
-    return 'blob'
-  }
   if (baseType.startsWith('text/')) return 'text'
+  if (baseType === 'application/octet-stream' || baseType === 'application/pdf' || /^(image|audio|video)\//.test(baseType)) return 'blob'
   return undefined
-}
-
-/**
- * Inspects the primary success response and derives a default `responseType` for the operation.
- *
- * A default is only inferred when the success response declares a single non-JSON content type
- * (e.g. a binary download). When multiple content types are present the value stays `undefined`
- * so the runtime client relies on `Content-Type` header auto-detection instead.
- */
-export function getResponseContentTypeInfo(node: ast.OperationNode): ResponseContentTypeInfo {
-  const primary = getPrimarySuccessResponse(node)
-  const responseContentTypes = primary?.content?.map((e) => e.contentType) ?? []
-  const isMultipleResponseContentTypes = responseContentTypes.length > 1
-  const defaultResponseType = !isMultipleResponseContentTypes && responseContentTypes[0] ? mapResponseType(responseContentTypes[0]) : undefined
-
-  return { responseContentTypes, isMultipleResponseContentTypes, defaultResponseType }
 }
 
 export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
