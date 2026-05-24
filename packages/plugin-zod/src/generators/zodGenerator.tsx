@@ -8,7 +8,7 @@ import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
 import { printerZod } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { buildSchemaNames, containsRoundTripNode } from '../utils.ts'
+import { buildSchemaNames, containsCodec } from '../utils.ts'
 
 type StdPrinters = { output: ReturnType<typeof printerZod>; input: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; dateType: unknown }
@@ -67,14 +67,14 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
-    // A round-trip component is rendered twice: the canonical (output) schema decodes
+    // A codec component is rendered twice: the canonical (output) schema decodes
     // `string → Date`, and an `${name}InputSchema` variant encodes `Date → string` for requests.
-    const hasRoundTrip = !mini && containsRoundTripNode(node)
+    const hasCodec = !mini && containsCodec(node)
 
-    const roundTripRefNames = new Set(
-      hasRoundTrip
+    const codecRefNames = new Set(
+      hasCodec
         ? ast.collect<string>(node, {
-            schema: (n) => (n.type === 'ref' && n.ref && containsRoundTripNode(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
+            schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
           })
         : [],
     )
@@ -82,8 +82,8 @@ export const zodGenerator = defineGenerator<PluginZod>({
       name: resolver.resolveSchemaName(schemaName),
       path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
     }))
-    const inputImportEntries = hasRoundTrip
-      ? [...roundTripRefNames].map((schemaName) => ({
+    const inputImportEntries = hasCodec
+      ? [...codecRefNames].map((schemaName) => ({
           name: resolver.resolveInputSchemaName(schemaName),
           path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
@@ -119,7 +119,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           imports.map((imp) => <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
 
         <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} />
-        {hasRoundTrip && stdPrinters && (
+        {hasCodec && stdPrinters && (
           <Zod
             name={resolver.resolveInputSchemaName(node.name)}
             node={node}
@@ -164,17 +164,17 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       const inferTypeName = inferred ? resolver.resolveTypeName(name) : null
 
-      // In the input direction, refs to round-trip components resolve to their input variant.
-      const roundTripRefNames =
+      // In the input direction, refs to codec components resolve to their input variant.
+      const codecRefNames =
         direction === 'input' && !mini
           ? new Set(
               ast.collect<string>(schema, {
-                schema: (n) => (n.type === 'ref' && n.ref && containsRoundTripNode(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
+                schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
               }),
             )
           : null
       const imports = adapter.getImports(schema, (schemaName) => ({
-        name: roundTripRefNames?.has(schemaName) ? resolver.resolveInputSchemaName(schemaName) : resolver.resolveSchemaName(schemaName),
+        name: codecRefNames?.has(schemaName) ? resolver.resolveInputSchemaName(schemaName) : resolver.resolveSchemaName(schemaName),
         path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 

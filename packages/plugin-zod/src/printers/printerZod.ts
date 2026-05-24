@@ -1,9 +1,8 @@
 import { stringify } from '@internals/utils'
 
 import { ast } from '@kubb/core'
-import { getRoundTripEntry } from '../roundTrip.ts'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, containsRoundTripNode, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
+import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -150,9 +149,9 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       },
       date(node) {
         // representation: 'date' → typed as `Date`; decode/encode at the boundary.
-        const entry = getRoundTripEntry(node)
-        if (entry) {
-          return this.options.direction === 'input' ? entry.encode(node) : entry.decode(node)
+        const codec = getCodec(node)
+        if (codec) {
+          return this.options.direction === 'input' ? codec.encode(node) : codec.decode(node)
         }
 
         return 'z.iso.date()'
@@ -208,7 +207,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
 
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.
-        const useInputVariant = node.ref != null && this.options.direction === 'input' && containsRoundTripNode(node)
+        const useInputVariant = node.ref != null && this.options.direction === 'input' && containsCodec(node)
         const resolvedName = node.ref
           ? useInputVariant
             ? (this.options.resolver?.resolveInputSchemaName(refName) ?? refName)
