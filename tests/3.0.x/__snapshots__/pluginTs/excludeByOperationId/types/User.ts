@@ -8,7 +8,8 @@
 */
 export type User = {
     /**
-     * @description Format: `int64`
+     * @description
+     * Format: `int64`
      * @example 10
      * @type integer | undefined
     */

@@ -234,11 +234,12 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).toContain('Format: `uuid`')
   })
 
-  it('emits format-only @description when no description exists', () => {
+  it('emits @description and Format on separate lines when only format exists', () => {
     const schema = ast.createSchema({ type: 'string', format: 'date-time' })
     const comments = buildPropertyJSDocComments(schema)
 
-    expect(comments).toContain('@description Format: `date-time`')
+    expect(comments).toContain('@description')
+    expect(comments).toContain('Format: `date-time`')
   })
 
   it('does not emit @description when neither description nor format exist', () => {

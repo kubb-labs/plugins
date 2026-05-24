@@ -1,7 +1,8 @@
 // Custom banner
 
 /**
- * @description Format: `int64`
+ * @description
+ * Format: `int64`
  * @type integer
 */
 export type CustomGetItemPathId = bigint;

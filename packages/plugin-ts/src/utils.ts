@@ -22,7 +22,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string
       ? hasDescription
         ? // Empty line between description and format
           [' ', `Format: \`${meta.format}\``]
-        : [`@description Format: \`${meta.format}\``]
+        : ['@description', `Format: \`${meta.format}\``]
       : []
 
   return [

@@ -18,7 +18,8 @@ export type CustomItem = {
     */
     name: string;
     /**
-     * @description Format: `int32`
+     * @description
+     * Format: `int32`
      * @type integer | undefined
     */
     count?: number;
