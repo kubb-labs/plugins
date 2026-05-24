@@ -1,5 +1,5 @@
 import { jsStringEscape, stringify } from '@internals/utils'
-import { getOperationParameters } from '@internals/shared'
+import { getOperationParameters, resolveInlinableRefName } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from './types.ts'
 
@@ -57,7 +57,7 @@ type BuildOperationSchemaOptions = {
  */
 function responseRefSchema(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs, operationTypes: boolean): ast.SchemaNode {
   const schema = res.content?.[0]?.schema
-  if (!operationTypes && schema && ast.resolveRefName(schema)) {
+  if (!operationTypes && schema && resolveInlinableRefName(res.content?.[0])) {
     return ast.createSchema({ ...schema })
   }
 
@@ -83,8 +83,9 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 export function buildData(node: ast.OperationNode, { resolver, operationTypes = true }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
-  const requestBodySchema = node.requestBody?.content?.[0]?.schema
-  const inlinedRequestRef = !operationTypes && requestBodySchema && ast.resolveRefName(requestBodySchema) ? requestBodySchema : null
+  const requestContents = node.requestBody?.content ?? []
+  const requestBodySchema = requestContents[0]?.schema
+  const inlinedRequestRef = !operationTypes && requestContents.length === 1 && resolveInlinableRefName(requestContents[0]) ? requestBodySchema : null
 
   return ast.createSchema({
     type: 'object',

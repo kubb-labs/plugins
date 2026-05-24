@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { AddPetData, AddPetStatus200, AddPetStatus405 } from "../types/AddPet.ts";
+import type { AddPetData, AddPetStatus405 } from "../types/AddPet.ts";
+import type { Pet } from "../types/Pet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
 import type { MaybeRefOrGetter } from "vue";
@@ -18,7 +19,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
-  mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: MaybeRefOrGetter<AddPetData>}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<Pet, ResponseErrorConfig<AddPetStatus405>, {data: MaybeRefOrGetter<AddPetData>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
@@ -26,7 +27,7 @@ export function useAddPet<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-          return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
+          return useMutation<Pet, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
             mutationFn: async({ data }) => {
               return addPet(data, config)
             },

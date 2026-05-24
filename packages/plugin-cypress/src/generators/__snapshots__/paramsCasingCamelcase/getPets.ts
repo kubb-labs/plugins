@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetPetsResponse } from './GetPets'
+import type { GetPetsQueryPageSize, GetPetsResponse } from './GetPets'
 
 export function getPets(params?: { pageSize?: GetPetsQueryPageSize }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
   return cy

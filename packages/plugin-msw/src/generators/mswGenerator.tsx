@@ -1,7 +1,7 @@
-import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { getOperationSuccessResponses, groupOperationTypeImports, resolveInlinableRefName, resolveResponseTypes } from '@internals/shared'
+import { type ast, defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
@@ -58,6 +58,24 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
 
+    const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
+    const toTypeImport = (name: string, content?: { schema?: ast.SchemaNode | null; keysToOmit?: ReadonlyArray<string> | null } | null) => {
+      if (operationTypes === false) {
+        const refName = resolveInlinableRefName(content)
+        if (refName) return { name, schemaName: refName }
+      }
+      return { name, schemaName: null }
+    }
+    const typeImports = [
+      { name: type.responseName, schemaName: null },
+      ...types.map(([code, typeName]) => {
+        if (typeName === type.responseName) return { name: typeName, schemaName: null }
+        const response = node.responses.find((item) => String(item.statusCode) === String(code))
+        return toTypeImport(typeName, response?.content?.[0])
+      }),
+      ...(requestName ? [toTypeImport(requestName, node.requestBody?.content?.length === 1 ? node.requestBody.content[0] : undefined)] : []),
+    ]
+
     return (
       <File
         baseName={mock.file.baseName}
@@ -68,12 +86,17 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />
-        <File.Import
-          name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))}
-          path={type.file.path}
-          root={mock.file.path}
-          isTypeOnly
-        />
+        {groupOperationTypeImports(
+          typeImports,
+          type.file.path,
+          (schemaName) =>
+            tsResolver.resolveFile(
+              { name: schemaName, extname: '.ts' },
+              { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+            ).path,
+        ).map((typeImport) => (
+          <File.Import key={typeImport.path} name={typeImport.names} root={mock.file.path} path={typeImport.path} isTypeOnly />
+        ))}
         {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types

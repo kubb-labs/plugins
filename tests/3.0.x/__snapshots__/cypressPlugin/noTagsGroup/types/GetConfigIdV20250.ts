@@ -13,11 +13,6 @@ export type GetConfigIdV20250PathConfigId = string;
 /**
  * @type object
 */
-export type GetConfigIdV20250Status200 = Config;
-
-/**
- * @type object
-*/
 export type GetConfigIdV20250RequestConfig = {
     data?: never;
     /**
@@ -38,10 +33,13 @@ export type GetConfigIdV20250RequestConfig = {
  * @type object
 */
 export type GetConfigIdV20250Responses = {
-    "200": GetConfigIdV20250Status200;
+    /**
+     * @type object
+    */
+    "200": Config;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type GetConfigIdV20250Response = GetConfigIdV20250Status200;
+export type GetConfigIdV20250Response = Config;

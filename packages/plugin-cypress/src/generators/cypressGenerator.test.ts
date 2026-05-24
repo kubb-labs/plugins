@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
+import { inlineOperationResolver } from '@internals/shared'
 import type { Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
@@ -38,7 +39,7 @@ const defaultOptions: PluginCypress['resolvedOptions'] = {
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
   options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
-  resolver: resolverTs,
+  resolver: inlineOperationResolver(resolverTs, false),
 })
 
 describe('cypressGenerator — Operation', () => {

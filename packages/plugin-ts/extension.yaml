@@ -346,7 +346,7 @@ options:
   - name: operationTypes
     type: boolean
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Reference base schema types directly instead of the per-operation alias layer that `@kubb/plugin-ts` generates.
 
@@ -354,19 +354,7 @@ options:
     tip: |
       Set this once on `@kubb/plugin-ts`. Consumer plugins (`@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`) read the TypeScript resolver via the plugin driver, so they inherit the inlining automatically — no per-plugin flag to keep in sync.
     examples:
-      - name: true (default)
-        files:
-          - name: addPet.ts
-            lang: typescript
-            twoslash: false
-            code: |
-              import type { AddPetData, AddPetStatus200 } from '../models/AddPet'
-
-              export async function addPet(data?: AddPetData, config: Partial<RequestConfig<AddPetData>> = {}) {
-                const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus422>, AddPetData>({ /* ... */ })
-                return res.data
-              }
-      - name: 'false'
+      - name: false (default)
         files:
           - name: addPet.ts
             lang: typescript
@@ -377,6 +365,18 @@ options:
 
               export async function addPet(data?: Pet, config: Partial<RequestConfig<Pet>> = {}) {
                 const res = await request<Pet, ResponseErrorConfig<HttpValidationError>, Pet>({ /* ... */ })
+                return res.data
+              }
+      - name: 'true'
+        files:
+          - name: addPet.ts
+            lang: typescript
+            twoslash: false
+            code: |
+              import type { AddPetData, AddPetStatus200 } from '../models/AddPet'
+
+              export async function addPet(data?: AddPetData, config: Partial<RequestConfig<AddPetData>> = {}) {
+                const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus422>, AddPetData>({ /* ... */ })
                 return res.data
               }
   - name: group

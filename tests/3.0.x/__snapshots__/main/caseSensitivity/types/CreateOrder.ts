@@ -6,11 +6,6 @@
 import type { Order } from "./Order.ts";
 
 /**
- * @type object
-*/
-export type CreateOrderStatus201 = Order;
-
-/**
  * @description Order request body
  * @type object | undefined
 */
@@ -43,10 +38,13 @@ export type CreateOrderRequestConfig = {
  * @type object
 */
 export type CreateOrderResponses = {
-    "201": CreateOrderStatus201;
+    /**
+     * @type object
+    */
+    "201": Order;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type CreateOrderResponse = CreateOrderStatus201;
+export type CreateOrderResponse = Order;

@@ -4,6 +4,7 @@
 */
 
 import type { AddPetData, AddPetResponse } from "../types/AddPet.ts";
+import type { Pet } from "../types/Pet.ts";
 
 export function addPet(data: AddPetData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<AddPetResponse> {
   return cy.request<AddPetResponse>({

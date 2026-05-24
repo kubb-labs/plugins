@@ -1,6 +1,7 @@
+import { resolveInlinableRefName } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
@@ -156,6 +157,20 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ),
     } as const
 
+    const operationTypes = pluginTs.options?.operationTypes ?? defaultOperationTypes
+    const resolveTypeFilePath = (content?: { schema?: ast.SchemaNode | null; keysToOmit?: ReadonlyArray<string> | null } | null) => {
+      if (operationTypes === false) {
+        const refName = resolveInlinableRefName(content)
+        if (refName) {
+          return tsResolver.resolveFile(
+            { name: refName, extname: '.ts' },
+            { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+          ).path
+        }
+      }
+      return meta.typeFile.path
+    }
+
     function resolveMockImports(schema: ast.SchemaNode) {
       return adapter
         .getImports(schema, (schemaName) => ({
@@ -170,12 +185,14 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       name,
       typeName,
       description,
+      typeFilePath = meta.typeFile.path,
       skipImportNames = [],
     }: {
       schema: ast.SchemaNode | null
       name: string
       typeName: string
       description?: string
+      typeFilePath?: string
       skipImportNames?: Array<string>
     }) {
       if (!schema) {
@@ -203,7 +220,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         name,
         typeName,
         filePath: meta.file.path,
-        typeFilePath: meta.typeFile.path,
+        typeFilePath,
       })
 
       return (
@@ -249,6 +266,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             name,
             typeName,
             description: response.description,
+            typeFilePath: resolveTypeFilePath(response.content?.[0]),
           }),
         )}
         {dataEntry
@@ -257,6 +275,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
               name: dataEntry.name,
               typeName: dataEntry.typeName,
               description: dataEntry.description,
+              typeFilePath: resolveTypeFilePath(node.requestBody?.content?.length === 1 ? node.requestBody.content[0] : null),
             })
           : null}
         {renderEntry({

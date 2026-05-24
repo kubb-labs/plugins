@@ -3,14 +3,15 @@
 * Do not edit manually.
 */
 
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatusDefault } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatusDefault } from "../types/CreateUsersWithListInput.ts";
+import type { User } from "../types/User.ts";
 import { createUser } from "./createUser.ts";
 import { fakerDE as faker } from "@faker-js/faker";
 
 /**
  * @description Successful operation
  */
-export function createCreateUsersWithListInputStatus200(data?: Partial<CreateUsersWithListInputStatus200>): CreateUsersWithListInputStatus200 {
+export function createCreateUsersWithListInputStatus200(data?: Partial<User>): User {
   return createUser(data)
 }
 

@@ -4,6 +4,7 @@
 */
 
 import type { GetOrderByIdPathOrderId, GetOrderByIdResponse } from "../types/GetOrderById.ts";
+import type { Order } from "../types/Order.ts";
 
 export function getOrderById(orderId: GetOrderByIdPathOrderId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetOrderByIdResponse> {
   return cy.request<GetOrderByIdResponse>({

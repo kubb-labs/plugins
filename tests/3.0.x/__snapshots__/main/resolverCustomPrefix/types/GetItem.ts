@@ -6,12 +6,6 @@
 export type CustomGetItemPathId = bigint;
 
 /**
- * @description A simple item
- * @type object
-*/
-export type CustomGetItemStatus200 = Item;
-
-/**
  * @type object
 */
 export type CustomGetItemRequestConfig = {
@@ -34,10 +28,14 @@ export type CustomGetItemRequestConfig = {
  * @type object
 */
 export type CustomGetItemResponses = {
-    "200": CustomGetItemStatus200;
+    /**
+     * @description A simple item
+     * @type object
+    */
+    "200": Item;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type CustomGetItemResponse = CustomGetItemStatus200;
+export type CustomGetItemResponse = Item;

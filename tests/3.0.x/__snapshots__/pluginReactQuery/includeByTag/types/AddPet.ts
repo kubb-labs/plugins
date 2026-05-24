@@ -7,11 +7,6 @@ import type { AddPetRequest } from "./AddPetRequest.ts";
 import type { Pet } from "./Pet.ts";
 
 /**
- * @type object
-*/
-export type AddPetStatus200 = Pet;
-
-/**
  * @type any
 */
 export type AddPetStatus405 = any;
@@ -54,11 +49,14 @@ export type AddPetRequestConfig = {
  * @type object
 */
 export type AddPetResponses = {
-    "200": AddPetStatus200;
+    /**
+     * @type object
+    */
+    "200": Pet;
     "405": AddPetStatus405;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type AddPetResponse = (AddPetStatus200 | AddPetStatus405);
+export type AddPetResponse = (Pet | AddPetStatus405);

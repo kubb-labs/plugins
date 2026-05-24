@@ -40,7 +40,7 @@ export type OperationTypesOptions = {
    * (`AddPetStatus200`, `AddPetData`). Inline, array, and union schemas keep the alias
    * because no single base type exists.
    *
-   * @default true
+   * @default false
    */
   operationTypes?: boolean
 }
@@ -162,6 +162,21 @@ export function getPrimarySuccessResponse(node: ast.OperationNode): ast.Response
   return getOperationSuccessResponses(node)[0] ?? null
 }
 
+type InlinableContent = { schema?: ast.SchemaNode | null; keysToOmit?: ReadonlyArray<string> | null } | null | undefined
+
+/**
+ * Returns the referenced component name when a content entry can be inlined to its base type,
+ * or `null` when it cannot. Inlining is only safe for a bare `$ref`: a `keysToOmit` turns the
+ * type into `Omit<Base, ...>`, so the per-operation alias must be kept instead.
+ */
+export function resolveInlinableRefName(content: InlinableContent): string | null {
+  if (!content?.schema || content.keysToOmit?.length) {
+    return null
+  }
+
+  return ast.resolveRefName(content.schema) ?? null
+}
+
 export type ResolveResponseTypeNameOptions = OperationTypesOptions & {
   node: ast.OperationNode
   response: ast.ResponseNode
@@ -175,9 +190,8 @@ export type ResolveResponseTypeNameOptions = OperationTypesOptions & {
  * referenced component type (e.g. `Pet`); otherwise it falls back to the per-operation alias.
  */
 export function resolveResponseTypeName({ node, response, resolver, operationTypes = true }: ResolveResponseTypeNameOptions): string {
-  const schema = response.content?.[0]?.schema
-  if (!operationTypes && schema) {
-    const refName = ast.resolveRefName(schema)
+  if (!operationTypes) {
+    const refName = resolveInlinableRefName(response.content?.[0])
     if (refName) {
       return resolver.resolveTypeName(refName)
     }
@@ -194,17 +208,19 @@ export type ResolveRequestTypeNameOptions = OperationTypesOptions & {
 /**
  * Resolves the request body type name, or `null` when the operation has no body.
  *
- * With `operationTypes: false`, a body backed by a single `$ref` resolves to the referenced
- * component type (e.g. `Pet`); otherwise it falls back to the `XxxData` alias.
+ * With `operationTypes: false`, a body with a single content type backed by a single `$ref`
+ * resolves to the referenced component type (e.g. `Pet`); otherwise it falls back to the
+ * `XxxData` alias. Multiple content types keep the alias because the body is a union of
+ * per-content-type variants, so no single base type exists.
  */
 export function resolveRequestTypeName({ node, resolver, operationTypes = true }: ResolveRequestTypeNameOptions): string | null {
-  const schema = node.requestBody?.content?.[0]?.schema
-  if (!schema) {
+  const contents = node.requestBody?.content ?? []
+  if (!contents[0]?.schema) {
     return null
   }
 
-  if (!operationTypes) {
-    const refName = ast.resolveRefName(schema)
+  if (!operationTypes && contents.length === 1) {
+    const refName = resolveInlinableRefName(contents[0])
     if (refName) {
       return resolver.resolveTypeName(refName)
     }
@@ -288,9 +304,9 @@ export function resolveOperationTypeImports(
 
   const requestImport: OperationTypeImport | null = node.requestBody?.content?.[0]?.schema
     ? (() => {
-        const schema = node.requestBody!.content![0]!.schema!
-        if (operationTypes === false) {
-          const refName = ast.resolveRefName(schema)
+        const contents = node.requestBody!.content!
+        if (operationTypes === false && contents.length === 1) {
+          const refName = resolveInlinableRefName(contents[0])
           if (refName) {
             return { name: resolver.resolveTypeName(refName), schemaName: refName }
           }
@@ -306,9 +322,8 @@ export function resolveOperationTypeImports(
       ? []
       : (options.responseStatusNames === 'error' ? node.responses.filter((response) => isErrorStatusCode(response.statusCode)) : node.responses).map(
           (response) => {
-            const schema = response.content?.[0]?.schema
-            if (operationTypes === false && schema) {
-              const refName = ast.resolveRefName(schema)
+            if (operationTypes === false) {
+              const refName = resolveInlinableRefName(response.content?.[0])
               if (refName) {
                 return { name: resolver.resolveTypeName(refName), schemaName: refName }
               }

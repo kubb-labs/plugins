@@ -1,3 +1,4 @@
+import { resolveInlinableRefName } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -184,7 +185,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
         if (!entry.schema) return null
         // With `operationTypes: false`, a `$ref`-backed body references the base component
         // (e.g. `Pet`) directly, so the per-operation `XxxData` alias is not emitted.
-        if (!operationTypes && ast.resolveRefName(entry.schema)) {
+        if (!operationTypes && resolveInlinableRefName(entry)) {
           return null
         }
         return renderSchemaType({
@@ -240,7 +241,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       const schema = res.content?.[0]?.schema ?? null
       // With `operationTypes: false`, a `$ref`-backed response references the base component
       // (e.g. `Pet`) directly, so the per-operation `XxxStatus<code>` alias is not emitted.
-      if (!operationTypes && schema && ast.resolveRefName(schema)) {
+      if (!operationTypes && resolveInlinableRefName(res.content?.[0])) {
         return null
       }
 

@@ -24,18 +24,11 @@ export type UpdatePetQueryRequestSource = string | undefined;
 /**
  * @type object
 */
-export type UpdatePetStatus200 = Pet;
-
-/**
- * @type object
-*/
-export type UpdatePetData = PetUpdate;
-
-/**
- * @type object
-*/
 export type UpdatePetRequestConfig = {
-    data?: UpdatePetData;
+    /**
+     * @type object | undefined
+    */
+    data?: PetUpdate;
     /**
      * @type object
     */
@@ -60,10 +53,13 @@ export type UpdatePetRequestConfig = {
  * @type object
 */
 export type UpdatePetResponses = {
-    "200": UpdatePetStatus200;
+    /**
+     * @type object
+    */
+    "200": Pet;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type UpdatePetResponse = UpdatePetStatus200;
+export type UpdatePetResponse = Pet;

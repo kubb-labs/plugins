@@ -4,7 +4,7 @@ import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
@@ -119,7 +119,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
       const typeImportsByFile = new Map<string, Set<string>>()
 
       ops.forEach((op) => {
-        const imports = resolveOperationTypeImports(op.node, tsResolver, { order: 'body-response-first', operationTypes: tsPluginOptions?.operationTypes })
+        const imports = resolveOperationTypeImports(op.node, tsResolver, {
+          order: 'body-response-first',
+          operationTypes: tsPluginOptions?.operationTypes ?? defaultOperationTypes,
+        })
         imports.forEach((imp) => {
           const filePath = imp.schemaName ? resolveSchemaFilePath(imp.schemaName) : op.typeFile.path
           const names = typeImportsByFile.get(filePath) ?? new Set<string>()

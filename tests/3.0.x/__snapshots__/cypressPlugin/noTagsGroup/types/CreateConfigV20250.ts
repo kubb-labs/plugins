@@ -9,18 +9,11 @@ import type { ConfigCreate } from "./ConfigCreate.ts";
 /**
  * @type object
 */
-export type CreateConfigV20250Status201 = Config;
-
-/**
- * @type object
-*/
-export type CreateConfigV20250Data = ConfigCreate;
-
-/**
- * @type object
-*/
 export type CreateConfigV20250RequestConfig = {
-    data?: CreateConfigV20250Data;
+    /**
+     * @type object | undefined
+    */
+    data?: ConfigCreate;
     pathParams?: never;
     queryParams?: never;
     headerParams?: never;
@@ -34,10 +27,13 @@ export type CreateConfigV20250RequestConfig = {
  * @type object
 */
 export type CreateConfigV20250Responses = {
-    "201": CreateConfigV20250Status201;
+    /**
+     * @type object
+    */
+    "201": Config;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type CreateConfigV20250Response = CreateConfigV20250Status201;
+export type CreateConfigV20250Response = Config;

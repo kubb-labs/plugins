@@ -49,7 +49,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
   options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
-  resolver: resolverTs,
+  resolver: inlineOperationResolver(resolverTs, false),
 })
 
 // Shared operation nodes

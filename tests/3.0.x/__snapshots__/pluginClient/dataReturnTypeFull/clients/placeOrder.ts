@@ -4,7 +4,8 @@
 */
 
 import client from "@kubb/plugin-client/clients/axios";
-import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import type { Order } from "../types/Order.ts";
+import type { PlaceOrderData, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getPlaceOrderUrl() {
@@ -25,7 +26,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
   const requestData = data
 
 
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res
 }

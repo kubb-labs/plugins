@@ -3,7 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200 } from "../types/UpdatePet.ts";
+import type { Pet } from "../types/Pet.ts";
+import type { PetUpdate } from "../types/PetUpdate.ts";
+import type { UpdatePetResponse } from "../types/UpdatePet.ts";
 import { createPet } from "./createPet.ts";
 import { createPetUpdate } from "./createPetUpdate.ts";
 import { faker } from "@faker-js/faker";
@@ -23,11 +25,11 @@ export function createUpdatePetQueryRequestSource(data?: string): string {
 /**
  * @description Success
  */
-export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+export function createUpdatePetStatus200(data?: Partial<Pet>): Pet {
   return createPet(data)
 }
 
-export function createUpdatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
+export function createUpdatePetData(data?: Partial<PetUpdate>): PetUpdate {
   return createPetUpdate(data)
 }
 

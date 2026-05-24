@@ -1,5 +1,6 @@
 import client from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetResponse } from "../types/UpdatePet.ts";
+import type { PetUpdate } from "../types/PetUpdate.ts";
+import type { UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetResponse } from "../types/UpdatePet.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
 import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
@@ -7,7 +8,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from "@modelco
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePetHandler({ petId, data, params }: { petId: UpdatePetPathPetId; data: UpdatePetData; params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+export async function updatePetHandler({ petId, data, params }: { petId: UpdatePetPathPetId; data: PetUpdate; params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
 
 
   const pet_id = petId
@@ -19,7 +20,7 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
   const requestData = data
 
 
-  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
+  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, PetUpdate>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
 
   return {
               content: [

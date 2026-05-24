@@ -4,6 +4,13 @@ type OptionalType = PluginTs['resolvedOptions']['optionalType']
 type EnumType = PluginTs['resolvedOptions']['enumType']
 
 /**
+ * Default for the `operationTypes` option. `false` references base schema types directly
+ * (e.g. `Pet`) instead of the per-operation `XxxData` / `XxxStatus<code>` alias layer.
+ * Consumer plugins import this to resolve the value when the user leaves it unset.
+ */
+export const defaultOperationTypes = false
+
+/**
  * `optionalType` values that cause a property's type to include `| undefined`.
  */
 export const OPTIONAL_ADDS_UNDEFINED = new Set<OptionalType>(['undefined', 'questionTokenAndUndefined'] as const)

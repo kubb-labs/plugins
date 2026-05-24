@@ -5,12 +5,13 @@
 
 import client from "@kubb/plugin-client/clients/axios";
 import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData } from "../types/CreateUsersWithListInput.ts";
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
-import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
+import type { GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
 import type { LogoutUserResponse } from "../types/LogoutUser.ts";
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from "../types/UpdateUser.ts";
+import type { User } from "../types/User.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { mergeConfig } from "@kubb/plugin-client/clients/axios";
 
@@ -41,7 +42,7 @@ export class User {
   async createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ ...requestConfig, method: "POST", url: `/user/createWithList`, data: requestData })
+    const res = await request<User, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ ...requestConfig, method: "POST", url: `/user/createWithList`, data: requestData })
     return res.data
   }
 
@@ -71,7 +72,7 @@ export class User {
    */
   async getUserByName(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/user/${username}` })
+    const res = await request<User, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/user/${username}` })
     return res.data
   }
 

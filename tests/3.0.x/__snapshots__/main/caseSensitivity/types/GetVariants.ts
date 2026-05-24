@@ -8,11 +8,6 @@ import type { Variant } from "./Variant.ts";
 /**
  * @type object
 */
-export type GetVariantsStatus200 = Variant;
-
-/**
- * @type object
-*/
 export type GetVariantsRequestConfig = {
     data?: never;
     pathParams?: never;
@@ -28,10 +23,13 @@ export type GetVariantsRequestConfig = {
  * @type object
 */
 export type GetVariantsResponses = {
-    "200": GetVariantsStatus200;
+    /**
+     * @type object
+    */
+    "200": Variant;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type GetVariantsResponse = GetVariantsStatus200;
+export type GetVariantsResponse = Variant;

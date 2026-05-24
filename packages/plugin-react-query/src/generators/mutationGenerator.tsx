@@ -3,7 +3,7 @@ import { groupOperationTypeImports, resolveOperationTypeImports } from '@interna
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { difference } from 'remeda'
@@ -61,7 +61,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const typeImports = resolveOperationTypeImports(node, tsResolver, {
       paramsCasing,
       order: 'body-response-first',
-      operationTypes: pluginTs.options?.operationTypes,
+      operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
     })
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null

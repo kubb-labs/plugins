@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdatePetPathPetId, UpdatePetData, UpdatePetResponse } from './UpdatePet'
+import type { UpdatePetPathPetId, UpdatePetQueryStatus, UpdatePetData, UpdatePetResponse } from './UpdatePet'
 
 export function updatePet(
   { petId, data, params }: { petId: UpdatePetPathPetId; data?: UpdatePetData; params?: { status?: UpdatePetQueryStatus } },

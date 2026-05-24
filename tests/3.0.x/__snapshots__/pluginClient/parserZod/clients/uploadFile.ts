@@ -4,7 +4,8 @@
 */
 
 import client from "@kubb/plugin-client/clients/axios";
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from "../types/UploadFile.ts";
+import type { ApiResponse } from "../types/ApiResponse.ts";
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData } from "../types/UploadFile.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { uploadFileResponseSchema, uploadFileDataSchema } from "../zod/uploadFileSchema.ts";
 
@@ -25,7 +26,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
   const requestData = uploadFileDataSchema.parse(data)
 
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: "POST", url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+  const res = await request<ApiResponse, ResponseErrorConfig<Error>, UploadFileData>({ method: "POST", url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return uploadFileResponseSchema.parse(res.data)
 }

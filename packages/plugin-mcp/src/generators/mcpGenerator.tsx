@@ -1,7 +1,7 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { groupOperationTypeImports, resolveOperationTypeImports } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
@@ -27,7 +27,11 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing, responseStatusNames: 'error' })
+    const typeImports = resolveOperationTypeImports(node, tsResolver, {
+      paramsCasing,
+      responseStatusNames: 'error',
+      operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+    })
 
     const meta = {
       name: resolver.resolveHandlerName(node),
@@ -47,9 +51,18 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     return (
       <File baseName={meta.file.baseName} path={meta.file.path} meta={meta.file.meta}>
-        {meta.fileTs && importedTypeNames.length > 0 && (
-          <File.Import name={Array.from(new Set(importedTypeNames)).sort()} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {meta.fileTs &&
+          groupOperationTypeImports(
+            typeImports,
+            meta.fileTs.path,
+            (schemaName) =>
+              tsResolver.resolveFile(
+                { name: schemaName, extname: '.ts' },
+                { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+              ).path,
+          ).map((typeImport) => (
+            <File.Import key={typeImport.path} name={[...typeImport.names].sort()} root={meta.file.path} path={typeImport.path} isTypeOnly />
+          ))}
         <File.Import name={['CallToolResult', 'ServerNotification', 'ServerRequest']} path={'@modelcontextprotocol/sdk/types'} isTypeOnly />
         <File.Import name={['RequestHandlerExtra']} path={'@modelcontextprotocol/sdk/shared/protocol'} isTypeOnly />
         <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />

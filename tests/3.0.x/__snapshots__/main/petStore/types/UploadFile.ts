@@ -18,11 +18,6 @@ export type UploadFilePathPetId = bigint;
 export type UploadFileQueryAdditionalMetadata = string | undefined;
 
 /**
- * @type object
-*/
-export type UploadFileStatus200 = ApiResponse;
-
-/**
  * @type string | undefined
 */
 export type UploadFileData = Blob | undefined;
@@ -55,10 +50,13 @@ export type UploadFileRequestConfig = {
  * @type object
 */
 export type UploadFileResponses = {
-    "200": UploadFileStatus200;
+    /**
+     * @type object
+    */
+    "200": ApiResponse;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type UploadFileResponse = UploadFileStatus200;
+export type UploadFileResponse = ApiResponse;

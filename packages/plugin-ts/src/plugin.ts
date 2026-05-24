@@ -1,6 +1,7 @@
 import { inlineOperationResolver } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { definePlugin, type Group } from '@kubb/core'
+import { defaultOperationTypes } from './constants.ts'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs } from './types.ts'
@@ -49,7 +50,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     arrayType = 'array',
     syntaxType = 'type',
     paramsCasing,
-    operationTypes = true,
+    operationTypes = defaultOperationTypes,
     printer,
     resolver: userResolver,
     transformer: userTransformer,

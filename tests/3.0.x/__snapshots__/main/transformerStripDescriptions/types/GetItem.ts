@@ -12,12 +12,6 @@ import type { Item } from "./Item.ts";
 export type GetItemPathId = bigint;
 
 /**
- * @example test
- * @type object
-*/
-export type GetItemStatus200 = Item;
-
-/**
  * @type object
 */
 export type GetItemRequestConfig = {
@@ -40,10 +34,15 @@ export type GetItemRequestConfig = {
  * @type object
 */
 export type GetItemResponses = {
-    "200": GetItemStatus200;
+    /**
+     * @description A simple item
+     * @example test
+     * @type object
+    */
+    "200": Item;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type GetItemResponse = GetItemStatus200;
+export type GetItemResponse = Item;

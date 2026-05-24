@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
+import type { Pet } from "../types/Pet.ts";
+import type { UpdatePetData, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
 import type { MaybeRefOrGetter } from "vue";
@@ -18,7 +19,7 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export function useUpdatePet<TContext>(options: {
-  mutation?: MutationObserverOptions<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: MaybeRefOrGetter<UpdatePetData>}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<Pet, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: MaybeRefOrGetter<UpdatePetData>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
 
@@ -26,7 +27,7 @@ export function useUpdatePet<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? updatePetMutationKey()
 
-          return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext>({
+          return useMutation<Pet, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, {data: UpdatePetData}, TContext>({
             mutationFn: async({ data }) => {
               return updatePet(data, config)
             },

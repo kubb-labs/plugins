@@ -3,13 +3,14 @@
  * Do not edit manually.
  */
 
-import type { CreatePetData, CreatePetResponse, CreatePetStatus201 } from './types/CreatePet'
+import type { CreatePetData, CreatePetResponse } from './types/CreatePet'
+import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description Created pet
  */
-export function createCreatePetStatus201(data?: Partial<CreatePetStatus201>): CreatePetStatus201 {
+export function createCreatePetStatus201(data?: Partial<Pet>): Pet {
   return createPet(data)
 }
 

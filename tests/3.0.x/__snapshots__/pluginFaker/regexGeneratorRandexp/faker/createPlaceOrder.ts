@@ -3,14 +3,15 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import type { Order } from "../types/Order.ts";
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import { createOrder } from "./createOrder.ts";
 import { faker } from "@faker-js/faker";
 
 /**
  * @description successful operation
  */
-export function createPlaceOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
+export function createPlaceOrderStatus200(data?: Partial<Order>): Order {
   return createOrder(data)
 }
 

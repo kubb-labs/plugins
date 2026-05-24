@@ -4,7 +4,8 @@
 */
 
 import client from "@kubb/plugin-client/clients/axios";
-import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../../types/GetUserByName.ts";
+import type { GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from "../../types/GetUserByName.ts";
+import type { User } from "../../types/User.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getGetUserByNameUrl(username: GetUserByNamePathUsername) {
@@ -23,7 +24,7 @@ export async function getUserByName(username: GetUserByNamePathUsername, config:
 
 
 
-  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: getGetUserByNameUrl(username).url.toString(), ...requestConfig })
+  const res = await request<User, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: getGetUserByNameUrl(username).url.toString(), ...requestConfig })
 
   return res.data
 }

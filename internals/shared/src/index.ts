@@ -13,6 +13,7 @@ export {
   groupOperationTypeImports,
   inlineOperationResolver,
   resolveErrorNames,
+  resolveInlinableRefName,
   resolveOperationTypeImports,
   resolveOperationTypeNames,
   resolveRequestTypeName,

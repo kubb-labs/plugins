@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { groupOperationTypeImports, resolveOperationTypeImports } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
@@ -32,7 +32,10 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    const typeImports = resolveOperationTypeImports(node, tsResolver, { paramsCasing, operationTypes: pluginTs.options?.operationTypes })
+    const typeImports = resolveOperationTypeImports(node, tsResolver, {
+      paramsCasing,
+      operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+    })
 
     const importedZodNames =
       zodResolver && parser === 'zod'

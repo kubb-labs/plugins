@@ -1,7 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { AddPetData, AddPetStatus200, AddPetStatus422 } from './AddPet'
+import type { HttpValidationError } from './HttpValidationError'
+import type { Pet } from './Pet'
 import { client } from './.kubb/client'
 
 export function getAddPetUrl() {
@@ -13,12 +14,12 @@ export function getAddPetUrl() {
 /**
  * {@link /pet}
  */
-export async function addPet(data?: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export async function addPet(data?: Pet, config: Partial<RequestConfig<Pet>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus422>, AddPetData>({
+  const res = await request<Pet, ResponseErrorConfig<HttpValidationError>, Pet>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
     data: requestData,

@@ -247,7 +247,7 @@ export type Options = {
    * `AddPetData`. Inline, array, and union schemas keep their per-operation alias because
    * no single base type exists.
    *
-   * @default true
+   * @default false
    * @note Consumer plugins (`plugin-client`, `plugin-react-query`, `plugin-vue-query`, ...)
    * read this plugin's resolver through the driver, so they inherit the inlining automatically.
    */

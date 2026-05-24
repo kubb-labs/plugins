@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { Pet } from "../types/Pet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
 import { getPetById } from "../clients/getPetById.ts";
@@ -16,7 +17,7 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getPetByIdQueryKey(petId)
-        return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
+        return queryOptions<Pet, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, Pet, typeof queryKey>({
          enabled: !!(petId),
          queryKey,
          queryFn: async ({ signal }) => {
@@ -31,8 +32,8 @@ export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Parti
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(petId: GetPetByIdPathPetId, options: {
-  query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useGetPetById<TData = Pet, TQueryData = Pet, TQueryKey extends QueryKey = GetPetByIdQueryKey>(petId: GetPetByIdPathPetId, options: {
+  query?: Partial<QueryObserverOptions<Pet, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

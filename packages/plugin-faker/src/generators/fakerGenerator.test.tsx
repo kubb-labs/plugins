@@ -1,3 +1,4 @@
+import { inlineOperationResolver } from '@internals/shared'
 import { aliasConflictingImports, rewriteAliasedImports } from '@internals/utils'
 import type { Config } from '@kubb/core'
 import { ast, FileProcessor, memoryStorage } from '@kubb/core'
@@ -151,7 +152,7 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
 const defaultTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
   options: { output: { path: 'types' }, group: null } as PluginTs['resolvedOptions'],
-  resolver: resolverTs,
+  resolver: inlineOperationResolver(resolverTs, false),
 })
 
 describe('fakerGenerator — schema', () => {

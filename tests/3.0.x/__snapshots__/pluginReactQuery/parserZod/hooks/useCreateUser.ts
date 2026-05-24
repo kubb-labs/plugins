@@ -5,6 +5,7 @@
 
 import client from "@kubb/plugin-client/clients/axios";
 import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
+import type { User } from "../types/User.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
 import { createUserResponseSchema, createUserDataSchema } from "../zod/createUserSchema.ts";

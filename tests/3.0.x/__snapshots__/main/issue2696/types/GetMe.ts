@@ -8,11 +8,6 @@ import type { User } from "./User.ts";
 /**
  * @type object
 */
-export type GetMeStatus200 = User;
-
-/**
- * @type object
-*/
 export type GetMeRequestConfig = {
     data?: never;
     pathParams?: never;
@@ -28,10 +23,13 @@ export type GetMeRequestConfig = {
  * @type object
 */
 export type GetMeResponses = {
-    "200": GetMeStatus200;
+    /**
+     * @type object
+    */
+    "200": User;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type GetMeResponse = GetMeStatus200;
+export type GetMeResponse = User;

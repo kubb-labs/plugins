@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetPetsResponse } from './GetPets'
+import type { GetPetsQueryPageSize, GetPetsHeaderXApiKey, GetPetsResponse } from './GetPets'
 
 export function getPets(
   headers: { xApiKey: GetPetsHeaderXApiKey },

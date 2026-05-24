@@ -4,7 +4,8 @@
 */
 
 import client from "@kubb/plugin-client/clients/axios";
-import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { Pet } from "../types/Pet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
@@ -24,7 +25,7 @@ export async function getPetByIdSuspense(petId: GetPetByIdPathPetId, config: Par
 
 
 
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: `/pet/${petId}`, ...requestConfig })
+  const res = await request<Pet, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: `/pet/${petId}`, ...requestConfig })
 
   return res.data
 }
@@ -32,7 +33,7 @@ export async function getPetByIdSuspense(petId: GetPetByIdPathPetId, config: Par
 export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getPetByIdSuspenseQueryKey(petId)
-        return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
+        return queryOptions<Pet, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, Pet, typeof queryKey>({
          enabled: !!(petId),
          queryKey,
          queryFn: async ({ signal }) => {
@@ -47,8 +48,8 @@ export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, confi
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>(petId: GetPetByIdPathPetId, options: {
-  query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & { client?: QueryClient },
+export function useGetPetByIdSuspense<TData = Pet, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>(petId: GetPetByIdPathPetId, options: {
+  query?: Partial<UseSuspenseQueryOptions<Pet, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

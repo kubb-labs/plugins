@@ -4,7 +4,8 @@
 */
 
 import client from "@kubb/plugin-client/clients/axios";
-import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
+import type { GetOrderByIdPathOrderId, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
+import type { Order } from "../types/Order.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
@@ -24,7 +25,7 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
 
 
 
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
+  const res = await request<Order, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
 
   return res
 }

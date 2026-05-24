@@ -1,6 +1,6 @@
-import { resolveOperationTypeNames } from '@internals/shared'
+import { groupOperationTypeImports, resolveOperationTypeImports } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
-import { pluginTsName } from '@kubb/plugin-ts'
+import { defaultOperationTypes, pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
@@ -25,7 +25,10 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
+    const typeImports = resolveOperationTypeImports(node, tsResolver, {
+      paramsCasing,
+      operationTypes: pluginTs.options?.operationTypes ?? defaultOperationTypes,
+    })
 
     const meta = {
       name: resolver.resolveName(node.operationId),
@@ -51,7 +54,16 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
+        {meta.fileTs &&
+          groupOperationTypeImports(
+            typeImports,
+            meta.fileTs.path,
+            (schemaName) =>
+              tsResolver.resolveFile(
+                { name: schemaName, extname: '.ts' },
+                { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+              ).path,
+          ).map((typeImport) => <File.Import key={typeImport.path} name={typeImport.names} root={meta.file.path} path={typeImport.path} isTypeOnly />)}
         <Request
           name={meta.name}
           node={node}

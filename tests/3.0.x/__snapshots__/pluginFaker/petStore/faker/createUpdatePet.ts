@@ -3,14 +3,15 @@
 * Do not edit manually.
 */
 
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
+import type { Pet } from "../types/Pet.ts";
+import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
 import { createPet } from "./createPet.ts";
 import { faker } from "@faker-js/faker";
 
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+export function createUpdatePetStatus200(data?: Partial<Pet>): Pet {
   return createPet(data)
 }
 
