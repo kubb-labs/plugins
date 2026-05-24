@@ -14,6 +14,16 @@ const tsPlugin = pluginTs({
   enumType: 'asConst',
 })
 
+// The custom `clientStaticGenerator` imports every operation type from a single
+// operation file, so it opts into the per-operation alias layer (`operationTypes: true`)
+// instead of the default inlined `$ref` base types, which live in their own component files.
+const tsPluginWithOperationTypes = pluginTs({
+  output: { path: 'models/ts' },
+  group: { type: 'tag' },
+  enumType: 'asConst',
+  operationTypes: true,
+})
+
 export default defineConfig([
   {
     root: '.',
@@ -73,7 +83,7 @@ export default defineConfig([
     output: { path: './src/gen3', clean: true, format: false, lint: false },
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
-      tsPlugin,
+      tsPluginWithOperationTypes,
       pluginClient({
         output: { path: './tagObject.ts' },
         generators: [clientStaticGenerator],
