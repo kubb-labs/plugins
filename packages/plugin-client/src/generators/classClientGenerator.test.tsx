@@ -88,33 +88,10 @@ const operationNodes: Array<ast.OperationNode> = [
   }),
 ]
 
-const coerceDatesNodes: Array<ast.OperationNode> = [
-  ast.createOperation({
-    operationId: 'getPet',
-    method: 'GET',
-    path: '/pet/{petId}',
-    tags: ['pet'],
-    parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-    responses: [
-      ast.createResponse({
-        statusCode: '200',
-        schema: ast.createSchema({
-          type: 'object',
-          properties: [
-            ast.createProperty({ name: 'createdAt', required: false, schema: ast.createSchema({ type: 'date', representation: 'date', format: 'date-time' }) }),
-          ],
-        }),
-        description: 'successful operation',
-      }),
-    ],
-  }),
-]
-
 describe('classClientGenerator operations', () => {
   const testData = [
     {
       name: 'findByTags',
-      nodes: operationNodes,
       options: {
         group: {
           type: 'tag' as const,
@@ -125,12 +102,7 @@ describe('classClientGenerator operations', () => {
         },
       } as Partial<PluginClient['resolvedOptions']>,
     },
-    {
-      name: 'coerceDatesClass',
-      nodes: coerceDatesNodes,
-      options: { coerceDates: true } as Partial<PluginClient['resolvedOptions']>,
-    },
-  ] as const satisfies Array<{ name: string; nodes: Array<ast.OperationNode>; options: Partial<PluginClient['resolvedOptions']> }>
+  ] as const satisfies Array<{ name: string; options: Partial<PluginClient['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginClient['resolvedOptions'] = {
@@ -143,7 +115,7 @@ describe('classClientGenerator operations', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    await renderGeneratorOperations(classClientGenerator, props.nodes, {
+    await renderGeneratorOperations(classClientGenerator, operationNodes, {
       config: testConfig,
       adapter: createMockedAdapter(),
       driver,

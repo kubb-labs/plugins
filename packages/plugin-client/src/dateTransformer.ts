@@ -71,6 +71,9 @@ function propKey(key: string): string {
  * Returns `true` when a schema tree contains at least one `date`/`time` field
  * with `representation: 'date'`. Refs are followed through `node.schema` with a
  * path-scoped cycle guard so recursive schemas terminate.
+ *
+ * Object `additionalProperties`/`patternProperties` (records) and `union`/`intersection`
+ * members are intentionally not inspected — those shapes are left untouched.
  */
 export function containsDateField(node: ast.SchemaNode | undefined | null, seen: ReadonlySet<string> = new Set()): boolean {
   if (!node) return false
@@ -85,21 +88,13 @@ export function containsDateField(node: ast.SchemaNode | undefined | null, seen:
     }
     case 'object': {
       const objectNode = node as ast.ObjectSchemaNode
-      if ((objectNode.properties ?? []).some((prop) => containsDateField(prop.schema, seen))) return true
-      const additional = objectNode.additionalProperties
-      if (additional && typeof additional === 'object' && containsDateField(additional, seen)) return true
-      return Object.values(objectNode.patternProperties ?? {}).some((schema) => containsDateField(schema, seen))
+      return (objectNode.properties ?? []).some((prop) => containsDateField(prop.schema, seen))
     }
     case 'array':
     case 'tuple': {
       const arrayNode = node as ast.ArraySchemaNode
       if ((arrayNode.items ?? []).some((item) => containsDateField(item, seen))) return true
       return containsDateField(arrayNode.rest, seen)
-    }
-    case 'union':
-    case 'intersection': {
-      const compositeNode = node as { members?: Array<ast.SchemaNode> }
-      return (compositeNode.members ?? []).some((member) => containsDateField(member, seen))
     }
     default:
       return false
@@ -143,13 +138,7 @@ export function buildTransformExpression(acc: string, node: ast.SchemaNode, opti
     case 'object': {
       const objectNode = node as ast.ObjectSchemaNode
       const dateProps = (objectNode.properties ?? []).filter((prop) => containsDateField(prop.schema))
-
       if (dateProps.length === 0) {
-        const additional = objectNode.additionalProperties
-        if (additional && typeof additional === 'object' && containsDateField(additional)) {
-          const mapped = buildTransformExpression('value', additional, options)
-          return `${acc} == null ? ${acc} : Object.fromEntries(Object.entries(${acc}).map(([key, value]: [string, any]) => [key, ${mapped}]))`
-        }
         return acc
       }
 
@@ -162,12 +151,6 @@ export function buildTransformExpression(acc: string, node: ast.SchemaNode, opti
       const itemNode = (arrayNode.items ?? [])[0] ?? arrayNode.rest
       if (!itemNode) return acc
       return `${acc}?.map((item: any) => ${buildTransformExpression('item', itemNode, options)})`
-    }
-    case 'union':
-    case 'intersection': {
-      const compositeNode = node as { members?: Array<ast.SchemaNode> }
-      const dateMember = (compositeNode.members ?? []).find((member) => containsDateField(member))
-      return dateMember ? buildTransformExpression(acc, dateMember, options) : acc
     }
     default:
       return acc

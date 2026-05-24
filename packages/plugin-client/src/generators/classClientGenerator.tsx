@@ -10,7 +10,6 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { ClassClient } from '../components/ClassClient'
 import { WrapperClient } from '../components/WrapperClient'
-import { resolveRequestSerializeName, resolveResponseTransformName, resolveTransformerOutput } from '../dateTransformer.ts'
 import type { PluginClient } from '../types'
 
 type OperationData = {
@@ -20,9 +19,6 @@ type OperationData = {
   zodResolver: ResolverZod | null
   typeFile: ast.FileNode
   zodFile: ast.FileNode | null
-  transformerFile: ast.FileNode | null
-  responseTransformName: string | null
-  requestSerializeName: string | null
 }
 
 type Controller = {
@@ -54,7 +50,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, coerceDates, importPath, sdk } = ctx.options
+    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -78,13 +74,6 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             )
           : null
 
-      const transformerFile = coerceDates
-        ? tsResolver.resolveFile(
-            { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-            { root, output: resolveTransformerOutput(output), group: group ?? undefined },
-          )
-        : null
-
       return {
         node: node,
         name: resolver.resolveName(node.operationId),
@@ -92,9 +81,6 @@ export const classClientGenerator = defineGenerator<PluginClient>({
         zodResolver,
         typeFile,
         zodFile,
-        transformerFile,
-        responseTransformName: coerceDates ? resolveResponseTransformName(node, (n, code) => tsResolver.resolveResponseStatusName(n, code)) : null,
-        requestSerializeName: coerceDates ? resolveRequestSerializeName(node, (n) => tsResolver.resolveDataName(n)) : null,
       }
     }
 
@@ -171,28 +157,8 @@ export const classClientGenerator = defineGenerator<PluginClient>({
       return { zodImportsByFile, zodFilesByPath }
     }
 
-    function collectTransformerImports(ops: Array<OperationData>) {
-      const transformerImportsByFile = new Map<string, Set<string>>()
-      const transformerFilesByPath = new Map<string, ast.FileNode>()
-
-      ops.forEach((op) => {
-        if (!op.transformerFile) return
-        const names = [op.responseTransformName, op.requestSerializeName].filter((n): n is string => Boolean(n))
-        if (names.length === 0) return
-        if (!transformerImportsByFile.has(op.transformerFile.path)) {
-          transformerImportsByFile.set(op.transformerFile.path, new Set())
-        }
-        const imports = transformerImportsByFile.get(op.transformerFile.path)!
-        names.forEach((n) => imports.add(n))
-        transformerFilesByPath.set(op.transformerFile.path, op.transformerFile)
-      })
-
-      return { transformerImportsByFile, transformerFilesByPath }
-    }
-
     const files = controllers.map(({ name, file, operations: ops }) => {
       const { typeImportsByFile, typeFilesByPath } = collectTypeImports(ops)
-      const { transformerImportsByFile, transformerFilesByPath } = collectTransformerImports(ops)
       const { zodImportsByFile, zodFilesByPath } =
         parser === 'zod' ? collectZodImports(ops) : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
       const hasFormData = ops.some((op) => op.node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false)
@@ -237,15 +203,6 @@ export const classClientGenerator = defineGenerator<PluginClient>({
               const importNames = Array.from(importSet).filter(Boolean)
               if (importNames.length === 0) return null
               return <File.Import key={filePath} name={importNames} root={file.path} path={zodFile.path} />
-            })}
-
-          {coerceDates &&
-            Array.from(transformerImportsByFile.entries()).map(([filePath, importSet]) => {
-              const transformerFile = transformerFilesByPath.get(filePath)
-              if (!transformerFile) return null
-              const importNames = Array.from(importSet).filter(Boolean)
-              if (importNames.length === 0) return null
-              return <File.Import key={filePath} name={importNames} root={file.path} path={transformerFile.path} />
             })}
 
           <ClassClient

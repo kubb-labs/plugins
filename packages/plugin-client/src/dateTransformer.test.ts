@@ -86,12 +86,6 @@ describe('buildTransformerBody - response', () => {
     expect(body).toContain('category: transformCategory(_data.category)')
     expect(collectDirectDateRefs(node)).toEqual(['Category'])
   })
-
-  it('handles records via additionalProperties', () => {
-    const node = ast.createSchema({ type: 'object', properties: [], additionalProperties: dateLeaf })
-    const body = buildTransformerBody(node, responseOptions)
-    expect(body).toContain('Object.fromEntries(Object.entries(_data).map(([key, value]: [string, any]) => [key, toDate(value)]))')
-  })
 })
 
 describe('buildTransformerBody - request', () => {

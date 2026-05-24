@@ -9,4 +9,4 @@ When enabled, Kubb generates a transformer per schema and applies it inside ever
 - **Responses** — ISO `string` → `Date` (via `new Date(value)`).
 - **Request bodies** — `Date` → ISO `string` (`date` → `YYYY-MM-DD`, `time` → `HH:mm:ss`, `date-time` → full ISO).
 
-Detection is schema-driven: only fields actually typed as a date are converted, following nested objects, arrays, and `$ref`s. Refs delegate to the referenced schema's transformer, so recursive schemas terminate. The behavior is independent of `parser` — `'client'` and `'zod'` produce the same result (the transformer runs before Zod validation on responses and after it on requests). Works with `function`, `class`, and `staticClass` clients.
+Detection is schema-driven: only fields actually typed as a date are converted, following nested objects, arrays, and `$ref`s. Refs delegate to the referenced schema's transformer, so recursive schemas terminate. The behavior is independent of `parser` — `'client'` and `'zod'` produce the same result (the transformer runs before Zod validation on responses and after it on requests). Applies to the default `clientType: 'function'`.
