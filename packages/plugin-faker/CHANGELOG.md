@@ -1,5 +1,37 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+### Patch Changes
+
+- [#207](https://github.com/kubb-labs/plugins/pull/207) [`c029564`](https://github.com/kubb-labs/plugins/commit/c02956455485aecd496e4e00603ded5c0d0fbfea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix `TS2322` errors in mocks generated for discriminated `oneOf` schemas (reported in kubb-labs/plugins#200).
+
+  Each union variant was annotated with the whole-union indexed-access type (`NonNullable<Union>["prop"]`), which TypeScript collapses to a single union member and rejects the other variants' values. The faker printer now narrows each variant to its own discriminated branch via `Extract<NonNullable<Union>, { "<discriminator>": "<value>" }>`. Undiscriminated unions of objects fall back to `any` instead of leaking the whole-union index (also resolving the related `TS2339` symptom).
+
+- [#209](https://github.com/kubb-labs/plugins/pull/209) [`3e114d1`](https://github.com/kubb-labs/plugins/commit/3e114d1101d58a567da223e2c14cb61d078c67c2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Keep mocks for non-discriminated `oneOf` unions type-safe (kubb-labs/plugins#199).
+
+  Building on the discriminated-union fix, members of a union without a discriminator now index each property via `(NonNullable<Union> & Record<K, unknown>)[K]` instead of falling back to `any`. A key carried by only some branches resolves to `unknown` rather than `any`, so the generated value stays type-checked. Single-object schemas keep their plain `NonNullable<T>[K]` types.
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d)]:
+  - @kubb/plugin-ts@5.0.0-beta.28
+
 ## 5.0.0-beta.27
 
 ### Patch Changes

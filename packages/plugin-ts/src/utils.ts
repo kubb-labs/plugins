@@ -56,8 +56,9 @@ type BuildOperationSchemaOptions = {
  * alias.
  */
 function responseRefSchema(node: ast.OperationNode, res: ast.ResponseNode, resolver: ResolverTs, operationTypes: boolean): ast.SchemaNode {
-  if (!operationTypes && res.schema && ast.resolveRefName(res.schema)) {
-    return ast.createSchema({ ...res.schema })
+  const schema = res.content?.[0]?.schema
+  if (!operationTypes && schema && ast.resolveRefName(schema)) {
+    return ast.createSchema({ ...schema })
   }
 
   return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })
@@ -143,7 +144,7 @@ export function buildResponses(node: ast.OperationNode, { resolver, operationTyp
 }
 
 export function buildResponseUnion(node: ast.OperationNode, { resolver, operationTypes = true }: BuildOperationSchemaOptions): ast.SchemaNode | null {
-  const responsesWithSchema = node.responses.filter((res) => res.schema)
+  const responsesWithSchema = node.responses.filter((res) => res.content?.[0]?.schema)
 
   if (responsesWithSchema.length === 0) {
     return null

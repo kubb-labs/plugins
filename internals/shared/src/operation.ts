@@ -175,8 +175,9 @@ export type ResolveResponseTypeNameOptions = OperationTypesOptions & {
  * referenced component type (e.g. `Pet`); otherwise it falls back to the per-operation alias.
  */
 export function resolveResponseTypeName({ node, response, resolver, operationTypes = true }: ResolveResponseTypeNameOptions): string {
-  if (!operationTypes && response.schema) {
-    const refName = ast.resolveRefName(response.schema)
+  const schema = response.content?.[0]?.schema
+  if (!operationTypes && schema) {
+    const refName = ast.resolveRefName(schema)
     if (refName) {
       return resolver.resolveTypeName(refName)
     }
@@ -305,8 +306,9 @@ export function resolveOperationTypeImports(
       ? []
       : (options.responseStatusNames === 'error' ? node.responses.filter((response) => isErrorStatusCode(response.statusCode)) : node.responses).map(
           (response) => {
-            if (operationTypes === false && response.schema) {
-              const refName = ast.resolveRefName(response.schema)
+            const schema = response.content?.[0]?.schema
+            if (operationTypes === false && schema) {
+              const refName = ast.resolveRefName(schema)
               if (refName) {
                 return { name: resolver.resolveTypeName(refName), schemaName: refName }
               }
