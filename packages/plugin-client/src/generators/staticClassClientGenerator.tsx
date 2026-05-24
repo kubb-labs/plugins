@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { inlineOperationResolver, resolveOperationTypeImports } from '@internals/shared'
+import { resolveOperationTypeImports } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import { defineGenerator } from '@kubb/core'
@@ -45,13 +45,13 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, operationTypes, parser, importPath } = ctx.options
+    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
-    const tsResolver = inlineOperationResolver(driver.getResolver(pluginTsName), operationTypes)
+    const tsResolver = driver.getResolver(pluginTsName)
     const tsPluginOptions = pluginTs.options
     const resolveSchemaFilePath = (schemaName: string) =>
       tsResolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group }).path
@@ -119,7 +119,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
       const typeImportsByFile = new Map<string, Set<string>>()
 
       ops.forEach((op) => {
-        const imports = resolveOperationTypeImports(op.node, tsResolver, { order: 'body-response-first', operationTypes })
+        const imports = resolveOperationTypeImports(op.node, tsResolver, { order: 'body-response-first', operationTypes: tsPluginOptions?.operationTypes })
         imports.forEach((imp) => {
           const filePath = imp.schemaName ? resolveSchemaFilePath(imp.schemaName) : op.typeFile.path
           const names = typeImportsByFile.get(filePath) ?? new Set<string>()

@@ -103,7 +103,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
             clientType: client?.clientType ?? 'function',
             importPath: clientImportPath,
             dataReturnType: client?.dataReturnType ?? 'data',
-            operationTypes: client?.operationTypes ?? true,
             paramsCasing,
           },
           queryKey,

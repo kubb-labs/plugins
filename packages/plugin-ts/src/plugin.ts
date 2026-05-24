@@ -1,3 +1,4 @@
+import { inlineOperationResolver } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { definePlugin, type Group } from '@kubb/core'
 import { typeGenerator } from './generators/typeGenerator.tsx'
@@ -88,7 +89,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           operationTypes,
           printer,
         })
-        ctx.setResolver(userResolver ? { ...resolverTs, ...userResolver } : resolverTs)
+        ctx.setResolver(inlineOperationResolver(userResolver ? { ...resolverTs, ...userResolver } : resolverTs, operationTypes))
         if (userTransformer) {
           ctx.setTransformer(userTransformer)
         }

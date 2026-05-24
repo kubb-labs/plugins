@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { groupOperationTypeImports, inlineOperationResolver, resolveOperationTypeImports } from '@internals/shared'
+import { groupOperationTypeImports, resolveOperationTypeImports } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
@@ -24,7 +24,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
-    const tsResolver = inlineOperationResolver(driver.getResolver(pluginTsName), clientOptions.operationTypes)
+    const tsResolver = driver.getResolver(pluginTsName)
 
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
     const isMutation =
@@ -61,7 +61,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
     const typeImports = resolveOperationTypeImports(node, tsResolver, {
       paramsCasing,
       order: 'body-response-first',
-      operationTypes: clientOptions.operationTypes,
+      operationTypes: pluginTs.options?.operationTypes,
     })
 
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null

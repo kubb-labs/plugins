@@ -248,8 +248,8 @@ export type Options = {
    * no single base type exists.
    *
    * @default true
-   * @note Set the same value on every plugin that references operation types
-   * (`plugin-client`, `plugin-react-query`, `plugin-vue-query`, ...).
+   * @note Consumer plugins (`plugin-client`, `plugin-react-query`, `plugin-vue-query`, ...)
+   * read this plugin's resolver through the driver, so they inherit the inlining automatically.
    */
   operationTypes?: boolean
   /**

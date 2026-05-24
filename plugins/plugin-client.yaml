@@ -76,8 +76,6 @@ options:
 
   - extends: ./_shared/client/data-return-type.yaml
 
-  - extends: ./_shared/core/operation-types.yaml
-
   - name: urlType
     type: "'export' | false"
     required: false

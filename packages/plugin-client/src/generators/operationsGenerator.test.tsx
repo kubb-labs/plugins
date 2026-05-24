@@ -21,7 +21,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
-  operationTypes: true,
   paramsType: 'inline',
   paramsCasing: undefined,
   pathParamsType: 'inline',

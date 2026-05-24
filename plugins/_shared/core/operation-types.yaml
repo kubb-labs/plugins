@@ -9,8 +9,8 @@ description: |
   Reference base schema types directly instead of the per-operation alias layer that `@kubb/plugin-ts` generates.
 
   When `false`, a request body or response backed by a single `$ref` resolves to the referenced component type (for example `Pet`) instead of the `AddPetData` / `AddPetStatus200` alias. Inline, array, and union schemas keep their per-operation alias because no single base type exists.
-important: |
-  Set the same `operationTypes` value on every plugin that references operation types (`@kubb/plugin-ts`, `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`). With `operationTypes: false`, `@kubb/plugin-ts` stops emitting the redundant aliases, so a consumer left at `true` would reference a name that no longer exists.
+tip: |
+  Set this once on `@kubb/plugin-ts`. Consumer plugins (`@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`) read the TypeScript resolver via the plugin driver, so they inherit the inlining automatically — no per-plugin flag to keep in sync.
 examples:
   - name: "true (default)"
     files:

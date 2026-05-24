@@ -1,5 +1,6 @@
 /** biome-ignore-all lint/suspicious/noTemplateCurlyInString: for test case */
 
+import { inlineOperationResolver } from '@internals/shared'
 import type { Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
@@ -23,7 +24,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
-  operationTypes: true,
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
@@ -221,7 +221,6 @@ describe('clientGenerator operation', () => {
       options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const },
     },
     { name: 'operationTypesDefault', node: refResponseNode, options: {} },
-    { name: 'operationTypesFalse', node: refResponseNode, options: { operationTypes: false } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginClient['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {
@@ -246,5 +245,31 @@ describe('clientGenerator operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
+  })
+
+  // `operationTypes: false` lives on plugin-ts: it inlines the resolver and sets the option,
+  // and the client inherits both through the driver.
+  test('operationTypesFalse — inherits inlined $ref types from plugin-ts', async () => {
+    const inlinedTsPlugin = createMockedPlugin<PluginTs>({
+      name: 'plugin-ts',
+      options: { output: { path: '.' }, group: null, operationTypes: false } as PluginTs['resolvedOptions'],
+      resolver: inlineOperationResolver(resolverTs, false),
+    })
+    const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options: defaultOptions, resolver: resolverClient })
+    const driver = createMockedPluginDriver({
+      name: 'operationTypesFalse',
+      plugin: inlinedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+    })
+
+    await renderGeneratorOperation(clientGenerator, refResponseNode, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options: defaultOptions,
+      resolver: resolverClient,
+    })
+
+    await matchFiles(driver.fileManager.files, 'operationTypesFalse')
   })
 })
