@@ -88,8 +88,28 @@ describe('printerZod', () => {
   })
 
   describe('date types', () => {
-    test('date (JS Date)', () => {
-      expect(printer.print(ast.createSchema({ type: 'date', representation: 'date' }))).toBe('z.date()')
+    test('date (JS Date) — output decodes string → Date (date-time default)', () => {
+      expect(printer.print(ast.createSchema({ type: 'date', representation: 'date' }))).toBe('z.iso.datetime().transform((value) => new Date(value))')
+    })
+
+    test('date (JS Date), format date — output decodes string → Date', () => {
+      expect(printer.print(ast.createSchema({ type: 'date', representation: 'date', format: 'date' }))).toBe(
+        'z.iso.date().transform((value) => new Date(value))',
+      )
+    })
+
+    test('date (JS Date) — input encodes Date → ISO string', () => {
+      const p = printerZod({ direction: 'input' })
+      expect(p.print(ast.createSchema({ type: 'date', representation: 'date', format: 'date-time' }))).toBe(
+        'z.date().transform((value) => value.toISOString())',
+      )
+    })
+
+    test('date (JS Date), format date — input encodes Date → YYYY-MM-DD string', () => {
+      const p = printerZod({ direction: 'input' })
+      expect(p.print(ast.createSchema({ type: 'date', representation: 'date', format: 'date' }))).toBe(
+        'z.date().transform((value) => value.toISOString().slice(0, 10))',
+      )
     })
 
     test('date (ISO string)', () => {
