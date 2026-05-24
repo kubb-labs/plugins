@@ -1,5 +1,11 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- [#230](https://github.com/kubb-labs/plugins/pull/230) [`21accf1`](https://github.com/kubb-labs/plugins/commit/21accf11be058a252aded049a5d98e30eb6b4c32) Thanks [@Ericlm](https://github.com/Ericlm)! - Add format info into description of generated fields
+
 ## 5.0.0-beta.29
 
 ### Patch Changes
