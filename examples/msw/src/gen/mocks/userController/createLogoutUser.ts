@@ -4,3 +4,18 @@
  */
 
 import { faker } from '@faker-js/faker'
+
+/**
+ * @description successful operation
+ */
+export function createLogoutUserStatusDefault() {
+  faker.seed([220])
+
+  return undefined
+}
+
+export function createLogoutUserResponse() {
+  faker.seed([220])
+
+  return undefined
+}

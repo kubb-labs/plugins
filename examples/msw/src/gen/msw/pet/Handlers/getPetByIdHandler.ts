@@ -6,9 +6,12 @@
 import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/GetPetById.ts'
 import { http } from 'msw'
 
-export function getPetByIdHandlerResponse200(data?: GetPetByIdResponse) {
+export function getPetByIdHandlerResponse200(data: GetPetByIdResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
@@ -24,14 +27,15 @@ export function getPetByIdHandlerResponse404(data?: GetPetByIdStatus404) {
   })
 }
 
-export function getPetByIdHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
-) {
+export function getPetByIdHandler(data?: GetPetByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
   return http.get(`http://localhost:3000/pet/:petId\\:search`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   })
 }

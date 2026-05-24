@@ -6,6 +6,23 @@
 import type { User } from '../User.js'
 
 /**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Json = User
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Xml = User
+
+export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
+
+/**
+ * @type any
+ */
+export type CreateUsersWithListInputStatusDefault = any
+
+/**
  * @type array | undefined
  */
 export type CreateUsersWithListInputData = User[] | undefined
@@ -31,3 +48,8 @@ export type CreateUsersWithListInputResponses = {
   '200': CreateUsersWithListInputStatus200
   default: CreateUsersWithListInputStatusDefault
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault

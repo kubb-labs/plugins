@@ -4,6 +4,11 @@
  */
 
 /**
+ * @type any
+ */
+export type LogoutUserStatusDefault = any
+
+/**
  * @type object
  */
 export type LogoutUserRequestConfig = {
@@ -23,3 +28,8 @@ export type LogoutUserRequestConfig = {
 export type LogoutUserResponses = {
   default: LogoutUserStatusDefault
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type LogoutUserResponse = LogoutUserStatusDefault

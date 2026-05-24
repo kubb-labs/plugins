@@ -4,5 +4,16 @@
  */
 
 import * as z from 'zod'
+import { petSchema } from './petSchema.js'
 
 export const findPetsByStatusPathStepIdSchema = z.string()
+
+export const findPetsByStatusStatus200Schema = z
+  .array(petSchema)
+  .min(1)
+  .max(3)
+  .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
+
+export const findPetsByStatusStatus400Schema = z.any()
+
+export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])

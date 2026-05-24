@@ -16,3 +16,14 @@ export function createUpdatePetWithFormQueryName(data?: string): string {
 export function createUpdatePetWithFormQueryStatus(data?: string): string {
   return data ?? faker.string.alpha()
 }
+
+/**
+ * @description Invalid input
+ */
+export function createUpdatePetWithFormStatus405() {
+  return undefined
+}
+
+export function createUpdatePetWithFormResponse() {
+  return undefined
+}

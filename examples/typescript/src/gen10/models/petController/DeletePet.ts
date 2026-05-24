@@ -15,6 +15,16 @@ export type DeletePetHeaderApiKey = string | undefined
 export type DeletePetPathPetId = bigint
 
 /**
+ * @type array
+ */
+export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
+
+/**
+ * @type any
+ */
+export type DeletePetStatus400 = any
+
+/**
  * @type object
  */
 export type DeletePetRequestConfig = {
@@ -45,3 +55,8 @@ export type DeletePetResponses = {
   '200': DeletePetStatus200
   '400': DeletePetStatus400
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400

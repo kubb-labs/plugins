@@ -3,11 +3,35 @@
  * Do not edit manually.
  */
 
+import type { User } from './User.js'
+
 /**
  * @description The name that needs to be fetched. Use user1 for testing.
  * @type string
  */
 export type GetUserByNamePathUsername = string
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Json = User
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Xml = User
+
+export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
+
+/**
+ * @type any
+ */
+export type GetUserByNameStatus400 = any
+
+/**
+ * @type any
+ */
+export type GetUserByNameStatus404 = any
 
 /**
  * @type object
@@ -36,3 +60,8 @@ export type GetUserByNameResponses = {
   '400': GetUserByNameStatus400
   '404': GetUserByNameStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetUserByNameResponse = GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404

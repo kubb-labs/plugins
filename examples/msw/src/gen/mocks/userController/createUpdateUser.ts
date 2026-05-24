@@ -14,10 +14,25 @@ export function createUpdateUserPathUsername(data?: string): string {
 }
 
 /**
+ * @description successful operation
+ */
+export function createUpdateUserStatusDefault() {
+  faker.seed([220])
+
+  return undefined
+}
+
+/**
  * @description Update an existent user in the store
  */
 export function createUpdateUserData(data?: Partial<UpdateUserData>): UpdateUserData {
   faker.seed([220])
 
   return createUser(data)
+}
+
+export function createUpdateUserResponse() {
+  faker.seed([220])
+
+  return undefined
 }

@@ -3,4 +3,19 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../models/GetInventory.ts'
+
+/**
+ * @description successful operation
+ */
+export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200> {
+  const defaultFakeData = {}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<GetInventoryStatus200>
+}
+
+export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
+  return createGetInventoryStatus200(data)
+}

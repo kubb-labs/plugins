@@ -3,4 +3,23 @@
  * Do not edit manually.
  */
 
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../../models/GetInventory.ts'
 import { faker } from '@faker-js/faker'
+
+/**
+ * @description successful operation
+ */
+export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200> {
+  faker.seed([220])
+  const defaultFakeData = {}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<GetInventoryStatus200>
+}
+
+export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
+  faker.seed([220])
+
+  return createGetInventoryStatus200(data)
+}

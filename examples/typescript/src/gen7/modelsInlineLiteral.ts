@@ -274,9 +274,6 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
   /**
    * @type array
@@ -375,6 +372,27 @@ export type PetNotFound = {
  */
 export type UserArray = Array<User>
 
+export type UpdatePetStatus200Json = Pet
+
+export type UpdatePetStatus200Xml = Pet
+
+export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
+
+/**
+ * @type any
+ */
+export type UpdatePetStatus400 = any
+
+/**
+ * @type any
+ */
+export type UpdatePetStatus404 = any
+
+/**
+ * @type any
+ */
+export type UpdatePetStatus405 = any
+
 /**
  * @description Update an existent pet in the store
  */
@@ -414,6 +432,31 @@ export type UpdatePetResponses = {
   '400': UpdatePetStatus400
   '404': UpdatePetStatus404
   '405': UpdatePetStatus405
+}
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405
+
+export type AddPetStatus200Json = Pet
+
+export type AddPetStatus200Xml = Pet
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
+
+/**
+ * @type object
+ */
+export type AddPetStatus405 = {
+  /**
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
 }
 
 /**
@@ -457,11 +500,33 @@ export type AddPetResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type AddPetResponse = AddPetStatus200 | AddPetStatus405
+
+/**
  * @description Status values that need to be considered for filter
  * @default "available"
  * @type string | undefined
  */
 export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Xml = Array<Pet>
+
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
+
+/**
+ * @type any
+ */
+export type FindPetsByStatusStatus400 = any
 
 /**
  * @type object
@@ -491,6 +556,11 @@ export type FindPetsByStatusResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400
+
+/**
  * @description Tags to filter by
  * @type array | undefined
  */
@@ -507,6 +577,23 @@ export type FindPetsByTagsQueryPage = string | undefined
  * @type string | undefined
  */
 export type FindPetsByTagsQueryPageSize = string | undefined
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Array<Pet>
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
+
+/**
+ * @type any
+ */
+export type FindPetsByTagsStatus400 = any
 
 /**
  * @type object
@@ -538,10 +625,31 @@ export type FindPetsByTagsResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsStatus400
+
+/**
  * @description ID of pet to return
  * @type integer
  */
 export type GetPetByIdPathPetId = bigint
+
+export type GetPetByIdStatus200Json = Pet
+
+export type GetPetByIdStatus200Xml = Pet
+
+export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
+
+/**
+ * @type any
+ */
+export type GetPetByIdStatus400 = any
+
+/**
+ * @type any
+ */
+export type GetPetByIdStatus404 = any
 
 /**
  * @type object
@@ -572,6 +680,11 @@ export type GetPetByIdResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
+
+/**
  * @description ID of pet that needs to be updated
  * @type integer
  */
@@ -588,6 +701,11 @@ export type UpdatePetWithFormQueryName = string | undefined
  * @type string | undefined
  */
 export type UpdatePetWithFormQueryStatus = string | undefined
+
+/**
+ * @type any
+ */
+export type UpdatePetWithFormStatus405 = any
 
 /**
  * @type object
@@ -622,6 +740,11 @@ export type UpdatePetWithFormResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type UpdatePetWithFormResponse = UpdatePetWithFormStatus405
+
+/**
  * @type string | undefined
  */
 export type DeletePetHeaderApiKey = string | undefined
@@ -631,6 +754,16 @@ export type DeletePetHeaderApiKey = string | undefined
  * @type integer
  */
 export type DeletePetPathPetId = bigint
+
+/**
+ * @type array
+ */
+export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
+
+/**
+ * @type any
+ */
+export type DeletePetStatus400 = any
 
 /**
  * @type object
@@ -665,6 +798,11 @@ export type DeletePetResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
+
+/**
  * @description ID of pet to update
  * @type integer
  */
@@ -675,6 +813,11 @@ export type UploadFilePathPetId = bigint
  * @type string | undefined
  */
 export type UploadFileQueryAdditionalMetadata = string | undefined
+
+/**
+ * @type object
+ */
+export type UploadFileStatus200 = ApiResponse
 
 /**
  * @type string | undefined
@@ -713,6 +856,18 @@ export type UploadFileResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type UploadFileResponse = UploadFileStatus200
+
+/**
+ * @type object
+ */
+export type GetInventoryStatus200 = {
+  [key: string]: number
+}
+
+/**
  * @type object
  */
 export type GetInventoryRequestConfig = {
@@ -732,6 +887,21 @@ export type GetInventoryRequestConfig = {
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetInventoryResponse = GetInventoryStatus200
+
+/**
+ * @type object
+ */
+export type PlaceOrderStatus200 = Order
+
+/**
+ * @type any
+ */
+export type PlaceOrderStatus405 = any
 
 /**
  * @description Order description
@@ -774,6 +944,21 @@ export type PlaceOrderResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
+
+/**
+ * @type object
+ */
+export type PlaceOrderPatchStatus200 = Order
+
+/**
+ * @type any
+ */
+export type PlaceOrderPatchStatus405 = any
+
+/**
  * @type object | undefined
  */
 export type PlaceOrderPatchJsonData = Order | undefined
@@ -813,10 +998,37 @@ export type PlaceOrderPatchResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
+
+/**
  * @description ID of order that needs to be fetched
  * @type integer
  */
 export type GetOrderByIdPathOrderId = bigint
+
+/**
+ * @type object
+ */
+export type GetOrderByIdStatus200Json = Order
+
+/**
+ * @type object
+ */
+export type GetOrderByIdStatus200Xml = Order
+
+export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
+
+/**
+ * @type any
+ */
+export type GetOrderByIdStatus400 = any
+
+/**
+ * @type any
+ */
+export type GetOrderByIdStatus404 = any
 
 /**
  * @type object
@@ -847,10 +1059,25 @@ export type GetOrderByIdResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404
+
+/**
  * @description ID of the order that needs to be deleted
  * @type integer
  */
 export type DeleteOrderPathOrderId = bigint
+
+/**
+ * @type any
+ */
+export type DeleteOrderStatus400 = any
+
+/**
+ * @type any
+ */
+export type DeleteOrderStatus404 = any
 
 /**
  * @type object
@@ -878,6 +1105,23 @@ export type DeleteOrderResponses = {
   '400': DeleteOrderStatus400
   '404': DeleteOrderStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
+
+/**
+ * @type object
+ */
+export type CreateUserStatusDefaultJson = User
+
+/**
+ * @type object
+ */
+export type CreateUserStatusDefaultXml = User
+
+export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
 
 /**
  * @description Created user object
@@ -921,6 +1165,28 @@ export type CreateUserResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type CreateUserResponse = CreateUserStatusDefault
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Json = User
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Xml = User
+
+export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
+
+/**
+ * @type any
+ */
+export type CreateUsersWithListInputStatusDefault = any
+
+/**
  * @type array | undefined
  */
 export type CreateUsersWithListInputData = Array<User> | undefined
@@ -948,6 +1214,11 @@ export type CreateUsersWithListInputResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault
+
+/**
  * @description The user name for login
  * @type string | undefined
  */
@@ -958,6 +1229,23 @@ export type LoginUserQueryUsername = string | undefined
  * @type string | undefined
  */
 export type LoginUserQueryPassword = string | undefined
+
+/**
+ * @type string
+ */
+export type LoginUserStatus200Xml = string
+
+/**
+ * @type string
+ */
+export type LoginUserStatus200Json = string
+
+export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
+
+/**
+ * @type any
+ */
+export type LoginUserStatus400 = any
 
 /**
  * @type object
@@ -988,6 +1276,16 @@ export type LoginUserResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type LoginUserResponse = LoginUserStatus200 | LoginUserStatus400
+
+/**
+ * @type any
+ */
+export type LogoutUserStatusDefault = any
+
+/**
  * @type object
  */
 export type LogoutUserRequestConfig = {
@@ -1009,10 +1307,37 @@ export type LogoutUserResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type LogoutUserResponse = LogoutUserStatusDefault
+
+/**
  * @description The name that needs to be fetched. Use user1 for testing.
  * @type string
  */
 export type GetUserByNamePathUsername = string
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Json = User
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Xml = User
+
+export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
+
+/**
+ * @type any
+ */
+export type GetUserByNameStatus400 = any
+
+/**
+ * @type any
+ */
+export type GetUserByNameStatus404 = any
 
 /**
  * @type object
@@ -1043,10 +1368,20 @@ export type GetUserByNameResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type GetUserByNameResponse = GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404
+
+/**
  * @description name that need to be deleted
  * @type string
  */
 export type UpdateUserPathUsername = string
+
+/**
+ * @type any
+ */
+export type UpdateUserStatusDefault = any
 
 /**
  * @description Update an existent user in the store
@@ -1095,10 +1430,25 @@ export type UpdateUserResponses = {
 }
 
 /**
+ * @description Union of all possible responses
+ */
+export type UpdateUserResponse = UpdateUserStatusDefault
+
+/**
  * @description The name that needs to be deleted
  * @type string
  */
 export type DeleteUserPathUsername = string | null
+
+/**
+ * @type any
+ */
+export type DeleteUserStatus400 = any
+
+/**
+ * @type any
+ */
+export type DeleteUserStatus404 = any
 
 /**
  * @type object
@@ -1126,3 +1476,8 @@ export type DeleteUserResponses = {
   '400': DeleteUserStatus400
   '404': DeleteUserStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteUserResponse = DeleteUserStatus400 | DeleteUserStatus404

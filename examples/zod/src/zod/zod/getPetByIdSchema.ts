@@ -4,7 +4,24 @@
  */
 
 import { z } from '../../zod.ts'
+import { petSchema } from './petSchema.ts'
 
 export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
 
 export type GetPetByIdPathPetIdSchema = z.infer<typeof getPetByIdPathPetIdSchema>
+
+export const getPetByIdStatus200Schema = z.lazy(() => petSchema)
+
+export type GetPetByIdStatus200Schema = z.infer<typeof getPetByIdStatus200Schema>
+
+export const getPetByIdStatus400Schema = z.any()
+
+export type GetPetByIdStatus400Schema = z.infer<typeof getPetByIdStatus400Schema>
+
+export const getPetByIdStatus404Schema = z.any()
+
+export type GetPetByIdStatus404Schema = z.infer<typeof getPetByIdStatus404Schema>
+
+export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
+
+export type GetPetByIdResponseSchema = z.infer<typeof getPetByIdResponseSchema>

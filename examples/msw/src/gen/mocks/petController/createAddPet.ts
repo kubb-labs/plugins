@@ -3,9 +3,31 @@
  * Do not edit manually.
  */
 
-import type { AddPetData } from '../../models/AddPet.ts'
+import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
 import { createAddPetRequest } from '../createAddPetRequest.ts'
+import { createPet } from '../createPet.ts'
 import { faker } from '@faker-js/faker'
+
+/**
+ * @description Successful operation
+ */
+export function createAddPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus200 {
+  faker.seed([220])
+
+  return createPet(data)
+}
+
+/**
+ * @description Pet not found
+ */
+export function createAddPetStatus405(data?: Partial<AddPetStatus405>): Required<AddPetStatus405> {
+  faker.seed([220])
+  const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Required<AddPetStatus405>
+}
 
 /**
  * @description Create a new pet in the store
@@ -14,4 +36,10 @@ export function createAddPetData(data?: Partial<AddPetData>): AddPetData {
   faker.seed([220])
 
   return createAddPetRequest(data)
+}
+
+export function createAddPetResponse(_data?: AddPetResponse): AddPetResponse {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createAddPetStatus200(), createAddPetStatus405()])
 }

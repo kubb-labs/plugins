@@ -3,6 +3,13 @@
  * Do not edit manually.
  */
 
+import * as z from 'zod'
 import { orderSchema } from './orderSchema.js'
+
+export const placeOrderStatus200Schema = orderSchema
+
+export const placeOrderStatus405Schema = z.any()
+
+export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
 export const placeOrderDataSchema = orderSchema.optional()

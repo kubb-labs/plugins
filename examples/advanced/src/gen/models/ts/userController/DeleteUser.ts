@@ -5,6 +5,16 @@
 export type DeleteUserPathUsername = string
 
 /**
+ * @type any
+ */
+export type DeleteUserStatus400 = any
+
+/**
+ * @type any
+ */
+export type DeleteUserStatus404 = any
+
+/**
  * @type object
  */
 export type DeleteUserRequestConfig = {
@@ -30,3 +40,8 @@ export type DeleteUserResponses = {
   '400': DeleteUserStatus400
   '404': DeleteUserStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteUserResponse = DeleteUserStatus400 | DeleteUserStatus404

@@ -1,23 +1,83 @@
-export type { AddFilesData, AddFilesFormData, AddFilesJsonData, AddFilesRequestConfig, AddFilesResponses } from './AddFiles.ts'
-export type { AddPetData, AddPetFormUrlEncodedData, AddPetJsonData, AddPetRequestConfig, AddPetResponses, AddPetXmlData } from './AddPet.ts'
-export type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetRequestConfig, DeletePetResponses } from './DeletePet.ts'
-export type { FindPetsByStatusPathStepId, FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from './FindPetsByStatus.ts'
+export type {
+  AddFilesData,
+  AddFilesFormData,
+  AddFilesJsonData,
+  AddFilesRequestConfig,
+  AddFilesResponse,
+  AddFilesResponses,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from './AddFiles.ts'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus405,
+  AddPetStatusDefault,
+  AddPetStatusDefaultJson,
+  AddPetStatusDefaultXml,
+  AddPetXmlData,
+} from './AddPet.ts'
+export type {
+  DeletePetHeaderApiKey,
+  DeletePetPathPetId,
+  DeletePetRequestConfig,
+  DeletePetResponse,
+  DeletePetResponses,
+  DeletePetStatus400,
+} from './DeletePet.ts'
+export type {
+  FindPetsByStatusPathStepId,
+  FindPetsByStatusRequestConfig,
+  FindPetsByStatusResponse,
+  FindPetsByStatusResponses,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+} from './FindPetsByStatus.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
   FindPetsByTagsRequestConfig,
+  FindPetsByTagsResponse,
   FindPetsByTagsResponses,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
+  FindPetsByTagsStatus400,
   FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.ts'
-export type { GetPetByIdPathPetId, GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById.ts'
+export type {
+  GetPetByIdPathPetId,
+  GetPetByIdRequestConfig,
+  GetPetByIdResponse,
+  GetPetByIdResponses,
+  GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+} from './GetPetById.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
   UpdatePetRequestConfig,
+  UpdatePetResponse,
   UpdatePetResponses,
+  UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
+  UpdatePetStatus202,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
   UpdatePetXmlData,
 } from './UpdatePet.ts'
 export type {
@@ -25,7 +85,17 @@ export type {
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
+  UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.ts'
-export type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileRequestConfig, UploadFileResponses } from './UploadFile.ts'
+export type {
+  UploadFileData,
+  UploadFilePathPetId,
+  UploadFileQueryAdditionalMetadata,
+  UploadFileRequestConfig,
+  UploadFileResponse,
+  UploadFileResponses,
+  UploadFileStatus200,
+} from './UploadFile.ts'
 export { findPetsByTagsXEXAMPLE } from './FindPetsByTags.ts'

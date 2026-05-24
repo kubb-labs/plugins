@@ -3,8 +3,24 @@
  * Do not edit manually.
  */
 
-import type { z } from '../../zod.ts'
+import { z } from '../../zod.ts'
 import { addPetRequestSchema } from './addPetRequestSchema.ts'
+import { petSchema } from './petSchema.ts'
+
+export const addPetStatus200Schema = z.lazy(() => petSchema)
+
+export type AddPetStatus200Schema = z.infer<typeof addPetStatus200Schema>
+
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
+})
+
+export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
+
+export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+
+export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
 
 export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
 

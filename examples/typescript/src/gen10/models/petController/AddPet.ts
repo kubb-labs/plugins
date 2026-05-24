@@ -6,6 +6,26 @@
 import type { AddPetRequest } from '../AddPetRequest.ts'
 import type { Pet } from '../Pet.ts'
 
+export type AddPetStatus200Json = Pet
+
+export type AddPetStatus200Xml = Pet
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
+
+/**
+ * @type object
+ */
+export type AddPetStatus405 = {
+  /**
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
+
 /**
  * @description Create a new pet in the store
  * @type object
@@ -45,3 +65,8 @@ export type AddPetResponses = {
   '200': AddPetStatus200
   '405': AddPetStatus405
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type AddPetResponse = AddPetStatus200 | AddPetStatus405

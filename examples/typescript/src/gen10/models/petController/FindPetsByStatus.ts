@@ -3,12 +3,31 @@
  * Do not edit manually.
  */
 
+import type { Pet } from '../Pet.ts'
+
 /**
  * @description Status values that need to be considered for filter
  * @default "available"
  * @type string | undefined
  */
 export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Xml = Array<Pet>
+
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
+
+/**
+ * @type any
+ */
+export type FindPetsByStatusStatus400 = any
 
 /**
  * @type object
@@ -36,3 +55,8 @@ export type FindPetsByStatusResponses = {
   '200': FindPetsByStatusStatus200
   '400': FindPetsByStatusStatus400
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsByStatusStatus400

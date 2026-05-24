@@ -5,4 +5,8 @@
 
 import { itemSchema } from './itemSchema.ts'
 
+export const createItemStatus200Schema = itemSchema
+
+export const createItemResponseSchema = createItemStatus200Schema
+
 export const createItemDataSchema = itemSchema.describe('Item to create')

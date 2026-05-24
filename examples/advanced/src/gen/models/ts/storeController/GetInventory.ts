@@ -1,6 +1,13 @@
 /**
  * @type object
  */
+export type GetInventoryStatus200 = {
+  [key: string]: number
+}
+
+/**
+ * @type object
+ */
 export type GetInventoryRequestConfig = {
   data?: never
   pathParams?: never
@@ -18,3 +25,8 @@ export type GetInventoryRequestConfig = {
 export type GetInventoryResponses = {
   '200': GetInventoryStatus200
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetInventoryResponse = GetInventoryStatus200

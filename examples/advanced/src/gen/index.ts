@@ -1,5 +1,3 @@
-export * from './mocks/userController/createLogoutUserFaker.ts'
-export * from './zod/userController/logoutUserSchema.ts'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/ts/AddPetRequest.ts'
 export type { Address } from './models/ts/Address.ts'
 export type { Animal, AnimalTypeEnumKey } from './models/ts/Animal.ts'
@@ -14,33 +12,86 @@ export type { Pet, PetStatusEnumKey } from './models/ts/Pet.ts'
 export type { PetNotFound } from './models/ts/PetNotFound.ts'
 export type { User } from './models/ts/User.ts'
 export type { UserArray } from './models/ts/UserArray.ts'
-export type { AddFilesData, AddFilesFormData, AddFilesJsonData, AddFilesRequestConfig, AddFilesResponses } from './models/ts/petController/AddFiles.ts'
+export type {
+  AddFilesData,
+  AddFilesFormData,
+  AddFilesJsonData,
+  AddFilesRequestConfig,
+  AddFilesResponse,
+  AddFilesResponses,
+  AddFilesStatus200,
+  AddFilesStatus405,
+} from './models/ts/petController/AddFiles.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
   AddPetJsonData,
   AddPetRequestConfig,
+  AddPetResponse,
   AddPetResponses,
+  AddPetStatus405,
+  AddPetStatusDefault,
+  AddPetStatusDefaultJson,
+  AddPetStatusDefaultXml,
   AddPetXmlData,
 } from './models/ts/petController/AddPet.ts'
-export type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetRequestConfig, DeletePetResponses } from './models/ts/petController/DeletePet.ts'
-export type { FindPetsByStatusPathStepId, FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from './models/ts/petController/FindPetsByStatus.ts'
+export type {
+  DeletePetHeaderApiKey,
+  DeletePetPathPetId,
+  DeletePetRequestConfig,
+  DeletePetResponse,
+  DeletePetResponses,
+  DeletePetStatus400,
+} from './models/ts/petController/DeletePet.ts'
+export type {
+  FindPetsByStatusPathStepId,
+  FindPetsByStatusRequestConfig,
+  FindPetsByStatusResponse,
+  FindPetsByStatusResponses,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+} from './models/ts/petController/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
   FindPetsByTagsRequestConfig,
+  FindPetsByTagsResponse,
   FindPetsByTagsResponses,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
+  FindPetsByTagsStatus400,
   FindPetsByTagsXEXAMPLEKey,
 } from './models/ts/petController/FindPetsByTags.ts'
-export type { GetPetByIdPathPetId, GetPetByIdRequestConfig, GetPetByIdResponses } from './models/ts/petController/GetPetById.ts'
+export type {
+  GetPetByIdPathPetId,
+  GetPetByIdRequestConfig,
+  GetPetByIdResponse,
+  GetPetByIdResponses,
+  GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+} from './models/ts/petController/GetPetById.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
   UpdatePetRequestConfig,
+  UpdatePetResponse,
   UpdatePetResponses,
+  UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
+  UpdatePetStatus202,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
   UpdatePetXmlData,
 } from './models/ts/petController/UpdatePet.ts'
 export type {
@@ -48,14 +99,18 @@ export type {
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
+  UpdatePetWithFormStatus405,
 } from './models/ts/petController/UpdatePetWithForm.ts'
 export type {
   UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
+  UploadFileResponse,
   UploadFileResponses,
+  UploadFileStatus200,
 } from './models/ts/petController/UploadFile.ts'
 export type {
   CreatePetsBoolParamKey,
@@ -65,18 +120,41 @@ export type {
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
   CreatePetsRequestConfig,
+  CreatePetsResponse,
   CreatePetsResponses,
+  CreatePetsStatus201,
+  CreatePetsStatusDefault,
   CreatePetsXEXAMPLEKey,
 } from './models/ts/petsController/CreatePets.ts'
-export type { DeleteOrderPathOrderId, DeleteOrderRequestConfig, DeleteOrderResponses } from './models/ts/storeController/DeleteOrder.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponses } from './models/ts/storeController/GetInventory.ts'
-export type { GetOrderByIdPathOrderId, GetOrderByIdRequestConfig, GetOrderByIdResponses } from './models/ts/storeController/GetOrderById.ts'
+export type {
+  DeleteOrderPathOrderId,
+  DeleteOrderRequestConfig,
+  DeleteOrderResponse,
+  DeleteOrderResponses,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+} from './models/ts/storeController/DeleteOrder.ts'
+export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/storeController/GetInventory.ts'
+export type {
+  GetOrderByIdPathOrderId,
+  GetOrderByIdRequestConfig,
+  GetOrderByIdResponse,
+  GetOrderByIdResponses,
+  GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
+  GetOrderByIdStatus400,
+  GetOrderByIdStatus404,
+} from './models/ts/storeController/GetOrderById.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
   PlaceOrderJsonData,
   PlaceOrderRequestConfig,
+  PlaceOrderResponse,
   PlaceOrderResponses,
+  PlaceOrderStatus200,
+  PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/ts/storeController/PlaceOrder.ts'
 export type {
@@ -84,7 +162,10 @@ export type {
   PlaceOrderPatchFormUrlEncodedData,
   PlaceOrderPatchJsonData,
   PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/ts/storeController/PlaceOrderPatch.ts'
 export type { TagTag } from './models/ts/tag/Tag.ts'
@@ -93,25 +174,63 @@ export type {
   CreateUserFormUrlEncodedData,
   CreateUserJsonData,
   CreateUserRequestConfig,
+  CreateUserResponse,
   CreateUserResponses,
+  CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './models/ts/userController/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
+  CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
+  CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
+  CreateUsersWithListInputStatusDefault,
 } from './models/ts/userController/CreateUsersWithListInput.ts'
-export type { DeleteUserPathUsername, DeleteUserRequestConfig, DeleteUserResponses } from './models/ts/userController/DeleteUser.ts'
-export type { GetUserByNamePathUsername, GetUserByNameRequestConfig, GetUserByNameResponses } from './models/ts/userController/GetUserByName.ts'
-export type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserRequestConfig, LoginUserResponses } from './models/ts/userController/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponses } from './models/ts/userController/LogoutUser.ts'
+export type {
+  DeleteUserPathUsername,
+  DeleteUserRequestConfig,
+  DeleteUserResponse,
+  DeleteUserResponses,
+  DeleteUserStatus400,
+  DeleteUserStatus404,
+} from './models/ts/userController/DeleteUser.ts'
+export type {
+  GetUserByNamePathUsername,
+  GetUserByNameRequestConfig,
+  GetUserByNameResponse,
+  GetUserByNameResponses,
+  GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
+  GetUserByNameStatus400,
+  GetUserByNameStatus404,
+} from './models/ts/userController/GetUserByName.ts'
+export type {
+  LoginUserQueryPassword,
+  LoginUserQueryUsername,
+  LoginUserRequestConfig,
+  LoginUserResponse,
+  LoginUserResponses,
+  LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
+  LoginUserStatus400,
+} from './models/ts/userController/LoginUser.ts'
+export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/userController/LogoutUser.ts'
 export type {
   UpdateUserData,
   UpdateUserFormUrlEncodedData,
   UpdateUserJsonData,
   UpdateUserPathUsername,
   UpdateUserRequestConfig,
+  UpdateUserResponse,
   UpdateUserResponses,
+  UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.ts'
 export type { AddPetRequestSchema } from './zod/addPetRequestSchema.ts'
@@ -124,24 +243,59 @@ export type { CustomerSchema } from './zod/customerSchema.ts'
 export type { DogSchema } from './zod/dogSchema.ts'
 export type { ImageSchema } from './zod/imageSchema.ts'
 export type { OrderSchema } from './zod/orderSchema.ts'
-export type { AddFilesDataSchema } from './zod/petController/addFilesSchema.ts'
-export type { AddPetDataSchema } from './zod/petController/addPetSchema.ts'
-export type { DeletePetHeaderApiKeySchema, DeletePetPathPetIdSchema } from './zod/petController/deletePetSchema.ts'
-export type { FindPetsByStatusPathStepIdSchema } from './zod/petController/findPetsByStatusSchema.ts'
+export type { AddFilesDataSchema, AddFilesResponseSchema, AddFilesStatus200Schema, AddFilesStatus405Schema } from './zod/petController/addFilesSchema.ts'
+export type { AddPetDataSchema, AddPetResponseSchema, AddPetStatus405Schema, AddPetStatusDefaultSchema } from './zod/petController/addPetSchema.ts'
+export type {
+  DeletePetHeaderApiKeySchema,
+  DeletePetPathPetIdSchema,
+  DeletePetResponseSchema,
+  DeletePetStatus400Schema,
+} from './zod/petController/deletePetSchema.ts'
+export type {
+  FindPetsByStatusPathStepIdSchema,
+  FindPetsByStatusResponseSchema,
+  FindPetsByStatusStatus200Schema,
+  FindPetsByStatusStatus400Schema,
+} from './zod/petController/findPetsByStatusSchema.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLESchema,
   FindPetsByTagsQueryPageSchema,
   FindPetsByTagsQueryPageSizeSchema,
   FindPetsByTagsQueryTagsSchema,
+  FindPetsByTagsResponseSchema,
+  FindPetsByTagsStatus200Schema,
+  FindPetsByTagsStatus400Schema,
 } from './zod/petController/findPetsByTagsSchema.ts'
-export type { GetPetByIdPathPetIdSchema } from './zod/petController/getPetByIdSchema.ts'
-export type { UpdatePetDataSchema } from './zod/petController/updatePetSchema.ts'
+export type {
+  GetPetByIdPathPetIdSchema,
+  GetPetByIdResponseSchema,
+  GetPetByIdStatus200Schema,
+  GetPetByIdStatus400Schema,
+  GetPetByIdStatus404Schema,
+} from './zod/petController/getPetByIdSchema.ts'
+export type {
+  UpdatePetDataSchema,
+  UpdatePetResponseSchema,
+  UpdatePetStatus200Schema,
+  UpdatePetStatus202Schema,
+  UpdatePetStatus400Schema,
+  UpdatePetStatus404Schema,
+  UpdatePetStatus405Schema,
+} from './zod/petController/updatePetSchema.ts'
 export type {
   UpdatePetWithFormPathPetIdSchema,
   UpdatePetWithFormQueryNameSchema,
   UpdatePetWithFormQueryStatusSchema,
+  UpdatePetWithFormResponseSchema,
+  UpdatePetWithFormStatus405Schema,
 } from './zod/petController/updatePetWithFormSchema.ts'
-export type { UploadFileDataSchema, UploadFilePathPetIdSchema, UploadFileQueryAdditionalMetadataSchema } from './zod/petController/uploadFileSchema.ts'
+export type {
+  UploadFileDataSchema,
+  UploadFilePathPetIdSchema,
+  UploadFileQueryAdditionalMetadataSchema,
+  UploadFileResponseSchema,
+  UploadFileStatus200Schema,
+} from './zod/petController/uploadFileSchema.ts'
 export type { PetNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export type { PetSchema } from './zod/petSchema.ts'
 export type {
@@ -150,15 +304,46 @@ export type {
   CreatePetsPathUuidSchema,
   CreatePetsQueryBoolParamSchema,
   CreatePetsQueryOffsetSchema,
+  CreatePetsResponseSchema,
+  CreatePetsStatus201Schema,
+  CreatePetsStatusDefaultSchema,
 } from './zod/petsController/createPetsSchema.ts'
 export type { TagTagSchema } from './zod/tag/tagSchema.ts'
 export type { UserArraySchema } from './zod/userArraySchema.ts'
-export type { CreateUserDataSchema } from './zod/userController/createUserSchema.ts'
-export type { CreateUsersWithListInputDataSchema } from './zod/userController/createUsersWithListInputSchema.ts'
-export type { DeleteUserPathUsernameSchema } from './zod/userController/deleteUserSchema.ts'
-export type { GetUserByNamePathUsernameSchema } from './zod/userController/getUserByNameSchema.ts'
-export type { LoginUserQueryPasswordSchema, LoginUserQueryUsernameSchema } from './zod/userController/loginUserSchema.ts'
-export type { UpdateUserDataSchema, UpdateUserPathUsernameSchema } from './zod/userController/updateUserSchema.ts'
+export type { CreateUserDataSchema, CreateUserResponseSchema, CreateUserStatusDefaultSchema } from './zod/userController/createUserSchema.ts'
+export type {
+  CreateUsersWithListInputDataSchema,
+  CreateUsersWithListInputResponseSchema,
+  CreateUsersWithListInputStatus200Schema,
+  CreateUsersWithListInputStatusDefaultSchema,
+} from './zod/userController/createUsersWithListInputSchema.ts'
+export type {
+  DeleteUserPathUsernameSchema,
+  DeleteUserResponseSchema,
+  DeleteUserStatus400Schema,
+  DeleteUserStatus404Schema,
+} from './zod/userController/deleteUserSchema.ts'
+export type {
+  GetUserByNamePathUsernameSchema,
+  GetUserByNameResponseSchema,
+  GetUserByNameStatus200Schema,
+  GetUserByNameStatus400Schema,
+  GetUserByNameStatus404Schema,
+} from './zod/userController/getUserByNameSchema.ts'
+export type {
+  LoginUserQueryPasswordSchema,
+  LoginUserQueryUsernameSchema,
+  LoginUserResponseSchema,
+  LoginUserStatus200Schema,
+  LoginUserStatus400Schema,
+} from './zod/userController/loginUserSchema.ts'
+export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './zod/userController/logoutUserSchema.ts'
+export type {
+  UpdateUserDataSchema,
+  UpdateUserPathUsernameSchema,
+  UpdateUserResponseSchema,
+  UpdateUserStatusDefaultSchema,
+} from './zod/userController/updateUserSchema.ts'
 export type { UserSchema } from './zod/userSchema.ts'
 export { operations } from './clients/axios/operations.ts'
 export { addFiles, getAddFilesUrl } from './clients/axios/petService/addFiles.ts'
@@ -221,27 +406,68 @@ export { createPetFaker } from './mocks/createPetFaker.ts'
 export { createPetNotFoundFaker } from './mocks/createPetNotFoundFaker.ts'
 export { createUserArrayFaker } from './mocks/createUserArrayFaker.ts'
 export { createUserFaker } from './mocks/createUserFaker.ts'
-export { createAddFilesDataFaker } from './mocks/petController/createAddFilesFaker.ts'
-export { createAddPetDataFaker } from './mocks/petController/createAddPetFaker.ts'
-export { createDeletePetHeaderApiKeyFaker, createDeletePetPathPetIdFaker } from './mocks/petController/createDeletePetFaker.ts'
-export { createFindPetsByStatusPathStepIdFaker } from './mocks/petController/createFindPetsByStatusFaker.ts'
+export {
+  createAddFilesDataFaker,
+  createAddFilesResponseFaker,
+  createAddFilesStatus200Faker,
+  createAddFilesStatus405Faker,
+} from './mocks/petController/createAddFilesFaker.ts'
+export {
+  createAddPetDataFaker,
+  createAddPetResponseFaker,
+  createAddPetStatus405Faker,
+  createAddPetStatusDefaultFaker,
+} from './mocks/petController/createAddPetFaker.ts'
+export {
+  createDeletePetHeaderApiKeyFaker,
+  createDeletePetPathPetIdFaker,
+  createDeletePetResponseFaker,
+  createDeletePetStatus400Faker,
+} from './mocks/petController/createDeletePetFaker.ts'
+export {
+  createFindPetsByStatusPathStepIdFaker,
+  createFindPetsByStatusResponseFaker,
+  createFindPetsByStatusStatus200Faker,
+  createFindPetsByStatusStatus400Faker,
+} from './mocks/petController/createFindPetsByStatusFaker.ts'
 export {
   createFindPetsByTagsHeaderXEXAMPLEFaker,
   createFindPetsByTagsQueryPageFaker,
   createFindPetsByTagsQueryPageSizeFaker,
   createFindPetsByTagsQueryTagsFaker,
+  createFindPetsByTagsResponseFaker,
+  createFindPetsByTagsStatus200Faker,
+  createFindPetsByTagsStatus400Faker,
 } from './mocks/petController/createFindPetsByTagsFaker.ts'
-export { createGetPetByIdPathPetIdFaker } from './mocks/petController/createGetPetByIdFaker.ts'
-export { createUpdatePetDataFaker } from './mocks/petController/createUpdatePetFaker.ts'
+export {
+  createGetPetByIdPathPetIdFaker,
+  createGetPetByIdResponseFaker,
+  createGetPetByIdStatus200Faker,
+  createGetPetByIdStatus400Faker,
+  createGetPetByIdStatus404Faker,
+} from './mocks/petController/createGetPetByIdFaker.ts'
+export {
+  createUpdatePetDataFaker,
+  createUpdatePetResponseFaker,
+  createUpdatePetStatus200Faker,
+  createUpdatePetStatus202Faker,
+  createUpdatePetStatus400Faker,
+  createUpdatePetStatus404Faker,
+  createUpdatePetStatus405Faker,
+} from './mocks/petController/createUpdatePetFaker.ts'
 export {
   createUpdatePetWithFormPathPetIdFaker,
   createUpdatePetWithFormQueryNameFaker,
   createUpdatePetWithFormQueryStatusFaker,
+  createUpdatePetWithFormResponseFaker,
+  createUpdatePetWithFormStatus405Faker,
 } from './mocks/petController/createUpdatePetWithFormFaker.ts'
 export {
   createUploadFileDataFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
+  createUploadFileResponseFaker,
+  createUploadFileStatus200Faker,
 } from './mocks/petController/createUploadFileFaker.ts'
 export {
   createCreatePetsDataFaker,
@@ -249,14 +475,45 @@ export {
   createCreatePetsPathUuidFaker,
   createCreatePetsQueryBoolParamFaker,
   createCreatePetsQueryOffsetFaker,
+  createCreatePetsResponseFaker,
+  createCreatePetsStatus201Faker,
+  createCreatePetsStatusDefaultFaker,
 } from './mocks/petsController/createCreatePetsFaker.ts'
 export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
-export { createCreateUserDataFaker } from './mocks/userController/createCreateUserFaker.ts'
-export { createCreateUsersWithListInputDataFaker } from './mocks/userController/createCreateUsersWithListInputFaker.ts'
-export { createDeleteUserPathUsernameFaker } from './mocks/userController/createDeleteUserFaker.ts'
-export { createGetUserByNamePathUsernameFaker } from './mocks/userController/createGetUserByNameFaker.ts'
-export { createLoginUserQueryPasswordFaker, createLoginUserQueryUsernameFaker } from './mocks/userController/createLoginUserFaker.ts'
-export { createUpdateUserDataFaker, createUpdateUserPathUsernameFaker } from './mocks/userController/createUpdateUserFaker.ts'
+export { createCreateUserDataFaker, createCreateUserResponseFaker, createCreateUserStatusDefaultFaker } from './mocks/userController/createCreateUserFaker.ts'
+export {
+  createCreateUsersWithListInputDataFaker,
+  createCreateUsersWithListInputResponseFaker,
+  createCreateUsersWithListInputStatus200Faker,
+  createCreateUsersWithListInputStatusDefaultFaker,
+} from './mocks/userController/createCreateUsersWithListInputFaker.ts'
+export {
+  createDeleteUserPathUsernameFaker,
+  createDeleteUserResponseFaker,
+  createDeleteUserStatus400Faker,
+  createDeleteUserStatus404Faker,
+} from './mocks/userController/createDeleteUserFaker.ts'
+export {
+  createGetUserByNamePathUsernameFaker,
+  createGetUserByNameResponseFaker,
+  createGetUserByNameStatus200Faker,
+  createGetUserByNameStatus400Faker,
+  createGetUserByNameStatus404Faker,
+} from './mocks/userController/createGetUserByNameFaker.ts'
+export {
+  createLoginUserQueryPasswordFaker,
+  createLoginUserQueryUsernameFaker,
+  createLoginUserResponseFaker,
+  createLoginUserStatus200Faker,
+  createLoginUserStatus400Faker,
+} from './mocks/userController/createLoginUserFaker.ts'
+export { createLogoutUserResponseFaker, createLogoutUserStatusDefaultFaker } from './mocks/userController/createLogoutUserFaker.ts'
+export {
+  createUpdateUserDataFaker,
+  createUpdateUserPathUsernameFaker,
+  createUpdateUserResponseFaker,
+  createUpdateUserStatusDefaultFaker,
+} from './mocks/userController/createUpdateUserFaker.ts'
 export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.ts'
 export { animalTypeEnum } from './models/ts/Animal.ts'
 export { customerParamsStatusEnum } from './models/ts/Customer.ts'
@@ -309,24 +566,59 @@ export { customerSchema } from './zod/customerSchema.ts'
 export { dogSchema } from './zod/dogSchema.ts'
 export { imageSchema } from './zod/imageSchema.ts'
 export { orderSchema } from './zod/orderSchema.ts'
-export { addFilesDataSchema } from './zod/petController/addFilesSchema.ts'
-export { addPetDataSchema } from './zod/petController/addPetSchema.ts'
-export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from './zod/petController/deletePetSchema.ts'
-export { findPetsByStatusPathStepIdSchema } from './zod/petController/findPetsByStatusSchema.ts'
+export { addFilesDataSchema, addFilesResponseSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './zod/petController/addFilesSchema.ts'
+export { addPetDataSchema, addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from './zod/petController/addPetSchema.ts'
+export {
+  deletePetHeaderApiKeySchema,
+  deletePetPathPetIdSchema,
+  deletePetResponseSchema,
+  deletePetStatus400Schema,
+} from './zod/petController/deletePetSchema.ts'
+export {
+  findPetsByStatusPathStepIdSchema,
+  findPetsByStatusResponseSchema,
+  findPetsByStatusStatus200Schema,
+  findPetsByStatusStatus400Schema,
+} from './zod/petController/findPetsByStatusSchema.ts'
 export {
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
   findPetsByTagsQueryTagsSchema,
+  findPetsByTagsResponseSchema,
+  findPetsByTagsStatus200Schema,
+  findPetsByTagsStatus400Schema,
 } from './zod/petController/findPetsByTagsSchema.ts'
-export { getPetByIdPathPetIdSchema } from './zod/petController/getPetByIdSchema.ts'
-export { updatePetDataSchema } from './zod/petController/updatePetSchema.ts'
+export {
+  getPetByIdPathPetIdSchema,
+  getPetByIdResponseSchema,
+  getPetByIdStatus200Schema,
+  getPetByIdStatus400Schema,
+  getPetByIdStatus404Schema,
+} from './zod/petController/getPetByIdSchema.ts'
+export {
+  updatePetDataSchema,
+  updatePetResponseSchema,
+  updatePetStatus200Schema,
+  updatePetStatus202Schema,
+  updatePetStatus400Schema,
+  updatePetStatus404Schema,
+  updatePetStatus405Schema,
+} from './zod/petController/updatePetSchema.ts'
 export {
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,
+  updatePetWithFormResponseSchema,
+  updatePetWithFormStatus405Schema,
 } from './zod/petController/updatePetWithFormSchema.ts'
-export { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema } from './zod/petController/uploadFileSchema.ts'
+export {
+  uploadFileDataSchema,
+  uploadFilePathPetIdSchema,
+  uploadFileQueryAdditionalMetadataSchema,
+  uploadFileResponseSchema,
+  uploadFileStatus200Schema,
+} from './zod/petController/uploadFileSchema.ts'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export { petSchema } from './zod/petSchema.ts'
 export {
@@ -335,13 +627,44 @@ export {
   createPetsPathUuidSchema,
   createPetsQueryBoolParamSchema,
   createPetsQueryOffsetSchema,
+  createPetsResponseSchema,
+  createPetsStatus201Schema,
+  createPetsStatusDefaultSchema,
 } from './zod/petsController/createPetsSchema.ts'
 export { tagTagSchema } from './zod/tag/tagSchema.ts'
 export { userArraySchema } from './zod/userArraySchema.ts'
-export { createUserDataSchema } from './zod/userController/createUserSchema.ts'
-export { createUsersWithListInputDataSchema } from './zod/userController/createUsersWithListInputSchema.ts'
-export { deleteUserPathUsernameSchema } from './zod/userController/deleteUserSchema.ts'
-export { getUserByNamePathUsernameSchema } from './zod/userController/getUserByNameSchema.ts'
-export { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema } from './zod/userController/loginUserSchema.ts'
-export { updateUserDataSchema, updateUserPathUsernameSchema } from './zod/userController/updateUserSchema.ts'
+export { createUserDataSchema, createUserResponseSchema, createUserStatusDefaultSchema } from './zod/userController/createUserSchema.ts'
+export {
+  createUsersWithListInputDataSchema,
+  createUsersWithListInputResponseSchema,
+  createUsersWithListInputStatus200Schema,
+  createUsersWithListInputStatusDefaultSchema,
+} from './zod/userController/createUsersWithListInputSchema.ts'
+export {
+  deleteUserPathUsernameSchema,
+  deleteUserResponseSchema,
+  deleteUserStatus400Schema,
+  deleteUserStatus404Schema,
+} from './zod/userController/deleteUserSchema.ts'
+export {
+  getUserByNamePathUsernameSchema,
+  getUserByNameResponseSchema,
+  getUserByNameStatus200Schema,
+  getUserByNameStatus400Schema,
+  getUserByNameStatus404Schema,
+} from './zod/userController/getUserByNameSchema.ts'
+export {
+  loginUserQueryPasswordSchema,
+  loginUserQueryUsernameSchema,
+  loginUserResponseSchema,
+  loginUserStatus200Schema,
+  loginUserStatus400Schema,
+} from './zod/userController/loginUserSchema.ts'
+export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './zod/userController/logoutUserSchema.ts'
+export {
+  updateUserDataSchema,
+  updateUserPathUsernameSchema,
+  updateUserResponseSchema,
+  updateUserStatusDefaultSchema,
+} from './zod/userController/updateUserSchema.ts'
 export { userSchema } from './zod/userSchema.ts'

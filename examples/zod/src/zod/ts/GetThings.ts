@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
+import type { PetNotFound } from './PetNotFound.ts'
+
 /**
  * @description Maximum number of things to return
  * @minLength 1
@@ -19,6 +21,17 @@ export type GetThingsQueryLimit = number | undefined
  * @type integer | undefined
  */
 export type GetThingsQuerySkip = number | undefined
+
+/**
+ * @type any
+ */
+export type GetThingsStatus201 = any
+
+/**
+ * @description Pet not found
+ * @type any
+ */
+export type GetThingsStatusDefault = PetNotFound
 
 /**
  * @type object
@@ -47,3 +60,8 @@ export type GetThingsResponses = {
   '201': GetThingsStatus201
   default: GetThingsStatusDefault
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type GetThingsResponse = GetThingsStatus201 | GetThingsStatusDefault

@@ -3,6 +3,16 @@ import type { Pet } from '../Pet.ts'
 /**
  * @type object
  */
+export type AddFilesStatus200 = Omit<NonNullable<Pet>, 'name'>
+
+/**
+ * @type any
+ */
+export type AddFilesStatus405 = any
+
+/**
+ * @type object
+ */
 export type AddFilesJsonData = {
   /**
    * @description URL of the image to upload
@@ -39,3 +49,8 @@ export type AddFilesResponses = {
   '200': AddFilesStatus200
   '405': AddFilesStatus405
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type AddFilesResponse = AddFilesStatus200 | AddFilesStatus405

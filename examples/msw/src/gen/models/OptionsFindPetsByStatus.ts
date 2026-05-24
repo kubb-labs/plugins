@@ -3,6 +3,13 @@
  * Do not edit manually.
  */
 
+import type { Pet } from './Pet.ts'
+
+/**
+ * @type array
+ */
+export type OptionsFindPetsByStatusStatus200 = Pet[]
+
 /**
  * @type object
  */
@@ -23,3 +30,8 @@ export type OptionsFindPetsByStatusRequestConfig = {
 export type OptionsFindPetsByStatusResponses = {
   '200': OptionsFindPetsByStatusStatus200
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type OptionsFindPetsByStatusResponse = OptionsFindPetsByStatusStatus200

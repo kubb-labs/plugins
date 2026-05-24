@@ -3,6 +3,16 @@
 import type { Order } from './Order.ts'
 
 /**
+ * @type object
+ */
+export type PlaceOrderPatchStatus200 = Order
+
+/**
+ * @type any
+ */
+export type PlaceOrderPatchStatus405 = any
+
+/**
  * @type object | undefined
  */
 export type PlaceOrderPatchJsonData = Order | undefined
@@ -40,3 +50,8 @@ export type PlaceOrderPatchResponses = {
   '200': PlaceOrderPatchStatus200
   '405': PlaceOrderPatchStatus405
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405

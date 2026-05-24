@@ -3,10 +3,45 @@
  * Do not edit manually.
  */
 
+import type { GetUserByNameResponse, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/GetUserByName.ts'
+import { createUser } from '../createUser.ts'
 import { faker } from '@faker-js/faker'
 
 export function createGetUserByNamePathUsername(data?: string): string {
   faker.seed([220])
 
   return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetUserByNameStatus200(data?: Partial<GetUserByNameStatus200>): GetUserByNameStatus200 {
+  faker.seed([220])
+
+  return createUser(data)
+}
+
+/**
+ * @description Invalid username supplied
+ */
+export function createGetUserByNameStatus400() {
+  faker.seed([220])
+
+  return undefined
+}
+
+/**
+ * @description User not found
+ */
+export function createGetUserByNameStatus404() {
+  faker.seed([220])
+
+  return undefined
+}
+
+export function createGetUserByNameResponse(_data?: GetUserByNameResponse): GetUserByNameResponse {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createGetUserByNameStatus200(), createGetUserByNameStatus400(), createGetUserByNameStatus404()])
 }

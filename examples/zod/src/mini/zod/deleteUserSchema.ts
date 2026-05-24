@@ -6,3 +6,9 @@
 import * as z from 'zod/mini'
 
 export const deleteUserPathUsernameSchema = z.string()
+
+export const deleteUserStatus400Schema = z.any()
+
+export const deleteUserStatus404Schema = z.any()
+
+export const deleteUserResponseSchema = z.union([deleteUserStatus400Schema, deleteUserStatus404Schema])

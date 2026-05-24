@@ -3,8 +3,20 @@
  * Do not edit manually.
  */
 
-import type { z } from '../../zod.ts'
+import { z } from '../../zod.ts'
 import { orderSchema } from './orderSchema.ts'
+
+export const placeOrderPatchStatus200Schema = orderSchema
+
+export type PlaceOrderPatchStatus200Schema = z.infer<typeof placeOrderPatchStatus200Schema>
+
+export const placeOrderPatchStatus405Schema = z.any()
+
+export type PlaceOrderPatchStatus405Schema = z.infer<typeof placeOrderPatchStatus405Schema>
+
+export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
+
+export type PlaceOrderPatchResponseSchema = z.infer<typeof placeOrderPatchResponseSchema>
 
 export const placeOrderPatchDataSchema = orderSchema.optional()
 

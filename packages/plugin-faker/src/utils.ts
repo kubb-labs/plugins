@@ -111,8 +111,8 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
   }
 
   if (responses.length === 1) {
-    const schema = responses[0]!.content![0]!.schema!
-    if (shouldInlineSingleResponseSchema(schema)) {
+    const schema = responses[0]!.content?.[0]?.schema
+    if (schema && shouldInlineSingleResponseSchema(schema)) {
       return schema
     }
 

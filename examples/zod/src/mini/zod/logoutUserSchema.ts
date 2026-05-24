@@ -4,3 +4,7 @@
  */
 
 import * as z from 'zod/mini'
+
+export const logoutUserStatusDefaultSchema = z.any()
+
+export const logoutUserResponseSchema = logoutUserStatusDefaultSchema

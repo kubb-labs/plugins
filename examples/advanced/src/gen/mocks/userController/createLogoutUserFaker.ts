@@ -1,1 +1,10 @@
-import { faker } from '@faker-js/faker'
+/**
+ * @description successful operation
+ */
+export function createLogoutUserStatusDefaultFaker() {
+  return undefined
+}
+
+export function createLogoutUserResponseFaker() {
+  return undefined
+}

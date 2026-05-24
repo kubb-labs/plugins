@@ -8,4 +8,8 @@ import { userSchema } from './userSchema.ts'
 
 export const updateUserPathUsernameSchema = z.string()
 
+export const updateUserStatusDefaultSchema = z.any()
+
+export const updateUserResponseSchema = updateUserStatusDefaultSchema
+
 export const updateUserDataSchema = z.optional(userSchema)

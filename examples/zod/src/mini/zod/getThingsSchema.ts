@@ -4,7 +4,14 @@
  */
 
 import * as z from 'zod/mini'
+import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
 export const getThingsQueryLimitSchema = z._default(z.optional(z.int().check(z.minimum(1), z.maximum(100))), 100)
 
 export const getThingsQuerySkipSchema = z._default(z.optional(z.int().check(z.minimum(0))), 0)
+
+export const getThingsStatus201Schema = z.any()
+
+export const getThingsStatusDefaultSchema = petNotFoundSchema
+
+export const getThingsResponseSchema = z.union([getThingsStatus201Schema, getThingsStatusDefaultSchema])

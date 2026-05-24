@@ -2,9 +2,12 @@ import type { AddFilesResponse, AddFilesStatus405, AddFilesData } from '../../mo
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function addFilesHandlerResponse200(data?: AddFilesResponse) {
+export function addFilesHandlerResponse200(data: AddFilesResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
@@ -14,12 +17,15 @@ export function addFilesHandlerResponse405(data?: AddFilesStatus405) {
   })
 }
 
-export function addFilesHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, AddFilesData, any>) {
+export function addFilesHandler(data?: AddFilesResponse | HttpResponseResolver<Record<string, string>, AddFilesData, any>) {
   return http.post<Record<string, string>, AddFilesData, any>(`/pet/files`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   })
 }

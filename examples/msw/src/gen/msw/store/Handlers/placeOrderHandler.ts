@@ -7,9 +7,12 @@ import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderData } from '..
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function placeOrderHandlerResponse200(data?: PlaceOrderResponse) {
+export function placeOrderHandlerResponse200(data: PlaceOrderResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
@@ -19,12 +22,15 @@ export function placeOrderHandlerResponse405(data?: PlaceOrderStatus405) {
   })
 }
 
-export function placeOrderHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, PlaceOrderData, any>) {
+export function placeOrderHandler(data?: PlaceOrderResponse | HttpResponseResolver<Record<string, string>, PlaceOrderData, any>) {
   return http.post<Record<string, string>, PlaceOrderData, any>(`http://localhost:3000/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   })
 }

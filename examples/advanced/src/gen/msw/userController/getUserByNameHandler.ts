@@ -1,9 +1,12 @@
 import type { GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/ts/userController/GetUserByName.ts'
 import { http } from 'msw'
 
-export function getUserByNameHandlerResponse200(data?: GetUserByNameResponse) {
+export function getUserByNameHandlerResponse200(data: GetUserByNameResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
@@ -19,14 +22,15 @@ export function getUserByNameHandlerResponse404(data?: GetUserByNameStatus404) {
   })
 }
 
-export function getUserByNameHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>),
-) {
+export function getUserByNameHandler(data?: GetUserByNameResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
   return http.get(`/user/:username`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   })
 }

@@ -3,6 +3,17 @@
  * Do not edit manually.
  */
 
+import * as z from 'zod'
 import { addPetRequestSchema } from './addPetRequestSchema.js'
+import { petSchema } from './petSchema.js'
+
+export const addPetStatus200Schema = petSchema.omit({ name: true })
+
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
+})
+
+export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
 export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')

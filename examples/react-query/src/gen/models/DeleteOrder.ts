@@ -7,6 +7,16 @@
 export type DeleteOrderPathOrderId = number
 
 /**
+ * @type any
+ */
+export type DeleteOrderStatus400 = any
+
+/**
+ * @type any
+ */
+export type DeleteOrderStatus404 = any
+
+/**
  * @type object
  */
 export type DeleteOrderRequestConfig = {
@@ -32,3 +42,8 @@ export type DeleteOrderResponses = {
   '400': DeleteOrderStatus400
   '404': DeleteOrderStatus404
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404

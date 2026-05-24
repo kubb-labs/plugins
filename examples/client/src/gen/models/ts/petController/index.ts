@@ -1,20 +1,71 @@
-export type { AddPetData, AddPetFormUrlEncodedData, AddPetJsonData, AddPetRequestConfig, AddPetResponses, AddPetXmlData } from './AddPet.js'
-export type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetRequestConfig, DeletePetResponses } from './DeletePet.js'
-export type { FindPetsByStatusQueryStatus, FindPetsByStatusRequestConfig, FindPetsByStatusResponses, FindPetsByStatusStatusKey } from './FindPetsByStatus.js'
+export type {
+  AddPetData,
+  AddPetFormUrlEncodedData,
+  AddPetJsonData,
+  AddPetRequestConfig,
+  AddPetResponse,
+  AddPetResponses,
+  AddPetStatus200,
+  AddPetStatus200Json,
+  AddPetStatus200Xml,
+  AddPetStatus405,
+  AddPetXmlData,
+} from './AddPet.js'
+export type {
+  DeletePetHeaderApiKey,
+  DeletePetPathPetId,
+  DeletePetRequestConfig,
+  DeletePetResponse,
+  DeletePetResponses,
+  DeletePetStatus400,
+} from './DeletePet.js'
+export type {
+  FindPetsByStatusQueryStatus,
+  FindPetsByStatusRequestConfig,
+  FindPetsByStatusResponse,
+  FindPetsByStatusResponses,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
+} from './FindPetsByStatus.js'
 export type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
   FindPetsByTagsRequestConfig,
+  FindPetsByTagsResponse,
   FindPetsByTagsResponses,
+  FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
+  FindPetsByTagsStatus400,
 } from './FindPetsByTags.js'
-export type { GetPetByIdPathPetId, GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById.js'
+export type {
+  GetPetByIdPathPetId,
+  GetPetByIdRequestConfig,
+  GetPetByIdResponse,
+  GetPetByIdResponses,
+  GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
+  GetPetByIdStatus400,
+  GetPetByIdStatus404,
+} from './GetPetById.js'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
   UpdatePetRequestConfig,
+  UpdatePetResponse,
   UpdatePetResponses,
+  UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
   UpdatePetXmlData,
 } from './UpdatePet.js'
 export type {
@@ -22,7 +73,9 @@ export type {
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormRequestConfig,
+  UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
+  UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.js'
 export type {
   UploadFileData,
@@ -31,6 +84,8 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
+  UploadFileResponse,
   UploadFileResponses,
+  UploadFileStatus200,
 } from './UploadFile.js'
 export { findPetsByStatusStatus } from './FindPetsByStatus.js'

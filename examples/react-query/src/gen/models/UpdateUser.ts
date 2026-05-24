@@ -9,6 +9,11 @@ import type { User } from './User.ts'
 export type UpdateUserPathUsername = string
 
 /**
+ * @type any
+ */
+export type UpdateUserStatusDefault = any
+
+/**
  * @description Update an existent user in the store
  * @type object | undefined
  */
@@ -53,3 +58,8 @@ export type UpdateUserRequestConfig = {
 export type UpdateUserResponses = {
   default: UpdateUserStatusDefault
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type UpdateUserResponse = UpdateUserStatusDefault

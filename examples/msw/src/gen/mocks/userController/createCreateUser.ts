@@ -3,9 +3,18 @@
  * Do not edit manually.
  */
 
-import type { CreateUserData } from '../../models/CreateUser.ts'
+import type { CreateUserData, CreateUserResponse, CreateUserStatusDefault } from '../../models/CreateUser.ts'
 import { createUser } from '../createUser.ts'
 import { faker } from '@faker-js/faker'
+
+/**
+ * @description successful operation
+ */
+export function createCreateUserStatusDefault(data?: Partial<CreateUserStatusDefault>): CreateUserStatusDefault {
+  faker.seed([220])
+
+  return createUser(data)
+}
 
 /**
  * @description Created user object
@@ -14,4 +23,10 @@ export function createCreateUserData(data?: Partial<CreateUserData>): CreateUser
   faker.seed([220])
 
   return createUser(data)
+}
+
+export function createCreateUserResponse(data?: Partial<CreateUserResponse>): CreateUserResponse {
+  faker.seed([220])
+
+  return createCreateUserStatusDefault(data)
 }

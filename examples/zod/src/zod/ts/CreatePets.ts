@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
+import type { PetNotFound } from './PetNotFound.ts'
+
 /**
  * @description UUID
  * @type string
@@ -28,6 +30,17 @@ export type CreatePetsXEXAMPLEKey = (typeof createPetsXEXAMPLE)[keyof typeof cre
  * @type string
  */
 export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
+
+/**
+ * @type any
+ */
+export type CreatePetsStatus201 = any
+
+/**
+ * @description Pet not found
+ * @type any
+ */
+export type CreatePetsStatusDefault = PetNotFound
 
 /**
  * @type object
@@ -79,3 +92,8 @@ export type CreatePetsResponses = {
   '201': CreatePetsStatus201
   default: CreatePetsStatusDefault
 }
+
+/**
+ * @description Union of all possible responses
+ */
+export type CreatePetsResponse = CreatePetsStatus201 | CreatePetsStatusDefault

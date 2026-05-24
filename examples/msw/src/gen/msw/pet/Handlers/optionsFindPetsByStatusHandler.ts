@@ -6,20 +6,26 @@
 import type { OptionsFindPetsByStatusResponse } from '../../../models/OptionsFindPetsByStatus.ts'
 import { http } from 'msw'
 
-export function optionsFindPetsByStatusHandlerResponse200(data?: OptionsFindPetsByStatusResponse) {
+export function optionsFindPetsByStatusHandlerResponse200(data: OptionsFindPetsByStatusResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
 export function optionsFindPetsByStatusHandler(
-  data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.options>[1]>[0]) => Response | Promise<Response>),
+  data?: OptionsFindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.options>[1]>[0]) => Response | Promise<Response>),
 ) {
   return http.options(`http://localhost:3000/pet/findByStatus`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   })
 }

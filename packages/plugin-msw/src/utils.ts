@@ -9,6 +9,7 @@ export function getContentType(response: ast.ResponseNode | null | undefined): s
   if (!hasResponseSchema(response)) {
     return null
   }
+
   return getResponseContentType(response) ?? 'application/json'
 }
 

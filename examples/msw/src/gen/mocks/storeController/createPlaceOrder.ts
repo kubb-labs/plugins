@@ -3,12 +3,36 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderData } from '../../models/PlaceOrder.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/PlaceOrder.ts'
 import { createOrder } from '../createOrder.ts'
 import { faker } from '@faker-js/faker'
+
+/**
+ * @description successful operation
+ */
+export function createPlaceOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
+  faker.seed([220])
+
+  return createOrder(data)
+}
+
+/**
+ * @description Invalid input
+ */
+export function createPlaceOrderStatus405() {
+  faker.seed([220])
+
+  return undefined
+}
 
 export function createPlaceOrderData(data?: Partial<PlaceOrderData>): PlaceOrderData {
   faker.seed([220])
 
   return createOrder(data)
+}
+
+export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createPlaceOrderStatus200(), createPlaceOrderStatus405()])
 }

@@ -4,7 +4,24 @@
  */
 
 import { z } from '../../zod.ts'
+import { orderSchema } from './orderSchema.ts'
 
 export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
 export type GetOrderByIdPathOrderIdSchema = z.infer<typeof getOrderByIdPathOrderIdSchema>
+
+export const getOrderByIdStatus200Schema = orderSchema
+
+export type GetOrderByIdStatus200Schema = z.infer<typeof getOrderByIdStatus200Schema>
+
+export const getOrderByIdStatus400Schema = z.any()
+
+export type GetOrderByIdStatus400Schema = z.infer<typeof getOrderByIdStatus400Schema>
+
+export const getOrderByIdStatus404Schema = z.any()
+
+export type GetOrderByIdStatus404Schema = z.infer<typeof getOrderByIdStatus404Schema>
+
+export const getOrderByIdResponseSchema = z.union([getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
+
+export type GetOrderByIdResponseSchema = z.infer<typeof getOrderByIdResponseSchema>

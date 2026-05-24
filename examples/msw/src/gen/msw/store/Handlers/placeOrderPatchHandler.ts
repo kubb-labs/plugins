@@ -7,9 +7,12 @@ import type { PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatch
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function placeOrderPatchHandlerResponse200(data?: PlaceOrderPatchResponse) {
+export function placeOrderPatchHandlerResponse200(data: PlaceOrderPatchResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 }
 
@@ -19,14 +22,15 @@ export function placeOrderPatchHandlerResponse405(data?: PlaceOrderPatchStatus40
   })
 }
 
-export function placeOrderPatchHandler(
-  data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, PlaceOrderPatchData, any>,
-) {
+export function placeOrderPatchHandler(data?: PlaceOrderPatchResponse | HttpResponseResolver<Record<string, string>, PlaceOrderPatchData, any>) {
   return http.patch<Record<string, string>, PlaceOrderPatchData, any>(`http://localhost:3000/store/order`, function handler(info) {
     if (typeof data === 'function') return data(info)
 
     return new Response(JSON.stringify(data), {
       status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
   })
 }
