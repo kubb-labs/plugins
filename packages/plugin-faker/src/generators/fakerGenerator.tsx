@@ -245,7 +245,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         )}
         {responseEntries.map(({ response, name, typeName }) =>
           renderEntry({
-            schema: response.schema,
+            schema: response.content?.[0]?.schema ?? null,
             name,
             typeName,
             description: response.description,

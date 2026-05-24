@@ -143,13 +143,13 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const responseSchemas = node.responses.map((res) =>
       renderSchemaEntry({
-        schema: res.schema,
+        schema: res.content?.[0]?.schema ?? null,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
-        keysToOmit: res.keysToOmit,
+        keysToOmit: res.content?.[0]?.keysToOmit,
       }),
     )
 
-    const responsesWithSchema = node.responses.filter((res) => res.schema)
+    const responsesWithSchema = node.responses.filter((res) => res.content?.[0]?.schema)
     const responseUnionSchema =
       responsesWithSchema.length > 0
         ? (() => {
@@ -160,9 +160,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
             // the response union name, skip generation to avoid redeclaration errors.
             const importedNames = new Set(
               responsesWithSchema.flatMap((res) =>
-                res.schema
+                res.content?.[0]?.schema
                   ? adapter
-                      .getImports(res.schema, (schemaName) => ({
+                      .getImports(res.content[0].schema, (schemaName) => ({
                         name: resolver.resolveSchemaName(schemaName),
                         path: '',
                       }))
