@@ -1,3 +1,4 @@
+import type { Order } from '../../models/ts/Order.ts'
 import type { PlaceOrderPatchData, PlaceOrderPatchResponse } from '../../models/ts/storeController/PlaceOrderPatch.ts'
 
 export function placeOrderPatch(data?: PlaceOrderPatchData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderPatchResponse> {

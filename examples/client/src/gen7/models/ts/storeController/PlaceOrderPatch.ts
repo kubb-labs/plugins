@@ -6,11 +6,6 @@
 import type { Order } from '../Order.ts'
 
 /**
- * @type object
- */
-export type PlaceOrderPatchStatus200 = Order
-
-/**
  * @type any
  */
 export type PlaceOrderPatchStatus405 = any
@@ -50,11 +45,14 @@ export type PlaceOrderPatchRequestConfig = {
  * @type object
  */
 export type PlaceOrderPatchResponses = {
-  '200': PlaceOrderPatchStatus200
+  /**
+   * @type object
+   */
+  '200': Order
   '405': PlaceOrderPatchStatus405
 }
 
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
+export type PlaceOrderPatchResponse = Order | PlaceOrderPatchStatus405

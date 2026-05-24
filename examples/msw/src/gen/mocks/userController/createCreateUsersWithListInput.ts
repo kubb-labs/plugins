@@ -6,16 +6,16 @@
 import type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputResponse,
-  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from '../../models/CreateUsersWithListInput.ts'
+import type { User } from '../../models/User.ts'
 import { createUser } from '../createUser.ts'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description Successful operation
  */
-export function createCreateUsersWithListInputStatus200(data?: Partial<CreateUsersWithListInputStatus200>): CreateUsersWithListInputStatus200 {
+export function createCreateUsersWithListInputStatus200(data?: Partial<User>): User {
   faker.seed([220])
 
   return createUser(data)

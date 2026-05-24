@@ -12,11 +12,6 @@ import type { Pet } from './Pet.ts'
 export type GetPetByIdPathPetId = bigint
 
 /**
- * @type object
- */
-export type GetPetByIdStatus200 = Pet
-
-/**
  * @type any
  */
 export type GetPetByIdStatus400 = any
@@ -49,7 +44,10 @@ export type GetPetByIdRequestConfig = {
  * @type object
  */
 export type GetPetByIdResponses = {
-  '200': GetPetByIdStatus200
+  /**
+   * @type object
+   */
+  '200': Pet
   '400': GetPetByIdStatus400
   '404': GetPetByIdStatus404
 }
@@ -57,4 +55,4 @@ export type GetPetByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404
+export type GetPetByIdResponse = Pet | GetPetByIdStatus400 | GetPetByIdStatus404

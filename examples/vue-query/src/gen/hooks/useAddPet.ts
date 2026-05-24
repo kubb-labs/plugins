@@ -4,7 +4,8 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../models/AddPet.ts'
+import type { AddPetData, AddPetStatus405 } from '../models/AddPet.ts'
+import type { Pet } from '../models/Pet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
@@ -28,7 +29,7 @@ export async function addPet(
 
   const requestData = data
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
+  const res = await request<Pet, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: `/pet`,
     data: requestData,
@@ -46,9 +47,7 @@ export async function addPet(
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, { data: MaybeRefOrGetter<AddPetData> }, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: MutationObserverOptions<Pet, ResponseErrorConfig<AddPetStatus405>, { data: MaybeRefOrGetter<AddPetData> }, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig<AddPetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -59,7 +58,7 @@ export function useAddPet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
+  return useMutation<Pet, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
     {
       mutationFn: async ({ data }) => {
         return addPet(data, config)

@@ -1,16 +1,12 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
+import type { Order } from '../../../models/ts/Order.ts'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models/ts/storeController/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from '../../../models/ts/storeController/GetInventory.ts'
-import type {
-  GetOrderByIdPathOrderId,
-  GetOrderByIdStatus200,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
-} from '../../../models/ts/storeController/GetOrderById.ts'
-import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../../models/ts/storeController/PlaceOrder.ts'
-import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../../models/ts/storeController/PlaceOrderPatch.ts'
+import type { GetOrderByIdPathOrderId, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/ts/storeController/GetOrderById.ts'
+import type { PlaceOrderData, PlaceOrderStatus405 } from '../../../models/ts/storeController/PlaceOrder.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchStatus405 } from '../../../models/ts/storeController/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
@@ -46,7 +42,7 @@ export class storeController {
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
+    const res = await request<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
       ...requestConfig,
       method: 'POST',
       url: `/store/order`,
@@ -70,7 +66,7 @@ export class storeController {
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
+    const res = await request<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
       ...requestConfig,
       method: 'PATCH',
       url: `/store/order`,
@@ -87,7 +83,7 @@ export class storeController {
    */
   async getOrderById({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
+    const res = await request<Order, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
       url: `/store/order/${orderId}`,
