@@ -37,6 +37,7 @@
     "circular-schema-detection-shared",
     "client-banner-aggregation-context",
     "core-plugins-beta-12-alignment",
+    "dull-areas-happen",
     "enforce-array-type-syntax",
     "faker-discriminated-union-variant-types",
     "fix-object-header-serialization",
