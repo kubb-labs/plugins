@@ -100,7 +100,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './models/ts/petController/UploadFile.ts'
 export type {
   CreatePetsBoolParamKey,
@@ -113,7 +112,6 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
-  CreatePetsStatusDefault,
   CreatePetsXEXAMPLEKey,
 } from './models/ts/petsController/CreatePets.ts'
 export type {
@@ -130,7 +128,6 @@ export type {
   GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
-  GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './models/ts/storeController/GetOrderById.ts'
@@ -141,7 +138,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/ts/storeController/PlaceOrder.ts'
@@ -152,7 +148,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/ts/storeController/PlaceOrderPatch.ts'
@@ -164,7 +159,6 @@ export type {
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
-  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './models/ts/userController/CreateUser.ts'
 export type {
@@ -172,7 +166,6 @@ export type {
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from './models/ts/userController/CreateUsersWithListInput.ts'
 export type {
@@ -188,7 +181,6 @@ export type {
   GetUserByNameRequestConfig,
   GetUserByNameResponse,
   GetUserByNameResponses,
-  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './models/ts/userController/GetUserByName.ts'

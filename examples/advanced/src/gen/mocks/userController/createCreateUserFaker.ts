@@ -1,10 +1,11 @@
-import type { CreateUserData, CreateUserResponse, CreateUserStatusDefault } from '../../models/ts/userController/CreateUser.ts'
+import type { User } from '../../models/ts/User.ts'
+import type { CreateUserData, CreateUserResponse } from '../../models/ts/userController/CreateUser.ts'
 import { createUserFaker } from '../createUserFaker.ts'
 
 /**
  * @description successful operation
  */
-export function createCreateUserStatusDefaultFaker(data?: Partial<CreateUserStatusDefault>): CreateUserStatusDefault {
+export function createCreateUserStatusDefaultFaker(data?: Partial<User>): User {
   return createUserFaker(data)
 }
 

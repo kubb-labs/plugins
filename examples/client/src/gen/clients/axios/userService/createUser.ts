@@ -1,6 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
+import type { User } from '../../../models/ts/User.js'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 

@@ -4,7 +4,8 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../../models/UploadFile.ts'
+import type { ApiResponse } from '../../models/ApiResponse.ts'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../models/UploadFile.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'
@@ -26,7 +27,7 @@ export async function uploadFileHook(
 
   const requestData = data
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<ApiResponse, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     params,
@@ -41,7 +42,7 @@ export async function uploadFileHook(
 export function uploadFileMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<
-    UploadFileStatus200,
+    ApiResponse,
     ResponseErrorConfig<Error>,
     { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
@@ -60,7 +61,7 @@ export function uploadFileMutationOptionsHook<TContext = unknown>(config: Partia
 export function useUploadFileHook<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      UploadFileStatus200,
+      ApiResponse,
       ResponseErrorConfig<Error>,
       { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
       TContext
@@ -73,20 +74,20 @@ export function useUploadFileHook<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
 
   const baseOptions = uploadFileMutationOptionsHook(config) as UseMutationOptions<
-    UploadFileStatus200,
+    ApiResponse,
     ResponseErrorConfig<Error>,
     { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useUploadFileHook', operationId: 'uploadFile' }) as UseMutationOptions<
-    UploadFileStatus200,
+    ApiResponse,
     ResponseErrorConfig<Error>,
     { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
   >
 
   return useMutation<
-    UploadFileStatus200,
+    ApiResponse,
     ResponseErrorConfig<Error>,
     { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext
@@ -99,7 +100,7 @@ export function useUploadFileHook<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    UploadFileStatus200,
+    ApiResponse,
     ResponseErrorConfig<Error>,
     { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext

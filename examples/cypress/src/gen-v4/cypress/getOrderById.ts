@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdPathOrderId, GetOrderByIdResponse } from '../models.ts'
+import type { GetOrderByIdPathOrderId, GetOrderByIdResponse, Order } from '../models.ts'
 
 export function getOrderById(orderId: GetOrderByIdPathOrderId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetOrderByIdResponse> {
   return cy

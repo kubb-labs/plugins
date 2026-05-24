@@ -1,4 +1,5 @@
-import type { UploadFileResponse, UploadFileStatus200 } from '../../models/ts/petController/UploadFile.ts'
+import type { ApiResponse } from '../../models/ts/ApiResponse.ts'
+import type { UploadFileResponse } from '../../models/ts/petController/UploadFile.ts'
 import { createApiResponseFaker } from '../createApiResponseFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -13,7 +14,7 @@ export function createUploadFileQueryAdditionalMetadataFaker(data?: string): str
 /**
  * @description successful operation
  */
-export function createUploadFileStatus200Faker(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
+export function createUploadFileStatus200Faker(data?: Partial<ApiResponse>): ApiResponse {
   return createApiResponseFaker(data)
 }
 

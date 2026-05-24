@@ -3,14 +3,15 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
+import type { Order } from '../../models/Order.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
 import { createOrder } from '../createOrder.ts'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
  */
-export function createPlaceOrderPatchStatus200(data?: Partial<PlaceOrderPatchStatus200>): PlaceOrderPatchStatus200 {
+export function createPlaceOrderPatchStatus200(data?: Partial<Order>): Order {
   faker.seed([220])
 
   return createOrder(data)
