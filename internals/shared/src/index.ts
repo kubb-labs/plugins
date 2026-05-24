@@ -10,6 +10,7 @@ export {
   getSuccessResponses,
   isErrorStatusCode,
   isSuccessStatusCode,
+  operationFileEntry,
   resolveErrorNames,
   resolveOperationTypeNames,
   resolveResponseTypes,

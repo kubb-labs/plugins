@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, resolveOperationTypeNames } from '@internals/shared'
+import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
@@ -54,14 +54,12 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const clientBaseName = resolver.resolveInfiniteClientName(node)
 
     const meta = {
-      file: resolver.resolveFile(
-        { name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      ),
-      fileTs: tsResolver.resolveFile(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
-      ),
+      file: resolver.resolveFile(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
     }
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
@@ -73,10 +71,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
     const fileZod = zodResolver
-      ? zodResolver.resolveFile(
-          { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group ?? undefined },
-        )
+      ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+          root,
+          output: pluginZod?.options?.output ?? output,
+          group: pluginZod?.options?.group ?? undefined,
+        })
       : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver)
 
@@ -86,14 +85,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : null
 
     const clientFile = shouldUseClientPlugin
-      ? clientResolver?.resolveFile(
-          { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          {
-            root,
-            output: clientPlugin?.options?.output ?? output,
-            group: clientPlugin?.options?.group ?? undefined,
-          },
-        )
+      ? clientResolver?.resolveFile(operationFileEntry(node, node.operationId), {
+          root,
+          output: clientPlugin?.options?.output ?? output,
+          group: clientPlugin?.options?.group ?? undefined,
+        })
       : null
 
     const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientBaseName) : clientBaseName

@@ -1,5 +1,25 @@
 import { URLPath } from '@internals/utils'
-import { ast } from '@kubb/core'
+import { ast, type ResolverFileParams } from '@kubb/core'
+
+/**
+ * Builds the `ResolverFileParams` every operation generator passes to
+ * `resolver.resolveFile`: a file named `name`, tagged by the operation's first
+ * tag (or `'default'`), at the operation's path. Centralizes the entry object
+ * that was repeated at dozens of call sites across the client and query plugins.
+ *
+ * @example
+ * ```ts
+ * resolver.resolveFile(operationFileEntry(node, node.operationId), { root, output, group })
+ * ```
+ */
+export function operationFileEntry(node: ast.OperationNode, name: string, extname: ResolverFileParams['extname'] = '.ts'): ResolverFileParams {
+  return {
+    name,
+    extname,
+    tag: node.tags[0] ?? 'default',
+    path: node.path,
+  }
+}
 
 export type ContentTypeInfo = {
   contentTypes: string[]

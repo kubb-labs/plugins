@@ -1,4 +1,4 @@
-import { getOperationParameters } from '@internals/shared'
+import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -57,20 +57,14 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       if (isQueryOp) {
         const queryOptionsName = resolver.resolveQueryOptionsName(node)
         const queryHookName = resolver.resolveQueryName(node)
-        const queryHookFile = resolver.resolveFile(
-          { name: queryHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output, group: group ?? undefined },
-        )
+        const queryHookFile = resolver.resolveFile(operationFileEntry(node, queryHookName), { root, output, group: group ?? undefined })
         imports.push(<File.Import name={[queryOptionsName]} root={hookOptionsFile.path} path={queryHookFile.path} />)
         hookOptions[queryHookName] = `Partial<ReturnType<typeof ${queryOptionsName}>>`
 
         if (isSuspenseOp) {
           const suspenseOptionsName = resolver.resolveSuspenseQueryOptionsName(node)
           const suspenseHookName = resolver.resolveSuspenseQueryName(node)
-          const suspenseHookFile = resolver.resolveFile(
-            { name: suspenseHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-            { root, output, group: group ?? undefined },
-          )
+          const suspenseHookFile = resolver.resolveFile(operationFileEntry(node, suspenseHookName), { root, output, group: group ?? undefined })
           imports.push(<File.Import name={[suspenseOptionsName]} root={hookOptionsFile.path} path={suspenseHookFile.path} />)
           hookOptions[suspenseHookName] = `Partial<ReturnType<typeof ${suspenseOptionsName}>>`
         }
@@ -84,20 +78,18 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
           if (hasQueryParam) {
             const infiniteOptionsName = resolver.resolveInfiniteQueryOptionsName(node)
             const infiniteHookName = resolver.resolveInfiniteQueryName(node)
-            const infiniteHookFile = resolver.resolveFile(
-              { name: infiniteHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output, group: group ?? undefined },
-            )
+            const infiniteHookFile = resolver.resolveFile(operationFileEntry(node, infiniteHookName), { root, output, group: group ?? undefined })
             imports.push(<File.Import name={[infiniteOptionsName]} root={hookOptionsFile.path} path={infiniteHookFile.path} />)
             hookOptions[infiniteHookName] = `Partial<ReturnType<typeof ${infiniteOptionsName}>>`
 
             if (isSuspenseOp) {
               const suspenseInfiniteOptionsName = resolver.resolveSuspenseInfiniteQueryOptionsName(node)
               const suspenseInfiniteHookName = resolver.resolveSuspenseInfiniteQueryName(node)
-              const suspenseInfiniteHookFile = resolver.resolveFile(
-                { name: suspenseInfiniteHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-                { root, output, group: group ?? undefined },
-              )
+              const suspenseInfiniteHookFile = resolver.resolveFile(operationFileEntry(node, suspenseInfiniteHookName), {
+                root,
+                output,
+                group: group ?? undefined,
+              })
               imports.push(<File.Import name={[suspenseInfiniteOptionsName]} root={hookOptionsFile.path} path={suspenseInfiniteHookFile.path} />)
               hookOptions[suspenseInfiniteHookName] = `Partial<ReturnType<typeof ${suspenseInfiniteOptionsName}>>`
             }
@@ -108,10 +100,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       if (isMutationOp) {
         const mutationOptionsName = resolver.resolveMutationOptionsName(node)
         const mutationHookName = resolver.resolveMutationName(node)
-        const mutationHookFile = resolver.resolveFile(
-          { name: mutationHookName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output, group: group ?? undefined },
-        )
+        const mutationHookFile = resolver.resolveFile(operationFileEntry(node, mutationHookName), { root, output, group: group ?? undefined })
         imports.push(<File.Import name={[mutationOptionsName]} root={hookOptionsFile.path} path={mutationHookFile.path} />)
         hookOptions[mutationHookName] = `Partial<ReturnType<typeof ${mutationOptionsName}>>`
       }
