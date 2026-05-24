@@ -710,7 +710,7 @@ options:
                 // ...
               }
   - name: parser
-    type: "false | 'zod'"
+    type: false | 'zod'
     required: false
     default: 'false'
     description: |
