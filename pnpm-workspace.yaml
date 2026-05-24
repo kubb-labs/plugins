@@ -12,18 +12,18 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.28
-  '@kubb/agent': 5.0.0-beta.28
-  '@kubb/core': 5.0.0-beta.28
-  '@kubb/middleware-barrel': 5.0.0-beta.28
-  '@kubb/parser-ts': 5.0.0-beta.28
-  '@kubb/renderer-jsx': 5.0.0-beta.28
+  '@kubb/adapter-oas': 5.0.0-beta.29
+  '@kubb/agent': 5.0.0-beta.29
+  '@kubb/core': 5.0.0-beta.29
+  '@kubb/middleware-barrel': 5.0.0-beta.29
+  '@kubb/parser-ts': 5.0.0-beta.29
+  '@kubb/renderer-jsx': 5.0.0-beta.29
   '@size-limit/file': ^12.1.0
   '@types/node': ^22.19.19
   '@types/react': ^19.2.15
   '@vitest/coverage-v8': ^4.1.7
   '@vitest/ui': ^4.1.7
-  kubb: 5.0.0-beta.28
+  kubb: 5.0.0-beta.29
   oxfmt: ^0.47.0
   oxlint: ^1.66.0
   prettier: ^3.8.3
@@ -31,7 +31,7 @@ catalog:
   'size-limit': ^12.1.0
   tsdown: ^0.22.0
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.28
+  unplugin-kubb: 5.0.0-beta.29
   vitest: ^4.1.7
 
 minimumReleaseAge: 4320 # 72 hours, matches .npmrc min-package-age
