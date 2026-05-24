@@ -1,5 +1,6 @@
 import { stringify, toRegExpString } from '@internals/utils'
 import { ast } from '@kubb/core'
+import { isRoundTripNode } from './roundTrip.ts'
 import type { PluginZod, ResolverZod } from './types.ts'
 
 /**
@@ -13,15 +14,15 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
 }
 
 /**
- * Returns `true` when the schema transitively contains a `date` node with
- * `representation: 'date'` — a value plugin-ts types as a runtime `Date` that
- * must be decoded (response) or encoded (request) at the validation boundary.
+ * Returns `true` when the schema transitively contains a round-trip boundary —
+ * a node whose runtime type differs from its wire type (see {@link isRoundTripNode}),
+ * so it must be decoded (response) or encoded (request) at the validation boundary.
  * `$ref`s are followed via their resolved schema; a `seen` set guards cycles.
  */
-export function containsDateRepresentation(node: ast.SchemaNode | undefined, seen: Set<string> = new Set()): boolean {
+export function containsRoundTripNode(node: ast.SchemaNode | undefined, seen: Set<string> = new Set()): boolean {
   if (!node) return false
 
-  if (node.type === 'date' && node.representation === 'date') return true
+  if (isRoundTripNode(node)) return true
 
   if (node.type === 'ref') {
     if (!node.ref) return false
@@ -32,7 +33,7 @@ export function containsDateRepresentation(node: ast.SchemaNode | undefined, see
     }
     const resolved = ast.syncSchemaRef(node)
     if (resolved.type === 'ref') return false
-    return containsDateRepresentation(resolved, seen)
+    return containsRoundTripNode(resolved, seen)
   }
 
   const children: Array<ast.SchemaNode | undefined> = []
@@ -41,7 +42,7 @@ export function containsDateRepresentation(node: ast.SchemaNode | undefined, see
   if ('members' in node && node.members) children.push(...node.members)
   if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
 
-  return children.some((child) => containsDateRepresentation(child, seen))
+  return children.some((child) => containsRoundTripNode(child, seen))
 }
 
 /**

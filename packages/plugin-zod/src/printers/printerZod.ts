@@ -1,8 +1,9 @@
 import { stringify } from '@internals/utils'
 
 import { ast } from '@kubb/core'
+import { getRoundTripEntry } from '../roundTrip.ts'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, containsDateRepresentation, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
+import { applyModifiers, containsRoundTripNode, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -72,23 +73,6 @@ export type PrinterZodOptions = {
    * Custom handler map for node type overrides.
    */
   nodes?: PrinterZodNodes
-}
-
-/**
- * Emits the Zod schema for a `dateType: 'date'` field (typed as `Date`).
- *
- * The wire value is always an ISO `string`; the TypeScript value is a `Date`.
- * Output decodes `string → Date`; input encodes `Date → string`, preserving the
- * `date` (`YYYY-MM-DD`) vs `date-time` precision carried on `node.format`.
- */
-function dateRepresentationSchema(node: ast.SchemaNode, direction: 'input' | 'output' | undefined): string {
-  const isDateOnly = node.format === 'date'
-
-  if (direction === 'input') {
-    return isDateOnly ? 'z.date().transform((value) => value.toISOString().slice(0, 10))' : 'z.date().transform((value) => value.toISOString())'
-  }
-
-  return isDateOnly ? 'z.iso.date().transform((value) => new Date(value))' : 'z.iso.datetime().transform((value) => new Date(value))'
 }
 
 /**
@@ -165,12 +149,13 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         return shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.bigint()' : 'z.bigint()'
       },
       date(node) {
-        if (node.representation === 'string') {
-          return 'z.iso.date()'
+        // representation: 'date' → typed as `Date`; decode/encode at the boundary.
+        const entry = getRoundTripEntry(node)
+        if (entry) {
+          return this.options.direction === 'input' ? entry.encode(node) : entry.decode(node)
         }
 
-        // representation: 'date' → typed as `Date`; decode/encode at the boundary.
-        return dateRepresentationSchema(node, this.options.direction)
+        return 'z.iso.date()'
       },
       datetime(node) {
         const offset = node.offset || this.options.dateType === 'stringOffset'
@@ -223,7 +208,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
 
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.
-        const useInputVariant = node.ref != null && this.options.direction === 'input' && containsDateRepresentation(node)
+        const useInputVariant = node.ref != null && this.options.direction === 'input' && containsRoundTripNode(node)
         const resolvedName = node.ref
           ? useInputVariant
             ? (this.options.resolver?.resolveInputSchemaName(refName) ?? refName)
