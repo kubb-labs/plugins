@@ -1,5 +1,5 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { zodGenerator } from './generators/zodGenerator.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import type { PluginZod } from './types.ts'
@@ -57,17 +57,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: (ctx) => {
-          if (group.type === 'path') {
-            return `${ctx.group.split('/')[1]}`
-          }
-          return `${camelCase(ctx.group)}Controller`
-        },
-      } satisfies Group)
-    : null
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginZodName,

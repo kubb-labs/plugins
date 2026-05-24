@@ -25,4 +25,5 @@ export {
   type ResponseStatusNameResolver,
   type ResolveOperationTypeNameOptions,
 } from './operation.ts'
+export { createGroupConfig } from './group.ts'
 export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'

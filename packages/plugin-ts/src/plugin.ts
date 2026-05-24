@@ -1,5 +1,5 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs } from './types.ts'
@@ -54,17 +54,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: (ctx) => {
-          if (group.type === 'path') {
-            return `${ctx.group.split('/')[1]}`
-          }
-          return `${camelCase(ctx.group)}Controller`
-        },
-      } satisfies Group)
-    : null
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginTsName,
