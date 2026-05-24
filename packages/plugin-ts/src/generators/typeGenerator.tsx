@@ -233,9 +233,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const responseTypes = node.responses.map((res) =>
       renderSchemaType({
-        schema: res.schema,
+        schema: res.content?.[0]?.schema ?? null,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
-        keysToOmit: res.keysToOmit,
+        keysToOmit: res.content?.[0]?.keysToOmit,
       }),
     )
 
@@ -250,18 +250,18 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     function buildResponseType() {
-      if (!node.responses.some((res) => res.schema)) {
+      if (!node.responses.some((res) => res.content?.[0]?.schema)) {
         return null
       }
 
       const responseName = resolver.resolveResponseName(node)
 
-      const responsesWithSchema = node.responses.filter((res) => res.schema)
+      const responsesWithSchema = node.responses.filter((res) => res.content?.[0]?.schema)
       const importedNames = new Set(
         responsesWithSchema.flatMap((res) =>
-          res.schema
+          res.content?.[0]?.schema
             ? adapter
-                .getImports(res.schema, (schemaName) => ({
+                .getImports(res.content[0].schema, (schemaName) => ({
                   name: resolveImportName(schemaName),
                   path: '',
                 }))
