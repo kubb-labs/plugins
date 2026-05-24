@@ -7,6 +7,8 @@ import type { Pet } from './Pet.js'
 
 /**
  * @description ID of pet to return
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetPetByIdPathPetId = number

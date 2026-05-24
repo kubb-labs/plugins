@@ -5,6 +5,8 @@
 
 /**
  * @description ID of pet that needs to be updated
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UpdatePetWithFormPathPetId = number

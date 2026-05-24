@@ -6,6 +6,8 @@ import type { Pet } from '../Pet.ts'
  */
 export type AddPetStatus405 = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number

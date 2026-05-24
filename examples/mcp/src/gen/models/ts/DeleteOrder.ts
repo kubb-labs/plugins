@@ -5,6 +5,8 @@
 
 /**
  * @description ID of the order that needs to be deleted
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeleteOrderPathOrderId = number

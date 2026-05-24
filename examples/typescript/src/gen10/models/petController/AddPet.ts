@@ -17,6 +17,8 @@ export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
  */
 export type AddPetStatus405 = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number

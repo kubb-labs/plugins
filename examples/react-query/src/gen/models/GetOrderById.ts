@@ -4,6 +4,8 @@ import type { Order } from './Order.ts'
 
 /**
  * @description ID of order that needs to be fetched
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetOrderByIdPathOrderId = number

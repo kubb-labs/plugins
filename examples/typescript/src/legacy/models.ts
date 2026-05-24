@@ -24,11 +24,15 @@ export enum OrderHttpStatusEnum {
  */
 export interface Order {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
   id?: bigint
   /**
+   * @description
+   * Format: `int64`
    * @example 198772
    * @type integer | undefined
    */
@@ -49,11 +53,15 @@ export interface Order {
     type: string
   }
   /**
+   * @description
+   * Format: `int32`
    * @example 7
    * @type integer | undefined
    */
   quantity?: number
   /**
+   * @description
+   * Format: `date-time`
    * @type string | undefined
    */
   shipDate?: string
@@ -113,6 +121,8 @@ export enum CustomerParamsStatusEnum {
  */
 export interface Customer {
   /**
+   * @description
+   * Format: `int64`
    * @example 100000
    * @type integer | undefined
    */
@@ -166,6 +176,8 @@ export type UnhappyCustomer = Customer & {
  */
 export interface Category {
   /**
+   * @description
+   * Format: `int64`
    * @example 1
    * @type integer | undefined
    */
@@ -182,6 +194,8 @@ export interface Category {
  */
 export interface User {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -218,6 +232,8 @@ export interface User {
   phone?: string
   /**
    * @description User Status
+   *
+   * Format: `int32`
    * @example 1
    * @type integer | undefined
    */
@@ -229,6 +245,8 @@ export interface User {
  */
 export interface Tag {
   /**
+   * @description
+   * Format: `int64`
    * @type integer | undefined
    */
   id?: bigint
@@ -294,6 +312,8 @@ export type Pet = (
     })
 ) & {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -350,6 +370,8 @@ export enum AddPetRequestStatusEnum {
  */
 export interface AddPetRequest {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -383,6 +405,8 @@ export interface AddPetRequest {
  */
 export interface ApiResponse {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
@@ -401,6 +425,8 @@ export interface ApiResponse {
  */
 export interface PetNotFound {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
@@ -493,6 +519,8 @@ export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
  */
 export interface AddPetStatus405 {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
@@ -680,6 +708,8 @@ export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsSta
 
 /**
  * @description ID of pet to return
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetPetByIdPathPetId = bigint
@@ -735,6 +765,8 @@ export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | Get
 
 /**
  * @description ID of pet that needs to be updated
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UpdatePetWithFormPathPetId = bigint
@@ -800,6 +832,8 @@ export type DeletePetHeaderApiKey = string | undefined
 
 /**
  * @description Pet id to delete
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeletePetPathPetId = bigint
@@ -859,6 +893,8 @@ export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
 
 /**
  * @description ID of pet to update
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UploadFilePathPetId = bigint
@@ -875,6 +911,8 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 export type UploadFileStatus200 = ApiResponse
 
 /**
+ * @description
+ * Format: `binary`
  * @type string | undefined
  */
 export type UploadFileData = Blob | undefined
@@ -1059,6 +1097,8 @@ export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatch
 
 /**
  * @description ID of order that needs to be fetched
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetOrderByIdPathOrderId = bigint
@@ -1120,6 +1160,8 @@ export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400
 
 /**
  * @description ID of the order that needs to be deleted
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeleteOrderPathOrderId = bigint
