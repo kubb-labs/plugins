@@ -30,14 +30,14 @@ function getResponseContentType(response: ast.ResponseNode | null | undefined): 
  * Converts an HTTP method to its lowercase MSW equivalent (e.g., 'POST' → 'post').
  */
 export function getMswMethod(node: ast.OperationNode): string {
-  return node.method.toLowerCase()
+  return node.method?.toLowerCase() ?? ''
 }
 
 /**
  * Converts an OpenAPI-style path to an Express/MSW-style path by replacing `{param}` with `:param`.
  */
 export function getMswUrl(node: ast.OperationNode): string {
-  return node.path.replaceAll('{', ':').replaceAll('}', '')
+  return (node.path ?? '').replaceAll('{', ':').replaceAll('}', '')
 }
 
 /**

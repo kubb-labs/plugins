@@ -96,7 +96,7 @@ export function Client({
   children,
   isConfigurable = true,
 }: Props): KubbReactNode {
-  const path = new URLPath(node.path)
+  const path = new URLPath(node.path ?? '')
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
 
@@ -156,7 +156,7 @@ export function Client({
       mode: 'object',
       children: {
         method: {
-          value: JSON.stringify(node.method.toUpperCase()),
+          value: JSON.stringify(node.method?.toUpperCase()),
         },
         url: {
           value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : path.template,

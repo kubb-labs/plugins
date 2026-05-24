@@ -62,7 +62,7 @@ function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): 
     return node.path ? `{@link ${new URLPath(node.path).URL}}` : null
   }
 
-  return `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}`
+  return `{@link ${(node.path ?? '').replaceAll('{', ':').replaceAll('}', '')}}`
 }
 
 export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {

@@ -54,7 +54,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
   // even when the OpenAPI spec has inconsistent casing between the two.
   const pathParamNameMap = new Map(casedPathParams.map((p) => [camelCase(p.name), p.name]))
 
-  const urlPath = new URLPath(node.path, { casing: paramsCasing })
+  const urlPath = new URLPath(node.path ?? '', { casing: paramsCasing })
   const urlTemplate = urlPath.toTemplateString({
     prefix: baseURL,
     replacer: (param) => pathParamNameMap.get(camelCase(param)) ?? param,

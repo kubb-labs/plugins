@@ -21,7 +21,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export const queryKeyTransformer: Transformer = ({ node, casing }) => {
-  const path = new URLPath(node.path, { casing })
+  const path = new URLPath(node.path ?? '', { casing })
   const hasQueryParams = getOperationParameters(node).query.length > 0
   const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
 

@@ -45,12 +45,12 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       // query: false means "still a query but skip the useQuery hook"
       const isQueryOp =
         nodeQuery === false
-          ? !!query && query.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
-          : !!nodeQuery && nodeQuery.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
+          ? !!query && query.methods.some((m) => node.method?.toLowerCase() === m.toLowerCase())
+          : !!nodeQuery && nodeQuery.methods.some((m) => node.method?.toLowerCase() === m.toLowerCase())
       const isMutationOp =
         nodeMutation !== false &&
         !isQueryOp &&
-        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some((m) => node.method.toLowerCase() === m.toLowerCase())
+        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some((m) => node.method?.toLowerCase() === m.toLowerCase())
       const isSuspenseOp = !!suspense
       const isInfiniteOp = !!nodeInfiniteOptions
 
