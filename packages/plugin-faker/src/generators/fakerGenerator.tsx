@@ -73,8 +73,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -230,8 +230,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -245,7 +245,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         )}
         {responseEntries.map(({ response, name, typeName }) =>
           renderEntry({
-            schema: response.schema,
+            schema: response.content?.[0]?.schema ?? null,
             name,
             typeName,
             description: response.description,

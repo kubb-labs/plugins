@@ -111,8 +111,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={serverFile.baseName}
           path={serverFile.path}
           meta={serverFile.meta}
-          banner={resolver.resolveBanner(ctx.meta, { output, config })}
-          footer={resolver.resolveFooter(ctx.meta, { output, config })}
+          banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
         >
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/sdk/server/mcp'} />
           <File.Import name={['z']} path={'zod'} />

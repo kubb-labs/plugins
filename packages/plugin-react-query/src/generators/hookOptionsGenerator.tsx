@@ -122,8 +122,8 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         baseName={hookOptionsFile.baseName}
         path={hookOptionsFile.path}
         meta={hookOptionsFile.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: hookOptionsFile.path, baseName: hookOptionsFile.baseName } })}
       >
         {imports}
         <File.Source name={name} isExportable isIndexable isTypeOnly>
