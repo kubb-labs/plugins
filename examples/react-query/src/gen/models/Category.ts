@@ -5,6 +5,8 @@
  */
 export type Category = {
   /**
+   * @description
+   * Format: `int64`
    * @example 1
    * @type integer | undefined
    */

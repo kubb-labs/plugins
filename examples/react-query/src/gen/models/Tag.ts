@@ -5,6 +5,8 @@
  */
 export type Tag = {
   /**
+   * @description
+   * Format: `int64`
    * @type integer | undefined
    */
   id?: number
