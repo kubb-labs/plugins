@@ -15,15 +15,15 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string
 
   const isArray = meta?.primitive === 'array'
 
-
   const hasDescription = meta && 'description' in meta && meta.description
-  
-  const formatComment = meta && 'format' in meta && meta.format
-    ? hasDescription
-      // Empty line between description and format
-      ? [' ', `Format: \`${meta.format}\``]
-      : [`@description Format: \`${meta.format}\``]
-    : []
+
+  const formatComment =
+    meta && 'format' in meta && meta.format
+      ? hasDescription
+        ? // Empty line between description and format
+          [' ', `Format: \`${meta.format}\``]
+        : [`@description Format: \`${meta.format}\``]
+      : []
 
   return [
     hasDescription ? `@description ${jsStringEscape(meta.description)}` : null,
