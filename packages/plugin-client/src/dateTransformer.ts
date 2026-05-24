@@ -25,10 +25,11 @@ export function resolveTransformerOutput<T extends { path: string }>(output: T):
 }
 
 /**
- * Maps a TypeScript type name to its generated transformer function name.
+ * Maps a TypeScript type name to its generated response-parser function name.
+ * Mirrors how `@kubb/plugin-zod` exposes `.parse` for the response direction.
  */
-export function transformFnName(typeName: string): string {
-  return `transform${typeName}`
+export function parseFnName(typeName: string): string {
+  return `parse${typeName}`
 }
 
 /**
@@ -207,7 +208,7 @@ export function resolveResponseTransformName(
   if (!success?.schema || !containsDateField(success.schema)) {
     return null
   }
-  return transformFnName(resolveResponseStatusName(node, success.statusCode))
+  return parseFnName(resolveResponseStatusName(node, success.statusCode))
 }
 
 /**

@@ -12,7 +12,7 @@ import {
   requestUsesFormData,
   resolveTransformerOutput,
   serializeFnName,
-  transformFnName,
+  parseFnName,
 } from '../dateTransformer.ts'
 import type { PluginClient } from '../types.ts'
 
@@ -26,7 +26,7 @@ function usedHelpers(bodies: Array<string>): Array<string> {
  * Built-in generator for `@kubb/plugin-client` enabled by `coerceDates: true`.
  *
  * Emits one transformer file per named schema (and per operation for inline
- * request/response schemas). Each file exports `transform<Name>` (response:
+ * request/response schemas). Each file exports `parse<Name>` (response:
  * ISO string → Date) and `serialize<Name>` (request: Date → ISO string).
  * Refs delegate to the sibling schema's transformers.
  */
@@ -53,8 +53,8 @@ export const dateTransformerGenerator = defineGenerator<PluginClient>({
 
     const functions: Array<TransformerFn> = [
       {
-        name: transformFnName(typeName),
-        body: buildTransformerBody(node, { direction: 'response', refFnName: (name) => transformFnName(tsResolver.resolveTypeName(name)) }),
+        name: parseFnName(typeName),
+        body: buildTransformerBody(node, { direction: 'response', refFnName: (name) => parseFnName(tsResolver.resolveTypeName(name)) }),
       },
       {
         name: serializeFnName(typeName),
@@ -69,7 +69,7 @@ export const dateTransformerGenerator = defineGenerator<PluginClient>({
     const refImports = collectDirectDateRefs(node).map((refName) => {
       const refFile = tsResolver.resolveFile({ name: refName, extname: '.ts' }, { root, output: transformerOutput })
       const refTypeName = tsResolver.resolveTypeName(refName)
-      const names = [transformFnName(refTypeName), serializeFnName(refTypeName)].filter((name) => bodies.some((body) => body.includes(`${name}(`)))
+      const names = [parseFnName(refTypeName), serializeFnName(refTypeName)].filter((name) => bodies.some((body) => body.includes(`${name}(`)))
       if (names.length === 0) return null
       return <File.Import key={refName} name={names} root={file.path} path={refFile.path} />
     })
@@ -114,8 +114,8 @@ export const dateTransformerGenerator = defineGenerator<PluginClient>({
     const primarySuccess = getPrimarySuccessResponse(node)
     if (primarySuccess?.schema && containsDateField(primarySuccess.schema)) {
       functions.push({
-        name: transformFnName(tsResolver.resolveResponseStatusName(node, primarySuccess.statusCode)),
-        body: buildTransformerBody(primarySuccess.schema, { direction: 'response', refFnName: (name) => transformFnName(tsResolver.resolveTypeName(name)) }),
+        name: parseFnName(tsResolver.resolveResponseStatusName(node, primarySuccess.statusCode)),
+        body: buildTransformerBody(primarySuccess.schema, { direction: 'response', refFnName: (name) => parseFnName(tsResolver.resolveTypeName(name)) }),
       })
       for (const refName of collectDirectDateRefs(primarySuccess.schema)) refNames.add(refName)
     }
@@ -136,7 +136,7 @@ export const dateTransformerGenerator = defineGenerator<PluginClient>({
     const refImports = [...refNames].map((refName) => {
       const refFile = tsResolver.resolveFile({ name: refName, extname: '.ts' }, { root, output: transformerOutput })
       const refTypeName = tsResolver.resolveTypeName(refName)
-      const names = [transformFnName(refTypeName), serializeFnName(refTypeName)].filter((name) => bodies.some((body) => body.includes(`${name}(`)))
+      const names = [parseFnName(refTypeName), serializeFnName(refTypeName)].filter((name) => bodies.some((body) => body.includes(`${name}(`)))
       if (names.length === 0) return null
       return <File.Import key={refName} name={names} root={file.path} path={refFile.path} />
     })

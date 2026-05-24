@@ -1,6 +1,6 @@
 import { ast } from '@kubb/core'
 import { describe, expect, it } from 'vitest'
-import { buildTransformerBody, collectDirectDateRefs, containsDateField, serializeFnName, transformFnName } from './dateTransformer.ts'
+import { buildTransformerBody, collectDirectDateRefs, containsDateField, parseFnName, serializeFnName } from './dateTransformer.ts'
 
 const dateLeaf = ast.createSchema({ type: 'date', representation: 'date', format: 'date-time' })
 const dateOnlyLeaf = ast.createSchema({ type: 'date', representation: 'date', format: 'date' })
@@ -8,7 +8,7 @@ const timeLeaf = ast.createSchema({ type: 'time', representation: 'date', format
 const stringDate = ast.createSchema({ type: 'date', representation: 'string', format: 'date' })
 const datetimeString = ast.createSchema({ type: 'datetime' })
 
-const responseOptions = { direction: 'response' as const, refFnName: transformFnName }
+const responseOptions = { direction: 'response' as const, refFnName: parseFnName }
 const requestOptions = { direction: 'request' as const, refFnName: serializeFnName }
 
 describe('containsDateField', () => {
@@ -83,7 +83,7 @@ describe('buildTransformerBody - response', () => {
       properties: [ast.createProperty({ name: 'category', required: false, schema: ref })],
     })
     const body = buildTransformerBody(node, responseOptions)
-    expect(body).toContain('category: transformCategory(_data.category)')
+    expect(body).toContain('category: parseCategory(_data.category)')
     expect(collectDirectDateRefs(node)).toEqual(['Category'])
   })
 })
