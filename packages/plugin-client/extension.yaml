@@ -554,42 +554,6 @@ options:
               //    ^? ResponseConfig<Pet>
               console.log(response.status, response.headers)
               const pet = response.data
-  - name: operationTypes
-    type: boolean
-    required: false
-    default: 'true'
-    description: |
-      Reference base schema types directly instead of the per-operation alias layer that `@kubb/plugin-ts` generates.
-
-      When `false`, a request body or response backed by a single `$ref` resolves to the referenced component type (for example `Pet`) instead of the `AddPetData` / `AddPetStatus200` alias. Inline, array, and union schemas keep their per-operation alias because no single base type exists.
-    important: |
-      Set the same `operationTypes` value on every plugin that references operation types (`@kubb/plugin-ts`, `@kubb/plugin-client`, `@kubb/plugin-react-query`, `@kubb/plugin-vue-query`). With `operationTypes: false`, `@kubb/plugin-ts` stops emitting the redundant aliases, so a consumer left at `true` would reference a name that no longer exists.
-    examples:
-      - name: true (default)
-        files:
-          - name: addPet.ts
-            lang: typescript
-            twoslash: false
-            code: |
-              import type { AddPetData, AddPetStatus200 } from '../models/AddPet'
-
-              export async function addPet(data?: AddPetData, config: Partial<RequestConfig<AddPetData>> = {}) {
-                const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus422>, AddPetData>({ /* ... */ })
-                return res.data
-              }
-      - name: 'false'
-        files:
-          - name: addPet.ts
-            lang: typescript
-            twoslash: false
-            code: |
-              import type { Pet } from '../models/Pet'
-              import type { HttpValidationError } from '../models/HttpValidationError'
-
-              export async function addPet(data?: Pet, config: Partial<RequestConfig<Pet>> = {}) {
-                const res = await request<Pet, ResponseErrorConfig<HttpValidationError>, Pet>({ /* ... */ })
-                return res.data
-              }
   - name: urlType
     type: "'export' | false"
     required: false
