@@ -5,7 +5,7 @@ import type { ast } from '@kubb/core'
  * wire type, so the output (response) schema must decode wire → runtime and the
  * input (request) variant must encode runtime → wire.
  *
- * To add a round-trippable type, append a `RoundTripEntry` to `roundTripEntries`
+ * To support another round-trip type, append a `RoundTripEntry` to `roundTripEntries`
  * and route that type's printer node handler through `getRoundTripEntry`.
  */
 export type RoundTripEntry = {
