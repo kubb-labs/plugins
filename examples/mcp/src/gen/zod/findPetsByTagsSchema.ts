@@ -14,7 +14,11 @@ export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe(
 
 export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
-export const findPetsByTagsStatus200Schema = z.array(petSchema)
+export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
+
+export const findPetsByTagsStatus200SchemaXml = z.array(petSchema)
+
+export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 
 export const findPetsByTagsStatus400Schema = z.any()
 

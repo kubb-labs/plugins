@@ -99,6 +99,59 @@ export function getResponseType(node: ast.OperationNode): ResponseType | undefin
   return undefined
 }
 
+/**
+ * Maps a content type to the PascalCase suffix used to name per-content-type variants
+ * (e.g. `application/json` → `Json`, `application/xml` → `Xml`, `multipart/form-data` → `FormData`).
+ */
+export function getContentTypeSuffix(contentType: string): string {
+  const baseType = contentType.split(';')[0]!.trim()
+  if (baseType === 'application/json') return 'Json'
+  if (baseType === 'multipart/form-data') return 'FormData'
+  if (baseType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
+  const subtype = baseType.split('/').pop() ?? baseType
+  const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
+  if (parts.length === 0) return 'Unknown'
+  return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
+}
+
+/**
+ * Appends a content-type suffix to a base name, keeping a trailing `Data` segment last
+ * (e.g. `AddPetData` + `Json` → `AddPetJsonData`, `AddPetStatus200` + `Xml` → `AddPetStatus200Xml`).
+ */
+export function getPerContentTypeName(baseName: string, suffix: string): string {
+  if (baseName.endsWith('Data')) {
+    return suffix.endsWith('Data') ? baseName.slice(0, -4) + suffix : `${baseName.slice(0, -4)}${suffix}Data`
+  }
+  return baseName + suffix
+}
+
+export type ContentVariantInput = { contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }
+export type ContentVariant = { name: string; suffix: string; schema: ast.SchemaNode; keysToOmit?: Array<string> | null; contentType: string }
+
+/**
+ * Resolves per-content-type variant names for a set of content entries, deduplicating suffix
+ * collisions with a numeric counter. Entries without a schema are skipped. The returned `suffix` is
+ * the final (possibly counter-augmented) value, so callers can derive parallel names in another
+ * namespace (e.g. plugin-faker deriving the matching plugin-ts type name).
+ */
+export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, baseName: string): Array<ContentVariant> {
+  const usedNames = new Set<string>()
+  return entries
+    .filter((entry) => entry.schema)
+    .map((entry) => {
+      const baseSuffix = getContentTypeSuffix(entry.contentType)
+      let suffix = baseSuffix
+      let name = getPerContentTypeName(baseName, suffix)
+      let counter = 2
+      while (usedNames.has(name)) {
+        suffix = `${baseSuffix}${counter++}`
+        name = getPerContentTypeName(baseName, suffix)
+      }
+      usedNames.add(name)
+      return { name, suffix, schema: entry.schema!, keysToOmit: entry.keysToOmit, contentType: entry.contentType }
+    })
+}
+
 export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)

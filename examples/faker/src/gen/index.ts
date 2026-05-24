@@ -194,11 +194,16 @@ export { createPet } from './faker/createPet.ts'
 export { createTag } from './faker/createTag.ts'
 export {
   createUpdatePetData,
+  createUpdatePetFormUrlEncodedData,
+  createUpdatePetJsonData,
   createUpdatePetResponse,
   createUpdatePetStatus200,
+  createUpdatePetStatus200Json,
+  createUpdatePetStatus200Xml,
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
+  createUpdatePetXmlData,
 } from './faker/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,

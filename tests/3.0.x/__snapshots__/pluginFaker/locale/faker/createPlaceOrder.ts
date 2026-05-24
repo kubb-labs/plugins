@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import type { PlaceOrderData, PlaceOrderFormUrlEncodedData, PlaceOrderJsonData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405, PlaceOrderXmlData } from "../types/PlaceOrder.ts";
 import { createOrder } from "./createOrder.ts";
 import { fakerDE as faker } from "@faker-js/faker";
 
@@ -21,8 +21,20 @@ export function createPlaceOrderStatus405() {
   return undefined
 }
 
-export function createPlaceOrderData(data?: Partial<PlaceOrderData>): PlaceOrderData {
+export function createPlaceOrderJsonData(data?: Partial<PlaceOrderJsonData>): PlaceOrderJsonData {
   return createOrder(data)
+}
+
+export function createPlaceOrderXmlData(data?: Partial<PlaceOrderXmlData>): PlaceOrderXmlData {
+  return createOrder(data)
+}
+
+export function createPlaceOrderFormUrlEncodedData(data?: Partial<PlaceOrderFormUrlEncodedData>): PlaceOrderFormUrlEncodedData {
+  return createOrder(data)
+}
+
+export function createPlaceOrderData(_data?: PlaceOrderData): PlaceOrderData {
+  return faker.helpers.arrayElement<any>([createPlaceOrderJsonData(), createPlaceOrderXmlData(), createPlaceOrderFormUrlEncodedData()])
 }
 
 export function createPlaceOrderResponse(_data?: PlaceOrderResponse): PlaceOrderResponse {

@@ -10,7 +10,15 @@ export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order th
 
 export type GetOrderByIdPathOrderIdSchema = z.infer<typeof getOrderByIdPathOrderIdSchema>
 
-export const getOrderByIdStatus200Schema = orderSchema
+export const getOrderByIdStatus200SchemaJson = orderSchema
+
+export type GetOrderByIdStatus200SchemaJson = z.infer<typeof getOrderByIdStatus200SchemaJson>
+
+export const getOrderByIdStatus200SchemaXml = orderSchema
+
+export type GetOrderByIdStatus200SchemaXml = z.infer<typeof getOrderByIdStatus200SchemaXml>
+
+export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 
 export type GetOrderByIdStatus200Schema = z.infer<typeof getOrderByIdStatus200Schema>
 

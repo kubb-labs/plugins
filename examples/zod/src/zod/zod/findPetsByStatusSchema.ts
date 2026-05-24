@@ -14,7 +14,15 @@ export const findPetsByStatusQueryStatusSchema = z
 
 export type FindPetsByStatusQueryStatusSchema = z.infer<typeof findPetsByStatusQueryStatusSchema>
 
-export const findPetsByStatusStatus200Schema = z.array(z.lazy(() => petSchema))
+export const findPetsByStatusStatus200SchemaJson = z.array(z.lazy(() => petSchema))
+
+export type FindPetsByStatusStatus200SchemaJson = z.infer<typeof findPetsByStatusStatus200SchemaJson>
+
+export const findPetsByStatusStatus200SchemaXml = z.array(z.lazy(() => petSchema))
+
+export type FindPetsByStatusStatus200SchemaXml = z.infer<typeof findPetsByStatusStatus200SchemaXml>
+
+export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 
 export type FindPetsByStatusStatus200Schema = z.infer<typeof findPetsByStatusStatus200Schema>
 

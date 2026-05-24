@@ -17,7 +17,15 @@ export const findPetsByTagsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']
 
 export type FindPetsByTagsHeaderXEXAMPLESchema = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
 
-export const findPetsByTagsStatus200Schema = z.array(z.lazy(() => petSchema))
+export const findPetsByTagsStatus200SchemaJson = z.array(z.lazy(() => petSchema))
+
+export type FindPetsByTagsStatus200SchemaJson = z.infer<typeof findPetsByTagsStatus200SchemaJson>
+
+export const findPetsByTagsStatus200SchemaXml = z.array(z.lazy(() => petSchema))
+
+export type FindPetsByTagsStatus200SchemaXml = z.infer<typeof findPetsByTagsStatus200SchemaXml>
+
+export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 
 export type FindPetsByTagsStatus200Schema = z.infer<typeof findPetsByTagsStatus200Schema>
 

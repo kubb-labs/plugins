@@ -3,7 +3,15 @@
  * Do not edit manually.
  */
 
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
+import type {
+  PlaceOrderPatchData,
+  PlaceOrderPatchFormUrlEncodedData,
+  PlaceOrderPatchJsonData,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
+  PlaceOrderPatchXmlData,
+} from '../../models/PlaceOrderPatch.ts'
 import { createOrder } from '../createOrder.ts'
 import { faker } from '@faker-js/faker'
 
@@ -25,10 +33,28 @@ export function createPlaceOrderPatchStatus405() {
   return undefined
 }
 
-export function createPlaceOrderPatchData(data?: Partial<PlaceOrderPatchData>): PlaceOrderPatchData {
+export function createPlaceOrderPatchJsonData(data?: Partial<PlaceOrderPatchJsonData>): PlaceOrderPatchJsonData {
   faker.seed([220])
 
   return createOrder(data)
+}
+
+export function createPlaceOrderPatchXmlData(data?: Partial<PlaceOrderPatchXmlData>): PlaceOrderPatchXmlData {
+  faker.seed([220])
+
+  return createOrder(data)
+}
+
+export function createPlaceOrderPatchFormUrlEncodedData(data?: Partial<PlaceOrderPatchFormUrlEncodedData>): PlaceOrderPatchFormUrlEncodedData {
+  faker.seed([220])
+
+  return createOrder(data)
+}
+
+export function createPlaceOrderPatchData(_data?: PlaceOrderPatchData): PlaceOrderPatchData {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createPlaceOrderPatchJsonData(), createPlaceOrderPatchXmlData(), createPlaceOrderPatchFormUrlEncodedData()])
 }
 
 export function createPlaceOrderPatchResponse(_data?: PlaceOrderPatchResponse): PlaceOrderPatchResponse {

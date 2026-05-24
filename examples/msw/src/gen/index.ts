@@ -220,7 +220,17 @@ export { createPetNotFound } from './mocks/createPetNotFound.ts'
 export { createTag } from './mocks/createTag.ts'
 export { createUser } from './mocks/createUser.ts'
 export { createUserArray } from './mocks/createUserArray.ts'
-export { createAddPetData, createAddPetResponse, createAddPetStatus200, createAddPetStatus405 } from './mocks/petController/createAddPet.ts'
+export {
+  createAddPetData,
+  createAddPetFormUrlEncodedData,
+  createAddPetJsonData,
+  createAddPetResponse,
+  createAddPetStatus200,
+  createAddPetStatus200Json,
+  createAddPetStatus200Xml,
+  createAddPetStatus405,
+  createAddPetXmlData,
+} from './mocks/petController/createAddPet.ts'
 export {
   createDeletePetHeaderApiKey,
   createDeletePetPathPetId,
@@ -231,6 +241,8 @@ export {
   createFindPetsByStatusQueryStatus,
   createFindPetsByStatusResponse,
   createFindPetsByStatusStatus200,
+  createFindPetsByStatusStatus200Json,
+  createFindPetsByStatusStatus200Xml,
   createFindPetsByStatusStatus400,
 } from './mocks/petController/createFindPetsByStatus.ts'
 export {
@@ -239,23 +251,32 @@ export {
   createFindPetsByTagsQueryTags,
   createFindPetsByTagsResponse,
   createFindPetsByTagsStatus200,
+  createFindPetsByTagsStatus200Json,
+  createFindPetsByTagsStatus200Xml,
   createFindPetsByTagsStatus400,
 } from './mocks/petController/createFindPetsByTags.ts'
 export {
   createGetPetByIdPathPetId,
   createGetPetByIdResponse,
   createGetPetByIdStatus200,
+  createGetPetByIdStatus200Json,
+  createGetPetByIdStatus200Xml,
   createGetPetByIdStatus400,
   createGetPetByIdStatus404,
 } from './mocks/petController/createGetPetById.ts'
 export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './mocks/petController/createOptionsFindPetsByStatus.ts'
 export {
   createUpdatePetData,
+  createUpdatePetFormUrlEncodedData,
+  createUpdatePetJsonData,
   createUpdatePetResponse,
   createUpdatePetStatus200,
+  createUpdatePetStatus200Json,
+  createUpdatePetStatus200Xml,
   createUpdatePetStatus400,
   createUpdatePetStatus404,
   createUpdatePetStatus405,
+  createUpdatePetXmlData,
 } from './mocks/petController/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
@@ -282,26 +303,45 @@ export {
   createGetOrderByIdPathOrderId,
   createGetOrderByIdResponse,
   createGetOrderByIdStatus200,
+  createGetOrderByIdStatus200Json,
+  createGetOrderByIdStatus200Xml,
   createGetOrderByIdStatus400,
   createGetOrderByIdStatus404,
 } from './mocks/storeController/createGetOrderById.ts'
 export {
   createPlaceOrderData,
+  createPlaceOrderFormUrlEncodedData,
+  createPlaceOrderJsonData,
   createPlaceOrderResponse,
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
+  createPlaceOrderXmlData,
 } from './mocks/storeController/createPlaceOrder.ts'
 export {
   createPlaceOrderPatchData,
+  createPlaceOrderPatchFormUrlEncodedData,
+  createPlaceOrderPatchJsonData,
   createPlaceOrderPatchResponse,
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
+  createPlaceOrderPatchXmlData,
 } from './mocks/storeController/createPlaceOrderPatch.ts'
-export { createCreateUserData, createCreateUserResponse, createCreateUserStatusDefault } from './mocks/userController/createCreateUser.ts'
+export {
+  createCreateUserData,
+  createCreateUserFormUrlEncodedData,
+  createCreateUserJsonData,
+  createCreateUserResponse,
+  createCreateUserStatusDefault,
+  createCreateUserStatusDefaultJson,
+  createCreateUserStatusDefaultXml,
+  createCreateUserXmlData,
+} from './mocks/userController/createCreateUser.ts'
 export {
   createCreateUsersWithListInputData,
   createCreateUsersWithListInputResponse,
   createCreateUsersWithListInputStatus200,
+  createCreateUsersWithListInputStatus200Json,
+  createCreateUsersWithListInputStatus200Xml,
   createCreateUsersWithListInputStatusDefault,
 } from './mocks/userController/createCreateUsersWithListInput.ts'
 export {
@@ -314,6 +354,8 @@ export {
   createGetUserByNamePathUsername,
   createGetUserByNameResponse,
   createGetUserByNameStatus200,
+  createGetUserByNameStatus200Json,
+  createGetUserByNameStatus200Xml,
   createGetUserByNameStatus400,
   createGetUserByNameStatus404,
 } from './mocks/userController/createGetUserByName.ts'
@@ -322,14 +364,19 @@ export {
   createLoginUserQueryUsername,
   createLoginUserResponse,
   createLoginUserStatus200,
+  createLoginUserStatus200Json,
+  createLoginUserStatus200Xml,
   createLoginUserStatus400,
 } from './mocks/userController/createLoginUser.ts'
 export { createLogoutUserResponse, createLogoutUserStatusDefault } from './mocks/userController/createLogoutUser.ts'
 export {
   createUpdateUserData,
+  createUpdateUserFormUrlEncodedData,
+  createUpdateUserJsonData,
   createUpdateUserPathUsername,
   createUpdateUserResponse,
   createUpdateUserStatusDefault,
+  createUpdateUserXmlData,
 } from './mocks/userController/createUpdateUser.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
 export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'

@@ -1,6 +1,8 @@
 import type {
   GetUserByNameResponse,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from '../../models/ts/userController/GetUserByName.ts'
@@ -14,8 +16,22 @@ export function createGetUserByNamePathUsernameFaker(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetUserByNameStatus200Faker(data?: Partial<GetUserByNameStatus200>): GetUserByNameStatus200 {
+export function createGetUserByNameStatus200FakerJson(data?: Partial<GetUserByNameStatus200Json>): GetUserByNameStatus200Json {
   return createUserFaker(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetUserByNameStatus200FakerXml(data?: Partial<GetUserByNameStatus200Xml>): GetUserByNameStatus200Xml {
+  return createUserFaker(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetUserByNameStatus200Faker(_data?: GetUserByNameStatus200): GetUserByNameStatus200 {
+  return faker.helpers.arrayElement<any>([createGetUserByNameStatus200FakerJson(), createGetUserByNameStatus200FakerXml()])
 }
 
 /**

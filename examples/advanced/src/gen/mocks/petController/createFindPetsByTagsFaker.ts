@@ -3,6 +3,8 @@ import type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsResponse,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from '../../models/ts/petController/FindPetsByTags.ts'
 import { createPetFaker } from '../createPetFaker.ts'
@@ -27,8 +29,22 @@ export function createFindPetsByTagsHeaderXEXAMPLEFaker(data?: FindPetsByTagsHea
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Faker(data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
+export function createFindPetsByTagsStatus200FakerJson(data?: FindPetsByTagsStatus200Json): FindPetsByTagsStatus200Json {
   return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByTagsStatus200FakerXml(data?: FindPetsByTagsStatus200Xml): FindPetsByTagsStatus200Xml {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByTagsStatus200Faker(_data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
+  return faker.helpers.arrayElement<any>([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])
 }
 
 /**

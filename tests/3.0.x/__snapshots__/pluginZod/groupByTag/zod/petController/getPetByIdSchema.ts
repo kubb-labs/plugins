@@ -8,7 +8,11 @@ import { petSchema } from "../petSchema.ts";
 
 export const getPetByIdPathPetIdSchema = z.bigint().describe("ID of pet to return")
 
-export const getPetByIdStatus200Schema = petSchema
+export const getPetByIdStatus200SchemaJson = petSchema
+
+export const getPetByIdStatus200SchemaXml = petSchema
+
+export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
 export const getPetByIdStatus400Schema = z.any()
 

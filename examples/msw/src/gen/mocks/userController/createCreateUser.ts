@@ -3,14 +3,50 @@
  * Do not edit manually.
  */
 
-import type { CreateUserData, CreateUserResponse, CreateUserStatusDefault } from '../../models/CreateUser.ts'
+import type {
+  CreateUserData,
+  CreateUserFormUrlEncodedData,
+  CreateUserJsonData,
+  CreateUserResponse,
+  CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
+  CreateUserXmlData,
+} from '../../models/CreateUser.ts'
 import { createUser } from '../createUser.ts'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
  */
-export function createCreateUserStatusDefault(data?: Partial<CreateUserStatusDefault>): CreateUserStatusDefault {
+export function createCreateUserStatusDefaultJson(data?: Partial<CreateUserStatusDefaultJson>): CreateUserStatusDefaultJson {
+  faker.seed([220])
+
+  return createUser(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createCreateUserStatusDefaultXml(data?: Partial<CreateUserStatusDefaultXml>): CreateUserStatusDefaultXml {
+  faker.seed([220])
+
+  return createUser(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createCreateUserStatusDefault(_data?: CreateUserStatusDefault): CreateUserStatusDefault {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createCreateUserStatusDefaultJson(), createCreateUserStatusDefaultXml()])
+}
+
+/**
+ * @description Created user object
+ */
+export function createCreateUserJsonData(data?: Partial<CreateUserJsonData>): CreateUserJsonData {
   faker.seed([220])
 
   return createUser(data)
@@ -19,10 +55,28 @@ export function createCreateUserStatusDefault(data?: Partial<CreateUserStatusDef
 /**
  * @description Created user object
  */
-export function createCreateUserData(data?: Partial<CreateUserData>): CreateUserData {
+export function createCreateUserXmlData(data?: Partial<CreateUserXmlData>): CreateUserXmlData {
   faker.seed([220])
 
   return createUser(data)
+}
+
+/**
+ * @description Created user object
+ */
+export function createCreateUserFormUrlEncodedData(data?: Partial<CreateUserFormUrlEncodedData>): CreateUserFormUrlEncodedData {
+  faker.seed([220])
+
+  return createUser(data)
+}
+
+/**
+ * @description Created user object
+ */
+export function createCreateUserData(_data?: CreateUserData): CreateUserData {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createCreateUserJsonData(), createCreateUserXmlData(), createCreateUserFormUrlEncodedData()])
 }
 
 export function createCreateUserResponse(data?: Partial<CreateUserResponse>): CreateUserResponse {

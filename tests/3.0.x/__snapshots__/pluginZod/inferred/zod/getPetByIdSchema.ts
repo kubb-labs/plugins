@@ -10,7 +10,15 @@ export const getPetByIdPathPetIdSchema = z.bigint().describe("ID of pet to retur
 
 export type GetPetByIdPathPetIdSchema = z.infer<typeof getPetByIdPathPetIdSchema>
 
-export const getPetByIdStatus200Schema = petSchema
+export const getPetByIdStatus200SchemaJson = petSchema
+
+export type GetPetByIdStatus200SchemaJson = z.infer<typeof getPetByIdStatus200SchemaJson>
+
+export const getPetByIdStatus200SchemaXml = petSchema
+
+export type GetPetByIdStatus200SchemaXml = z.infer<typeof getPetByIdStatus200SchemaXml>
+
+export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
 export type GetPetByIdStatus200Schema = z.infer<typeof getPetByIdStatus200Schema>
 

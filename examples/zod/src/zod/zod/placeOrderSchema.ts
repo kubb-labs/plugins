@@ -18,6 +18,18 @@ export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, plac
 
 export type PlaceOrderResponseSchema = z.infer<typeof placeOrderResponseSchema>
 
-export const placeOrderDataSchema = orderSchema.optional()
+export const placeOrderDataSchemaJson = orderSchema.optional()
+
+export type PlaceOrderDataSchemaJson = z.infer<typeof placeOrderDataSchemaJson>
+
+export const placeOrderDataSchemaXml = orderSchema.optional()
+
+export type PlaceOrderDataSchemaXml = z.infer<typeof placeOrderDataSchemaXml>
+
+export const placeOrderDataSchemaFormUrlEncoded = orderSchema.optional()
+
+export type PlaceOrderDataSchemaFormUrlEncoded = z.infer<typeof placeOrderDataSchemaFormUrlEncoded>
+
+export const placeOrderDataSchema = z.union([placeOrderDataSchemaJson, placeOrderDataSchemaXml, placeOrderDataSchemaFormUrlEncoded])
 
 export type PlaceOrderDataSchema = z.infer<typeof placeOrderDataSchema>

@@ -9,7 +9,15 @@ export const addPetStatus405Schema = z.object({
 
 export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
 
-export const addPetStatusDefaultSchema = z.lazy(() => petSchema.omit({ name: true }))
+export const addPetStatusDefaultSchemaJson = z.lazy(() => petSchema.omit({ name: true }))
+
+export type AddPetStatusDefaultSchemaJson = z.infer<typeof addPetStatusDefaultSchemaJson>
+
+export const addPetStatusDefaultSchemaXml = z.lazy(() => petSchema.omit({ name: true }))
+
+export type AddPetStatusDefaultSchemaXml = z.infer<typeof addPetStatusDefaultSchemaXml>
+
+export const addPetStatusDefaultSchema = z.union([addPetStatusDefaultSchemaJson, addPetStatusDefaultSchemaXml])
 
 export type AddPetStatusDefaultSchema = z.infer<typeof addPetStatusDefaultSchema>
 
@@ -17,6 +25,18 @@ export const addPetResponseSchema = z.union([addPetStatus405Schema, addPetStatus
 
 export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
 
-export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+
+export type AddPetDataSchemaJson = z.infer<typeof addPetDataSchemaJson>
+
+export const addPetDataSchemaXml = z.lazy(() => petSchema.omit({ id: true })).describe('Create a new pet in the store')
+
+export type AddPetDataSchemaXml = z.infer<typeof addPetDataSchemaXml>
+
+export const addPetDataSchemaFormUrlEncoded = z.lazy(() => petSchema.omit({ id: true })).describe('Create a new pet in the store')
+
+export type AddPetDataSchemaFormUrlEncoded = z.infer<typeof addPetDataSchemaFormUrlEncoded>
+
+export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
 export type AddPetDataSchema = z.infer<typeof addPetDataSchema>

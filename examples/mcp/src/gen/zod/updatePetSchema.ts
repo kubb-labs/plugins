@@ -6,7 +6,11 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.js'
 
-export const updatePetStatus200Schema = petSchema.omit({ name: true })
+export const updatePetStatus200SchemaJson = petSchema.omit({ name: true })
+
+export const updatePetStatus200SchemaXml = petSchema.omit({ name: true })
+
+export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
 export const updatePetStatus202Schema = z.object({
   id: z.int().optional(),
@@ -26,4 +30,10 @@ export const updatePetResponseSchema = z.union([
   updatePetStatus405Schema,
 ])
 
-export const updatePetDataSchema = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+export const updatePetDataSchemaJson = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+
+export const updatePetDataSchemaXml = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+
+export const updatePetDataSchemaFormUrlEncoded = petSchema.omit({ id: true }).describe('Update an existent pet in the store')
+
+export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])

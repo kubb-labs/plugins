@@ -12,4 +12,10 @@ export const placeOrderPatchStatus405Schema = z.any()
 
 export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
-export const placeOrderPatchDataSchema = z.optional(orderSchema)
+export const placeOrderPatchDataSchemaJson = z.optional(orderSchema)
+
+export const placeOrderPatchDataSchemaXml = z.optional(orderSchema)
+
+export const placeOrderPatchDataSchemaFormUrlEncoded = z.optional(orderSchema)
+
+export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])

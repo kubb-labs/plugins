@@ -12,4 +12,10 @@ export const updateUserStatusDefaultSchema = z.any()
 
 export const updateUserResponseSchema = updateUserStatusDefaultSchema
 
-export const updateUserDataSchema = userSchema.optional().describe("Update an existent user in the store")
+export const updateUserDataSchemaJson = userSchema.optional().describe("Update an existent user in the store")
+
+export const updateUserDataSchemaXml = userSchema.optional().describe("Update an existent user in the store")
+
+export const updateUserDataSchemaFormUrlEncoded = userSchema.optional().describe("Update an existent user in the store")
+
+export const updateUserDataSchema = z.union([updateUserDataSchemaJson, updateUserDataSchemaXml, updateUserDataSchemaFormUrlEncoded])

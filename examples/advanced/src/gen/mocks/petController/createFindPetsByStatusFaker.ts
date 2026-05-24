@@ -1,4 +1,10 @@
-import type { FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/ts/petController/FindPetsByStatus.ts'
+import type {
+  FindPetsByStatusResponse,
+  FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
+  FindPetsByStatusStatus400,
+} from '../../models/ts/petController/FindPetsByStatus.ts'
 import { createPetFaker } from '../createPetFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -9,8 +15,22 @@ export function createFindPetsByStatusPathStepIdFaker(data?: string): string {
 /**
  * @description successful operation
  */
-export function createFindPetsByStatusStatus200Faker(data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
+export function createFindPetsByStatusStatus200FakerJson(data?: FindPetsByStatusStatus200Json): FindPetsByStatusStatus200Json {
   return [...faker.helpers.multiple(() => createPetFaker(), { count: { min: 1, max: 3 } }), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200FakerXml(data?: FindPetsByStatusStatus200Xml): FindPetsByStatusStatus200Xml {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200Faker(_data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
+  return faker.helpers.arrayElement<any>([createFindPetsByStatusStatus200FakerJson(), createFindPetsByStatusStatus200FakerXml()])
 }
 
 /**

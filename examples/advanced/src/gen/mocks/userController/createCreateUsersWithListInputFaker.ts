@@ -2,6 +2,8 @@ import type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from '../../models/ts/userController/CreateUsersWithListInput.ts'
 import { createUserFaker } from '../createUserFaker.ts'
@@ -10,8 +12,22 @@ import { faker } from '@faker-js/faker'
 /**
  * @description Successful operation
  */
-export function createCreateUsersWithListInputStatus200Faker(data?: Partial<CreateUsersWithListInputStatus200>): CreateUsersWithListInputStatus200 {
+export function createCreateUsersWithListInputStatus200FakerJson(data?: Partial<CreateUsersWithListInputStatus200Json>): CreateUsersWithListInputStatus200Json {
   return createUserFaker(data)
+}
+
+/**
+ * @description Successful operation
+ */
+export function createCreateUsersWithListInputStatus200FakerXml(data?: Partial<CreateUsersWithListInputStatus200Xml>): CreateUsersWithListInputStatus200Xml {
+  return createUserFaker(data)
+}
+
+/**
+ * @description Successful operation
+ */
+export function createCreateUsersWithListInputStatus200Faker(_data?: CreateUsersWithListInputStatus200): CreateUsersWithListInputStatus200 {
+  return faker.helpers.arrayElement<any>([createCreateUsersWithListInputStatus200FakerJson(), createCreateUsersWithListInputStatus200FakerXml()])
 }
 
 /**
