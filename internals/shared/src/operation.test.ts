@@ -13,6 +13,7 @@ import {
   isErrorStatusCode,
   isSuccessStatusCode,
   groupOperationTypeImports,
+  inlineOperationResolver,
   resolveErrorNames,
   resolveOperationTypeImports,
   resolveOperationTypeNames,
@@ -66,14 +67,20 @@ describe('operationTypes inlining', () => {
     ],
   })
 
-  test('resolveSuccessNames inlines $ref responses when operationTypes is false', () => {
+  test('inlineOperationResolver inlines $ref response names so resolveSuccessNames needs no flag', () => {
     expect(resolveSuccessNames(refOperation, resolver)).toEqual(['Status200'])
-    expect(resolveSuccessNames(refOperation, resolver, { operationTypes: false })).toEqual(['Pet'])
+    expect(resolveSuccessNames(refOperation, inlineOperationResolver(resolver, false))).toEqual(['Pet'])
   })
 
-  test('resolveErrorNames inlines $ref responses but keeps inline aliases', () => {
+  test('inlineOperationResolver keeps inline aliases for non-$ref responses', () => {
     expect(resolveErrorNames(refOperation, resolver)).toEqual(['Status422', 'Status500'])
-    expect(resolveErrorNames(refOperation, resolver, { operationTypes: false })).toEqual(['HttpValidationError', 'Status500'])
+    expect(resolveErrorNames(refOperation, inlineOperationResolver(resolver, false))).toEqual(['HttpValidationError', 'Status500'])
+  })
+
+  test('inlineOperationResolver is a no-op when operationTypes is not false', () => {
+    expect(inlineOperationResolver(resolver, true)).toBe(resolver)
+    expect(inlineOperationResolver(resolver, undefined)).toBe(resolver)
+    expect(resolveSuccessNames(refOperation, inlineOperationResolver(resolver, true))).toEqual(['Status200'])
   })
 
   test('resolveRequestTypeName inlines a $ref request body', () => {

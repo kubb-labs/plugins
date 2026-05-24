@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildEnabledCheck } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, resolveErrorNames, resolveRequestTypeName, resolveSuccessNames } from '../utils.ts'
+import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -17,7 +17,6 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
-  operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -29,12 +28,11 @@ export function getQueryOptionsParams(
     paramsType: PluginReactQuery['resolvedOptions']['paramsType']
     paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
-    operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, operationTypes, resolver } = options
-  const requestName = resolveRequestTypeName({ node, resolver, operationTypes })
+  const { paramsType, paramsCasing, pathParamsType, resolver } = options
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   return ast.createOperationParams(node, {
     paramsType,
@@ -58,7 +56,6 @@ export function QueryOptions({
   name,
   clientName,
   dataReturnType,
-  operationTypes,
   node,
   tsResolver,
   paramsCasing,
@@ -66,14 +63,14 @@ export function QueryOptions({
   pathParamsType,
   queryKeyName,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
+  const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
+  const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, operationTypes, resolver: tsResolver })
+  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')

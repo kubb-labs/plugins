@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, getComments, resolveErrorNames, resolveRequestTypeName, resolveSuccessNames } from '../utils.ts'
+import { buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -18,7 +18,6 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
-  operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
 }
 
@@ -32,15 +31,14 @@ function buildSuspenseQueryParamsNode(
     paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
-    operationTypes: PluginReactQuery['resolvedOptions']['client']['operationTypes']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, dataReturnType, operationTypes, resolver } = options
-  const successNames = resolveSuccessNames(node, resolver, { operationTypes })
+  const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
+  const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
-  const requestName = resolveRequestTypeName({ node, resolver, operationTypes })
-  const errorNames = resolveErrorNames(node, resolver, { operationTypes })
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+  const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -75,14 +73,13 @@ export function SuspenseQuery({
   paramsCasing,
   pathParamsType,
   dataReturnType,
-  operationTypes,
   node,
   tsResolver,
   customOptions,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
+  const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
+  const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -92,10 +89,10 @@ export function SuspenseQuery({
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, operationTypes, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildSuspenseQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, operationTypes, resolver: tsResolver })
+  const paramsNode = buildSuspenseQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

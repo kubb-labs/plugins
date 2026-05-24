@@ -95,12 +95,8 @@ export function getContentTypeInfo(node: ast.OperationNode): ContentTypeInfo {
   }
 }
 
-export function buildRequestConfigType(
-  node: ast.OperationNode,
-  resolver: RequestConfigResolver & TypeNameResolver,
-  { operationTypes }: OperationTypesOptions = {},
-): string {
-  const requestName = resolveRequestTypeName({ node, resolver, operationTypes })
+export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
   const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
   const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null].filter(Boolean).join('; ')
@@ -217,13 +213,17 @@ export function resolveRequestTypeName({ node, resolver, operationTypes = true }
 }
 
 /**
- * Wraps a resolver so `resolveDataName` returns the inlined base type for a `$ref` request
- * body when `operationTypes` is false. Use it for `ast.createOperationParams`, which types the
- * `data` parameter via `resolveDataName` and cannot otherwise see the inlining decision.
+ * Wraps a resolver so response and request body names resolve to the inlined base type for a
+ * single `$ref` when `operationTypes` is false. Apply it once per operation so every downstream
+ * consumer — `resolveSuccessNames`, `buildRequestConfigType`, `ast.createOperationParams` — sees
+ * the inlining decision without threading the flag through each call.
  *
  * Returns the resolver unchanged when `operationTypes` is not false.
  */
-export function inlineOperationResolver<T extends RequestConfigResolver & TypeNameResolver>(resolver: T, operationTypes: boolean | undefined): T {
+export function inlineOperationResolver<T extends RequestConfigResolver & ResponseStatusNameResolver & TypeNameResolver>(
+  resolver: T,
+  operationTypes: boolean | undefined,
+): T {
   if (operationTypes !== false) {
     return resolver
   }
@@ -233,35 +233,27 @@ export function inlineOperationResolver<T extends RequestConfigResolver & TypeNa
     resolveDataName(node: ast.OperationNode): string {
       return resolveRequestTypeName({ node, resolver, operationTypes }) ?? resolver.resolveDataName(node)
     },
+    resolveResponseStatusName(node: ast.OperationNode, statusCode: ast.StatusCode): string {
+      const response = node.responses.find((res) => String(res.statusCode) === String(statusCode))
+      return response ? resolveResponseTypeName({ node, response, resolver, operationTypes }) : resolver.resolveResponseStatusName(node, statusCode)
+    },
   }
 }
 
-export function resolveErrorNames(
-  node: ast.OperationNode,
-  resolver: ResponseStatusNameResolver & TypeNameResolver,
-  { operationTypes }: OperationTypesOptions = {},
-): string[] {
+export function resolveErrorNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
   return node.responses
     .filter((response) => isErrorStatusCode(response.statusCode))
-    .map((response) => resolveResponseTypeName({ node, response, resolver, operationTypes }))
+    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }
 
-export function resolveSuccessNames(
-  node: ast.OperationNode,
-  resolver: ResponseStatusNameResolver & TypeNameResolver,
-  { operationTypes }: OperationTypesOptions = {},
-): string[] {
+export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
   return node.responses
     .filter((response) => isSuccessStatusCode(response.statusCode))
-    .map((response) => resolveResponseTypeName({ node, response, resolver, operationTypes }))
+    .map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }
 
-export function resolveStatusCodeNames(
-  node: ast.OperationNode,
-  resolver: ResponseStatusNameResolver & TypeNameResolver,
-  { operationTypes }: OperationTypesOptions = {},
-): string[] {
-  return node.responses.map((response) => resolveResponseTypeName({ node, response, resolver, operationTypes }))
+export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
+  return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }
 
 /**

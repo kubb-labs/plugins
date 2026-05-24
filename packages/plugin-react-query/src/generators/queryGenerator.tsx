@@ -149,7 +149,6 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
             paramsCasing={clientOptions.paramsCasing || paramsCasing}
             paramsType={paramsType}
             pathParamsType={pathParamsType}
-            operationTypes={clientOptions.operationTypes ?? true}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -169,7 +168,6 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
           paramsType={paramsType}
           pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
-          operationTypes={clientOptions.operationTypes ?? true}
         />
 
         {query && (
@@ -187,7 +185,6 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
               paramsType={paramsType}
               pathParamsType={pathParamsType}
               dataReturnType={clientOptions.dataReturnType || 'data'}
-              operationTypes={clientOptions.operationTypes ?? true}
               customOptions={customOptions}
             />
           </>

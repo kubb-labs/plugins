@@ -12,7 +12,6 @@ export {
   buildRequestConfigType,
   getContentTypeInfo,
   resolveErrorNames,
-  resolveRequestTypeName,
   resolveStatusCodeNames,
   resolveSuccessNames,
 } from '@internals/shared'

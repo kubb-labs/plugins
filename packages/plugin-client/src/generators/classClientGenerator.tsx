@@ -206,7 +206,6 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             pathParamsType={pathParamsType}
             paramsCasing={paramsCasing}
             paramsType={paramsType}
-            operationTypes={operationTypes}
             parser={parser}
           />
         </File>

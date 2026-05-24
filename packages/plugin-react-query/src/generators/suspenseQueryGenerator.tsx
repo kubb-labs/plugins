@@ -151,7 +151,6 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
             paramsCasing={clientOptions.paramsCasing || paramsCasing}
             paramsType={paramsType}
             pathParamsType={pathParamsType}
-            operationTypes={clientOptions.operationTypes ?? true}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -171,7 +170,6 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
           paramsType={paramsType}
           pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
-          operationTypes={clientOptions.operationTypes ?? true}
         />
 
         {suspense && (
@@ -189,7 +187,6 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
               paramsType={paramsType}
               pathParamsType={pathParamsType}
               dataReturnType={clientOptions.dataReturnType || 'data'}
-              operationTypes={clientOptions.operationTypes ?? true}
               customOptions={customOptions}
             />
           </>

@@ -141,7 +141,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
             paramsCasing={clientOptions.paramsCasing || paramsCasing}
             paramsType={paramsType}
             pathParamsType={pathParamsType}
-            operationTypes={clientOptions.operationTypes ?? true}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -161,7 +160,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
           paramsType={paramsType}
           pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
-          operationTypes={clientOptions.operationTypes ?? true}
         />
 
         {mutation && (
@@ -176,7 +174,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
               node={node}
               tsResolver={tsResolver}
               dataReturnType={clientOptions.dataReturnType || 'data'}
-              operationTypes={clientOptions.operationTypes ?? true}
               paramsCasing={paramsCasing}
               pathParamsType={pathParamsType}
               customOptions={customOptions}

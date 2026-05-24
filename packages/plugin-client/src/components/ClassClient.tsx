@@ -27,7 +27,6 @@ type Props = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  operationTypes: PluginClient['resolvedOptions']['operationTypes']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   children?: KubbReactNode
 }
@@ -43,7 +42,6 @@ type GenerateMethodProps = {
   paramsType: PluginClient['resolvedOptions']['paramsType']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  operationTypes: PluginClient['resolvedOptions']['operationTypes']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -59,7 +57,6 @@ function generateMethod({
   paramsType,
   paramsCasing,
   pathParamsType,
-  operationTypes,
 }: GenerateMethodProps): string {
   const path = new URLPath(node.path, { casing: paramsCasing })
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
@@ -67,8 +64,8 @@ function generateMethod({
   const { header: headerParams } = getOperationParameters(node)
   const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
-  const generics = buildGenerics(node, tsResolver, operationTypes)
-  const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, operationTypes, node, tsResolver, isConfigurable: true })
+  const generics = buildGenerics(node, tsResolver)
+  const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers })
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
@@ -103,7 +100,6 @@ export function ClassClient({
   paramsType,
   paramsCasing,
   pathParamsType,
-  operationTypes,
   children,
 }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver }) =>
@@ -118,7 +114,6 @@ export function ClassClient({
       paramsType,
       paramsCasing,
       pathParamsType,
-      operationTypes,
     }),
   )
 

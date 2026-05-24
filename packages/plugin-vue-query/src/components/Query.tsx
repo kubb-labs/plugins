@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { getComments, resolveErrorNames, resolveRequestTypeName, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -19,7 +19,6 @@ type Props = {
   paramsType: PluginVueQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
-  operationTypes: PluginVueQuery['resolvedOptions']['client']['operationTypes']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -32,15 +31,14 @@ function buildQueryParamsNode(
     paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
     pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
     dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
-    operationTypes: PluginVueQuery['resolvedOptions']['client']['operationTypes']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, dataReturnType, operationTypes, resolver } = options
-  const successNames = resolveSuccessNames(node, resolver, { operationTypes })
+  const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
+  const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
-  const requestName = resolveRequestTypeName({ node, resolver, operationTypes })
-  const errorNames = resolveErrorNames(node, resolver, { operationTypes })
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+  const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -78,13 +76,12 @@ export function Query({
   paramsCasing,
   pathParamsType,
   dataReturnType,
-  operationTypes,
   node,
   tsResolver,
 }: Props): KubbReactNode {
-  const successNames = resolveSuccessNames(node, tsResolver, { operationTypes })
+  const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const errorNames = resolveErrorNames(node, tsResolver, { operationTypes })
+  const errorNames = resolveErrorNames(node, tsResolver)
 
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -94,10 +91,10 @@ export function Query({
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, operationTypes, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, operationTypes, resolver: tsResolver })
+  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

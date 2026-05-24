@@ -131,7 +131,6 @@ export const clientGenerator = defineGenerator<PluginClient>({
           pathParamsType={pathParamsType}
           paramsCasing={paramsCasing}
           paramsType={paramsType}
-          operationTypes={operationTypes}
           node={node}
           tsResolver={tsResolver}
           zodResolver={zodResolver}
