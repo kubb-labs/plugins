@@ -4,7 +4,6 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { GetPetPathPetId, GetPetResponse, GetPetStatus200 } from './GetPet'
 import { client } from './.kubb/client'
 import { GetPetResponse } from './GetPet'
-import { parseGetPetStatus200 } from './transformers/GetPet'
 
 export function getGetPetUrl(petId: GetPetPathPetId) {
   const res = { method: 'GET', url: `/pet/${petId}` as const }
@@ -20,5 +19,5 @@ export async function getPet(petId: GetPetPathPetId, config: Partial<RequestConf
 
   const res = await request<GetPetStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getGetPetUrl(petId).url.toString(), ...requestConfig })
 
-  return GetPetResponse.parse(parseGetPetStatus200(res.data))
+  return GetPetResponse.parse(res.data)
 }

@@ -754,7 +754,7 @@ options:
       - **Responses** — ISO `string` → `Date` (via `new Date(value)`).
       - **Request bodies** — `Date` → ISO `string` (`date` → `YYYY-MM-DD`, `time` → `HH:mm:ss`, `date-time` → full ISO).
 
-      Detection is schema-driven: only fields actually typed as a date are converted, including nested objects, arrays, and `$ref`s. The behavior is independent of `parser` — `'client'` and `'zod'` produce the same result.
+      Detection is schema-driven: only fields actually typed as a date are converted, including nested objects, arrays, and `$ref`s. Applies to `parser: 'client'`; with `parser: 'zod'`, Zod owns response validation/coercion and `coerceDates` is ignored.
     examples:
       - name: Coerce dates in the generated client
         files:

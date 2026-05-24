@@ -72,14 +72,16 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
 
-    const transformerFile = coerceDates
+    // The custom runtime date parser is incompatible with the Zod parser, which owns response validation/coercion.
+    const coerceActive = coerceDates && parser !== 'zod'
+    const transformerFile = coerceActive
       ? tsResolver.resolveFile(
           { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
           { root, output: resolveTransformerOutput(output), group: group ?? undefined },
         )
       : null
-    const responseTransformName = coerceDates ? resolveResponseTransformName(node, (n, code) => tsResolver.resolveResponseStatusName(n, code)) : null
-    const requestSerializeName = coerceDates ? resolveRequestSerializeName(node, (n) => tsResolver.resolveDataName(n)) : null
+    const responseTransformName = coerceActive ? resolveResponseTransformName(node, (n, code) => tsResolver.resolveResponseStatusName(n, code)) : null
+    const requestSerializeName = coerceActive ? resolveRequestSerializeName(node, (n) => tsResolver.resolveDataName(n)) : null
     const coerceImportNames = [responseTransformName, requestSerializeName].filter((name): name is string => Boolean(name))
 
     return (
