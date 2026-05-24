@@ -224,8 +224,11 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.
         const useInputVariant = node.ref != null && this.options.direction === 'input' && containsDateRepresentation(node)
-        const lookupName = useInputVariant ? `${refName} input` : refName
-        const resolvedName = node.ref ? (this.options.resolver?.default(lookupName, 'function') ?? refName) : node.name
+        const resolvedName = node.ref
+          ? useInputVariant
+            ? (this.options.resolver?.resolveInputSchemaName(refName) ?? refName)
+            : (this.options.resolver?.default(refName, 'function') ?? refName)
+          : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {
           return `z.lazy(() => ${resolvedName})`

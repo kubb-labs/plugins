@@ -84,7 +84,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }))
     const inputImportEntries = isDateBearing
       ? [...dateBearingRefNames].map((schemaName) => ({
-          name: resolver.resolveSchemaName(`${schemaName} input`),
+          name: resolver.resolveInputSchemaName(schemaName),
           path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
       : []
@@ -121,10 +121,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
         <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} />
         {isDateBearing && stdPrinters && (
           <Zod
-            name={resolver.resolveSchemaName(`${node.name} input`)}
+            name={resolver.resolveInputSchemaName(node.name)}
             node={node}
             printer={stdPrinters.input}
-            inferTypeName={inferred ? resolver.resolveSchemaTypeName(`${node.name} input`) : null}
+            inferTypeName={inferred ? resolver.resolveInputSchemaTypeName(node.name) : null}
           />
         )}
       </File>
@@ -174,7 +174,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             )
           : null
       const imports = adapter.getImports(schema, (schemaName) => ({
-        name: dateBearingRefNames?.has(schemaName) ? resolver.resolveSchemaName(`${schemaName} input`) : resolver.resolveSchemaName(schemaName),
+        name: dateBearingRefNames?.has(schemaName) ? resolver.resolveInputSchemaName(schemaName) : resolver.resolveSchemaName(schemaName),
         path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
 
