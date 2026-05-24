@@ -22,6 +22,8 @@ export type AddFilesJsonData =
   | {
       /**
        * @description URL of the image to upload
+       *
+       * Format: `uri`
        * @type string
        */
       url: string

@@ -24,21 +24,29 @@ export type OrderHttpStatusEnumKey = (typeof orderHttpStatusEnum)[keyof typeof o
  */
 export type Order = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
   id?: bigint
   /**
+   * @description
+   * Format: `int64`
    * @example 198772
    * @type integer | undefined
    */
   petId?: bigint
   /**
+   * @description
+   * Format: `int32`
    * @example 7
    * @type integer | undefined
    */
   quantity?: number
   /**
+   * @description
+   * Format: `date-time`
    * @type string | undefined
    */
   shipDate?: string
@@ -91,6 +99,8 @@ export type Address = {
  */
 export type Customer = {
   /**
+   * @description
+   * Format: `int64`
    * @example 100000
    * @type integer | undefined
    */
@@ -111,6 +121,8 @@ export type Customer = {
  */
 export type Category = {
   /**
+   * @description
+   * Format: `int64`
    * @example 1
    * @type integer | undefined
    */
@@ -134,6 +146,8 @@ export type Person = {
 
 export type User = Person & {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -170,6 +184,8 @@ export type User = Person & {
   phone?: string
   /**
    * @description User Status
+   *
+   * Format: `int32`
    * @example 1
    * @type integer | undefined
    */
@@ -181,6 +197,8 @@ export type User = Person & {
  */
 export type Tag = {
   /**
+   * @description
+   * Format: `int64`
    * @type integer | undefined
    */
   id?: bigint
@@ -203,6 +221,8 @@ export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum
  */
 export type Pet = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -244,6 +264,8 @@ export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof 
  */
 export type AddPetRequest = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -277,6 +299,8 @@ export type AddPetRequest = {
  */
 export type ApiResponse = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
@@ -295,6 +319,8 @@ export type ApiResponse = {
  */
 export type PetNotFound = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
@@ -402,6 +428,8 @@ export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
  */
 export type AddPetStatus405 = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
@@ -593,6 +621,8 @@ export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsSta
 
 /**
  * @description ID of pet to return
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetPetByIdPathPetId = bigint
@@ -654,6 +684,8 @@ export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | Get
 
 /**
  * @description ID of pet that needs to be updated
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UpdatePetWithFormPathPetId = bigint
@@ -719,6 +751,8 @@ export type DeletePetHeaderApiKey = string | undefined
 
 /**
  * @description Pet id to delete
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeletePetPathPetId = bigint
@@ -766,6 +800,8 @@ export type DeletePetResponse = DeletePetStatus400
 
 /**
  * @description ID of pet to update
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UploadFilePathPetId = bigint
@@ -782,6 +818,8 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 export type UploadFileStatus200 = ApiResponse
 
 /**
+ * @description
+ * Format: `binary`
  * @type string | undefined
  */
 export type UploadFileData = Blob | undefined
@@ -965,6 +1003,8 @@ export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatch
 
 /**
  * @description ID of order that needs to be fetched
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetOrderByIdPathOrderId = bigint
@@ -1026,6 +1066,8 @@ export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400
 
 /**
  * @description ID of the order that needs to be deleted
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeleteOrderPathOrderId = bigint

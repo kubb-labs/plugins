@@ -22,6 +22,8 @@ export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
  */
 export type UpdatePetStatus202 = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
