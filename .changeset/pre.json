@@ -42,6 +42,7 @@
     "fix-object-header-serialization",
     "kubb-core-beta-23-alignment",
     "kubb-core-beta-24-alignment",
+    "kubb-core-beta-29-alignment",
     "multi-content-type-request-body",
     "oas-ts-resolve-options",
     "open-pianos-create",
