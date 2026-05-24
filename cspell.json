@@ -75,6 +75,7 @@
     "APIV",
     "dedupe",
     "inlines",
+    "inlinable",
     "Oxlint",
     "Oxfmt",
     "whatwg",
