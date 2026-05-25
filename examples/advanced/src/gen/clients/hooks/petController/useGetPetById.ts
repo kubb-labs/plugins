@@ -16,7 +16,6 @@ export function getPetByIdQueryOptions({ petId }: { petId: GetPetByIdPathPetId }
     ResponseConfig<GetPetByIdStatus200>,
     typeof queryKey
   >({
-    enabled: !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ petId }, { ...config, signal: config.signal ?? signal })

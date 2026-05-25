@@ -32,7 +32,6 @@ export function getUserByNameQueryOptions({ username }: { username: GetUserByNam
 
         const queryKey = getUserByNameQueryKey({ username })
         return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
-         enabled: !!(username),
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByName({ username }, { ...config, signal: config.signal ?? signal })

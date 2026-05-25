@@ -37,7 +37,6 @@ export function findPetsByTagsQueryOptions(
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<Error>, ResponseConfig<FindPetsByTagsStatus200>>({
-    enabled: () => !!toValue(params),
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTags(toValue(params), { ...config, signal: config.signal ?? signal })

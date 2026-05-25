@@ -173,23 +173,3 @@ export function buildQueryKeyParams(
 
   return ast.createFunctionParameters({ params })
 }
-
-export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
-  const required: string[] = []
-  for (const param of paramsNode.params) {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      for (const child of group.properties) {
-        if (!child.optional && child.default === undefined) {
-          required.push(child.name)
-        }
-      }
-    } else {
-      const fp = param as ast.FunctionParameterNode
-      if (!fp.optional && fp.default === undefined) {
-        required.push(fp.name)
-      }
-    }
-  }
-  return required.join(' && ')
-}

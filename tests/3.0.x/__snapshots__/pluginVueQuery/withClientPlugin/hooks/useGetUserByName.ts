@@ -19,7 +19,6 @@ export function getUserByNameQueryOptions(username: MaybeRefOrGetter<GetUserByNa
 
         const queryKey = getUserByNameQueryKey(username)
         return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200>({
-         enabled: () => !!toValue(username),
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByName(toValue(username), { ...config, signal: config.signal ?? signal })

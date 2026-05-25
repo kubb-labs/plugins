@@ -3,7 +3,6 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildEnabledCheck } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
@@ -17,7 +16,6 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
-  suspense?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -63,7 +61,6 @@ export function QueryOptions({
   paramsType,
   pathParamsType,
   queryKeyName,
-  suspense,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
@@ -80,16 +77,12 @@ export function QueryOptions({
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = suspense ? '' : enabledSource ? `enabled: !!(${enabledSource}),` : ''
-
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature}>
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({
-       ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
           return ${clientName}(${clientCallStr})

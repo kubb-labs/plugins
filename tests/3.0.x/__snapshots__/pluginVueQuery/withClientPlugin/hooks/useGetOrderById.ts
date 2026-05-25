@@ -19,7 +19,6 @@ export function getOrderByIdQueryOptions(orderId: MaybeRefOrGetter<GetOrderByIdP
 
         const queryKey = getOrderByIdQueryKey(orderId)
         return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200>({
-         enabled: () => !!toValue(orderId),
          queryKey,
          queryFn: async ({ signal }) => {
             return getOrderById(toValue(orderId), { ...config, signal: config.signal ?? signal })

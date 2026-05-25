@@ -251,7 +251,6 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
 export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey(petId)
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById(petId, { ...config, signal: config.signal ?? signal })
@@ -455,7 +454,6 @@ export async function getPetByIdSuspense(petId: GetPetByIdPathPetId, config: Par
 export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdSuspenseQueryKey(petId)
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetByIdSuspense(petId, { ...config, signal: config.signal ?? signal })
@@ -1002,7 +1000,6 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
 export function getOrderByIdQueryOptions(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getOrderByIdQueryKey(orderId)
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-    enabled: !!orderId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderById(orderId, { ...config, signal: config.signal ?? signal })
@@ -1189,7 +1186,6 @@ export async function getOrderByIdSuspense(orderId: GetOrderByIdPathOrderId, con
 export function getOrderByIdSuspenseQueryOptions(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getOrderByIdSuspenseQueryKey(orderId)
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-    enabled: !!orderId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderByIdSuspense(orderId, { ...config, signal: config.signal ?? signal })
@@ -1749,7 +1745,6 @@ export async function getUserByName(username: GetUserByNamePathUsername, config:
 export function getUserByNameQueryOptions(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getUserByNameQueryKey(username)
   return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
-    enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByName(username, { ...config, signal: config.signal ?? signal })
@@ -1865,7 +1860,6 @@ export async function getUserByNameSuspense(username: GetUserByNamePathUsername,
 export function getUserByNameSuspenseQueryOptions(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getUserByNameSuspenseQueryKey(username)
   return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
-    enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByNameSuspense(username, { ...config, signal: config.signal ?? signal })

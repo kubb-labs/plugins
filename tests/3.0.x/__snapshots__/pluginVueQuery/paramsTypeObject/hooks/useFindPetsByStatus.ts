@@ -35,7 +35,6 @@ export function findPetsByStatusQueryOptions({ params }: { params?: MaybeRefOrGe
 
         const queryKey = findPetsByStatusQueryKey(params)
         return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
-
          queryKey,
          queryFn: async ({ signal }) => {
             return findPetsByStatus({ params: toValue(params) }, { ...config, signal: config.signal ?? signal })

@@ -22,7 +22,6 @@ export function getUserByNameQueryOptions({ username }: { username: GetUserByNam
     ResponseConfig<GetUserByNameStatus200>,
     typeof queryKey
   >({
-    enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
       return getUserByName({ username }, { ...config, signal: config.signal ?? signal })

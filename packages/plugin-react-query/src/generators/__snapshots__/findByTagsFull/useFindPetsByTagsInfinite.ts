@@ -50,7 +50,6 @@ export function findPetsByTagsInfiniteQueryOptions(
     typeof queryKey,
     number
   >({
-    enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTagsInfinite(params, { ...config, signal: config.signal ?? signal })

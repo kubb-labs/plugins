@@ -35,7 +35,6 @@ export async function getOrderByIdHook({ orderId }: { orderId: GetOrderByIdPathO
 export function getOrderByIdQueryOptionsHook({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getOrderByIdQueryKey({ orderId })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-    enabled: !!orderId,
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderByIdHook({ orderId }, { ...config, signal: config.signal ?? signal })

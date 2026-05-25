@@ -17,7 +17,6 @@ export function findPetsByStatusQueryOptions({ stepId }: { stepId: FindPetsBySta
     ResponseConfig<FindPetsByStatusStatus200>,
     typeof queryKey
   >({
-    enabled: !!stepId,
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByStatus({ stepId }, { ...config, signal: config.signal ?? signal })

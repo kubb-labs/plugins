@@ -3,7 +3,6 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildEnabledCheck } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
 import { resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
@@ -83,21 +82,12 @@ export function QueryOptions({
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource
-    ? `enabled: () => ${enabledSource
-        .split(' && ')
-        .map((n) => `!!toValue(${n.trim()})`)
-        .join(' && ')},`
-    : ''
-
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature}>
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return queryOptions<${TData}, ${TError}, ${TData}>({
-       ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
           return ${clientName}(${addToValueCalls(clientCallStr)})

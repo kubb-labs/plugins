@@ -17,7 +17,6 @@ export function getOrderByIdSuspenseQueryOptions(orderId: GetOrderByIdPathOrderI
 
         const queryKey = getOrderByIdSuspenseQueryKey(orderId)
         return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-
          queryKey,
          queryFn: async ({ signal }) => {
             return getOrderById(orderId, { ...config, signal: config.signal ?? signal })

@@ -34,7 +34,6 @@ export async function getPetByIdHook({ pet_id }: { pet_id: GetPetByIdPathPetId }
 export function getPetByIdQueryOptionsHook({ pet_id }: { pet_id: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ pet_id })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetByIdHook({ pet_id }, { ...config, signal: config.signal ?? signal })

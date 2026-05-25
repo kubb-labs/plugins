@@ -17,7 +17,6 @@ export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, confi
 
         const queryKey = getPetByIdSuspenseQueryKey(petId)
         return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-
          queryKey,
          queryFn: async ({ signal }) => {
             return getPetById(petId, { ...config, signal: config.signal ?? signal })

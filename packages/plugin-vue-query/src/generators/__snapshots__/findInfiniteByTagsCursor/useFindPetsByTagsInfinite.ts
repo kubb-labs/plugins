@@ -37,7 +37,6 @@ export function findPetsByTagsInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
   return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, QueryKey, number>({
-    enabled: () => !!toValue(params),
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTagsInfinite(toValue(params), { ...config, signal: config.signal ?? signal })
