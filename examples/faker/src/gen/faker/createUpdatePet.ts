@@ -23,14 +23,14 @@ import { faker } from '@faker-js/faker'
  * @description Successful operation
  */
 export function createUpdatePetStatus200Json(data?: Partial<UpdatePetStatus200Json>): UpdatePetStatus200Json {
-  return createPet(data)
+  return createPet(data) as UpdatePetStatus200Json
 }
 
 /**
  * @description Successful operation
  */
 export function createUpdatePetStatus200Xml(data?: Partial<UpdatePetStatus200Xml>): UpdatePetStatus200Xml {
-  return createPet(data)
+  return createPet(data) as UpdatePetStatus200Xml
 }
 
 /**
@@ -65,21 +65,21 @@ export function createUpdatePetStatus405() {
  * @description Update an existent pet in the store
  */
 export function createUpdatePetJsonData(data?: Partial<UpdatePetJsonData>): UpdatePetJsonData {
-  return createPet(data)
+  return createPet(data) as UpdatePetJsonData
 }
 
 /**
  * @description Update an existent pet in the store
  */
 export function createUpdatePetXmlData(data?: Partial<UpdatePetXmlData>): UpdatePetXmlData {
-  return createPet(data)
+  return createPet(data) as UpdatePetXmlData
 }
 
 /**
  * @description Update an existent pet in the store
  */
 export function createUpdatePetFormUrlEncodedData(data?: Partial<UpdatePetFormUrlEncodedData>): UpdatePetFormUrlEncodedData {
-  return createPet(data)
+  return createPet(data) as UpdatePetFormUrlEncodedData
 }
 
 /**

@@ -8,7 +8,7 @@ import { createCategory } from './createCategory.ts'
 import { createTag } from './createTag.ts'
 import { faker } from '@faker-js/faker'
 
-export function createPet(data?: Partial<Pet>): Required<Pet> {
+export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = {
     id: faker.number.bigInt(),
@@ -21,5 +21,5 @@ export function createPet(data?: Partial<Pet>): Required<Pet> {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Pet>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

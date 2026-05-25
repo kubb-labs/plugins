@@ -17,14 +17,14 @@ export function createGetUserByNamePathUsernameFaker(data?: string): string {
  * @description successful operation
  */
 export function createGetUserByNameStatus200FakerJson(data?: Partial<GetUserByNameStatus200Json>): GetUserByNameStatus200Json {
-  return createUserFaker(data)
+  return createUserFaker(data) as GetUserByNameStatus200Json
 }
 
 /**
  * @description successful operation
  */
 export function createGetUserByNameStatus200FakerXml(data?: Partial<GetUserByNameStatus200Xml>): GetUserByNameStatus200Xml {
-  return createUserFaker(data)
+  return createUserFaker(data) as GetUserByNameStatus200Xml
 }
 
 /**

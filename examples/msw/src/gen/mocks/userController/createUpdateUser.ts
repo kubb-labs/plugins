@@ -28,7 +28,7 @@ export function createUpdateUserStatusDefault() {
 export function createUpdateUserJsonData(data?: Partial<UpdateUserJsonData>): UpdateUserJsonData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as UpdateUserJsonData
 }
 
 /**
@@ -37,7 +37,7 @@ export function createUpdateUserJsonData(data?: Partial<UpdateUserJsonData>): Up
 export function createUpdateUserXmlData(data?: Partial<UpdateUserXmlData>): UpdateUserXmlData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as UpdateUserXmlData
 }
 
 /**
@@ -46,7 +46,7 @@ export function createUpdateUserXmlData(data?: Partial<UpdateUserXmlData>): Upda
 export function createUpdateUserFormUrlEncodedData(data?: Partial<UpdateUserFormUrlEncodedData>): UpdateUserFormUrlEncodedData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as UpdateUserFormUrlEncodedData
 }
 
 /**

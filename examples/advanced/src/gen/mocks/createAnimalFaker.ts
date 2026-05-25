@@ -3,7 +3,7 @@ import { createCatFaker } from './createCatFaker.ts'
 import { createDogFaker } from './createDogFaker.ts'
 import { faker } from '@faker-js/faker'
 
-export function createAnimalFaker(data?: Partial<Animal>): Required<Animal> {
+export function createAnimalFaker<TData extends Partial<Animal> = object>(data?: TData) {
   const defaultFakeData = {
     ...faker.helpers.arrayElement<any>([
       { ...createCatFaker(), ...{ type: faker.helpers.arrayElement<(NonNullable<Animal> & Record<'type', unknown>)['type']>(['cat']) } },
@@ -14,5 +14,5 @@ export function createAnimalFaker(data?: Partial<Animal>): Required<Animal> {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Animal>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

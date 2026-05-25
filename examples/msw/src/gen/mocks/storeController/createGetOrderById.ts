@@ -26,7 +26,7 @@ export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
 export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatus200Json>): GetOrderByIdStatus200Json {
   faker.seed([220])
 
-  return createOrder(data)
+  return createOrder(data) as GetOrderByIdStatus200Json
 }
 
 /**
@@ -35,7 +35,7 @@ export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatu
 export function createGetOrderByIdStatus200Xml(data?: Partial<GetOrderByIdStatus200Xml>): GetOrderByIdStatus200Xml {
   faker.seed([220])
 
-  return createOrder(data)
+  return createOrder(data) as GetOrderByIdStatus200Xml
 }
 
 /**

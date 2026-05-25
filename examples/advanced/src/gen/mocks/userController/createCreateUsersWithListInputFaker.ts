@@ -13,14 +13,14 @@ import { faker } from '@faker-js/faker'
  * @description Successful operation
  */
 export function createCreateUsersWithListInputStatus200FakerJson(data?: Partial<CreateUsersWithListInputStatus200Json>): CreateUsersWithListInputStatus200Json {
-  return createUserFaker(data)
+  return createUserFaker(data) as CreateUsersWithListInputStatus200Json
 }
 
 /**
  * @description Successful operation
  */
 export function createCreateUsersWithListInputStatus200FakerXml(data?: Partial<CreateUsersWithListInputStatus200Xml>): CreateUsersWithListInputStatus200Xml {
-  return createUserFaker(data)
+  return createUserFaker(data) as CreateUsersWithListInputStatus200Xml
 }
 
 /**

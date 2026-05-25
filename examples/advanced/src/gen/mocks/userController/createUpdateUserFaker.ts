@@ -17,21 +17,21 @@ export function createUpdateUserStatusDefaultFaker() {
  * @description Update an existent user in the store
  */
 export function createUpdateUserDataFakerJson(data?: Partial<UpdateUserJsonData>): UpdateUserJsonData {
-  return createUserFaker(data)
+  return createUserFaker(data) as UpdateUserJsonData
 }
 
 /**
  * @description Update an existent user in the store
  */
 export function createUpdateUserDataFakerXml(data?: Partial<UpdateUserXmlData>): UpdateUserXmlData {
-  return createUserFaker(data)
+  return createUserFaker(data) as UpdateUserXmlData
 }
 
 /**
  * @description Update an existent user in the store
  */
 export function createUpdateUserDataFakerFormUrlEncoded(data?: Partial<UpdateUserFormUrlEncodedData>): UpdateUserFormUrlEncodedData {
-  return createUserFaker(data)
+  return createUserFaker(data) as UpdateUserFormUrlEncodedData
 }
 
 /**

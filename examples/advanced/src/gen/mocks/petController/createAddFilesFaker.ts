@@ -13,7 +13,7 @@ import { faker } from '@faker-js/faker'
  * @description successful operation
  */
 export function createAddFilesStatus200Faker(data?: Partial<AddFilesStatus200>): AddFilesStatus200 {
-  return createPetFaker(data)
+  return createPetFaker(data) as AddFilesStatus200
 }
 
 /**
@@ -23,16 +23,16 @@ export function createAddFilesStatus405Faker() {
   return undefined
 }
 
-export function createAddFilesDataFakerJson(data?: Partial<AddFilesJsonData>): Required<AddFilesJsonData> {
+export function createAddFilesDataFakerJson<TData extends Partial<AddFilesJsonData> = object>(data?: TData) {
   const defaultFakeData = { url: faker.internet.url() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<AddFilesJsonData>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 export function createAddFilesDataFakerFormData(data?: Partial<AddFilesFormData>): AddFilesFormData {
-  return createPetFaker(data)
+  return createPetFaker(data) as AddFilesFormData
 }
 
 export function createAddFilesDataFaker(_data?: AddFilesData): AddFilesData {

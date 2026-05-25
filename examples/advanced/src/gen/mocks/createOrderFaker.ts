@@ -1,7 +1,7 @@
 import type { Order } from '../models/ts/Order.ts'
 import { faker } from '@faker-js/faker'
 
-export function createOrderFaker(data?: Partial<Order>): Required<Order> {
+export function createOrderFaker<TData extends Partial<Order> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     petId: faker.number.int(),
@@ -17,5 +17,5 @@ export function createOrderFaker(data?: Partial<Order>): Required<Order> {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Order>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
