@@ -44,7 +44,7 @@ export function buildClassClientParams({
   hasFormData,
   headers,
 }: {
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   path: URLPath
   baseURL: string | null | undefined
   tsResolver: ResolverTs
@@ -65,7 +65,7 @@ export function buildClassClientParams({
           mode: 'inlineSpread',
         },
         method: {
-          value: JSON.stringify(node.method!.toUpperCase()),
+          value: JSON.stringify(node.method.toUpperCase()),
         },
         url: {
           value: path.template,

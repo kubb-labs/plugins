@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { difference } from 'remeda'
@@ -36,6 +36,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {
+      if (!ast.isHttpOperationNode(node)) continue
       const opOverrides = resolveOperationOverrides(node, override)
       const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
       const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation
@@ -45,12 +46,12 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
       // query: false means "still a query but skip the useQuery hook"
       const isQueryOp =
         nodeQuery === false
-          ? !!query && query.methods.some((m) => node.method!.toLowerCase() === m.toLowerCase())
-          : !!nodeQuery && nodeQuery.methods.some((m) => node.method!.toLowerCase() === m.toLowerCase())
+          ? !!query && query.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
+          : !!nodeQuery && nodeQuery.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
       const isMutationOp =
         nodeMutation !== false &&
         !isQueryOp &&
-        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some((m) => node.method!.toLowerCase() === m.toLowerCase())
+        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some((m) => node.method.toLowerCase() === m.toLowerCase())
       const isSuspenseOp = !!suspense
       const isInfiniteOp = !!nodeInfiniteOptions
 

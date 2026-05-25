@@ -12,7 +12,7 @@ type Props = {
   requestTypeName?: string | null
   fakerName: string
   baseURL: string | null | undefined
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })

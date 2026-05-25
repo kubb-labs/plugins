@@ -11,7 +11,7 @@ import { buildClassClientParams, buildFormDataLine, buildGenerics, buildHeaders,
 import { buildClientParamsNode } from './Client.tsx'
 
 type OperationData = {
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
@@ -32,7 +32,7 @@ type Props = {
 }
 
 type GenerateMethodProps = {
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
@@ -58,7 +58,7 @@ function generateMethod({
   paramsCasing,
   pathParamsType,
 }: GenerateMethodProps): string {
-  const path = new URLPath(node.path!, { casing: paramsCasing })
+  const path = new URLPath(node.path, { casing: paramsCasing })
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const { header: headerParams } = getOperationParameters(node)

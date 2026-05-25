@@ -5,7 +5,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
 type OperationsProps = {
   name: string
-  nodes: Array<ast.OperationNode>
+  nodes: Array<ast.HttpOperationNode>
 }
 
 export function Operations({ name, nodes }: OperationsProps): KubbReactNode {
@@ -13,8 +13,8 @@ export function Operations({ name, nodes }: OperationsProps): KubbReactNode {
 
   nodes.forEach((node) => {
     operationsObject[node.operationId] = {
-      path: new URLPath(node.path!).URL,
-      method: node.method!.toLowerCase(),
+      path: new URLPath(node.path).URL,
+      method: node.method.toLowerCase(),
     }
   })
 

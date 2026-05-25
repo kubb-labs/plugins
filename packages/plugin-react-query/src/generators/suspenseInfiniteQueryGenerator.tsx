@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { getOperationParameters, resolveOperationTypeNames } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -20,6 +20,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
   name: 'react-suspense-infinite-query',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
     const {
       output,
@@ -40,11 +41,11 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     if (!pluginTs) return null
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method!.toLowerCase() === method.toLowerCase()))
+    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method!.toLowerCase() === method.toLowerCase())
+      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
     const isSuspense = !!suspense
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
 

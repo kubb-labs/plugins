@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -19,6 +19,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
     const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, customOptions } = ctx.options
 
@@ -27,11 +28,11 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     // query: false means "this IS a query op, but skip the useQuery hook"
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method!.toLowerCase() === method.toLowerCase()))
+    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method!.toLowerCase() === method.toLowerCase())
+      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
 
     if (!isQuery || isMutation) return null
 

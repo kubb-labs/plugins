@@ -16,8 +16,8 @@ function matchesPattern(node: ast.OperationNode, ov: { type: string; pattern: st
   const matches = (value: string) => (typeof pattern === 'string' ? value === pattern : pattern.test(value))
   if (type === 'operationId') return matches(node.operationId)
   if (type === 'tag') return node.tags.some((t) => matches(t))
-  if (type === 'path') return matches(node.path!)
-  if (type === 'method') return matches(node.method!)
+  if (type === 'path') return node.path !== undefined && matches(node.path)
+  if (type === 'method') return node.method !== undefined && matches(node.method)
   return false
 }
 

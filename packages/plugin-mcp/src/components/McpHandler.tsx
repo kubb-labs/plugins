@@ -15,7 +15,7 @@ type Props = {
   /**
    * AST operation node.
    */
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   /**
    * TypeScript resolver for resolving param/data/response type names.
    */
@@ -50,7 +50,7 @@ function buildRemappingCode(mapping: Record<string, string>, varName: string, so
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function McpHandler({ name, node, resolver, baseURL, dataReturnType, paramsCasing }: Props): KubbReactNode {
-  const urlPath = new URLPath(node.path!)
+  const urlPath = new URLPath(node.path)
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
@@ -86,7 +86,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   const headers = [headerParams.length ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : null, contentTypeHeader].filter(Boolean)
 
   const fetchConfig: Array<string> = []
-  fetchConfig.push(`method: ${JSON.stringify(node.method!.toUpperCase())}`)
+  fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
   fetchConfig.push(`url: ${urlPath.template}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
   if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'params: mappedParams' : 'params')

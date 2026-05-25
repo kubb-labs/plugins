@@ -1,5 +1,5 @@
 import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
@@ -17,6 +17,7 @@ export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, config, root } = ctx
     const { output, parser, baseURL, group } = ctx.options
 

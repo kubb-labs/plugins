@@ -8,4 +8,4 @@
 "@kubb/plugin-zod": patch
 ---
 
-Handle the now-optional `method`/`path` on `@kubb/ast`'s `OperationNode`. These plugins target OpenAPI, where both fields are always present, so they assert the value where a definite `method`/`path` is required. OpenAPI output is unchanged.
+Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.

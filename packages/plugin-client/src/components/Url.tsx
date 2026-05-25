@@ -16,7 +16,7 @@ type Props = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   tsResolver: ResolverTs
 }
 
@@ -24,7 +24,7 @@ type GetParamsProps = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['paramsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   tsResolver: ResolverTs
 }
 
@@ -32,7 +32,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
   // Build a URL-only node with only path params (no body, query, header)
-  const urlNode: ast.OperationNode = {
+  const urlNode: ast.HttpOperationNode = {
     ...node,
     parameters: node.parameters.filter((p) => p.in === 'path'),
     requestBody: undefined,
@@ -57,7 +57,7 @@ export function Url({
   node,
   tsResolver,
 }: Props): KubbReactNode {
-  const path = new URLPath(node.path!)
+  const path = new URLPath(node.path)
 
   const paramsNode = buildUrlParamsNode({
     paramsType,
@@ -81,7 +81,7 @@ export function Url({
             .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
             .join('\n')}
         {pathParamsMapping && Object.keys(pathParamsMapping).length > 0 && <br />}
-        <Const name={'res'}>{`{ method: '${node.method!.toUpperCase()}', url: ${path.toTemplateString({ prefix: baseURL })} as const }`}</Const>
+        <Const name={'res'}>{`{ method: '${node.method.toUpperCase()}', url: ${path.toTemplateString({ prefix: baseURL })} as const }`}</Const>
         <br />
         return res
       </Function>

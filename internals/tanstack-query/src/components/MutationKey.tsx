@@ -7,7 +7,7 @@ import type { Transformer } from '../types.ts'
 
 type Props = {
   name: string
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'
   transformer: Transformer | null | undefined
@@ -16,7 +16,8 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export const mutationKeyTransformer: Transformer = ({ node, casing }) => {
-  const path = new URLPath(node.path!, { casing })
+  if (!node.path) return []
+  const path = new URLPath(node.path, { casing })
   return [`{ url: '${path.toURLPath()}' }`]
 }
 

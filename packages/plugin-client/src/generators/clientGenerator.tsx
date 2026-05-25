@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
@@ -17,6 +17,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
     const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL

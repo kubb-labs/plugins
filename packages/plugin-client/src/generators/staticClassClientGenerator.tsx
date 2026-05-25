@@ -1,8 +1,7 @@
 import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
 import { camelCase } from '@internals/utils'
-import type { ast } from '@kubb/core'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -12,7 +11,7 @@ import { StaticClassClient } from '../components/StaticClassClient'
 import type { PluginClient } from '../types'
 
 type OperationData = {
-  node: ast.OperationNode
+  node: ast.HttpOperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver: ResolverZod | null
@@ -60,7 +59,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    function buildOperationData(node: ast.OperationNode): OperationData {
+    function buildOperationData(node: ast.HttpOperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },
@@ -84,6 +83,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     }
 
     const controllers = nodes.reduce((acc, operationNode) => {
+      if (!ast.isHttpOperationNode(operationNode)) return acc
       const tag = operationNode.tags[0]
       const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
