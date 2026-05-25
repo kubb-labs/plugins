@@ -1,4 +1,4 @@
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 import { Const, File, Function, Jsx, jsxRendererSync } from '@kubb/renderer-jsx'
 
@@ -14,6 +14,7 @@ export const example3 = defineGenerator<PluginClient>({
   name: 'client-operation',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { resolver, root } = ctx
     const { output } = ctx.options
     const file = resolver.resolveFile({ name: node.operationId, extname: '.tsx', tag: node.tags[0] ?? 'default', path: node.path }, { root, output })
