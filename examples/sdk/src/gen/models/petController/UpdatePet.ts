@@ -6,6 +6,11 @@
 import type { Pet } from '../Pet.ts'
 
 /**
+ * @type object
+ */
+export type UpdatePetStatus200 = Pet
+
+/**
  * @type any
  */
 export type UpdatePetStatus400 = any
@@ -58,10 +63,7 @@ export type UpdatePetRequestConfig = {
  * @type object
  */
 export type UpdatePetResponses = {
-  /**
-   * @type object
-   */
-  '200': Pet
+  '200': UpdatePetStatus200
   '400': UpdatePetStatus400
   '404': UpdatePetStatus404
   '405': UpdatePetStatus405
@@ -70,4 +72,4 @@ export type UpdatePetResponses = {
 /**
  * @description Union of all possible responses
  */
-export type UpdatePetResponse = Pet | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405
+export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405

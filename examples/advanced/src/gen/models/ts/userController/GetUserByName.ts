@@ -7,6 +7,11 @@ import type { User } from '../User.ts'
 export type GetUserByNamePathUsername = string
 
 /**
+ * @type object
+ */
+export type GetUserByNameStatus200 = User
+
+/**
  * @type any
  */
 export type GetUserByNameStatus400 = any
@@ -39,10 +44,7 @@ export type GetUserByNameRequestConfig = {
  * @type object
  */
 export type GetUserByNameResponses = {
-  /**
-   * @type object
-   */
-  '200': User
+  '200': GetUserByNameStatus200
   '400': GetUserByNameStatus400
   '404': GetUserByNameStatus404
 }
@@ -50,4 +52,4 @@ export type GetUserByNameResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetUserByNameResponse = User | GetUserByNameStatus400 | GetUserByNameStatus404
+export type GetUserByNameResponse = GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404

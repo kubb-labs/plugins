@@ -5,7 +5,6 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { CreateUserData, CreateUserResponse } from '../../models/CreateUser.ts'
-import type { User } from '../../models/User.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'

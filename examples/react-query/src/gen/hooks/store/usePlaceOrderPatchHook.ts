@@ -4,8 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { Order } from '../../models/Order.ts'
-import type { PlaceOrderPatchData, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'
@@ -29,7 +28,7 @@ export async function placeOrderPatchHook(
 
   const requestData = data
 
-  const res = await request<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
+  const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
     data: requestData,
@@ -47,7 +46,7 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
+  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
     mutationKey,
     mutationFn: async ({ data }) => {
       return placeOrderPatchHook(data, config)
@@ -62,7 +61,9 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
  */
 export function usePlaceOrderPatchHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<PlaceOrderPatchData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -74,19 +75,19 @@ export function usePlaceOrderPatchHook<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? placeOrderPatchMutationKey()
 
   const baseOptions = placeOrderPatchMutationOptionsHook(config) as UseMutationOptions<
-    Order,
+    PlaceOrderPatchStatus200,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
     { data?: PlaceOrderPatchData },
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'usePlaceOrderPatchHook', operationId: 'placeOrderPatch' }) as UseMutationOptions<
-    Order,
+    PlaceOrderPatchStatus200,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
     { data?: PlaceOrderPatchData },
     TContext
   >
 
-  return useMutation<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>(
+  return useMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -94,5 +95,5 @@ export function usePlaceOrderPatchHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>
+  ) as UseMutationResult<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>
 }

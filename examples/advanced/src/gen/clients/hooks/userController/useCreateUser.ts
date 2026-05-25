@@ -1,5 +1,4 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { User } from '../../../models/ts/User.ts'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createUser } from '../../axios/userService/createUser.ts'

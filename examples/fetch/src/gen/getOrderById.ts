@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { GetOrderByIdPathOrderId, Order, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models.ts'
+import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
@@ -21,7 +21,7 @@ function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
 export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<Order, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
+  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
     method: 'GET',
     url: getGetOrderByIdUrl(orderId).url.toString(),
     ...requestConfig,

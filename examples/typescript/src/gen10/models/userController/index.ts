@@ -5,6 +5,7 @@ export type {
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
+  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './CreateUser.ts'
 export type {
@@ -12,6 +13,7 @@ export type {
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
+  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.ts'
 export type {
@@ -27,6 +29,7 @@ export type {
   GetUserByNameRequestConfig,
   GetUserByNameResponse,
   GetUserByNameResponses,
+  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './GetUserByName.ts'

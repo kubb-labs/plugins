@@ -21,6 +21,7 @@ export type {
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
+  AddPetStatus200,
   AddPetStatus405,
   AddPetXmlData,
 } from './petController/AddPet.ts'
@@ -56,6 +57,7 @@ export type {
   GetPetByIdRequestConfig,
   GetPetByIdResponse,
   GetPetByIdResponses,
+  GetPetByIdStatus200,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './petController/GetPetById.ts'
@@ -66,6 +68,7 @@ export type {
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
+  UpdatePetStatus200,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -87,6 +90,7 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
+  UploadFileStatus200,
 } from './petController/UploadFile.ts'
 export type {
   DeleteOrderPathOrderId,
@@ -102,6 +106,7 @@ export type {
   GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
+  GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './storeController/GetOrderById.ts'
@@ -112,6 +117,7 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
+  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './storeController/PlaceOrder.ts'
@@ -122,6 +128,7 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './storeController/PlaceOrderPatch.ts'
@@ -132,6 +139,7 @@ export type {
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
+  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './userController/CreateUser.ts'
 export type {
@@ -139,6 +147,7 @@ export type {
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
+  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from './userController/CreateUsersWithListInput.ts'
 export type {
@@ -154,6 +163,7 @@ export type {
   GetUserByNameRequestConfig,
   GetUserByNameResponse,
   GetUserByNameResponses,
+  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './userController/GetUserByName.ts'

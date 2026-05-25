@@ -4,8 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { Pet } from '../models/Pet.ts'
-import type { UpdatePetData, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../models/UpdatePet.ts'
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../models/UpdatePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
@@ -29,7 +28,7 @@ export async function updatePet(
 
   const requestData = data
 
-  const res = await request<Pet, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: `/pet`,
     data: requestData,
@@ -48,7 +47,7 @@ export async function updatePet(
 export function useUpdatePet<TContext>(
   options: {
     mutation?: MutationObserverOptions<
-      Pet,
+      UpdatePetStatus200,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
       { data: MaybeRefOrGetter<UpdatePetData> },
       TContext
@@ -63,7 +62,7 @@ export function useUpdatePet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updatePetMutationKey()
 
-  return useMutation<Pet, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, { data: UpdatePetData }, TContext>(
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, { data: UpdatePetData }, TContext>(
     {
       mutationFn: async ({ data }) => {
         return updatePet(data, config)

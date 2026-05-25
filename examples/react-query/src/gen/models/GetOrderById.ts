@@ -11,6 +11,11 @@ import type { Order } from './Order.ts'
 export type GetOrderByIdPathOrderId = number
 
 /**
+ * @type object
+ */
+export type GetOrderByIdStatus200 = Order
+
+/**
  * @type any
  */
 export type GetOrderByIdStatus400 = any
@@ -43,10 +48,7 @@ export type GetOrderByIdRequestConfig = {
  * @type object
  */
 export type GetOrderByIdResponses = {
-  /**
-   * @type object
-   */
-  '200': Order
+  '200': GetOrderByIdStatus200
   '400': GetOrderByIdStatus400
   '404': GetOrderByIdStatus404
 }
@@ -54,4 +56,4 @@ export type GetOrderByIdResponses = {
 /**
  * @description Union of all possible responses
  */
-export type GetOrderByIdResponse = Order | GetOrderByIdStatus400 | GetOrderByIdStatus404
+export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404

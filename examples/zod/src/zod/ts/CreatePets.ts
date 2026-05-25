@@ -37,6 +37,12 @@ export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 export type CreatePetsStatus201 = any
 
 /**
+ * @description Pet not found
+ * @type any
+ */
+export type CreatePetsStatusDefault = PetNotFound
+
+/**
  * @type object
  */
 export type CreatePetsData = {
@@ -84,14 +90,10 @@ export type CreatePetsRequestConfig = {
  */
 export type CreatePetsResponses = {
   '201': CreatePetsStatus201
-  /**
-   * @description Pet not found
-   * @type any
-   */
-  default: PetNotFound
+  default: CreatePetsStatusDefault
 }
 
 /**
  * @description Union of all possible responses
  */
-export type CreatePetsResponse = CreatePetsStatus201 | PetNotFound
+export type CreatePetsResponse = CreatePetsStatus201 | CreatePetsStatusDefault

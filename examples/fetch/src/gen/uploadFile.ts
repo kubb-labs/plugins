@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, ApiResponse } from './models.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from './.kubb/config.ts'
 
@@ -30,7 +30,7 @@ export async function uploadFile(
 
   const formData = buildFormData(requestData)
 
-  const res = await request<ApiResponse, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl(petId).url.toString(),
     params,

@@ -1,4 +1,3 @@
-import type { User } from '../../models/ts/User.ts'
 import type { CreateUserData, CreateUserResponse } from '../../models/ts/userController/CreateUser.ts'
 
 export function createUser(data?: CreateUserData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateUserResponse> {

@@ -4,8 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { ApiResponse } from '../models/ApiResponse.ts'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../models/UploadFile.ts'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../models/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
@@ -27,7 +26,7 @@ export async function uploadFile(
 
   const requestData = data
 
-  const res = await request<ApiResponse, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     params,
@@ -46,7 +45,7 @@ export async function uploadFile(
 export function useUploadFile<TContext>(
   options: {
     mutation?: MutationObserverOptions<
-      ApiResponse,
+      UploadFileStatus200,
       ResponseErrorConfig<Error>,
       {
         petId: MaybeRefOrGetter<UploadFilePathPetId>
@@ -63,7 +62,7 @@ export function useUploadFile<TContext>(
   const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
   return useMutation<
-    ApiResponse,
+    UploadFileStatus200,
     ResponseErrorConfig<Error>,
     { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     TContext

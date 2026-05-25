@@ -5,6 +5,7 @@ export type {
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
+  AddPetStatus200,
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.ts'
@@ -20,6 +21,7 @@ export type {
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
+  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './CreateUser.ts'
 export type {
@@ -27,6 +29,7 @@ export type {
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
+  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.ts'
 export type { Customer, CustomerParamsStatusEnumKey } from './Customer.ts'
@@ -83,6 +86,7 @@ export type {
   GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
+  GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './GetOrderById.ts'
@@ -91,6 +95,7 @@ export type {
   GetPetByIdRequestConfig,
   GetPetByIdResponse,
   GetPetByIdResponses,
+  GetPetByIdStatus200,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './GetPetById.ts'
@@ -99,6 +104,7 @@ export type {
   GetUserByNameRequestConfig,
   GetUserByNameResponse,
   GetUserByNameResponses,
+  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './GetUserByName.ts'
@@ -123,6 +129,7 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
+  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './PlaceOrder.ts'
@@ -133,6 +140,7 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.ts'
@@ -145,6 +153,7 @@ export type {
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
+  UpdatePetStatus200,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -177,6 +186,7 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
+  UploadFileStatus200,
 } from './UploadFile.ts'
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'

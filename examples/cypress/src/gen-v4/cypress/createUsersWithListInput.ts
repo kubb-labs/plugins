@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, User } from '../models.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../models.ts'
 
 export function createUsersWithListInput(
   data?: CreateUsersWithListInputData,

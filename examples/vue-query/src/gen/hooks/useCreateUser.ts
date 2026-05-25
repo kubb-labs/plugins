@@ -5,7 +5,6 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUserData, CreateUserResponse } from '../models/CreateUser.ts'
-import type { User } from '../models/User.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'

@@ -1,9 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { ApiResponse } from '../../../models/ts/ApiResponse.ts'
-import type { Pet } from '../../../models/ts/Pet.ts'
-import type { AddPetData, AddPetStatus405 } from '../../../models/ts/petController/AddPet.ts'
+import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../../models/ts/petController/AddPet.ts'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../../models/ts/petController/DeletePet.ts'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
 import type {
@@ -13,8 +11,14 @@ import type {
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
-import type { GetPetByIdPathPetId, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
-import type { UpdatePetData, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../../models/ts/petController/UpdatePet.ts'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
+import type {
+  UpdatePetData,
+  UpdatePetStatus200,
+  UpdatePetStatus400,
+  UpdatePetStatus404,
+  UpdatePetStatus405,
+} from '../../../models/ts/petController/UpdatePet.ts'
 import type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
@@ -22,7 +26,12 @@ import type {
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormStatus405,
 } from '../../../models/ts/petController/UpdatePetWithForm.ts'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../../models/ts/petController/UploadFile.ts'
+import type {
+  UploadFileData,
+  UploadFilePathPetId,
+  UploadFileQueryAdditionalMetadata,
+  UploadFileStatus200,
+} from '../../../models/ts/petController/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from '../../../.kubb/config.ts'
 import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
@@ -48,7 +57,7 @@ export class petController {
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<Pet, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
+    const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
       ...requestConfig,
       method: 'PUT',
       url: `/pet`,
@@ -72,7 +81,7 @@ export class petController {
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<Pet, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
+    const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet`,
@@ -124,7 +133,7 @@ export class petController {
    */
   async getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<Pet, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
+    const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
       url: `/pet/${petId}`,
@@ -184,7 +193,7 @@ export class petController {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const formData = buildFormData(requestData)
-    const res = await request<ApiResponse, ResponseErrorConfig<Error>, UploadFileData>({
+    const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}/uploadImage`,

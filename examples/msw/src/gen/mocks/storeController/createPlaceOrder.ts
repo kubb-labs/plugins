@@ -3,15 +3,14 @@
  * Do not edit manually.
  */
 
-import type { Order } from '../../models/Order.ts'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../models/PlaceOrder.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/PlaceOrder.ts'
 import { createOrder } from '../createOrder.ts'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
  */
-export function createPlaceOrderStatus200(data?: Partial<Order>): Order {
+export function createPlaceOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
   faker.seed([220])
 
   return createOrder(data)

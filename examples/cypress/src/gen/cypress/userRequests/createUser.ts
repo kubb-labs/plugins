@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreateUserData, CreateUserResponse, User } from '../../models.ts'
+import type { CreateUserData, CreateUserResponse } from '../../models.ts'
 
 export function createUser(data?: CreateUserData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateUserResponse> {
   return cy

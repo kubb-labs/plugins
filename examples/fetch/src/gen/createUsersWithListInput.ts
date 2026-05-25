@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { CreateUsersWithListInputData, User } from './models.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getCreateUsersWithListInputUrl() {
@@ -26,7 +26,7 @@ export async function createUsersWithListInput(
 
   const requestData = data
 
-  const res = await request<User, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: getCreateUsersWithListInputUrl().url.toString(),
     data: requestData,

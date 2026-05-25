@@ -4,11 +4,15 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { User } from '../../models/User.ts'
 import type { CreateUserData, CreateUserResponse } from '../../models/userController/CreateUser.ts'
-import type { CreateUsersWithListInputData } from '../../models/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../models/userController/CreateUsersWithListInput.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/userController/DeleteUser.ts'
-import type { GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/userController/GetUserByName.ts'
+import type {
+  GetUserByNamePathUsername,
+  GetUserByNameStatus200,
+  GetUserByNameStatus400,
+  GetUserByNameStatus404,
+} from '../../models/userController/GetUserByName.ts'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../models/userController/LoginUser.ts'
 import type { LogoutUserResponse } from '../../models/userController/LogoutUser.ts'
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../models/userController/UpdateUser.ts'
@@ -54,7 +58,7 @@ export class userController {
   async createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<User, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+    const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
       ...requestConfig,
       method: 'POST',
       url: `/user/createWithList`,
@@ -97,7 +101,7 @@ export class userController {
    */
   async getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<User, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
+    const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
       url: `/user/${username}`,

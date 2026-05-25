@@ -1,10 +1,10 @@
-import type { PetNotFound } from '../../models/ts/PetNotFound.ts'
 import type {
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsQueryBoolParam,
   CreatePetsResponse,
   CreatePetsStatus201,
+  CreatePetsStatusDefault,
 } from '../../models/ts/petsController/CreatePets.ts'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
 import { faker } from '@faker-js/faker'
@@ -35,7 +35,7 @@ export function createCreatePetsStatus201Faker() {
 /**
  * @description unexpected error
  */
-export function createCreatePetsStatusDefaultFaker(data?: Partial<PetNotFound>): PetNotFound {
+export function createCreatePetsStatusDefaultFaker(data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
   return createPetNotFoundFaker(data)
 }
 

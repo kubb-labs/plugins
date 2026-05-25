@@ -28,6 +28,12 @@ export type GetThingsQuerySkip = number | undefined
 export type GetThingsStatus201 = any
 
 /**
+ * @description Pet not found
+ * @type any
+ */
+export type GetThingsStatusDefault = PetNotFound
+
+/**
  * @type object
  */
 export type GetThingsRequestConfig = {
@@ -52,14 +58,10 @@ export type GetThingsRequestConfig = {
  */
 export type GetThingsResponses = {
   '201': GetThingsStatus201
-  /**
-   * @description Pet not found
-   * @type any
-   */
-  default: PetNotFound
+  default: GetThingsStatusDefault
 }
 
 /**
  * @description Union of all possible responses
  */
-export type GetThingsResponse = GetThingsStatus201 | PetNotFound
+export type GetThingsResponse = GetThingsStatus201 | GetThingsStatusDefault

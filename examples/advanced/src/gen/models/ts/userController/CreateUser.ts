@@ -1,6 +1,11 @@
 import type { User } from '../User.ts'
 
 /**
+ * @type object
+ */
+export type CreateUserStatusDefault = User
+
+/**
  * @description Created user object
  * @type object | undefined
  */
@@ -38,13 +43,10 @@ export type CreateUserRequestConfig = {
  * @type object
  */
 export type CreateUserResponses = {
-  /**
-   * @type object
-   */
-  default: User
+  default: CreateUserStatusDefault
 }
 
 /**
  * @description Union of all possible responses
  */
-export type CreateUserResponse = User
+export type CreateUserResponse = CreateUserStatusDefault

@@ -22,6 +22,11 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 /**
  * @type object
  */
+export type UploadFileStatus200 = ApiResponse
+
+/**
+ * @type object
+ */
 export type UploadFileJsonData = {
   /**
    * @description URL of the image to upload
@@ -74,13 +79,10 @@ export type UploadFileRequestConfig = {
  * @type object
  */
 export type UploadFileResponses = {
-  /**
-   * @type object
-   */
-  '200': ApiResponse
+  '200': UploadFileStatus200
 }
 
 /**
  * @description Union of all possible responses
  */
-export type UploadFileResponse = ApiResponse
+export type UploadFileResponse = UploadFileStatus200

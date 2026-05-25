@@ -1,7 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { User } from '../../../models/ts/User.ts'
-import type { CreateUsersWithListInputData } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
 import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../../../zod/userController/createUsersWithListInputSchema.ts'
 
 export function getCreateUsersWithListInputUrl() {
@@ -23,7 +22,7 @@ export async function createUsersWithListInput(
 
   const requestData = createUsersWithListInputDataSchema.parse(data)
 
-  const res = await request<User, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: getCreateUsersWithListInputUrl().url.toString(),
     data: requestData,

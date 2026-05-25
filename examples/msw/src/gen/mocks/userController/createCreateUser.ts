@@ -3,15 +3,14 @@
  * Do not edit manually.
  */
 
-import type { CreateUserData, CreateUserResponse } from '../../models/CreateUser.ts'
-import type { User } from '../../models/User.ts'
+import type { CreateUserData, CreateUserResponse, CreateUserStatusDefault } from '../../models/CreateUser.ts'
 import { createUser } from '../createUser.ts'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description successful operation
  */
-export function createCreateUserStatusDefault(data?: Partial<User>): User {
+export function createCreateUserStatusDefault(data?: Partial<CreateUserStatusDefault>): CreateUserStatusDefault {
   faker.seed([220])
 
   return createUser(data)

@@ -1,6 +1,5 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { User } from '../../../models/ts/User.ts'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
 import { createUserResponseSchema, createUserDataSchema } from '../../../zod/userController/createUserSchema.ts'
 

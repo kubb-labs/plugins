@@ -3,8 +3,7 @@
  * Do not edit manually.
  */
 
-import type { GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
-import type { Pet } from '../../models/Pet.ts'
+import type { GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
 import { createPet } from '../createPet.ts'
 import { faker } from '@faker-js/faker'
 
@@ -17,7 +16,7 @@ export function createGetPetByIdPathPetId(data?: bigint): bigint {
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200(data?: Partial<Pet>): Pet {
+export function createGetPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
   faker.seed([220])
 
   return createPet(data)

@@ -32,6 +32,7 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
+  CreatePetsStatusDefault,
   CreatePetsXEXAMPLEKey,
 } from './CreatePets.js'
 export type {
@@ -41,6 +42,7 @@ export type {
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
+  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './CreateUser.js'
 export type {
@@ -48,6 +50,7 @@ export type {
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
+  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.js'
 export type { Customer } from './Customer.js'
@@ -101,6 +104,7 @@ export type {
   GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
+  GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './GetOrderById.js'
@@ -118,6 +122,7 @@ export type {
   GetUserByNameRequestConfig,
   GetUserByNameResponse,
   GetUserByNameResponses,
+  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './GetUserByName.js'
@@ -141,6 +146,7 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
+  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './PlaceOrder.js'
@@ -151,6 +157,7 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
+  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.js'
