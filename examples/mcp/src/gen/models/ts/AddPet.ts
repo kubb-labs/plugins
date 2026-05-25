@@ -9,7 +9,14 @@ import type { Pet } from './Pet.js'
 /**
  * @type object
  */
-export type AddPetStatus200 = Omit<NonNullable<Pet>, 'name'>
+export type AddPetStatus200Json = Omit<NonNullable<Pet>, 'name'>
+
+/**
+ * @type object
+ */
+export type AddPetStatus200Xml = Omit<NonNullable<Pet>, 'name'>
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
 /**
  * @type object

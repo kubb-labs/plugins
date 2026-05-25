@@ -35,7 +35,14 @@ export type FindPetsByTagsHeaderXEXAMPLE = FindPetsByTagsXEXAMPLEKey
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Array<Pet>
+export type FindPetsByTagsStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Array<Pet>
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any

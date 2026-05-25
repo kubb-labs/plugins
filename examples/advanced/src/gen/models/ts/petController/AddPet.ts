@@ -20,7 +20,14 @@ export type AddPetStatus405 = {
 /**
  * @type object
  */
-export type AddPetStatusDefault = Omit<NonNullable<Pet>, 'name'>
+export type AddPetStatusDefaultJson = Omit<NonNullable<Pet>, 'name'>
+
+/**
+ * @type object
+ */
+export type AddPetStatusDefaultXml = Omit<NonNullable<Pet>, 'name'>
+
+export type AddPetStatusDefault = AddPetStatusDefaultJson | AddPetStatusDefaultXml
 
 /**
  * @description Create a new pet in the store

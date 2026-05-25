@@ -5,7 +5,15 @@ export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
 export type GetPetByIdPathPetIdSchema = z.infer<typeof getPetByIdPathPetIdSchema>
 
-export const getPetByIdStatus200Schema = z.lazy(() => petSchema.omit({ name: true }))
+export const getPetByIdStatus200SchemaJson = z.lazy(() => petSchema.omit({ name: true }))
+
+export type GetPetByIdStatus200SchemaJson = z.infer<typeof getPetByIdStatus200SchemaJson>
+
+export const getPetByIdStatus200SchemaXml = z.lazy(() => petSchema.omit({ name: true }))
+
+export type GetPetByIdStatus200SchemaXml = z.infer<typeof getPetByIdStatus200SchemaXml>
+
+export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
 export type GetPetByIdStatus200Schema = z.infer<typeof getPetByIdStatus200Schema>
 

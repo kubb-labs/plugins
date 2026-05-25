@@ -17,12 +17,21 @@ export function getContentType(response: ast.ResponseNode | null | undefined): s
  * Determines if a response has a schema that is not void or any.
  */
 export function hasResponseSchema(response: ast.ResponseNode | null | undefined): boolean {
-  const schema = response?.content?.[0]?.schema
+  const schema = response?.content?.find((entry) => entry.schema)?.schema
   return !!schema && schema.type !== 'void' && schema.type !== 'any'
 }
 
+/**
+ * Picks the content type used for the mocked response header. When a response declares multiple
+ * content types, JSON is preferred (the faker mock body is JSON), otherwise the first declared type.
+ */
 function getResponseContentType(response: ast.ResponseNode | null | undefined): string | null {
-  const value = response?.content?.[0]?.contentType
+  const contents = response?.content ?? []
+  const jsonEntry = contents.find((entry) => {
+    const baseType = entry.contentType?.split(';')[0]?.trim().toLowerCase()
+    return baseType === 'application/json' || baseType?.endsWith('+json')
+  })
+  const value = (jsonEntry ?? contents[0])?.contentType
   return typeof value === 'string' && value.length > 0 ? value : null
 }
 

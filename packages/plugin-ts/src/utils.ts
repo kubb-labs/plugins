@@ -127,7 +127,7 @@ export function buildResponses(node: ast.OperationNode, { resolver }: BuildOpera
 }
 
 export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode | null {
-  const responsesWithSchema = node.responses.filter((res) => res.content?.[0]?.schema)
+  const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
 
   if (responsesWithSchema.length === 0) {
     return null

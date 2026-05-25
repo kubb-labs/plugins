@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetUserByNameResponse, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
+import type { GetUserByNameResponse, GetUserByNameStatus200, GetUserByNameStatus200Json, GetUserByNameStatus200Xml, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
 import { createUser } from "./createUser.ts";
 import { fakerDE as faker } from "@faker-js/faker";
 
@@ -14,8 +14,22 @@ export function createGetUserByNamePathUsername(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetUserByNameStatus200(data?: Partial<GetUserByNameStatus200>): GetUserByNameStatus200 {
+export function createGetUserByNameStatus200Json(data?: Partial<GetUserByNameStatus200Json>): GetUserByNameStatus200Json {
   return createUser(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetUserByNameStatus200Xml(data?: Partial<GetUserByNameStatus200Xml>): GetUserByNameStatus200Xml {
+  return createUser(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetUserByNameStatus200(_data?: GetUserByNameStatus200): GetUserByNameStatus200 {
+  return faker.helpers.arrayElement<any>([createGetUserByNameStatus200Json(), createGetUserByNameStatus200Xml()])
 }
 
 /**

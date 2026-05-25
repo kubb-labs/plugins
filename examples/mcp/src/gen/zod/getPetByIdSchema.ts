@@ -8,7 +8,11 @@ import { petSchema } from './petSchema.js'
 
 export const getPetByIdPathPetIdSchema = z.int().describe('ID of pet to return')
 
-export const getPetByIdStatus200Schema = petSchema.omit({ name: true })
+export const getPetByIdStatus200SchemaJson = petSchema.omit({ name: true })
+
+export const getPetByIdStatus200SchemaXml = petSchema.omit({ name: true })
+
+export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
 export const getPetByIdStatus400Schema = z.any()
 

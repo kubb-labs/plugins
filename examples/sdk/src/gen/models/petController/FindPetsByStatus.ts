@@ -23,7 +23,14 @@ export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200 = Pet[]
+export type FindPetsByStatusStatus200Json = Pet[]
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Xml = Pet[]
+
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
 /**
  * @type any

@@ -12,8 +12,12 @@ export const addFilesStatus405Schema = z.any()
 
 export const addFilesResponseSchema = z.union([addFilesStatus200Schema, addFilesStatus405Schema])
 
-export const addFilesDataSchema = z
+export const addFilesDataSchemaJson = z
   .object({
     url: z.url().describe('URL of the image to upload'),
   })
   .optional()
+
+export const addFilesDataSchemaFormData = petSchema.omit({ id: true }).optional()
+
+export const addFilesDataSchema = z.union([addFilesDataSchemaJson, addFilesDataSchemaFormData])

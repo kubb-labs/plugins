@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
+import type { GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
 import { createPet } from "./createPet.ts";
 import { faker } from "@faker-js/faker";
 
@@ -14,8 +14,22 @@ export function createGetPetByIdPathPetId(data?: bigint): bigint {
 /**
  * @description successful operation
  */
-export function createGetPetByIdStatus200(data?: Partial<GetPetByIdStatus200>): GetPetByIdStatus200 {
+export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
   return createPet(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetPetByIdStatus200Xml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
+  return createPet(data)
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetPetByIdStatus200(_data?: GetPetByIdStatus200): GetPetByIdStatus200 {
+  return faker.helpers.arrayElement<any>([createGetPetByIdStatus200Json(), createGetPetByIdStatus200Xml()])
 }
 
 /**

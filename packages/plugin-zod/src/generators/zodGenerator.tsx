@@ -1,3 +1,4 @@
+import { resolveContentTypeVariants } from '@internals/shared'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
@@ -196,17 +197,49 @@ export const zodGenerator = defineGenerator<PluginZod>({
       )
     }
 
+    // Multiple content types for a single name — emit one schema per content type plus a union alias.
+    function buildContentTypeVariants(
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+      baseName: string,
+      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+      direction?: 'input' | 'output',
+    ) {
+      const variants = resolveContentTypeVariants(entries, baseName)
+      const unionSchema = ast.createSchema({
+        type: 'union',
+        members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })),
+      })
+      return (
+        <>
+          {variants.map((variant) =>
+            renderSchemaEntry({
+              schema: decorate ? decorate(variant.schema) : variant.schema,
+              name: variant.name,
+              keysToOmit: variant.keysToOmit,
+              direction,
+            }),
+          )}
+          {renderSchemaEntry({ schema: unionSchema, name: baseName, direction })}
+        </>
+      )
+    }
+
     const paramSchemas = params.map((param) => renderSchemaEntry({ schema: param.schema, name: resolver.resolveParamName(node, param), direction: 'input' }))
 
-    const responseSchemas = node.responses.map((res) =>
-      renderSchemaEntry({
-        schema: res.content?.[0]?.schema ?? null,
+    const responseSchemas = node.responses.map((res) => {
+      const variants = (res.content ?? []).filter((entry) => entry.schema)
+      if (variants.length > 1) {
+        return buildContentTypeVariants(res.content!, resolver.resolveResponseStatusName(node, res.statusCode))
+      }
+      const primary = variants[0] ?? res.content?.[0]
+      return renderSchemaEntry({
+        schema: primary?.schema ?? null,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
-        keysToOmit: res.content?.[0]?.keysToOmit,
-      }),
-    )
+        keysToOmit: primary?.keysToOmit,
+      })
+    })
 
-    const responsesWithSchema = node.responses.filter((res) => res.content?.[0]?.schema)
+    const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
     const responseUnionSchema =
       responsesWithSchema.length > 0
         ? (() => {
@@ -217,14 +250,16 @@ export const zodGenerator = defineGenerator<PluginZod>({
             // the response union name, skip generation to avoid redeclaration errors.
             const importedNames = new Set(
               responsesWithSchema.flatMap((res) =>
-                res.content?.[0]?.schema
-                  ? adapter
-                      .getImports(res.content[0].schema, (schemaName) => ({
-                        name: resolver.resolveSchemaName(schemaName),
-                        path: '',
-                      }))
-                      .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-                  : [],
+                (res.content ?? []).flatMap((entry) =>
+                  entry.schema
+                    ? adapter
+                        .getImports(entry.schema, (schemaName) => ({
+                          name: resolver.resolveSchemaName(schemaName),
+                          path: '',
+                        }))
+                        .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+                    : [],
+                ),
               ),
             )
 
@@ -242,17 +277,29 @@ export const zodGenerator = defineGenerator<PluginZod>({
           })()
         : null
 
-    const requestSchema = node.requestBody?.content?.[0]?.schema
-      ? renderSchemaEntry({
-          schema: {
-            ...node.requestBody.content![0]!.schema!,
-            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
-          },
+    const requestBodyContent = node.requestBody?.content ?? []
+    const requestSchema = (() => {
+      if (requestBodyContent.length === 0) return null
+      if (requestBodyContent.length === 1) {
+        const entry = requestBodyContent[0]!
+        if (!entry.schema) return null
+        return renderSchemaEntry({
+          schema: { ...entry.schema, description: node.requestBody!.description ?? entry.schema.description },
           name: resolver.resolveDataName(node),
-          keysToOmit: node.requestBody.content![0]!.keysToOmit,
+          keysToOmit: entry.keysToOmit,
           direction: 'input',
         })
-      : null
+      }
+      return buildContentTypeVariants(
+        requestBodyContent,
+        resolver.resolveDataName(node),
+        (schema) => ({
+          ...schema,
+          description: node.requestBody!.description ?? schema.description,
+        }),
+        'input',
+      )
+    })()
 
     return (
       <File

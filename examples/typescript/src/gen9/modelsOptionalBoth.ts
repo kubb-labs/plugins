@@ -298,9 +298,6 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category | undefined
   /**
    * @type array
@@ -405,7 +402,11 @@ export type PetNotFound = {
  */
 export type UserArray = Array<User>
 
-export type UpdatePetStatus200 = Pet
+export type UpdatePetStatus200Json = Pet
+
+export type UpdatePetStatus200Xml = Pet
+
+export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
 /**
  * @type any
@@ -468,7 +469,11 @@ export type UpdatePetResponses = {
  */
 export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405
 
-export type AddPetStatus200 = Pet
+export type AddPetStatus200Json = Pet
+
+export type AddPetStatus200Xml = Pet
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
 /**
  * @type object
@@ -541,7 +546,14 @@ export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | u
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200 = Array<Pet>
+export type FindPetsByStatusStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Xml = Array<Pet>
+
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
 /**
  * @type any
@@ -603,7 +615,14 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Array<Pet>
+export type FindPetsByTagsStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Array<Pet>
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any
@@ -654,7 +673,11 @@ export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsSta
  */
 export type GetPetByIdPathPetId = bigint
 
-export type GetPetByIdStatus200 = Pet
+export type GetPetByIdStatus200Json = Pet
+
+export type GetPetByIdStatus200Xml = Pet
+
+export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
 /**
  * @type any
@@ -1042,7 +1065,14 @@ export type GetOrderByIdPathOrderId = bigint
 /**
  * @type object
  */
-export type GetOrderByIdStatus200 = Order
+export type GetOrderByIdStatus200Json = Order
+
+/**
+ * @type object
+ */
+export type GetOrderByIdStatus200Xml = Order
+
+export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
 /**
  * @type any
@@ -1140,7 +1170,14 @@ export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
 /**
  * @type object
  */
-export type CreateUserStatusDefault = User
+export type CreateUserStatusDefaultJson = User
+
+/**
+ * @type object
+ */
+export type CreateUserStatusDefaultXml = User
+
+export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
 
 /**
  * @description Created user object
@@ -1191,7 +1228,14 @@ export type CreateUserResponse = CreateUserStatusDefault
 /**
  * @type object
  */
-export type CreateUsersWithListInputStatus200 = User
+export type CreateUsersWithListInputStatus200Json = User
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Xml = User
+
+export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 
 /**
  * @type any
@@ -1245,7 +1289,14 @@ export type LoginUserQueryPassword = string | undefined
 /**
  * @type string
  */
-export type LoginUserStatus200 = string
+export type LoginUserStatus200Xml = string
+
+/**
+ * @type string
+ */
+export type LoginUserStatus200Json = string
+
+export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
 
 /**
  * @type any
@@ -1327,7 +1378,14 @@ export type GetUserByNamePathUsername = string
 /**
  * @type object
  */
-export type GetUserByNameStatus200 = User
+export type GetUserByNameStatus200Json = User
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Xml = User
+
+export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
 
 /**
  * @type any

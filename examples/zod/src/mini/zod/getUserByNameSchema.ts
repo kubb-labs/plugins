@@ -8,7 +8,11 @@ import { userSchema } from './userSchema.ts'
 
 export const getUserByNamePathUsernameSchema = z.string()
 
-export const getUserByNameStatus200Schema = userSchema
+export const getUserByNameStatus200SchemaJson = userSchema
+
+export const getUserByNameStatus200SchemaXml = userSchema
+
+export const getUserByNameStatus200Schema = z.union([getUserByNameStatus200SchemaJson, getUserByNameStatus200SchemaXml])
 
 export const getUserByNameStatus400Schema = z.any()
 

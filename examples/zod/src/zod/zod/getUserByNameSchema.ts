@@ -10,7 +10,15 @@ export const getUserByNamePathUsernameSchema = z.string().describe('The name tha
 
 export type GetUserByNamePathUsernameSchema = z.infer<typeof getUserByNamePathUsernameSchema>
 
-export const getUserByNameStatus200Schema = userSchema
+export const getUserByNameStatus200SchemaJson = userSchema
+
+export type GetUserByNameStatus200SchemaJson = z.infer<typeof getUserByNameStatus200SchemaJson>
+
+export const getUserByNameStatus200SchemaXml = userSchema
+
+export type GetUserByNameStatus200SchemaXml = z.infer<typeof getUserByNameStatus200SchemaXml>
+
+export const getUserByNameStatus200Schema = z.union([getUserByNameStatus200SchemaJson, getUserByNameStatus200SchemaXml])
 
 export type GetUserByNameStatus200Schema = z.infer<typeof getUserByNameStatus200Schema>
 

@@ -16,7 +16,14 @@ export type GetOrderByIdPathOrderId = number
 /**
  * @type object
  */
-export type GetOrderByIdStatus200 = Order
+export type GetOrderByIdStatus200Json = Order
+
+/**
+ * @type object
+ */
+export type GetOrderByIdStatus200Xml = Order
+
+export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
 /**
  * @type any

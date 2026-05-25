@@ -8,7 +8,15 @@ export const loginUserQueryPasswordSchema = z.string().optional().describe('The 
 
 export type LoginUserQueryPasswordSchema = z.infer<typeof loginUserQueryPasswordSchema>
 
-export const loginUserStatus200Schema = z.string()
+export const loginUserStatus200SchemaXml = z.string()
+
+export type LoginUserStatus200SchemaXml = z.infer<typeof loginUserStatus200SchemaXml>
+
+export const loginUserStatus200SchemaJson = z.string()
+
+export type LoginUserStatus200SchemaJson = z.infer<typeof loginUserStatus200SchemaJson>
+
+export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, loginUserStatus200SchemaJson])
 
 export type LoginUserStatus200Schema = z.infer<typeof loginUserStatus200Schema>
 

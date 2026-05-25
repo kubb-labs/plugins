@@ -18,7 +18,14 @@ export type LoginUserQueryPassword = string | undefined
 /**
  * @type string
  */
-export type LoginUserStatus200 = string
+export type LoginUserStatus200Xml = string
+
+/**
+ * @type string
+ */
+export type LoginUserStatus200Json = string
+
+export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
 
 /**
  * @type any

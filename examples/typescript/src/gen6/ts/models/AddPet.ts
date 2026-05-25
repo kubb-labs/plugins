@@ -6,7 +6,11 @@
 import type { AddPetRequest } from './AddPetRequest.ts'
 import type { Pet } from './Pet.ts'
 
-export type AddPetStatus200 = Pet
+export type AddPetStatus200Json = Pet
+
+export type AddPetStatus200Xml = Pet
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
 /**
  * @type object

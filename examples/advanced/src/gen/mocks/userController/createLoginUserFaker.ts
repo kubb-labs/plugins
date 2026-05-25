@@ -1,4 +1,4 @@
-import type { LoginUserResponse, LoginUserStatus400 } from '../../models/ts/userController/LoginUser.ts'
+import type { LoginUserResponse, LoginUserStatus200, LoginUserStatus400 } from '../../models/ts/userController/LoginUser.ts'
 import { faker } from '@faker-js/faker'
 
 export function createLoginUserQueryUsernameFaker(data?: string): string {
@@ -12,8 +12,22 @@ export function createLoginUserQueryPasswordFaker(data?: string): string {
 /**
  * @description successful operation
  */
-export function createLoginUserStatus200Faker(data?: string): string {
+export function createLoginUserStatus200FakerXml(data?: string): string {
   return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200FakerJson(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200Faker(_data?: LoginUserStatus200): LoginUserStatus200 {
+  return faker.helpers.arrayElement<any>([createLoginUserStatus200FakerXml(), createLoginUserStatus200FakerJson()])
 }
 
 /**

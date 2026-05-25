@@ -7,7 +7,11 @@ import * as z from 'zod/mini'
 import { addPetRequestSchema } from './addPetRequestSchema.ts'
 import { petSchema } from './petSchema.ts'
 
-export const addPetStatus200Schema = z.lazy(() => petSchema)
+export const addPetStatus200SchemaJson = z.lazy(() => petSchema)
+
+export const addPetStatus200SchemaXml = z.lazy(() => petSchema)
+
+export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
 export const addPetStatus405Schema = z.object({
   code: z.optional(z.int()),
@@ -16,4 +20,10 @@ export const addPetStatus405Schema = z.object({
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetDataSchema = addPetRequestSchema
+export const addPetDataSchemaJson = addPetRequestSchema
+
+export const addPetDataSchemaXml = z.lazy(() => petSchema)
+
+export const addPetDataSchemaFormUrlEncoded = z.lazy(() => petSchema)
+
+export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])

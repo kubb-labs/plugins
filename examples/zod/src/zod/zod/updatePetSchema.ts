@@ -6,7 +6,15 @@
 import { z } from '../../zod.ts'
 import { petSchema } from './petSchema.ts'
 
-export const updatePetStatus200Schema = z.lazy(() => petSchema)
+export const updatePetStatus200SchemaJson = z.lazy(() => petSchema)
+
+export type UpdatePetStatus200SchemaJson = z.infer<typeof updatePetStatus200SchemaJson>
+
+export const updatePetStatus200SchemaXml = z.lazy(() => petSchema)
+
+export type UpdatePetStatus200SchemaXml = z.infer<typeof updatePetStatus200SchemaXml>
+
+export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
 export type UpdatePetStatus200Schema = z.infer<typeof updatePetStatus200Schema>
 
@@ -26,6 +34,18 @@ export const updatePetResponseSchema = z.union([updatePetStatus200Schema, update
 
 export type UpdatePetResponseSchema = z.infer<typeof updatePetResponseSchema>
 
-export const updatePetDataSchema = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+export const updatePetDataSchemaJson = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+
+export type UpdatePetDataSchemaJson = z.infer<typeof updatePetDataSchemaJson>
+
+export const updatePetDataSchemaXml = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+
+export type UpdatePetDataSchemaXml = z.infer<typeof updatePetDataSchemaXml>
+
+export const updatePetDataSchemaFormUrlEncoded = z.lazy(() => petSchema).describe('Update an existent pet in the store')
+
+export type UpdatePetDataSchemaFormUrlEncoded = z.infer<typeof updatePetDataSchemaFormUrlEncoded>
+
+export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])
 
 export type UpdatePetDataSchema = z.infer<typeof updatePetDataSchema>

@@ -9,7 +9,14 @@ export type GetUserByNamePathUsername = string
 /**
  * @type object
  */
-export type GetUserByNameStatus200 = User
+export type GetUserByNameStatus200Json = User
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Xml = User
+
+export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
 
 /**
  * @type any

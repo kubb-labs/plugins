@@ -89,7 +89,11 @@ export const petNotFoundSchema = z.object({
 
 export const userArraySchema = z.array(userSchema)
 
-export const updatePetStatus200Schema = petSchema
+export const updatePetStatus200SchemaJson = petSchema
+
+export const updatePetStatus200SchemaXml = petSchema
+
+export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
 export const updatePetStatus400Schema = z.any()
 
@@ -99,9 +103,19 @@ export const updatePetStatus405Schema = z.any()
 
 export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetDataSchema = petSchema.describe('Update an existent pet in the store')
+export const updatePetDataSchemaJson = petSchema.describe('Update an existent pet in the store')
 
-export const addPetStatus200Schema = petSchema
+export const updatePetDataSchemaXml = petSchema.describe('Update an existent pet in the store')
+
+export const updatePetDataSchemaFormUrlEncoded = petSchema.describe('Update an existent pet in the store')
+
+export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])
+
+export const addPetStatus200SchemaJson = petSchema
+
+export const addPetStatus200SchemaXml = petSchema
+
+export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
 export const addPetStatus405Schema = z.object({
   code: z.int().optional(),
@@ -110,7 +124,13 @@ export const addPetStatus405Schema = z.object({
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetDataSchema = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+
+export const addPetDataSchemaXml = petSchema.describe('Create a new pet in the store')
+
+export const addPetDataSchemaFormUrlEncoded = petSchema.describe('Create a new pet in the store')
+
+export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
 export const findPetsByStatusQueryStatusSchema = z
   .enum(['available', 'pending', 'sold'])
@@ -118,7 +138,11 @@ export const findPetsByStatusQueryStatusSchema = z
   .default('available')
   .describe('Status values that need to be considered for filter')
 
-export const findPetsByStatusStatus200Schema = z.array(petSchema)
+export const findPetsByStatusStatus200SchemaJson = z.array(petSchema)
+
+export const findPetsByStatusStatus200SchemaXml = z.array(petSchema)
+
+export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 
 export const findPetsByStatusStatus400Schema = z.any()
 
@@ -130,7 +154,11 @@ export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to 
 
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export const findPetsByTagsStatus200Schema = z.array(petSchema)
+export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
+
+export const findPetsByTagsStatus200SchemaXml = z.array(petSchema)
+
+export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 
 export const findPetsByTagsStatus400Schema = z.any()
 
@@ -138,7 +166,11 @@ export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Sche
 
 export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
 
-export const getPetByIdStatus200Schema = petSchema
+export const getPetByIdStatus200SchemaJson = petSchema
+
+export const getPetByIdStatus200SchemaXml = petSchema
+
+export const getPetByIdStatus200Schema = z.union([getPetByIdStatus200SchemaJson, getPetByIdStatus200SchemaXml])
 
 export const getPetByIdStatus400Schema = z.any()
 
@@ -184,7 +216,13 @@ export const placeOrderStatus405Schema = z.any()
 
 export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
-export const placeOrderDataSchema = orderSchema.optional()
+export const placeOrderDataSchemaJson = orderSchema.optional()
+
+export const placeOrderDataSchemaXml = orderSchema.optional()
+
+export const placeOrderDataSchemaFormUrlEncoded = orderSchema.optional()
+
+export const placeOrderDataSchema = z.union([placeOrderDataSchemaJson, placeOrderDataSchemaXml, placeOrderDataSchemaFormUrlEncoded])
 
 export const placeOrderPatchStatus200Schema = orderSchema
 
@@ -192,11 +230,21 @@ export const placeOrderPatchStatus405Schema = z.any()
 
 export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
-export const placeOrderPatchDataSchema = orderSchema.optional()
+export const placeOrderPatchDataSchemaJson = orderSchema.optional()
+
+export const placeOrderPatchDataSchemaXml = orderSchema.optional()
+
+export const placeOrderPatchDataSchemaFormUrlEncoded = orderSchema.optional()
+
+export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])
 
 export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
-export const getOrderByIdStatus200Schema = orderSchema
+export const getOrderByIdStatus200SchemaJson = orderSchema
+
+export const getOrderByIdStatus200SchemaXml = orderSchema
+
+export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 
 export const getOrderByIdStatus400Schema = z.any()
 
@@ -212,13 +260,27 @@ export const deleteOrderStatus404Schema = z.any()
 
 export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
-export const createUserStatusDefaultSchema = userSchema
+export const createUserStatusDefaultSchemaJson = userSchema
+
+export const createUserStatusDefaultSchemaXml = userSchema
+
+export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSchemaJson, createUserStatusDefaultSchemaXml])
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export const createUserDataSchema = userSchema.optional().describe('Created user object')
+export const createUserDataSchemaJson = userSchema.optional().describe('Created user object')
 
-export const createUsersWithListInputStatus200Schema = userSchema
+export const createUserDataSchemaXml = userSchema.optional().describe('Created user object')
+
+export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Created user object')
+
+export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])
+
+export const createUsersWithListInputStatus200SchemaJson = userSchema
+
+export const createUsersWithListInputStatus200SchemaXml = userSchema
+
+export const createUsersWithListInputStatus200Schema = z.union([createUsersWithListInputStatus200SchemaJson, createUsersWithListInputStatus200SchemaXml])
 
 export const createUsersWithListInputStatusDefaultSchema = z.any()
 
@@ -230,7 +292,11 @@ export const loginUserQueryUsernameSchema = z.string().optional().describe('The 
 
 export const loginUserQueryPasswordSchema = z.string().optional().describe('The password for login in clear text')
 
-export const loginUserStatus200Schema = z.string()
+export const loginUserStatus200SchemaXml = z.string()
+
+export const loginUserStatus200SchemaJson = z.string()
+
+export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, loginUserStatus200SchemaJson])
 
 export const loginUserStatus400Schema = z.any()
 
@@ -242,7 +308,11 @@ export const logoutUserResponseSchema = logoutUserStatusDefaultSchema
 
 export const getUserByNamePathUsernameSchema = z.string().describe('The name that needs to be fetched. Use user1 for testing. ')
 
-export const getUserByNameStatus200Schema = userSchema
+export const getUserByNameStatus200SchemaJson = userSchema
+
+export const getUserByNameStatus200SchemaXml = userSchema
+
+export const getUserByNameStatus200Schema = z.union([getUserByNameStatus200SchemaJson, getUserByNameStatus200SchemaXml])
 
 export const getUserByNameStatus400Schema = z.any()
 
@@ -256,7 +326,13 @@ export const updateUserStatusDefaultSchema = z.any()
 
 export const updateUserResponseSchema = updateUserStatusDefaultSchema
 
-export const updateUserDataSchema = userSchema.optional().describe('Update an existent user in the store')
+export const updateUserDataSchemaJson = userSchema.optional().describe('Update an existent user in the store')
+
+export const updateUserDataSchemaXml = userSchema.optional().describe('Update an existent user in the store')
+
+export const updateUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Update an existent user in the store')
+
+export const updateUserDataSchema = z.union([updateUserDataSchemaJson, updateUserDataSchemaXml, updateUserDataSchemaFormUrlEncoded])
 
 export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
 

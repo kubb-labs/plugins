@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from "../types/AddPet.ts";
+import type { AddPetData, AddPetFormUrlEncodedData, AddPetJsonData, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml, AddPetStatus405, AddPetXmlData } from "../types/AddPet.ts";
 import { createAddPetRequest } from "./createAddPetRequest.ts";
 import { createPet } from "./createPet.ts";
 import { faker } from "@faker-js/faker";
@@ -11,10 +11,28 @@ import { faker } from "@faker-js/faker";
 /**
  * @description Successful operation
  */
-export function createAddPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus200 {
+export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): AddPetStatus200Json {
   faker.seed([42])
 
   return createPet(data)
+}
+
+/**
+ * @description Successful operation
+ */
+export function createAddPetStatus200Xml(data?: Partial<AddPetStatus200Xml>): AddPetStatus200Xml {
+  faker.seed([42])
+
+  return createPet(data)
+}
+
+/**
+ * @description Successful operation
+ */
+export function createAddPetStatus200(_data?: AddPetStatus200): AddPetStatus200 {
+  faker.seed([42])
+
+  return faker.helpers.arrayElement<any>([createAddPetStatus200Json(), createAddPetStatus200Xml()])
 }
 
 /**
@@ -29,10 +47,37 @@ export function createAddPetStatus405() {
 /**
  * @description Create a new pet in the store
  */
-export function createAddPetData(data?: Partial<AddPetData>): AddPetData {
+export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJsonData {
   faker.seed([42])
 
   return createAddPetRequest(data)
+}
+
+/**
+ * @description Create a new pet in the store
+ */
+export function createAddPetXmlData(data?: Partial<AddPetXmlData>): AddPetXmlData {
+  faker.seed([42])
+
+  return createPet(data)
+}
+
+/**
+ * @description Create a new pet in the store
+ */
+export function createAddPetFormUrlEncodedData(data?: Partial<AddPetFormUrlEncodedData>): AddPetFormUrlEncodedData {
+  faker.seed([42])
+
+  return createPet(data)
+}
+
+/**
+ * @description Create a new pet in the store
+ */
+export function createAddPetData(_data?: AddPetData): AddPetData {
+  faker.seed([42])
+
+  return faker.helpers.arrayElement<any>([createAddPetJsonData(), createAddPetXmlData(), createAddPetFormUrlEncodedData()])
 }
 
 export function createAddPetResponse(_data?: AddPetResponse): AddPetResponse {

@@ -6,8 +6,18 @@
 import * as z from 'zod/mini'
 import { userSchema } from './userSchema.ts'
 
-export const createUserStatusDefaultSchema = userSchema
+export const createUserStatusDefaultSchemaJson = userSchema
+
+export const createUserStatusDefaultSchemaXml = userSchema
+
+export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSchemaJson, createUserStatusDefaultSchemaXml])
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export const createUserDataSchema = z.optional(userSchema)
+export const createUserDataSchemaJson = z.optional(userSchema)
+
+export const createUserDataSchemaXml = z.optional(userSchema)
+
+export const createUserDataSchemaFormUrlEncoded = z.optional(userSchema)
+
+export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])

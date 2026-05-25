@@ -8,11 +8,15 @@ import { petSchema } from './petSchema.js'
 
 export const findPetsByStatusPathStepIdSchema = z.string()
 
-export const findPetsByStatusStatus200Schema = z
+export const findPetsByStatusStatus200SchemaJson = z
   .array(petSchema)
   .min(1)
   .max(3)
   .refine((items) => new Set(items).size === items.length, { message: 'Array entries must be unique' })
+
+export const findPetsByStatusStatus200SchemaXml = z.array(petSchema)
+
+export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 
 export const findPetsByStatusStatus400Schema = z.any()
 

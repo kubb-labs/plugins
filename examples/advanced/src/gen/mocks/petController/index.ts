@@ -1,5 +1,22 @@
-export { createAddFilesDataFaker, createAddFilesResponseFaker, createAddFilesStatus200Faker, createAddFilesStatus405Faker } from './createAddFilesFaker.ts'
-export { createAddPetDataFaker, createAddPetResponseFaker, createAddPetStatus405Faker, createAddPetStatusDefaultFaker } from './createAddPetFaker.ts'
+export {
+  createAddFilesDataFaker,
+  createAddFilesDataFakerFormData,
+  createAddFilesDataFakerJson,
+  createAddFilesResponseFaker,
+  createAddFilesStatus200Faker,
+  createAddFilesStatus405Faker,
+} from './createAddFilesFaker.ts'
+export {
+  createAddPetDataFaker,
+  createAddPetDataFakerFormUrlEncoded,
+  createAddPetDataFakerJson,
+  createAddPetDataFakerXml,
+  createAddPetResponseFaker,
+  createAddPetStatus405Faker,
+  createAddPetStatusDefaultFaker,
+  createAddPetStatusDefaultFakerJson,
+  createAddPetStatusDefaultFakerXml,
+} from './createAddPetFaker.ts'
 export {
   createDeletePetHeaderApiKeyFaker,
   createDeletePetPathPetIdFaker,
@@ -10,6 +27,8 @@ export {
   createFindPetsByStatusPathStepIdFaker,
   createFindPetsByStatusResponseFaker,
   createFindPetsByStatusStatus200Faker,
+  createFindPetsByStatusStatus200FakerJson,
+  createFindPetsByStatusStatus200FakerXml,
   createFindPetsByStatusStatus400Faker,
 } from './createFindPetsByStatusFaker.ts'
 export {
@@ -19,19 +38,28 @@ export {
   createFindPetsByTagsQueryTagsFaker,
   createFindPetsByTagsResponseFaker,
   createFindPetsByTagsStatus200Faker,
+  createFindPetsByTagsStatus200FakerJson,
+  createFindPetsByTagsStatus200FakerXml,
   createFindPetsByTagsStatus400Faker,
 } from './createFindPetsByTagsFaker.ts'
 export {
   createGetPetByIdPathPetIdFaker,
   createGetPetByIdResponseFaker,
   createGetPetByIdStatus200Faker,
+  createGetPetByIdStatus200FakerJson,
+  createGetPetByIdStatus200FakerXml,
   createGetPetByIdStatus400Faker,
   createGetPetByIdStatus404Faker,
 } from './createGetPetByIdFaker.ts'
 export {
   createUpdatePetDataFaker,
+  createUpdatePetDataFakerFormUrlEncoded,
+  createUpdatePetDataFakerJson,
+  createUpdatePetDataFakerXml,
   createUpdatePetResponseFaker,
   createUpdatePetStatus200Faker,
+  createUpdatePetStatus200FakerJson,
+  createUpdatePetStatus200FakerXml,
   createUpdatePetStatus202Faker,
   createUpdatePetStatus400Faker,
   createUpdatePetStatus404Faker,

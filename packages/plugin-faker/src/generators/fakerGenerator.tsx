@@ -1,3 +1,4 @@
+import { getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -111,27 +112,57 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       name: resolveParamNameByLocation(resolver, node, param),
       typeName: resolveParamNameByLocation(tsResolver, node, param),
     }))
-    const responseEntries = node.responses.map((response) => ({
-      response,
-      name: resolver.resolveResponseStatusName(node, response.statusCode),
-      typeName: tsResolver.resolveResponseStatusName(node, response.statusCode),
-    }))
-    const dataEntry = node.requestBody?.content?.[0]?.schema
-      ? {
-          schema: {
-            ...node.requestBody.content![0]!.schema!,
-            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
-          },
-          name: resolver.resolveDataName(node),
-          typeName: tsResolver.resolveDataName(node),
-          description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
-        }
-      : null
+    type RenderUnit = { schema: ast.SchemaNode | null; name: string; typeName: string; description?: string; skipImportNames: Array<string> }
+
+    // Expands a content array into render units: one faker per content type plus a union faker
+    // (named `baseName`) when more than one content type carries a schema, else a single faker.
+    function expandContentUnits(
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null }>,
+      baseName: string,
+      tsBaseName: string,
+      description: string | undefined,
+      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+    ): Array<RenderUnit> {
+      const withSchema = entries.filter((entry) => entry.schema)
+      if (withSchema.length <= 1) {
+        const primary = withSchema[0] ?? entries[0]
+        if (!primary?.schema) return []
+        return [{ schema: decorate ? decorate(primary.schema) : primary.schema, name: baseName, typeName: tsBaseName, description, skipImportNames: [] }]
+      }
+      const variants = resolveContentTypeVariants(entries, baseName)
+      const unionSchema = ast.createSchema({ type: 'union', members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })) })
+      return [
+        ...variants.map((variant) => ({
+          schema: decorate ? decorate(variant.schema) : variant.schema,
+          name: variant.name,
+          typeName: getPerContentTypeName(tsBaseName, variant.suffix),
+          description,
+          skipImportNames: [],
+        })),
+        { schema: unionSchema, name: baseName, typeName: tsBaseName, description, skipImportNames: variants.map((variant) => variant.name) },
+      ]
+    }
+
+    const responseUnits = node.responses.flatMap((response) =>
+      expandContentUnits(
+        response.content ?? [],
+        resolver.resolveResponseStatusName(node, response.statusCode),
+        tsResolver.resolveResponseStatusName(node, response.statusCode),
+        response.description,
+      ),
+    )
+    const dataUnits = expandContentUnits(
+      node.requestBody?.content ?? [],
+      resolver.resolveDataName(node),
+      tsResolver.resolveDataName(node),
+      node.requestBody?.description,
+      (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
+    )
     const responseName = resolver.resolveResponseName(node)
     const localHelperNames = new Set([
       ...paramEntries.map((entry) => entry.name),
-      ...responseEntries.map((entry) => entry.name),
-      ...(dataEntry ? [dataEntry.name] : []),
+      ...responseUnits.map((unit) => unit.name),
+      ...dataUnits.map((unit) => unit.name),
       responseName,
     ])
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
@@ -243,27 +274,29 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName,
           }),
         )}
-        {responseEntries.map(({ response, name, typeName }) =>
+        {responseUnits.map((unit) =>
           renderEntry({
-            schema: response.content?.[0]?.schema ?? null,
-            name,
-            typeName,
-            description: response.description,
+            schema: unit.schema,
+            name: unit.name,
+            typeName: unit.typeName,
+            description: unit.description,
+            skipImportNames: unit.skipImportNames,
           }),
         )}
-        {dataEntry
-          ? renderEntry({
-              schema: dataEntry.schema,
-              name: dataEntry.name,
-              typeName: dataEntry.typeName,
-              description: dataEntry.description,
-            })
-          : null}
+        {dataUnits.map((unit) =>
+          renderEntry({
+            schema: unit.schema,
+            name: unit.name,
+            typeName: unit.typeName,
+            description: unit.description,
+            skipImportNames: unit.skipImportNames,
+          }),
+        )}
         {renderEntry({
           schema: buildResponseUnionSchema(node, resolver),
           name: responseName,
           typeName: tsResolver.resolveResponseName(node),
-          skipImportNames: responseEntries.map(({ name }) => name),
+          skipImportNames: responseUnits.map((unit) => unit.name),
         })}
       </File>
     )

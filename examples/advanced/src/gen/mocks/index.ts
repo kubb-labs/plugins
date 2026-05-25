@@ -14,15 +14,22 @@ export { createUserArrayFaker } from './createUserArrayFaker.ts'
 export { createUserFaker } from './createUserFaker.ts'
 export {
   createAddFilesDataFaker,
+  createAddFilesDataFakerFormData,
+  createAddFilesDataFakerJson,
   createAddFilesResponseFaker,
   createAddFilesStatus200Faker,
   createAddFilesStatus405Faker,
 } from './petController/createAddFilesFaker.ts'
 export {
   createAddPetDataFaker,
+  createAddPetDataFakerFormUrlEncoded,
+  createAddPetDataFakerJson,
+  createAddPetDataFakerXml,
   createAddPetResponseFaker,
   createAddPetStatus405Faker,
   createAddPetStatusDefaultFaker,
+  createAddPetStatusDefaultFakerJson,
+  createAddPetStatusDefaultFakerXml,
 } from './petController/createAddPetFaker.ts'
 export {
   createDeletePetHeaderApiKeyFaker,
@@ -34,6 +41,8 @@ export {
   createFindPetsByStatusPathStepIdFaker,
   createFindPetsByStatusResponseFaker,
   createFindPetsByStatusStatus200Faker,
+  createFindPetsByStatusStatus200FakerJson,
+  createFindPetsByStatusStatus200FakerXml,
   createFindPetsByStatusStatus400Faker,
 } from './petController/createFindPetsByStatusFaker.ts'
 export {
@@ -43,19 +52,28 @@ export {
   createFindPetsByTagsQueryTagsFaker,
   createFindPetsByTagsResponseFaker,
   createFindPetsByTagsStatus200Faker,
+  createFindPetsByTagsStatus200FakerJson,
+  createFindPetsByTagsStatus200FakerXml,
   createFindPetsByTagsStatus400Faker,
 } from './petController/createFindPetsByTagsFaker.ts'
 export {
   createGetPetByIdPathPetIdFaker,
   createGetPetByIdResponseFaker,
   createGetPetByIdStatus200Faker,
+  createGetPetByIdStatus200FakerJson,
+  createGetPetByIdStatus200FakerXml,
   createGetPetByIdStatus400Faker,
   createGetPetByIdStatus404Faker,
 } from './petController/createGetPetByIdFaker.ts'
 export {
   createUpdatePetDataFaker,
+  createUpdatePetDataFakerFormUrlEncoded,
+  createUpdatePetDataFakerJson,
+  createUpdatePetDataFakerXml,
   createUpdatePetResponseFaker,
   createUpdatePetStatus200Faker,
+  createUpdatePetStatus200FakerJson,
+  createUpdatePetStatus200FakerXml,
   createUpdatePetStatus202Faker,
   createUpdatePetStatus400Faker,
   createUpdatePetStatus404Faker,
@@ -86,11 +104,22 @@ export {
   createCreatePetsStatusDefaultFaker,
 } from './petsController/createCreatePetsFaker.ts'
 export { createTagTagFaker } from './tag/createTagFaker.ts'
-export { createCreateUserDataFaker, createCreateUserResponseFaker, createCreateUserStatusDefaultFaker } from './userController/createCreateUserFaker.ts'
+export {
+  createCreateUserDataFaker,
+  createCreateUserDataFakerFormUrlEncoded,
+  createCreateUserDataFakerJson,
+  createCreateUserDataFakerXml,
+  createCreateUserResponseFaker,
+  createCreateUserStatusDefaultFaker,
+  createCreateUserStatusDefaultFakerJson,
+  createCreateUserStatusDefaultFakerXml,
+} from './userController/createCreateUserFaker.ts'
 export {
   createCreateUsersWithListInputDataFaker,
   createCreateUsersWithListInputResponseFaker,
   createCreateUsersWithListInputStatus200Faker,
+  createCreateUsersWithListInputStatus200FakerJson,
+  createCreateUsersWithListInputStatus200FakerXml,
   createCreateUsersWithListInputStatusDefaultFaker,
 } from './userController/createCreateUsersWithListInputFaker.ts'
 export {
@@ -103,6 +132,8 @@ export {
   createGetUserByNamePathUsernameFaker,
   createGetUserByNameResponseFaker,
   createGetUserByNameStatus200Faker,
+  createGetUserByNameStatus200FakerJson,
+  createGetUserByNameStatus200FakerXml,
   createGetUserByNameStatus400Faker,
   createGetUserByNameStatus404Faker,
 } from './userController/createGetUserByNameFaker.ts'
@@ -111,11 +142,16 @@ export {
   createLoginUserQueryUsernameFaker,
   createLoginUserResponseFaker,
   createLoginUserStatus200Faker,
+  createLoginUserStatus200FakerJson,
+  createLoginUserStatus200FakerXml,
   createLoginUserStatus400Faker,
 } from './userController/createLoginUserFaker.ts'
 export { createLogoutUserResponseFaker, createLogoutUserStatusDefaultFaker } from './userController/createLogoutUserFaker.ts'
 export {
   createUpdateUserDataFaker,
+  createUpdateUserDataFakerFormUrlEncoded,
+  createUpdateUserDataFakerJson,
+  createUpdateUserDataFakerXml,
   createUpdateUserPathUsernameFaker,
   createUpdateUserResponseFaker,
   createUpdateUserStatusDefaultFaker,

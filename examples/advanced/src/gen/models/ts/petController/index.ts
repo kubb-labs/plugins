@@ -17,6 +17,8 @@ export type {
   AddPetResponses,
   AddPetStatus405,
   AddPetStatusDefault,
+  AddPetStatusDefaultJson,
+  AddPetStatusDefaultXml,
   AddPetXmlData,
 } from './AddPet.ts'
 export type {
@@ -33,6 +35,8 @@ export type {
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './FindPetsByStatus.ts'
 export type {
@@ -44,6 +48,8 @@ export type {
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
   FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.ts'
@@ -53,6 +59,8 @@ export type {
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './GetPetById.ts'
@@ -64,6 +72,8 @@ export type {
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus202,
   UpdatePetStatus400,
   UpdatePetStatus404,

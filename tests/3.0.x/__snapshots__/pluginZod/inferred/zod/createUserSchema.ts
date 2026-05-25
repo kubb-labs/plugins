@@ -6,7 +6,15 @@
 import * as z from "zod";
 import { userSchema } from "./userSchema.ts";
 
-export const createUserStatusDefaultSchema = userSchema
+export const createUserStatusDefaultSchemaJson = userSchema
+
+export type CreateUserStatusDefaultSchemaJson = z.infer<typeof createUserStatusDefaultSchemaJson>
+
+export const createUserStatusDefaultSchemaXml = userSchema
+
+export type CreateUserStatusDefaultSchemaXml = z.infer<typeof createUserStatusDefaultSchemaXml>
+
+export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSchemaJson, createUserStatusDefaultSchemaXml])
 
 export type CreateUserStatusDefaultSchema = z.infer<typeof createUserStatusDefaultSchema>
 
@@ -14,6 +22,18 @@ export const createUserResponseSchema = createUserStatusDefaultSchema
 
 export type CreateUserResponseSchema = z.infer<typeof createUserResponseSchema>
 
-export const createUserDataSchema = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaJson = userSchema.optional().describe("Created user object")
+
+export type CreateUserDataSchemaJson = z.infer<typeof createUserDataSchemaJson>
+
+export const createUserDataSchemaXml = userSchema.optional().describe("Created user object")
+
+export type CreateUserDataSchemaXml = z.infer<typeof createUserDataSchemaXml>
+
+export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe("Created user object")
+
+export type CreateUserDataSchemaFormUrlEncoded = z.infer<typeof createUserDataSchemaFormUrlEncoded>
+
+export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])
 
 export type CreateUserDataSchema = z.infer<typeof createUserDataSchema>

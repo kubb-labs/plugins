@@ -1,3 +1,4 @@
+import { resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -5,24 +6,6 @@ import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
 import type { PluginTs } from '../types'
 import { buildData, buildResponses, buildResponseUnion } from '../utils.ts'
-
-function getContentTypeSuffix(contentType: string): string {
-  const baseType = contentType.split(';')[0]!.trim()
-  if (baseType === 'application/json') return 'Json'
-  if (baseType === 'multipart/form-data') return 'FormData'
-  if (baseType === 'application/x-www-form-urlencoded') return 'FormUrlEncoded'
-  const subtype = baseType.split('/').pop() ?? baseType
-  const parts = subtype.split(/[^a-zA-Z0-9]+/).filter(Boolean)
-  if (parts.length === 0) return 'Unknown'
-  return parts.map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join('')
-}
-
-function getPerContentTypeName(dataName: string, suffix: string): string {
-  if (dataName.endsWith('Data')) {
-    return suffix.endsWith('Data') ? dataName.slice(0, -4) + suffix : `${dataName.slice(0, -4)}${suffix}Data`
-  }
-  return dataName + suffix
-}
 
 /**
  * Built-in generator for `@kubb/plugin-ts`. Emits one TypeScript file per
@@ -168,6 +151,34 @@ export const typeGenerator = defineGenerator<PluginTs>({
       )
     }
 
+    /**
+     * Emits an individual type per content type plus a union alias under `baseName`.
+     * Shared by the request body and multi-content-type responses.
+     */
+    function buildContentTypeVariants(
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null; keysToOmit?: Array<string> | null }>,
+      baseName: string,
+      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+    ) {
+      const variants = resolveContentTypeVariants(entries, baseName)
+      const unionSchema = ast.createSchema({
+        type: 'union',
+        members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })),
+      })
+      return (
+        <>
+          {variants.map((variant) =>
+            renderSchemaType({
+              schema: decorate ? decorate(variant.schema) : variant.schema,
+              name: variant.name,
+              keysToOmit: variant.keysToOmit,
+            }),
+          )}
+          {renderSchemaType({ schema: unionSchema, name: baseName })}
+        </>
+      )
+    }
+
     const paramTypes = params.map((param) =>
       renderSchemaType({
         schema: param.schema,
@@ -192,52 +203,27 @@ export const typeGenerator = defineGenerator<PluginTs>({
         })
       }
       // Multiple content types — generate individual types + union alias
-      const dataName = resolver.resolveDataName(node)
-      const usedNames = new Set<string>()
-      const individualItems = requestBodyContent
-        .filter((entry) => entry.schema)
-        .map((entry) => {
-          const baseSuffix = getContentTypeSuffix(entry.contentType)
-          let individualName = getPerContentTypeName(dataName, baseSuffix)
-          let counter = 2
-          while (usedNames.has(individualName)) {
-            individualName = getPerContentTypeName(dataName, `${baseSuffix}${counter++}`)
-          }
-          usedNames.add(individualName)
-          return {
-            name: individualName,
-            rendered: renderSchemaType({
-              schema: {
-                ...entry.schema!,
-                description: node.requestBody!.description ?? entry.schema!.description,
-              },
-              name: individualName,
-              keysToOmit: entry.keysToOmit,
-            }),
-          }
-        })
-      const unionSchema = ast.createSchema({
-        type: 'union',
-        members: individualItems.map((item) => ast.createSchema({ type: 'ref', name: item.name })),
-      })
-      const unionType = renderSchemaType({ schema: unionSchema, name: dataName })
-      return (
-        <>
-          {individualItems.map((item) => item.rendered)}
-          {unionType}
-        </>
-      )
+      return buildContentTypeVariants(requestBodyContent, resolver.resolveDataName(node), (schema) => ({
+        ...schema,
+        description: node.requestBody!.description ?? schema.description,
+      }))
     }
 
     const requestType = buildRequestType()
 
-    const responseTypes = node.responses.map((res) =>
-      renderSchemaType({
-        schema: res.content?.[0]?.schema ?? null,
+    const responseTypes = node.responses.map((res) => {
+      const variants = (res.content ?? []).filter((entry) => entry.schema)
+      // Multiple content types for a single status code — generate a union of the variants.
+      if (variants.length > 1) {
+        return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
+      }
+      const primary = variants[0] ?? res.content?.[0]
+      return renderSchemaType({
+        schema: primary?.schema ?? null,
         name: resolver.resolveResponseStatusName(node, res.statusCode),
-        keysToOmit: res.content?.[0]?.keysToOmit,
-      }),
-    )
+        keysToOmit: primary?.keysToOmit,
+      })
+    })
 
     const dataType = renderSchemaType({
       schema: buildData({ ...node, parameters: params }, { resolver }),
@@ -250,23 +236,26 @@ export const typeGenerator = defineGenerator<PluginTs>({
     })
 
     function buildResponseType() {
-      if (!node.responses.some((res) => res.content?.[0]?.schema)) {
+      const hasSchema = (res: ast.ResponseNode) => (res.content ?? []).some((entry) => entry.schema)
+      if (!node.responses.some(hasSchema)) {
         return null
       }
 
       const responseName = resolver.resolveResponseName(node)
 
-      const responsesWithSchema = node.responses.filter((res) => res.content?.[0]?.schema)
+      const responsesWithSchema = node.responses.filter(hasSchema)
       const importedNames = new Set(
         responsesWithSchema.flatMap((res) =>
-          res.content?.[0]?.schema
-            ? adapter
-                .getImports(res.content[0].schema, (schemaName) => ({
-                  name: resolveImportName(schemaName),
-                  path: '',
-                }))
-                .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
-            : [],
+          (res.content ?? []).flatMap((entry) =>
+            entry.schema
+              ? adapter
+                  .getImports(entry.schema, (schemaName) => ({
+                    name: resolveImportName(schemaName),
+                    path: '',
+                  }))
+                  .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+              : [],
+          ),
         ),
       )
 

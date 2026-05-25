@@ -6,7 +6,15 @@
 import * as z from "zod";
 import { userSchema } from "./userSchema.ts";
 
-export const createUsersWithListInputStatus200Schema = userSchema
+export const createUsersWithListInputStatus200SchemaJson = userSchema
+
+export type CreateUsersWithListInputStatus200SchemaJson = z.infer<typeof createUsersWithListInputStatus200SchemaJson>
+
+export const createUsersWithListInputStatus200SchemaXml = userSchema
+
+export type CreateUsersWithListInputStatus200SchemaXml = z.infer<typeof createUsersWithListInputStatus200SchemaXml>
+
+export const createUsersWithListInputStatus200Schema = z.union([createUsersWithListInputStatus200SchemaJson, createUsersWithListInputStatus200SchemaXml])
 
 export type CreateUsersWithListInputStatus200Schema = z.infer<typeof createUsersWithListInputStatus200Schema>
 

@@ -7,6 +7,8 @@ export type {
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
+  AddPetStatus200Json,
+  AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
 } from './models/AddPet.ts'
@@ -22,6 +24,8 @@ export type {
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './models/CreateUser.ts'
 export type {
@@ -30,6 +34,8 @@ export type {
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './models/CreateUsersWithListInput.ts'
 export type { Customer } from './models/Customer.ts'
@@ -63,6 +69,8 @@ export type {
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
   FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
@@ -74,6 +82,8 @@ export type {
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './models/FindPetsByTags.ts'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/GetInventory.ts'
@@ -83,6 +93,8 @@ export type {
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './models/GetOrderById.ts'
@@ -92,6 +104,8 @@ export type {
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './models/GetPetById.ts'
@@ -101,6 +115,8 @@ export type {
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './models/GetUserByName.ts'
@@ -111,6 +127,8 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './models/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
@@ -148,6 +166,8 @@ export type {
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,

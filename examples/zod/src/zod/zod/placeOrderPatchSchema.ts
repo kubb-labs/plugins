@@ -18,6 +18,18 @@ export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Sc
 
 export type PlaceOrderPatchResponseSchema = z.infer<typeof placeOrderPatchResponseSchema>
 
-export const placeOrderPatchDataSchema = orderSchema.optional()
+export const placeOrderPatchDataSchemaJson = orderSchema.optional()
+
+export type PlaceOrderPatchDataSchemaJson = z.infer<typeof placeOrderPatchDataSchemaJson>
+
+export const placeOrderPatchDataSchemaXml = orderSchema.optional()
+
+export type PlaceOrderPatchDataSchemaXml = z.infer<typeof placeOrderPatchDataSchemaXml>
+
+export const placeOrderPatchDataSchemaFormUrlEncoded = orderSchema.optional()
+
+export type PlaceOrderPatchDataSchemaFormUrlEncoded = z.infer<typeof placeOrderPatchDataSchemaFormUrlEncoded>
+
+export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])
 
 export type PlaceOrderPatchDataSchema = z.infer<typeof placeOrderPatchDataSchema>
