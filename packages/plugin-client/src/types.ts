@@ -171,12 +171,13 @@ export type Options = {
   paramsCasing?: 'camelcase'
   /**
    * Validator applied to response bodies before they are returned to the caller.
-   * - `'client'` — no validation. Trusts the API.
+   * - `false` (default) — no validation. The client has no runtime parser; the response is
+   *   returned as-is, cast to the generated TypeScript type.
    * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
    *
-   * @default 'client'
+   * @default false
    */
-  parser?: 'client' | 'zod'
+  parser?: false | 'zod'
   /**
    * Shape of the generated client.
    * - `'function'` — one standalone async function per operation.

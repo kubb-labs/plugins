@@ -60,7 +60,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     operations = false,
     paramsCasing,
     clientType = options.sdk ? 'class' : 'function',
-    parser = 'client',
+    parser = false,
     client = 'axios',
     importPath,
     bundle = false,

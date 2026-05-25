@@ -58,7 +58,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = 'client',
+    parser = false,
     suspense = {},
     infinite = false,
     paramsType = 'inline',

@@ -137,7 +137,7 @@ export default defineConfig({
           type: 'contentType',
           pattern: 'multipart/form-data',
           options: {
-            parser: 'client',
+            parser: false,
           },
         },
       ],

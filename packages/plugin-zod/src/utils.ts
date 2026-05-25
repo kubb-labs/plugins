@@ -13,6 +13,99 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
 }
 
 /**
+ * A codec for a schema node whose runtime type differs from its JSON wire type:
+ * the output (response) schema decodes wire → runtime, and the input (request)
+ * variant encodes runtime → wire.
+ *
+ * To support another codec type, append a `Codec` to `codecs` and route that
+ * type's printer node handler through `getCodec`.
+ */
+export type Codec = {
+  /**
+   * Whether this node is encoded/decoded by this codec.
+   */
+  matches(node: ast.SchemaNode): boolean
+  /**
+   * Output direction (response): decode the wire value into the runtime type.
+   */
+  decode(node: ast.SchemaNode): string
+  /**
+   * Input direction (request): encode the runtime value back to the wire value.
+   */
+  encode(node: ast.SchemaNode): string
+}
+
+/**
+ * `dateType: 'date'` fields are typed as `Date` but travel as ISO `string`s.
+ * Output decodes `string → Date`; input encodes `Date → string`, preserving the
+ * `date` (`YYYY-MM-DD`) vs `date-time` precision carried on `node.format`.
+ */
+const dateCodec: Codec = {
+  matches(node) {
+    return node.type === 'date' && node.representation === 'date'
+  },
+  decode(node) {
+    return node.format === 'date' ? 'z.iso.date().transform((value) => new Date(value))' : 'z.iso.datetime().transform((value) => new Date(value))'
+  },
+  encode(node) {
+    return node.format === 'date' ? 'z.date().transform((value) => value.toISOString().slice(0, 10))' : 'z.date().transform((value) => value.toISOString())'
+  },
+}
+
+/**
+ * Registered codecs, checked in order.
+ */
+const codecs: Array<Codec> = [dateCodec]
+
+/**
+ * Returns the codec for this node, or `undefined` when the node needs no
+ * encode/decode (its wire and runtime types match).
+ */
+export function getCodec(node: ast.SchemaNode | undefined): Codec | undefined {
+  if (!node) return undefined
+  return codecs.find((codec) => codec.matches(node))
+}
+
+/**
+ * Returns `true` when the node itself is encoded/decoded by a codec.
+ */
+export function hasCodec(node: ast.SchemaNode | undefined): boolean {
+  return getCodec(node) !== undefined
+}
+
+/**
+ * Returns `true` when the schema transitively contains a codec node —
+ * a value whose runtime type differs from its wire type (see {@link hasCodec}),
+ * so it must be decoded (response) or encoded (request) at the validation boundary.
+ * `$ref`s are followed via their resolved schema; a `seen` set guards cycles.
+ */
+export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string> = new Set()): boolean {
+  if (!node) return false
+
+  if (hasCodec(node)) return true
+
+  if (node.type === 'ref') {
+    if (!node.ref) return false
+    const refName = ast.extractRefName(node.ref)
+    if (refName) {
+      if (seen.has(refName)) return false
+      seen.add(refName)
+    }
+    const resolved = ast.syncSchemaRef(node)
+    if (resolved.type === 'ref') return false
+    return containsCodec(resolved, seen)
+  }
+
+  const children: Array<ast.SchemaNode | undefined> = []
+  if ('properties' in node && node.properties) children.push(...node.properties.map((prop) => prop.schema))
+  if ('items' in node && node.items) children.push(...node.items)
+  if ('members' in node && node.members) children.push(...node.members)
+  if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
+
+  return children.some((child) => containsCodec(child, seen))
+}
+
+/**
  * Collects all resolved schema names for an operation's parameters and responses
  * into a single lookup object, useful for building imports and type references.
  */

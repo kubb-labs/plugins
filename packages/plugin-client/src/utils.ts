@@ -150,7 +150,7 @@ export function buildReturnStatement({
   if (dataReturnType === 'data' && parser === 'zod' && zodResponseName) {
     return `return ${zodResponseName}.parse(res.data)`
   }
-  if (dataReturnType === 'full' && parser === 'client') {
+  if (dataReturnType === 'full' && parser !== 'zod') {
     return 'return res'
   }
   return 'return res.data'

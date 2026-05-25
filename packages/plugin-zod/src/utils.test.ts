@@ -8,6 +8,8 @@ import {
   buildSchemaNames,
   formatDefault,
   formatLiteral,
+  getCodec,
+  hasCodec,
   lengthChecksMini,
   lengthConstraints,
   numberChecksMini,
@@ -365,5 +367,37 @@ describe('buildGroupedParamsSchema', () => {
     expect(obj.properties![0]!.required).toBe(true)
     expect(obj.properties![1]!.name).toBe('q')
     expect(obj.properties![1]!.required).toBe(false)
+  })
+})
+
+describe('codec', () => {
+  test('date-time with representation "date" decodes and encodes', () => {
+    const node = ast.createSchema({ type: 'date', representation: 'date', format: 'date-time' })
+
+    const codec = getCodec(node)
+    expect(hasCodec(node)).toBe(true)
+    expect(codec?.decode(node)).toBe('z.iso.datetime().transform((value) => new Date(value))')
+    expect(codec?.encode(node)).toBe('z.date().transform((value) => value.toISOString())')
+  })
+
+  test('date with representation "date" preserves YYYY-MM-DD precision', () => {
+    const node = ast.createSchema({ type: 'date', representation: 'date', format: 'date' })
+
+    const codec = getCodec(node)
+    expect(codec?.decode(node)).toBe('z.iso.date().transform((value) => new Date(value))')
+    expect(codec?.encode(node)).toBe('z.date().transform((value) => value.toISOString().slice(0, 10))')
+  })
+
+  test('date with representation "string" has no codec', () => {
+    const node = ast.createSchema({ type: 'date', representation: 'string', format: 'date-time' })
+
+    expect(hasCodec(node)).toBe(false)
+    expect(getCodec(node)).toBeUndefined()
+  })
+
+  test('non-registered types have no codec', () => {
+    expect(hasCodec(ast.createSchema({ type: 'bigint' }))).toBe(false)
+    expect(hasCodec(ast.createSchema({ type: 'string' }))).toBe(false)
+    expect(hasCodec(undefined)).toBe(false)
   })
 })

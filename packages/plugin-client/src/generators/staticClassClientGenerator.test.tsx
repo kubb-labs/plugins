@@ -28,7 +28,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   clientType: 'staticClass',
   importPath: undefined,
   bundle: false,
-  parser: 'client',
+  parser: false,
   output: {
     path: '.',
   },

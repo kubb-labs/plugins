@@ -30,7 +30,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   clientType: 'function',
   importPath: undefined,
   bundle: false,
-  parser: 'client',
+  parser: false,
   output: {
     path: '.',
     banner: '/* eslint-disable no-alert, no-console */',
