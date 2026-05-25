@@ -1,7 +1,7 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
+import { createGroupConfig } from '@internals/shared'
 
-import { ast, definePlugin, type Group } from '@kubb/core'
+import { ast, definePlugin } from '@kubb/core'
 import { pluginClientName } from '@kubb/plugin-client'
 import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
 import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
@@ -64,19 +64,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Requests`
-            },
-      } satisfies Group)
-    : null
+  const groupConfig = createGroupConfig(group, { suffix: 'Requests', honorName: true })
 
   return {
     name: pluginMcpName,

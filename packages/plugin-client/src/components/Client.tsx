@@ -97,6 +97,7 @@ export function Client({
   children,
   isConfigurable = true,
 }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const path = new URLPath(node.path)
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'

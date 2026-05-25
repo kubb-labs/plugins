@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { findSuccessStatusCode, getOperationParameters } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -43,7 +43,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       meta: { pluginName: plugin.name },
     }
 
-    const operationsMapped = nodes.map((node) => {
+    const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
 
       const mcpFile = resolver.resolveFile(

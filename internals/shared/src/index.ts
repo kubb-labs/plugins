@@ -14,6 +14,7 @@ export {
   getSuccessResponses,
   isErrorStatusCode,
   isSuccessStatusCode,
+  operationFileEntry,
   resolveErrorNames,
   resolveOperationTypeNames,
   resolveResponseTypes,
@@ -32,4 +33,5 @@ export {
   type ResponseType,
   type ResolveOperationTypeNameOptions,
 } from './operation.ts'
+export { createGroupConfig } from './group.ts'
 export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'

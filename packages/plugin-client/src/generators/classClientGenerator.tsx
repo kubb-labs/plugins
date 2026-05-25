@@ -1,8 +1,7 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { camelCase } from '@internals/utils'
-import type { ast } from '@kubb/core'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -62,16 +61,18 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     function buildOperationData(node: ast.OperationNode): OperationData {
-      const typeFile = tsResolver.resolveFile(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },
-      )
+      const typeFile = tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+        root,
+        output: tsPluginOptions?.output ?? output,
+        group: tsPluginOptions?.group,
+      })
       const zodFile =
         zodResolver && pluginZod?.options
-          ? zodResolver.resolveFile(
-              { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group ?? undefined },
-            )
+          ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+              root,
+              output: pluginZod.options?.output ?? output,
+              group: pluginZod.options?.group ?? undefined,
+            })
           : null
 
       return {
@@ -85,6 +86,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
     }
 
     const controllers = nodes.reduce((acc, operationNode) => {
+      if (!ast.isHttpOperationNode(operationNode)) return acc
       const tag = operationNode.tags[0]
       const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 

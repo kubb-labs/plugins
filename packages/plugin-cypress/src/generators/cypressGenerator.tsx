@@ -1,5 +1,5 @@
 import { resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
@@ -14,6 +14,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { config, resolver, driver, root } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
 

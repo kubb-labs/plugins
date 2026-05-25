@@ -89,6 +89,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     )
   },
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
     const dateType = (adapter as Adapter<AdapterOas>).options.dateType
@@ -265,7 +266,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       file: resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
-    const transformedOperations = nodes.map((node) => {
+    const transformedOperations = nodes.filter(ast.isHttpOperationNode).map((node) => {
       const params = ast.caseParams(node.parameters, paramsCasing)
 
       return {

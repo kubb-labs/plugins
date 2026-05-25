@@ -1,4 +1,4 @@
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { ResolverFaker } from '@kubb/plugin-faker'
 import type { PluginMsw } from './types.ts'
 
@@ -39,14 +39,14 @@ function getResponseContentType(response: ast.ResponseNode | null | undefined): 
  * Converts an HTTP method to its lowercase MSW equivalent (e.g., 'POST' → 'post').
  */
 export function getMswMethod(node: ast.OperationNode): string {
-  return node.method.toLowerCase()
+  return ast.isHttpOperationNode(node) ? node.method.toLowerCase() : ''
 }
 
 /**
  * Converts an OpenAPI-style path to an Express/MSW-style path by replacing `{param}` with `:param`.
  */
 export function getMswUrl(node: ast.OperationNode): string {
-  return node.path.replaceAll('{', ':').replaceAll('}', '')
+  return ast.isHttpOperationNode(node) ? node.path.replaceAll('{', ':').replaceAll('}', '') : ''
 }
 
 /**

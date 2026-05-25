@@ -18,6 +18,8 @@ export type ElectricCar = (Vehicle & {
     type?: ElectricCarTypeEnumKey;
     /**
      * @description Battery capacity in kWh
+     *
+     * Format: `float`
      * @type number | undefined
     */
     batteryCapacity?: number;

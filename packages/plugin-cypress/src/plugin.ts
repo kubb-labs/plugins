@@ -1,5 +1,5 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { cypressGenerator } from './generators/cypressGenerator.tsx'
 import { resolverCypress } from './resolvers/resolverCypress.ts'
@@ -51,19 +51,7 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Requests`
-            },
-      } satisfies Group)
-    : null
+  const groupConfig = createGroupConfig(group, { suffix: 'Requests', honorName: true })
 
   return {
     name: pluginCypressName,

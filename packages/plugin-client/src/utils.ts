@@ -1,6 +1,6 @@
 import { getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
@@ -66,7 +66,7 @@ export function buildClassClientParams({
           mode: 'inlineSpread',
         },
         method: {
-          value: JSON.stringify(node.method.toUpperCase()),
+          value: JSON.stringify(ast.isHttpOperationNode(node) ? node.method.toUpperCase() : ''),
         },
         url: {
           value: path.template,
