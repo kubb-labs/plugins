@@ -17,6 +17,7 @@ type Props = {
   paramsType: PluginReactQuery['resolvedOptions']['paramsType']
   pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  suspense?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -62,6 +63,7 @@ export function QueryOptions({
   paramsType,
   pathParamsType,
   queryKeyName,
+  suspense,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
@@ -79,7 +81,7 @@ export function QueryOptions({
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledText = suspense ? '' : enabledSource ? `enabled: !!(${enabledSource}),` : ''
 
   return (
     <File.Source name={name} isExportable isIndexable>

@@ -51,7 +51,6 @@ export function updatePetWithFormSuspenseQueryOptionsHook(
 ) {
   const queryKey = updatePetWithFormSuspenseQueryKey(pet_id, params)
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormResponse, typeof queryKey>({
-    enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
       return updatePetWithFormSuspenseHook(pet_id, params, { ...config, signal: config.signal ?? signal })

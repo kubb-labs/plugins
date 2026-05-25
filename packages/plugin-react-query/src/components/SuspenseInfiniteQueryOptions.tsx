@@ -7,7 +7,6 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { buildEnabledCheck } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -88,9 +87,6 @@ export function SuspenseInfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
-
   const hasNewParams = nextParam != null || previousParam != null
 
   const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
@@ -135,7 +131,6 @@ export function SuspenseInfiniteQueryOptions({
           {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-       ${enabledText}
        queryKey,
        queryFn: async ({ signal, pageParam }) => {
           ${infiniteOverrideParams}
@@ -155,7 +150,6 @@ export function SuspenseInfiniteQueryOptions({
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-       ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
           return ${clientName}(${clientCallStr})
