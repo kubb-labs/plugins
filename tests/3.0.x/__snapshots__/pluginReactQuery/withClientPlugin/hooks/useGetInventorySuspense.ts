@@ -17,6 +17,7 @@ export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> 
 
         const queryKey = getInventorySuspenseQueryKey()
         return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getInventory({ ...config, signal: config.signal ?? signal })

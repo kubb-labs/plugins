@@ -17,7 +17,7 @@ import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const updatePetWithFormQueryKey = (
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
 ) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }, ...(params ? [params] : [])] as const
 
@@ -45,15 +45,16 @@ export async function updatePetWithFormHook(
 }
 
 export function updatePetWithFormQueryOptionsHook(
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = updatePetWithFormQueryKey(pet_id, params)
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormResponse, typeof queryKey>({
+    enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithFormHook(pet_id, params, { ...config, signal: config.signal ?? signal })
+      return updatePetWithFormHook(pet_id!, params, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -67,7 +68,7 @@ export function useUpdatePetWithFormHook<
   TQueryData = UpdatePetWithFormResponse,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   options: {
     query?: Partial<QueryObserverOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, TData, TQueryData, TQueryKey>> & {

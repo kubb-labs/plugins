@@ -10,7 +10,7 @@ import { client } from './.kubb/client'
 import { GetPetByIdResponse } from './GetPetById'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
+export const getPetByIdQueryKey = (petId?: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -25,12 +25,13 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
   return GetPetByIdResponse.parse(res.data)
 }
 
-export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions(petId?: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey(petId)
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdStatus200, typeof queryKey>({
+    enabled: !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetById(petId, { ...config, signal: config.signal ?? signal })
+      return getPetById(petId!, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -39,7 +40,7 @@ export function getPetByIdQueryOptions(petId: GetPetByIdPathPetId, config: Parti
  * {@link /pet/:petId}
  */
 export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
-  petId: GetPetByIdPathPetId,
+  petId?: GetPetByIdPathPetId,
   options: {
     query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

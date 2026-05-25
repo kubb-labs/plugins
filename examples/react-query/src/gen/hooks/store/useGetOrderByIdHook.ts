@@ -10,7 +10,7 @@ import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getOrderByIdQueryKey = ({ orderId }: { orderId: GetOrderByIdPathOrderId }) =>
+export const getOrderByIdQueryKey = ({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}) =>
   ['v5', { url: '/store/order/:orderId', params: { orderId: orderId } }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
@@ -32,12 +32,16 @@ export async function getOrderByIdHook({ orderId }: { orderId: GetOrderByIdPathO
   return res.data
 }
 
-export function getOrderByIdQueryOptionsHook({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdQueryOptionsHook(
+  { orderId }: { orderId?: GetOrderByIdPathOrderId } = {},
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = getOrderByIdQueryKey({ orderId })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
+    enabled: !!orderId,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getOrderByIdHook({ orderId }, { ...config, signal: config.signal ?? signal })
+      return getOrderByIdHook({ orderId: orderId! }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -48,7 +52,7 @@ export function getOrderByIdQueryOptionsHook({ orderId }: { orderId: GetOrderByI
  * {@link /store/order/:orderId}
  */
 export function useGetOrderByIdHook<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(
-  { orderId }: { orderId: GetOrderByIdPathOrderId },
+  { orderId }: { orderId?: GetOrderByIdPathOrderId } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>

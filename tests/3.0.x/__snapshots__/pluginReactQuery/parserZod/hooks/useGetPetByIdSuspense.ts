@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { getPetByIdResponseSchema } from "../zod/getPetByIdSchema.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getPetByIdSuspenseQueryKey = (petId: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
+export const getPetByIdSuspenseQueryKey = (petId?: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
@@ -34,6 +34,7 @@ export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, confi
 
         const queryKey = getPetByIdSuspenseQueryKey(petId)
         return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getPetByIdSuspense(petId, { ...config, signal: config.signal ?? signal })

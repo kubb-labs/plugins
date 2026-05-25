@@ -3,6 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
 import { resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
@@ -72,15 +73,18 @@ export function QueryOptions({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
+
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
+  const enabledText = enabledNames.length ? `enabled: () => ${enabledNames.map((n) => `!!toValue(${n})`).join(' && ')},` : ''
+
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
 
   // Transform: wrap non-config params with toValue(), add signal to config
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
-
-  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
-  const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -88,9 +92,10 @@ export function QueryOptions({
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return queryOptions<${TData}, ${TError}, ${TData}>({
+       ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
-          return ${clientName}(${addToValueCalls(clientCallStr)})
+          return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
        },
       })
 `}
@@ -106,8 +111,10 @@ export function QueryOptions({
  * Handles both inline params (`petId, config`) and object shorthand
  * params (`{ petId }, config`) by expanding to `{ petId: toValue(petId) }`.
  */
-function addToValueCalls(callStr: string): string {
+function addToValueCalls(callStr: string, enabledNames: ReadonlyArray<string> = []): string {
+  const optional = new Set(enabledNames)
   // Step 1: Transform shorthand object params like { petId } → { petId: toValue(petId) }
+  // Params that drive the `enabled` guard are optional, so assert non-null: toValue(petId!)
   let result = callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
     // Only transform simple shorthand (no colons, no spread)
     if (inner.includes(':') || inner.includes('...')) return match
@@ -115,7 +122,7 @@ function addToValueCalls(callStr: string): string {
       .split(',')
       .map((k: string) => k.trim())
       .filter(Boolean)
-    const wrapped = keys.map((k: string) => `${k}: toValue(${k})`).join(', ')
+    const wrapped = keys.map((k: string) => `${k}: toValue(${optional.has(k) ? `${k}!` : k})`).join(', ')
     return `{ ${wrapped} }`
   })
 
@@ -123,7 +130,7 @@ function addToValueCalls(callStr: string): string {
   result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => {
     if (name === 'config' || name === 'signal' || name === 'undefined') return match
     if (match.includes('toValue(')) return match
-    return `toValue(${name})`
+    return `toValue(${optional.has(name) ? `${name}!` : name})`
   })
 
   return result

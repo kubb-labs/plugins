@@ -9,7 +9,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { getOrderById } from "../clients/getOrderById.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getOrderByIdSuspenseQueryKey = (orderId: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
+export const getOrderByIdSuspenseQueryKey = (orderId?: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
@@ -17,6 +17,7 @@ export function getOrderByIdSuspenseQueryOptions(orderId: GetOrderByIdPathOrderI
 
         const queryKey = getOrderByIdSuspenseQueryKey(orderId)
         return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getOrderById(orderId, { ...config, signal: config.signal ?? signal })

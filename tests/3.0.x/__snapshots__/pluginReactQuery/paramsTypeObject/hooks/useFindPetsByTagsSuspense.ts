@@ -33,6 +33,7 @@ export function findPetsByTagsSuspenseQueryOptions({ params }: { params?: { tags
 
         const queryKey = findPetsByTagsSuspenseQueryKey(params)
         return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return findPetsByTagsSuspense({ params }, { ...config, signal: config.signal ?? signal })

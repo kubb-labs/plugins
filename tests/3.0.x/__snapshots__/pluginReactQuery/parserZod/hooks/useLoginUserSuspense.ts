@@ -33,6 +33,7 @@ export function loginUserSuspenseQueryOptions(params?: { username?: LoginUserQue
 
         const queryKey = loginUserSuspenseQueryKey(params)
         return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return loginUserSuspense(params, { ...config, signal: config.signal ?? signal })

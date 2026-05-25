@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { queryKeyTransformer } from '@internals/tanstack-query'
+import { getEnabledParamNames, markParamsOptional, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '../types.ts'
 import { buildQueryKeyParams, wrapWithMaybeRefOrGetter } from '../utils.ts'
 
@@ -27,7 +27,8 @@ export function buildQueryKeyParamsNode(
 }
 
 export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer }: Props): KubbReactNode {
-  const paramsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const baseParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const paramsNode = markParamsOptional(baseParamsNode, getEnabledParamNames(baseParamsNode))
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? queryKeyTransformer)({
     node,

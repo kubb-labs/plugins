@@ -16,7 +16,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseQueryKey = (params: {
+export const findPetsByTagsSuspenseQueryKey = (params?: {
   tags: FindPetsByTagsQueryTags
   status?: FindPetsByTagsQueryStatus
   pageSize?: FindPetsByTagsQueryPageSize

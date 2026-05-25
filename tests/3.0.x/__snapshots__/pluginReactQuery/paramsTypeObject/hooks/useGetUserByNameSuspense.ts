@@ -9,7 +9,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-cl
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getUserByNameSuspenseQueryKey = ({ username }: { username: GetUserByNamePathUsername }) => [{ url: '/user/:username', params: {username:username} }] as const
+export const getUserByNameSuspenseQueryKey = ({ username }: { username?: GetUserByNamePathUsername } = {}) => [{ url: '/user/:username', params: {username:username} }] as const
 
 type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
@@ -32,6 +32,7 @@ export function getUserByNameSuspenseQueryOptions({ username }: { username: GetU
 
         const queryKey = getUserByNameSuspenseQueryKey({ username })
         return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByNameSuspense({ username }, { ...config, signal: config.signal ?? signal })

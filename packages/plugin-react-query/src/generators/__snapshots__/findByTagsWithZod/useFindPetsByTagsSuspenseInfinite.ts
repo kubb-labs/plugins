@@ -16,7 +16,7 @@ import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = (params: {
+export const findPetsByTagsSuspenseInfiniteQueryKey = (params?: {
   tags: FindPetsByTagsQueryTags
   status?: FindPetsByTagsQueryStatus
   pageSize?: FindPetsByTagsQueryPageSize

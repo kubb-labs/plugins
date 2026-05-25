@@ -19,7 +19,7 @@ import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
 export const updatePetWithFormQueryKey = (
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
 ) => [{ url: '/pet/:petId', params: { petId: petId } }, ...(params ? [params] : []), ...(data ? [data] : [])] as const
@@ -51,16 +51,17 @@ export async function updatePetWithForm(
 }
 
 export function updatePetWithFormQueryOptions(
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const queryKey = updatePetWithFormQueryKey(petId, data, params)
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
+    enabled: () => !!toValue(petId),
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithForm(toValue(petId), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })
+      return updatePetWithForm(toValue(petId!), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -73,7 +74,7 @@ export function useUpdatePetWithForm<
   TQueryData = UpdatePetWithFormStatus200,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   options: {

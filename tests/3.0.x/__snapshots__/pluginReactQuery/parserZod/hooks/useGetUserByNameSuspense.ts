@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { getUserByNameResponseSchema } from "../zod/getUserByNameSchema.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getUserByNameSuspenseQueryKey = (username: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
+export const getUserByNameSuspenseQueryKey = (username?: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
 
 type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
@@ -33,6 +33,7 @@ export function getUserByNameSuspenseQueryOptions(username: GetUserByNamePathUse
 
         const queryKey = getUserByNameSuspenseQueryKey(username)
         return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByNameSuspense(username, { ...config, signal: config.signal ?? signal })

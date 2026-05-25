@@ -160,6 +160,7 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
           paramsType={paramsType}
           pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
+          suspense
         />
 
         {suspense && (

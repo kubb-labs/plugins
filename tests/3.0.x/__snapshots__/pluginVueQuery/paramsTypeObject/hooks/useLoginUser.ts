@@ -34,6 +34,7 @@ export function loginUserQueryOptions({ params }: { params?: MaybeRefOrGetter<{ 
 
         const queryKey = loginUserQueryKey(params)
         return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return loginUser({ params: toValue(params) }, { ...config, signal: config.signal ?? signal })

@@ -17,6 +17,7 @@ export function loginUserQueryOptions(params?: { username?: LoginUserQueryUserna
 
         const queryKey = loginUserQueryKey(params)
         return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return loginUser(params, { ...config, signal: config.signal ?? signal })

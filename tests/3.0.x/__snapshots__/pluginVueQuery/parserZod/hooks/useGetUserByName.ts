@@ -12,7 +12,7 @@ import { getUserByNameResponseSchema } from "../zod/getUserByNameSchema.ts";
 import { queryOptions, useQuery } from "@tanstack/vue-query";
 import { toValue } from "vue";
 
-export const getUserByNameQueryKey = (username: MaybeRefOrGetter<GetUserByNamePathUsername>) => [{ url: '/user/:username', params: {username:username} }] as const
+export const getUserByNameQueryKey = (username?: MaybeRefOrGetter<GetUserByNamePathUsername>) => [{ url: '/user/:username', params: {username:username} }] as const
 
 export type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
@@ -31,13 +31,14 @@ export async function getUserByName(username: GetUserByNamePathUsername, config:
   return getUserByNameResponseSchema.parse(res.data)
 }
 
-export function getUserByNameQueryOptions(username: MaybeRefOrGetter<GetUserByNamePathUsername>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getUserByNameQueryOptions(username?: MaybeRefOrGetter<GetUserByNamePathUsername>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getUserByNameQueryKey(username)
         return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200>({
+         enabled: () => !!toValue(username),
          queryKey,
          queryFn: async ({ signal }) => {
-            return getUserByName(toValue(username), { ...config, signal: config.signal ?? signal })
+            return getUserByName(toValue(username!), { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -47,7 +48,7 @@ export function getUserByNameQueryOptions(username: MaybeRefOrGetter<GetUserByNa
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameQueryKey>(username: MaybeRefOrGetter<GetUserByNamePathUsername>, options: {
+export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameQueryKey>(username?: MaybeRefOrGetter<GetUserByNamePathUsername>, options: {
   query?: Partial<UseQueryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {

@@ -16,7 +16,7 @@ import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsInfiniteQueryKey = (params: {
+export const findPetsByTagsInfiniteQueryKey = (params?: {
   tags: FindPetsByTagsQueryTags
   status?: FindPetsByTagsQueryStatus
   pageSize?: FindPetsByTagsQueryPageSize
@@ -39,7 +39,7 @@ export async function findPetsByTagsInfinite(
 }
 
 export function findPetsByTagsInfiniteQueryOptions(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
@@ -50,9 +50,10 @@ export function findPetsByTagsInfiniteQueryOptions(
     typeof queryKey,
     number
   >({
+    enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsInfinite(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByTagsInfinite(params!, { ...config, signal: config.signal ?? signal })
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1),
@@ -70,7 +71,7 @@ export function useFindPetsByTagsInfinite<
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
   TPageParam = number,
 >(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

@@ -9,7 +9,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-cl
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getOrderByIdSuspenseQueryKey = ({ orderId }: { orderId: GetOrderByIdPathOrderId }) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
+export const getOrderByIdSuspenseQueryKey = ({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
@@ -33,6 +33,7 @@ export function getOrderByIdSuspenseQueryOptions({ orderId }: { orderId: GetOrde
 
         const queryKey = getOrderByIdSuspenseQueryKey({ orderId })
         return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getOrderByIdSuspense({ orderId }, { ...config, signal: config.signal ?? signal })

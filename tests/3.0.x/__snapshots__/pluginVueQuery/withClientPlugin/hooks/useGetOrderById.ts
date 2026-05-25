@@ -11,17 +11,18 @@ import { getOrderById } from "../clients/getOrderById.ts";
 import { queryOptions, useQuery } from "@tanstack/vue-query";
 import { toValue } from "vue";
 
-export const getOrderByIdQueryKey = (orderId: MaybeRefOrGetter<GetOrderByIdPathOrderId>) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
+export const getOrderByIdQueryKey = (orderId?: MaybeRefOrGetter<GetOrderByIdPathOrderId>) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
 export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
-export function getOrderByIdQueryOptions(orderId: MaybeRefOrGetter<GetOrderByIdPathOrderId>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdQueryOptions(orderId?: MaybeRefOrGetter<GetOrderByIdPathOrderId>, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getOrderByIdQueryKey(orderId)
         return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200>({
+         enabled: () => !!toValue(orderId),
          queryKey,
          queryFn: async ({ signal }) => {
-            return getOrderById(toValue(orderId), { ...config, signal: config.signal ?? signal })
+            return getOrderById(toValue(orderId!), { ...config, signal: config.signal ?? signal })
          },
         })
 
@@ -32,7 +33,7 @@ export function getOrderByIdQueryOptions(orderId: MaybeRefOrGetter<GetOrderByIdP
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(orderId: MaybeRefOrGetter<GetOrderByIdPathOrderId>, options: {
+export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(orderId?: MaybeRefOrGetter<GetOrderByIdPathOrderId>, options: {
   query?: Partial<UseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {

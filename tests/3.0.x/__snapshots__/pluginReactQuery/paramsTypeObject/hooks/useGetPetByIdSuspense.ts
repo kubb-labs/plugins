@@ -9,7 +9,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-cl
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getPetByIdSuspenseQueryKey = ({ petId }: { petId: GetPetByIdPathPetId }) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
+export const getPetByIdSuspenseQueryKey = ({ petId }: { petId?: GetPetByIdPathPetId } = {}) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
@@ -33,6 +33,7 @@ export function getPetByIdSuspenseQueryOptions({ petId }: { petId: GetPetByIdPat
 
         const queryKey = getPetByIdSuspenseQueryKey({ petId })
         return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getPetByIdSuspense({ petId }, { ...config, signal: config.signal ?? signal })
