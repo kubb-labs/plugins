@@ -1,5 +1,35 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.31
+
+### Minor Changes
+
+- [#223](https://github.com/kubb-labs/plugins/pull/223) [`682b463`](https://github.com/kubb-labs/plugins/commit/682b4634ffcff48d8e1c6622e514ab49f2eae381) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rename the client `parser` option value `'client'` to `false`. The client has no runtime parser — it returns the response cast to the generated TypeScript type — so `false` (no validator) is clearer than `'client'`. `parser: 'zod'` is unchanged.
+
+  Migration: replace `parser: 'client'` with `parser: false` (or drop it, since `false` is the default) in `pluginClient`, `pluginReactQuery`, and `pluginVueQuery`.
+
+### Patch Changes
+
+- [#238](https://github.com/kubb-labs/plugins/pull/238) [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.
+
+- [#251](https://github.com/kubb-labs/plugins/pull/251) [`2e69cfa`](https://github.com/kubb-labs/plugins/commit/2e69cfae618a561321518ac8bc2d826054dec844) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Don't emit an `enabled` guard in generated suspense query options.
+
+  `useSuspenseQuery`/`useSuspenseInfiniteQuery` always run, and TanStack Query
+  types `UseSuspenseQueryOptions` as `Omit<UseQueryOptions, 'enabled' | ...>`, so
+  an `enabled` option is invalid for suspense hooks. The generated
+  `<op>SuspenseQueryOptions` and `<op>SuspenseInfiniteQueryOptions` functions no
+  longer include `enabled`. Regular `useQuery`/`useInfiniteQuery` options are
+  unchanged.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the per-plugin `group` naming block (duplicated verbatim across nine plugins) with a shared `createGroupConfig` helper from `@internals/shared`. Each plugin's grouping behavior is preserved exactly — the `Controller`/`Requests` suffix and whether a user-provided `group.name` is honored are passed as options — so generated output is unchanged. Internal refactor only.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`0ca63ab`](https://github.com/kubb-labs/plugins/commit/0ca63ab8f6c34a51936d355969a3d1b6f6c98708) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the `resolver.resolveFile` entry object — duplicated 44 times across the client and query operation generators — with a shared `operationFileEntry(node, name)` helper from `@internals/shared`. The helper returns the same `{ name, extname: '.ts', tag, path }` params, so generated output is unchanged. Internal refactor only.
+
+- Updated dependencies [[`682b463`](https://github.com/kubb-labs/plugins/commit/682b4634ffcff48d8e1c6622e514ab49f2eae381), [`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea), [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374), [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf), [`0ca63ab`](https://github.com/kubb-labs/plugins/commit/0ca63ab8f6c34a51936d355969a3d1b6f6c98708), [`4c08e4c`](https://github.com/kubb-labs/plugins/commit/4c08e4c5082410871e0ccb7274343738d1f7b3ff)]:
+  - @kubb/plugin-client@5.0.0-beta.31
+  - @kubb/plugin-ts@5.0.0-beta.31
+  - @kubb/plugin-zod@5.0.0-beta.31
+
 ## 5.0.0-beta.30
 
 ### Patch Changes
