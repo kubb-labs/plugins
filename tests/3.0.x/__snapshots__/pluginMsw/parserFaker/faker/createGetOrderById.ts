@@ -15,14 +15,14 @@ export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
  * @description successful operation
  */
 export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatus200Json>): GetOrderByIdStatus200Json {
-  return createOrder(data)
+  return createOrder(data) as GetOrderByIdStatus200Json
 }
 
 /**
  * @description successful operation
  */
 export function createGetOrderByIdStatus200Xml(data?: Partial<GetOrderByIdStatus200Xml>): GetOrderByIdStatus200Xml {
-  return createOrder(data)
+  return createOrder(data) as GetOrderByIdStatus200Xml
 }
 
 /**

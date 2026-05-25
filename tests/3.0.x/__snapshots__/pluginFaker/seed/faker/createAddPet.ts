@@ -14,7 +14,7 @@ import { faker } from "@faker-js/faker";
 export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): AddPetStatus200Json {
   faker.seed([42])
 
-  return createPet(data)
+  return createPet(data) as AddPetStatus200Json
 }
 
 /**
@@ -23,7 +23,7 @@ export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): 
 export function createAddPetStatus200Xml(data?: Partial<AddPetStatus200Xml>): AddPetStatus200Xml {
   faker.seed([42])
 
-  return createPet(data)
+  return createPet(data) as AddPetStatus200Xml
 }
 
 /**
@@ -50,7 +50,7 @@ export function createAddPetStatus405() {
 export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJsonData {
   faker.seed([42])
 
-  return createAddPetRequest(data)
+  return createAddPetRequest(data) as AddPetJsonData
 }
 
 /**
@@ -59,7 +59,7 @@ export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJson
 export function createAddPetXmlData(data?: Partial<AddPetXmlData>): AddPetXmlData {
   faker.seed([42])
 
-  return createPet(data)
+  return createPet(data) as AddPetXmlData
 }
 
 /**
@@ -68,7 +68,7 @@ export function createAddPetXmlData(data?: Partial<AddPetXmlData>): AddPetXmlDat
 export function createAddPetFormUrlEncodedData(data?: Partial<AddPetFormUrlEncodedData>): AddPetFormUrlEncodedData {
   faker.seed([42])
 
-  return createPet(data)
+  return createPet(data) as AddPetFormUrlEncodedData
 }
 
 /**

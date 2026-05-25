@@ -6,11 +6,11 @@
 import type { Pet } from "../types/Pet.ts";
 import { faker } from "@faker-js/faker";
 
-export function createPet(data?: Partial<Pet>): Required<Pet>
+export function createPet<TData extends Partial<Pet> = object>(data?: TData)
 {
   const defaultFakeData = {"id": faker.string.alpha(),"name": faker.string.alpha()}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Pet>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

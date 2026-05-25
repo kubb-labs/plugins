@@ -7,12 +7,12 @@ import type { Customer } from "../types/Customer.ts";
 import { createAddress } from "./createAddress.ts";
 import { faker } from "@faker-js/faker";
 
-export function createCustomer(data?: Partial<Customer>): Required<Customer>
+export function createCustomer<TData extends Partial<Customer> = object>(data?: TData)
 {
   faker.seed([42])
   const defaultFakeData = {"id": faker.number.bigInt(),"username": faker.string.alpha(),"address": faker.helpers.multiple(() => (createAddress()))}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Customer>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

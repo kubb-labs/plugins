@@ -15,14 +15,14 @@ export function createGetPetByIdPathPetId(data?: bigint): bigint {
  * @description successful operation
  */
 export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
-  return createPet(data)
+  return createPet(data) as GetPetByIdStatus200Json
 }
 
 /**
  * @description successful operation
  */
 export function createGetPetByIdStatus200Xml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
-  return createPet(data)
+  return createPet(data) as GetPetByIdStatus200Xml
 }
 
 /**
