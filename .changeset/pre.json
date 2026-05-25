@@ -36,6 +36,7 @@
   "changesets": [
     "circular-schema-detection-shared",
     "client-banner-aggregation-context",
+    "client-parser-false",
     "core-plugins-beta-12-alignment",
     "dull-areas-happen",
     "enforce-array-type-syntax",
@@ -45,8 +46,10 @@
     "kubb-core-beta-24-alignment",
     "kubb-core-beta-29-alignment",
     "multi-content-type-request-body",
+    "multi-content-type-response",
     "oas-ts-resolve-options",
     "open-pianos-create",
+    "operation-optional-method-path",
     "plugin-client-drop-dead-transformers-yaml",
     "plugin-client-export-clients-barrel",
     "plugin-client-params-casing-unused-var",
@@ -89,10 +92,13 @@
     "rename-plugin-manager-to-plugin-driver",
     "require-node-22",
     "sanitize-leading-digit-identifiers",
+    "shared-group-config-helper",
+    "shared-operation-file-entry",
     "standardize-client-runtime-symbol",
     "tanstack-tdata-success-only",
     "ts-discriminator-string-types",
     "ts-fix-request-body-description",
-    "vue-query-enabled-tovalue"
+    "vue-query-enabled-tovalue",
+    "zod-date-roundtrip"
   ]
 }
