@@ -16,7 +16,7 @@ type Props = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   tsResolver: ResolverTs
 }
 
@@ -24,7 +24,7 @@ type GetParamsProps = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['paramsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   tsResolver: ResolverTs
 }
 
@@ -32,7 +32,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
   // Build a URL-only node with only path params (no body, query, header)
-  const urlNode: ast.HttpOperationNode = {
+  const urlNode: ast.OperationNode = {
     ...node,
     parameters: node.parameters.filter((p) => p.in === 'path'),
     requestBody: undefined,
@@ -57,6 +57,7 @@ export function Url({
   node,
   tsResolver,
 }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const path = new URLPath(node.path)
 
   const paramsNode = buildUrlParamsNode({

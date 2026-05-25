@@ -31,7 +31,7 @@ type Props = {
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
   children?: KubbReactNode
@@ -41,7 +41,7 @@ type GetParamsProps = {
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['paramsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   tsResolver: ResolverTs
   isConfigurable: boolean
 }
@@ -96,6 +96,7 @@ export function Client({
   children,
   isConfigurable = true,
 }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const path = new URLPath(node.path)
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'

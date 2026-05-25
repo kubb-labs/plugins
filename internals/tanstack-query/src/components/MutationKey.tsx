@@ -7,7 +7,7 @@ import type { Transformer } from '../types.ts'
 
 type Props = {
   name: string
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'
   transformer: Transformer | null | undefined

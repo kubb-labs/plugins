@@ -11,7 +11,7 @@ import { StaticClassClient } from '../components/StaticClassClient'
 import type { PluginClient } from '../types'
 
 type OperationData = {
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver: ResolverZod | null
@@ -59,7 +59,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    function buildOperationData(node: ast.HttpOperationNode): OperationData {
+    function buildOperationData(node: ast.OperationNode): OperationData {
       const typeFile = tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },

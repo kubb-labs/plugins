@@ -15,7 +15,7 @@ type Props = {
   /**
    * AST operation node.
    */
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   /**
    * TypeScript resolver for resolving param/data/response type names.
    */
@@ -50,6 +50,7 @@ function buildRemappingCode(mapping: Record<string, string>, varName: string, so
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function McpHandler({ name, node, resolver, baseURL, dataReturnType, paramsCasing }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const urlPath = new URLPath(node.path)
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'

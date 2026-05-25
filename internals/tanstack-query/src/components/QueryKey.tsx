@@ -11,7 +11,7 @@ import { buildQueryKeyParams } from '../utils.ts'
 type Props = {
   name: string
   typeName: string
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   tsResolver: PluginTs['resolver']
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'

@@ -1,6 +1,6 @@
 import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
 import { buildJSDoc, URLPath } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -11,7 +11,7 @@ import { buildClassClientParams, buildFormDataLine, buildGenerics, buildHeaders,
 import { buildClientParamsNode } from './Client.tsx'
 
 type OperationData = {
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
@@ -32,7 +32,7 @@ type Props = {
 }
 
 type GenerateMethodProps = {
-  node: ast.HttpOperationNode
+  node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
@@ -58,6 +58,7 @@ function generateMethod({
   paramsCasing,
   pathParamsType,
 }: GenerateMethodProps): string {
+  if (!ast.isHttpOperationNode(node)) return ''
   const path = new URLPath(node.path, { casing: paramsCasing })
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
