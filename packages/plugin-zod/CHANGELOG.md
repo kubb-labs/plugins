@@ -1,5 +1,33 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.31
+
+### Minor Changes
+
+- [#221](https://github.com/kubb-labs/plugins/pull/221) [`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Support multiple content types on requests and responses.
+  - `plugin-ts` now emits a union of per-content-type variants for responses that declare more than one content type (e.g. `GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml`), mirroring the existing request-body behaviour. Single-content-type responses are unchanged.
+  - `plugin-zod` and `plugin-faker` mirror this: they emit one schema/mock per content type plus a union alias for both responses and request bodies (e.g. `addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])`, and a `createAddPetStatus200` factory that picks between the per-content-type factories). Variant names line up across the three plugins via shared naming helpers.
+  - `plugin-msw` prefers the `application/json` content type for the mocked response's `Content-Type` header when a response declares several.
+  - The generated fetch client parses the response body based on the `Content-Type` header (JSON, text, blob) instead of always calling `res.json()`, honours an explicit `responseType` override, and serializes `application/x-www-form-urlencoded` bodies as `URLSearchParams`. Operations whose success response is a single binary/text content type now default `responseType` (e.g. `'blob'`), so file downloads work out of the box.
+
+  Single-content-type operations are backwards-compatible — generated output is unchanged.
+
+  Requires `@kubb/adapter-oas` and `@kubb/ast` with response `content` support.
+
+- [#223](https://github.com/kubb-labs/plugins/pull/223) [`4c08e4c`](https://github.com/kubb-labs/plugins/commit/4c08e4c5082410871e0ccb7274343738d1f7b3ff) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Round-trip `Date` fields at the Zod validation boundary when `@kubb/adapter-oas` uses `dateType: 'date'`.
+
+  Date fields are typed as `Date` by `@kubb/plugin-ts`, but the wire value is always an ISO `string`. Previously these emitted `z.date()` (or `z.coerce.date()`), which cannot validate a response string. Now:
+  - **Response schemas decode** the ISO `string` into a `Date` — `z.iso.datetime().transform((value) => new Date(value))` (or `z.iso.date().transform(...)` for `format: date`).
+  - **Request bodies encode** a `Date` back into the wire `string`. Each date-bearing component emits an `${name}InputSchema` variant — `z.date().transform((value) => value.toISOString())` (or `.slice(0, 10)` for `format: date`) — and request schemas (`<op>Data`) reference it.
+
+  Pairs with `@kubb/plugin-client` `parser: 'zod'` to parse both directions automatically. `coercion.dates` no longer affects `dateType: 'date'` fields. Applies to the standard (chainable) printer; `zod/mini` is unchanged.
+
+### Patch Changes
+
+- [#238](https://github.com/kubb-labs/plugins/pull/238) [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the per-plugin `group` naming block (duplicated verbatim across nine plugins) with a shared `createGroupConfig` helper from `@internals/shared`. Each plugin's grouping behavior is preserved exactly — the `Controller`/`Requests` suffix and whether a user-provided `group.name` is honored are passed as options — so generated output is unchanged. Internal refactor only.
+
 ## 5.0.0-beta.30
 
 ## 5.0.0-beta.29
