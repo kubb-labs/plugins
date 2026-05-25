@@ -22,7 +22,7 @@ import { faker } from '@faker-js/faker'
 export function createCreateUserStatusDefaultJson(data?: Partial<CreateUserStatusDefaultJson>): CreateUserStatusDefaultJson {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUserStatusDefaultJson
 }
 
 /**
@@ -31,7 +31,7 @@ export function createCreateUserStatusDefaultJson(data?: Partial<CreateUserStatu
 export function createCreateUserStatusDefaultXml(data?: Partial<CreateUserStatusDefaultXml>): CreateUserStatusDefaultXml {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUserStatusDefaultXml
 }
 
 /**
@@ -49,7 +49,7 @@ export function createCreateUserStatusDefault(_data?: CreateUserStatusDefault): 
 export function createCreateUserJsonData(data?: Partial<CreateUserJsonData>): CreateUserJsonData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUserJsonData
 }
 
 /**
@@ -58,7 +58,7 @@ export function createCreateUserJsonData(data?: Partial<CreateUserJsonData>): Cr
 export function createCreateUserXmlData(data?: Partial<CreateUserXmlData>): CreateUserXmlData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUserXmlData
 }
 
 /**
@@ -67,7 +67,7 @@ export function createCreateUserXmlData(data?: Partial<CreateUserXmlData>): Crea
 export function createCreateUserFormUrlEncodedData(data?: Partial<CreateUserFormUrlEncodedData>): CreateUserFormUrlEncodedData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUserFormUrlEncodedData
 }
 
 /**
@@ -82,5 +82,5 @@ export function createCreateUserData(_data?: CreateUserData): CreateUserData {
 export function createCreateUserResponse(data?: Partial<CreateUserResponse>): CreateUserResponse {
   faker.seed([220])
 
-  return createCreateUserStatusDefault(data)
+  return createCreateUserStatusDefault(data) as CreateUserResponse
 }

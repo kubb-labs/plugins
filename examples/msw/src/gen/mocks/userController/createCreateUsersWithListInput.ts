@@ -20,7 +20,7 @@ import { faker } from '@faker-js/faker'
 export function createCreateUsersWithListInputStatus200Json(data?: Partial<CreateUsersWithListInputStatus200Json>): CreateUsersWithListInputStatus200Json {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUsersWithListInputStatus200Json
 }
 
 /**
@@ -29,7 +29,7 @@ export function createCreateUsersWithListInputStatus200Json(data?: Partial<Creat
 export function createCreateUsersWithListInputStatus200Xml(data?: Partial<CreateUsersWithListInputStatus200Xml>): CreateUsersWithListInputStatus200Xml {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as CreateUsersWithListInputStatus200Xml
 }
 
 /**

@@ -36,15 +36,15 @@ export function createCreatePetsStatus201Faker() {
  * @description unexpected error
  */
 export function createCreatePetsStatusDefaultFaker(data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
-  return createPetNotFoundFaker(data)
+  return createPetNotFoundFaker(data) as CreatePetsStatusDefault
 }
 
-export function createCreatePetsDataFaker(data?: Partial<CreatePetsData>): Required<CreatePetsData> {
+export function createCreatePetsDataFaker<TData extends Partial<CreatePetsData> = object>(data?: TData) {
   const defaultFakeData = { name: faker.string.alpha(), tag: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<CreatePetsData>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 export function createCreatePetsResponseFaker(_data?: CreatePetsResponse): CreatePetsResponse {

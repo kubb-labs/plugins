@@ -19,14 +19,14 @@ import { faker } from '@faker-js/faker'
  * @description Successful operation
  */
 export function createUpdatePetStatus200FakerJson(data?: Partial<UpdatePetStatus200Json>): UpdatePetStatus200Json {
-  return createPetFaker(data)
+  return createPetFaker(data) as UpdatePetStatus200Json
 }
 
 /**
  * @description Successful operation
  */
 export function createUpdatePetStatus200FakerXml(data?: Partial<UpdatePetStatus200Xml>): UpdatePetStatus200Xml {
-  return createPetFaker(data)
+  return createPetFaker(data) as UpdatePetStatus200Xml
 }
 
 /**
@@ -39,12 +39,12 @@ export function createUpdatePetStatus200Faker(_data?: UpdatePetStatus200): Updat
 /**
  * @description accepted operation
  */
-export function createUpdatePetStatus202Faker(data?: Partial<UpdatePetStatus202>): Required<UpdatePetStatus202> {
+export function createUpdatePetStatus202Faker<TData extends Partial<UpdatePetStatus202> = object>(data?: TData) {
   const defaultFakeData = { id: faker.number.int() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<UpdatePetStatus202>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**
@@ -72,21 +72,21 @@ export function createUpdatePetStatus405Faker() {
  * @description Update an existent pet in the store
  */
 export function createUpdatePetDataFakerJson(data?: Partial<UpdatePetJsonData>): UpdatePetJsonData {
-  return createPetFaker(data)
+  return createPetFaker(data) as UpdatePetJsonData
 }
 
 /**
  * @description Update an existent pet in the store
  */
 export function createUpdatePetDataFakerXml(data?: Partial<UpdatePetXmlData>): UpdatePetXmlData {
-  return createPetFaker(data)
+  return createPetFaker(data) as UpdatePetXmlData
 }
 
 /**
  * @description Update an existent pet in the store
  */
 export function createUpdatePetDataFakerFormUrlEncoded(data?: Partial<UpdatePetFormUrlEncodedData>): UpdatePetFormUrlEncodedData {
-  return createPetFaker(data)
+  return createPetFaker(data) as UpdatePetFormUrlEncodedData
 }
 
 /**

@@ -2,7 +2,7 @@ import type { Customer } from '../models/ts/Customer.ts'
 import { createAddressFaker } from './createAddressFaker.ts'
 import { faker } from '@faker-js/faker'
 
-export function createCustomerFaker(data?: Partial<Customer>): Required<Customer> {
+export function createCustomerFaker<TData extends Partial<Customer> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     username: faker.string.alpha(),
@@ -12,5 +12,5 @@ export function createCustomerFaker(data?: Partial<Customer>): Required<Customer
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Customer>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

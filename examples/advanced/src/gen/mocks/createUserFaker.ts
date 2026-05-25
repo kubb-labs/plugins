@@ -2,7 +2,7 @@ import type { User } from '../models/ts/User.ts'
 import { createTagTagFaker } from './tag/createTagFaker.ts'
 import { faker } from '@faker-js/faker'
 
-export function createUserFaker(data?: Partial<User>): Required<User> {
+export function createUserFaker<TData extends Partial<User> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     username: faker.string.alpha(),
@@ -18,5 +18,5 @@ export function createUserFaker(data?: Partial<User>): Required<User> {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<User>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

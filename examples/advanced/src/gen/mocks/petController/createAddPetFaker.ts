@@ -16,26 +16,26 @@ import { faker } from '@faker-js/faker'
 /**
  * @description Pet not found
  */
-export function createAddPetStatus405Faker(data?: Partial<AddPetStatus405>): Required<AddPetStatus405> {
+export function createAddPetStatus405Faker<TData extends Partial<AddPetStatus405> = object>(data?: TData) {
   const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<AddPetStatus405>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**
  * @description Successful operation
  */
 export function createAddPetStatusDefaultFakerJson(data?: Partial<AddPetStatusDefaultJson>): AddPetStatusDefaultJson {
-  return createPetFaker(data)
+  return createPetFaker(data) as AddPetStatusDefaultJson
 }
 
 /**
  * @description Successful operation
  */
 export function createAddPetStatusDefaultFakerXml(data?: Partial<AddPetStatusDefaultXml>): AddPetStatusDefaultXml {
-  return createPetFaker(data)
+  return createPetFaker(data) as AddPetStatusDefaultXml
 }
 
 /**
@@ -49,21 +49,21 @@ export function createAddPetStatusDefaultFaker(_data?: AddPetStatusDefault): Add
  * @description Create a new pet in the store
  */
 export function createAddPetDataFakerJson(data?: Partial<AddPetJsonData>): AddPetJsonData {
-  return createAddPetRequestFaker(data)
+  return createAddPetRequestFaker(data) as AddPetJsonData
 }
 
 /**
  * @description Create a new pet in the store
  */
 export function createAddPetDataFakerXml(data?: Partial<AddPetXmlData>): AddPetXmlData {
-  return createPetFaker(data)
+  return createPetFaker(data) as AddPetXmlData
 }
 
 /**
  * @description Create a new pet in the store
  */
 export function createAddPetDataFakerFormUrlEncoded(data?: Partial<AddPetFormUrlEncodedData>): AddPetFormUrlEncodedData {
-  return createPetFaker(data)
+  return createPetFaker(data) as AddPetFormUrlEncodedData
 }
 
 /**

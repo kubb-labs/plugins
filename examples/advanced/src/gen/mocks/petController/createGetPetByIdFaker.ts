@@ -17,14 +17,14 @@ export function createGetPetByIdPathPetIdFaker(data?: number): number {
  * @description successful operation
  */
 export function createGetPetByIdStatus200FakerJson(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
-  return createPetFaker(data)
+  return createPetFaker(data) as GetPetByIdStatus200Json
 }
 
 /**
  * @description successful operation
  */
 export function createGetPetByIdStatus200FakerXml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
-  return createPetFaker(data)
+  return createPetFaker(data) as GetPetByIdStatus200Xml
 }
 
 /**

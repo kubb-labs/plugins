@@ -24,7 +24,7 @@ import { faker } from '@faker-js/faker'
 export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): AddPetStatus200Json {
   faker.seed([220])
 
-  return createPet(data)
+  return createPet(data) as AddPetStatus200Json
 }
 
 /**
@@ -33,7 +33,7 @@ export function createAddPetStatus200Json(data?: Partial<AddPetStatus200Json>): 
 export function createAddPetStatus200Xml(data?: Partial<AddPetStatus200Xml>): AddPetStatus200Xml {
   faker.seed([220])
 
-  return createPet(data)
+  return createPet(data) as AddPetStatus200Xml
 }
 
 /**
@@ -48,13 +48,13 @@ export function createAddPetStatus200(_data?: AddPetStatus200): AddPetStatus200 
 /**
  * @description Pet not found
  */
-export function createAddPetStatus405(data?: Partial<AddPetStatus405>): Required<AddPetStatus405> {
+export function createAddPetStatus405<TData extends Partial<AddPetStatus405> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<AddPetStatus405>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**
@@ -63,7 +63,7 @@ export function createAddPetStatus405(data?: Partial<AddPetStatus405>): Required
 export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJsonData {
   faker.seed([220])
 
-  return createAddPetRequest(data)
+  return createAddPetRequest(data) as AddPetJsonData
 }
 
 /**
@@ -72,7 +72,7 @@ export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJson
 export function createAddPetXmlData(data?: Partial<AddPetXmlData>): AddPetXmlData {
   faker.seed([220])
 
-  return createPet(data)
+  return createPet(data) as AddPetXmlData
 }
 
 /**
@@ -81,7 +81,7 @@ export function createAddPetXmlData(data?: Partial<AddPetXmlData>): AddPetXmlDat
 export function createAddPetFormUrlEncodedData(data?: Partial<AddPetFormUrlEncodedData>): AddPetFormUrlEncodedData {
   faker.seed([220])
 
-  return createPet(data)
+  return createPet(data) as AddPetFormUrlEncodedData
 }
 
 /**

@@ -6,11 +6,11 @@
 import type { Tag } from '../models/Tag.ts'
 import { faker } from '@faker-js/faker'
 
-export function createTag(data?: Partial<Tag>): Required<Tag> {
+export function createTag<TData extends Partial<Tag> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = { id: faker.number.bigInt(), name: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Tag>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

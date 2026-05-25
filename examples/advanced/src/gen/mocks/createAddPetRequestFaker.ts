@@ -3,7 +3,7 @@ import { createCategoryFaker } from './createCategoryFaker.ts'
 import { createTagTagFaker } from './tag/createTagFaker.ts'
 import { faker } from '@faker-js/faker'
 
-export function createAddPetRequestFaker(data?: Partial<AddPetRequest>): Required<AddPetRequest> {
+export function createAddPetRequestFaker<TData extends Partial<AddPetRequest> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     name: faker.string.alpha(),
@@ -15,5 +15,5 @@ export function createAddPetRequestFaker(data?: Partial<AddPetRequest>): Require
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<AddPetRequest>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
