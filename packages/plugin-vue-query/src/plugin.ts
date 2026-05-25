@@ -50,7 +50,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = 'client',
+    parser = false,
     infinite = false,
     paramsType = 'inline',
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',

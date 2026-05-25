@@ -4,7 +4,7 @@
 */
 
 import * as z from "zod";
-import { orderSchema } from "./orderSchema.ts";
+import { orderInputSchema, orderSchema } from "./orderSchema.ts";
 
 export const placeOrderStatus200Schema = orderSchema
 
@@ -12,10 +12,10 @@ export const placeOrderStatus405Schema = z.any()
 
 export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
-export const placeOrderDataSchemaJson = orderSchema.optional()
+export const placeOrderDataSchemaJson = orderInputSchema.optional()
 
-export const placeOrderDataSchemaXml = orderSchema.optional()
+export const placeOrderDataSchemaXml = orderInputSchema.optional()
 
-export const placeOrderDataSchemaFormUrlEncoded = orderSchema.optional()
+export const placeOrderDataSchemaFormUrlEncoded = orderInputSchema.optional()
 
 export const placeOrderDataSchema = z.union([placeOrderDataSchemaJson, placeOrderDataSchemaXml, placeOrderDataSchemaFormUrlEncoded])

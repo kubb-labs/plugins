@@ -2,7 +2,7 @@ import { stringify } from '@internals/utils'
 
 import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, formatLiteral, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
+import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -59,6 +59,15 @@ export type PrinterZodOptions = {
    * Properties referencing these emit lazy getters wrapping refs in `z.lazy(() => …)`.
    */
   cyclicSchemas?: ReadonlySet<string>
+  /**
+   * Print direction for `dateType: 'date'` fields (`Date` in TypeScript):
+   * - `'output'` (default) — decode the wire `string` into a `Date` (response bodies).
+   * - `'input'` — encode a `Date` back into the wire `string` (request bodies/params).
+   *
+   * Diverging the directions requires the generator to emit an `${name}InputSchema`
+   * variant for each date-bearing component.
+   */
+  direction?: 'input' | 'output'
   /**
    * Custom handler map for node type overrides.
    */
@@ -139,11 +148,13 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         return shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.bigint()' : 'z.bigint()'
       },
       date(node) {
-        if (node.representation === 'string') {
-          return 'z.iso.date()'
+        // representation: 'date' → typed as `Date`; decode/encode at the boundary.
+        const codec = getCodec(node)
+        if (codec) {
+          return this.options.direction === 'input' ? codec.encode(node) : codec.decode(node)
         }
 
-        return shouldCoerce(this.options.coercion, 'dates') ? 'z.coerce.date()' : 'z.date()'
+        return 'z.iso.date()'
       },
       datetime(node) {
         const offset = node.offset || this.options.dateType === 'stringOffset'
@@ -193,7 +204,15 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       ref(node) {
         if (!node.name) return null
         const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
-        const resolvedName = node.ref ? (this.options.resolver?.default(refName, 'function') ?? refName) : node.name
+
+        // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
+        // variant so request bodies encode `Date → string` instead of decoding.
+        const useInputVariant = node.ref != null && this.options.direction === 'input' && containsCodec(node)
+        const resolvedName = node.ref
+          ? useInputVariant
+            ? (this.options.resolver?.resolveInputSchemaName(refName) ?? refName)
+            : (this.options.resolver?.default(refName, 'function') ?? refName)
+          : node.name
 
         if (node.ref && this.options.cyclicSchemas?.has(refName)) {
           return `z.lazy(() => ${resolvedName})`

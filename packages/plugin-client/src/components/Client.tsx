@@ -203,8 +203,8 @@ export function Client({
     <>
       {dataReturnType === 'full' && parser === 'zod' && zodResponseName && `return {...res, data: ${zodResponseName}.parse(res.data)}`}
       {dataReturnType === 'data' && parser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
-      {dataReturnType === 'full' && parser === 'client' && 'return res'}
-      {dataReturnType === 'data' && parser === 'client' && 'return res.data'}
+      {dataReturnType === 'full' && parser !== 'zod' && 'return res'}
+      {dataReturnType === 'data' && parser !== 'zod' && 'return res.data'}
     </>
   )
 

@@ -501,6 +501,8 @@ options:
       - Object — pick which primitives to coerce.
 
       See [Coercion for primitives](https://zod.dev/?id=coercion-for-primitives).
+    tip: |
+      When `@kubb/adapter-oas` runs with `dateType: 'date'` (date fields typed as `Date`), the generated schemas round-trip dates at the validation boundary rather than coercing: response schemas decode the ISO `string` into a `Date` (`z.iso.datetime().transform(...)`), and an `${name}InputSchema` variant encodes `Date` back into an ISO `string` (`z.date().transform(...)`) for request bodies. `coercion.dates` has no effect on these fields.
     examples:
       - name: '`coercion: true`'
         files:

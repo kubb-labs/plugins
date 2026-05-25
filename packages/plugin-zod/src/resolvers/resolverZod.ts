@@ -29,6 +29,12 @@ export const resolverZod = defineResolver<PluginZod>(() => {
     resolveSchemaTypeName(name) {
       return ensureValidVarName(pascalCase(name, { suffix: 'schema' }))
     },
+    resolveInputSchemaName(name) {
+      return this.resolveSchemaName(`${name} input`)
+    },
+    resolveInputSchemaTypeName(name) {
+      return this.resolveSchemaTypeName(`${name} input`)
+    },
     resolveTypeName(name) {
       return ensureValidVarName(pascalCase(name))
     },

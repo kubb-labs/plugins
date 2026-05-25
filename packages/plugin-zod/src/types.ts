@@ -19,6 +19,21 @@ export type ResolverZod = Resolver &
      */
     resolveSchemaTypeName(this: ResolverZod, name: string): string
     /**
+     * Resolves the schema function name for the request (input) direction of a
+     * date-bearing component, where `Date` is encoded back to a wire `string`.
+     *
+     * @example Input schema names
+     * `resolver.resolveInputSchemaName('order') // → 'orderInputSchema'`
+     */
+    resolveInputSchemaName(this: ResolverZod, name: string): string
+    /**
+     * Resolves the inferred type name for the request (input) direction variant.
+     *
+     * @example Input schema type names
+     * `resolver.resolveInputSchemaTypeName('order') // → 'OrderInputSchema'`
+     */
+    resolveInputSchemaTypeName(this: ResolverZod, name: string): string
+    /**
      * Resolves the generated type name from the schema.
      *
      * @example Type names
