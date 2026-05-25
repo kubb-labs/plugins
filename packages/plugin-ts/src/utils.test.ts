@@ -224,4 +224,28 @@ describe('buildPropertyJSDocComments', () => {
     expect(comments).not.toContain('@minLength 1')
     expect(comments).not.toContain('@maxLength 10')
   })
+
+  it('emits format on a separate line when both description and format exist', () => {
+    const schema = ast.createSchema({ type: 'string', format: 'uuid', description: 'Unique identifier' })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@description Unique identifier')
+    expect(comments).toContain(' ')
+    expect(comments).toContain('Format: `uuid`')
+  })
+
+  it('emits @description and Format on separate lines when only format exists', () => {
+    const schema = ast.createSchema({ type: 'string', format: 'date-time' })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@description')
+    expect(comments).toContain('Format: `date-time`')
+  })
+
+  it('does not emit @description when neither description nor format exist', () => {
+    const schema = ast.createSchema({ type: 'string' })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).not.toContain('@description')
+  })
 })

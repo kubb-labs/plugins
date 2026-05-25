@@ -5,6 +5,8 @@
  */
 export type User = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -41,6 +43,8 @@ export type User = {
   phone?: string
   /**
    * @description User Status
+   *
+   * Format: `int32`
    * @example 1
    * @type integer | undefined
    */

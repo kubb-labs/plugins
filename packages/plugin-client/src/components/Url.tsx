@@ -57,6 +57,7 @@ export function Url({
   node,
   tsResolver,
 }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const path = new URLPath(node.path)
 
   const paramsNode = buildUrlParamsNode({

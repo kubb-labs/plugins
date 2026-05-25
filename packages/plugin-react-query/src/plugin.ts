@@ -1,6 +1,6 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
-import { ast, definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { ast, definePlugin } from '@kubb/core'
 import { pluginClientName } from '@kubb/plugin-client'
 import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
 import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
@@ -90,19 +90,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
       customHookOptionsFileGenerator,
     ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            },
-      } satisfies Group)
-    : null
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
 
   return {
     name: pluginReactQueryName,

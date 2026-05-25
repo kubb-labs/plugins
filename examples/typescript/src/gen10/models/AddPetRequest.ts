@@ -11,6 +11,8 @@ import type { Tag } from './Tag.ts'
  */
 export type AddPetRequest = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
