@@ -1,7 +1,7 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
+import { createGroupConfig } from '@internals/shared'
 
-import { ast, definePlugin, type Group } from '@kubb/core'
+import { ast, definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { classClientGenerator } from './generators/classClientGenerator.tsx'
@@ -80,19 +80,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
       operations ? operationsGenerator : null,
     ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            },
-      } satisfies Group)
-    : null
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
 
   return {
     name: pluginClientName,
