@@ -2,6 +2,8 @@ import type { Pet } from '../Pet.ts'
 
 /**
  * @description ID of pet to return
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetPetByIdPathPetId = number

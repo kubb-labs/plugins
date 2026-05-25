@@ -16,6 +16,8 @@ export type AddPetStatus200 = Pet
  */
 export type AddPetStatus405 = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number
