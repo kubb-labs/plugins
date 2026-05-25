@@ -1,11 +1,7 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type {
-  GetUserByNamePathUsername,
-  GetUserByNameStatus200,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from '../../../models/ts/userController/GetUserByName.ts'
+import type { User } from '../../../models/ts/User.ts'
+import type { GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../../models/ts/userController/GetUserByName.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { getUserByName } from '../../axios/userService/getUserByName.ts'
 
@@ -16,12 +12,7 @@ type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
 export function getUserByNameQueryOptions({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getUserByNameQueryKey({ username })
-  return queryOptions<
-    ResponseConfig<GetUserByNameStatus200>,
-    ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
-    ResponseConfig<GetUserByNameStatus200>,
-    typeof queryKey
-  >({
+  return queryOptions<ResponseConfig<User>, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, ResponseConfig<User>, typeof queryKey>({
     enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
@@ -34,21 +25,11 @@ export function getUserByNameQueryOptions({ username }: { username: GetUserByNam
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export function useGetUserByName<
-  TData = ResponseConfig<GetUserByNameStatus200>,
-  TQueryData = ResponseConfig<GetUserByNameStatus200>,
-  TQueryKey extends QueryKey = GetUserByNameQueryKey,
->(
+export function useGetUserByName<TData = ResponseConfig<User>, TQueryData = ResponseConfig<User>, TQueryKey extends QueryKey = GetUserByNameQueryKey>(
   { username }: { username: GetUserByNamePathUsername },
   options: {
     query?: Partial<
-      QueryObserverOptions<
-        ResponseConfig<GetUserByNameStatus200>,
-        ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
-        TData,
-        TQueryData,
-        TQueryKey
-      >
+      QueryObserverOptions<ResponseConfig<User>, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryData, TQueryKey>
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

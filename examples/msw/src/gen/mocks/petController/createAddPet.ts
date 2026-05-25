@@ -3,7 +3,8 @@
  * Do not edit manually.
  */
 
-import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
+import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../models/AddPet.ts'
+import type { Pet } from '../../models/Pet.ts'
 import { createAddPetRequest } from '../createAddPetRequest.ts'
 import { createPet } from '../createPet.ts'
 import { faker } from '@faker-js/faker'
@@ -11,7 +12,7 @@ import { faker } from '@faker-js/faker'
 /**
  * @description Successful operation
  */
-export function createAddPetStatus200(data?: Partial<AddPetStatus200>): AddPetStatus200 {
+export function createAddPetStatus200(data?: Partial<Pet>): Pet {
   faker.seed([220])
 
   return createPet(data)

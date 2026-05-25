@@ -1,3 +1,4 @@
+import type { User } from '../../models/ts/User.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../models/ts/userController/CreateUsersWithListInput.ts'
 
 export function createUsersWithListInput(

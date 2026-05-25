@@ -3,7 +3,8 @@
  * Do not edit manually.
  */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
+import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
+import type { Order } from '../../models/Order.ts'
 import { createOrder } from '../createOrder.ts'
 import { faker } from '@faker-js/faker'
 
@@ -16,7 +17,7 @@ export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
 /**
  * @description successful operation
  */
-export function createGetOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
+export function createGetOrderByIdStatus200(data?: Partial<Order>): Order {
   faker.seed([220])
 
   return createOrder(data)

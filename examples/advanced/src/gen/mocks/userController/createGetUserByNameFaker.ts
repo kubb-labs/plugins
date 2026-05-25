@@ -1,9 +1,5 @@
-import type {
-  GetUserByNameResponse,
-  GetUserByNameStatus200,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from '../../models/ts/userController/GetUserByName.ts'
+import type { User } from '../../models/ts/User.ts'
+import type { GetUserByNameResponse, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../models/ts/userController/GetUserByName.ts'
 import { createUserFaker } from '../createUserFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -14,7 +10,7 @@ export function createGetUserByNamePathUsernameFaker(data?: string): string {
 /**
  * @description successful operation
  */
-export function createGetUserByNameStatus200Faker(data?: Partial<GetUserByNameStatus200>): GetUserByNameStatus200 {
+export function createGetUserByNameStatus200Faker(data?: Partial<User>): User {
   return createUserFaker(data)
 }
 

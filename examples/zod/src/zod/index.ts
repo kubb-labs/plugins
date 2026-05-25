@@ -5,7 +5,6 @@ export type {
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
-  AddPetStatus200,
   AddPetStatus405,
   AddPetXmlData,
 } from './ts/AddPet.ts'
@@ -22,7 +21,6 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
-  CreatePetsStatusDefault,
   CreatePetsXEXAMPLEKey,
 } from './ts/CreatePets.ts'
 export type {
@@ -32,7 +30,6 @@ export type {
   CreateUserRequestConfig,
   CreateUserResponse,
   CreateUserResponses,
-  CreateUserStatusDefault,
   CreateUserXmlData,
 } from './ts/CreateUser.ts'
 export type {
@@ -40,7 +37,6 @@ export type {
   CreateUsersWithListInputRequestConfig,
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
   CreateUsersWithListInputStatusDefault,
 } from './ts/CreateUsersWithListInput.ts'
 export type { Customer } from './ts/Customer.ts'
@@ -95,7 +91,6 @@ export type {
   GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
   GetOrderByIdResponses,
-  GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './ts/GetOrderById.ts'
@@ -104,7 +99,6 @@ export type {
   GetPetByIdRequestConfig,
   GetPetByIdResponse,
   GetPetByIdResponses,
-  GetPetByIdStatus200,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './ts/GetPetById.ts'
@@ -115,14 +109,12 @@ export type {
   GetThingsResponse,
   GetThingsResponses,
   GetThingsStatus201,
-  GetThingsStatusDefault,
 } from './ts/GetThings.ts'
 export type {
   GetUserByNamePathUsername,
   GetUserByNameRequestConfig,
   GetUserByNameResponse,
   GetUserByNameResponses,
-  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './ts/GetUserByName.ts'
@@ -149,7 +141,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './ts/PlaceOrder.ts'
@@ -160,7 +151,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './ts/PlaceOrderPatch.ts'
@@ -172,7 +162,6 @@ export type {
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
-  UpdatePetStatus200,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -205,7 +194,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './ts/UploadFile.ts'
 export type { User } from './ts/User.ts'
 export type { UserArray } from './ts/UserArray.ts'

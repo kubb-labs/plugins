@@ -5,7 +5,6 @@ export type {
   AddPetRequestConfig,
   AddPetResponse,
   AddPetResponses,
-  AddPetStatus200,
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.ts'
@@ -41,7 +40,6 @@ export type {
   GetPetByIdRequestConfig,
   GetPetByIdResponse,
   GetPetByIdResponses,
-  GetPetByIdStatus200,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './GetPetById.ts'
@@ -52,7 +50,6 @@ export type {
   UpdatePetRequestConfig,
   UpdatePetResponse,
   UpdatePetResponses,
-  UpdatePetStatus200,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -74,5 +71,4 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './UploadFile.ts'

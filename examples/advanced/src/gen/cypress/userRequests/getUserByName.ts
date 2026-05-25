@@ -1,3 +1,4 @@
+import type { User } from '../../models/ts/User.ts'
 import type { GetUserByNamePathUsername, GetUserByNameResponse } from '../../models/ts/userController/GetUserByName.ts'
 
 export function getUserByName(username: GetUserByNamePathUsername, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetUserByNameResponse> {
