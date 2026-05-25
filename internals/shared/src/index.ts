@@ -12,6 +12,7 @@ export {
   isSuccessStatusCode,
   groupOperationTypeImports,
   inlineOperationResolver,
+  operationFileEntry,
   resolveErrorNames,
   resolveInlinableRefName,
   resolveOperationTypeImports,
@@ -37,4 +38,5 @@ export {
   type ResolveOperationTypeNameOptions,
   type TypeNameResolver,
 } from './operation.ts'
+export { createGroupConfig } from './group.ts'
 export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'

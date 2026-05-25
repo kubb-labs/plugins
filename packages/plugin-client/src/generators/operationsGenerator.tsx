@@ -1,4 +1,4 @@
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations'
 import type { PluginClient } from '../types'
@@ -27,7 +27,7 @@ export const operationsGenerator = defineGenerator<PluginClient>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
       >
-        <Operations name={name} nodes={nodes} />
+        <Operations name={name} nodes={nodes.filter(ast.isHttpOperationNode)} />
       </File>
     )
   },

@@ -30,6 +30,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function Request({ baseURL = '', name, dataReturnType, resolver, node, paramsType, pathParamsType, paramsCasing }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const paramsNode = ast.createOperationParams(node, {
     paramsType,
     pathParamsType,

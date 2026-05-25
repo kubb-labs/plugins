@@ -10,6 +10,8 @@ import type { Address } from './Address.js'
  */
 export type Customer = {
   /**
+   * @description
+   * Format: `int64`
    * @example 100000
    * @type integer | undefined
    */

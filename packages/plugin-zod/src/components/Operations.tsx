@@ -1,5 +1,5 @@
 import { stringifyObject } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import { Const, File, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
@@ -30,6 +30,7 @@ export function Operations({ name, operations }: Props): KubbReactNode {
   )
 
   const pathsJSON = operations.reduce<Record<string, Record<string, string>>>((prev, acc) => {
+    if (!ast.isHttpOperationNode(acc.node)) return prev
     prev[`"${acc.node.path}"`] = {
       ...(prev[`"${acc.node.path}"`] ?? {}),
       [acc.node.method]: `operations["${acc.node.operationId}"]`,

@@ -13,6 +13,8 @@ export type CustomerParamsStatusEnumKey = (typeof customerParamsStatusEnum)[keyo
  */
 export type Customer = {
   /**
+   * @description
+   * Format: `int64`
    * @example 100000
    * @type integer | undefined
    */

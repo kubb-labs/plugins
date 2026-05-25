@@ -7,6 +7,8 @@ import type { ApiResponse } from "./ApiResponse.ts";
 
 /**
  * @description ID of pet to update
+ *
+ * Format: `int64`
  * @type integer
 */
 export type UploadFilePathPetId = bigint;
@@ -18,6 +20,8 @@ export type UploadFilePathPetId = bigint;
 export type UploadFileQueryAdditionalMetadata = string | undefined;
 
 /**
+ * @description
+ * Format: `binary`
  * @type string | undefined
 */
 export type UploadFileData = Blob | undefined;
