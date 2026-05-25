@@ -4,6 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
+import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import { getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -90,11 +91,15 @@ export function Query({
 
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
+  const paramsNode = markParamsOptional(
+    buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver }),
+    enabledNames,
+  )
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

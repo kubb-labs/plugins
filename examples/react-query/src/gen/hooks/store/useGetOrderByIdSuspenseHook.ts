@@ -10,7 +10,7 @@ import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getOrderByIdSuspenseQueryKey = ({ orderId }: { orderId: GetOrderByIdPathOrderId }) =>
+export const getOrderByIdSuspenseQueryKey = ({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}) =>
   ['v5', { url: '/store/order/:orderId', params: { orderId: orderId } }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>

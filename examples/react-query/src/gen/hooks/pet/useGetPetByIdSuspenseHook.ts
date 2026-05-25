@@ -10,7 +10,8 @@ import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getPetByIdSuspenseQueryKey = ({ pet_id }: { pet_id: GetPetByIdPathPetId }) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }] as const
+export const getPetByIdSuspenseQueryKey = ({ pet_id }: { pet_id?: GetPetByIdPathPetId } = {}) =>
+  ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 

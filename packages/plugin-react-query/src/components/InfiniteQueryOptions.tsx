@@ -7,7 +7,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { buildEnabledCheck } from '@internals/tanstack-query'
+import { getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -80,16 +80,16 @@ export function InfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
-
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
+  const enabledText = enabledNames.length ? `enabled: !!(${enabledNames.join(' && ')}),` : ''
+
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
+  const clientCallStr = injectNonNullAssertions(rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }'), enabledNames)
 
   const hasNewParams = nextParam != null || previousParam != null
 

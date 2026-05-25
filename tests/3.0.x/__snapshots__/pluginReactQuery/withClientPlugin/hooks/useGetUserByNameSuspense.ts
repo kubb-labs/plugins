@@ -9,7 +9,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { getUserByName } from "../clients/getUserByName.ts";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getUserByNameSuspenseQueryKey = (username: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
+export const getUserByNameSuspenseQueryKey = (username?: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
 
 type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 

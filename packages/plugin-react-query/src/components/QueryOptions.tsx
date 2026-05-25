@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildEnabledCheck } from '@internals/tanstack-query'
+import { getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
@@ -72,16 +72,18 @@ export function QueryOptions({
   const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
-
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = suspense ? '' : enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
+  // Suspense queries can't be disabled, so their params stay required.
+  const optionalNames = suspense ? [] : enabledNames
+  const enabledText = suspense ? '' : enabledNames.length ? `enabled: !!(${enabledNames.join(' && ')}),` : ''
+
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), optionalNames)
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
+  const clientCallStr = injectNonNullAssertions(rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }'), optionalNames)
 
   return (
     <File.Source name={name} isExportable isIndexable>

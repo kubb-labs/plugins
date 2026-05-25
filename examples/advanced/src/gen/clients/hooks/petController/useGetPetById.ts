@@ -4,11 +4,11 @@ import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, Get
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { getPetById } from '../../axios/petService/getPetById.ts'
 
-export const getPetByIdQueryKey = ({ petId }: { petId: GetPetByIdPathPetId }) => [{ url: '/pet/:petId:search', params: { petId: petId } }] as const
+export const getPetByIdQueryKey = ({ petId }: { petId?: GetPetByIdPathPetId } = {}) => [{ url: '/pet/:petId:search', params: { petId: petId } }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ petId })
   return queryOptions<
     ResponseConfig<GetPetByIdStatus200>,
@@ -19,7 +19,7 @@ export function getPetByIdQueryOptions({ petId }: { petId: GetPetByIdPathPetId }
     enabled: !!petId,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetById({ petId }, { ...config, signal: config.signal ?? signal })
+      return getPetById({ petId: petId! }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -34,7 +34,7 @@ export function useGetPetById<
   TQueryData = ResponseConfig<GetPetByIdStatus200>,
   TQueryKey extends QueryKey = GetPetByIdQueryKey,
 >(
-  { petId }: { petId: GetPetByIdPathPetId },
+  { petId }: { petId?: GetPetByIdPathPetId } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<ResponseConfig<GetPetByIdStatus200>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>

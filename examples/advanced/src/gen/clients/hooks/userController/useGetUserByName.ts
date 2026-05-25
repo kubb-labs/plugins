@@ -9,12 +9,15 @@ import type {
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { getUserByName } from '../../axios/userService/getUserByName.ts'
 
-export const getUserByNameQueryKey = ({ username }: { username: GetUserByNamePathUsername }) =>
+export const getUserByNameQueryKey = ({ username }: { username?: GetUserByNamePathUsername } = {}) =>
   [{ url: '/user/:username', params: { username: username } }] as const
 
 type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 
-export function getUserByNameQueryOptions({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getUserByNameQueryOptions(
+  { username }: { username?: GetUserByNamePathUsername } = {},
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = getUserByNameQueryKey({ username })
   return queryOptions<
     ResponseConfig<GetUserByNameStatus200>,
@@ -25,7 +28,7 @@ export function getUserByNameQueryOptions({ username }: { username: GetUserByNam
     enabled: !!username,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getUserByName({ username }, { ...config, signal: config.signal ?? signal })
+      return getUserByName({ username: username! }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -39,7 +42,7 @@ export function useGetUserByName<
   TQueryData = ResponseConfig<GetUserByNameStatus200>,
   TQueryKey extends QueryKey = GetUserByNameQueryKey,
 >(
-  { username }: { username: GetUserByNamePathUsername },
+  { username }: { username?: GetUserByNamePathUsername } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<

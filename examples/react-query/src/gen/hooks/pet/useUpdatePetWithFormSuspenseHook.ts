@@ -17,7 +17,7 @@ import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const updatePetWithFormSuspenseQueryKey = (
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
 ) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }, ...(params ? [params] : [])] as const
 

@@ -10,7 +10,7 @@ import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getUserByNameSuspenseQueryKey = ({ username }: { username: GetUserByNamePathUsername }) =>
+export const getUserByNameSuspenseQueryKey = ({ username }: { username?: GetUserByNamePathUsername } = {}) =>
   ['v5', { url: '/user/:username', params: { username: username } }] as const
 
 type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>

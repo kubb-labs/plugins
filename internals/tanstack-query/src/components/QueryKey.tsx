@@ -6,7 +6,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Transformer } from '../types.ts'
-import { buildQueryKeyParams } from '../utils.ts'
+import { buildQueryKeyParams, getEnabledParamNames, markParamsOptional } from '../utils.ts'
 
 type Props = {
   name: string
@@ -34,7 +34,8 @@ export const queryKeyTransformer: Transformer = ({ node, casing }) => {
 }
 
 export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer }: Props): KubbReactNode {
-  const paramsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const baseParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const paramsNode = markParamsOptional(baseParamsNode, getEnabledParamNames(baseParamsNode))
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? queryKeyTransformer)({ node, casing: paramsCasing })
 
