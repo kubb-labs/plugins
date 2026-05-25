@@ -8,11 +8,15 @@
  */
 export type Order = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
   id?: bigint
   /**
+   * @description
+   * Format: `int64`
    * @example 198772
    * @type integer | undefined
    */
@@ -33,11 +37,15 @@ export type Order = {
     type: string
   }
   /**
+   * @description
+   * Format: `int32`
    * @example 7
    * @type integer | undefined
    */
   quantity?: number
   /**
+   * @description
+   * Format: `date-time`
    * @type string | undefined
    */
   shipDate?: string

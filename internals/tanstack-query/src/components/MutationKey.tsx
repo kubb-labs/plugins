@@ -16,6 +16,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export const mutationKeyTransformer: Transformer = ({ node, casing }) => {
+  if (!node.path) return []
   const path = new URLPath(node.path, { casing })
   return [`{ url: '${path.toURLPath()}' }`]
 }

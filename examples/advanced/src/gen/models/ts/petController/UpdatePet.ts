@@ -10,6 +10,8 @@ export type UpdatePetStatus200 = Omit<NonNullable<Pet>, 'name'>
  */
 export type UpdatePetStatus202 = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */

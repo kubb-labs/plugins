@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { difference } from 'remeda'
@@ -36,6 +36,7 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
     const hookOptions: Record<string, string> = {}
 
     for (const node of nodes) {
+      if (!ast.isHttpOperationNode(node)) continue
       const opOverrides = resolveOperationOverrides(node, override)
       const nodeQuery: QueryOption = 'query' in opOverrides ? (opOverrides.query as QueryOption) : query
       const nodeMutation: MutationOption = 'mutation' in opOverrides ? (opOverrides.mutation as MutationOption) : mutation

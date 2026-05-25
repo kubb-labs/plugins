@@ -1,5 +1,5 @@
 import { URLPath } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import { Const, File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
@@ -12,6 +12,7 @@ export function Operations({ name, nodes }: OperationsProps): KubbReactNode {
   const operationsObject: Record<string, { path: string; method: string }> = {}
 
   nodes.forEach((node) => {
+    if (!ast.isHttpOperationNode(node)) return
     operationsObject[node.operationId] = {
       path: new URLPath(node.path).URL,
       method: node.method.toLowerCase(),

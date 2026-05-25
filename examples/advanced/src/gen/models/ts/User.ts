@@ -5,6 +5,8 @@ import type { TagTag } from './tag/Tag.ts'
  */
 export type User = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -15,6 +17,8 @@ export type User = {
    */
   username?: string
   /**
+   * @description
+   * Format: `uuid`
    * @deprecated
    * @type string | undefined
    */
@@ -36,6 +40,8 @@ export type User = {
    */
   lastName?: string
   /**
+   * @description
+   * Format: `email`
    * @example john@email.com
    * @type string | undefined
    */
@@ -52,6 +58,8 @@ export type User = {
   phone?: string
   /**
    * @description User Status
+   *
+   * Format: `int32`
    * @example 1
    * @type integer | undefined
    */
