@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 import { Client } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -11,6 +11,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver } = ctx
     const { output, importPath, dataReturnType, pathParamsType, paramsType, paramsCasing, parser } = ctx.options
     const baseURL = ctx.meta.baseURL
