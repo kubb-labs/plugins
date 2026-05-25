@@ -57,7 +57,7 @@ export function Url({
   node,
   tsResolver,
 }: Props): KubbReactNode {
-  const path = new URLPath(node.path)
+  const path = new URLPath(node.path!)
 
   const paramsNode = buildUrlParamsNode({
     paramsType,
@@ -81,7 +81,7 @@ export function Url({
             .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
             .join('\n')}
         {pathParamsMapping && Object.keys(pathParamsMapping).length > 0 && <br />}
-        <Const name={'res'}>{`{ method: '${node.method.toUpperCase()}', url: ${path.toTemplateString({ prefix: baseURL })} as const }`}</Const>
+        <Const name={'res'}>{`{ method: '${node.method!.toUpperCase()}', url: ${path.toTemplateString({ prefix: baseURL })} as const }`}</Const>
         <br />
         return res
       </Function>

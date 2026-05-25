@@ -13,8 +13,8 @@ export function Operations({ name, nodes }: OperationsProps): KubbReactNode {
 
   nodes.forEach((node) => {
     operationsObject[node.operationId] = {
-      path: new URLPath(node.path).URL,
-      method: node.method.toLowerCase(),
+      path: new URLPath(node.path!).URL,
+      method: node.method!.toLowerCase(),
     }
   })
 

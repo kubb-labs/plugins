@@ -28,11 +28,11 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     // query: false means "this IS a query op" (suspense hooks still generate)
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
+    const isQuery = query === false || (!!query && query.methods.some((method) => node.method!.toLowerCase() === method.toLowerCase()))
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
+      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method!.toLowerCase() === method.toLowerCase())
     const isSuspense = !!suspense
 
     if (!isQuery || isMutation || !isSuspense) return null

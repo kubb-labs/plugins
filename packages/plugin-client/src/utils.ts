@@ -65,7 +65,7 @@ export function buildClassClientParams({
           mode: 'inlineSpread',
         },
         method: {
-          value: JSON.stringify(node.method.toUpperCase()),
+          value: JSON.stringify(node.method!.toUpperCase()),
         },
         url: {
           value: path.template,

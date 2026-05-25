@@ -27,11 +27,11 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     // query: false means "this IS a query op, but skip the useQuery hook"
-    const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
+    const isQuery = query === false || (!!query && query.methods.some((method) => node.method!.toLowerCase() === method.toLowerCase()))
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
+      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method!.toLowerCase() === method.toLowerCase())
 
     if (!isQuery || isMutation) return null
 

@@ -32,7 +32,7 @@ export function Operations({ name, operations }: Props): KubbReactNode {
   const pathsJSON = operations.reduce<Record<string, Record<string, string>>>((prev, acc) => {
     prev[`"${acc.node.path}"`] = {
       ...(prev[`"${acc.node.path}"`] ?? {}),
-      [acc.node.method]: `operations["${acc.node.operationId}"]`,
+      [acc.node.method!]: `operations["${acc.node.operationId}"]`,
     }
 
     return prev
