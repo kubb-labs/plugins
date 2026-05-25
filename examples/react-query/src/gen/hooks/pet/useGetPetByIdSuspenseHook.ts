@@ -34,7 +34,6 @@ export async function getPetByIdSuspenseHook({ pet_id }: { pet_id: GetPetByIdPat
 export function getPetByIdSuspenseQueryOptionsHook({ pet_id }: { pet_id: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdSuspenseQueryKey({ pet_id })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetByIdSuspenseHook({ pet_id }, { ...config, signal: config.signal ?? signal })

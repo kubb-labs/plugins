@@ -32,7 +32,7 @@ export function getUserByNameSuspenseQueryOptions(username: GetUserByNamePathUse
 
         const queryKey = getUserByNameSuspenseQueryKey(username)
         return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
-         enabled: !!(username),
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByNameSuspense(username, { ...config, signal: config.signal ?? signal })
