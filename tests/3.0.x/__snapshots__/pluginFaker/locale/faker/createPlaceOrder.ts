@@ -11,7 +11,7 @@ import { fakerDE as faker } from "@faker-js/faker";
  * @description successful operation
  */
 export function createPlaceOrderStatus200(data?: Partial<PlaceOrderStatus200>): PlaceOrderStatus200 {
-  return createOrder(data)
+  return createOrder(data) as PlaceOrderStatus200
 }
 
 /**
@@ -22,15 +22,15 @@ export function createPlaceOrderStatus405() {
 }
 
 export function createPlaceOrderJsonData(data?: Partial<PlaceOrderJsonData>): PlaceOrderJsonData {
-  return createOrder(data)
+  return createOrder(data) as PlaceOrderJsonData
 }
 
 export function createPlaceOrderXmlData(data?: Partial<PlaceOrderXmlData>): PlaceOrderXmlData {
-  return createOrder(data)
+  return createOrder(data) as PlaceOrderXmlData
 }
 
 export function createPlaceOrderFormUrlEncodedData(data?: Partial<PlaceOrderFormUrlEncodedData>): PlaceOrderFormUrlEncodedData {
-  return createOrder(data)
+  return createOrder(data) as PlaceOrderFormUrlEncodedData
 }
 
 export function createPlaceOrderData(_data?: PlaceOrderData): PlaceOrderData {

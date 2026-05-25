@@ -8,11 +8,11 @@ import { createCategory } from "./createCategory.ts";
 import { createTag } from "./createTag.ts";
 import { faker } from "@faker-js/faker";
 
-export function createAddPetRequest(data?: Partial<AddPetRequest>): Required<AddPetRequest>
+export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData)
 {
   const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha(),"category": createCategory(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (createTag())),"status": faker.helpers.arrayElement<NonNullable<AddPetRequest>["status"]>(["available", "pending", "sold"])}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<AddPetRequest>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

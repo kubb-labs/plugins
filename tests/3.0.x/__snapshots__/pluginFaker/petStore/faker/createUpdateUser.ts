@@ -22,21 +22,21 @@ export function createUpdateUserStatusDefault() {
  * @description Update an existent user in the store
  */
 export function createUpdateUserJsonData(data?: Partial<UpdateUserJsonData>): UpdateUserJsonData {
-  return createUser(data)
+  return createUser(data) as UpdateUserJsonData
 }
 
 /**
  * @description Update an existent user in the store
  */
 export function createUpdateUserXmlData(data?: Partial<UpdateUserXmlData>): UpdateUserXmlData {
-  return createUser(data)
+  return createUser(data) as UpdateUserXmlData
 }
 
 /**
  * @description Update an existent user in the store
  */
 export function createUpdateUserFormUrlEncodedData(data?: Partial<UpdateUserFormUrlEncodedData>): UpdateUserFormUrlEncodedData {
-  return createUser(data)
+  return createUser(data) as UpdateUserFormUrlEncodedData
 }
 
 /**

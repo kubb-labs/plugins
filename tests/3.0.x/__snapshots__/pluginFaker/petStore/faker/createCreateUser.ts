@@ -11,14 +11,14 @@ import { faker } from "@faker-js/faker";
  * @description successful operation
  */
 export function createCreateUserStatusDefaultJson(data?: Partial<CreateUserStatusDefaultJson>): CreateUserStatusDefaultJson {
-  return createUser(data)
+  return createUser(data) as CreateUserStatusDefaultJson
 }
 
 /**
  * @description successful operation
  */
 export function createCreateUserStatusDefaultXml(data?: Partial<CreateUserStatusDefaultXml>): CreateUserStatusDefaultXml {
-  return createUser(data)
+  return createUser(data) as CreateUserStatusDefaultXml
 }
 
 /**
@@ -32,21 +32,21 @@ export function createCreateUserStatusDefault(_data?: CreateUserStatusDefault): 
  * @description Created user object
  */
 export function createCreateUserJsonData(data?: Partial<CreateUserJsonData>): CreateUserJsonData {
-  return createUser(data)
+  return createUser(data) as CreateUserJsonData
 }
 
 /**
  * @description Created user object
  */
 export function createCreateUserXmlData(data?: Partial<CreateUserXmlData>): CreateUserXmlData {
-  return createUser(data)
+  return createUser(data) as CreateUserXmlData
 }
 
 /**
  * @description Created user object
  */
 export function createCreateUserFormUrlEncodedData(data?: Partial<CreateUserFormUrlEncodedData>): CreateUserFormUrlEncodedData {
-  return createUser(data)
+  return createUser(data) as CreateUserFormUrlEncodedData
 }
 
 /**
@@ -57,5 +57,5 @@ export function createCreateUserData(_data?: CreateUserData): CreateUserData {
 }
 
 export function createCreateUserResponse(data?: Partial<CreateUserResponse>): CreateUserResponse {
-  return createCreateUserStatusDefault(data)
+  return createCreateUserStatusDefault(data) as CreateUserResponse
 }

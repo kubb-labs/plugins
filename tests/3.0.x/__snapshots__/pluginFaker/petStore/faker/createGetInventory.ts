@@ -8,15 +8,15 @@ import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetIn
 /**
    * @description successful operation
    */
-  export function createGetInventoryStatus200(data?: Partial<GetInventoryStatus200>): Required<GetInventoryStatus200>
+  export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData)
 {
   const defaultFakeData = {}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<GetInventoryStatus200>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 export function createGetInventoryResponse(data?: Partial<GetInventoryResponse>): GetInventoryResponse {
-  return createGetInventoryStatus200(data)
+  return createGetInventoryStatus200(data) as GetInventoryResponse
 }

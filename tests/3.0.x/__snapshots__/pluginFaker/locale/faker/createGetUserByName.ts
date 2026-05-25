@@ -15,14 +15,14 @@ export function createGetUserByNamePathUsername(data?: string): string {
  * @description successful operation
  */
 export function createGetUserByNameStatus200Json(data?: Partial<GetUserByNameStatus200Json>): GetUserByNameStatus200Json {
-  return createUser(data)
+  return createUser(data) as GetUserByNameStatus200Json
 }
 
 /**
  * @description successful operation
  */
 export function createGetUserByNameStatus200Xml(data?: Partial<GetUserByNameStatus200Xml>): GetUserByNameStatus200Xml {
-  return createUser(data)
+  return createUser(data) as GetUserByNameStatus200Xml
 }
 
 /**

@@ -19,7 +19,7 @@ export function createGetPetByIdPathPetId(data?: bigint): bigint {
 export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200Json>): GetPetByIdStatus200Json {
   faker.seed([42])
 
-  return createPet(data)
+  return createPet(data) as GetPetByIdStatus200Json
 }
 
 /**
@@ -28,7 +28,7 @@ export function createGetPetByIdStatus200Json(data?: Partial<GetPetByIdStatus200
 export function createGetPetByIdStatus200Xml(data?: Partial<GetPetByIdStatus200Xml>): GetPetByIdStatus200Xml {
   faker.seed([42])
 
-  return createPet(data)
+  return createPet(data) as GetPetByIdStatus200Xml
 }
 
 /**
