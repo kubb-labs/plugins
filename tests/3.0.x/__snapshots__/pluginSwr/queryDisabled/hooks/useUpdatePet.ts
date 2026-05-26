@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
-export const updatePetQueryKey = (data: UpdatePetData) => [{ url: '/pet' }, ...(data ? [data] : [])] as const
+export const updatePetQueryKey = (data?: UpdatePetData) => [{ url: '/pet' }, ...(data ? [data] : [])] as const
 
 type UpdatePetQueryKey = ReturnType<typeof updatePetQueryKey>
 
@@ -17,22 +17,22 @@ type UpdatePetQueryKey = ReturnType<typeof updatePetQueryKey>
  * {@link /pet}
  */
 export async function updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
 
-export function updatePetQueryOptions(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export function updatePetQueryOptions(data?: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
 
         return {
           fetcher: async () => {
-            return updatePet(data, config)
+            return updatePet(data!, config)
           },
         }
 

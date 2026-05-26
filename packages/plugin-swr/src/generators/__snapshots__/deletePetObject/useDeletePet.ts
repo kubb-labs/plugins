@@ -4,10 +4,10 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey } from './DeletePet'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -21,9 +21,9 @@ export async function deletePet(
   headers?: { api_key?: DeletePetHeaderApiKey },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeletePetResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'DELETE',
     url: `/pet/${petId}`,
     ...requestConfig,

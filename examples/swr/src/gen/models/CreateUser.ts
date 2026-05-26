@@ -5,7 +5,11 @@
 
 import type { User } from './User.ts'
 
-export type CreateUserStatusDefault = User
+export type CreateUserStatusDefaultJson = User
+
+export type CreateUserStatusDefaultXml = User
+
+export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
 
 /**
  * @description Created user object

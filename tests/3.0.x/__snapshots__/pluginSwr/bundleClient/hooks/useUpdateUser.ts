@@ -4,10 +4,10 @@
 */
 
 import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/fetch.ts";
+import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from "../types/UpdateUser.ts";
 import type { SWRMutationConfiguration } from "swr/mutation";
-import { fetch } from "../.kubb/fetch.ts";
+import { client } from "../.kubb/client.ts";
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -19,7 +19,7 @@ export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
  * {@link /user/:username}
  */
 export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data

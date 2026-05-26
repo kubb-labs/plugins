@@ -9,15 +9,15 @@ import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-cl
 import type { SWRConfiguration } from "swr";
 import { getOrderById } from "../clients/getOrderById.ts";
 
-export const getOrderByIdQueryKey = (orderId: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
+export const getOrderByIdQueryKey = (orderId?: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
-export function getOrderByIdQueryOptions(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdQueryOptions(orderId?: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         return {
           fetcher: async () => {
-            return getOrderById(orderId, config)
+            return getOrderById(orderId!, config)
           },
         }
 
@@ -28,7 +28,7 @@ export function getOrderByIdQueryOptions(orderId: GetOrderByIdPathOrderId, confi
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export function useGetOrderById(orderId: GetOrderByIdPathOrderId, options: {
+export function useGetOrderById(orderId?: GetOrderByIdPathOrderId, options: {
   query?: SWRConfiguration<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
@@ -40,7 +40,7 @@ export function useGetOrderById(orderId: GetOrderByIdPathOrderId, options: {
          const queryKey = getOrderByIdQueryKey(orderId)
 
          return useSWR<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
-          shouldFetch ? queryKey : null,
+          shouldFetch && !!(orderId) ? queryKey : null,
           {
             ...getOrderByIdQueryOptions(orderId, config),
             ...(immutable ? {

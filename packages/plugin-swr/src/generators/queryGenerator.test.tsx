@@ -29,7 +29,7 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
     clientType: 'function',
     bundle: false,
   },
-  parser: 'client',
+  parser: false,
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
@@ -53,7 +53,7 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

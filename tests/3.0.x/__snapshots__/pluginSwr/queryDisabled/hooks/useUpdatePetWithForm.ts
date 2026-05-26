@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from "../types/UpdatePetWithForm.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
-export const updatePetWithFormQueryKey = (petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }) => [{ url: '/pet/:petId', params: {petId:petId} }, ...(params ? [params] : [])] as const
+export const updatePetWithFormQueryKey = (petId?: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }) => [{ url: '/pet/:petId', params: {petId:petId} }, ...(params ? [params] : [])] as const
 
 type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
 
@@ -16,7 +16,7 @@ type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
@@ -26,11 +26,11 @@ export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, param
   return res.data
 }
 
-export function updatePetWithFormQueryOptions(petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function updatePetWithFormQueryOptions(petId?: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         return {
           fetcher: async () => {
-            return updatePetWithForm(petId, params, config)
+            return updatePetWithForm(petId!, params, config)
           },
         }
 

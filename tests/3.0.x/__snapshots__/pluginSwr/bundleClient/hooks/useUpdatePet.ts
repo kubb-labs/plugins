@@ -4,10 +4,10 @@
 */
 
 import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/fetch.ts";
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
+import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
+import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
 import type { SWRMutationConfiguration } from "swr/mutation";
-import { fetch } from "../.kubb/fetch.ts";
+import { client } from "../.kubb/client.ts";
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -19,13 +19,13 @@ export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
  * {@link /pet}
  */
 export async function updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
