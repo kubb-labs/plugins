@@ -1,20 +1,27 @@
-import { camelCase, pascalCase } from '@internals/utils'
+import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginClient } from '../types.ts'
 
 /**
- * Naming convention resolver for client plugin.
+ * Default resolver used by `@kubb/plugin-client`. Decides the names and file
+ * paths for every generated client function or class. Functions and files use
+ * camelCase; classes and tag groups use PascalCase.
  *
- * Provides default naming helpers using camelCase for functions and file paths.
+ * @example Resolve client function and class names
+ * ```ts
+ * import { resolverClient } from '@kubb/plugin-client'
  *
- * @example
- * `resolverClient.default('list pets', 'function')  // → 'listPets'`
+ * resolverClient.default('list pets', 'function') // 'listPets'
+ * resolverClient.resolveClassName('pet')          // 'Pet'
+ * resolverClient.resolveUrlName(operationNode)    // 'getShowPetByIdUrl'
+ * ```
  */
 export const resolverClient = defineResolver<PluginClient>(() => ({
   name: 'default',
   pluginName: 'plugin-client',
   default(name, type) {
-    return camelCase(name, { isFile: type === 'file' })
+    const resolved = camelCase(name, { isFile: type === 'file' })
+    return type === 'file' ? resolved : ensureValidVarName(resolved)
   },
   resolveName(name) {
     return this.default(name, 'function')
@@ -23,13 +30,13 @@ export const resolverClient = defineResolver<PluginClient>(() => ({
     return this.default(name, type)
   },
   resolveClassName(name) {
-    return pascalCase(name)
+    return ensureValidVarName(pascalCase(name))
   },
   resolveGroupName(name) {
-    return pascalCase(name)
+    return ensureValidVarName(pascalCase(name))
   },
   resolveClientPropertyName(name) {
-    return camelCase(name)
+    return ensureValidVarName(camelCase(name))
   },
   resolveUrlName(node) {
     const name = this.resolveName(node.operationId)

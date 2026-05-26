@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { GetInventoryResponse } from '../../models/GetInventory.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { GetInventoryStatus200 } from '../../models/GetInventory.ts'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => ['v5', { url: '/store/inventory' }] as const
@@ -20,16 +20,16 @@ type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryK
  * {@link /store/inventory}
  */
 export async function getInventorySuspenseHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }
 
 export function getInventorySuspenseQueryOptionsHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getInventorySuspenseQueryKey()
-  return queryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryResponse, typeof queryKey>({
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return getInventorySuspenseHook({ ...config, signal: config.signal ?? signal })
@@ -42,9 +42,9 @@ export function getInventorySuspenseQueryOptionsHook(config: Partial<RequestConf
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function useGetInventorySuspenseHook<TData = GetInventoryResponse, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(
+export function useGetInventorySuspenseHook<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(
   options: {
-    query?: Partial<UseSuspenseQueryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-client
 name: Client
-description: Generate type-safe HTTP clients (Axios, Fetch) from OpenAPI specifications for making API requests.
+description: Generate type-safe HTTP clients (axios or fetch) from OpenAPI — one async function per operation, fully typed end to end.
 category: client
 type: official
 npmPackage: '@kubb/plugin-client'
@@ -36,16 +36,16 @@ icon:
 intro: |
   # @kubb/plugin-client
 
-  Generate API client code for handling API requests.
+  Generate HTTP client functions for every operation in your OpenAPI spec. Each generated function has typed path params, query params, body, and response — call the API like any other typed function.
 
-  By default, this plugin uses [Axios](https://axios-http.com/docs/intro), but you can add your own client. See [Use of Fetch](https://kubb.dev/plugins/plugin-client#importpath) for an example.
+  Ships with `axios` and `fetch` runtimes out of the box. Bring your own client (auth, retries, custom base URL) by pointing `importPath` at your module.
 
 options:
   - name: output
     type: Output
     required: false
     default: "{ path: 'clients', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated client files are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'clients'"
@@ -63,7 +63,7 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. Used for the file and identifier generation.
+        description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - extends: ./_shared/client/import-path.yaml
 
@@ -71,7 +71,8 @@ options:
     type: boolean
     required: false
     default: 'false'
-    description: Create an `operations.ts` file with all operations grouped by methods.
+    description: |
+      Emits an `operations.ts` file that re-exports every generated function grouped by HTTP method. Useful for building meta-tooling (route registries, API explorers) on top of the generated code.
 
   - extends: ./_shared/client/data-return-type.yaml
 
@@ -79,12 +80,14 @@ options:
     type: "'export' | false"
     required: false
     default: 'false'
-    description: Export URLs that are used by every operation.
-    body: |
-      - `'export'` will make them part of your barrel file.
-      - `false` will not make them exportable.
+    description: |
+      Controls whether the URL builder helpers (`get<Operation>Url`) are exported alongside each client function.
+
+      - `'export'` — expose them via the barrel. Useful when you call the API through a different transport (`navigator.sendBeacon`, server actions, etc.).
+      - `false` (default) — keep them private to the generated module.
     codeBlock:
       lang: typescript
+      title: Generated URL helper
       code: |
         export function getGetPetByIdUrl(petId: GetPetByIdPathParams['petId']) {
           return `/pet/${petId}` as const
@@ -106,47 +109,65 @@ options:
   - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginClient>>'
 
-  - extends: ./_shared/core/transformer.yaml
-    name: transformers
-
   - name: resolver
     type: 'Partial<ResolverClient> & ThisType<ResolverClient>'
     required: false
-    description: Override individual resolver methods to customize generated names. Any method you omit falls back to the preset resolver. Use `this.default(...)` to call the preset's implementation.
+    description: |
+      Overrides naming and path resolution for the generated client. Only the methods you supply replace the defaults; everything else falls back to the built-in resolver.
+
+      Inside each method, `this` is bound to the full resolver, so you can call `this.default(name)` to delegate to the original implementation.
     codeBlock:
       lang: typescript
+      title: Append "Client" to every name
       code: |
+        import { defineConfig } from 'kubb'
         import { pluginClient } from '@kubb/plugin-client'
 
-        pluginClient({
-          resolver: {
-            resolveName(name) {
-              return `${this.default(name)}Client`
-            },
-          },
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginClient({
+              resolver: {
+                resolveName(name) {
+                  return `${this.default(name)}Client`
+                },
+              },
+            }),
+          ],
         })
 
   - name: transformer
     type: Visitor
     required: false
     experimental: true
-    description: Apply an AST `Visitor` to transform operation nodes before they are printed.
+    description: |
+      AST visitor applied to operation nodes before code is printed. Use this to rewrite operation IDs, tags, or descriptions across the entire client.
     codeBlock:
       lang: typescript
+      title: Prefix every operationId with "api_"
       code: |
+        import { defineConfig } from 'kubb'
         import { pluginClient } from '@kubb/plugin-client'
 
-        pluginClient({
-          transformer: {
-            operation(node) {
-              return { ...node, operationId: `api_${node.operationId}` }
-            },
-          },
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginClient({
+              transformer: {
+                operation(node) {
+                  return { ...node, operationId: `api_${node.operationId}` }
+                },
+              },
+            }),
+          ],
         })
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginTs } from '@kubb/plugin-ts'
@@ -161,8 +182,7 @@ examples:
                 output: {
                   path: './clients/axios',
                   barrel: { type: 'named' },
-                  banner: '/* eslint-disable no-alert, no-console */',
-                  footer: '',
+                  banner: '/* eslint-disable */',
                 },
                 group: {
                   type: 'tag',
@@ -174,7 +194,7 @@ examples:
                   },
                 },
                 operations: true,
-                parser: 'client',
+                parser: false,
                 exclude: [{ type: 'tag', pattern: 'store' }],
                 pathParamsType: 'object',
                 dataReturnType: 'full',
@@ -182,4 +202,3 @@ examples:
               }),
             ],
           })
-        twoslash: false

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getPlaceOrderUrl() {
@@ -19,13 +19,13 @@ function getPlaceOrderUrl() {
  * {@link /store/order}
  */
 export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

@@ -6,12 +6,12 @@
 import type { Order } from "../types/Order.ts";
 import { faker } from "@faker-js/faker";
 
-export function createOrder(data?: Partial<Order>): Required<Order>
+export function createOrder<TData extends Partial<Order> = object>(data?: TData)
 {
   faker.seed([42])
   const defaultFakeData = {"id": faker.number.bigInt(),"petId": faker.number.bigInt(),"quantity": faker.number.int(),"shipDate": faker.date.anytime().toISOString(),"status": faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),"complete": faker.datatype.boolean()}
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Order>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

@@ -1,8 +1,8 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
   GetUserByNamePathUsername,
-  GetUserByNameResponse,
+  GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from '../../../models/ts/userController/GetUserByName.ts'
@@ -19,9 +19,9 @@ export function getGetUserByNameUrl({ username }: { username: GetUserByNamePathU
  * {@link /user/:username}
  */
 export async function getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
     method: 'GET',
     url: getGetUserByNameUrl({ username }).url.toString(),
     ...requestConfig,

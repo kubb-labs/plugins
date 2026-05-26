@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { CreateUserData, CreateUserResponse } from '../models/ts/CreateUser.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -15,7 +15,7 @@ export async function createUserHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await fetch<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>(
+  const res = await client<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>(
     { method: 'POST', url: `/user`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
     request,
   )

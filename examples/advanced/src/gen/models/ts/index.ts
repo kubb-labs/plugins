@@ -1,15 +1,19 @@
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.ts'
+export type { AddPetRequest } from './AddPetRequest.ts'
 export type { Address } from './Address.ts'
 export type { Animal, AnimalTypeEnumKey } from './Animal.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Cat } from './Cat.ts'
 export type { Category } from './Category.ts'
-export type { Customer, CustomerParamsStatusEnumKey } from './Customer.ts'
+export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.ts'
+export type { Customer } from './Customer.ts'
 export type { Dog } from './Dog.ts'
 export type { Image } from './Image.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderParamsStatusEnumKey, OrderStatusEnumKey } from './Order.ts'
-export type { Pet, PetStatusEnumKey } from './Pet.ts'
+export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey } from './Order.ts'
+export type { OrderParams } from './OrderParams.ts'
+export type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
+export type { Pet } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
+export type { PetStatusEnumKey } from './PetStatusEnum.ts'
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
 export type {
@@ -31,6 +35,8 @@ export type {
   AddPetResponses,
   AddPetStatus405,
   AddPetStatusDefault,
+  AddPetStatusDefaultJson,
+  AddPetStatusDefaultXml,
   AddPetXmlData,
 } from './petController/AddPet.ts'
 export type {
@@ -47,6 +53,8 @@ export type {
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './petController/FindPetsByStatus.ts'
 export type {
@@ -58,6 +66,8 @@ export type {
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './petController/FindPetsByTags.ts'
 export type {
@@ -66,6 +76,8 @@ export type {
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './petController/GetPetById.ts'
@@ -77,6 +89,8 @@ export type {
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus202,
   UpdatePetStatus400,
   UpdatePetStatus404,
@@ -102,6 +116,7 @@ export type {
   UploadFileStatus200,
 } from './petController/UploadFile.ts'
 export type {
+  CreatePetsBoolParamKey,
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
@@ -128,6 +143,8 @@ export type {
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './storeController/GetOrderById.ts'
@@ -162,6 +179,8 @@ export type {
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './userController/CreateUser.ts'
 export type {
@@ -170,6 +189,8 @@ export type {
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './userController/CreateUsersWithListInput.ts'
 export type {
@@ -186,6 +207,8 @@ export type {
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './userController/GetUserByName.ts'
@@ -196,6 +219,8 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './userController/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './userController/LogoutUser.ts'
@@ -210,8 +235,9 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './userController/UpdateUser.ts'
-export { addPetRequestStatusEnum } from './AddPetRequest.ts'
 export { animalTypeEnum } from './Animal.ts'
-export { customerParamsStatusEnum } from './Customer.ts'
-export { orderHttpStatusEnum, orderOrderTypeEnum, orderParamsStatusEnum, orderStatusEnum } from './Order.ts'
-export { petStatusEnum } from './Pet.ts'
+export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.ts'
+export { orderHttpStatusEnum, orderOrderTypeEnum } from './Order.ts'
+export { orderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
+export { petStatusEnum } from './PetStatusEnum.ts'
+export { createPetsBoolParam } from './petsController/CreatePets.ts'

@@ -1,6 +1,6 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/petController/GetPetById.ts'
 import { getPetByIdResponseSchema } from '../../../zod/petController/getPetByIdSchema.ts'
 
 export function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
@@ -15,9 +15,9 @@ export function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
  * {@link /pet/:petId:search}
  */
 export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
     url: getGetPetByIdUrl({ petId }).url.toString(),
     ...requestConfig,

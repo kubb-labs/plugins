@@ -1,7 +1,7 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
+import { createGroupConfig } from '@internals/shared'
 
-import { ast, definePlugin, type Group } from '@kubb/core'
+import { ast, definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { classClientGenerator } from './generators/classClientGenerator.tsx'
@@ -16,20 +16,33 @@ import { source as configSource } from './templates/config.source.ts'
 import type { PluginClient } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-client`, used in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-client`. Used for driver lookups and
+ * cross-plugin dependency references.
  */
 export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
 
 /**
- * Generates type-safe HTTP client functions or classes from an OpenAPI specification.
- * Creates client APIs by walking operations and delegating to generators.
- * Writes barrel files based on the configured `barrelType`.
+ * Generates one HTTP client function per OpenAPI operation. Each function has
+ * typed path params, query params, body, and response, so callers use the API
+ * like any other typed function. Ships with `axios` and `fetch` runtimes; bring
+ * your own by setting `importPath`.
  *
- * @example Client generator
+ * @example
  * ```ts
- * import pluginClient from '@kubb/plugin-client'
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginClient } from '@kubb/plugin-client'
+ *
  * export default defineConfig({
- *   plugins: [pluginClient({ output: { path: 'clients' } })]
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginClient({
+ *       output: { path: './clients' },
+ *       client: 'fetch',
+ *     }),
+ *   ],
  * })
  * ```
  */
@@ -47,7 +60,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     operations = false,
     paramsCasing,
     clientType = options.sdk ? 'class' : 'function',
-    parser = 'client',
+    parser = false,
     client = 'axios',
     importPath,
     bundle = false,
@@ -63,28 +76,16 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     options.generators ??
     [
       clientType === 'staticClass' ? staticClassClientGenerator : clientType === 'class' ? classClientGenerator : clientGenerator,
-      group && clientType === 'function' ? groupedClientGenerator : undefined,
-      operations ? operationsGenerator : undefined,
+      group && clientType === 'function' ? groupedClientGenerator : null,
+      operations ? operationsGenerator : null,
     ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
 
   return {
     name: pluginClientName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverClient, ...userResolver } : resolverClient

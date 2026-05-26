@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
 import type { MaybeRefOrGetter } from "vue";
@@ -18,7 +18,7 @@ export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWi
  * {@link /user/createWithList}
  */
 export function useCreateUsersWithListInput<TContext>(options: {
-  mutation?: MutationObserverOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUsersWithListInputData>}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: MaybeRefOrGetter<CreateUsersWithListInputData>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client },
 } = {}) {
 
@@ -26,7 +26,7 @@ export function useCreateUsersWithListInput<TContext>(options: {
           const { client: queryClient, ...mutationOptions } = mutation;
           const mutationKey = mutationOptions?.mutationKey ?? createUsersWithListInputMutationKey()
 
-          return useMutation<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
+          return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
             mutationFn: async({ data }) => {
               return createUsersWithListInput(data, config)
             },

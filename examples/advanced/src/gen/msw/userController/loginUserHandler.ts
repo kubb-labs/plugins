@@ -5,7 +5,7 @@ export function loginUserHandlerResponse200(data: LoginUserResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
-      'Content-Type': 'application/xml',
+      'Content-Type': 'application/json',
     },
   })
 }
@@ -23,7 +23,7 @@ export function loginUserHandler(data?: LoginUserResponse | ((info: Parameters<P
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: {
-        'Content-Type': 'application/xml',
+        'Content-Type': 'application/json',
       },
     })
   })

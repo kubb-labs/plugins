@@ -8,7 +8,14 @@ import type { User } from '../User.ts'
 /**
  * @type object
  */
-export type CreateUsersWithListInputStatus200 = User
+export type CreateUsersWithListInputStatus200Json = User
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Xml = User
+
+export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 
 /**
  * @type any
@@ -18,7 +25,7 @@ export type CreateUsersWithListInputStatusDefault = any
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputData = User[] | undefined
+export type CreateUsersWithListInputData = Array<User> | undefined
 
 /**
  * @type object

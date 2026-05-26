@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-mcp
 name: MCP
-description: Generate Model Context Protocol (MCP) servers from OpenAPI specifications for AI assistants to call your API.
+description: Generate a Model Context Protocol (MCP) server from OpenAPI so AI assistants like Claude can call your API as tools.
 category: ai
 type: official
 npmPackage: '@kubb/plugin-mcp'
@@ -40,27 +40,30 @@ icon:
 intro: |
   # @kubb/plugin-mcp
 
-  Generate [Model Context Protocol](https://modelcontextprotocol.io/introduction) servers from your OpenAPI schema. AI assistants like Claude can now call your API through conversational interfaces.
+  Generate a [Model Context Protocol](https://modelcontextprotocol.io/introduction) server straight from your OpenAPI spec. Every operation becomes a typed MCP tool that AI assistants (Claude Desktop, Claude Code, MCP-compatible clients) can call directly.
+
+  The plugin emits the tool definitions, the request handlers, and the Zod schemas they validate against. Plug the generated server into Claude with one config file.
 
   ```mermaid
   graph TD
-    A[Kubb<br/>Generates code from OpenAPI] --> B[MCP Server<br/>Handles tool calls]
-    B --> C[Claude<br/>Conversational AI]
-    C -->|Sends tool request| B
-    B -->|Uses generated code| A
+    A[OpenAPI spec] --> B[Kubb<br/>code generation]
+    B --> C[MCP server<br/>tool registry]
+    C --> D[Claude / MCP client]
+    D -->|Tool call| C
+    C -->|HTTP request| E[Your API]
   ```
 
 notes:
   - type: tip
     body: |
-      See [Setup Claude with Kubb](https://modelcontextprotocol.io/docs/tools/claude-desktop) for configuration instructions.
+      See [Connect Claude to a remote MCP server](https://modelcontextprotocol.io/docs/tools/claude-desktop) for connecting the generated server.
 
 options:
   - name: output
     type: Output
     required: false
     default: "{ path: 'mcp', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated MCP tool handlers are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'mcp'"
@@ -69,38 +72,28 @@ options:
       - extends: ./_shared/core/output-footer.yaml
       - extends: ./_shared/core/output-override.yaml
 
-  - name: resolver
+  - extends: ./_shared/core/resolver.yaml
     type: 'Partial<ResolverMcp> & ThisType<ResolverMcp>'
-    required: false
-    description: |
-      A single resolver that overrides the naming and path-resolution conventions. Each method you provide replaces the corresponding built-in one. When a method returns `null` or `undefined`, the resolver's result is used as the fallback, so you only need to supply the methods you want to change.
-
-      `this` inside each method is bound to the **full** resolver, so you can call other resolver methods (e.g. `this.default(name, 'function')`) without losing context.
-    body: |
-      Each plugin ships a built-in resolver:
-
-      | Plugin | Default resolver |
-      | --- | --- |
-      | `@kubb/plugin-ts` | `resolverTs` |
-      | `@kubb/plugin-valibot` | `resolverValibot` |
-      | `@kubb/plugin-zod` | `resolverZod` |
-      | `@kubb/plugin-cypress` | `resolverCypress` |
-      | `@kubb/plugin-mcp` | `resolverMcp` |
     codeBlock:
       lang: typescript
-      title: Custom resolver (plugin-mcp example)
+      title: Prefix every tool name with "Mcp"
       code: |
+        import { defineConfig } from 'kubb'
         import { pluginMcp } from '@kubb/plugin-mcp'
 
-        pluginMcp({
-          resolver: {
-            resolveName(name) {
-              return `Mcp${this.default(name, 'function')}`
-            },
-          },
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginMcp({
+              resolver: {
+                resolveName(name) {
+                  return `Mcp${this.default(name, 'function')}`
+                },
+              },
+            }),
+          ],
         })
-    tip: |
-      Use `resolver` for fine-grained control over naming conventions.
 
   - extends: ./_shared/core/group.yaml
     properties:
@@ -109,61 +102,57 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Requests`"
-        description: Return the name of a group based on the group name. This is used for file and identifier generation.
+        description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: paramsCasing
     type: "'camelcase'"
     required: false
-    description: Transform parameter names to camelCase in generated MCP handlers.
+    description: |
+      Renames parameter properties in the generated MCP handlers. The HTTP layer still uses the original spec names — Kubb adds the mapping for you.
     important: |
-      When using `paramsCasing`, ensure that `@kubb/plugin-ts` also has the same `paramsCasing` setting. This option automatically maps transformed parameter names back to their original API names in HTTP requests.
-    body: |
-      - `'camelcase'` transforms parameter names to camelCase.
+      Set the same `paramsCasing` here as on `@kubb/plugin-ts` so the handlers' parameter types line up with the generated request types.
     examples:
-      - name: With paramsCasing camelcase
+      - name: "With `paramsCasing: 'camelcase'`"
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              // Handler uses camelCase parameters
+              // Handler signature uses camelCase
               export async function findPetsByStatusHandler({
-                stepId  // ✓ camelCase
+                stepId,
               }: {
                 stepId: FindPetsByStatusPathParams['stepId']
-              }): Promise<Promise<CallToolResult>> {
-                // Automatically maps back to original name
+              }): Promise<CallToolResult> {
                 const step_id = stepId
 
                 const res = await fetch({
                   method: 'GET',
-                  url: `/pet/findByStatus/${step_id}`,  // Uses original API name
-                  ...
+                  url: `/pet/findByStatus/${step_id}`,
                 })
-                ...
+                // ...
               }
-            twoslash: false
-      - name: Without paramsCasing
+      - name: Without `paramsCasing`
         files:
           - lang: typescript
+            twoslash: false
             code: |
-              // Handler uses original API naming
               export async function findPetsByStatusHandler({
-                step_id  // Original naming
+                step_id,
               }: {
                 step_id: FindPetsByStatusPathParams['step_id']
-              }): Promise<Promise<CallToolResult>> {
+              }): Promise<CallToolResult> {
                 const res = await fetch({
                   method: 'GET',
                   url: `/pet/findByStatus/${step_id}`,
-                  ...
                 })
-                ...
+                // ...
               }
-            twoslash: false
 
   - name: client
     type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
     required: false
-    description: Client configuration for HTTP request generation, including client type, data return type, base URL, and bundling options.
+    description: |
+      HTTP client used by each MCP handler to call the underlying API. Mirrors a subset of `pluginClient` options.
     properties:
       - extends: ./_shared/client/import-path.yaml
       - extends: ./_shared/client/data-return-type.yaml
@@ -177,11 +166,11 @@ options:
     type: 'Array<Generator<PluginMcp>>'
 
   - extends: ./_shared/core/transformer.yaml
-    name: transformer
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginTs } from '@kubb/plugin-ts'
@@ -208,4 +197,3 @@ examples:
               }),
             ],
           })
-        twoslash: false

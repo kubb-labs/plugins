@@ -1,3 +1,4 @@
+import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
 import type { Pet } from '../Pet.ts'
 
 /**
@@ -20,14 +21,20 @@ export type FindPetsByTagsQueryPageSize = number | undefined
 
 /**
  * @description Header parameters
- * @type string
  */
-export type FindPetsByTagsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type FindPetsByTagsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Array<Pet>
+export type FindPetsByTagsStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Array<Pet>
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any

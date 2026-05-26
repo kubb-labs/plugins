@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { deleteUserResponseSchema } from "../zod/deleteUserSchema.ts";
@@ -20,7 +20,7 @@ function getDeleteUserUrl(username: DeleteUserPathUsername) {
  * {@link /user/:username}
  */
 export async function deleteUser(username: DeleteUserPathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

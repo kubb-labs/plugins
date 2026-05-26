@@ -1,9 +1,14 @@
 import type { Exclude, Include, Output, Override, PluginFactoryOptions } from '@kubb/core'
 
 export type Options = {
+  /**
+   * Output location of the generated Redoc HTML file. The path is resolved
+   * against the global `output.path` set on `defineConfig`.
+   */
   output?: {
     /**
-     * Output path for the generated HTML documentation.
+     * File path of the generated HTML, relative to the global `output.path`.
+     * Unlike most plugins, this points at a single file rather than a directory.
      *
      * @default 'docs.html'
      */

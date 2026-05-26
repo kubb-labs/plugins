@@ -6,6 +6,7 @@
 import type { Cat } from './Cat.ts'
 import type { Category } from './Category.ts'
 import type { Dog } from './Dog.ts'
+import type { PetStatusEnumKey } from './PetStatusEnum.ts'
 import type { Tag } from './Tag.ts'
 
 export const petTypeEnum = {
@@ -14,14 +15,6 @@ export const petTypeEnum = {
 } as const
 
 export type PetTypeEnumKey = (typeof petTypeEnum)[keyof typeof petTypeEnum]
-
-export const petStatusEnum = {
-  available: 'available',
-  pending: 'pending',
-  sold: 'sold',
-} as const
-
-export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
 
 export type Pet = (
   | (Dog & {
@@ -38,6 +31,8 @@ export type Pet = (
     })
 ) & {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -58,14 +53,13 @@ export type Pet = (
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  readonly tags?: Tag[]
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: PetStatusEnumKey
 }

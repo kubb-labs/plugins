@@ -16,10 +16,12 @@ export type {
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
+  AddPetStatus200Json,
+  AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.js'
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.js'
+export type { AddPetRequest } from './AddPetRequest.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
@@ -34,6 +36,7 @@ export type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from './CreatePets.js'
+export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -42,6 +45,8 @@ export type {
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './CreateUser.js'
 export type {
@@ -50,6 +55,8 @@ export type {
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.js'
 export type { Customer } from './Customer.js'
@@ -83,6 +90,8 @@ export type {
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './FindPetsByStatus.js'
 export type {
@@ -94,6 +103,8 @@ export type {
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './FindPetsByTags.js'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
@@ -103,6 +114,8 @@ export type {
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './GetOrderById.js'
@@ -112,6 +125,8 @@ export type {
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './GetPetById.js'
@@ -121,6 +136,8 @@ export type {
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './GetUserByName.js'
@@ -131,12 +148,15 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './LoginUser.js'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.js'
 export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderStatusEnumKey } from './Order.js'
-export type { Pet, PetStatusEnumKey } from './Pet.js'
+export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
+export type { PetStatusEnumKey } from './PetStatusEnum.js'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -167,6 +187,8 @@ export type {
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus202,
   UpdatePetStatus400,
   UpdatePetStatus404,
@@ -196,6 +218,6 @@ export type {
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
 export type { TagTag } from './tag/Tag.js'
-export { addPetRequestStatusEnum } from './AddPetRequest.js'
+export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.js'
 export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
-export { petStatusEnum } from './Pet.js'
+export { petStatusEnum } from './PetStatusEnum.js'

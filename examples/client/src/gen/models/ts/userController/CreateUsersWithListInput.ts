@@ -8,7 +8,14 @@ import type { User } from '../User.js'
 /**
  * @type object
  */
-export type CreateUsersWithListInputStatus200 = User
+export type CreateUsersWithListInputStatus200Json = User
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Xml = User
+
+export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 
 /**
  * @type any

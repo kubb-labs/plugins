@@ -1,6 +1,6 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
 import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../../../zod/userController/createUsersWithListInputSchema.ts'
 
 export function getCreateUsersWithListInputUrl() {
@@ -18,11 +18,11 @@ export async function createUsersWithListInput(
   { data }: { data?: CreateUsersWithListInputData } = {},
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = createUsersWithListInputDataSchema.parse(data)
 
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: getCreateUsersWithListInputUrl().url.toString(),
     data: requestData,

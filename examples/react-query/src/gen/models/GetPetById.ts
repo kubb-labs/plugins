@@ -4,6 +4,8 @@ import type { Pet } from './Pet.ts'
 
 /**
  * @description ID of pet to return
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetPetByIdPathPetId = number
@@ -11,7 +13,14 @@ export type GetPetByIdPathPetId = number
 /**
  * @type object
  */
-export type GetPetByIdStatus200 = Pet
+export type GetPetByIdStatus200Json = Pet
+
+/**
+ * @type object
+ */
+export type GetPetByIdStatus200Xml = Pet
+
+export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
 /**
  * @type any

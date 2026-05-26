@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { findSuccessStatusCode, getOperationParameters } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Server } from '../components/Server.tsx'
@@ -17,7 +17,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   name: 'operations',
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { config, resolver, plugin, driver, root, inputNode } = ctx
+    const { config, resolver, plugin, driver, root } = ctx
     const { output, paramsCasing, group } = ctx.options
 
     const pluginZod = driver.getPlugin(pluginZodName)
@@ -43,23 +43,26 @@ export const serverGenerator = defineGenerator<PluginMcp>({
       meta: { pluginName: plugin.name },
     }
 
-    const operationsMapped = nodes.map((node) => {
+    const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
       const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
 
-      const mcpFile = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group })
+      const mcpFile = resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      )
 
       const zodFile = zodResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
           output: pluginZod.options?.output ?? output,
-          group: pluginZod.options?.group,
+          group: pluginZod.options?.group ?? undefined,
         },
       )
 
-      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName(node) : undefined
+      const requestName = node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName(node) : null
       const successStatus = findSuccessStatusCode(node.responses)
-      const responseName = successStatus ? zodResolver.resolveResponseStatusName(node, successStatus) : undefined
+      const responseName = successStatus ? zodResolver.resolveResponseStatusName(node, successStatus) : null
 
       const resolveParams = (params: typeof pathParams) => params.map((p) => ({ name: p.name, schemaName: zodResolver.resolveParamName(node, p) }))
 
@@ -75,8 +78,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
         },
         zod: {
           pathParams: resolveParams(pathParams),
-          queryParams: queryParams.length ? resolveParams(queryParams) : undefined,
-          headerParams: headerParams.length ? resolveParams(headerParams) : undefined,
+          queryParams: queryParams.length ? resolveParams(queryParams) : null,
+          headerParams: headerParams.length ? resolveParams(headerParams) : null,
           requestName,
           responseName,
           file: zodFile,
@@ -108,8 +111,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           baseName={serverFile.baseName}
           path={serverFile.path}
           meta={serverFile.meta}
-          banner={resolver.resolveBanner(inputNode, { output, config })}
-          footer={resolver.resolveFooter(inputNode, { output, config })}
+          banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
+          footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: serverFile.path, baseName: serverFile.baseName } })}
         >
           <File.Import name={['McpServer']} path={'@modelcontextprotocol/sdk/server/mcp'} />
           <File.Import name={['z']} path={'zod'} />
@@ -118,8 +121,8 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           {imports}
           <Server
             name={name}
-            serverName={inputNode.meta?.title ?? 'server'}
-            serverVersion={inputNode.meta?.version ?? '0.0.0'}
+            serverName={ctx.meta.title ?? 'server'}
+            serverVersion={ctx.meta.version ?? '0.0.0'}
             paramsCasing={paramsCasing}
             operations={operationsMapped}
           />
@@ -130,7 +133,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
             {`
           {
             "mcpServers": {
-              "${inputNode.meta?.title || 'server'}": {
+              "${ctx.meta.title || 'server'}": {
                 "type": "stdio",
                 "command": "npx",
                 "args": ["tsx", "${path.relative(path.dirname(jsonFile.path), serverFile.path)}"]

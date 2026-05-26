@@ -6,8 +6,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, resolveErrorNames } from '../utils.ts'
-import { buildEnabledCheck } from '@internals/tanstack-query'
+import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -46,7 +45,8 @@ export function SuspenseInfiniteQueryOptions({
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -72,11 +72,11 @@ export function SuspenseInfiniteQueryOptions({
       ? (() => {
           const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : undefined
+          return groupName !== individualName ? groupName : null
         })()
-      : undefined
+      : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
   const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
@@ -87,40 +87,27 @@ export function SuspenseInfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const hasNewParams = nextParam != null || previousParam != null
 
-  const hasNewParams = nextParam !== undefined || previousParam !== undefined
-
-  let getNextPageParamExpr: string | undefined
-  let getPreviousPageParamExpr: string | undefined
-
-  if (hasNewParams) {
-    if (nextParam) {
-      const accessor = getNestedAccessor(nextParam, 'lastPage')
-      if (accessor) {
-        getNextPageParamExpr = `getNextPageParam: (lastPage) => ${accessor}`
-      }
+  const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
+    if (hasNewParams) {
+      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
+      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
+      return [
+        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
+        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,
+      ] as const
     }
-    if (previousParam) {
-      const accessor = getNestedAccessor(previousParam, 'firstPage')
-      if (accessor) {
-        getPreviousPageParamExpr = `getPreviousPageParam: (firstPage) => ${accessor}`
-      }
+    if (cursorParam) {
+      return [`getNextPageParam: (lastPage) => lastPage['${cursorParam}']`, `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`] as const
     }
-  } else if (cursorParam) {
-    getNextPageParamExpr = `getNextPageParam: (lastPage) => lastPage['${cursorParam}']`
-    getPreviousPageParamExpr = `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`
-  } else {
-    if (dataReturnType === 'full') {
-      getNextPageParamExpr =
-        'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1'
-    } else {
-      getNextPageParamExpr =
-        'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1'
-    }
-    getPreviousPageParamExpr = 'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1'
-  }
+    return [
+      dataReturnType === 'full'
+        ? 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1'
+        : 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
+      'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1',
+    ] as const
+  })()
 
   const queryOptionsArr = [
     `initialPageParam: ${typeof initialPageParam === 'string' ? JSON.stringify(initialPageParam) : initialPageParam}`,
@@ -144,7 +131,6 @@ export function SuspenseInfiniteQueryOptions({
           {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-       ${enabledText}
        queryKey,
        queryFn: async ({ signal, pageParam }) => {
           ${infiniteOverrideParams}
@@ -164,7 +150,6 @@ export function SuspenseInfiniteQueryOptions({
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
       return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-       ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
           return ${clientName}(${clientCallStr})

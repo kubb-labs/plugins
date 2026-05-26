@@ -1,5 +1,96 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.31
+
+### Patch Changes
+
+- [#238](https://github.com/kubb-labs/plugins/pull/238) [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the per-plugin `group` naming block (duplicated verbatim across nine plugins) with a shared `createGroupConfig` helper from `@internals/shared`. Each plugin's grouping behavior is preserved exactly — the `Controller`/`Requests` suffix and whether a user-provided `group.name` is honored are passed as options — so generated output is unchanged. Internal refactor only.
+
+- Updated dependencies [[`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea), [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf)]:
+  - @kubb/plugin-ts@5.0.0-beta.31
+
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`21accf1`](https://github.com/kubb-labs/plugins/commit/21accf11be058a252aded049a5d98e30eb6b4c32)]:
+  - @kubb/plugin-ts@5.0.0-beta.30
+
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#226](https://github.com/kubb-labs/plugins/pull/226) [`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.29 core dependency update.
+
+- Updated dependencies [[`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a)]:
+  - @kubb/plugin-ts@5.0.0-beta.29
+
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+### Patch Changes
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d)]:
+  - @kubb/plugin-ts@5.0.0-beta.28
+
+## 5.0.0-beta.27
+
+### Patch Changes
+
+- Updated dependencies [[`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877)]:
+  - @kubb/plugin-ts@5.0.0-beta.27
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- [#195](https://github.com/kubb-labs/plugins/pull/195) [`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Enforce `Array<T>` syntax (over `T[]`) via the oxlint `typescript/array-type` rule. Internal-only change; no runtime or API impact.
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync with kubb
+
+- Updated dependencies [[`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65), [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac), [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c), [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b), [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3)]:
+  - @kubb/plugin-ts@5.0.0-beta.25
+
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync between core with same version
+
+- Updated dependencies [[`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b)]:
+  - @kubb/plugin-ts@5.0.0-beta.22
+
+## 5.0.0-beta.15
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
+- Updated dependencies [[`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f)]:
+  - @kubb/plugin-ts@5.0.0-beta.15
+
 ## 5.0.0-beta.10
 
 ### Patch Changes

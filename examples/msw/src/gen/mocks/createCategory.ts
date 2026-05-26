@@ -6,11 +6,11 @@
 import type { Category } from '../models/Category.ts'
 import { faker } from '@faker-js/faker'
 
-export function createCategory(data?: Partial<Category>): Required<Category> {
+export function createCategory<TData extends Partial<Category> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = { id: faker.number.bigInt(), name: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Category>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

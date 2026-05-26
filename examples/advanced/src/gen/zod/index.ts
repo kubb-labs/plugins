@@ -4,12 +4,32 @@ export type { AnimalSchema } from './animalSchema.ts'
 export type { ApiResponseSchema } from './apiResponseSchema.ts'
 export type { CatSchema } from './catSchema.ts'
 export type { CategorySchema } from './categorySchema.ts'
+export type { CreatePetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 export type { CustomerSchema } from './customerSchema.ts'
 export type { DogSchema } from './dogSchema.ts'
 export type { ImageSchema } from './imageSchema.ts'
+export type { OrderParamsSchema } from './orderParamsSchema.ts'
+export type { OrderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
 export type { OrderSchema } from './orderSchema.ts'
-export type { AddFilesDataSchema, AddFilesResponseSchema, AddFilesStatus200Schema, AddFilesStatus405Schema } from './petController/addFilesSchema.ts'
-export type { AddPetDataSchema, AddPetResponseSchema, AddPetStatus405Schema, AddPetStatusDefaultSchema } from './petController/addPetSchema.ts'
+export type {
+  AddFilesDataSchema,
+  AddFilesDataSchemaFormData,
+  AddFilesDataSchemaJson,
+  AddFilesResponseSchema,
+  AddFilesStatus200Schema,
+  AddFilesStatus405Schema,
+} from './petController/addFilesSchema.ts'
+export type {
+  AddPetDataSchema,
+  AddPetDataSchemaFormUrlEncoded,
+  AddPetDataSchemaJson,
+  AddPetDataSchemaXml,
+  AddPetResponseSchema,
+  AddPetStatus405Schema,
+  AddPetStatusDefaultSchema,
+  AddPetStatusDefaultSchemaJson,
+  AddPetStatusDefaultSchemaXml,
+} from './petController/addPetSchema.ts'
 export type {
   DeletePetHeaderApiKeySchema,
   DeletePetPathPetIdSchema,
@@ -20,6 +40,8 @@ export type {
   FindPetsByStatusPathStepIdSchema,
   FindPetsByStatusResponseSchema,
   FindPetsByStatusStatus200Schema,
+  FindPetsByStatusStatus200SchemaJson,
+  FindPetsByStatusStatus200SchemaXml,
   FindPetsByStatusStatus400Schema,
 } from './petController/findPetsByStatusSchema.ts'
 export type {
@@ -29,19 +51,28 @@ export type {
   FindPetsByTagsQueryTagsSchema,
   FindPetsByTagsResponseSchema,
   FindPetsByTagsStatus200Schema,
+  FindPetsByTagsStatus200SchemaJson,
+  FindPetsByTagsStatus200SchemaXml,
   FindPetsByTagsStatus400Schema,
 } from './petController/findPetsByTagsSchema.ts'
 export type {
   GetPetByIdPathPetIdSchema,
   GetPetByIdResponseSchema,
   GetPetByIdStatus200Schema,
+  GetPetByIdStatus200SchemaJson,
+  GetPetByIdStatus200SchemaXml,
   GetPetByIdStatus400Schema,
   GetPetByIdStatus404Schema,
 } from './petController/getPetByIdSchema.ts'
 export type {
   UpdatePetDataSchema,
+  UpdatePetDataSchemaFormUrlEncoded,
+  UpdatePetDataSchemaJson,
+  UpdatePetDataSchemaXml,
   UpdatePetResponseSchema,
   UpdatePetStatus200Schema,
+  UpdatePetStatus200SchemaJson,
+  UpdatePetStatus200SchemaXml,
   UpdatePetStatus202Schema,
   UpdatePetStatus400Schema,
   UpdatePetStatus404Schema,
@@ -63,6 +94,7 @@ export type {
 } from './petController/uploadFileSchema.ts'
 export type { PetNotFoundSchema } from './petNotFoundSchema.ts'
 export type { PetSchema } from './petSchema.ts'
+export type { PetStatusEnumSchema } from './petStatusEnumSchema.ts'
 export type {
   CreatePetsDataSchema,
   CreatePetsHeaderXEXAMPLESchema,
@@ -75,11 +107,22 @@ export type {
 } from './petsController/createPetsSchema.ts'
 export type { TagTagSchema } from './tag/tagSchema.ts'
 export type { UserArraySchema } from './userArraySchema.ts'
-export type { CreateUserDataSchema, CreateUserResponseSchema, CreateUserStatusDefaultSchema } from './userController/createUserSchema.ts'
+export type {
+  CreateUserDataSchema,
+  CreateUserDataSchemaFormUrlEncoded,
+  CreateUserDataSchemaJson,
+  CreateUserDataSchemaXml,
+  CreateUserResponseSchema,
+  CreateUserStatusDefaultSchema,
+  CreateUserStatusDefaultSchemaJson,
+  CreateUserStatusDefaultSchemaXml,
+} from './userController/createUserSchema.ts'
 export type {
   CreateUsersWithListInputDataSchema,
   CreateUsersWithListInputResponseSchema,
   CreateUsersWithListInputStatus200Schema,
+  CreateUsersWithListInputStatus200SchemaJson,
+  CreateUsersWithListInputStatus200SchemaXml,
   CreateUsersWithListInputStatusDefaultSchema,
 } from './userController/createUsersWithListInputSchema.ts'
 export type {
@@ -92,6 +135,8 @@ export type {
   GetUserByNamePathUsernameSchema,
   GetUserByNameResponseSchema,
   GetUserByNameStatus200Schema,
+  GetUserByNameStatus200SchemaJson,
+  GetUserByNameStatus200SchemaXml,
   GetUserByNameStatus400Schema,
   GetUserByNameStatus404Schema,
 } from './userController/getUserByNameSchema.ts'
@@ -100,11 +145,16 @@ export type {
   LoginUserQueryUsernameSchema,
   LoginUserResponseSchema,
   LoginUserStatus200Schema,
+  LoginUserStatus200SchemaJson,
+  LoginUserStatus200SchemaXml,
   LoginUserStatus400Schema,
 } from './userController/loginUserSchema.ts'
 export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './userController/logoutUserSchema.ts'
 export type {
   UpdateUserDataSchema,
+  UpdateUserDataSchemaFormUrlEncoded,
+  UpdateUserDataSchemaJson,
+  UpdateUserDataSchemaXml,
   UpdateUserPathUsernameSchema,
   UpdateUserResponseSchema,
   UpdateUserStatusDefaultSchema,
@@ -116,17 +166,39 @@ export { animalSchema } from './animalSchema.ts'
 export { apiResponseSchema } from './apiResponseSchema.ts'
 export { catSchema } from './catSchema.ts'
 export { categorySchema } from './categorySchema.ts'
+export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 export { customerSchema } from './customerSchema.ts'
 export { dogSchema } from './dogSchema.ts'
 export { imageSchema } from './imageSchema.ts'
+export { orderParamsSchema } from './orderParamsSchema.ts'
+export { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
 export { orderSchema } from './orderSchema.ts'
-export { addFilesDataSchema, addFilesResponseSchema, addFilesStatus200Schema, addFilesStatus405Schema } from './petController/addFilesSchema.ts'
-export { addPetDataSchema, addPetResponseSchema, addPetStatus405Schema, addPetStatusDefaultSchema } from './petController/addPetSchema.ts'
+export {
+  addFilesDataSchema,
+  addFilesDataSchemaFormData,
+  addFilesDataSchemaJson,
+  addFilesResponseSchema,
+  addFilesStatus200Schema,
+  addFilesStatus405Schema,
+} from './petController/addFilesSchema.ts'
+export {
+  addPetDataSchema,
+  addPetDataSchemaFormUrlEncoded,
+  addPetDataSchemaJson,
+  addPetDataSchemaXml,
+  addPetResponseSchema,
+  addPetStatus405Schema,
+  addPetStatusDefaultSchema,
+  addPetStatusDefaultSchemaJson,
+  addPetStatusDefaultSchemaXml,
+} from './petController/addPetSchema.ts'
 export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './petController/deletePetSchema.ts'
 export {
   findPetsByStatusPathStepIdSchema,
   findPetsByStatusResponseSchema,
   findPetsByStatusStatus200Schema,
+  findPetsByStatusStatus200SchemaJson,
+  findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
 } from './petController/findPetsByStatusSchema.ts'
 export {
@@ -136,19 +208,28 @@ export {
   findPetsByTagsQueryTagsSchema,
   findPetsByTagsResponseSchema,
   findPetsByTagsStatus200Schema,
+  findPetsByTagsStatus200SchemaJson,
+  findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
 } from './petController/findPetsByTagsSchema.ts'
 export {
   getPetByIdPathPetIdSchema,
   getPetByIdResponseSchema,
   getPetByIdStatus200Schema,
+  getPetByIdStatus200SchemaJson,
+  getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
 } from './petController/getPetByIdSchema.ts'
 export {
   updatePetDataSchema,
+  updatePetDataSchemaFormUrlEncoded,
+  updatePetDataSchemaJson,
+  updatePetDataSchemaXml,
   updatePetResponseSchema,
   updatePetStatus200Schema,
+  updatePetStatus200SchemaJson,
+  updatePetStatus200SchemaXml,
   updatePetStatus202Schema,
   updatePetStatus400Schema,
   updatePetStatus404Schema,
@@ -170,6 +251,7 @@ export {
 } from './petController/uploadFileSchema.ts'
 export { petNotFoundSchema } from './petNotFoundSchema.ts'
 export { petSchema } from './petSchema.ts'
+export { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 export {
   createPetsDataSchema,
   createPetsHeaderXEXAMPLESchema,
@@ -182,11 +264,22 @@ export {
 } from './petsController/createPetsSchema.ts'
 export { tagTagSchema } from './tag/tagSchema.ts'
 export { userArraySchema } from './userArraySchema.ts'
-export { createUserDataSchema, createUserResponseSchema, createUserStatusDefaultSchema } from './userController/createUserSchema.ts'
+export {
+  createUserDataSchema,
+  createUserDataSchemaFormUrlEncoded,
+  createUserDataSchemaJson,
+  createUserDataSchemaXml,
+  createUserResponseSchema,
+  createUserStatusDefaultSchema,
+  createUserStatusDefaultSchemaJson,
+  createUserStatusDefaultSchemaXml,
+} from './userController/createUserSchema.ts'
 export {
   createUsersWithListInputDataSchema,
   createUsersWithListInputResponseSchema,
   createUsersWithListInputStatus200Schema,
+  createUsersWithListInputStatus200SchemaJson,
+  createUsersWithListInputStatus200SchemaXml,
   createUsersWithListInputStatusDefaultSchema,
 } from './userController/createUsersWithListInputSchema.ts'
 export {
@@ -199,6 +292,8 @@ export {
   getUserByNamePathUsernameSchema,
   getUserByNameResponseSchema,
   getUserByNameStatus200Schema,
+  getUserByNameStatus200SchemaJson,
+  getUserByNameStatus200SchemaXml,
   getUserByNameStatus400Schema,
   getUserByNameStatus404Schema,
 } from './userController/getUserByNameSchema.ts'
@@ -207,11 +302,16 @@ export {
   loginUserQueryUsernameSchema,
   loginUserResponseSchema,
   loginUserStatus200Schema,
+  loginUserStatus200SchemaJson,
+  loginUserStatus200SchemaXml,
   loginUserStatus400Schema,
 } from './userController/loginUserSchema.ts'
 export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './userController/logoutUserSchema.ts'
 export {
   updateUserDataSchema,
+  updateUserDataSchemaFormUrlEncoded,
+  updateUserDataSchemaJson,
+  updateUserDataSchemaXml,
   updateUserPathUsernameSchema,
   updateUserResponseSchema,
   updateUserStatusDefaultSchema,

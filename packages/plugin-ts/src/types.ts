@@ -115,7 +115,7 @@ type EnumTypeOptions =
       /**
        * Suffix appended to the generated type alias name.
        *
-       * Only affects the type alias — the const object name is unchanged.
+       * Only affects the type alias; the const object name is unchanged.
        *
        * @default 'Key'
        * @example enumTypeSuffix: 'Value' → `export type PetStatusValue = …`
@@ -172,81 +172,89 @@ type EnumTypeOptions =
       enumTypeSuffix?: never
       /**
        * `enumKeyCasing` has no effect for this `enumType`.
-       * Literal and inlineLiteral modes emit only values — keys are discarded entirely.
+       * Literal and inlineLiteral modes emit only values; keys are discarded entirely.
        */
       enumKeyCasing?: never
     }
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'types', barrelType: 'named' }
+   * Where the generated `.ts` files are written and how they are exported.
+   *
+   * @default { path: 'types', barrel: { type: 'named' } }
    */
   output?: Output
   /**
-   * Define which contentType should be used.
-   * By default, uses the first valid JSON media type.
+   * Media type read from the OpenAPI spec when an operation defines several.
+   * Defaults to the first JSON-compatible media type Kubb finds.
    */
   contentType?: 'application/json' | (string & {})
   /**
-   * Group the clients based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Array containing exclude parameters to exclude/skip tags/operations/methods/paths.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Array containing include parameters to include tags/operations/methods/paths.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Array containing override parameters to override `options` based on tags/operations/methods/paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Switch between type or interface for creating TypeScript types.
-   * - 'type' generates type alias declarations.
-   * - 'interface' generates interface declarations.
+   * Whether object schemas are emitted as `type` aliases or `interface` declarations.
+   * - `'type'` emits closed type aliases. Safer default for generated code.
+   * - `'interface'` emits interfaces. Useful when consumers rely on declaration merging.
+   *
    * @default 'type'
+   * @see https://www.totaltypescript.com/type-vs-interface-which-should-you-use
    */
   syntaxType?: 'type' | 'interface'
   /**
-   * Choose what to use as mode for an optional value.
-   * - 'questionToken' marks the property as optional with ? (e.g., type?: string).
-   * - 'undefined' adds undefined to the type union (e.g., type: string | undefined).
-   * - 'questionTokenAndUndefined' combines both approaches (e.g., type?: string | undefined).
+   * How optional properties are written in generated types.
+   * - `'questionToken'` — `type?: string`. The property may be missing.
+   * - `'undefined'` — `type: string | undefined`. Required to exist, may be `undefined`.
+   * - `'questionTokenAndUndefined'` — `type?: string | undefined`. Strictest.
+   *
    * @default 'questionToken'
+   * @note Pick `'questionTokenAndUndefined'` when `exactOptionalPropertyTypes` is on in `tsconfig.json`.
    */
   optionalType?: 'questionToken' | 'undefined' | 'questionTokenAndUndefined'
   /**
-   * Choose between Array<string> or string[] for array types.
-   * - 'generic' generates Array<Type> syntax.
-   * - 'array' generates Type[] syntax.
+   * Syntax used for array types.
+   * - `'array'` — `Type[]`. Shorter.
+   * - `'generic'` — `Array<Type>`. More readable for complex element types.
+   *
    * @default 'array'
    */
   arrayType?: 'generic' | 'array'
   /**
-   * How to style your params, by default no casing is applied
-   * - 'camelcase' uses camelCase for pathParams, queryParams and headerParams property names
-   * @default undefined
-   * @note response types (data/body) are NOT affected by this option
+   * Rename properties inside `PathParams`, `QueryParams`, and `HeaderParams` types.
+   * Response and request body types are not affected.
+   *
+   * @note Every plugin that touches operation parameters must use the same value.
    */
   paramsCasing?: 'camelcase'
   /**
-   * Define some generators next to the ts generators
+   * Custom generators that run alongside the built-in TypeScript generators.
    */
   generators?: Array<Generator<PluginTs>>
   /**
-   * Override naming conventions. When a method returns `null` or `undefined`, the preset
-   * resolver (`resolverTs`) is used as fallback.
+   * Override how names and file paths are built for generated symbols.
+   * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
+   * full resolver, so `this.default(name, 'function')` delegates to the built-in
+   * implementation.
    */
   resolver?: Partial<ResolverTs> & ThisType<ResolverTs>
   /**
-   * AST visitor applied to each schema/operation node before printing.
-   * Returning `null` or `undefined` from a visitor method falls back to the preset transformer.
+   * AST visitor applied to each schema or operation node before printing.
+   * Methods you omit fall back to the preset transformer.
    *
-   * @example Remove writeOnly properties from response types
+   * @example Drop writeOnly properties from response types
    * ```ts
    * transformer: {
    *   property(node) {
@@ -257,18 +265,17 @@ export type Options = {
    */
   transformer?: ast.Visitor
   /**
-   * Override individual printer node handlers to customize rendering of specific schema types.
+   * Replace the TypeScript handler for a specific schema type (`'integer'`, `'date'`, ...).
+   * Each handler returns a TypeScript AST node for that schema type. Use `this.transform`
+   * to recurse into nested schema nodes.
    *
-   * Each key is a `SchemaType` (e.g. `'date'`, `'string'`). The function replaces the
-   * built-in handler for that type. Use `this.transform` to recurse into nested schema nodes.
-   *
-   * @example Override the `date` node to use the `Date` object type
+   * @example Use the JavaScript `Date` object for date schemas
    * ```ts
    * import ts from 'typescript'
    * pluginTs({
    *   printer: {
    *     nodes: {
-   *       date(node) {
+   *       date() {
    *         return ts.factory.createTypeReferenceNode('Date', [])
    *       },
    *     },
@@ -286,7 +293,7 @@ type ResolvedOptions = {
   exclude: Array<Exclude>
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
-  group: Group | undefined
+  group: Group | null
   enumType: NonNullable<Options['enumType']>
   enumTypeSuffix: NonNullable<Options['enumTypeSuffix']>
   enumKeyCasing: EnumKeyCasing

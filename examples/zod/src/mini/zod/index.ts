@@ -1,5 +1,15 @@
 export { addPetRequestSchema } from './addPetRequestSchema.ts'
-export { addPetDataSchema, addPetResponseSchema, addPetStatus200Schema, addPetStatus405Schema } from './addPetSchema.ts'
+export {
+  addPetDataSchema,
+  addPetDataSchemaFormUrlEncoded,
+  addPetDataSchemaJson,
+  addPetDataSchemaXml,
+  addPetResponseSchema,
+  addPetStatus200Schema,
+  addPetStatus200SchemaJson,
+  addPetStatus200SchemaXml,
+  addPetStatus405Schema,
+} from './addPetSchema.ts'
 export { addressSchema } from './addressSchema.ts'
 export { apiResponseSchema } from './apiResponseSchema.ts'
 export { categorySchema } from './categorySchema.ts'
@@ -12,11 +22,23 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './createPetsSchema.ts'
-export { createUserDataSchema, createUserResponseSchema, createUserStatusDefaultSchema } from './createUserSchema.ts'
+export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
+export {
+  createUserDataSchema,
+  createUserDataSchemaFormUrlEncoded,
+  createUserDataSchemaJson,
+  createUserDataSchemaXml,
+  createUserResponseSchema,
+  createUserStatusDefaultSchema,
+  createUserStatusDefaultSchemaJson,
+  createUserStatusDefaultSchemaXml,
+} from './createUserSchema.ts'
 export {
   createUsersWithListInputDataSchema,
   createUsersWithListInputResponseSchema,
   createUsersWithListInputStatus200Schema,
+  createUsersWithListInputStatus200SchemaJson,
+  createUsersWithListInputStatus200SchemaXml,
   createUsersWithListInputStatusDefaultSchema,
 } from './createUsersWithListInputSchema.ts'
 export { customerSchema } from './customerSchema.ts'
@@ -27,6 +49,8 @@ export {
   findPetsByStatusQueryStatusSchema,
   findPetsByStatusResponseSchema,
   findPetsByStatusStatus200Schema,
+  findPetsByStatusStatus200SchemaJson,
+  findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
 } from './findPetsByStatusSchema.ts'
 export {
@@ -36,6 +60,8 @@ export {
   findPetsByTagsQueryTagsSchema,
   findPetsByTagsResponseSchema,
   findPetsByTagsStatus200Schema,
+  findPetsByTagsStatus200SchemaJson,
+  findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
 } from './findPetsByTagsSchema.ts'
 export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema.ts'
@@ -43,6 +69,8 @@ export {
   getOrderByIdPathOrderIdSchema,
   getOrderByIdResponseSchema,
   getOrderByIdStatus200Schema,
+  getOrderByIdStatus200SchemaJson,
+  getOrderByIdStatus200SchemaXml,
   getOrderByIdStatus400Schema,
   getOrderByIdStatus404Schema,
 } from './getOrderByIdSchema.ts'
@@ -50,6 +78,8 @@ export {
   getPetByIdPathPetIdSchema,
   getPetByIdResponseSchema,
   getPetByIdStatus200Schema,
+  getPetByIdStatus200SchemaJson,
+  getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
 } from './getPetByIdSchema.ts'
@@ -64,6 +94,8 @@ export {
   getUserByNamePathUsernameSchema,
   getUserByNameResponseSchema,
   getUserByNameStatus200Schema,
+  getUserByNameStatus200SchemaJson,
+  getUserByNameStatus200SchemaXml,
   getUserByNameStatus400Schema,
   getUserByNameStatus404Schema,
 } from './getUserByNameSchema.ts'
@@ -72,27 +104,46 @@ export {
   loginUserQueryUsernameSchema,
   loginUserResponseSchema,
   loginUserStatus200Schema,
+  loginUserStatus200SchemaJson,
+  loginUserStatus200SchemaXml,
   loginUserStatus400Schema,
 } from './loginUserSchema.ts'
 export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './logoutUserSchema.ts'
 export { orderSchema } from './orderSchema.ts'
 export { petNotFoundSchema } from './petNotFoundSchema.ts'
 export { petSchema } from './petSchema.ts'
+export { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 export { phoneNumberSchema } from './phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'
 export {
   placeOrderPatchDataSchema,
+  placeOrderPatchDataSchemaFormUrlEncoded,
+  placeOrderPatchDataSchemaJson,
+  placeOrderPatchDataSchemaXml,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
 } from './placeOrderPatchSchema.ts'
-export { placeOrderDataSchema, placeOrderResponseSchema, placeOrderStatus200Schema, placeOrderStatus405Schema } from './placeOrderSchema.ts'
+export {
+  placeOrderDataSchema,
+  placeOrderDataSchemaFormUrlEncoded,
+  placeOrderDataSchemaJson,
+  placeOrderDataSchemaXml,
+  placeOrderResponseSchema,
+  placeOrderStatus200Schema,
+  placeOrderStatus405Schema,
+} from './placeOrderSchema.ts'
 export { tagSchema } from './tagSchema.ts'
 export {
   updatePetDataSchema,
+  updatePetDataSchemaFormUrlEncoded,
+  updatePetDataSchemaJson,
+  updatePetDataSchemaXml,
   updatePetResponseSchema,
   updatePetStatus200Schema,
+  updatePetStatus200SchemaJson,
+  updatePetStatus200SchemaXml,
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
@@ -104,7 +155,15 @@ export {
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.ts'
-export { updateUserDataSchema, updateUserPathUsernameSchema, updateUserResponseSchema, updateUserStatusDefaultSchema } from './updateUserSchema.ts'
+export {
+  updateUserDataSchema,
+  updateUserDataSchemaFormUrlEncoded,
+  updateUserDataSchemaJson,
+  updateUserDataSchemaXml,
+  updateUserPathUsernameSchema,
+  updateUserResponseSchema,
+  updateUserStatusDefaultSchema,
+} from './updateUserSchema.ts'
 export {
   uploadFileDataSchema,
   uploadFilePathPetIdSchema,

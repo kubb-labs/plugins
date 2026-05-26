@@ -3,13 +3,14 @@
  * Do not edit manually.
  */
 
+import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.ts'
 import type { Pet } from './Pet.ts'
 
 /**
  * @description Tags to filter by
  * @type array | undefined
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
+export type FindPetsByTagsQueryTags = Array<string> | undefined
 
 /**
  * @description to request with required page number or pagination
@@ -25,14 +26,20 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 
 /**
  * @description Header parameters
- * @type string
  */
-export type FindPetsByTagsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type FindPetsByTagsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Pet[]
+export type FindPetsByTagsStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Array<Pet>
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any

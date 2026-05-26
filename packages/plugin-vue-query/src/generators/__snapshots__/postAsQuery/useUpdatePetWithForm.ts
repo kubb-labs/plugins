@@ -3,17 +3,23 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryStatus } from './UpdatePetWithForm'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type {
+  UpdatePetWithFormData,
+  UpdatePetWithFormResponse,
+  UpdatePetWithFormPathPetId,
+  UpdatePetWithFormQueryStatus,
+  UpdatePetWithFormStatus200,
+} from './UpdatePetWithForm'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
 export const updatePetWithFormQueryKey = (
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
 ) => [{ url: '/pet/:petId', params: { petId: petId } }, ...(params ? [params] : []), ...(data ? [data] : [])] as const
@@ -29,11 +35,11 @@ export async function updatePetWithForm(
   params?: { status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = UpdatePetWithFormData.parse(data)
 
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
+  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
     url: `/pet/${petId}`,
     params,
@@ -45,17 +51,17 @@ export async function updatePetWithForm(
 }
 
 export function updatePetWithFormQueryOptions(
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const queryKey = updatePetWithFormQueryKey(petId, data, params)
-  return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormResponse>({
+  return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
     enabled: () => !!toValue(petId),
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithForm(toValue(petId), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })
+      return updatePetWithForm(toValue(petId!), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -64,15 +70,15 @@ export function updatePetWithFormQueryOptions(
  * {@link /pet/:petId}
  */
 export function useUpdatePetWithForm<
-  TData = UpdatePetWithFormResponse,
-  TQueryData = UpdatePetWithFormResponse,
+  TData = UpdatePetWithFormStatus200,
+  TQueryData = UpdatePetWithFormStatus200,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
   options: {
-    query?: Partial<UseQueryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client }
   } = {},
 ) {
@@ -86,7 +92,7 @@ export function useUpdatePetWithForm<
       ...updatePetWithFormQueryOptions(petId, data, params, config),
       ...resolvedOptions,
       queryKey,
-    } as unknown as UseQueryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, TData, UpdatePetWithFormResponse, TQueryKey>,
+    } as unknown as UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, UpdatePetWithFormStatus200, TQueryKey>,
     toValue(queryClient),
   ) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 

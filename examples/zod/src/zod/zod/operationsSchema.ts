@@ -110,11 +110,11 @@ export type OperationsMap = Record<string, OperationSchema>
 
 export const operations = {
   getThings: {
-    request: undefined,
+    request: null,
     parameters: {
-      path: undefined,
+      path: null,
       query: getThingsQueryLimitSchema,
-      header: undefined,
+      header: null,
     },
     responses: {
       201: getThingsStatus201Schema,
@@ -138,9 +138,9 @@ export const operations = {
   updatePet: {
     request: updatePetDataSchema,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       200: updatePetStatus200Schema,
@@ -158,9 +158,9 @@ export const operations = {
   addPet: {
     request: addPetDataSchema,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       200: addPetStatus200Schema,
@@ -172,11 +172,11 @@ export const operations = {
     },
   },
   findPetsByStatus: {
-    request: undefined,
+    request: null,
     parameters: {
-      path: undefined,
+      path: null,
       query: findPetsByStatusQueryStatusSchema,
-      header: undefined,
+      header: null,
     },
     responses: {
       200: findPetsByStatusStatus200Schema,
@@ -188,9 +188,9 @@ export const operations = {
     },
   },
   findPetsByTags: {
-    request: undefined,
+    request: null,
     parameters: {
-      path: undefined,
+      path: null,
       query: findPetsByTagsQueryTagsSchema,
       header: findPetsByTagsHeaderXEXAMPLESchema,
     },
@@ -204,11 +204,11 @@ export const operations = {
     },
   },
   getPetById: {
-    request: undefined,
+    request: null,
     parameters: {
       path: getPetByIdPathPetIdSchema,
-      query: undefined,
-      header: undefined,
+      query: null,
+      header: null,
     },
     responses: {
       200: getPetByIdStatus200Schema,
@@ -222,11 +222,11 @@ export const operations = {
     },
   },
   updatePetWithForm: {
-    request: undefined,
+    request: null,
     parameters: {
       path: updatePetWithFormPathPetIdSchema,
       query: updatePetWithFormQueryNameSchema,
-      header: undefined,
+      header: null,
     },
     responses: {
       405: updatePetWithFormStatus405Schema,
@@ -237,10 +237,10 @@ export const operations = {
     },
   },
   deletePet: {
-    request: undefined,
+    request: null,
     parameters: {
       path: deletePetPathPetIdSchema,
-      query: undefined,
+      query: null,
       header: deletePetHeaderApiKeySchema,
     },
     responses: {
@@ -256,7 +256,7 @@ export const operations = {
     parameters: {
       path: uploadFilePathPetIdSchema,
       query: uploadFileQueryAdditionalMetadataSchema,
-      header: undefined,
+      header: null,
     },
     responses: {
       200: uploadFileStatus200Schema,
@@ -265,11 +265,11 @@ export const operations = {
     errors: {},
   },
   getInventory: {
-    request: undefined,
+    request: null,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       200: getInventoryStatus200Schema,
@@ -280,9 +280,9 @@ export const operations = {
   placeOrder: {
     request: placeOrderDataSchema,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       200: placeOrderStatus200Schema,
@@ -296,9 +296,9 @@ export const operations = {
   placeOrderPatch: {
     request: placeOrderPatchDataSchema,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       200: placeOrderPatchStatus200Schema,
@@ -310,11 +310,11 @@ export const operations = {
     },
   },
   getOrderById: {
-    request: undefined,
+    request: null,
     parameters: {
       path: getOrderByIdPathOrderIdSchema,
-      query: undefined,
-      header: undefined,
+      query: null,
+      header: null,
     },
     responses: {
       200: getOrderByIdStatus200Schema,
@@ -328,11 +328,11 @@ export const operations = {
     },
   },
   deleteOrder: {
-    request: undefined,
+    request: null,
     parameters: {
       path: deleteOrderPathOrderIdSchema,
-      query: undefined,
-      header: undefined,
+      query: null,
+      header: null,
     },
     responses: {
       400: deleteOrderStatus400Schema,
@@ -347,9 +347,9 @@ export const operations = {
   createUser: {
     request: createUserDataSchema,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       default: createUserResponseSchema,
@@ -359,9 +359,9 @@ export const operations = {
   createUsersWithListInput: {
     request: createUsersWithListInputDataSchema,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       200: createUsersWithListInputStatus200Schema,
@@ -370,11 +370,11 @@ export const operations = {
     errors: {},
   },
   loginUser: {
-    request: undefined,
+    request: null,
     parameters: {
-      path: undefined,
+      path: null,
       query: loginUserQueryUsernameSchema,
-      header: undefined,
+      header: null,
     },
     responses: {
       200: loginUserStatus200Schema,
@@ -386,11 +386,11 @@ export const operations = {
     },
   },
   logoutUser: {
-    request: undefined,
+    request: null,
     parameters: {
-      path: undefined,
-      query: undefined,
-      header: undefined,
+      path: null,
+      query: null,
+      header: null,
     },
     responses: {
       default: logoutUserResponseSchema,
@@ -398,11 +398,11 @@ export const operations = {
     errors: {},
   },
   getUserByName: {
-    request: undefined,
+    request: null,
     parameters: {
       path: getUserByNamePathUsernameSchema,
-      query: undefined,
-      header: undefined,
+      query: null,
+      header: null,
     },
     responses: {
       200: getUserByNameStatus200Schema,
@@ -419,8 +419,8 @@ export const operations = {
     request: updateUserDataSchema,
     parameters: {
       path: updateUserPathUsernameSchema,
-      query: undefined,
-      header: undefined,
+      query: null,
+      header: null,
     },
     responses: {
       default: updateUserResponseSchema,
@@ -428,11 +428,11 @@ export const operations = {
     errors: {},
   },
   deleteUser: {
-    request: undefined,
+    request: null,
     parameters: {
       path: deleteUserPathUsernameSchema,
-      query: undefined,
-      header: undefined,
+      query: null,
+      header: null,
     },
     responses: {
       400: deleteUserStatus400Schema,

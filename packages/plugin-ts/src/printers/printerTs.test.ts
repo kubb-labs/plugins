@@ -1,5 +1,5 @@
 import { ast } from '@kubb/core'
-import { print } from '@kubb/parser-ts'
+import { parserTs } from '@kubb/parser-ts'
 import ts from 'typescript'
 import { describe, expect, it } from 'vitest'
 import { format } from '#mocks'
@@ -14,7 +14,7 @@ const formatTS = async (node: ts.Node | null | undefined): Promise<string> => {
   if (!node) return ''
 
   const alias = ts.factory.createTypeAliasDeclaration(undefined, '_', undefined, node as ts.TypeNode)
-  const source = print(alias)
+  const source = parserTs.print(alias)
   const formatted = await format(source)
 
   return formatted
@@ -148,7 +148,7 @@ describe('printerTs', () => {
     it('ref without name returns undefined', () => {
       const result = printer.transform(ast.createSchema({ type: 'ref' }))
 
-      expect(result).toBeUndefined()
+      expect(result).toBeNull()
     })
 
     it('ref with $ref path uses canonical name from path, not node.name (Bug 1: allOf name override)', async () => {
@@ -1019,7 +1019,7 @@ describe('printerTs', () => {
         enumType: 'inlineLiteral',
         nodes: {
           array(node) {
-            const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean) as ts.TypeNode[]
+            const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean) as Array<ts.TypeNode>
             return ts.factory.createTypeReferenceNode('Set', [ts.factory.createUnionTypeNode(itemNodes)])
           },
         },

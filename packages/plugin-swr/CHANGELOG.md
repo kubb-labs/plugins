@@ -1,0 +1,1 @@
+# @kubb/plugin-swr

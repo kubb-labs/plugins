@@ -25,7 +25,7 @@ export function createUploadFileQueryAdditionalMetadata(data?: string): string {
 export function createUploadFileStatus200(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
   faker.seed([220])
 
-  return createApiResponse(data)
+  return createApiResponse(data) as UploadFileStatus200
 }
 
 export function createUploadFileData(data?: Blob): Blob {
@@ -37,5 +37,5 @@ export function createUploadFileData(data?: Blob): Blob {
 export function createUploadFileResponse(data?: Partial<UploadFileResponse>): UploadFileResponse {
   faker.seed([220])
 
-  return createUploadFileStatus200(data)
+  return createUploadFileStatus200(data) as UploadFileResponse
 }

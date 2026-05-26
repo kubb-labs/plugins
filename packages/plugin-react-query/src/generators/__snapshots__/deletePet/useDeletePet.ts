@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey } from './DeletePet'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { DeletePetResponse } from './DeletePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -20,9 +20,9 @@ export async function deletePet(
   headers?: { api_key?: DeletePetHeaderApiKey },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeletePetResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'DELETE',
     url: `/pet/${petId}`,
     ...requestConfig,
@@ -34,14 +34,17 @@ export async function deletePet(
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = deletePetMutationKey()
-  return mutationOptions<DeletePetResponse, ResponseErrorConfig<Error>, { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, TContext>(
-    {
-      mutationKey,
-      mutationFn: async ({ petId, headers }) => {
-        return deletePet(petId, headers, config)
-      },
+  return mutationOptions<
+    DeletePetStatus200,
+    ResponseErrorConfig<Error>,
+    { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
+    TContext
+  >({
+    mutationKey,
+    mutationFn: async ({ petId, headers }) => {
+      return deletePet(petId, headers, config)
     },
-  )
+  })
 }
 
 /**
@@ -50,7 +53,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Req
 export function useDeletePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      DeletePetResponse,
+      DeletePetStatus200,
       ResponseErrorConfig<Error>,
       { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
       TContext
@@ -63,18 +66,18 @@ export function useDeletePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? deletePetMutationKey()
 
   const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<
-    DeletePetResponse,
+    DeletePetStatus200,
     ResponseErrorConfig<Error>,
     { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
     TContext
   >
 
-  return useMutation<DeletePetResponse, ResponseErrorConfig<Error>, { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, TContext>(
+  return useMutation<DeletePetStatus200, ResponseErrorConfig<Error>, { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<DeletePetResponse, ResponseErrorConfig<Error>, { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, TContext>
+  ) as UseMutationResult<DeletePetStatus200, ResponseErrorConfig<Error>, { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, TContext>
 }

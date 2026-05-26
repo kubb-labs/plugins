@@ -1,37 +1,45 @@
 # Shared option: core/group
 
-# ─────────────────────────── group.* ───────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: group
 type: Group
 required: false
 description: |
-  Grouping combines files in a folder based on a specific `type`.
+  Splits generated files into subfolders based on the operation's tag, so each tag in your OpenAPI spec gets its own directory.
+
+  Without `group`, every file lands in the plugin's `output.path` folder. With `group`, files are bucketed under `{output.path}/{groupName}/`, where `groupName` is derived from the operation's first tag.
+tip: |
+  Use `group` to mirror your API's domain structure (pet, store, user) in the generated code. Combine it with `output.barrel: { type: 'named', nested: true }` to get per-tag barrel files.
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
-        code: |
-          group: {
-            type: 'tag',
-            name({ group }) {
-              return `${group}Controller`
-            }
-          }
         twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                group: {
+                  type: 'tag',
+                  name: ({ group }) => `${group}Controller`,
+                },
+              }),
+            ],
+          })
 body: |
   With the configuration above, the generator emits:
 
   ```text
-  .
-  ├── src/
-  │   └── petController/
-  │   │   ├── addPet.ts
-  │   │   └── getPet.ts
-  │   └── storeController/
-  │       ├── createStore.ts
-  │       └── getStoreById.ts
-  ├── petStore.yaml
-  ├── kubb.config.ts
-  └── package.json
+  src/gen/
+  ├── petController/
+  │   ├── AddPet.ts
+  │   └── GetPet.ts
+  └── storeController/
+      ├── CreateStore.ts
+      └── GetStoreById.ts
   ```

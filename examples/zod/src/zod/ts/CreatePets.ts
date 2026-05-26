@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.ts'
 import type { PetNotFound } from './PetNotFound.ts'
 
 /**
@@ -19,9 +20,8 @@ export type CreatePetsQueryOffset = number | undefined
 
 /**
  * @description Header parameters
- * @type string
  */
-export type CreatePetsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type CreatePetsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type any

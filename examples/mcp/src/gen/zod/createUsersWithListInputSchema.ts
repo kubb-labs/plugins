@@ -6,7 +6,11 @@
 import * as z from 'zod'
 import { userSchema } from './userSchema.js'
 
-export const createUsersWithListInputStatus200Schema = userSchema
+export const createUsersWithListInputStatus200SchemaJson = userSchema
+
+export const createUsersWithListInputStatus200SchemaXml = userSchema
+
+export const createUsersWithListInputStatus200Schema = z.union([createUsersWithListInputStatus200SchemaJson, createUsersWithListInputStatus200SchemaXml])
 
 export const createUsersWithListInputStatusDefaultSchema = z.any()
 

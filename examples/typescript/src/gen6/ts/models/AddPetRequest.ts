@@ -20,6 +20,8 @@ export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof 
  */
 export type AddPetRequest = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -36,11 +38,11 @@ export type AddPetRequest = {
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  tags?: Tag[]
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
    * @type string | undefined

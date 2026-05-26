@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetUserByNameResponse, GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
 
-export const getUserByNameSuspenseQueryKey = ({ username }: { username: GetUserByNamePathUsername }) => [{ url: '/user/:username', params: {username:username} }] as const
+export const getUserByNameSuspenseQueryKey = ({ username }: { username?: GetUserByNamePathUsername } = {}) => [{ url: '/user/:username', params: {username:username} }] as const
 
 type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQueryKey>
 
@@ -18,12 +18,12 @@ type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQuer
  * {@link /user/:username}
  */
 export async function getUserByNameSuspense({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
 
-  const res = await request<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}`, ...requestConfig })
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}`, ...requestConfig })
 
   return res.data
 }
@@ -31,8 +31,8 @@ export async function getUserByNameSuspense({ username }: { username: GetUserByN
 export function getUserByNameSuspenseQueryOptions({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getUserByNameSuspenseQueryKey({ username })
-        return queryOptions<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameResponse, typeof queryKey>({
-         enabled: !!(username),
+        return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
+
          queryKey,
          queryFn: async ({ signal }) => {
             return getUserByNameSuspense({ username }, { ...config, signal: config.signal ?? signal })
@@ -45,8 +45,8 @@ export function getUserByNameSuspenseQueryOptions({ username }: { username: GetU
  * @summary Get user by user name
  * {@link /user/:username}
  */
-export function useGetUserByNameSuspense<TData = GetUserByNameResponse, TQueryKey extends QueryKey = GetUserByNameSuspenseQueryKey>({ username }: { username: GetUserByNamePathUsername }, options: {
-  query?: Partial<UseSuspenseQueryOptions<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryKey>> & { client?: QueryClient },
+export function useGetUserByNameSuspense<TData = GetUserByNameStatus200, TQueryKey extends QueryKey = GetUserByNameSuspenseQueryKey>({ username }: { username: GetUserByNamePathUsername }, options: {
+  query?: Partial<UseSuspenseQueryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

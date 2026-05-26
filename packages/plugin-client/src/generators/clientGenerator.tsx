@@ -1,6 +1,6 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
@@ -8,13 +8,19 @@ import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
 import type { PluginClient } from '../types'
 
+/**
+ * Built-in operation generator for `@kubb/plugin-client`. Emits one async
+ * function per OpenAPI operation, plus the matching URL helper. Used when
+ * `clientType: 'function'` (the default).
+ */
 export const clientGenerator = defineGenerator<PluginClient>({
   name: 'client',
   renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { config, driver, resolver, root, inputNode } = ctx
+    if (!ast.isHttpOperationNode(node)) return null
+    const { config, driver, resolver, root } = ctx
     const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
-    const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
+    const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
 
@@ -24,14 +30,14 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
 
     const importedZodNames =
       zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(
+        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
             (name): name is string => Boolean(name),
           )
         : []
@@ -39,26 +45,20 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const meta = {
       name: resolver.resolveName(node.operationId),
       urlName: resolver.resolveUrlName(node),
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      fileTs: tsResolver.resolveFile(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        {
-          root,
-          output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
-        },
-      ),
+      file: resolver.resolveFile(operationFileEntry(node, node.operationId), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
       fileZod:
         zodResolver && pluginZod?.options
-          ? zodResolver.resolveFile(
-              { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              {
-                root,
-                output: pluginZod.options.output ?? output,
-                group: pluginZod.options?.group,
-              },
-            )
-          : undefined,
+          ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+              root,
+              output: pluginZod.options.output ?? output,
+              group: pluginZod.options?.group ?? undefined,
+            })
+          : null,
     } as const
 
     const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
@@ -68,17 +68,17 @@ export const clientGenerator = defineGenerator<PluginClient>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {importPath ? (
           <>
-            <File.Import name={'fetch'} path={importPath} />
+            <File.Import name={'client'} path={importPath} />
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={importPath} isTypeOnly />
           </>
         ) : (
           <>
-            <File.Import name={['fetch']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
+            <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
             <File.Import
               name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
               root={meta.file.path}
@@ -90,7 +90,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
         {hasFormData && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
-        {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as string[]} root={meta.file.path} path={meta.fileZod.path} />}
+        {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as Array<string>} root={meta.file.path} path={meta.fileZod.path} />}
 
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />

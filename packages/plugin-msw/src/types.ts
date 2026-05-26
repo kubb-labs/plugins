@@ -24,55 +24,64 @@ export type ResolverMsw = Resolver & {
 
 export type Options = {
   /**
-   * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'handlers', barrelType: 'named' }
+   * Where the generated MSW handlers are written and how they are exported.
+   *
+   * @default { path: 'handlers', barrel: { type: 'named' } }
    */
   output?: Output
+  /**
+   * Base URL prepended to every handler's request URL. When omitted, falls back
+   * to the adapter's server URL (typically `servers[0].url`).
+   */
   baseURL?: string
   /**
-   * Group the MSW mocks based on the provided name.
+   * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group
   /**
-   * Tags, operations, or paths to exclude from generation.
+   * Skip operations matching at least one entry in the list.
    */
   exclude?: Array<Exclude>
   /**
-   * Tags, operations, or paths to include in generation.
+   * Restrict generation to operations matching at least one entry in the list.
    */
   include?: Array<Include>
   /**
-   * Override options for specific tags, operations, or paths.
+   * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
   /**
-   * Override naming conventions for function names and types.
+   * Override how handler names and file paths are built.
    */
   resolver?: Partial<ResolverMsw> & ThisType<ResolverMsw>
   /**
-   * AST visitor to transform generated nodes.
+   * AST visitor applied to operation nodes before printing.
    */
   transformer?: ast.Visitor
   /**
-   * Create `handlers.ts` file with all handlers grouped by methods.
+   * Emit a `handlers.ts` file that re-exports every handler grouped by HTTP method.
+   * Drop the file into `setupServer(...handlers)` or `setupWorker(...handlers)`.
+   *
    * @default false
    */
   handlers?: boolean
   /**
-   * Which parser to use for generating response data.
+   * Source of the response body returned by each generated handler.
+   * - `'data'` — typed empty/example payload, ready for you to fill in from tests.
+   * - `'faker'` — value produced by `@kubb/plugin-faker`.
    *
    * @default 'data'
    */
   parser?: 'data' | 'faker'
   /**
-   * Additional generators alongside the default generators.
+   * Custom generators that run alongside the built-in MSW generators.
    */
   generators?: Array<Generator<PluginMsw>>
 }
 
 type ResolvedOptions = {
   output: Output
-  group: Group | undefined
+  group: Group | null
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>

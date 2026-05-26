@@ -10,20 +10,21 @@ type Props = {
   node: ast.OperationNode
   paramsCasing: 'camelcase' | undefined
   pathParamsType: 'object' | 'inline'
-  transformer: Transformer | undefined
+  transformer: Transformer | null | undefined
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export const mutationKeyTransformer: Transformer = ({ node, casing }) => {
+  if (!node.path) return []
   const path = new URLPath(node.path, { casing })
   return [`{ url: '${path.toURLPath()}' }`]
 }
 
-export function MutationKey({ name, paramsCasing, node, transformer = mutationKeyTransformer }: Props): KubbReactNode {
+export function MutationKey({ name, paramsCasing, node, transformer }: Props): KubbReactNode {
   const paramsNode = ast.createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = transformer({ node, casing: paramsCasing })
+  const keys = (transformer ?? mutationKeyTransformer)({ node, casing: paramsCasing })
 
   return (
     <File.Source name={name} isExportable isIndexable>

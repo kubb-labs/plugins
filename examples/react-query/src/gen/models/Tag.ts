@@ -1,15 +1,5 @@
 // version: 1.0.11
 
-/**
- * @type object
- */
-export type Tag = {
-  /**
-   * @type integer | undefined
-   */
-  id?: number
-  /**
-   * @type string | undefined
-   */
-  name?: string
-}
+import type { Category } from './Category.ts'
+
+export type Tag = Category

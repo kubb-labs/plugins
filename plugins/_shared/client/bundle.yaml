@@ -1,13 +1,32 @@
 # Shared option: client/bundle
 
-# ────────────────────────── client.bundle ──────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: bundle
 type: boolean
 required: false
 default: 'false'
-description: Controls whether the HTTP client runtime is copied into the generated `.kubb` directory.
-body: |
-  - `true` adds a `.kubb/fetch.ts` file containing the selected client template (fetch or axios). Generated clients remain self-contained.
-  - `false` keeps generated clients slim by importing the shared runtime from `@kubb/plugin-client/clients/{client}`.
-  - Override this behavior by providing a custom `client.importPath`.
+description: |
+  Copies the HTTP client runtime into the generated output, so the consuming app does not need `@kubb/plugin-client` installed at runtime.
+
+  - `false` (default) — generated files import from `@kubb/plugin-client/clients/{client}`. Smaller diff, but the package must be a runtime dependency.
+  - `true` — Kubb writes a `.kubb/client.ts` file with the client implementation. Generated code imports from that local file and the project no longer pulls `@kubb/plugin-client` at runtime.
+  - Setting `client.importPath` overrides both behaviors and uses your custom client instead.
+examples:
+  - name: Bundle the runtime
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginClient } from '@kubb/plugin-client'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginClient({
+                client: 'fetch',
+                bundle: true,
+              }),
+            ],
+          })

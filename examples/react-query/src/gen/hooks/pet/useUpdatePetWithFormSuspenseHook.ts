@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
@@ -13,11 +13,11 @@ import type {
 } from '../../models/UpdatePetWithForm.ts'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const updatePetWithFormSuspenseQueryKey = (
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
 ) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }, ...(params ? [params] : [])] as const
 
@@ -32,7 +32,7 @@ export async function updatePetWithFormSuspenseHook(
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
@@ -51,7 +51,6 @@ export function updatePetWithFormSuspenseQueryOptionsHook(
 ) {
   const queryKey = updatePetWithFormSuspenseQueryKey(pet_id, params)
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormResponse, typeof queryKey>({
-    enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
       return updatePetWithFormSuspenseHook(pet_id, params, { ...config, signal: config.signal ?? signal })

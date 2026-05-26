@@ -55,18 +55,6 @@ export function canOverrideSchema(node: ast.SchemaNode): boolean {
 }
 
 /**
- * Resolves a schema reference by looking up the referenced schema in the provided array.
- * Returns the original node if it's not a reference.
- */
-export function resolveSchemaRef(node: ast.SchemaNode, schemas: Array<ast.SchemaNode>): ast.SchemaNode {
-  if (node.type !== 'ref') {
-    return node
-  }
-
-  return schemas.find((schema) => schema.name === node.name && schema.type !== 'ref') ?? node
-}
-
-/**
  * Resolves a parameter name based on its location (path, query, header, etc.) using the provided resolver.
  */
 export function resolveParamNameByLocation(
@@ -116,15 +104,16 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
  * Returns null if no responses are provided, or embeds single simple responses inline.
  */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
-  const responses = node.responses.filter((response) => response.schema)
+  const responses = node.responses.filter((response) => response.content?.[0]?.schema)
 
   if (!responses.length) {
     return null
   }
 
   if (responses.length === 1) {
-    if (shouldInlineSingleResponseSchema(responses[0]!.schema)) {
-      return responses[0]!.schema
+    const schema = responses[0]!.content?.[0]?.schema
+    if (schema && shouldInlineSingleResponseSchema(schema)) {
+      return schema
     }
 
     return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, responses[0]!.statusCode) })
@@ -237,7 +226,7 @@ export function resolveFakerTypeUsage(
   canOverride: boolean,
 ): {
   dataType: string
-  returnType: string | undefined
+  returnType: string | null
   usesTypeName: boolean
 } {
   const isArray = ARRAY_TYPES.has(node.type)
@@ -254,7 +243,7 @@ export function resolveFakerTypeUsage(
     dataType = getScalarType(node, typeName)
   }
 
-  let returnType = canOverride ? typeName : undefined
+  let returnType = canOverride ? typeName : null
 
   if (isScalar) {
     returnType = getScalarType(node, typeName)

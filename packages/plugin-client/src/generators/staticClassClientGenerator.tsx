@@ -1,8 +1,7 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { camelCase } from '@internals/utils'
-import type { ast } from '@kubb/core'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -15,9 +14,9 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
-  zodResolver: ResolverZod | undefined
+  zodResolver: ResolverZod | null
   typeFile: ast.FileNode
-  zodFile: ast.FileNode | undefined
+  zodFile: ast.FileNode | null
 }
 
 type Controller = {
@@ -31,41 +30,49 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
-  const names: Array<string | undefined> = [
+  const names: Array<string | null | undefined> = [
     zodResolver.resolveResponseName?.(node),
-    node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined,
+    node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
 }
 
+/**
+ * Built-in `operations` generator for `@kubb/plugin-client` when
+ * `clientType: 'staticClass'`. Emits one class per tag, with a static method
+ * per operation so callers can use `Pet.getPetById(...)` without
+ * instantiating the class.
+ */
 export const staticClassClientGenerator = defineGenerator<PluginClient>({
   name: 'staticClassClient',
   renderer: jsxRendererSync,
   operations(nodes, ctx) {
-    const { config, driver, resolver, root, inputNode } = ctx
+    const { config, driver, resolver, root } = ctx
     const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath } = ctx.options
-    const baseURL = ctx.options.baseURL ?? inputNode.meta?.baseURL
+    const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
 
     const tsResolver = driver.getResolver(pluginTsName)
     const tsPluginOptions = pluginTs.options
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     function buildOperationData(node: ast.OperationNode): OperationData {
-      const typeFile = tsResolver.resolveFile(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: tsPluginOptions?.output ?? output, group: tsPluginOptions?.group },
-      )
+      const typeFile = tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+        root,
+        output: tsPluginOptions?.output ?? output,
+        group: tsPluginOptions?.group,
+      })
       const zodFile =
         zodResolver && pluginZod?.options
-          ? zodResolver.resolveFile(
-              { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-              { root, output: pluginZod.options?.output ?? output, group: pluginZod.options?.group },
-            )
-          : undefined
+          ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+              root,
+              output: pluginZod.options?.output ?? output,
+              group: pluginZod.options?.group ?? undefined,
+            })
+          : null
 
       return {
         node: node,
@@ -78,12 +85,13 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     }
 
     const controllers = nodes.reduce((acc, operationNode) => {
+      if (!ast.isHttpOperationNode(operationNode)) return acc
       const tag = operationNode.tags[0]
       const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
 
       if (!tag && !group) {
         const name = resolver.resolveClassName('ApiClient')
-        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group })
+        const file = resolver.resolveFile({ name, extname: '.ts' }, { root, output, group: group ?? undefined })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
 
@@ -92,9 +100,12 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
         } else {
           acc.push({ name, file, operations: [operationData] })
         }
-      } else if (tag) {
+        return acc
+      }
+
+      if (tag) {
         const name = groupName
-        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
+        const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
         const operationData = buildOperationData(operationNode)
         const previous = acc.find((item) => item.file.path === file.path)
 
@@ -161,18 +172,18 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(inputNode, { output, config })}
-              footer={resolver.resolveFooter(inputNode, { output, config })}
+              banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
+              footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
             >
               {importPath ? (
                 <>
-                  <File.Import name={'fetch'} path={importPath} />
+                  <File.Import name={'client'} path={importPath} />
                   <File.Import name={['mergeConfig']} path={importPath} />
                   <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={importPath} isTypeOnly />
                 </>
               ) : (
                 <>
-                  <File.Import name={['fetch']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
+                  <File.Import name={['client']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
                   <File.Import name={['mergeConfig']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
                   <File.Import
                     name={['Client', 'RequestConfig', 'ResponseErrorConfig']}

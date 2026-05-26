@@ -1,6 +1,6 @@
 {
   "name": "tests-3.0.x",
-  "version": "0.0.1-beta.7",
+  "version": "0.0.1-beta.15",
   "private": true,
   "description": "Integration tests for OpenAPI 3.0.x",
   "repository": {
@@ -26,6 +26,7 @@
     "@kubb/plugin-mcp": "workspace:*",
     "@kubb/plugin-msw": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
+    "@kubb/plugin-swr": "workspace:*",
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-valibot": "workspace:*",

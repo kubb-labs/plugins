@@ -4,6 +4,37 @@ $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/
 name: path
 type: string
 required: true
-description: Output directory or file for the generated code, relative to the global `output.path`.
+description: |
+  Folder (or single file) where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
+
+  Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). Use a single file when you want everything in one place, for example `'api.ts'`.
 tip: |
-  if `output.path` is a file, `group` cannot be used.
+  When `output.path` points to a single file, the `group` option cannot be used because every operation ends up in the same file.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { path: './types' },
+              }),
+            ],
+          })
+  - name: Resulting tree
+    files:
+      - lang: text
+        twoslash: false
+        code: |
+          src/
+          └── gen/
+              └── types/
+                  ├── Pet.ts
+                  └── Store.ts

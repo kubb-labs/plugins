@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from './CreateUsersWithListInput'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from './CreateUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
@@ -21,11 +21,11 @@ export async function createUsersWithListInput(
   data?: CreateUsersWithListInputData,
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = CreateUsersWithListInputData.parse(data)
 
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
     url: `/user/createWithList`,
     data: requestData,
@@ -40,7 +40,7 @@ export function createUsersWithListInputQueryOptions(
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey(data)
-  return queryOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputResponse, typeof queryKey>({
+  return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return createUsersWithListInput(data, { ...config, signal: config.signal ?? signal })
@@ -52,13 +52,15 @@ export function createUsersWithListInputQueryOptions(
  * {@link /user/createWithList}
  */
 export function useCreateUsersWithListInput<
-  TData = CreateUsersWithListInputResponse,
-  TQueryData = CreateUsersWithListInputResponse,
+  TData = CreateUsersWithListInputStatus200,
+  TQueryData = CreateUsersWithListInputStatus200,
   TQueryKey extends QueryKey = CreateUsersWithListInputQueryKey,
 >(
   data?: CreateUsersWithListInputData,
   options: {
-    query?: Partial<QueryObserverOptions<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client }
   } = {},
 ) {

@@ -1,6 +1,6 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
-import { ast, definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { ast, definePlugin } from '@kubb/core'
 import { pluginClientName } from '@kubb/plugin-client'
 import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
 import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
@@ -13,8 +13,36 @@ import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './gen
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-vue-query`. Used for driver lookups
+ * and cross-plugin dependency references.
+ */
 export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['name']
 
+/**
+ * Generates one TanStack Query composable per OpenAPI operation for Vue's
+ * Composition API. Queries become `useFooQuery` (and optionally
+ * `useFooInfiniteQuery`); mutations become `useFooMutation`. Each composable
+ * is fully typed end to end.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginVueQuery } from '@kubb/plugin-vue-query'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginVueQuery({
+ *       output: { path: './hooks' },
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   const {
     output = { path: 'hooks', barrelType: 'named' },
@@ -22,7 +50,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = 'client',
+    parser = false,
     infinite = false,
     paramsType = 'inline',
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
@@ -44,19 +72,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     options.generators ??
     [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
 
   return {
     name: pluginVueQueryName,
@@ -99,9 +115,9 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
             ? {
                 queryParam: 'id',
                 initialPageParam: 0,
-                cursorParam: undefined,
-                nextParam: undefined,
-                previousParam: undefined,
+                cursorParam: null,
+                nextParam: null,
+                previousParam: null,
                 ...infinite,
               }
             : false,
@@ -132,11 +148,11 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
 
         if (client?.bundle && !hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
-            baseName: 'fetch.ts',
-            path: path.resolve(root, '.kubb/fetch.ts'),
+            baseName: 'client.ts',
+            path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
-                name: 'fetch',
+                name: 'client',
                 nodes: [ast.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
                 isExportable: true,
                 isIndexable: true,

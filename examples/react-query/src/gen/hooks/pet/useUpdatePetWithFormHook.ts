@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
@@ -13,11 +13,11 @@ import type {
 } from '../../models/UpdatePetWithForm.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const updatePetWithFormQueryKey = (
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
 ) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }, ...(params ? [params] : [])] as const
 
@@ -32,7 +32,7 @@ export async function updatePetWithFormHook(
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
@@ -45,7 +45,7 @@ export async function updatePetWithFormHook(
 }
 
 export function updatePetWithFormQueryOptionsHook(
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
@@ -54,7 +54,7 @@ export function updatePetWithFormQueryOptionsHook(
     enabled: !!pet_id,
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithFormHook(pet_id, params, { ...config, signal: config.signal ?? signal })
+      return updatePetWithFormHook(pet_id!, params, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -68,7 +68,7 @@ export function useUpdatePetWithFormHook<
   TQueryData = UpdatePetWithFormResponse,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  pet_id: UpdatePetWithFormPathPetId,
+  pet_id?: UpdatePetWithFormPathPetId,
   params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
   options: {
     query?: Partial<QueryObserverOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, TData, TQueryData, TQueryKey>> & {

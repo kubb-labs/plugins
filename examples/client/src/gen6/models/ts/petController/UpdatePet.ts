@@ -8,7 +8,14 @@ import type { Pet } from '../Pet.ts'
 /**
  * @type object
  */
-export type UpdatePetStatus200 = Pet
+export type UpdatePetStatus200Json = Pet
+
+/**
+ * @type object
+ */
+export type UpdatePetStatus200Xml = Pet
+
+export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
 /**
  * @type any

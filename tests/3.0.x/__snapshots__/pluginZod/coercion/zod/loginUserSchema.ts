@@ -9,7 +9,11 @@ export const loginUserQueryUsernameSchema = z.coerce.string().optional().describ
 
 export const loginUserQueryPasswordSchema = z.coerce.string().optional().describe("The password for login in clear text")
 
-export const loginUserStatus200Schema = z.coerce.string()
+export const loginUserStatus200SchemaXml = z.coerce.string()
+
+export const loginUserStatus200SchemaJson = z.coerce.string()
+
+export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, loginUserStatus200SchemaJson])
 
 export const loginUserStatus400Schema = z.any()
 

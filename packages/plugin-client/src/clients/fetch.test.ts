@@ -20,7 +20,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({ success: true }),
       })
@@ -52,7 +52,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({ success: true }),
       })
@@ -89,7 +89,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({ success: true }),
       })
@@ -112,7 +112,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({ success: true }),
       })
@@ -134,7 +134,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({ data: 'test' }),
       })
@@ -157,7 +157,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({}),
       })
@@ -175,7 +175,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({}),
       })
@@ -198,7 +198,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({}),
       })
@@ -225,7 +225,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 204,
         statusText: 'No Content',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: null,
       })
 
@@ -242,7 +242,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({}),
       })
@@ -266,7 +266,7 @@ describe('fetch client', () => {
       mockFetch.mockResolvedValue({
         status: 200,
         statusText: 'OK',
-        headers: new Headers(),
+        headers: new Headers({ 'Content-Type': 'application/json' }),
         body: {},
         json: async () => ({}),
       })
@@ -284,6 +284,93 @@ describe('fetch client', () => {
           headers: {},
         }),
       )
+    })
+  })
+
+  describe('response parsing', () => {
+    it('parses a text/plain response as text via Content-Type auto-detection', async () => {
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers({ 'Content-Type': 'text/plain' }),
+        body: {},
+        text: async () => 'hello world',
+        json: async () => {
+          throw new Error('should not be called')
+        },
+      })
+
+      const response = await client({ url: '/api/text', method: 'GET' })
+
+      expect(response.data).toBe('hello world')
+    })
+
+    it('parses an application/octet-stream response as a blob via Content-Type auto-detection', async () => {
+      const blob = new Blob(['binary'])
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers({ 'Content-Type': 'application/octet-stream' }),
+        body: {},
+        blob: async () => blob,
+      })
+
+      const response = await client({ url: '/api/download', method: 'GET' })
+
+      expect(response.data).toBe(blob)
+    })
+
+    it('honors an explicit responseType over the Content-Type header', async () => {
+      const blob = new Blob(['binary'])
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        body: {},
+        blob: async () => blob,
+        json: async () => {
+          throw new Error('should not be called')
+        },
+      })
+
+      const response = await client({ url: '/api/download', method: 'GET', responseType: 'blob' })
+
+      expect(response.data).toBe(blob)
+    })
+
+    it('encodes a plain object as URLSearchParams for application/x-www-form-urlencoded', async () => {
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers({ 'Content-Type': 'application/json' }),
+        body: {},
+        json: async () => ({}),
+      })
+
+      await client({
+        url: '/api/form',
+        method: 'POST',
+        data: { name: 'John', age: 30 },
+        contentType: 'application/x-www-form-urlencoded',
+      })
+
+      const callArgs = mockFetch.mock.calls[0]
+      expect(callArgs?.[1]?.body).toBeInstanceOf(URLSearchParams)
+      expect((callArgs?.[1]?.body as URLSearchParams).toString()).toBe('name=John&age=30')
+    })
+
+    it('falls back to JSON.parse on the text body when no Content-Type header is present', async () => {
+      mockFetch.mockResolvedValue({
+        status: 200,
+        statusText: 'OK',
+        headers: new Headers(),
+        body: {},
+        text: async () => '{"parsed":true}',
+      })
+
+      const response = await client({ url: '/api/unknown', method: 'GET' })
+
+      expect(response.data).toEqual({ parsed: true })
     })
   })
 })

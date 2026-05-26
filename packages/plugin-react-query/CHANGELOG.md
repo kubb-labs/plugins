@@ -1,5 +1,159 @@
 # @kubb/plugin-react-query
 
+## 5.0.0-beta.31
+
+### Minor Changes
+
+- [#223](https://github.com/kubb-labs/plugins/pull/223) [`682b463`](https://github.com/kubb-labs/plugins/commit/682b4634ffcff48d8e1c6622e514ab49f2eae381) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rename the client `parser` option value `'client'` to `false`. The client has no runtime parser — it returns the response cast to the generated TypeScript type — so `false` (no validator) is clearer than `'client'`. `parser: 'zod'` is unchanged.
+
+  Migration: replace `parser: 'client'` with `parser: false` (or drop it, since `false` is the default) in `pluginClient`, `pluginReactQuery`, and `pluginVueQuery`.
+
+### Patch Changes
+
+- [#238](https://github.com/kubb-labs/plugins/pull/238) [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.
+
+- [#251](https://github.com/kubb-labs/plugins/pull/251) [`2e69cfa`](https://github.com/kubb-labs/plugins/commit/2e69cfae618a561321518ac8bc2d826054dec844) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Don't emit an `enabled` guard in generated suspense query options.
+
+  `useSuspenseQuery`/`useSuspenseInfiniteQuery` always run, and TanStack Query
+  types `UseSuspenseQueryOptions` as `Omit<UseQueryOptions, 'enabled' | ...>`, so
+  an `enabled` option is invalid for suspense hooks. The generated
+  `<op>SuspenseQueryOptions` and `<op>SuspenseInfiniteQueryOptions` functions no
+  longer include `enabled`. Regular `useQuery`/`useInfiniteQuery` options are
+  unchanged.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the per-plugin `group` naming block (duplicated verbatim across nine plugins) with a shared `createGroupConfig` helper from `@internals/shared`. Each plugin's grouping behavior is preserved exactly — the `Controller`/`Requests` suffix and whether a user-provided `group.name` is honored are passed as options — so generated output is unchanged. Internal refactor only.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`0ca63ab`](https://github.com/kubb-labs/plugins/commit/0ca63ab8f6c34a51936d355969a3d1b6f6c98708) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the `resolver.resolveFile` entry object — duplicated 44 times across the client and query operation generators — with a shared `operationFileEntry(node, name)` helper from `@internals/shared`. The helper returns the same `{ name, extname: '.ts', tag, path }` params, so generated output is unchanged. Internal refactor only.
+
+- [#253](https://github.com/kubb-labs/plugins/pull/253) [`99c0ec9`](https://github.com/kubb-labs/plugins/commit/99c0ec9ef9fb2036cdf63eadd7e388cc23d3870b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Make `enabled`-guarded params optional in generated query signatures (type-only).
+
+  Query and infinite-query options emit an `enabled` guard derived from the required
+  path/query params (`enabled: !!petId`), but those params stayed required in the
+  type, so callers could never pass `undefined` to reach the disabled state the guard
+  already implements (kubb-labs/plugins#60).
+
+  Those params are now optional in the generated `queryKey`, `queryOptions`, and hook
+  signatures, and the `queryFn` calls the client with a non-null assertion (`petId!`).
+  The `enabled` guard is unchanged, and since `?`/`!` are erased at compile time the
+  emitted runtime is identical — this is a type-only change. Suspense hooks (which
+  cannot be disabled) keep their params required.
+
+  ```ts
+  // now type-checks; the query stays disabled until petId is defined
+  useGetPetById({ petId: route.params.petId });
+  ```
+
+- Updated dependencies [[`682b463`](https://github.com/kubb-labs/plugins/commit/682b4634ffcff48d8e1c6622e514ab49f2eae381), [`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea), [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374), [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf), [`0ca63ab`](https://github.com/kubb-labs/plugins/commit/0ca63ab8f6c34a51936d355969a3d1b6f6c98708), [`4c08e4c`](https://github.com/kubb-labs/plugins/commit/4c08e4c5082410871e0ccb7274343738d1f7b3ff)]:
+  - @kubb/plugin-client@5.0.0-beta.31
+  - @kubb/plugin-ts@5.0.0-beta.31
+  - @kubb/plugin-zod@5.0.0-beta.31
+
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`21accf1`](https://github.com/kubb-labs/plugins/commit/21accf11be058a252aded049a5d98e30eb6b4c32)]:
+  - @kubb/plugin-ts@5.0.0-beta.30
+  - @kubb/plugin-client@5.0.0-beta.30
+  - @kubb/plugin-zod@5.0.0-beta.30
+
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#226](https://github.com/kubb-labs/plugins/pull/226) [`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.29 core dependency update.
+
+- Updated dependencies [[`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a)]:
+  - @kubb/plugin-client@5.0.0-beta.29
+  - @kubb/plugin-ts@5.0.0-beta.29
+  - @kubb/plugin-zod@5.0.0-beta.29
+
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+### Patch Changes
+
+- [#212](https://github.com/kubb-labs/plugins/pull/212) [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Standardize the generated HTTP-client runtime on the export name `client`.
+
+  Previously the request function was exported under mismatched names (`fetch` in some places, `client` in others), so with `bundle: true` the generated root barrel emitted `export { client } from './.kubb/client.ts'` while the runtime only exported `fetch`, causing `TS2724`. The runtime now consistently exports `client` across the `fetch` and `axios` adapters, and the bundled client file is always written to `.kubb/client.ts` (react-query, vue-query, and mcp previously wrote `.kubb/fetch.ts`). Generated code imports and calls `client` accordingly.
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d), [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd)]:
+  - @kubb/plugin-client@5.0.0-beta.28
+  - @kubb/plugin-ts@5.0.0-beta.28
+  - @kubb/plugin-zod@5.0.0-beta.28
+
+## 5.0.0-beta.27
+
+### Minor Changes
+
+- [#204](https://github.com/kubb-labs/plugins/pull/204) [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Client functions and TanStack mutation/query `TData` now reference the union of `2xx` response types only (e.g. `AddPetStatus200`) instead of the full response alias (`AddPetMutation` / `AddPetQueryResponse`), which previously also included `4xx`/`5xx` shapes.
+
+  This aligns the generated code with TanStack Query's contract that `TData` is the resolved success value while errors flow through `TError`. The previous behavior forced `as` casts at call sites because the success body was unioned with error bodies.
+
+  If your HTTP client returns non-`2xx` bodies as resolved data instead of throwing, narrow with a type guard at the call site or wrap the client to throw on error responses. Fixes [#16](https://github.com/kubb-labs/plugins/issues/16).
+
+### Patch Changes
+
+- Updated dependencies [[`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7), [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877), [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c)]:
+  - @kubb/plugin-client@5.0.0-beta.27
+  - @kubb/plugin-ts@5.0.0-beta.27
+  - @kubb/plugin-zod@5.0.0-beta.27
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- [#195](https://github.com/kubb-labs/plugins/pull/195) [`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Enforce `Array<T>` syntax (over `T[]`) via the oxlint `typescript/array-type` rule. Internal-only change; no runtime or API impact.
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync with kubb
+
+- Updated dependencies [[`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65), [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac), [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c), [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b), [`9de6534`](https://github.com/kubb-labs/plugins/commit/9de653476daefd588633ec4b12551c72b8c88965), [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3)]:
+  - @kubb/plugin-client@5.0.0-beta.25
+  - @kubb/plugin-ts@5.0.0-beta.25
+  - @kubb/plugin-zod@5.0.0-beta.25
+
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync between core with same version
+
+- Updated dependencies [[`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b)]:
+  - @kubb/plugin-client@5.0.0-beta.22
+  - @kubb/plugin-ts@5.0.0-beta.22
+  - @kubb/plugin-zod@5.0.0-beta.22
+
+## 5.0.0-beta.15
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
+- Updated dependencies [[`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f)]:
+  - @kubb/plugin-client@5.0.0-beta.15
+  - @kubb/plugin-ts@5.0.0-beta.15
+  - @kubb/plugin-zod@5.0.0-beta.15
+
 ## 5.0.0-beta.10
 
 ### Patch Changes

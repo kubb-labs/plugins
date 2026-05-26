@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-vue-query
 name: Vue Query
-description: Generate Vue Query composables from OpenAPI specifications.
+description: Generate TanStack Query composables for Vue (useQuery, useMutation, useInfiniteQuery) from OpenAPI.
 category: framework
 type: official
 npmPackage: '@kubb/plugin-vue-query'
@@ -38,14 +38,16 @@ icon:
 intro: |
   # @kubb/plugin-vue-query
 
-  Generate type-safe Vue Query composables from your OpenAPI schema for data fetching, caching, and synchronization.
+  Generate one [TanStack Query](https://tanstack.com/query) composable per OpenAPI operation, ready to use inside Vue's Composition API. Queries become `useFooQuery` (and optionally `useFooInfiniteQuery`); mutations become `useFooMutation`. Each composable is fully typed end to end.
+
+  Pairs with `@kubb/plugin-client` for the HTTP layer and `@kubb/plugin-ts` for types.
 
 options:
   - name: output
     type: Output
     required: false
     default: "{ path: 'hooks', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated composables are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'hooks'"
@@ -63,12 +65,15 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. This is used for file and identifier generation.
+        description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: client
     type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
     required: false
-    description: Client configuration for HTTP request generation.
+    description: |
+      HTTP client used inside every generated composable. Each composable calls into this client to perform the request.
+
+      Mirrors a subset of `pluginClient` options. Set these here when the Vue composables need different client behavior than the rest of your app.
     properties:
       - extends: ./_shared/client/import-path.yaml
       - extends: ./_shared/client/data-return-type.yaml
@@ -86,33 +91,18 @@ options:
     required: false
     default: 'false'
     description: |
-      Generate an `infiniteQuery` composable for paginated queries. Pass `false` to disable.
+      Enables `useInfiniteQuery` composables for cursor- or page-based pagination. Pass an object to configure how the cursor is read from the response; pass `false` (default) to skip.
     typeDefinition: |
       type Infinite = {
-        /**
-         * Specify the params key used for `pageParam`.
-         * @default `'id'`
-         */
+        /** Query-param key used as the page cursor. Defaults to `'id'`. */
         queryParam: string
-        /**
-         * Which field of the data will be used, set it to undefined when no cursor is known.
-         * @deprecated Use `nextParam` and `previousParam` instead for more flexible pagination handling.
-         */
-        cursorParam?: string | undefined
-        /**
-         * Which field of the data will be used to get the cursor for the next page.
-         * Supports dot notation (e.g. 'pagination.next.id') or array path (e.g. ['pagination', 'next', 'id']) to access nested fields.
-         */
-        nextParam?: string | string[] | undefined
-        /**
-         * Which field of the data will be used to get the cursor for the previous page.
-         * Supports dot notation (e.g. 'pagination.prev.id') or array path (e.g. ['pagination', 'prev', 'id']) to access nested fields.
-         */
-        previousParam?: string | string[] | undefined
-        /**
-         * The initial value, the value of the first page.
-         * @default `0`
-         */
+        /** @deprecated Use `nextParam` / `previousParam` instead. */
+        cursorParam?: string
+        /** Path to the next-page cursor in the response. Dot or array form. */
+        nextParam?: string | string[]
+        /** Path to the previous-page cursor in the response. Dot or array form. */
+        previousParam?: string | string[]
+        /** Value of `pageParam` for the first page. Defaults to `0`. */
         initialPageParam: unknown
       } | false
     properties:
@@ -120,50 +110,42 @@ options:
         type: string
         required: false
         default: "'id'"
-        description: Specify the params key used for `pageParam`.
+        description: Name of the query parameter that holds the page cursor.
       - name: initialPageParam
         type: unknown
         required: false
         default: '0'
-        description: Specify the initial page param value.
+        description: Initial value for `pageParam` on the first fetch.
       - name: cursorParam
         type: 'string | undefined'
         required: false
         deprecated:
-          note: '`cursorParam` is deprecated. Use `nextParam` and `previousParam` instead for more flexible pagination handling.'
-        description: Which field of the data will be used, set it to undefined when no cursor is known.
+          note: '`cursorParam` is deprecated. Use `nextParam` and `previousParam` for richer pagination control.'
+        description: Path to the cursor field on the response. Leave undefined when the cursor is not known.
       - name: nextParam
         type: 'string | string[] | undefined'
         required: false
         description: |
-          Which field of the data will be used to get the cursor for the next page.
-
-          Supports dot notation (e.g. `'pagination.next.id'`) or array path (e.g. `['pagination', 'next', 'id']`) to access nested fields.
+          Path to the next-page cursor on the response. Supports dot notation (`'pagination.next.id'`) or array form (`['pagination', 'next', 'id']`).
       - name: previousParam
         type: 'string | string[] | undefined'
         required: false
         description: |
-          Which field of the data will be used to get the cursor for the previous page.
-
-          Supports dot notation (e.g. `'pagination.prev.id'`) or array path (e.g. `['pagination', 'prev', 'id']`) to access nested fields.
+          Path to the previous-page cursor on the response. Supports dot notation (`'pagination.prev.id'`) or array form.
 
   - name: queryKey
     type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
     required: false
     description: |
-      Customize the queryKey that will be used for the query.
+      Builds the `queryKey` for each generated composable. Use this to add a version namespace, swap to operation IDs, or shape keys to match an existing invalidation strategy.
 
-      The function receives an object with:
-      - `operation`: The OpenAPI operation object with methods like `getTags()`, `getOperationId()`, etc.
-      - `schemas`: An object containing operation schemas including `pathParams`, `queryParams`, `request`, `response`, etc.
+      The callback receives the OpenAPI `operation` and a `schemas` object containing `pathParams`, `queryParams`, `request`, and `response`.
     warning: |
-      When using a string you need to use `JSON.stringify`.
+      String values are inlined verbatim into generated code. Wrap any literal string in `JSON.stringify(...)`.
     details:
-      - title: Using tags and path parameters
+      - title: Keys from tags and path parameters
         body: |-
-          Generate a queryKey with operation tags and path parameters:
-
-          For a GET operation with tags `["user"]` and path parameter `username`, this generates:
+          Build a key from the operation's first tag plus its path parameters:
         codeBlock:
           - lang: typescript
             code: |-
@@ -171,12 +153,13 @@ options:
               import { pluginVueQuery } from '@kubb/plugin-vue-query'
 
               export default defineConfig({
-                // ...
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
                 plugins: [
                   pluginVueQuery({
                     queryKey: ({ operation, schemas }) => {
-                      const tags = operation.getTags().map(tag => JSON.stringify(tag.name))
-                      const pathParams = schemas.pathParams?.keys || []
+                      const tags = operation.getTags().map((tag) => JSON.stringify(tag.name))
+                      const pathParams = schemas.pathParams?.keys ?? []
                       return [...tags, ...pathParams]
                     },
                   }),
@@ -184,13 +167,11 @@ options:
               })
           - lang: typescript
             code: |-
-              export const getUserByNameQueryKey = ({ username }: { username: GetUserByNamePathParams["username"] }) =>
+              export const getUserByNameQueryKey = ({ username }: { username: GetUserByNamePathParams['username'] }) =>
                 ['user', username] as const
-      - title: Using the default transformer
+      - title: Extend the default transformer
         body: |-
-          You can extend the default queryKey transformer:
-
-          This prepends a version to the default queryKey:
+          Prepend a version prefix to the default query key:
         codeBlock:
           - lang: typescript
             code: |-
@@ -199,7 +180,8 @@ options:
               import { QueryKey } from '@kubb/plugin-vue-query/components'
 
               export default defineConfig({
-                // ...
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
                 plugins: [
                   pluginVueQuery({
                     queryKey: (props) => {
@@ -213,9 +195,7 @@ options:
             code: |-
               export const findPetsByTagsQueryKey = (params?: FindPetsByTagsQueryParams) =>
                 ['v5', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
-      - title: Using operation ID
-        body: |-
-          Create a simple queryKey using the operation ID:
+      - title: Key from operationId
         codeBlock:
           lang: typescript
           code: |-
@@ -223,18 +203,15 @@ options:
             import { pluginVueQuery } from '@kubb/plugin-vue-query'
 
             export default defineConfig({
-              // ...
+              input: { path: './petStore.yaml' },
+              output: { path: './src/gen' },
               plugins: [
                 pluginVueQuery({
-                  queryKey: ({ operation }) => {
-                    return [JSON.stringify(operation.getOperationId())]
-                  },
+                  queryKey: ({ operation }) => [JSON.stringify(operation.getOperationId())],
                 }),
               ],
             })
-      - title: Conditional keys based on parameters
-        body: |-
-          Include query parameters when they exist:
+      - title: Conditional keys based on params
         codeBlock:
           lang: typescript
           code: |-
@@ -242,18 +219,17 @@ options:
             import { pluginVueQuery } from '@kubb/plugin-vue-query'
 
             export default defineConfig({
-              // ...
+              input: { path: './petStore.yaml' },
+              output: { path: './src/gen' },
               plugins: [
                 pluginVueQuery({
                   queryKey: ({ operation, schemas }) => {
-                    const keys = [JSON.stringify(operation.getOperationId())]
+                    const keys: unknown[] = [JSON.stringify(operation.getOperationId())]
 
-                    // Add path parameter values (without quotes, so they reference the variables)
                     if (schemas.pathParams?.keys) {
                       keys.push(...schemas.pathParams.keys)
                     }
 
-                    // Add query params conditionally (the string gets embedded as code)
                     if (schemas.queryParams?.name) {
                       keys.push('...(params ? [params] : [])')
                     }
@@ -268,9 +244,7 @@ options:
     type: Query
     required: false
     description: |
-      Override some `useQuery` behaviors.
-
-      To disable the creation of hooks pass `false`, this will result in only creating `queryOptions`.
+      Configures the query composables. Pass `false` to skip composable generation and emit only `queryOptions(...)` helpers.
     typeDefinition: |
       type Query = {
         methods: Array<HttpMethod>
@@ -278,23 +252,18 @@ options:
       } | false
     properties:
       - extends: ./_shared/core/query-methods.yaml
-        name: methods
       - name: importPath
         type: string
         required: false
         default: "'@tanstack/vue-query'"
         description: |
-          Path to the `useQuery` that will be used to do the `useQuery` functionality.
-
-          It will be used as `import { useQuery } from '${hook.importPath}'`. It allows both relative and absolute paths. The path will be applied as is, so relative paths should be based on the file being generated.
+          Module specifier used in the `import { useQuery } from '...'` statement at the top of every generated composable file. Useful for routing through your own wrapper.
 
   - name: mutation
     type: Mutation
     required: false
     description: |
-      Override some `useMutation` behaviors.
-
-      To disable queries pass `false`.
+      Configures mutation composables. Set to `false` to skip mutation generation.
     typeDefinition: |
       type Mutation = {
         methods: Array<HttpMethod>
@@ -302,22 +271,20 @@ options:
       } | false
     properties:
       - extends: ./_shared/core/mutation-methods.yaml
-        name: methods
       - name: importPath
         type: string
         required: false
         default: "'@tanstack/vue-query'"
         description: |
-          Path to the `useMutation` that will be used to do the `useMutation` functionality.
-
-          It will be used as `import { useMutation } from '${hook.importPath}'`. It allows both relative and absolute paths. The path will be applied as is, so relative paths should be based on the file being generated.
+          Module specifier used in the `import { useMutation } from '...'` statement at the top of every generated composable file.
 
   - name: mutationKey
     type: '(props: { operation: Operation; schemas: OperationSchemas }) => unknown[]'
     required: false
-    description: Customize the mutationKey.
+    description: |
+      Builds the `mutationKey` for each mutation composable. Useful when you batch invalidations or read mutation state via `useMutationState`.
     warning: |
-      When using a string you need to use `JSON.stringify`.
+      String values are inlined verbatim into generated code. Wrap any literal string in `JSON.stringify(...)`.
 
   - extends: ./_shared/core/include.yaml
   - extends: ./_shared/core/exclude.yaml
@@ -329,48 +296,46 @@ options:
   - name: resolver
     type: 'Partial<ResolverVueQuery>'
     required: false
-    description: Override individual resolver methods to customize naming conventions.
+    description: |
+      Overrides naming and path resolution for the generated composables. Supply only the methods you want to change; everything else falls back to the default resolver.
 
   - name: transformer
     type: ast.Visitor
     required: false
-    description: Single AST visitor applied to each node before printing.
+    description: |
+      AST visitor applied to operation nodes before code is printed. Use this to rewrite operation IDs, tags, or descriptions across the entire output.
+
+notes:
+  - type: tip
+    body: |
+      Reference: [TanStack Query for Vue](https://tanstack.com/query/latest/docs/framework/vue/overview) for cache, retries, and devtools.
 examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginTs } from '@kubb/plugin-ts'
           import { pluginVueQuery } from '@kubb/plugin-vue-query'
 
           export default defineConfig({
-            input: {
-              path: './petStore.yaml',
-            },
-            output: {
-              path: './src/gen',
-            },
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
             plugins: [
               pluginTs(),
               pluginVueQuery({
-                output: {
-                  path: './hooks',
-                },
+                output: { path: './hooks' },
                 group: {
                   type: 'tag',
                   name: ({ group }) => `${group}Hooks`,
                 },
-                client: {
-                  dataReturnType: 'full',
-                },
-                mutation: {
-                  methods: ['post', 'put', 'delete'],
-                },
+                client: { dataReturnType: 'full' },
+                mutation: { methods: ['post', 'put', 'delete'] },
                 infinite: {
                   queryParam: 'next_page',
                   initialPageParam: 0,
-                  cursorParam: 'nextCursor',
+                  nextParam: 'pagination.next.cursor',
                 },
                 query: {
                   methods: ['get'],
@@ -379,4 +344,3 @@ examples:
               }),
             ],
           })
-        twoslash: false

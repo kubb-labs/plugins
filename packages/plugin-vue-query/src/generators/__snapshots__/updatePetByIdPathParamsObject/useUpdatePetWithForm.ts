@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId } from './UpdatePetWithForm'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { useMutation } from '@tanstack/vue-query'
 
@@ -21,11 +21,11 @@ export async function updatePetWithForm(
   data?: UpdatePetWithFormData,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = UpdatePetWithFormData.parse(data)
 
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
+  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
     url: `/pet/${petId}`,
     data: requestData,
@@ -41,7 +41,7 @@ export async function updatePetWithForm(
 export function useUpdatePetWithForm<TContext>(
   options: {
     mutation?: MutationObserverOptions<
-      UpdatePetWithFormResponse,
+      UpdatePetWithFormStatus200,
       ResponseErrorConfig<Error>,
       { petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>; data?: MaybeRefOrGetter<UpdatePetWithFormData> },
       TContext
@@ -53,7 +53,7 @@ export function useUpdatePetWithForm<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updatePetWithFormMutationKey()
 
-  return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData }, TContext>(
+  return useMutation<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData }, TContext>(
     {
       mutationFn: async ({ petId, data }) => {
         return updatePetWithForm({ petId }, data, config)

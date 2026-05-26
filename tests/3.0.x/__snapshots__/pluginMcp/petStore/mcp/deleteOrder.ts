@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -14,7 +14,7 @@ export async function deleteOrderHandler({ orderId }: { orderId: DeleteOrderPath
 
 
 
-  const res = await fetch<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: "DELETE", url: `/store/order/${orderId}` }, request)
+  const res = await client<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: "DELETE", url: `/store/order/${orderId}` }, request)
 
   return {
               content: [

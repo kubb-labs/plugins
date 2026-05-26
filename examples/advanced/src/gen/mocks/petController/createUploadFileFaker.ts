@@ -14,7 +14,7 @@ export function createUploadFileQueryAdditionalMetadataFaker(data?: string): str
  * @description successful operation
  */
 export function createUploadFileStatus200Faker(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
-  return createApiResponseFaker(data)
+  return createApiResponseFaker(data) as UploadFileStatus200
 }
 
 export function createUploadFileDataFaker(data?: Blob): Blob {
@@ -22,5 +22,5 @@ export function createUploadFileDataFaker(data?: Blob): Blob {
 }
 
 export function createUploadFileResponseFaker(data?: Partial<UploadFileResponse>): UploadFileResponse {
-  return createUploadFileStatus200Faker(data)
+  return createUploadFileStatus200Faker(data) as UploadFileResponse
 }

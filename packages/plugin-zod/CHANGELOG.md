@@ -1,5 +1,94 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.31
+
+### Minor Changes
+
+- [#221](https://github.com/kubb-labs/plugins/pull/221) [`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Support multiple content types on requests and responses.
+  - `plugin-ts` now emits a union of per-content-type variants for responses that declare more than one content type (e.g. `GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml`), mirroring the existing request-body behaviour. Single-content-type responses are unchanged.
+  - `plugin-zod` and `plugin-faker` mirror this: they emit one schema/mock per content type plus a union alias for both responses and request bodies (e.g. `addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])`, and a `createAddPetStatus200` factory that picks between the per-content-type factories). Variant names line up across the three plugins via shared naming helpers.
+  - `plugin-msw` prefers the `application/json` content type for the mocked response's `Content-Type` header when a response declares several.
+  - The generated fetch client parses the response body based on the `Content-Type` header (JSON, text, blob) instead of always calling `res.json()`, honours an explicit `responseType` override, and serializes `application/x-www-form-urlencoded` bodies as `URLSearchParams`. Operations whose success response is a single binary/text content type now default `responseType` (e.g. `'blob'`), so file downloads work out of the box.
+
+  Single-content-type operations are backwards-compatible — generated output is unchanged.
+
+  Requires `@kubb/adapter-oas` and `@kubb/ast` with response `content` support.
+
+- [#223](https://github.com/kubb-labs/plugins/pull/223) [`4c08e4c`](https://github.com/kubb-labs/plugins/commit/4c08e4c5082410871e0ccb7274343738d1f7b3ff) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Round-trip `Date` fields at the Zod validation boundary when `@kubb/adapter-oas` uses `dateType: 'date'`.
+
+  Date fields are typed as `Date` by `@kubb/plugin-ts`, but the wire value is always an ISO `string`. Previously these emitted `z.date()` (or `z.coerce.date()`), which cannot validate a response string. Now:
+  - **Response schemas decode** the ISO `string` into a `Date` — `z.iso.datetime().transform((value) => new Date(value))` (or `z.iso.date().transform(...)` for `format: date`).
+  - **Request bodies encode** a `Date` back into the wire `string`. Each date-bearing component emits an `${name}InputSchema` variant — `z.date().transform((value) => value.toISOString())` (or `.slice(0, 10)` for `format: date`) — and request schemas (`<op>Data`) reference it.
+
+  Pairs with `@kubb/plugin-client` `parser: 'zod'` to parse both directions automatically. `coercion.dates` no longer affects `dateType: 'date'` fields. Applies to the standard (chainable) printer; `zod/mini` is unchanged.
+
+### Patch Changes
+
+- [#238](https://github.com/kubb-labs/plugins/pull/238) [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the per-plugin `group` naming block (duplicated verbatim across nine plugins) with a shared `createGroupConfig` helper from `@internals/shared`. Each plugin's grouping behavior is preserved exactly — the `Controller`/`Requests` suffix and whether a user-provided `group.name` is honored are passed as options — so generated output is unchanged. Internal refactor only.
+
+## 5.0.0-beta.30
+
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#226](https://github.com/kubb-labs/plugins/pull/226) [`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.29 core dependency update.
+
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+## 5.0.0-beta.27
+
+### Patch Changes
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Sanitize generated identifiers that would otherwise start with a digit so they're valid JavaScript names.
+
+  OpenAPI schemas/operations named `409`, `504AccountCancel`, etc. previously produced invalid output like `export const 409Schema = …` and `export interface 409 { … }`. Resolvers in `plugin-ts`, `plugin-zod`, `plugin-client`, and `plugin-faker` now run their PascalCase/camelCase results through a new `ensureValidVarName` helper, which prefixes the name with `_` when it isn't a syntactically valid identifier (leading digit or reserved word). File paths are unaffected.
+
+  Reported in kubb-labs/plugins#196.
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- [#195](https://github.com/kubb-labs/plugins/pull/195) [`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Enforce `Array<T>` syntax (over `T[]`) via the oxlint `typescript/array-type` rule. Internal-only change; no runtime or API impact.
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync with kubb
+
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync between core with same version
+
+## 5.0.0-beta.15
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
 ## 5.0.0-beta.10
 
 ## 5.0.0-beta.4

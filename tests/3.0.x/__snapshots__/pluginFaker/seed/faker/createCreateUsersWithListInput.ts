@@ -3,17 +3,35 @@
 * Do not edit manually.
 */
 
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatusDefault } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatus200Json, CreateUsersWithListInputStatus200Xml, CreateUsersWithListInputStatusDefault } from "../types/CreateUsersWithListInput.ts";
 import { createUser } from "./createUser.ts";
 import { faker } from "@faker-js/faker";
 
 /**
  * @description Successful operation
  */
-export function createCreateUsersWithListInputStatus200(data?: Partial<CreateUsersWithListInputStatus200>): CreateUsersWithListInputStatus200 {
+export function createCreateUsersWithListInputStatus200Json(data?: Partial<CreateUsersWithListInputStatus200Json>): CreateUsersWithListInputStatus200Json {
   faker.seed([42])
 
-  return createUser(data)
+  return createUser(data) as CreateUsersWithListInputStatus200Json
+}
+
+/**
+ * @description Successful operation
+ */
+export function createCreateUsersWithListInputStatus200Xml(data?: Partial<CreateUsersWithListInputStatus200Xml>): CreateUsersWithListInputStatus200Xml {
+  faker.seed([42])
+
+  return createUser(data) as CreateUsersWithListInputStatus200Xml
+}
+
+/**
+ * @description Successful operation
+ */
+export function createCreateUsersWithListInputStatus200(_data?: CreateUsersWithListInputStatus200): CreateUsersWithListInputStatus200 {
+  faker.seed([42])
+
+  return faker.helpers.arrayElement<any>([createCreateUsersWithListInputStatus200Json(), createCreateUsersWithListInputStatus200Xml()])
 }
 
 /**

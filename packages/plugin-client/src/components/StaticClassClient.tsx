@@ -1,6 +1,6 @@
 import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
 import { buildJSDoc, URLPath } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -14,7 +14,7 @@ type OperationData = {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
-  zodResolver?: ResolverZod
+  zodResolver?: ResolverZod | null
 }
 
 type Props = {
@@ -22,7 +22,7 @@ type Props = {
   isExportable?: boolean
   isIndexable?: boolean
   operations: Array<OperationData>
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
@@ -35,8 +35,8 @@ type GenerateMethodProps = {
   node: ast.OperationNode
   name: string
   tsResolver: ResolverTs
-  zodResolver?: ResolverZod
-  baseURL: string | undefined
+  zodResolver?: ResolverZod | null
+  baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   paramsType: PluginClient['resolvedOptions']['paramsType']
@@ -58,11 +58,12 @@ function generateMethod({
   paramsCasing,
   pathParamsType,
 }: GenerateMethodProps): string {
+  if (!ast.isHttpOperationNode(node)) return ''
   const path = new URLPath(node.path, { casing: paramsCasing })
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const { header: headerParams } = getOperationParameters(node)
-  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : undefined
+  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
   const generics = buildGenerics(node, tsResolver)
   const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
@@ -75,7 +76,7 @@ function generateMethod({
   const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
 
   const methodBody = [
-    `const { client: request = fetch, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
+    `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
     '',
     requestDataLine,
     formDataLine,

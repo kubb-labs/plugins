@@ -6,6 +6,7 @@ import type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from '../../models/ts/petsController/CreatePets.ts'
+import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -21,8 +22,8 @@ export function createCreatePetsQueryOffsetFaker(data?: number): number {
   return data ?? faker.number.int()
 }
 
-export function createCreatePetsHeaderXEXAMPLEFaker(data?: CreatePetsHeaderXEXAMPLE): CreatePetsHeaderXEXAMPLE {
-  return data ?? faker.helpers.arrayElement<CreatePetsHeaderXEXAMPLE>(['ONE', 'TWO', 'THREE'])
+export function createCreatePetsHeaderXEXAMPLEFaker(data?: Partial<CreatePetsHeaderXEXAMPLE>): CreatePetsHeaderXEXAMPLE {
+  return createCreatePetsXEXAMPLEFaker(data) as CreatePetsHeaderXEXAMPLE
 }
 
 /**
@@ -36,15 +37,15 @@ export function createCreatePetsStatus201Faker() {
  * @description unexpected error
  */
 export function createCreatePetsStatusDefaultFaker(data?: Partial<CreatePetsStatusDefault>): CreatePetsStatusDefault {
-  return createPetNotFoundFaker(data)
+  return createPetNotFoundFaker(data) as CreatePetsStatusDefault
 }
 
-export function createCreatePetsDataFaker(data?: Partial<CreatePetsData>): Required<CreatePetsData> {
+export function createCreatePetsDataFaker<TData extends Partial<CreatePetsData> = object>(data?: TData) {
   const defaultFakeData = { name: faker.string.alpha(), tag: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<CreatePetsData>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 export function createCreatePetsResponseFaker(_data?: CreatePetsResponse): CreatePetsResponse {

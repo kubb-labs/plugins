@@ -3,15 +3,24 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/fetch'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/client'
+import type {
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryStatus,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
+} from './FindPetsByTags'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsQueryKey = (params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize }) =>
-  [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsQueryKey = (params?: {
+  tags: FindPetsByTagsQueryTags
+  status?: FindPetsByTagsQueryStatus
+  pageSize?: FindPetsByTagsQueryPageSize
+}) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
@@ -22,23 +31,23 @@ export async function findPetsByTags(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return { ...res, data: FindPetsByTagsResponse.parse(res.data) }
 }
 
 export function findPetsByTagsQueryOptions(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
-  return queryOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>, ResponseConfig<FindPetsByTagsResponse>, typeof queryKey>({
+  return queryOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<Error>, ResponseConfig<FindPetsByTagsStatus200>, typeof queryKey>({
     enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByTags(params!, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -47,13 +56,13 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<
-  TData = ResponseConfig<FindPetsByTagsResponse>,
-  TQueryData = ResponseConfig<FindPetsByTagsResponse>,
+  TData = ResponseConfig<FindPetsByTagsStatus200>,
+  TQueryData = ResponseConfig<FindPetsByTagsStatus200>,
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
-    query?: Partial<QueryObserverOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
+    query?: Partial<QueryObserverOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
     client?: Partial<RequestConfig> & { client?: Client }

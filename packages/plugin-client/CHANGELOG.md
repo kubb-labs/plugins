@@ -1,5 +1,146 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.31
+
+### Minor Changes
+
+- [#223](https://github.com/kubb-labs/plugins/pull/223) [`682b463`](https://github.com/kubb-labs/plugins/commit/682b4634ffcff48d8e1c6622e514ab49f2eae381) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Rename the client `parser` option value `'client'` to `false`. The client has no runtime parser — it returns the response cast to the generated TypeScript type — so `false` (no validator) is clearer than `'client'`. `parser: 'zod'` is unchanged.
+
+  Migration: replace `parser: 'client'` with `parser: false` (or drop it, since `false` is the default) in `pluginClient`, `pluginReactQuery`, and `pluginVueQuery`.
+
+- [#221](https://github.com/kubb-labs/plugins/pull/221) [`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Support multiple content types on requests and responses.
+  - `plugin-ts` now emits a union of per-content-type variants for responses that declare more than one content type (e.g. `GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml`), mirroring the existing request-body behaviour. Single-content-type responses are unchanged.
+  - `plugin-zod` and `plugin-faker` mirror this: they emit one schema/mock per content type plus a union alias for both responses and request bodies (e.g. `addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])`, and a `createAddPetStatus200` factory that picks between the per-content-type factories). Variant names line up across the three plugins via shared naming helpers.
+  - `plugin-msw` prefers the `application/json` content type for the mocked response's `Content-Type` header when a response declares several.
+  - The generated fetch client parses the response body based on the `Content-Type` header (JSON, text, blob) instead of always calling `res.json()`, honours an explicit `responseType` override, and serializes `application/x-www-form-urlencoded` bodies as `URLSearchParams`. Operations whose success response is a single binary/text content type now default `responseType` (e.g. `'blob'`), so file downloads work out of the box.
+
+  Single-content-type operations are backwards-compatible — generated output is unchanged.
+
+  Requires `@kubb/adapter-oas` and `@kubb/ast` with response `content` support.
+
+### Patch Changes
+
+- [#238](https://github.com/kubb-labs/plugins/pull/238) [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt `@kubb/ast`'s `HttpOperationNode` union. Each operation generator narrows the incoming node with `ast.isHttpOperationNode` (HTTP-only plugins), and shared helpers/components accept `ast.HttpOperationNode`, so `method`/`path` are non-nullable without manual assertions. OpenAPI output is unchanged.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the per-plugin `group` naming block (duplicated verbatim across nine plugins) with a shared `createGroupConfig` helper from `@internals/shared`. Each plugin's grouping behavior is preserved exactly — the `Controller`/`Requests` suffix and whether a user-provided `group.name` is honored are passed as options — so generated output is unchanged. Internal refactor only.
+
+- [#241](https://github.com/kubb-labs/plugins/pull/241) [`0ca63ab`](https://github.com/kubb-labs/plugins/commit/0ca63ab8f6c34a51936d355969a3d1b6f6c98708) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the `resolver.resolveFile` entry object — duplicated 44 times across the client and query operation generators — with a shared `operationFileEntry(node, name)` helper from `@internals/shared`. The helper returns the same `{ name, extname: '.ts', tag, path }` params, so generated output is unchanged. Internal refactor only.
+
+- Updated dependencies [[`8a5e800`](https://github.com/kubb-labs/plugins/commit/8a5e8004e49d2125e9b89598e09d47645b7ad8ea), [`12084a7`](https://github.com/kubb-labs/plugins/commit/12084a75e4539c9c416a33657c86b699f885c374), [`7bf4c87`](https://github.com/kubb-labs/plugins/commit/7bf4c87304143708f7c7619b4af5013f40fb81cf), [`4c08e4c`](https://github.com/kubb-labs/plugins/commit/4c08e4c5082410871e0ccb7274343738d1f7b3ff)]:
+  - @kubb/plugin-ts@5.0.0-beta.31
+  - @kubb/plugin-zod@5.0.0-beta.31
+
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`21accf1`](https://github.com/kubb-labs/plugins/commit/21accf11be058a252aded049a5d98e30eb6b4c32)]:
+  - @kubb/plugin-ts@5.0.0-beta.30
+  - @kubb/plugin-zod@5.0.0-beta.30
+
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#226](https://github.com/kubb-labs/plugins/pull/226) [`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.29 core dependency update.
+
+- Updated dependencies [[`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a)]:
+  - @kubb/plugin-ts@5.0.0-beta.29
+  - @kubb/plugin-zod@5.0.0-beta.29
+
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+### Patch Changes
+
+- [#212](https://github.com/kubb-labs/plugins/pull/212) [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Standardize the generated HTTP-client runtime on the export name `client`.
+
+  Previously the request function was exported under mismatched names (`fetch` in some places, `client` in others), so with `bundle: true` the generated root barrel emitted `export { client } from './.kubb/client.ts'` while the runtime only exported `fetch`, causing `TS2724`. The runtime now consistently exports `client` across the `fetch` and `axios` adapters, and the bundled client file is always written to `.kubb/client.ts` (react-query, vue-query, and mcp previously wrote `.kubb/fetch.ts`). Generated code imports and calls `client` accordingly.
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d)]:
+  - @kubb/plugin-ts@5.0.0-beta.28
+  - @kubb/plugin-zod@5.0.0-beta.28
+
+## 5.0.0-beta.27
+
+### Minor Changes
+
+- [#204](https://github.com/kubb-labs/plugins/pull/204) [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - **Breaking:** Client functions and TanStack mutation/query `TData` now reference the union of `2xx` response types only (e.g. `AddPetStatus200`) instead of the full response alias (`AddPetMutation` / `AddPetQueryResponse`), which previously also included `4xx`/`5xx` shapes.
+
+  This aligns the generated code with TanStack Query's contract that `TData` is the resolved success value while errors flow through `TError`. The previous behavior forced `as` casts at call sites because the success body was unioned with error bodies.
+
+  If your HTTP client returns non-`2xx` bodies as resolved data instead of throwing, narrow with a type guard at the call site or wrap the client to throw on error responses. Fixes [#16](https://github.com/kubb-labs/plugins/issues/16).
+
+### Patch Changes
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Serialize object header values to JSON in the generated `fetch` and `axios` clients so headers like `X-Filter` (which OpenAPI specs declare as a JSON object) are sent in their canonical form instead of being coerced to `[object Object]` by the runtime. `RequestConfig.headers` now widens to a shared `HeadersInit` type that accepts primitive and object values, matching what spec authors actually pass.
+
+  A new `serializeHeaders()` helper turns non-string values into JSON before they reach `globalThis.fetch` or `axios.request`. Existing string-valued headers behave unchanged.
+
+- [#197](https://github.com/kubb-labs/plugins/pull/197) [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Sanitize generated identifiers that would otherwise start with a digit so they're valid JavaScript names.
+
+  OpenAPI schemas/operations named `409`, `504AccountCancel`, etc. previously produced invalid output like `export const 409Schema = …` and `export interface 409 { … }`. Resolvers in `plugin-ts`, `plugin-zod`, `plugin-client`, and `plugin-faker` now run their PascalCase/camelCase results through a new `ensureValidVarName` helper, which prefixes the name with `_` when it isn't a syntactically valid identifier (leading digit or reserved word). File paths are unaffected.
+
+  Reported in kubb-labs/plugins#196.
+
+- Updated dependencies [[`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877)]:
+  - @kubb/plugin-ts@5.0.0-beta.27
+  - @kubb/plugin-zod@5.0.0-beta.27
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- [#195](https://github.com/kubb-labs/plugins/pull/195) [`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Enforce `Array<T>` syntax (over `T[]`) via the oxlint `typescript/array-type` rule. Internal-only change; no runtime or API impact.
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync with kubb
+
+- [#183](https://github.com/kubb-labs/plugins/pull/183) [`9de6534`](https://github.com/kubb-labs/plugins/commit/9de653476daefd588633ec4b12551c72b8c88965) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the duplicate `transformers` option from the plugin-client extension YAML. The TypeScript option type only defines `transformer` (singular), so the duplicate was dead metadata that bloated the published registry. The `transformer` option itself is unchanged.
+
+- Updated dependencies [[`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65), [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac), [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c), [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b), [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3)]:
+  - @kubb/plugin-ts@5.0.0-beta.25
+  - @kubb/plugin-zod@5.0.0-beta.25
+
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync between core with same version
+
+- Updated dependencies [[`b528b32`](https://github.com/kubb-labs/plugins/commit/b528b3226d796a6aab5f1f6d45b575921da1341b)]:
+  - @kubb/plugin-ts@5.0.0-beta.22
+  - @kubb/plugin-zod@5.0.0-beta.22
+
+## 5.0.0-beta.15
+
+### Patch Changes
+
+- [#163](https://github.com/kubb-labs/plugins/pull/163) [`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.12 core dependency update and run E2E CI against all schemas by default except isolated heavy schemas.
+
+- Updated dependencies [[`234a4d7`](https://github.com/kubb-labs/plugins/commit/234a4d7c9dccb1f756447e8d70d4a5bec4dcf72f)]:
+  - @kubb/plugin-ts@5.0.0-beta.15
+  - @kubb/plugin-zod@5.0.0-beta.15
+
 ## 5.0.0-beta.10
 
 ### Patch Changes

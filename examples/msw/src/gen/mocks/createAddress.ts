@@ -6,11 +6,11 @@
 import type { Address } from '../models/Address.ts'
 import { faker } from '@faker-js/faker'
 
-export function createAddress(data?: Partial<Address>): Required<Address> {
+export function createAddress<TData extends Partial<Address> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = { street: faker.string.alpha(), city: faker.string.alpha(), state: faker.string.alpha(), zip: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Address>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

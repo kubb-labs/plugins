@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -15,7 +15,7 @@ export async function placeOrderHandler({ data }: { data?: PlaceOrderData } = {}
   const requestData = data
 
 
-  const res = await fetch<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData }, request)
+  const res = await client<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData }, request)
 
   return {
               content: [

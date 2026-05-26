@@ -1,6 +1,6 @@
 import path from 'node:path'
-import { camelCase } from '@internals/utils'
-import { ast, definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { ast, definePlugin } from '@kubb/core'
 import { pluginClientName } from '@kubb/plugin-client'
 import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
 import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
@@ -20,8 +20,37 @@ import {
 import { resolverReactQuery } from './resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-react-query`. Used for driver lookups
+ * and cross-plugin dependency references.
+ */
 export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQuery['name']
 
+/**
+ * Generates one TanStack Query hook per OpenAPI operation for React. Queries
+ * become `useFooQuery`/`useFooSuspenseQuery`/`useFooInfiniteQuery`; mutations
+ * become `useFooMutation`. Each hook is fully typed: query keys, input
+ * variables, response data, and error shape all come from the spec.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginReactQuery } from '@kubb/plugin-react-query'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginReactQuery({
+ *       output: { path: './hooks' },
+ *       suspense: {},
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   const {
     output = { path: 'hooks', barrelType: 'named' },
@@ -29,7 +58,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = 'client',
+    parser = false,
     suspense = {},
     infinite = false,
     paramsType = 'inline',
@@ -61,19 +90,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
       customHookOptionsFileGenerator,
     ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
 
   return {
     name: pluginReactQueryName,
@@ -116,14 +133,14 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
             ? {
                 queryParam: 'id',
                 initialPageParam: 0,
-                cursorParam: undefined,
-                nextParam: undefined,
-                previousParam: undefined,
+                cursorParam: null,
+                nextParam: null,
+                previousParam: null,
                 ...infinite,
               }
             : false,
           suspense,
-          customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : undefined,
+          customOptions: customOptions ? { name: 'useCustomHookOptions', ...customOptions } : null,
           parser,
           paramsType,
           pathParamsType,
@@ -151,11 +168,11 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
 
         if (client?.bundle && !hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
-            baseName: 'fetch.ts',
-            path: path.resolve(root, '.kubb/fetch.ts'),
+            baseName: 'client.ts',
+            path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
-                name: 'fetch',
+                name: 'client',
                 nodes: [ast.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
                 isExportable: true,
                 isIndexable: true,

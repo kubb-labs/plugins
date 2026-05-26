@@ -11,7 +11,7 @@ type ParamLeaf = {
 
 type ParamGroup = {
   mode: 'object' | 'inlineSpread'
-  children: Record<string, ParamLeaf | undefined>
+  children: Record<string, ParamLeaf | null | undefined>
   default?: string
 }
 
@@ -25,14 +25,14 @@ function isGroup(spec: ParamSpec): spec is ParamGroup {
 }
 
 function createType(type?: string) {
-  return type ? ast.createParamsType({ variant: 'reference', name: type }) : undefined
+  return type ? ast.createParamsType({ variant: 'reference', name: type }) : null
 }
 
 function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParameterNode {
   if (spec.default !== undefined) {
     return ast.createFunctionParameter({
       name,
-      type: createType(spec.type),
+      type: createType(spec.type) ?? undefined,
       default: spec.default,
       rest: spec.mode === 'inlineSpread',
     })
@@ -40,7 +40,7 @@ function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParam
 
   return ast.createFunctionParameter({
     name,
-    type: createType(spec.type),
+    type: createType(spec.type) ?? undefined,
     optional: !!spec.optional,
     rest: spec.mode === 'inlineSpread',
   })
@@ -52,7 +52,7 @@ function createDeclarationParam(name: string, spec: ParamSpec): ast.FunctionPara
       inline: spec.mode === 'inlineSpread',
       default: spec.default,
       properties: Object.entries(spec.children)
-        .filter(([, child]) => child !== undefined)
+        .filter(([, child]) => child != null)
         .map(([childName, child]) => createDeclarationLeaf(childName, child!)),
     })
   }
@@ -65,7 +65,7 @@ function createCallParam(name: string, spec: ParamSpec): ast.FunctionParameterNo
     return ast.createParameterGroup({
       inline: spec.mode === 'inlineSpread',
       properties: Object.entries(spec.children)
-        .filter(([, child]) => child !== undefined)
+        .filter(([, child]) => child != null)
         .map(([childName, child]) =>
           ast.createFunctionParameter({
             name:
@@ -92,8 +92,8 @@ function createCallParam(name: string, spec: ParamSpec): ast.FunctionParameterNo
  * Creates function parameter builders for generating function signatures and calls.
  * Returns utilities to output constructor signatures (`toConstructor()`) or call expressions (`toCall()`).
  */
-export function createFunctionParams(params: Record<string, ParamSpec | undefined>) {
-  const entries = Object.entries(params).filter(([, spec]) => spec !== undefined) as Array<[string, ParamSpec]>
+export function createFunctionParams(params: Record<string, ParamSpec | null | undefined>) {
+  const entries = Object.entries(params).filter(([, spec]) => spec != null) as Array<[string, ParamSpec]>
 
   return {
     toConstructor() {

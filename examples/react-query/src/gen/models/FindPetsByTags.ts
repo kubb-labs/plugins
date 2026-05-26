@@ -23,7 +23,14 @@ export type FindPetsByTagsQueryPageSize = number | undefined
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Pet[]
+export type FindPetsByTagsStatus200Json = Pet[]
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Pet[]
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any

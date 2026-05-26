@@ -7,7 +7,15 @@ import * as z from "zod";
 import { addPetRequestSchema } from "./addPetRequestSchema.ts";
 import { petSchema } from "./petSchema.ts";
 
-export const addPetStatus200Schema = petSchema
+export const addPetStatus200SchemaJson = petSchema
+
+export type AddPetStatus200SchemaJson = z.infer<typeof addPetStatus200SchemaJson>
+
+export const addPetStatus200SchemaXml = petSchema
+
+export type AddPetStatus200SchemaXml = z.infer<typeof addPetStatus200SchemaXml>
+
+export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
 export type AddPetStatus200Schema = z.infer<typeof addPetStatus200Schema>
 
@@ -19,6 +27,18 @@ export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus
 
 export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
 
-export const addPetDataSchema = addPetRequestSchema.describe("Create a new pet in the store")
+export const addPetDataSchemaJson = addPetRequestSchema.describe("Create a new pet in the store")
+
+export type AddPetDataSchemaJson = z.infer<typeof addPetDataSchemaJson>
+
+export const addPetDataSchemaXml = petSchema.describe("Create a new pet in the store")
+
+export type AddPetDataSchemaXml = z.infer<typeof addPetDataSchemaXml>
+
+export const addPetDataSchemaFormUrlEncoded = petSchema.describe("Create a new pet in the store")
+
+export type AddPetDataSchemaFormUrlEncoded = z.infer<typeof addPetDataSchemaFormUrlEncoded>
+
+export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
 export type AddPetDataSchema = z.infer<typeof addPetDataSchema>

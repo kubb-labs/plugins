@@ -8,8 +8,31 @@ import { version } from '../package.json'
 import { getPageHTML } from './redoc.tsx'
 import type { PluginRedoc } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-redoc`. Used for driver lookups and
+ * cross-plugin dependency references.
+ */
 export const pluginRedocName = 'plugin-redoc' satisfies PluginRedoc['name']
 
+/**
+ * Generates a self-contained static HTML documentation page from your OpenAPI
+ * spec using Redoc. The file is regenerated on every Kubb build, so the docs
+ * stay in lockstep with the spec the rest of your code is generated from.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginRedoc } from '@kubb/plugin-redoc'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginRedoc({ output: { path: 'docs.html' } }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginRedoc = definePlugin<PluginRedoc>((options) => {
   const { output = { path: 'docs.html' } } = options
 

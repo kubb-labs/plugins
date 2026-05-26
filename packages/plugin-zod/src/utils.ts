@@ -13,6 +13,99 @@ export function shouldCoerce(coercion: PluginZod['resolvedOptions']['coercion'] 
 }
 
 /**
+ * A codec for a schema node whose runtime type differs from its JSON wire type:
+ * the output (response) schema decodes wire → runtime, and the input (request)
+ * variant encodes runtime → wire.
+ *
+ * To support another codec type, append a `Codec` to `codecs` and route that
+ * type's printer node handler through `getCodec`.
+ */
+export type Codec = {
+  /**
+   * Whether this node is encoded/decoded by this codec.
+   */
+  matches(node: ast.SchemaNode): boolean
+  /**
+   * Output direction (response): decode the wire value into the runtime type.
+   */
+  decode(node: ast.SchemaNode): string
+  /**
+   * Input direction (request): encode the runtime value back to the wire value.
+   */
+  encode(node: ast.SchemaNode): string
+}
+
+/**
+ * `dateType: 'date'` fields are typed as `Date` but travel as ISO `string`s.
+ * Output decodes `string → Date`; input encodes `Date → string`, preserving the
+ * `date` (`YYYY-MM-DD`) vs `date-time` precision carried on `node.format`.
+ */
+const dateCodec: Codec = {
+  matches(node) {
+    return node.type === 'date' && node.representation === 'date'
+  },
+  decode(node) {
+    return node.format === 'date' ? 'z.iso.date().transform((value) => new Date(value))' : 'z.iso.datetime().transform((value) => new Date(value))'
+  },
+  encode(node) {
+    return node.format === 'date' ? 'z.date().transform((value) => value.toISOString().slice(0, 10))' : 'z.date().transform((value) => value.toISOString())'
+  },
+}
+
+/**
+ * Registered codecs, checked in order.
+ */
+const codecs: Array<Codec> = [dateCodec]
+
+/**
+ * Returns the codec for this node, or `undefined` when the node needs no
+ * encode/decode (its wire and runtime types match).
+ */
+export function getCodec(node: ast.SchemaNode | undefined): Codec | undefined {
+  if (!node) return undefined
+  return codecs.find((codec) => codec.matches(node))
+}
+
+/**
+ * Returns `true` when the node itself is encoded/decoded by a codec.
+ */
+export function hasCodec(node: ast.SchemaNode | undefined): boolean {
+  return getCodec(node) !== undefined
+}
+
+/**
+ * Returns `true` when the schema transitively contains a codec node —
+ * a value whose runtime type differs from its wire type (see {@link hasCodec}),
+ * so it must be decoded (response) or encoded (request) at the validation boundary.
+ * `$ref`s are followed via their resolved schema; a `seen` set guards cycles.
+ */
+export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string> = new Set()): boolean {
+  if (!node) return false
+
+  if (hasCodec(node)) return true
+
+  if (node.type === 'ref') {
+    if (!node.ref) return false
+    const refName = ast.extractRefName(node.ref)
+    if (refName) {
+      if (seen.has(refName)) return false
+      seen.add(refName)
+    }
+    const resolved = ast.syncSchemaRef(node)
+    if (resolved.type === 'ref') return false
+    return containsCodec(resolved, seen)
+  }
+
+  const children: Array<ast.SchemaNode | undefined> = []
+  if ('properties' in node && node.properties) children.push(...node.properties.map((prop) => prop.schema))
+  if ('items' in node && node.items) children.push(...node.items)
+  if ('members' in node && node.members) children.push(...node.members)
+  if ('additionalProperties' in node && node.additionalProperties && node.additionalProperties !== true) children.push(node.additionalProperties)
+
+  return children.some((child) => containsCodec(child, seen))
+}
+
+/**
  * Collects all resolved schema names for an operation's parameters and responses
  * into a single lookup object, useful for building imports and type references.
  */
@@ -39,11 +132,11 @@ export function buildSchemaNames(node: ast.OperationNode, { params, resolver }: 
   responses['default'] = resolver.resolveResponseName(node)
 
   return {
-    request: node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined,
+    request: node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null,
     parameters: {
-      path: pathParam ? resolver.resolvePathParamsName(node, pathParam) : undefined,
-      query: queryParam ? resolver.resolveQueryParamsName(node, queryParam) : undefined,
-      header: headerParam ? resolver.resolveHeaderParamsName(node, headerParam) : undefined,
+      path: pathParam ? resolver.resolvePathParamsName(node, pathParam) : null,
+      query: queryParam ? resolver.resolveQueryParamsName(node, queryParam) : null,
+      header: headerParam ? resolver.resolveHeaderParamsName(node, headerParam) : null,
     },
     responses,
     errors,
@@ -133,7 +226,7 @@ export function lengthConstraints({ min, max, pattern }: LengthConstraints): str
  * Build `.check(z.minimum(), z.maximum())` for `zod/mini` numeric constraints.
  */
 export function numberChecksMini({ min, max, exclusiveMinimum, exclusiveMaximum, multipleOf }: NumericConstraints): string {
-  const checks: string[] = []
+  const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minimum(${min})`)
   if (max !== undefined) checks.push(`z.maximum(${max})`)
   if (exclusiveMinimum !== undefined) checks.push(`z.minimum(${exclusiveMinimum}, { exclusive: true })`)
@@ -146,7 +239,7 @@ export function numberChecksMini({ min, max, exclusiveMinimum, exclusiveMaximum,
  * Build `.check(z.minLength(), z.maxLength(), z.regex())` for `zod/mini` length constraints.
  */
 export function lengthChecksMini({ min, max, pattern }: LengthConstraints): string {
-  const checks: string[] = []
+  const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minLength(${min})`)
   if (max !== undefined) checks.push(`z.maxLength(${max})`)
   if (pattern !== undefined) checks.push(`z.regex(${toRegExpString(pattern, null)})`)
@@ -158,21 +251,14 @@ export function lengthChecksMini({ min, max, pattern }: LengthConstraints): stri
  * to a schema value string using the chainable Zod v4 API.
  */
 export function applyModifiers({ value, nullable, optional, nullish, defaultValue, description }: ModifierOptions): string {
-  let result = value
-  if (nullish || (nullable && optional)) {
-    result = `${result}.nullish()`
-  } else if (optional) {
-    result = `${result}.optional()`
-  } else if (nullable) {
-    result = `${result}.nullable()`
-  }
-  if (defaultValue !== undefined) {
-    result = `${result}.default(${formatDefault(defaultValue)})`
-  }
-  if (description) {
-    result = `${result}.describe(${stringify(description)})`
-  }
-  return result
+  const withModifier = (() => {
+    if (nullish || (nullable && optional)) return `${value}.nullish()`
+    if (optional) return `${value}.optional()`
+    if (nullable) return `${value}.nullable()`
+    return value
+  })()
+  const withDefault = defaultValue !== undefined ? `${withModifier}.default(${formatDefault(defaultValue)})` : withModifier
+  return description ? `${withDefault}.describe(${stringify(description)})` : withDefault
 }
 
 /**
@@ -180,21 +266,12 @@ export function applyModifiers({ value, nullable, optional, nullish, defaultValu
  * (`z.nullable()`, `z.optional()`, `z.nullish()`).
  */
 export function applyMiniModifiers({ value, nullable, optional, nullish, defaultValue }: Omit<ModifierOptions, 'description'>): string {
-  let result = value
-  if (nullish) {
-    result = `z.nullish(${result})`
-  } else {
-    if (nullable) {
-      result = `z.nullable(${result})`
-    }
-    if (optional) {
-      result = `z.optional(${result})`
-    }
-  }
-  if (defaultValue !== undefined) {
-    result = `z._default(${result}, ${formatDefault(defaultValue)})`
-  }
-  return result
+  const withModifier = (() => {
+    if (nullish) return `z.nullish(${value})`
+    const withNullable = nullable ? `z.nullable(${value})` : value
+    return optional ? `z.optional(${withNullable})` : withNullable
+  })()
+  return defaultValue !== undefined ? `z._default(${withModifier}, ${formatDefault(defaultValue)})` : withModifier
 }
 
 type BuildGroupedParamsSchemaOptions = {

@@ -25,7 +25,7 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
   output: { path: '.' },
   parser: 'data',
   baseURL: undefined,
-  group: undefined,
+  group: null,
   exclude: [],
   include: undefined,
   override: [],
@@ -35,13 +35,13 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
 const mockedFakerPlugin = createMockedPlugin<any>({
   name: pluginFakerName,
-  options: { output: { path: '.' }, group: undefined },
+  options: { output: { path: '.' }, group: null },
   resolver: resolverFaker,
 })
 

@@ -12,7 +12,7 @@ type Props = {
   isExportable?: boolean
   isIndexable?: boolean
 
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
@@ -57,6 +57,7 @@ export function Url({
   node,
   tsResolver,
 }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const path = new URLPath(node.path)
 
   const paramsNode = buildUrlParamsNode({
@@ -70,7 +71,7 @@ export function Url({
 
   const { path: originalPathParams } = getOperationParameters(node)
   const { path: casedPathParams } = getOperationParameters(node, { paramsCasing })
-  const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : undefined
+  const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : null
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>

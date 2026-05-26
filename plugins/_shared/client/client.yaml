@@ -1,12 +1,32 @@
 # Shared option: client/client
 
-# ────────────────────────── client.client ──────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: client
 type: "'axios' | 'fetch'"
 required: false
 default: "'axios'"
-description: Client used for HTTP calls.
-body: |
-  - `'axios'` uses `@kubb/plugin-client/templates/axios` to fetch data.
-  - `'fetch'` uses `@kubb/plugin-client/templates/fetch` to fetch data.
+description: |
+  HTTP client used by the generated code.
+
+  - `'axios'` — generated functions call into `@kubb/plugin-client/clients/axios`. Requires `axios` as a runtime dependency.
+  - `'fetch'` — generated functions call into `@kubb/plugin-client/clients/fetch`. Uses the global `fetch`, no extra runtime dependency.
+
+  To plug in your own client, use [`importPath`](#importpath) instead.
+examples:
+  - name: Use fetch
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginClient } from '@kubb/plugin-client'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginClient({
+                client: 'fetch',
+              }),
+            ],
+          })

@@ -23,7 +23,7 @@ type Props = {
   /**
    * Base URL prepended to every generated request URL.
    */
-  baseURL: string | undefined
+  baseURL: string | null | undefined
   /**
    * Return type when calling fetch.
    * - 'data' returns response data only.
@@ -50,6 +50,7 @@ function buildRemappingCode(mapping: Record<string, string>, varName: string, so
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function McpHandler({ name, node, resolver, baseURL, dataReturnType, paramsCasing }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const urlPath = new URLPath(node.path)
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
@@ -57,7 +58,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
   const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
 
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const responseName = resolver.resolveResponseName(node)
 
   const errorResponses = node.responses.filter((r) => Number(r.statusCode) >= 400).map((r) => resolver.resolveResponseStatusName(node, r.statusCode))
@@ -77,15 +78,15 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     ? `${baseParamsSignature}, request: RequestHandlerExtra<ServerRequest, ServerNotification>`
     : 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'
 
-  const pathParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalPathParams, camelCase) : undefined
-  const queryParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalQueryParams, camelCase) : undefined
-  const headerParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalHeaderParams, camelCase) : undefined
+  const pathParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalPathParams, camelCase) : null
+  const queryParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalQueryParams, camelCase) : null
+  const headerParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalHeaderParams, camelCase) : null
 
   const contentTypeHeader =
-    contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : undefined
-  const headers = [headerParams.length ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : undefined, contentTypeHeader].filter(Boolean)
+    contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null
+  const headers = [headerParams.length ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : null, contentTypeHeader].filter(Boolean)
 
-  const fetchConfig: string[] = []
+  const fetchConfig: Array<string> = []
   fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
   fetchConfig.push(`url: ${urlPath.template}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
@@ -158,7 +159,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
         <br />
         {isFormData && requestName && 'const formData = buildFormData(requestData)'}
         <br />
-        {`const res = await fetch<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
+        {`const res = await client<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
         <br />
         {callToolResult}
       </Function>

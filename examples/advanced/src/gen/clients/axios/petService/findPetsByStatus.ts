@@ -1,6 +1,6 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { FindPetsByStatusPathStepId, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
+import type { FindPetsByStatusPathStepId, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
 import { findPetsByStatusResponseSchema } from '../../../zod/petController/findPetsByStatusSchema.ts'
 
 export function getFindPetsByStatusUrl({ stepId }: { stepId: FindPetsByStatusPathStepId }) {
@@ -17,9 +17,9 @@ export function getFindPetsByStatusUrl({ stepId }: { stepId: FindPetsByStatusPat
  * {@link /pet/findByStatus/:step_id}
  */
 export async function findPetsByStatus({ stepId }: { stepId: FindPetsByStatusPathStepId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByStatusUrl({ stepId }).url.toString(),
     ...requestConfig,

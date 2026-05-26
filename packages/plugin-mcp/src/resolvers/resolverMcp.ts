@@ -3,12 +3,16 @@ import { defineResolver } from '@kubb/core'
 import type { PluginMcp } from '../types.ts'
 
 /**
- * Naming convention resolver for MCP plugin.
+ * Default resolver used by `@kubb/plugin-mcp`. Decides the names and file
+ * paths for every generated MCP tool handler. Function names get a `Handler`
+ * suffix so an operation `addPet` becomes `addPetHandler`.
  *
- * Provides default naming helpers using camelCase with a `handler` suffix for functions.
+ * @example Resolve a handler name
+ * ```ts
+ * import { resolverMcp } from '@kubb/plugin-mcp'
  *
- * @example
- * `resolverMcp.default('addPet', 'function')  // → 'addPetHandler'`
+ * resolverMcp.default('addPet', 'function') // 'addPetHandler'
+ * ```
  */
 export const resolverMcp = defineResolver<PluginMcp>(() => ({
   name: 'default',

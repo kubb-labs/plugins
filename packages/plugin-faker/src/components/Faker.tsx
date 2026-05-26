@@ -44,71 +44,17 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const isTuple = node.type === 'tuple'
   const isScalar = SCALAR_TYPES.has(node.type)
 
-  let fakerTextWithOverride = fakerText
-  let useGenericOverride = false
-
-  if (canOverride && isObject) {
-    useGenericOverride = true
-  }
-
-  if (canOverride && isTuple) {
-    fakerTextWithOverride = `data || ${fakerText}`
-  }
-
-  if (canOverride && isArray) {
-    fakerTextWithOverride = `[
-  ...${fakerText},
-  ...(data || [])
-]`
-  }
-
-  if (canOverride && isScalar) {
-    fakerTextWithOverride = `data ?? ${fakerText}`
-  }
+  const useGenericOverride = canOverride && isObject
+  const fakerTextWithOverride = (() => {
+    if (canOverride && isTuple) return `data || ${fakerText}`
+    if (canOverride && isArray) return `[\n  ...${fakerText},\n  ...(data || [])\n]`
+    if (canOverride && isScalar) return `data ?? ${fakerText}`
+    return fakerText
+  })()
 
   const { dataType, returnType: resolvedReturnType } = resolveFakerTypeUsage(node, typeName, canOverride)
 
-  let functionSignature = ''
-  let functionBody = ''
-
-  if (useGenericOverride) {
-    // Generate function with defaultFakeData structure
-    const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
-    functionSignature = `${jsdoc}export function ${name}(data?: Partial<${typeName}>): Required<${typeName}>`
-
-    const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
-
-    // When the object node has properties that transitively reference a cyclic schema,
-    // the printer emits memoizing getters for those properties. Spreading the object
-    // literal would immediately invoke those getters, triggering recursive faker calls
-    // and causing a stack overflow. Detect this upfront via ast helpers so we can
-    // use Object.defineProperty-based merging instead of spread.
-    const { cyclicSchemas, schemaName } = printer.options
-    const hasGetters =
-      node.type === 'object' &&
-      !!cyclicSchemas &&
-      (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
-
-    if (hasGetters) {
-      functionBody = `{
-  ${seedCode}const defaultFakeData = ${fakerText}
-  if (data) {
-    for (const [key, value] of Object.entries(data)) {
-      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
-    }
-  }
-  return defaultFakeData as Required<${typeName}>
-}`
-    } else {
-      functionBody = `{
-  ${seedCode}const defaultFakeData = ${fakerText}
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as Required<${typeName}>
-}`
-    }
-  } else {
+  if (!useGenericOverride) {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
     const params = ast.createFunctionParameters({
@@ -123,6 +69,11 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
     const paramsSignature = declarationPrinter.print(params) ?? ''
     const returnType = resolvedReturnType
 
+    // A `ref` wrapper delegates to another faker. Object fakers are now generic and
+    // widen to `Partial<T>` when called with a `Partial<T>`-typed argument, so cast
+    // back to the wrapper's declared return type to keep it assignable.
+    const returnExpression = node.type === 'ref' && canOverride && returnType ? `${fakerTextWithOverride} as ${returnType}` : fakerTextWithOverride
+
     return (
       <File.Source name={name} isExportable isIndexable>
         <Function
@@ -130,7 +81,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
           name={name}
           JSDoc={{ comments: description ? [`@description ${jsStringEscape(description)}`] : [] }}
           params={canOverride ? paramsSignature : undefined}
-          returnType={returnType}
+          returnType={returnType ?? undefined}
         >
           {seed ? (
             <>
@@ -138,11 +89,46 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
               <br />
             </>
           ) : undefined}
-          {`return ${fakerTextWithOverride}`}
+          {`return ${returnExpression}`}
         </Function>
       </File.Source>
     )
   }
+
+  // Generate function with defaultFakeData structure
+  const jsdoc = description ? `/**\n   * @description ${jsStringEscape(description)}\n   */\n  ` : ''
+  const functionSignature = `${jsdoc}export function ${name}<TData extends Partial<${typeName}> = object>(data?: TData)`
+
+  const seedCode = seed ? `faker.seed(${JSON.stringify(seed)})\n  ` : ''
+
+  // When the object node has properties that transitively reference a cyclic schema,
+  // the printer emits memoizing getters for those properties. Spreading the object
+  // literal would immediately invoke those getters, triggering recursive faker calls
+  // and causing a stack overflow. Detect this upfront via ast helpers so we can
+  // use Object.defineProperty-based merging instead of spread.
+  const { cyclicSchemas, schemaName } = printer.options
+  const hasGetters =
+    node.type === 'object' &&
+    !!cyclicSchemas &&
+    (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+
+  const functionBody = hasGetters
+    ? `{
+  ${seedCode}const defaultFakeData = ${fakerText}
+  if (data) {
+    for (const [key, value] of Object.entries(data)) {
+      Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
+    }
+  }
+  return defaultFakeData as Omit<typeof defaultFakeData, keyof TData> & TData
+}`
+    : `{
+  ${seedCode}const defaultFakeData = ${fakerText}
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
+}`
 
   return (
     <File.Source name={name} isExportable isIndexable>

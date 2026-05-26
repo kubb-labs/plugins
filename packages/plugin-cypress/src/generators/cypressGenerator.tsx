@@ -1,15 +1,21 @@
 import { resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { Request } from '../components/Request.tsx'
 import type { PluginCypress } from '../types.ts'
 
+/**
+ * Built-in generator for `@kubb/plugin-cypress`. Emits one typed
+ * `cy.request()` wrapper per OpenAPI operation, ready to call inside Cypress
+ * test specs and custom commands.
+ */
 export const cypressGenerator = defineGenerator<PluginCypress>({
   name: 'cypress',
   renderer: jsxRendererSync,
   operation(node, ctx) {
-    const { config, resolver, driver, root, inputNode } = ctx
+    if (!ast.isHttpOperationNode(node)) return null
+    const { config, resolver, driver, root } = ctx
     const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -24,13 +30,16 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const meta = {
       name: resolver.resolveName(node.operationId),
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group ?? undefined,
         },
       ),
     } as const
@@ -40,8 +49,8 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(inputNode, { output, config })}
-        footer={resolver.resolveFooter(inputNode, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <Request

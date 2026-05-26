@@ -10,20 +10,20 @@ import { faker } from '@faker-js/faker'
  * @description Created pet
  */
 export function createCreatePetStatus201(data?: Partial<CreatePetStatus201>): CreatePetStatus201 {
-  return createPet(data)
+  return createPet(data) as CreatePetStatus201
 }
 
 /**
  * @description Pet to add
  */
-export function createCreatePetData(data?: Partial<CreatePetData>): Required<CreatePetData> {
+export function createCreatePetData<TData extends Partial<CreatePetData> = object>(data?: TData) {
   const defaultFakeData = { name: faker.string.alpha(), category: createCategory() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<CreatePetData>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 export function createCreatePetResponse(data?: Partial<CreatePetResponse>): CreatePetResponse {
-  return createCreatePetStatus201(data)
+  return createCreatePetStatus201(data) as CreatePetResponse
 }

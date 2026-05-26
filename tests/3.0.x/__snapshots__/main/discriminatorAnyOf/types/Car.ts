@@ -5,15 +5,11 @@
 
 import type { SUV } from "./SUV.ts";
 import type { Sedan } from "./Sedan.ts";
+import type { TypeEnumKey } from "./TypeEnum.ts";
+import type { TypeEnum2Key } from "./TypeEnum2.ts";
 
 export type Car = ((Sedan & {
-    /**
-     * @type string
-    */
-    type: "Sedan";
+    type: TypeEnumKey;
 }) | (SUV & {
-    /**
-     * @type string
-    */
-    type: "SUV";
+    type: TypeEnum2Key;
 }));

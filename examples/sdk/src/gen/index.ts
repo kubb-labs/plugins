@@ -1,11 +1,12 @@
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/AddPetRequest.ts'
+export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
 export type { Customer } from './models/Customer.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/Order.ts'
-export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
+export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
+export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type { Tag } from './models/Tag.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
@@ -17,6 +18,8 @@ export type {
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
+  AddPetStatus200Json,
+  AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
 } from './models/petController/AddPet.ts'
@@ -34,6 +37,8 @@ export type {
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './models/petController/FindPetsByStatus.ts'
 export type {
@@ -44,6 +49,8 @@ export type {
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './models/petController/FindPetsByTags.ts'
 export type {
@@ -52,6 +59,8 @@ export type {
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './models/petController/GetPetById.ts'
@@ -63,6 +72,8 @@ export type {
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -103,6 +114,8 @@ export type {
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './models/storeController/GetOrderById.ts'
@@ -136,6 +149,8 @@ export type {
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './models/userController/CreateUser.ts'
 export type {
@@ -144,6 +159,8 @@ export type {
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './models/userController/CreateUsersWithListInput.ts'
 export type {
@@ -160,6 +177,8 @@ export type {
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './models/userController/GetUserByName.ts'
@@ -170,6 +189,8 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './models/userController/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/userController/LogoutUser.ts'
@@ -185,9 +206,8 @@ export type {
   UpdateUserXmlData,
 } from './models/userController/UpdateUser.ts'
 export { client } from './.kubb/client.ts'
-export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
-export { petStatusEnum } from './models/Pet.ts'
+export { petStatusEnum } from './models/PetStatusEnum.ts'
 export { petController } from './sdk/petController/petController.ts'
 export { PetStoreSDK } from './sdk/petStoreSDK.ts'
 export { storeController } from './sdk/storeController/storeController.ts'

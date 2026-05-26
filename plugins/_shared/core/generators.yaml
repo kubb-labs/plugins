@@ -1,12 +1,13 @@
 # Shared option: core/generators
 
-# ──────────────────────── generators / methods ────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: generators
 type: 'Array<Generator<PluginOptions>>'
 required: false
 experimental: true
 description: |
-  Define additional generators next to the built-in generators.
+  Adds custom generators that run alongside the plugin's built-in generators. Each generator can emit additional files or post-process existing ones using the plugin's AST and options.
 
-  See [Generators](https://kubb.dev/docs/5.x/guides/creating-plugins) for more information on how to use generators.
+  Use this when you need output the plugin does not produce out of the box (a custom client wrapper, an extra index, a metadata file). For end-to-end guidance, see [Creating plugins](https://kubb.dev/docs/5.x/guides/creating-plugins).
+warning: |
+  Generators are an experimental, low-level API. The signature may change between minor releases.

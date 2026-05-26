@@ -1,4 +1,4 @@
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { UpdateUserData, UpdateUserPathUsername, UpdateUserResponse } from "../../types/UpdateUser.ts";
 import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
@@ -15,7 +15,7 @@ export async function updateUserHandler({ username, data }: { username: UpdateUs
   const requestData = data
 
 
-  const res = await fetch<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: `/user/${username}`, data: requestData }, request)
+  const res = await client<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: `/user/${username}`, data: requestData }, request)
 
   return {
               content: [

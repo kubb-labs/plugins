@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { FindPetsByStatusPathStepId, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../models/ts/FindPetsByStatus.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -13,7 +13,7 @@ export async function findPetsByStatusHandler(
   { step_id }: { step_id: FindPetsByStatusPathStepId },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>(
+  const res = await client<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>(
     { method: 'GET', url: `/pet/findByStatus/${step_id}`, baseURL: `https://petstore.swagger.io/v2` },
     request,
   )

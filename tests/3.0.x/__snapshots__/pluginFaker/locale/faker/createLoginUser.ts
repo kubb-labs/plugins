@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { LoginUserResponse, LoginUserStatus400 } from "../types/LoginUser.ts";
+import type { LoginUserResponse, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
 import { fakerDE as faker } from "@faker-js/faker";
 
 export function createLoginUserQueryUsername(data?: string): string {
@@ -17,8 +17,22 @@ export function createLoginUserQueryPassword(data?: string): string {
 /**
  * @description successful operation
  */
-export function createLoginUserStatus200(data?: string): string {
+export function createLoginUserStatus200Xml(data?: string): string {
   return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200Json(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200(_data?: LoginUserStatus200): LoginUserStatus200 {
+  return faker.helpers.arrayElement<any>([createLoginUserStatus200Xml(), createLoginUserStatus200Json()])
 }
 
 /**
