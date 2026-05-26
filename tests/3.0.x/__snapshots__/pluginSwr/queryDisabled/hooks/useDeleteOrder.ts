@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
-export const deleteOrderQueryKey = (orderId: DeleteOrderPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
+export const deleteOrderQueryKey = (orderId?: DeleteOrderPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
 type DeleteOrderQueryKey = ReturnType<typeof deleteOrderQueryKey>
 
@@ -17,7 +17,7 @@ type DeleteOrderQueryKey = ReturnType<typeof deleteOrderQueryKey>
  * {@link /store/order/:orderId}
  */
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
@@ -27,11 +27,11 @@ export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Parti
   return res.data
 }
 
-export function deleteOrderQueryOptions(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deleteOrderQueryOptions(orderId?: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         return {
           fetcher: async () => {
-            return deleteOrder(orderId, config)
+            return deleteOrder(orderId!, config)
           },
         }
 

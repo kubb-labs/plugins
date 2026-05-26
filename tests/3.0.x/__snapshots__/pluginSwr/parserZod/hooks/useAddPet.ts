@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import useSWRMutation from "swr/mutation";
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from "../types/AddPet.ts";
+import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from "../types/AddPet.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { SWRMutationConfiguration } from "swr/mutation";
 import { addPetResponseSchema, addPetDataSchema } from "../zod/addPetSchema.ts";
@@ -20,13 +20,13 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
  * {@link /pet}
  */
 export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = addPetDataSchema.parse(data)
 
 
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return addPetResponseSchema.parse(res.data)
 }

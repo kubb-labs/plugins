@@ -4,10 +4,10 @@
 */
 
 import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/fetch.ts";
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import type { SWRMutationConfiguration } from "swr/mutation";
-import { fetch } from "../.kubb/fetch.ts";
+import { client } from "../.kubb/client.ts";
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -19,13 +19,13 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
  * {@link /store/order}
  */
 export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

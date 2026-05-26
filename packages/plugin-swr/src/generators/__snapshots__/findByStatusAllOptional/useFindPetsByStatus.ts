@@ -4,10 +4,10 @@
  */
 
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus } from './FindPetsByStatus'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import type { SWRConfiguration } from 'swr'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
   [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
@@ -21,9 +21,9 @@ export async function findPetsByStatus(
   { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: `/pet/findByStatus`,
     params,

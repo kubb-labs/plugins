@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import useSWRMutation from "swr/mutation";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
@@ -19,13 +19,13 @@ export type CreateUsersWithListInputMutationKey = ReturnType<typeof createUsersW
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput({ data }: { data?: CreateUsersWithListInputData } = {}, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData, ...requestConfig })
 
   return res.data
 }

@@ -21,7 +21,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     exclude = [],
     include,
     override = [],
-    parser = 'client',
+    parser = false,
     paramsType = 'inline',
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     mutation = {},
@@ -119,11 +119,11 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
 
         if (client?.bundle && !hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
-            baseName: 'fetch.ts',
-            path: path.resolve(root, '.kubb/fetch.ts'),
+            baseName: 'client.ts',
+            path: path.resolve(root, '.kubb/client.ts'),
             sources: [
               ast.createSource({
-                name: 'fetch',
+                name: 'client',
                 nodes: [ast.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
                 isExportable: true,
                 isIndexable: true,

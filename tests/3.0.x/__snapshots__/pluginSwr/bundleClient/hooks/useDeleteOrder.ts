@@ -4,10 +4,10 @@
 */
 
 import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/fetch.ts";
+import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
 import type { SWRMutationConfiguration } from "swr/mutation";
-import { fetch } from "../.kubb/fetch.ts";
+import { client } from "../.kubb/client.ts";
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
@@ -19,7 +19,7 @@ export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
  * {@link /store/order/:orderId}
  */
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

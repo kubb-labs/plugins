@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from "../types/UpdateUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
-export const updateUserQueryKey = (username: UpdateUserPathUsername, data?: UpdateUserData) => [{ url: '/user/:username', params: {username:username} }, ...(data ? [data] : [])] as const
+export const updateUserQueryKey = (username?: UpdateUserPathUsername, data?: UpdateUserData) => [{ url: '/user/:username', params: {username:username} }, ...(data ? [data] : [])] as const
 
 type UpdateUserQueryKey = ReturnType<typeof updateUserQueryKey>
 
@@ -17,7 +17,7 @@ type UpdateUserQueryKey = ReturnType<typeof updateUserQueryKey>
  * {@link /user/:username}
  */
 export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = fetch, contentType = "application/json", ...requestConfig } = config
+  const { client: request = client, contentType = "application/json", ...requestConfig } = config
 
 
   const requestData = data
@@ -28,11 +28,11 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
   return res.data
 }
 
-export function updateUserQueryOptions(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
+export function updateUserQueryOptions(username?: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client } = {}) {
 
         return {
           fetcher: async () => {
-            return updateUser(username, data, config)
+            return updateUser(username!, data, config)
           },
         }
 

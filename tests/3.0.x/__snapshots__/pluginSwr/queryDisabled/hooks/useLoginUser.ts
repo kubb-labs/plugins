@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from "../types/LoginUser.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) => [{ url: '/user/login' }, ...(params ? [params] : [])] as const
@@ -16,12 +16,12 @@ type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
  * {@link /user/login}
  */
 export async function loginUser(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
 
-  const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: `/user/login`, params, ...requestConfig })
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: `/user/login`, params, ...requestConfig })
 
   return res.data
 }

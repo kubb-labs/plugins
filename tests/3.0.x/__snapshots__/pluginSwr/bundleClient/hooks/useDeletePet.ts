@@ -4,10 +4,10 @@
 */
 
 import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/fetch.ts";
+import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from "../types/DeletePet.ts";
 import type { SWRMutationConfiguration } from "swr/mutation";
-import { fetch } from "../.kubb/fetch.ts";
+import { client } from "../.kubb/client.ts";
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -19,7 +19,7 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
  * {@link /pet/:petId}
  */
 export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import fetch from 'axios'
+import client from 'axios'
 import useSWRMutation from 'swr/mutation'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId } from './UpdatePetWithForm'
+import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -21,11 +21,11 @@ export async function updatePetWithForm(
   data?: UpdatePetWithFormData,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const requestData = data
 
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
+  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
     url: `/pet/${petId}`,
     data: requestData,

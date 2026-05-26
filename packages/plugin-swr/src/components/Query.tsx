@@ -3,6 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
 import { buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -85,12 +86,20 @@ export function Query({
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver })
+  const paramsNode = markParamsOptional(
+    buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver }),
+    enabledNames,
+  )
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+
+  // SWR has no `enabled` option; fold the param-presence check into the null-key gate
+  // so passing `undefined` for a required param disables the request (mirrors React Query #60).
+  const shouldFetchExpr = enabledNames.length ? `shouldFetch && !!(${enabledNames.join(' && ')})` : 'shouldFetch'
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -101,7 +110,7 @@ export function Query({
        const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 
        return useSWR<${generics.join(', ')}>(
-        shouldFetch ? queryKey : null,
+        ${shouldFetchExpr} ? queryKey : null,
         {
           ...${queryOptionsName}(${queryOptionsParamsCall}),
           ...(immutable ? {

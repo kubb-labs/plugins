@@ -7,6 +7,8 @@ import type { Person } from './Person.ts'
 
 export type User = Person & {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -43,6 +45,8 @@ export type User = Person & {
   phone?: string
   /**
    * @description User Status
+   *
+   * Format: `int32`
    * @example 1
    * @type integer | undefined
    */
