@@ -5,12 +5,13 @@
 
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
 import { createPet } from "./createPet.ts";
+import { createPetStatusEnum } from "./createPetStatusEnum.ts";
 import { faker } from "@faker-js/faker";
 
-export function createFindPetsByStatusQueryStatus(data?: FindPetsByStatusQueryStatus): FindPetsByStatusQueryStatus {
+export function createFindPetsByStatusQueryStatus(data?: Partial<FindPetsByStatusQueryStatus>): FindPetsByStatusQueryStatus {
   faker.seed([42])
 
-  return data ?? faker.helpers.arrayElement<FindPetsByStatusQueryStatus>(["available", "pending", "sold"])
+  return createPetStatusEnum(data) as FindPetsByStatusQueryStatus
 }
 
 /**

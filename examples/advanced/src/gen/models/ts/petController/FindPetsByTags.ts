@@ -1,3 +1,4 @@
+import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
 import type { Pet } from '../Pet.ts'
 
 /**
@@ -18,19 +19,10 @@ export type FindPetsByTagsQueryPage = string | undefined
  */
 export type FindPetsByTagsQueryPageSize = number | undefined
 
-export const findPetsByTagsXEXAMPLE = {
-  ONE: 'ONE',
-  TWO: 'TWO',
-  THREE: 'THREE',
-} as const
-
-export type FindPetsByTagsXEXAMPLEKey = (typeof findPetsByTagsXEXAMPLE)[keyof typeof findPetsByTagsXEXAMPLE]
-
 /**
  * @description Header parameters
- * @type string
  */
-export type FindPetsByTagsHeaderXEXAMPLE = FindPetsByTagsXEXAMPLEKey
+export type FindPetsByTagsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type array

@@ -3,11 +3,7 @@
 * Do not edit manually.
 */
 
+import type { CardPayment2 } from "./CardPayment2.ts";
 import type { PaymentMethodMapped } from "./PaymentMethodMapped.ts";
 
-export type CardPaymentMapped = (PaymentMethodMapped & {
-    /**
-     * @type string | undefined
-    */
-    cardNumber?: string;
-});
+export type CardPaymentMapped = (PaymentMethodMapped & CardPayment2);

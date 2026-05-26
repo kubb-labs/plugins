@@ -35,7 +35,6 @@ export type {
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
   Customer,
-  CustomerParamsStatusEnumKey,
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
   DeleteOrderResponse,
@@ -65,7 +64,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -124,6 +122,7 @@ export type {
   LogoutUserStatusDefault,
   Order,
   OrderHttpStatusEnumKey,
+  OrderParams,
   OrderParamsStatusEnumKey,
   OrderStatusKey,
   Pet,
@@ -191,9 +190,7 @@ export type {
 } from './modelsPascalConst.ts'
 export {
   AddPetRequestStatusEnum,
-  CustomerParamsStatusEnum,
   DeletePetStatus200Enum,
-  FindPetsByStatusStatus,
   OrderHttpStatusEnum,
   OrderParamsStatusEnum,
   OrderStatus,

@@ -1,10 +1,5 @@
-export const orderParamsStatusEnum = {
-  placed: 'placed',
-  approved: 'approved',
-  delivered: 'delivered',
-} as const
-
-export type OrderParamsStatusEnumKey = (typeof orderParamsStatusEnum)[keyof typeof orderParamsStatusEnum]
+import type { OrderParams } from './OrderParams.ts'
+import type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
 
 export const orderOrderTypeEnum = {
   foo: 'foo',
@@ -12,14 +7,6 @@ export const orderOrderTypeEnum = {
 } as const
 
 export type OrderOrderTypeEnumKey = (typeof orderOrderTypeEnum)[keyof typeof orderOrderTypeEnum]
-
-export const orderStatusEnum = {
-  placed: 'placed',
-  approved: 'approved',
-  delivered: 'delivered',
-} as const
-
-export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum]
 
 export const orderHttpStatusEnum = {
   ok: 200,
@@ -47,21 +34,7 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: number
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: OrderParamsStatusEnumKey
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @description
    * Format: `int32`
@@ -88,9 +61,8 @@ export type Order = {
   /**
    * @description Order Status
    * @example approved
-   * @type string | undefined
    */
-  status?: OrderStatusEnumKey
+  status?: OrderParamsStatusEnumKey
   /**
    * @description HTTP Status
    * @example 200

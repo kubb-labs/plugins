@@ -1,5 +1,6 @@
 import * as z from 'zod'
 import { categorySchema } from './categorySchema.ts'
+import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 import { tagTagSchema } from './tag/tagSchema.ts'
 
 export const petSchema = z.object({
@@ -16,7 +17,7 @@ export const petSchema = z.object({
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(tagTagSchema).optional(),
-  status: z.enum(['available', 'pending', 'sold']).optional().describe('pet status in the store'),
+  status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })
 
 export type PetSchema = z.infer<typeof petSchema>

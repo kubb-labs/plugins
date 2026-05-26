@@ -3,18 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
-export type Tag = {
-  /**
-   * @description
-   * Format: `int64`
-   * @type integer | undefined
-   */
-  id?: bigint
-  /**
-   * @type string | undefined
-   */
-  name?: string
-}
+import type { Category } from './Category.ts'
+
+export type Tag = Category

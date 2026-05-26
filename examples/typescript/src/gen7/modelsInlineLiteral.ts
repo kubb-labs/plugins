@@ -6,6 +6,34 @@
 /**
  * @type object
  */
+export type OrderParams = {
+  /**
+   * @description Order Status
+   * @example approved
+   */
+  status: OrderParamsStatusEnum
+  /**
+   * @type string
+   */
+  type: string
+}
+
+/**
+ * @description Order Status
+ * @example approved
+ * @type string
+ */
+export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
+
+/**
+ * @description pet status in the store
+ * @type string
+ */
+export type PetStatusEnum = 'available' | 'pending' | 'sold'
+
+/**
+ * @type object
+ */
 export type Order = {
   /**
    * @description
@@ -21,21 +49,7 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: 'placed' | 'approved' | 'delivered'
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @description
    * Format: `int32`
@@ -105,21 +119,7 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: 'placed' | 'approved' | 'delivered'
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @example fehguy
    * @type string | undefined
@@ -218,21 +218,7 @@ export type User = {
   userStatus?: number
 }
 
-/**
- * @type object
- */
-export type Tag = {
-  /**
-   * @description
-   * Format: `int64`
-   * @type integer | undefined
-   */
-  id?: bigint
-  /**
-   * @type string | undefined
-   */
-  name?: string
-}
+export type Tag = Category
 
 /**
  * @type object
@@ -294,6 +280,9 @@ export type Pet = (
    * @type string
    */
   name: string
+  /**
+   * @type object | undefined
+   */
   category?: Category
   /**
    * @type array
@@ -305,9 +294,8 @@ export type Pet = (
   readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
-  status?: 'available' | 'pending' | 'sold'
+  status?: PetStatusEnum
 }
 
 export type FullAddress = Address & {
@@ -471,21 +459,7 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-/**
- * @type object
- */
-export type AddPetStatus405 = {
-  /**
-   * @description
-   * Format: `int32`
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
-}
+export type AddPetStatus405 = PetNotFound
 
 /**
  * @description Create a new pet in the store
@@ -534,10 +508,9 @@ export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
 /**
  * @description Status values that need to be considered for filter
- * @default "available"
- * @type string | undefined
+ * @default available
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQueryStatus = PetStatusEnum | undefined
 
 /**
  * @type array

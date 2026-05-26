@@ -4,13 +4,13 @@
  */
 
 import type { Pet } from '../Pet.ts'
+import type { PetStatusEnum } from '../PetStatusEnum.ts'
 
 /**
  * @description Status values that need to be considered for filter
- * @default "available"
- * @type string | undefined
+ * @default available
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQueryStatus = PetStatusEnum | undefined
 
 /**
  * @type array

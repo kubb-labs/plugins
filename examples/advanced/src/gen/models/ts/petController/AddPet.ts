@@ -1,21 +1,8 @@
 import type { AddPetRequest } from '../AddPetRequest.ts'
 import type { Pet } from '../Pet.ts'
+import type { PetNotFound } from '../PetNotFound.ts'
 
-/**
- * @type object
- */
-export type AddPetStatus405 = {
-  /**
-   * @description
-   * Format: `int32`
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
-}
+export type AddPetStatus405 = PetNotFound
 
 /**
  * @type object

@@ -3,13 +3,7 @@
  * Do not edit manually.
  */
 
-export const orderParamsStatusEnum = {
-  placed: 'placed',
-  approved: 'approved',
-  delivered: 'delivered',
-} as const
-
-export type OrderParamsStatusEnumKey = (typeof orderParamsStatusEnum)[keyof typeof orderParamsStatusEnum]
+import type { OrderParams } from './OrderParams.ts'
 
 export const orderStatus = {
   accepted: 'accepted',
@@ -43,21 +37,7 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: OrderParamsStatusEnumKey
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @description
    * Format: `int32`

@@ -4,6 +4,7 @@
  */
 
 import type { Address } from './Address.ts'
+import type { OrderParams } from './OrderParams.ts'
 
 /**
  * @type object
@@ -16,21 +17,7 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: 'placed' | 'approved' | 'delivered'
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @example fehguy
    * @type string | undefined

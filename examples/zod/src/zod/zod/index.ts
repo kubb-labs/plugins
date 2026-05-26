@@ -22,6 +22,7 @@ export type {
   CreatePetsStatus201Schema,
   CreatePetsStatusDefaultSchema,
 } from './createPetsSchema.ts'
+export type { CreatePetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 export type {
   CreateUserDataSchema,
   CreateUserDataSchemaFormUrlEncoded,
@@ -111,6 +112,7 @@ export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './
 export type { OrderSchema } from './orderSchema.ts'
 export type { PetNotFoundSchema } from './petNotFoundSchema.ts'
 export type { PetSchema } from './petSchema.ts'
+export type { PetStatusEnumSchema } from './petStatusEnumSchema.ts'
 export type { PhoneNumberSchema } from './phoneNumberSchema.ts'
 export type { PhoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
 export type { PhoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'
@@ -195,6 +197,7 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './createPetsSchema.ts'
+export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 export {
   createUserDataSchema,
   createUserDataSchemaFormUrlEncoded,
@@ -285,6 +288,7 @@ export { OperationSchema, OperationsMap, operations, paths } from './operationsS
 export { orderSchema } from './orderSchema.ts'
 export { petNotFoundSchema } from './petNotFoundSchema.ts'
 export { petSchema } from './petSchema.ts'
+export { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 export { phoneNumberSchema } from './phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'

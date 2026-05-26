@@ -51,7 +51,6 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-  FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.ts'
 export type {
   GetPetByIdPathPetId,
@@ -98,4 +97,3 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './UploadFile.ts'
-export { findPetsByTagsXEXAMPLE } from './FindPetsByTags.ts'

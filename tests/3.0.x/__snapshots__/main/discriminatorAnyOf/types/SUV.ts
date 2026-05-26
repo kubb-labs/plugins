@@ -3,19 +3,11 @@
 * Do not edit manually.
 */
 
+import type { TypeEnum2Key } from "./TypeEnum2.ts";
 import type { Vehicle } from "./Vehicle.ts";
 
-export const typeEnum = {
-    SUV: "SUV"
-} as const;
-
-export type TypeEnumKey = (typeof typeEnum)[keyof typeof typeEnum];
-
 export type SUV = (Vehicle & {
-    /**
-     * @type string | undefined
-    */
-    type?: TypeEnumKey;
+    type?: TypeEnum2Key;
     /**
      * @description Can handle offroad terrain
      * @type boolean | undefined
