@@ -78,7 +78,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryTags,
@@ -137,7 +136,8 @@ export type {
 } from './models/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
 export type { Order, OrderStatusEnumKey } from './models/Order.ts'
-export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
+export type { Pet } from './models/Pet.ts'
+export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -216,6 +216,5 @@ export { updatePetWithForm, updatePetWithFormMutationKey, useUpdatePetWithForm }
 export { updateUser, updateUserMutationKey, useUpdateUser } from './hooks/useUpdateUser.ts'
 export { uploadFile, uploadFileMutationKey, useUploadFile } from './hooks/useUploadFile.ts'
 export { addressIdentifierEnum } from './models/Address.ts'
-export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
 export { orderStatusEnum } from './models/Order.ts'
-export { petStatusEnum } from './models/Pet.ts'
+export { petStatusEnum } from './models/PetStatusEnum.ts'

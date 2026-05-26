@@ -35,7 +35,6 @@ export type {
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
   Customer,
-  CustomerParamsStatusEnumenumType,
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
   DeleteOrderResponse,
@@ -65,7 +64,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusenumType,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -124,6 +122,7 @@ export type {
   LogoutUserStatusDefault,
   Order,
   OrderHttpStatusEnumenumType,
+  OrderParams,
   OrderParamsStatusEnumenumType,
   OrderStatusenumType,
   Pet,
@@ -191,9 +190,7 @@ export type {
 } from './modelsConst.ts'
 export {
   addPetRequestStatusEnum,
-  customerParamsStatusEnum,
   deletePetStatus200Enum,
-  findPetsByStatusStatus,
   orderHttpStatusEnum,
   orderParamsStatusEnum,
   orderStatus,

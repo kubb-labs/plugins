@@ -6,6 +6,7 @@ import type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from '../../models/ts/petsController/CreatePets.ts'
+import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -21,8 +22,8 @@ export function createCreatePetsQueryOffsetFaker(data?: number): number {
   return data ?? faker.number.int()
 }
 
-export function createCreatePetsHeaderXEXAMPLEFaker(data?: CreatePetsHeaderXEXAMPLE): CreatePetsHeaderXEXAMPLE {
-  return data ?? faker.helpers.arrayElement<CreatePetsHeaderXEXAMPLE>(['ONE', 'TWO', 'THREE'])
+export function createCreatePetsHeaderXEXAMPLEFaker(data?: Partial<CreatePetsHeaderXEXAMPLE>): CreatePetsHeaderXEXAMPLE {
+  return createCreatePetsXEXAMPLEFaker(data) as CreatePetsHeaderXEXAMPLE
 }
 
 /**

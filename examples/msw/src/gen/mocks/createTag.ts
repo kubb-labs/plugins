@@ -4,13 +4,11 @@
  */
 
 import type { Tag } from '../models/Tag.ts'
+import { createCategory } from './createCategory.ts'
 import { faker } from '@faker-js/faker'
 
-export function createTag<TData extends Partial<Tag> = object>(data?: TData) {
+export function createTag(data?: Partial<Tag>): Tag {
   faker.seed([220])
-  const defaultFakeData = { id: faker.number.bigInt(), name: faker.string.alpha() }
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+
+  return createCategory(data) as Tag
 }

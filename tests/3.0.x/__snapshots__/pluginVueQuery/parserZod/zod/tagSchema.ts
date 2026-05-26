@@ -3,9 +3,6 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import { categorySchema } from "./categorySchema.ts";
 
-export const tagSchema = z.object({
-    "id": z.bigint().optional(),
-    "name": z.string().optional()
-    })
+export const tagSchema = categorySchema

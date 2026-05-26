@@ -3,19 +3,11 @@
 * Do not edit manually.
 */
 
+import type { TypeEnum3Key } from "./TypeEnum3.ts";
 import type { Vehicle } from "./Vehicle.ts";
 
-export const typeEnum = {
-    ElectricCar: "ElectricCar"
-} as const;
-
-export type TypeEnumKey = (typeof typeEnum)[keyof typeof typeEnum];
-
 export type ElectricCar = (Vehicle & {
-    /**
-     * @type string | undefined
-    */
-    type?: TypeEnumKey;
+    type?: TypeEnum3Key;
     /**
      * @description Battery capacity in kWh
      *

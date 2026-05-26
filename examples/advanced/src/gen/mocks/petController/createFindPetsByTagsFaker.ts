@@ -7,6 +7,7 @@ import type {
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from '../../models/ts/petController/FindPetsByTags.ts'
+import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetFaker } from '../createPetFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -22,8 +23,8 @@ export function createFindPetsByTagsQueryPageSizeFaker(data?: number): number {
   return data ?? faker.number.float()
 }
 
-export function createFindPetsByTagsHeaderXEXAMPLEFaker(data?: FindPetsByTagsHeaderXEXAMPLE): FindPetsByTagsHeaderXEXAMPLE {
-  return data ?? faker.helpers.arrayElement<FindPetsByTagsHeaderXEXAMPLE>(['ONE', 'TWO', 'THREE'])
+export function createFindPetsByTagsHeaderXEXAMPLEFaker(data?: Partial<FindPetsByTagsHeaderXEXAMPLE>): FindPetsByTagsHeaderXEXAMPLE {
+  return createCreatePetsXEXAMPLEFaker(data) as FindPetsByTagsHeaderXEXAMPLE
 }
 
 /**

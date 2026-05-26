@@ -21,7 +21,7 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.js'
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.js'
+export type { AddPetRequest } from './AddPetRequest.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
@@ -35,8 +35,8 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
-  CreatePetsXEXAMPLEKey,
 } from './CreatePets.js'
+export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -106,7 +106,6 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-  FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.js'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
 export type {
@@ -155,8 +154,9 @@ export type {
 } from './LoginUser.js'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.js'
 export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderStatusEnumKey } from './Order.js'
-export type { Pet, PetStatusEnumKey } from './Pet.js'
+export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
+export type { PetStatusEnumKey } from './PetStatusEnum.js'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -218,8 +218,6 @@ export type {
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
 export type { TagTag } from './tag/Tag.js'
-export { addPetRequestStatusEnum } from './AddPetRequest.js'
-export { createPetsXEXAMPLE } from './CreatePets.js'
-export { findPetsByTagsXEXAMPLE } from './FindPetsByTags.js'
+export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.js'
 export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
-export { petStatusEnum } from './Pet.js'
+export { petStatusEnum } from './PetStatusEnum.js'

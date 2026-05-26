@@ -5,8 +5,9 @@
 
 import * as z from "zod";
 import { petSchema } from "./petSchema.ts";
+import { petStatusEnumSchema } from "./petStatusEnumSchema.ts";
 
-export const findPetsByStatusQueryStatusSchema = z.enum(["available", "pending", "sold"]).optional().default("available").describe("Status values that need to be considered for filter")
+export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema.optional().default("available").describe("Status values that need to be considered for filter")
 
 export type FindPetsByStatusQueryStatusSchema = z.infer<typeof findPetsByStatusQueryStatusSchema>
 

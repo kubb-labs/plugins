@@ -11,17 +11,14 @@ import type {
 } from '../../models/ts/petController/AddPet.ts'
 import { createAddPetRequestFaker } from '../createAddPetRequestFaker.ts'
 import { createPetFaker } from '../createPetFaker.ts'
+import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
 import { faker } from '@faker-js/faker'
 
 /**
  * @description Pet not found
  */
-export function createAddPetStatus405Faker<TData extends Partial<AddPetStatus405> = object>(data?: TData) {
-  const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
-  return {
-    ...defaultFakeData,
-    ...(data || {}),
-  } as Omit<typeof defaultFakeData, keyof TData> & TData
+export function createAddPetStatus405Faker(data?: Partial<AddPetStatus405>): AddPetStatus405 {
+  return createPetNotFoundFaker(data) as AddPetStatus405
 }
 
 /**

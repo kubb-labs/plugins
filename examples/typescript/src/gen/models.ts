@@ -3,6 +3,21 @@
  * Do not edit manually.
  */
 
+/**
+ * @type object
+ */
+export interface OrderParams {
+  /**
+   * @description Order Status
+   * @example approved
+   */
+  status: OrderParamsStatusEnumKey
+  /**
+   * @type string
+   */
+  type: string
+}
+
 export const orderParamsStatusEnum = {
   PLACED: 'placed',
   APPROVED: 'approved',
@@ -10,6 +25,14 @@ export const orderParamsStatusEnum = {
 } as const
 
 export type OrderParamsStatusEnumKey = (typeof orderParamsStatusEnum)[keyof typeof orderParamsStatusEnum]
+
+export const petStatusEnum = {
+  AVAILABLE: 'available',
+  PENDING: 'pending',
+  SOLD: 'sold',
+} as const
+
+export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
 
 export const orderStatus = {
   ACCEPTED: 'accepted',
@@ -43,21 +66,7 @@ export interface Order {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: OrderParamsStatusEnumKey
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @description
    * Format: `int32`
@@ -116,14 +125,6 @@ export interface Address {
   zip?: string
 }
 
-export const customerParamsStatusEnum = {
-  PLACED: 'placed',
-  APPROVED: 'approved',
-  DELIVERED: 'delivered',
-} as const
-
-export type CustomerParamsStatusEnumKey = (typeof customerParamsStatusEnum)[keyof typeof customerParamsStatusEnum]
-
 /**
  * @type object
  */
@@ -135,21 +136,7 @@ export interface Customer {
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: CustomerParamsStatusEnumKey
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @example fehguy
    * @type string | undefined
@@ -248,21 +235,7 @@ export interface User {
   userStatus?: number
 }
 
-/**
- * @type object
- */
-export interface Tag {
-  /**
-   * @description
-   * Format: `int64`
-   * @type integer | undefined
-   */
-  id?: bigint
-  /**
-   * @type string | undefined
-   */
-  name?: string
-}
+export type Tag = Category
 
 /**
  * @type object
@@ -301,14 +274,6 @@ export const petTypeEnum = {
 
 export type PetTypeEnumKey = (typeof petTypeEnum)[keyof typeof petTypeEnum]
 
-export const petStatusEnum = {
-  AVAILABLE: 'available',
-  PENDING: 'pending',
-  SOLD: 'sold',
-} as const
-
-export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
-
 export type Pet = (
   | (Dog & {
       /**
@@ -339,6 +304,9 @@ export type Pet = (
    * @type string
    */
   name: string
+  /**
+   * @type object | undefined
+   */
   category?: Category
   /**
    * @type array
@@ -350,7 +318,6 @@ export type Pet = (
   readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: PetStatusEnumKey
 }
@@ -525,21 +492,7 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-/**
- * @type object
- */
-export interface AddPetStatus405 {
-  /**
-   * @description
-   * Format: `int32`
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
-}
+export type AddPetStatus405 = PetNotFound
 
 /**
  * @description Create a new pet in the store
@@ -586,20 +539,11 @@ export interface AddPetResponses {
  */
 export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
-export const findPetsByStatusStatus = {
-  AVAILABLE: 'available',
-  PENDING: 'pending',
-  SOLD: 'sold',
-} as const
-
-export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
-
 /**
  * @description Status values that need to be considered for filter
- * @default "available"
- * @type string | undefined
+ * @default available
  */
-export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
+export type FindPetsByStatusQueryStatus = PetStatusEnumKey | undefined
 
 /**
  * @type array

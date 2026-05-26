@@ -12,7 +12,7 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './models/AddPet.ts'
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/AddPetRequest.ts'
+export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
@@ -72,7 +72,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -133,8 +132,9 @@ export type {
 } from './models/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/Order.ts'
-export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
+export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
+export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -311,7 +311,5 @@ export {
   useLogoutUserSuspenseHook,
 } from './hooks/user/useLogoutUserSuspenseHook.ts'
 export { updateUserHook, updateUserMutationKey, updateUserMutationOptionsHook, useUpdateUserHook } from './hooks/user/useUpdateUserHook.ts'
-export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
-export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
-export { petStatusEnum } from './models/Pet.ts'
+export { petStatusEnum } from './models/PetStatusEnum.ts'

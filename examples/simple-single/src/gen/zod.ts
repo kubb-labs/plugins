@@ -5,6 +5,8 @@
 
 import * as z from 'zod'
 
+export const petStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
+
 export const orderSchema = z.object({
   id: z.bigint().optional(),
   petId: z.bigint().optional(),
@@ -53,10 +55,7 @@ export const userSchema = personSchema.and(
   }),
 )
 
-export const tagSchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string().optional(),
-})
+export const tagSchema = categorySchema
 
 export const petSchema = z.object({
   id: z.bigint().optional(),
@@ -64,17 +63,10 @@ export const petSchema = z.object({
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(tagSchema).optional(),
-  status: z.enum(['available', 'pending', 'sold']).optional().describe('pet status in the store'),
+  status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })
 
-export const addPetRequestSchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string(),
-  category: categorySchema.optional(),
-  photoUrls: z.array(z.string()),
-  tags: z.array(tagSchema).optional(),
-  status: z.enum(['available', 'pending', 'sold']).optional().describe('pet status in the store'),
-})
+export const addPetRequestSchema = petSchema
 
 export const apiResponseSchema = z.object({
   code: z.int().optional(),
@@ -117,10 +109,7 @@ export const addPetStatus200SchemaXml = petSchema
 
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
-export const addPetStatus405Schema = z.object({
-  code: z.int().optional(),
-  message: z.string().optional(),
-})
+export const addPetStatus405Schema = petNotFoundSchema
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
@@ -132,8 +121,7 @@ export const addPetDataSchemaFormUrlEncoded = petSchema.describe('Create a new p
 
 export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
-export const findPetsByStatusQueryStatusSchema = z
-  .enum(['available', 'pending', 'sold'])
+export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema
   .optional()
   .default('available')
   .describe('Status values that need to be considered for filter')

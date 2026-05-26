@@ -3,48 +3,6 @@
  * Do not edit manually.
  */
 
-import type { Category } from './Category.ts'
-import type { Tag } from './Tag.ts'
+import type { Pet } from './Pet.ts'
 
-export const addPetRequestStatusEnum = {
-  available: 'available',
-  pending: 'pending',
-  sold: 'sold',
-} as const
-
-export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum]
-
-/**
- * @type object
- */
-export type AddPetRequest = {
-  /**
-   * @description
-   * Format: `int64`
-   * @example 10
-   * @type integer | undefined
-   */
-  id?: bigint
-  /**
-   * @example doggie
-   * @type string
-   */
-  name: string
-  /**
-   * @type object | undefined
-   */
-  category?: Category
-  /**
-   * @type array
-   */
-  photoUrls: Array<string>
-  /**
-   * @type array | undefined
-   */
-  tags?: Array<Tag>
-  /**
-   * @description pet status in the store
-   * @type string | undefined
-   */
-  status?: AddPetRequestStatusEnumKey
-}
+export type AddPetRequest = Pet

@@ -4,21 +4,13 @@
  */
 
 import type { Pet } from '../Pet.js'
-
-export const findPetsByStatusStatus = {
-  available: 'available',
-  pending: 'pending',
-  sold: 'sold',
-} as const
-
-export type FindPetsByStatusStatusKey = (typeof findPetsByStatusStatus)[keyof typeof findPetsByStatusStatus]
+import type { PetStatusEnumKey } from '../PetStatusEnum.js'
 
 /**
  * @description Status values that need to be considered for filter
- * @default "available"
- * @type string | undefined
+ * @default available
  */
-export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
+export type FindPetsByStatusQueryStatus = PetStatusEnumKey | undefined
 
 /**
  * @type array

@@ -28,7 +28,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
 } from './FindPetsByStatus.js'
 export type {
   FindPetsByTagsQueryPage,
@@ -88,4 +87,3 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './UploadFile.js'
-export { findPetsByStatusStatus } from './FindPetsByStatus.js'

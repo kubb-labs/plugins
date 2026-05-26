@@ -119,6 +119,7 @@ export type {
   LogoutUserResponses,
   LogoutUserStatusDefault,
   Order,
+  OrderParams,
   Pet,
   PetNotFound,
   PlaceOrderData,
@@ -182,9 +183,7 @@ export type {
 } from './modelsConstEnum.ts'
 export {
   AddPetRequestStatusEnum,
-  CustomerParamsStatusEnum,
   DeletePetStatus200Enum,
-  FindPetsByStatusStatus,
   OrderHttpStatusEnum,
   OrderParamsStatusEnum,
   OrderStatus,

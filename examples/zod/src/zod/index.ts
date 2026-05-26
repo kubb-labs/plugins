@@ -11,7 +11,7 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './ts/AddPet.ts'
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './ts/AddPetRequest.ts'
+export type { AddPetRequest } from './ts/AddPetRequest.ts'
 export type { Address } from './ts/Address.ts'
 export type { ApiResponse } from './ts/ApiResponse.ts'
 export type { Category } from './ts/Category.ts'
@@ -25,8 +25,8 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
-  CreatePetsXEXAMPLEKey,
 } from './ts/CreatePets.ts'
+export type { CreatePetsXEXAMPLEKey } from './ts/CreatePetsXEXAMPLE.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -83,7 +83,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
 } from './ts/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLE,
@@ -97,7 +96,6 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-  FindPetsByTagsXEXAMPLEKey,
 } from './ts/FindPetsByTags.ts'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './ts/GetInventory.ts'
 export type {
@@ -155,8 +153,9 @@ export type {
 } from './ts/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './ts/LogoutUser.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey, OrderValueEnumKey } from './ts/Order.ts'
-export type { Pet, PetStatusEnumKey } from './ts/Pet.ts'
+export type { Pet } from './ts/Pet.ts'
 export type { PetNotFound } from './ts/PetNotFound.ts'
+export type { PetStatusEnumKey } from './ts/PetStatusEnum.ts'
 export type { PhoneNumber } from './ts/PhoneNumber.ts'
 export type { PhoneWithMaxLength } from './ts/PhoneWithMaxLength.ts'
 export type { PhoneWithMaxLengthExplicit } from './ts/PhoneWithMaxLengthExplicit.ts'
@@ -253,6 +252,7 @@ export type {
   CreatePetsStatus201Schema,
   CreatePetsStatusDefaultSchema,
 } from './zod/createPetsSchema.ts'
+export type { CreatePetsXEXAMPLESchema } from './zod/createPetsXEXAMPLESchema.ts'
 export type {
   CreateUserDataSchema,
   CreateUserDataSchemaFormUrlEncoded,
@@ -347,6 +347,7 @@ export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './
 export type { OrderSchema } from './zod/orderSchema.ts'
 export type { PetNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export type { PetSchema } from './zod/petSchema.ts'
+export type { PetStatusEnumSchema } from './zod/petStatusEnumSchema.ts'
 export type { PhoneNumberSchema } from './zod/phoneNumberSchema.ts'
 export type { PhoneWithMaxLengthExplicitSchema } from './zod/phoneWithMaxLengthExplicitSchema.ts'
 export type { PhoneWithMaxLengthSchema } from './zod/phoneWithMaxLengthSchema.ts'
@@ -407,12 +408,9 @@ export type {
 } from './zod/uploadFileSchema.ts'
 export type { UserArraySchema } from './zod/userArraySchema.ts'
 export type { UserSchema } from './zod/userSchema.ts'
-export { addPetRequestStatusEnum } from './ts/AddPetRequest.ts'
-export { createPetsXEXAMPLE } from './ts/CreatePets.ts'
-export { findPetsByStatusStatus } from './ts/FindPetsByStatus.ts'
-export { findPetsByTagsXEXAMPLE } from './ts/FindPetsByTags.ts'
+export { createPetsXEXAMPLE } from './ts/CreatePetsXEXAMPLE.ts'
 export { orderHttpStatusEnum, orderStatusEnum, orderValueEnum } from './ts/Order.ts'
-export { petStatusEnum } from './ts/Pet.ts'
+export { petStatusEnum } from './ts/PetStatusEnum.ts'
 export { addPetRequestSchema } from './zod/addPetRequestSchema.ts'
 export {
   addPetDataSchema,
@@ -437,6 +435,7 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './zod/createPetsSchema.ts'
+export { createPetsXEXAMPLESchema } from './zod/createPetsXEXAMPLESchema.ts'
 export {
   createUserDataSchema,
   createUserDataSchemaFormUrlEncoded,
@@ -527,6 +526,7 @@ export { OperationSchema, OperationsMap, operations, paths } from './zod/operati
 export { orderSchema } from './zod/orderSchema.ts'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export { petSchema } from './zod/petSchema.ts'
+export { petStatusEnumSchema } from './zod/petStatusEnumSchema.ts'
 export { phoneNumberSchema } from './zod/phoneNumberSchema.ts'
 export { phoneWithMaxLengthExplicitSchema } from './zod/phoneWithMaxLengthExplicitSchema.ts'
 export { phoneWithMaxLengthSchema } from './zod/phoneWithMaxLengthSchema.ts'

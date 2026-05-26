@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
+import type { OrderParams } from './OrderParams.ts'
+
 /**
  * @type object
  */
@@ -21,21 +23,7 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  /**
-   * @type object | undefined
-   */
-  params?: {
-    /**
-     * @description Order Status
-     * @example approved
-     * @type string
-     */
-    status: 'placed' | 'approved' | 'delivered'
-    /**
-     * @type string
-     */
-    type: string
-  }
+  params?: OrderParams
   /**
    * @description
    * Format: `int32`

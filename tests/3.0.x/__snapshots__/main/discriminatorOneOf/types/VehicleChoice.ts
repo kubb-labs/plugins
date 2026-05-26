@@ -4,22 +4,16 @@
 */
 
 import type { ElectricCar } from "./ElectricCar.ts";
+import type { ElectricCarTypeEnumKey } from "./ElectricCarTypeEnum.ts";
 import type { SUV } from "./SUV.ts";
+import type { SUVTypeEnumKey } from "./SUVTypeEnum.ts";
 import type { Sedan } from "./Sedan.ts";
+import type { SedanTypeEnumKey } from "./SedanTypeEnum.ts";
 
 export type VehicleChoice = ((Sedan & {
-    /**
-     * @type string
-    */
-    type: "Sedan";
+    type: SedanTypeEnumKey;
 }) | (SUV & {
-    /**
-     * @type string
-    */
-    type: "SUV";
+    type: SUVTypeEnumKey;
 }) | (ElectricCar & {
-    /**
-     * @type string
-    */
-    type: "ElectricCar";
+    type: ElectricCarTypeEnumKey;
 }));

@@ -4,9 +4,12 @@ export type { AnimalSchema } from './animalSchema.ts'
 export type { ApiResponseSchema } from './apiResponseSchema.ts'
 export type { CatSchema } from './catSchema.ts'
 export type { CategorySchema } from './categorySchema.ts'
+export type { CreatePetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 export type { CustomerSchema } from './customerSchema.ts'
 export type { DogSchema } from './dogSchema.ts'
 export type { ImageSchema } from './imageSchema.ts'
+export type { OrderParamsSchema } from './orderParamsSchema.ts'
+export type { OrderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
 export type { OrderSchema } from './orderSchema.ts'
 export type {
   AddFilesDataSchema,
@@ -91,6 +94,7 @@ export type {
 } from './petController/uploadFileSchema.ts'
 export type { PetNotFoundSchema } from './petNotFoundSchema.ts'
 export type { PetSchema } from './petSchema.ts'
+export type { PetStatusEnumSchema } from './petStatusEnumSchema.ts'
 export type {
   CreatePetsDataSchema,
   CreatePetsHeaderXEXAMPLESchema,
@@ -162,9 +166,12 @@ export { animalSchema } from './animalSchema.ts'
 export { apiResponseSchema } from './apiResponseSchema.ts'
 export { catSchema } from './catSchema.ts'
 export { categorySchema } from './categorySchema.ts'
+export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 export { customerSchema } from './customerSchema.ts'
 export { dogSchema } from './dogSchema.ts'
 export { imageSchema } from './imageSchema.ts'
+export { orderParamsSchema } from './orderParamsSchema.ts'
+export { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
 export { orderSchema } from './orderSchema.ts'
 export {
   addFilesDataSchema,
@@ -244,6 +251,7 @@ export {
 } from './petController/uploadFileSchema.ts'
 export { petNotFoundSchema } from './petNotFoundSchema.ts'
 export { petSchema } from './petSchema.ts'
+export { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 export {
   createPetsDataSchema,
   createPetsHeaderXEXAMPLESchema,

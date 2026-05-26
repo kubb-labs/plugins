@@ -5,6 +5,7 @@
 
 import type { Pet } from '../models/Pet.ts'
 import { createCategory } from './createCategory.ts'
+import { createPetStatusEnum } from './createPetStatusEnum.ts'
 import { createTag } from './createTag.ts'
 import { faker } from '@faker-js/faker'
 
@@ -15,7 +16,7 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
     category: createCategory(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
     tags: faker.helpers.multiple(() => createTag()),
-    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+    status: createPetStatusEnum(),
   }
   return {
     ...defaultFakeData,

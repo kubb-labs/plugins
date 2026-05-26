@@ -38,7 +38,7 @@ export type {
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.ts'
-export type { Customer, CustomerParamsStatusEnumKey } from './Customer.ts'
+export type { Customer } from './Customer.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -75,7 +75,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
 } from './FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -137,9 +136,12 @@ export type {
   LoginUserStatus400,
 } from './LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderParamsStatusEnumKey, OrderStatusKey } from './Order.ts'
-export type { Pet, PetStatusEnumKey, PetTypeEnumKey } from './Pet.ts'
+export type { Order, OrderHttpStatusEnumKey, OrderStatusKey } from './Order.ts'
+export type { OrderParams } from './OrderParams.ts'
+export type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
+export type { Pet, PetTypeEnumKey } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
+export type { PetStatusEnumKey } from './PetStatusEnum.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -211,8 +213,8 @@ export type {
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
 export { addPetRequestStatusEnum } from './AddPetRequest.ts'
-export { customerParamsStatusEnum } from './Customer.ts'
 export { deletePetStatus200Enum } from './DeletePet.ts'
-export { findPetsByStatusStatus } from './FindPetsByStatus.ts'
-export { orderHttpStatusEnum, orderParamsStatusEnum, orderStatus } from './Order.ts'
-export { petStatusEnum, petTypeEnum } from './Pet.ts'
+export { orderHttpStatusEnum, orderStatus } from './Order.ts'
+export { orderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
+export { petTypeEnum } from './Pet.ts'
+export { petStatusEnum } from './PetStatusEnum.ts'

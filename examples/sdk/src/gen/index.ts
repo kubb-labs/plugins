@@ -1,11 +1,12 @@
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/AddPetRequest.ts'
+export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
 export type { Customer } from './models/Customer.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/Order.ts'
-export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
+export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
+export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type { Tag } from './models/Tag.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
@@ -39,7 +40,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
 } from './models/petController/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
@@ -206,10 +206,8 @@ export type {
   UpdateUserXmlData,
 } from './models/userController/UpdateUser.ts'
 export { client } from './.kubb/client.ts'
-export { addPetRequestStatusEnum } from './models/AddPetRequest.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
-export { petStatusEnum } from './models/Pet.ts'
-export { findPetsByStatusStatus } from './models/petController/FindPetsByStatus.ts'
+export { petStatusEnum } from './models/PetStatusEnum.ts'
 export { petController } from './sdk/petController/petController.ts'
 export { PetStoreSDK } from './sdk/petStoreSDK.ts'
 export { storeController } from './sdk/storeController/storeController.ts'

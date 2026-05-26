@@ -4,7 +4,6 @@ export type {
   AddPetJsonData,
   AddPetRequest,
   AddPetRequestConfig,
-  AddPetRequestStatusEnumKey,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -60,7 +59,6 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -294,7 +292,7 @@ export {
   useUpdateUser,
   useUploadFile,
 } from './hooks'
-export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
+export { orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models'
 export {
   addPetDataSchema,
   addPetDataSchemaFormUrlEncoded,
@@ -386,6 +384,7 @@ export {
   personSchema,
   petNotFoundSchema,
   petSchema,
+  petStatusEnumSchema,
   placeOrderDataSchema,
   placeOrderDataSchemaFormUrlEncoded,
   placeOrderDataSchemaJson,
