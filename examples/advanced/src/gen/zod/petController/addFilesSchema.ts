@@ -13,8 +13,16 @@ export const addFilesResponseSchema = z.union([addFilesStatus200Schema, addFiles
 
 export type AddFilesResponseSchema = z.infer<typeof addFilesResponseSchema>
 
-export const addFilesDataSchema = z.object({
+export const addFilesDataSchemaJson = z.object({
   url: z.url().describe('URL of the image to upload'),
 })
+
+export type AddFilesDataSchemaJson = z.infer<typeof addFilesDataSchemaJson>
+
+export const addFilesDataSchemaFormData = z.lazy(() => petSchema.omit({ id: true }))
+
+export type AddFilesDataSchemaFormData = z.infer<typeof addFilesDataSchemaFormData>
+
+export const addFilesDataSchema = z.union([addFilesDataSchemaJson, addFilesDataSchemaFormData])
 
 export type AddFilesDataSchema = z.infer<typeof addFilesDataSchema>

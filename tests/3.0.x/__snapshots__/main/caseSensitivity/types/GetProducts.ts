@@ -3,23 +3,9 @@
 * Do not edit manually.
 */
 
-/**
- * @type object
-*/
-export type GetProductsStatus200 = {
-    /**
-     * @type string | undefined
-    */
-    productId?: string;
-    /**
-     * @type string | undefined
-    */
-    productName?: string;
-    /**
-     * @type integer | undefined
-    */
-    stock?: number;
-};
+import type { ProductResponse } from "./ProductResponse.ts";
+
+export type GetProductsStatus200 = ProductResponse;
 
 /**
  * @type object

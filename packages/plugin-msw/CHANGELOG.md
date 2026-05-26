@@ -1,5 +1,72 @@
 # @kubb/plugin-msw
 
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- Updated dependencies [[`21accf1`](https://github.com/kubb-labs/plugins/commit/21accf11be058a252aded049a5d98e30eb6b4c32)]:
+  - @kubb/plugin-ts@5.0.0-beta.30
+  - @kubb/plugin-faker@5.0.0-beta.30
+
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#226](https://github.com/kubb-labs/plugins/pull/226) [`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.29 core dependency update.
+
+- Updated dependencies [[`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a)]:
+  - @kubb/plugin-faker@5.0.0-beta.29
+  - @kubb/plugin-ts@5.0.0-beta.29
+
+## 5.0.0-beta.28
+
+### Minor Changes
+
+- [#218](https://github.com/kubb-labs/plugins/pull/218) [`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Forward per-file context to `output.banner`/`output.footer` so a directive like `'use server'` can be skipped on re-export files.
+
+  Every generator now passes the file it renders into (`filePath`, `baseName`) to the banner/footer resolver, and the grouped client generator (`@kubb/plugin-client`) flags its group `[dir]/[dir].ts` files as `isAggregation`. Combined with the `BannerMeta` context added in `@kubb/core`, a banner function can branch per file:
+
+  ```ts
+  pluginClient({
+    output: {
+      banner: (meta) =>
+        meta.isBarrel || meta.isAggregation ? "" : "'use server'",
+    },
+  });
+  ```
+
+  Requires `@kubb/core` with `BannerMeta` per-file banner context.
+
+### Patch Changes
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d), [`c029564`](https://github.com/kubb-labs/plugins/commit/c02956455485aecd496e4e00603ded5c0d0fbfea), [`3e114d1`](https://github.com/kubb-labs/plugins/commit/3e114d1101d58a567da223e2c14cb61d078c67c2)]:
+  - @kubb/plugin-ts@5.0.0-beta.28
+  - @kubb/plugin-faker@5.0.0-beta.28
+
+## 5.0.0-beta.27
+
+### Patch Changes
+
+- Updated dependencies [[`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877)]:
+  - @kubb/plugin-ts@5.0.0-beta.27
+  - @kubb/plugin-faker@5.0.0-beta.27
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- [#195](https://github.com/kubb-labs/plugins/pull/195) [`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Enforce `Array<T>` syntax (over `T[]`) via the oxlint `typescript/array-type` rule. Internal-only change; no runtime or API impact.
+
+- [#188](https://github.com/kubb-labs/plugins/pull/188) [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.23 core dependency update.
+
+- [#192](https://github.com/kubb-labs/plugins/pull/192) [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align plugin release flow with the beta.24 core dependency update.
+
+- [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync with kubb
+
+- Updated dependencies [[`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65), [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac), [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c), [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b), [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3)]:
+  - @kubb/plugin-faker@5.0.0-beta.25
+  - @kubb/plugin-ts@5.0.0-beta.25
+
 ## 5.0.0-beta.22
 
 ### Patch Changes

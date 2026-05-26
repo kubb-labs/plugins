@@ -6,7 +6,7 @@
 import type { Cat } from './types/Cat'
 import { faker } from '@faker-js/faker'
 
-export function createCat(data?: Partial<Cat>): Required<Cat> {
+export function createCat<TData extends Partial<Cat> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     get archEnemy() {
@@ -25,5 +25,5 @@ export function createCat(data?: Partial<Cat>): Required<Cat> {
       Object.defineProperty(defaultFakeData, key, { value, configurable: true, writable: true, enumerable: true })
     }
   }
-  return defaultFakeData as Required<Cat>
+  return defaultFakeData as Omit<typeof defaultFakeData, keyof TData> & TData
 }

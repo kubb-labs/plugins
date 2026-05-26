@@ -3,13 +3,22 @@ import type { Pet } from '../Pet.ts'
 /**
  * @type object
  */
-export type UpdatePetStatus200 = Omit<NonNullable<Pet>, 'name'>
+export type UpdatePetStatus200Json = Omit<NonNullable<Pet>, 'name'>
+
+/**
+ * @type object
+ */
+export type UpdatePetStatus200Xml = Omit<NonNullable<Pet>, 'name'>
+
+export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
 /**
  * @type object
  */
 export type UpdatePetStatus202 = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */

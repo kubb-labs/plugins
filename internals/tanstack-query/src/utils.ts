@@ -16,8 +16,8 @@ function matchesPattern(node: ast.OperationNode, ov: { type: string; pattern: st
   const matches = (value: string) => (typeof pattern === 'string' ? value === pattern : pattern.test(value))
   if (type === 'operationId') return matches(node.operationId)
   if (type === 'tag') return node.tags.some((t) => matches(t))
-  if (type === 'path') return matches(node.path)
-  if (type === 'method') return matches(node.method)
+  if (type === 'path') return node.path !== undefined && matches(node.path)
+  if (type === 'method') return node.method !== undefined && matches(node.method)
   return false
 }
 
@@ -46,9 +46,9 @@ type ZodSchemaNameResolverLike = {
  *
  * Returns an empty array when no resolver is provided or the operation has no request body schema.
  */
-export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | undefined): string[] {
+export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined): string[] {
   if (!zodResolver) return []
-  return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : undefined].filter(
+  return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
     (n): n is string => Boolean(n),
   )
 }
@@ -70,18 +70,18 @@ export function resolvePathParamType(node: ast.OperationNode, param: ast.Paramet
   return ast.createParamsType({ variant: 'reference', name: individualName })
 }
 
-type QueryGroupResult = { type: ast.ParamsTypeNode; optional: boolean } | undefined
+type QueryGroupResult = { type: ast.ParamsTypeNode; optional: boolean } | null
 
 /**
  * Derive a query-params group type from the resolver.
- * Returns `undefined` when no query params exist or when the group name
+ * Returns `null` when no query params exist or when the group name
  * equals the individual param name (no real group).
  */
 export function resolveQueryGroupType(node: ast.OperationNode, params: ast.ParameterNode[], resolver: PluginTs['resolver']): QueryGroupResult {
-  if (!params.length) return undefined
+  if (!params.length) return null
   const firstParam = params[0]!
   const groupName = resolver.resolveQueryParamsName(node, firstParam)
-  if (groupName === resolver.resolveParamName(node, firstParam)) return undefined
+  if (groupName === resolver.resolveParamName(node, firstParam)) return null
   return { type: ast.createParamsType({ variant: 'reference', name: groupName }), optional: params.every((p) => !p.required) }
 }
 
@@ -89,10 +89,10 @@ export function resolveQueryGroupType(node: ast.OperationNode, params: ast.Param
  * Derive a header-params group type from the resolver.
  */
 export function resolveHeaderGroupType(node: ast.OperationNode, params: ast.ParameterNode[], resolver: PluginTs['resolver']): QueryGroupResult {
-  if (!params.length) return undefined
+  if (!params.length) return null
   const firstParam = params[0]!
   const groupName = resolver.resolveHeaderParamsName(node, firstParam)
-  if (groupName === resolver.resolveParamName(node, firstParam)) return undefined
+  if (groupName === resolver.resolveParamName(node, firstParam)) return null
   return { type: ast.createParamsType({ variant: 'reference', name: groupName }), optional: params.every((p) => !p.required) }
 }
 
@@ -145,7 +145,7 @@ export function buildQueryKeyParams(
 
   const queryGroupType = resolveQueryGroupType(node, queryParams, resolver)
 
-  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : undefined
+  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : null
   const bodyRequired = node.requestBody?.required ?? false
 
   const params: Array<ast.FunctionParameterNode | ast.ParameterGroupNode> = []
@@ -174,7 +174,12 @@ export function buildQueryKeyParams(
   return ast.createFunctionParameters({ params })
 }
 
-export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): string {
+/**
+ * Collect the names of the required params (no default) that drive the `enabled`
+ * guard. These are exactly the params that should be made optional in the
+ * generated signatures so callers can pass `undefined` to reach the disabled state.
+ */
+export function getEnabledParamNames(paramsNode: ast.FunctionParametersNode): string[] {
   const required: string[] = []
   for (const param of paramsNode.params) {
     if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
@@ -191,5 +196,62 @@ export function buildEnabledCheck(paramsNode: ast.FunctionParametersNode): strin
       }
     }
   }
-  return required.join(' && ')
+  return required
+}
+
+/**
+ * Return a copy of `paramsNode` with the named params marked optional.
+ *
+ * Used to align signatures with the `enabled` guard: the guard already disables
+ * the query while a param is falsy, so the param should accept `undefined`. The
+ * change is type-only — the `queryFn` keeps calling the client with a non-null
+ * assertion (see `injectNonNullAssertions`), so the emitted runtime is unchanged.
+ */
+export function markParamsOptional(paramsNode: ast.FunctionParametersNode, names: ReadonlyArray<string>): ast.FunctionParametersNode {
+  if (names.length === 0) return paramsNode
+  const nameSet = new Set(names)
+  const params = paramsNode.params.map((param) => {
+    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
+      const group = param as ast.ParameterGroupNode
+      return {
+        ...group,
+        properties: group.properties.map((child) =>
+          nameSet.has(child.name) ? ast.createFunctionParameter({ name: child.name, type: child.type, rest: child.rest, optional: true }) : child,
+        ),
+      }
+    }
+    const fp = param as ast.FunctionParameterNode
+    return nameSet.has(fp.name) ? ast.createFunctionParameter({ name: fp.name, type: fp.type, rest: fp.rest, optional: true }) : fp
+  })
+  return ast.createFunctionParameters({ params })
+}
+
+/**
+ * Add a non-null assertion (`!`) to the named params inside a printed client-call
+ * string. Bridges the type gap created by `markParamsOptional` while keeping the
+ * runtime identical (the `!` is erased at compile time).
+ *
+ * Handles destructured shorthand groups (`{ petId }` → `{ petId: petId! }`) and
+ * standalone identifiers (`params` → `params!`).
+ */
+export function injectNonNullAssertions(callStr: string, names: ReadonlyArray<string>): string {
+  if (names.length === 0) return callStr
+  const nameSet = new Set(names)
+
+  // Step 1: destructured shorthand group `{ petId }` → `{ petId: petId! }`
+  let result = callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
+    if (inner.includes(':') || inner.includes('...')) return match
+    const keys = inner
+      .split(',')
+      .map((k: string) => k.trim())
+      .filter(Boolean)
+    if (!keys.some((k) => nameSet.has(k))) return match
+    const rebuilt = keys.map((k) => (nameSet.has(k) ? `${k}: ${k}!` : k)).join(', ')
+    return `{ ${rebuilt} }`
+  })
+
+  // Step 2: standalone identifiers like `params`, `data`
+  result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => (nameSet.has(name) ? `${name}!` : match))
+
+  return result
 }

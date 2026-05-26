@@ -28,14 +28,14 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   clientType: 'class',
   importPath: undefined,
   bundle: false,
-  parser: 'client',
+  parser: false,
   output: {
     path: '.',
   },
   exclude: [],
   include: undefined,
   override: [],
-  group: undefined,
+  group: null,
   urlType: 'export',
   sdk: undefined,
   baseURL: undefined,
@@ -44,7 +44,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

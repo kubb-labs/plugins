@@ -1,3 +1,4 @@
+import { getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -7,6 +8,12 @@ import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resolveParamNameByLocation, resolveTypeReference } from '../utils.ts'
 
+/**
+ * Built-in generator for `@kubb/plugin-faker`. Emits one `createX` factory
+ * per schema in the spec plus per-operation request/response factories. Each
+ * factory returns a value matching the corresponding TypeScript type from
+ * `@kubb/plugin-ts`.
+ */
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
   renderer: jsxRendererSync,
@@ -23,13 +30,20 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const schemaName = node.name
     const mode = ctx.getMode(output)
+    const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
+    const tsEnumType = pluginTs.options?.enumType
+    const tsEnumTypeSuffix = pluginTs.options?.enumTypeSuffix ?? 'Key'
+    const schemaTypeName =
+      isEnumSchema && (tsEnumType === 'asConst' || tsEnumType === 'asPascalConst')
+        ? tsResolver.resolveEnumKeyName({ name: schemaName }, tsEnumTypeSuffix)
+        : tsResolver.resolveTypeName(schemaName)
     const meta = {
       name: resolver.resolveName(schemaName),
-      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }),
-      typeName: tsResolver.resolveTypeName(schemaName),
+      file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),
+      typeName: schemaTypeName,
       typeFile: tsResolver.resolveFile(
         { name: schemaName, extname: '.ts' },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
+        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
       ),
     } as const
     const canOverride = canOverrideSchema(node)
@@ -57,7 +71,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const imports = adapter
       .getImports(node, (schemaName) => ({
         name: resolver.resolveName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
       }))
       .filter((entry) => entry.path !== meta.file.path)
     const usedImports = filterUsedImports(imports, fakerText)
@@ -67,8 +81,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -105,33 +119,66 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       name: resolveParamNameByLocation(resolver, node, param),
       typeName: resolveParamNameByLocation(tsResolver, node, param),
     }))
-    const responseEntries = node.responses.map((response) => ({
-      response,
-      name: resolver.resolveResponseStatusName(node, response.statusCode),
-      typeName: tsResolver.resolveResponseStatusName(node, response.statusCode),
-    }))
-    const dataEntry = node.requestBody?.content?.[0]?.schema
-      ? {
-          schema: {
-            ...node.requestBody.content![0]!.schema!,
-            description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
-          },
-          name: resolver.resolveDataName(node),
-          typeName: tsResolver.resolveDataName(node),
-          description: node.requestBody.description ?? node.requestBody.content![0]!.schema!.description,
-        }
-      : null
+    type RenderUnit = { schema: ast.SchemaNode | null; name: string; typeName: string; description?: string; skipImportNames: Array<string> }
+
+    // Expands a content array into render units: one faker per content type plus a union faker
+    // (named `baseName`) when more than one content type carries a schema, else a single faker.
+    function expandContentUnits(
+      entries: Array<{ contentType: string; schema?: ast.SchemaNode | null }>,
+      baseName: string,
+      tsBaseName: string,
+      description: string | undefined,
+      decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+    ): Array<RenderUnit> {
+      const withSchema = entries.filter((entry) => entry.schema)
+      if (withSchema.length <= 1) {
+        const primary = withSchema[0] ?? entries[0]
+        if (!primary?.schema) return []
+        return [{ schema: decorate ? decorate(primary.schema) : primary.schema, name: baseName, typeName: tsBaseName, description, skipImportNames: [] }]
+      }
+      const variants = resolveContentTypeVariants(entries, baseName)
+      const unionSchema = ast.createSchema({ type: 'union', members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })) })
+      return [
+        ...variants.map((variant) => ({
+          schema: decorate ? decorate(variant.schema) : variant.schema,
+          name: variant.name,
+          typeName: getPerContentTypeName(tsBaseName, variant.suffix),
+          description,
+          skipImportNames: [],
+        })),
+        { schema: unionSchema, name: baseName, typeName: tsBaseName, description, skipImportNames: variants.map((variant) => variant.name) },
+      ]
+    }
+
+    const responseUnits = node.responses.flatMap((response) =>
+      expandContentUnits(
+        response.content ?? [],
+        resolver.resolveResponseStatusName(node, response.statusCode),
+        tsResolver.resolveResponseStatusName(node, response.statusCode),
+        response.description,
+      ),
+    )
+    const dataUnits = expandContentUnits(
+      node.requestBody?.content ?? [],
+      resolver.resolveDataName(node),
+      tsResolver.resolveDataName(node),
+      node.requestBody?.description,
+      (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
+    )
     const responseName = resolver.resolveResponseName(node)
     const localHelperNames = new Set([
       ...paramEntries.map((entry) => entry.name),
-      ...responseEntries.map((entry) => entry.name),
-      ...(dataEntry ? [dataEntry.name] : []),
+      ...responseUnits.map((unit) => unit.name),
+      ...dataUnits.map((unit) => unit.name),
       responseName,
     ])
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
     const meta = {
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       typeFile: tsResolver.resolveFile(
         {
           name: node.operationId,
@@ -142,7 +189,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group ?? undefined,
         },
       ),
     } as const
@@ -151,7 +198,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       return adapter
         .getImports(schema, (schemaName) => ({
           name: resolver.resolveName(schemaName),
-          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group }).path,
+          path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
         .filter((entry) => entry.path !== meta.file.path)
     }
@@ -221,8 +268,8 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={locale ? [{ propertyName: localeToFakerImport(locale), name: 'faker' }] : ['faker']} path="@faker-js/faker" />
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
@@ -234,27 +281,29 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName,
           }),
         )}
-        {responseEntries.map(({ response, name, typeName }) =>
+        {responseUnits.map((unit) =>
           renderEntry({
-            schema: response.schema,
-            name,
-            typeName,
-            description: response.description,
+            schema: unit.schema,
+            name: unit.name,
+            typeName: unit.typeName,
+            description: unit.description,
+            skipImportNames: unit.skipImportNames,
           }),
         )}
-        {dataEntry
-          ? renderEntry({
-              schema: dataEntry.schema,
-              name: dataEntry.name,
-              typeName: dataEntry.typeName,
-              description: dataEntry.description,
-            })
-          : null}
+        {dataUnits.map((unit) =>
+          renderEntry({
+            schema: unit.schema,
+            name: unit.name,
+            typeName: unit.typeName,
+            description: unit.description,
+            skipImportNames: unit.skipImportNames,
+          }),
+        )}
         {renderEntry({
           schema: buildResponseUnionSchema(node, resolver),
           name: responseName,
           typeName: tsResolver.resolveResponseName(node),
-          skipImportNames: responseEntries.map(({ name }) => name),
+          skipImportNames: responseUnits.map((unit) => unit.name),
         })}
       </File>
     )

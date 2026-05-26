@@ -5,6 +5,12 @@ import { defineGenerator } from '@kubb/core'
 import { File, Function, jsxRendererSync } from '@kubb/renderer-jsx'
 import type { PluginReactQuery } from '../types'
 
+/**
+ * Scaffolds the user-editable `useCustomHookOptions` file when
+ * `pluginReactQuery({ customOptions: { ... } })` is configured. The file is
+ * only created when it does not already exist, so user edits persist across
+ * regeneration.
+ */
 export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-custom-hook-options-file',
   renderer: jsxRendererSync,
@@ -27,7 +33,7 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
       const hookName = resolver.resolveQueryName(firstNode)
       const hookFile = resolver.resolveFile(
         { name: hookName, extname: '.ts', tag: firstNode.tags[0] ?? 'default', path: firstNode.path },
-        { root, output, group },
+        { root, output, group: group ?? undefined },
       )
       hookFilePath = hookFile.path
     } else {

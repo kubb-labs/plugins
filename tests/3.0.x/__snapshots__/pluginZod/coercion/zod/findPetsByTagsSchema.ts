@@ -8,7 +8,11 @@ import { petSchema } from "./petSchema.ts";
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.coerce.string()).optional().describe("Tags to filter by")
 
-export const findPetsByTagsStatus200Schema = z.array(petSchema)
+export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
+
+export const findPetsByTagsStatus200SchemaXml = z.array(petSchema)
+
+export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 
 export const findPetsByTagsStatus400Schema = z.any()
 

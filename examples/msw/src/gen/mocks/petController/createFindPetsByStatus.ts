@@ -7,24 +7,45 @@ import type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusResponse,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from '../../models/FindPetsByStatus.ts'
 import { createPet } from '../createPet.ts'
+import { createPetStatusEnum } from '../createPetStatusEnum.ts'
 import { faker } from '@faker-js/faker'
 
-export function createFindPetsByStatusQueryStatus(data?: FindPetsByStatusQueryStatus): FindPetsByStatusQueryStatus {
+export function createFindPetsByStatusQueryStatus(data?: Partial<FindPetsByStatusQueryStatus>): FindPetsByStatusQueryStatus {
   faker.seed([220])
 
-  return data ?? faker.helpers.arrayElement<FindPetsByStatusQueryStatus>(['available', 'pending', 'sold'])
+  return createPetStatusEnum(data) as FindPetsByStatusQueryStatus
 }
 
 /**
  * @description successful operation
  */
-export function createFindPetsByStatusStatus200(data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
+export function createFindPetsByStatusStatus200Json(data?: FindPetsByStatusStatus200Json): FindPetsByStatusStatus200Json {
   faker.seed([220])
 
   return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200Xml(data?: FindPetsByStatusStatus200Xml): FindPetsByStatusStatus200Xml {
+  faker.seed([220])
+
+  return [...faker.helpers.multiple(() => createPet()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByStatusStatus200(_data?: FindPetsByStatusStatus200): FindPetsByStatusStatus200 {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createFindPetsByStatusStatus200Json(), createFindPetsByStatusStatus200Xml()])
 }
 
 /**

@@ -30,6 +30,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function Request({ baseURL = '', name, dataReturnType, resolver, node, paramsType, pathParamsType, paramsCasing }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
   const paramsNode = ast.createOperationParams(node, {
     paramsType,
     pathParamsType,
@@ -60,7 +61,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
     replacer: (param) => pathParamNameMap.get(camelCase(param)) ?? param,
   })
 
-  const requestOptions: string[] = [`method: '${node.method}'`, `url: ${urlTemplate}`]
+  const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
   const queryParams = getOperationParameters(node).query
   if (queryParams.length > 0) {

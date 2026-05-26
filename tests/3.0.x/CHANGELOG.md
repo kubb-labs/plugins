@@ -1,5 +1,85 @@
 # tests-3.0.x
 
+## 0.0.1-beta.14
+
+### Patch Changes
+
+- Updated dependencies [[`21accf1`](https://github.com/kubb-labs/plugins/commit/21accf11be058a252aded049a5d98e30eb6b4c32)]:
+  - @kubb/plugin-ts@5.0.0-beta.30
+  - @kubb/plugin-client@5.0.0-beta.30
+  - @kubb/plugin-cypress@5.0.0-beta.30
+  - @kubb/plugin-faker@5.0.0-beta.30
+  - @kubb/plugin-mcp@5.0.0-beta.30
+  - @kubb/plugin-msw@5.0.0-beta.30
+  - @kubb/plugin-react-query@5.0.0-beta.30
+  - @kubb/plugin-vue-query@5.0.0-beta.30
+  - @kubb/plugin-redoc@5.0.0-beta.30
+  - @kubb/plugin-zod@5.0.0-beta.30
+
+## 0.0.1-beta.13
+
+### Patch Changes
+
+- Updated dependencies [[`299eede`](https://github.com/kubb-labs/plugins/commit/299eede6647b12684459c503addff704a1ead55a)]:
+  - @kubb/plugin-client@5.0.0-beta.29
+  - @kubb/plugin-cypress@5.0.0-beta.29
+  - @kubb/plugin-faker@5.0.0-beta.29
+  - @kubb/plugin-mcp@5.0.0-beta.29
+  - @kubb/plugin-msw@5.0.0-beta.29
+  - @kubb/plugin-react-query@5.0.0-beta.29
+  - @kubb/plugin-redoc@5.0.0-beta.29
+  - @kubb/plugin-ts@5.0.0-beta.29
+  - @kubb/plugin-vue-query@5.0.0-beta.29
+  - @kubb/plugin-zod@5.0.0-beta.29
+
+## 0.0.1-beta.12
+
+### Patch Changes
+
+- Updated dependencies [[`c97c8cf`](https://github.com/kubb-labs/plugins/commit/c97c8cf7b8e5c3d29293056f586d4591f8414a9d), [`c029564`](https://github.com/kubb-labs/plugins/commit/c02956455485aecd496e4e00603ded5c0d0fbfea), [`3e114d1`](https://github.com/kubb-labs/plugins/commit/3e114d1101d58a567da223e2c14cb61d078c67c2), [`7209687`](https://github.com/kubb-labs/plugins/commit/720968712147d1483682471dd5557082d0ff41fd)]:
+  - @kubb/plugin-client@5.0.0-beta.28
+  - @kubb/plugin-ts@5.0.0-beta.28
+  - @kubb/plugin-zod@5.0.0-beta.28
+  - @kubb/plugin-faker@5.0.0-beta.28
+  - @kubb/plugin-msw@5.0.0-beta.28
+  - @kubb/plugin-react-query@5.0.0-beta.28
+  - @kubb/plugin-vue-query@5.0.0-beta.28
+  - @kubb/plugin-cypress@5.0.0-beta.28
+  - @kubb/plugin-mcp@5.0.0-beta.28
+  - @kubb/plugin-redoc@5.0.0-beta.28
+
+## 0.0.1-beta.11
+
+### Patch Changes
+
+- Updated dependencies [[`84af283`](https://github.com/kubb-labs/plugins/commit/84af2838968a34c764655280622ed68ad63b84d7), [`3871c83`](https://github.com/kubb-labs/plugins/commit/3871c83f4d949335915ede38efd8b3474e252877), [`0e96b81`](https://github.com/kubb-labs/plugins/commit/0e96b81e861bd2e07340fda3a17c3a72b020317c)]:
+  - @kubb/plugin-client@5.0.0-beta.27
+  - @kubb/plugin-ts@5.0.0-beta.27
+  - @kubb/plugin-zod@5.0.0-beta.27
+  - @kubb/plugin-faker@5.0.0-beta.27
+  - @kubb/plugin-vue-query@5.0.0-beta.27
+  - @kubb/plugin-react-query@5.0.0-beta.27
+  - @kubb/plugin-mcp@5.0.0-beta.27
+  - @kubb/plugin-cypress@5.0.0-beta.27
+  - @kubb/plugin-msw@5.0.0-beta.27
+  - @kubb/plugin-redoc@5.0.0-beta.27
+
+## 0.0.1-beta.10
+
+### Patch Changes
+
+- Updated dependencies [[`0446ce8`](https://github.com/kubb-labs/plugins/commit/0446ce881472c49bc66886c13066c8ae246e9a65), [`57d79a2`](https://github.com/kubb-labs/plugins/commit/57d79a23ca628abad86c65ecca4aa282fa170aac), [`4ae19db`](https://github.com/kubb-labs/plugins/commit/4ae19db071d08514ff5f9c153d3c9adea30a253c), [`e7670fa`](https://github.com/kubb-labs/plugins/commit/e7670fadf2a822c71299ad9a827fd4226eaae55b), [`9de6534`](https://github.com/kubb-labs/plugins/commit/9de653476daefd588633ec4b12551c72b8c88965), [`eeefb2b`](https://github.com/kubb-labs/plugins/commit/eeefb2beb38ffe294bea771907baea026d2879b3)]:
+  - @kubb/plugin-client@5.0.0-beta.25
+  - @kubb/plugin-cypress@5.0.0-beta.25
+  - @kubb/plugin-faker@5.0.0-beta.25
+  - @kubb/plugin-mcp@5.0.0-beta.25
+  - @kubb/plugin-msw@5.0.0-beta.25
+  - @kubb/plugin-react-query@5.0.0-beta.25
+  - @kubb/plugin-ts@5.0.0-beta.25
+  - @kubb/plugin-vue-query@5.0.0-beta.25
+  - @kubb/plugin-zod@5.0.0-beta.25
+  - @kubb/plugin-redoc@5.0.0-beta.25
+
 ## 0.0.1-beta.9
 
 ### Patch Changes

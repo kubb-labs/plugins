@@ -1,7 +1,8 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type {
   UpdatePetData,
-  UpdatePetResponse,
+  UpdatePetStatus200,
+  UpdatePetStatus202,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -20,7 +21,7 @@ export function updatePetMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
-    ResponseConfig<UpdatePetResponse>,
+    ResponseConfig<UpdatePetStatus200 | UpdatePetStatus202>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext
@@ -40,7 +41,7 @@ export function updatePetMutationOptions<TContext = unknown>(
 export function useUpdatePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<UpdatePetResponse>,
+      ResponseConfig<UpdatePetStatus200 | UpdatePetStatus202>,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
       { data: UpdatePetData },
       TContext
@@ -56,14 +57,14 @@ export function useUpdatePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<UpdatePetResponse>,
+    ResponseConfig<UpdatePetStatus200 | UpdatePetStatus202>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext
   >
 
   return useMutation<
-    ResponseConfig<UpdatePetResponse>,
+    ResponseConfig<UpdatePetStatus200 | UpdatePetStatus202>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext
@@ -75,7 +76,7 @@ export function useUpdatePet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ResponseConfig<UpdatePetResponse>,
+    ResponseConfig<UpdatePetStatus200 | UpdatePetStatus202>,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     { data: UpdatePetData },
     TContext

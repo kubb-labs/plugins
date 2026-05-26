@@ -1,15 +1,22 @@
 import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
 
+/**
+ * Built-in operation generator for `@kubb/plugin-mcp`. Emits one MCP tool
+ * handler per OpenAPI operation, wiring the input Zod schema, the HTTP call,
+ * and the response shape into a single function that an MCP server can
+ * register as a callable tool.
+ */
 export const mcpGenerator = defineGenerator<PluginMcp>({
   name: 'mcp',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { resolver, driver, root } = ctx
     const { output, client, paramsCasing, group } = ctx.options
 
@@ -25,13 +32,16 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const meta = {
       name: resolver.resolveHandlerName(node),
-      file: resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
+      file: resolver.resolveFile(
+        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
+        { root, output, group: group ?? undefined },
+      ),
       fileTs: tsResolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         {
           root,
           output: pluginTs.options?.output ?? output,
-          group: pluginTs.options?.group,
+          group: pluginTs.options?.group ?? undefined,
         },
       ),
     } as const
@@ -47,7 +57,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         {client.importPath ? (
           <>
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={client.importPath} isTypeOnly />
-            <File.Import name={'fetch'} path={client.importPath} />
+            <File.Import name={'client'} path={client.importPath} />
             {client.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={client.importPath} isTypeOnly />}
           </>
         ) : (
@@ -55,12 +65,12 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
             <File.Import
               name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
               root={meta.file.path}
-              path={path.resolve(root, '.kubb/fetch.ts')}
+              path={path.resolve(root, '.kubb/client.ts')}
               isTypeOnly
             />
-            <File.Import name={['fetch']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} />
+            <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
             {client.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
             )}
           </>
         )}

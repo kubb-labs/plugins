@@ -7,6 +7,8 @@
 export type CustomItem = {
     /**
      * @description Unique identifier
+     *
+     * Format: `int64`
      * @type integer
     */
     id: bigint;
@@ -16,6 +18,8 @@ export type CustomItem = {
     */
     name: string;
     /**
+     * @description
+     * Format: `int32`
      * @type integer | undefined
     */
     count?: number;

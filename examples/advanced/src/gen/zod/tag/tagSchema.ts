@@ -1,8 +1,6 @@
 import * as z from 'zod'
+import { categorySchema } from '../categorySchema.ts'
 
-export const tagTagSchema = z.object({
-  id: z.int().optional().default(1),
-  name: z.string().optional(),
-})
+export const tagTagSchema = categorySchema
 
 export type TagTagSchema = z.infer<typeof tagTagSchema>

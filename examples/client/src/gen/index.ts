@@ -1,11 +1,12 @@
-export type { AddPetRequest, AddPetRequestStatusEnumKey } from './models/ts/AddPetRequest.js'
+export type { AddPetRequest } from './models/ts/AddPetRequest.js'
 export type { Address } from './models/ts/Address.js'
 export type { ApiResponse } from './models/ts/ApiResponse.js'
 export type { Category } from './models/ts/Category.js'
 export type { Customer } from './models/ts/Customer.js'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/ts/Order.js'
-export type { Pet, PetStatusEnumKey } from './models/ts/Pet.js'
+export type { Pet } from './models/ts/Pet.js'
 export type { PetNotFound } from './models/ts/PetNotFound.js'
+export type { PetStatusEnumKey } from './models/ts/PetStatusEnum.js'
 export type { Tag } from './models/ts/Tag.js'
 export type { User } from './models/ts/User.js'
 export type { UserArray } from './models/ts/UserArray.js'
@@ -17,6 +18,8 @@ export type {
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
+  AddPetStatus200Json,
+  AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
 } from './models/ts/petController/AddPet.js'
@@ -34,6 +37,8 @@ export type {
   FindPetsByStatusResponse,
   FindPetsByStatusResponses,
   FindPetsByStatusStatus200,
+  FindPetsByStatusStatus200Json,
+  FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './models/ts/petController/FindPetsByStatus.js'
 export type {
@@ -44,6 +49,8 @@ export type {
   FindPetsByTagsResponse,
   FindPetsByTagsResponses,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './models/ts/petController/FindPetsByTags.js'
 export type {
@@ -52,6 +59,8 @@ export type {
   GetPetByIdResponse,
   GetPetByIdResponses,
   GetPetByIdStatus200,
+  GetPetByIdStatus200Json,
+  GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './models/ts/petController/GetPetById.js'
@@ -63,6 +72,8 @@ export type {
   UpdatePetResponse,
   UpdatePetResponses,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -103,6 +114,8 @@ export type {
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './models/ts/storeController/GetOrderById.js'
@@ -136,6 +149,8 @@ export type {
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './models/ts/userController/CreateUser.js'
 export type {
@@ -144,6 +159,8 @@ export type {
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './models/ts/userController/CreateUsersWithListInput.js'
 export type {
@@ -160,6 +177,8 @@ export type {
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './models/ts/userController/GetUserByName.js'
@@ -170,6 +189,8 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './models/ts/userController/LoginUser.js'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/userController/LogoutUser.js'
@@ -203,6 +224,5 @@ export { loginUser } from './clients/axios/userService/loginUser.js'
 export { logoutUser } from './clients/axios/userService/logoutUser.js'
 export { updateUser } from './clients/axios/userService/updateUser.js'
 export { userService } from './clients/axios/userService/userService.js'
-export { addPetRequestStatusEnum } from './models/ts/AddPetRequest.js'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.js'
-export { petStatusEnum } from './models/ts/Pet.js'
+export { petStatusEnum } from './models/ts/PetStatusEnum.js'

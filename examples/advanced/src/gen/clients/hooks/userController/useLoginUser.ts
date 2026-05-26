@@ -1,6 +1,6 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../../models/ts/userController/LoginUser.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { loginUser } from '../../axios/userService/loginUser.ts'
 
@@ -14,7 +14,7 @@ export function loginUserQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = loginUserQueryKey(params)
-  return queryOptions<ResponseConfig<LoginUserResponse>, ResponseErrorConfig<LoginUserStatus400>, ResponseConfig<LoginUserResponse>, typeof queryKey>({
+  return queryOptions<ResponseConfig<LoginUserStatus200>, ResponseErrorConfig<LoginUserStatus400>, ResponseConfig<LoginUserStatus200>, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUser({ params }, { ...config, signal: config.signal ?? signal })
@@ -27,13 +27,13 @@ export function loginUserQueryOptions(
  * {@link /user/login}
  */
 export function useLoginUser<
-  TData = ResponseConfig<LoginUserResponse>,
-  TQueryData = ResponseConfig<LoginUserResponse>,
+  TData = ResponseConfig<LoginUserStatus200>,
+  TQueryData = ResponseConfig<LoginUserStatus200>,
   TQueryKey extends QueryKey = LoginUserQueryKey,
 >(
   { params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {},
   options: {
-    query?: Partial<QueryObserverOptions<ResponseConfig<LoginUserResponse>, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & {
+    query?: Partial<QueryObserverOptions<ResponseConfig<LoginUserStatus200>, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
     client?: Partial<RequestConfig> & { client?: Client }

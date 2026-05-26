@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
-import type { GetInventoryResponse } from "../types/GetInventory.ts";
-import type { GetOrderByIdResponse, GetOrderByIdPathOrderId, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
+import type { GetInventoryStatus200 } from "../types/GetInventory.ts";
+import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
+import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { mergeConfig } from "@kubb/plugin-client/clients/axios";
 
@@ -24,8 +24,8 @@ export class Store {
    * {@link /store/inventory}
    */
   async getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: "GET", url: `/store/inventory` })
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
+    const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: "GET", url: `/store/inventory` })
     return res.data
   }
 
@@ -35,9 +35,9 @@ export class Store {
    * {@link /store/order}
    */
   async placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-    const { client: request = fetch, contentType = "application/json", ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = "application/json", ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
-    const res = await request<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, data: requestData, contentType })
+    const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, data: requestData, contentType })
     return res.data
   }
 
@@ -47,8 +47,8 @@ export class Store {
    * {@link /store/order/:orderId}
    */
   async getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/store/order/${orderId}` })
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
+    const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/store/order/${orderId}` })
     return res.data
   }
 
@@ -58,7 +58,7 @@ export class Store {
    * {@link /store/order/:orderId}
    */
   async deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = fetch, ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ ...requestConfig, method: "DELETE", url: `/store/order/${orderId}` })
     return res.data
   }

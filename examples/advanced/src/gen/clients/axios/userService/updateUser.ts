@@ -1,4 +1,4 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.ts'
 import { updateUserResponseSchema, updateUserDataSchema } from '../../../zod/userController/updateUserSchema.ts'
@@ -21,7 +21,7 @@ export async function updateUser(
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = updateUserDataSchema.parse(data)
 

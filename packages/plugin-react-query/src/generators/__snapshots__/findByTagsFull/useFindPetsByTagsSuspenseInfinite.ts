@@ -3,14 +3,20 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/fetch'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize } from './FindPetsByTags'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/client'
+import type {
+  FindPetsByTagsResponse,
+  FindPetsByTagsQueryTags,
+  FindPetsByTagsQueryStatus,
+  FindPetsByTagsQueryPageSize,
+  FindPetsByTagsStatus200,
+} from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = (params: {
+export const findPetsByTagsSuspenseInfiniteQueryKey = (params?: {
   tags: FindPetsByTagsQueryTags
   status?: FindPetsByTagsQueryStatus
   pageSize?: FindPetsByTagsQueryPageSize
@@ -25,9 +31,9 @@ export async function findPetsByTagsSuspenseInfinite(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return { ...res, data: FindPetsByTagsResponse.parse(res.data) }
 }
@@ -38,13 +44,12 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey(params)
   return infiniteQueryOptions<
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     ResponseErrorConfig<Error>,
-    InfiniteData<ResponseConfig<FindPetsByTagsResponse>>,
+    InfiniteData<ResponseConfig<FindPetsByTagsStatus200>>,
     typeof queryKey,
     number
   >({
-    enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTagsSuspenseInfinite(params, { ...config, signal: config.signal ?? signal })
@@ -59,7 +64,7 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspenseInfinite<
-  TQueryFnData = ResponseConfig<FindPetsByTagsResponse>,
+  TQueryFnData = ResponseConfig<FindPetsByTagsStatus200>,
   TError = ResponseErrorConfig<Error>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,

@@ -6,40 +6,60 @@
 /**
  * @type object
  */
+export type OrderParams = {
+  /**
+   * @description Order Status
+   * @example approved
+   */
+  status: OrderParamsStatusEnum
+  /**
+   * @type string
+   */
+  type: string
+}
+
+/**
+ * @description Order Status
+ * @example approved
+ * @type string
+ */
+export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
+
+/**
+ * @description pet status in the store
+ * @type string
+ */
+export type PetStatusEnum = 'available' | 'pending' | 'sold'
+
+/**
+ * @type object
+ */
 export type Order = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
   id?: bigint | undefined
   /**
+   * @description
+   * Format: `int64`
    * @example 198772
    * @type integer | undefined
    */
   petId?: bigint | undefined
+  params?: OrderParams | undefined
   /**
-   * @type object | undefined
-   */
-  params?:
-    | {
-        /**
-         * @description Order Status
-         * @example approved
-         * @type string
-         */
-        status: 'placed' | 'approved' | 'delivered'
-        /**
-         * @type string
-         */
-        type: string
-      }
-    | undefined
-  /**
+   * @description
+   * Format: `int32`
    * @example 7
    * @type integer | undefined
    */
   quantity?: number | undefined
   /**
+   * @description
+   * Format: `date-time`
    * @type string | undefined
    */
   shipDate?: string | undefined
@@ -93,27 +113,13 @@ export type Address = {
  */
 export type Customer = {
   /**
+   * @description
+   * Format: `int64`
    * @example 100000
    * @type integer | undefined
    */
   id?: bigint | undefined
-  /**
-   * @type object | undefined
-   */
-  params?:
-    | {
-        /**
-         * @description Order Status
-         * @example approved
-         * @type string
-         */
-        status: 'placed' | 'approved' | 'delivered'
-        /**
-         * @type string
-         */
-        type: string
-      }
-    | undefined
+  params?: OrderParams | undefined
   /**
    * @example fehguy
    * @type string | undefined
@@ -122,7 +128,7 @@ export type Customer = {
   /**
    * @type array | undefined
    */
-  address?: Address[] | undefined
+  address?: Array<Address> | undefined
 }
 
 export type HappyCustomer = Customer & {
@@ -148,6 +154,8 @@ export type UnhappyCustomer = Customer & {
  */
 export type Category = {
   /**
+   * @description
+   * Format: `int64`
    * @example 1
    * @type integer | undefined
    */
@@ -164,6 +172,8 @@ export type Category = {
  */
 export type User = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -200,25 +210,15 @@ export type User = {
   phone?: string | undefined
   /**
    * @description User Status
+   *
+   * Format: `int32`
    * @example 1
    * @type integer | undefined
    */
   userStatus?: number | undefined
 }
 
-/**
- * @type object
- */
-export type Tag = {
-  /**
-   * @type integer | undefined
-   */
-  id?: bigint | undefined
-  /**
-   * @type string | undefined
-   */
-  name?: string | undefined
-}
+export type Tag = Category
 
 /**
  * @type object
@@ -265,6 +265,8 @@ export type Pet = (
     })
 ) & {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -285,16 +287,15 @@ export type Pet = (
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  readonly tags?: Tag[] | undefined
+  readonly tags?: Array<Tag> | undefined
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
-  status?: ('available' | 'pending' | 'sold') | undefined
+  status?: PetStatusEnum | undefined
 }
 
 export type FullAddress = Address & {
@@ -302,6 +303,7 @@ export type FullAddress = Address & {
    * @type string
    */
   streetNumber: string
+} & {
   /**
    * @type string
    */
@@ -313,6 +315,8 @@ export type FullAddress = Address & {
  */
 export type AddPetRequest = {
   /**
+   * @description
+   * Format: `int64`
    * @example 10
    * @type integer | undefined
    */
@@ -329,11 +333,11 @@ export type AddPetRequest = {
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  tags?: Tag[] | undefined
+  tags?: Array<Tag> | undefined
   /**
    * @description pet status in the store
    * @type string | undefined
@@ -346,6 +350,8 @@ export type AddPetRequest = {
  */
 export type ApiResponse = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number | undefined
@@ -364,6 +370,8 @@ export type ApiResponse = {
  */
 export type PetNotFound = {
   /**
+   * @description
+   * Format: `int32`
    * @type integer | undefined
    */
   code?: number | undefined
@@ -376,9 +384,13 @@ export type PetNotFound = {
 /**
  * @type array
  */
-export type UserArray = User[]
+export type UserArray = Array<User>
 
-export type UpdatePetStatus200 = Pet
+export type UpdatePetStatus200Json = Pet
+
+export type UpdatePetStatus200Xml = Pet
+
+export type UpdatePetStatus200 = UpdatePetStatus200Json | UpdatePetStatus200Xml
 
 /**
  * @type any
@@ -441,21 +453,13 @@ export type UpdatePetResponses = {
  */
 export type UpdatePetResponse = UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405
 
-export type AddPetStatus200 = Pet
+export type AddPetStatus200Json = Pet
 
-/**
- * @type object
- */
-export type AddPetStatus405 = {
-  /**
-   * @type integer | undefined
-   */
-  code?: number | undefined
-  /**
-   * @type string | undefined
-   */
-  message?: string | undefined
-}
+export type AddPetStatus200Xml = Pet
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
+
+export type AddPetStatus405 = PetNotFound
 
 /**
  * @description Create a new pet in the store
@@ -504,15 +508,21 @@ export type AddPetResponse = AddPetStatus200 | AddPetStatus405
 
 /**
  * @description Status values that need to be considered for filter
- * @default "available"
- * @type string | undefined
+ * @default available
  */
-export type FindPetsByStatusQueryStatus = ('available' | 'pending' | 'sold') | undefined
+export type FindPetsByStatusQueryStatus = PetStatusEnum | undefined
 
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200 = Pet[]
+export type FindPetsByStatusStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Xml = Array<Pet>
+
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
 /**
  * @type any
@@ -557,7 +567,7 @@ export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsBySta
  * @description Tags to filter by
  * @type array | undefined
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
+export type FindPetsByTagsQueryTags = Array<string> | undefined
 
 /**
  * @description to request with required page number or pagination
@@ -574,7 +584,14 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Pet[]
+export type FindPetsByTagsStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Array<Pet>
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any
@@ -619,11 +636,17 @@ export type FindPetsByTagsResponse = FindPetsByTagsStatus200 | FindPetsByTagsSta
 
 /**
  * @description ID of pet to return
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetPetByIdPathPetId = bigint
 
-export type GetPetByIdStatus200 = Pet
+export type GetPetByIdStatus200Json = Pet
+
+export type GetPetByIdStatus200Xml = Pet
+
+export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200Xml
 
 /**
  * @type any
@@ -670,6 +693,8 @@ export type GetPetByIdResponse = GetPetByIdStatus200 | GetPetByIdStatus400 | Get
 
 /**
  * @description ID of pet that needs to be updated
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UpdatePetWithFormPathPetId = bigint
@@ -737,6 +762,8 @@ export type DeletePetHeaderApiKey = string | undefined
 
 /**
  * @description Pet id to delete
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeletePetPathPetId = bigint
@@ -744,7 +771,7 @@ export type DeletePetPathPetId = bigint
 /**
  * @type array
  */
-export type DeletePetStatus200 = ('TYPE1' | 'TYPE2' | 'TYPE3')[]
+export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
 
 /**
  * @type any
@@ -792,6 +819,8 @@ export type DeletePetResponse = DeletePetStatus200 | DeletePetStatus400
 
 /**
  * @description ID of pet to update
+ *
+ * Format: `int64`
  * @type integer
  */
 export type UploadFilePathPetId = bigint
@@ -808,6 +837,8 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 export type UploadFileStatus200 = ApiResponse
 
 /**
+ * @description
+ * Format: `binary`
  * @type string | undefined
  */
 export type UploadFileData = Blob | undefined
@@ -994,6 +1025,8 @@ export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatch
 
 /**
  * @description ID of order that needs to be fetched
+ *
+ * Format: `int64`
  * @type integer
  */
 export type GetOrderByIdPathOrderId = bigint
@@ -1001,7 +1034,14 @@ export type GetOrderByIdPathOrderId = bigint
 /**
  * @type object
  */
-export type GetOrderByIdStatus200 = Order
+export type GetOrderByIdStatus200Json = Order
+
+/**
+ * @type object
+ */
+export type GetOrderByIdStatus200Xml = Order
+
+export type GetOrderByIdStatus200 = GetOrderByIdStatus200Json | GetOrderByIdStatus200Xml
 
 /**
  * @type any
@@ -1048,6 +1088,8 @@ export type GetOrderByIdResponse = GetOrderByIdStatus200 | GetOrderByIdStatus400
 
 /**
  * @description ID of the order that needs to be deleted
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeleteOrderPathOrderId = bigint
@@ -1097,7 +1139,14 @@ export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
 /**
  * @type object
  */
-export type CreateUserStatusDefault = User
+export type CreateUserStatusDefaultJson = User
+
+/**
+ * @type object
+ */
+export type CreateUserStatusDefaultXml = User
+
+export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
 
 /**
  * @description Created user object
@@ -1148,7 +1197,14 @@ export type CreateUserResponse = CreateUserStatusDefault
 /**
  * @type object
  */
-export type CreateUsersWithListInputStatus200 = User
+export type CreateUsersWithListInputStatus200Json = User
+
+/**
+ * @type object
+ */
+export type CreateUsersWithListInputStatus200Xml = User
+
+export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
 
 /**
  * @type any
@@ -1158,7 +1214,7 @@ export type CreateUsersWithListInputStatusDefault = any
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputData = User[] | undefined
+export type CreateUsersWithListInputData = Array<User> | undefined
 
 /**
  * @type object
@@ -1202,7 +1258,14 @@ export type LoginUserQueryPassword = string | undefined
 /**
  * @type string
  */
-export type LoginUserStatus200 = string
+export type LoginUserStatus200Xml = string
+
+/**
+ * @type string
+ */
+export type LoginUserStatus200Json = string
+
+export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
 
 /**
  * @type any
@@ -1284,7 +1347,14 @@ export type GetUserByNamePathUsername = string
 /**
  * @type object
  */
-export type GetUserByNameStatus200 = User
+export type GetUserByNameStatus200Json = User
+
+/**
+ * @type object
+ */
+export type GetUserByNameStatus200Xml = User
+
+export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
 
 /**
  * @type any

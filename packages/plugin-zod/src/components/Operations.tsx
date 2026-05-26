@@ -1,14 +1,14 @@
 import { stringifyObject } from '@internals/utils'
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import { Const, File, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
 type SchemaNames = {
-  request: string | undefined
+  request: string | null
   parameters: {
-    path: string | undefined
-    query: string | undefined
-    header: string | undefined
+    path: string | null
+    query: string | null
+    header: string | null
   }
   responses: { default?: string } & Record<number | string, string>
   errors: Record<number | string, string>
@@ -30,6 +30,7 @@ export function Operations({ name, operations }: Props): KubbReactNode {
   )
 
   const pathsJSON = operations.reduce<Record<string, Record<string, string>>>((prev, acc) => {
+    if (!ast.isHttpOperationNode(acc.node)) return prev
     prev[`"${acc.node.path}"`] = {
       ...(prev[`"${acc.node.path}"`] ?? {}),
       [acc.node.method]: `operations["${acc.node.operationId}"]`,

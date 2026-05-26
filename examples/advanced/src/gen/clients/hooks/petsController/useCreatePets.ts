@@ -1,11 +1,11 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type {
   CreatePetsData,
-  CreatePetsResponse,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
   CreatePetsHeaderXEXAMPLE,
+  CreatePetsStatus201,
 } from '../../../models/ts/petsController/CreatePets.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createPets } from '../../axios/petsService/createPets.ts'
@@ -16,7 +16,7 @@ export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const
 export function createPetsMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {}) {
   const mutationKey = createPetsMutationKey()
   return mutationOptions<
-    ResponseConfig<CreatePetsResponse>,
+    ResponseConfig<CreatePetsStatus201>,
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid
@@ -40,7 +40,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Re
 export function useCreatePets<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<CreatePetsResponse>,
+      ResponseConfig<CreatePetsStatus201>,
       ResponseErrorConfig<Error>,
       {
         uuid: CreatePetsPathUuid
@@ -58,7 +58,7 @@ export function useCreatePets<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? createPetsMutationKey()
 
   const baseOptions = createPetsMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<CreatePetsResponse>,
+    ResponseConfig<CreatePetsStatus201>,
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid
@@ -70,7 +70,7 @@ export function useCreatePets<TContext>(
   >
 
   return useMutation<
-    ResponseConfig<CreatePetsResponse>,
+    ResponseConfig<CreatePetsStatus201>,
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid
@@ -87,7 +87,7 @@ export function useCreatePets<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ResponseConfig<CreatePetsResponse>,
+    ResponseConfig<CreatePetsStatus201>,
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid

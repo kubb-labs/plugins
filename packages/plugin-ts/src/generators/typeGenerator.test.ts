@@ -32,7 +32,7 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  group: undefined,
+  group: null,
   printer: undefined,
 }
 
@@ -221,6 +221,57 @@ describe('typeGenerator — Operation', () => {
       }),
     },
     {
+      // Regression for kubb-labs/plugins#132: an inline response that is an array of objects with a
+      // nested enum property must stay an array of objects, not collapse into an array of the enum.
+      name: 'getPreferencesUnits — GET with inline array-of-object response containing a nested enum',
+      node: ast.createOperation({
+        operationId: 'getPreferencesUnits',
+        method: 'GET',
+        path: '/preferences/units/',
+        tags: ['Preferences'],
+        parameters: [],
+        responses: [
+          ast.createResponse({
+            statusCode: '200',
+            description: 'OK',
+            schema: ast.createSchema({
+              type: 'array',
+              name: 'GetPreferencesUnitsStatus200',
+              items: [
+                ast.createSchema({
+                  type: 'object',
+                  name: 'GetPreferencesUnitsStatus200',
+                  primitive: 'object',
+                  properties: [
+                    ast.createProperty({
+                      name: 'id',
+                      required: true,
+                      schema: ast.createSchema({ type: 'number', primitive: 'number', name: 'GetPreferencesUnitsStatus200Id' }),
+                    }),
+                    ast.createProperty({
+                      name: 'type',
+                      required: true,
+                      schema: ast.createSchema({
+                        type: 'enum',
+                        primitive: 'string',
+                        name: 'GetPreferencesUnitsStatus200TypeEnum',
+                        enumValues: ['area', 'density', 'length'],
+                      }),
+                    }),
+                    ast.createProperty({
+                      name: 'value',
+                      required: true,
+                      schema: ast.createSchema({ type: 'string', primitive: 'string', name: 'GetPreferencesUnitsStatus200Value' }),
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          }),
+        ],
+      }),
+    },
+    {
       name: 'multiContentType — POST with json and form-data request body',
       node: ast.createOperation({
         operationId: 'uploadFile',
@@ -248,6 +299,42 @@ describe('typeGenerator — Operation', () => {
         },
         responses: [
           ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Successful operation' }),
+        ],
+      }),
+    },
+    {
+      name: 'multiContentType — GET with json and xml response body',
+      node: ast.createOperation({
+        operationId: 'getPetById',
+        method: 'GET',
+        path: '/pet/{petId}',
+        tags: ['pet'],
+        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.createResponse({
+            statusCode: '200',
+            description: 'Successful operation',
+            schema: ast.createSchema({
+              type: 'object',
+              properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+            }),
+            content: [
+              {
+                contentType: 'application/json',
+                schema: ast.createSchema({
+                  type: 'object',
+                  properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+                }),
+              },
+              {
+                contentType: 'application/xml',
+                schema: ast.createSchema({
+                  type: 'object',
+                  properties: [ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) })],
+                }),
+              },
+            ],
+          }),
         ],
       }),
     },
@@ -292,9 +379,9 @@ describe('typeGenerator — Operation — group', () => {
       expectedBaseName: 'ListPets.ts',
       expectedDir: 'petsController',
     },
-    { group: undefined, expectedBaseName: 'ListPets.ts', expectedDir: undefined },
+    { group: null, expectedBaseName: 'ListPets.ts', expectedDir: undefined },
   ] satisfies Array<{
-    group: Group | undefined
+    group: Group | null
     expectedBaseName: string
     expectedDir: string | undefined
   }>)('group=$group.type — file path is computed correctly', async ({ group, expectedBaseName, expectedDir }) => {

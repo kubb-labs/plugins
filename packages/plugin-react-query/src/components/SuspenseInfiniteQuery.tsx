@@ -5,7 +5,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -39,7 +39,7 @@ function buildSuspenseInfiniteQueryParamsNode(
   },
 ): ast.FunctionParametersNode {
   const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
@@ -77,7 +77,8 @@ export function SuspenseInfiniteQuery({
   initialPageParam,
   queryParam,
 }: Props): KubbReactNode {
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
   const responseType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
@@ -104,11 +105,11 @@ export function SuspenseInfiniteQuery({
       ? (() => {
           const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : undefined
+          return groupName !== individualName ? groupName : null
         })()
-      : undefined
+      : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
   const returnType = 'UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }'

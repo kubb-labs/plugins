@@ -10,14 +10,24 @@ export type DeletePetHeaderApiKey = string | undefined
 
 /**
  * @description Pet id to delete
+ *
+ * Format: `int64`
  * @type integer
  */
 export type DeletePetPathPetId = bigint
 
+export const deletePetStatus200Enum = {
+  TYPE1: 'TYPE1',
+  TYPE2: 'TYPE2',
+  TYPE3: 'TYPE3',
+} as const
+
+export type DeletePetStatus200EnumKey = (typeof deletePetStatus200Enum)[keyof typeof deletePetStatus200Enum]
+
 /**
  * @type array
  */
-export type DeletePetStatus200 = ('TYPE1' | 'TYPE2' | 'TYPE3')[]
+export type DeletePetStatus200 = Array<DeletePetStatus200EnumKey>
 
 /**
  * @type any

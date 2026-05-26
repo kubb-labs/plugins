@@ -12,4 +12,10 @@ export const placeOrderStatus405Schema = z.any()
 
 export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
-export const placeOrderDataSchema = z.optional(orderSchema)
+export const placeOrderDataSchemaJson = z.optional(orderSchema)
+
+export const placeOrderDataSchemaXml = z.optional(orderSchema)
+
+export const placeOrderDataSchemaFormUrlEncoded = z.optional(orderSchema)
+
+export const placeOrderDataSchema = z.union([placeOrderDataSchemaJson, placeOrderDataSchemaXml, placeOrderDataSchemaFormUrlEncoded])

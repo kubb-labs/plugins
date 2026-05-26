@@ -1,8 +1,9 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
   UpdatePetData,
-  UpdatePetResponse,
+  UpdatePetStatus200,
+  UpdatePetStatus202,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
@@ -27,17 +28,15 @@ export async function updatePet(
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
-  const { client: request = fetch, contentType = 'application/json', ...requestConfig } = config
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = updatePetDataSchema.parse(data)
 
-  const res = await request<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
-    method: 'PUT',
-    url: getUpdatePetUrl().url.toString(),
-    data: requestData,
-    contentType,
-    ...requestConfig,
-  })
+  const res = await request<
+    UpdatePetStatus200 | UpdatePetStatus202,
+    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
+    UpdatePetData
+  >({ method: 'PUT', url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return { ...res, data: updatePetResponseSchema.parse(res.data) }
 }

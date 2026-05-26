@@ -5,11 +5,16 @@
 
 import type {
   UpdatePetData,
+  UpdatePetFormUrlEncodedData,
+  UpdatePetJsonData,
   UpdatePetResponse,
   UpdatePetStatus200,
+  UpdatePetStatus200Json,
+  UpdatePetStatus200Xml,
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
+  UpdatePetXmlData,
 } from '../../models/UpdatePet.ts'
 import { createPet } from '../createPet.ts'
 import { faker } from '@faker-js/faker'
@@ -17,10 +22,28 @@ import { faker } from '@faker-js/faker'
 /**
  * @description Successful operation
  */
-export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
+export function createUpdatePetStatus200Json(data?: Partial<UpdatePetStatus200Json>): UpdatePetStatus200Json {
   faker.seed([220])
 
-  return createPet(data)
+  return createPet(data) as UpdatePetStatus200Json
+}
+
+/**
+ * @description Successful operation
+ */
+export function createUpdatePetStatus200Xml(data?: Partial<UpdatePetStatus200Xml>): UpdatePetStatus200Xml {
+  faker.seed([220])
+
+  return createPet(data) as UpdatePetStatus200Xml
+}
+
+/**
+ * @description Successful operation
+ */
+export function createUpdatePetStatus200(_data?: UpdatePetStatus200): UpdatePetStatus200 {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createUpdatePetStatus200Json(), createUpdatePetStatus200Xml()])
 }
 
 /**
@@ -53,10 +76,37 @@ export function createUpdatePetStatus405() {
 /**
  * @description Update an existent pet in the store
  */
-export function createUpdatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
+export function createUpdatePetJsonData(data?: Partial<UpdatePetJsonData>): UpdatePetJsonData {
   faker.seed([220])
 
-  return createPet(data)
+  return createPet(data) as UpdatePetJsonData
+}
+
+/**
+ * @description Update an existent pet in the store
+ */
+export function createUpdatePetXmlData(data?: Partial<UpdatePetXmlData>): UpdatePetXmlData {
+  faker.seed([220])
+
+  return createPet(data) as UpdatePetXmlData
+}
+
+/**
+ * @description Update an existent pet in the store
+ */
+export function createUpdatePetFormUrlEncodedData(data?: Partial<UpdatePetFormUrlEncodedData>): UpdatePetFormUrlEncodedData {
+  faker.seed([220])
+
+  return createPet(data) as UpdatePetFormUrlEncodedData
+}
+
+/**
+ * @description Update an existent pet in the store
+ */
+export function createUpdatePetData(_data?: UpdatePetData): UpdatePetData {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createUpdatePetJsonData(), createUpdatePetXmlData(), createUpdatePetFormUrlEncodedData()])
 }
 
 export function createUpdatePetResponse(_data?: UpdatePetResponse): UpdatePetResponse {

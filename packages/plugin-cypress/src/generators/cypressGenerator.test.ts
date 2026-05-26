@@ -27,7 +27,7 @@ const defaultOptions: PluginCypress['resolvedOptions'] = {
   include: undefined,
   override: [],
   baseURL: undefined,
-  group: undefined,
+  group: null,
   dataReturnType: 'data',
   paramsCasing: 'camelcase',
   paramsType: 'inline',
@@ -37,7 +37,7 @@ const defaultOptions: PluginCypress['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

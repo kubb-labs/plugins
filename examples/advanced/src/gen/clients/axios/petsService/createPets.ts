@@ -1,4 +1,4 @@
-import fetch from '../../../../axios-client.ts'
+import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
   CreatePetsPathUuid,
@@ -6,7 +6,7 @@ import type {
   CreatePetsQueryOffset,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsData,
-  CreatePetsResponse,
+  CreatePetsStatus201,
 } from '../../../models/ts/petsController/CreatePets.ts'
 import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/petsController/createPetsSchema.ts'
 
@@ -34,7 +34,7 @@ export async function createPets(
   },
   config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
   const mappedParams = params ? { bool_param: params.boolParam, offset: params.offset } : undefined
 
@@ -42,7 +42,7 @@ export async function createPets(
 
   const requestData = createPetsDataSchema.parse(data)
 
-  const res = await request<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({
+  const res = await request<CreatePetsStatus201, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,

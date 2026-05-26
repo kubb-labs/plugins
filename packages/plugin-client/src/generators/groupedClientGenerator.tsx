@@ -4,6 +4,12 @@ import { defineGenerator } from '@kubb/core'
 import { File, Function, jsxRendererSync } from '@kubb/renderer-jsx'
 import type { PluginClient } from '../types'
 
+/**
+ * Emits one aggregate file per tag/group when `group` is configured. Each
+ * file re-exports every client function for that group, so callers can
+ * `import { petController } from './gen/clients'` instead of importing
+ * each operation individually.
+ */
 export const groupedClientGenerator = defineGenerator<PluginClient>({
   name: 'groupedClient',
   renderer: jsxRendererSync,
@@ -15,16 +21,16 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
       (acc, operationNode) => {
         if (group?.type === 'tag') {
           const tag = operationNode.tags[0]
-          const name = tag ? group?.name?.({ group: camelCase(tag) }) : undefined
+          const name = tag ? group?.name?.({ group: camelCase(tag) }) : null
 
           if (!tag || !name) {
             return acc
           }
 
-          const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group })
+          const file = resolver.resolveFile({ name, extname: '.ts', tag }, { root, output, group: group ?? undefined })
           const clientFile = resolver.resolveFile(
             { name: operationNode.operationId, extname: '.ts', tag: operationNode.tags[0] ?? 'default', path: operationNode.path },
-            { root, output, group },
+            { root, output, group: group ?? undefined },
           )
 
           const client = {
@@ -55,8 +61,8 @@ export const groupedClientGenerator = defineGenerator<PluginClient>({
               baseName={file.baseName}
               path={file.path}
               meta={file.meta}
-              banner={resolver.resolveBanner(ctx.meta, { output, config })}
-              footer={resolver.resolveFooter(ctx.meta, { output, config })}
+              banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName, isAggregation: true } })}
+              footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName, isAggregation: true } })}
             >
               {clients.map((client) => (
                 <File.Import key={client.name} name={[client.name]} root={file.path} path={client.file.path} />

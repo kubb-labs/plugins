@@ -1,34 +1,49 @@
 # Shared option: client/data-return-type
 
-# ────────────────────────── client.dataReturnType ──────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: dataReturnType
 type: "'data' | 'full'"
 required: false
 default: "'data'"
 description: |
-  Return type used when calling the client.
+  Shape of the value returned from each generated client function.
 
-  - `'data'` returns `ResponseConfig['data']`.
-  - `'full'` returns the full `ResponseConfig`.
+  - `'data'` returns only the response body (`response.data`). Concise and matches what most apps need.
+  - `'full'` returns the full response config — body, status code, headers, and the original request. Use this when callers need to inspect headers or status.
 examples:
-  - name: data
+  - name: "'data' (default)"
     files:
-      - lang: typescript
+      - name: getPetById.ts
+        lang: typescript
+        twoslash: false
         code: |
           export async function getPetById<TData>(
             petId: GetPetByIdPathParams,
           ): Promise<ResponseConfig<TData>['data']> {
-            ...
+            // ...
           }
+      - name: usage.ts
+        lang: typescript
         twoslash: false
-  - name: full
+        code: |
+          const pet = await getPetById(1)
+          //    ^? Pet
+  - name: "'full'"
     files:
-      - lang: typescript
+      - name: getPetById.ts
+        lang: typescript
+        twoslash: false
         code: |
           export async function getPetById<TData>(
             petId: GetPetByIdPathParams,
           ): Promise<ResponseConfig<TData>> {
-            ...
+            // ...
           }
+      - name: usage.ts
+        lang: typescript
         twoslash: false
+        code: |
+          const response = await getPetById(1)
+          //    ^? ResponseConfig<Pet>
+          console.log(response.status, response.headers)
+          const pet = response.data

@@ -14,14 +14,14 @@ export function createShowPetByIdPathPetId(data?: string): string {
  * @description Expected response to a valid request
  */
 export function createShowPetByIdStatus200(data?: Partial<ShowPetByIdStatus200>): ShowPetByIdStatus200 {
-  return createPet(data)
+  return createPet(data) as ShowPetByIdStatus200
 }
 
 /**
  * @description Unexpected error
  */
 export function createShowPetByIdStatusDefault(data?: Partial<ShowPetByIdStatusDefault>): ShowPetByIdStatusDefault {
-  return createError(data)
+  return createError(data) as ShowPetByIdStatusDefault
 }
 
 export function createShowPetByIdResponse(_data?: ShowPetByIdResponse): ShowPetByIdResponse {

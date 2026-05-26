@@ -9,7 +9,7 @@ import { getContentType, getMswMethod, getMswUrl } from '../utils.ts'
 type Props = {
   name: string
   typeName: string
-  requestTypeName?: string
+  requestTypeName?: string | null
   fakerName: string
   baseURL: string | null | undefined
   node: ast.OperationNode
@@ -24,7 +24,7 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
   const contentType = getContentType(successResponse)
   const url = new URLPath(getMswUrl(node)).toURLPath()
 
-  const headers = [contentType ? `'Content-Type': '${contentType}'` : undefined].filter(Boolean)
+  const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
 
   const callbackType = requestTypeName
     ? `HttpResponseResolver<Record<string, string>, ${requestTypeName}, any>`

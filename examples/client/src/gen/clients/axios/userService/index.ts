@@ -1,3 +1,5 @@
+/* eslint-disable no-alert, no-console */
+
 export * from './createUser.js'
 export * from './createUsersWithListInput.js'
 export * from './deleteUser.js'

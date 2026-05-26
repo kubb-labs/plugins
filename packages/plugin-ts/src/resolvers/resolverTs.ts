@@ -1,22 +1,23 @@
-import { pascalCase } from '@internals/utils'
+import { ensureValidVarName, pascalCase } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginTs } from '../types.ts'
 
 /**
- * Resolver for `@kubb/plugin-ts` that provides the default naming and path-resolution
- * helpers used by the plugin. Import this in other plugins to resolve the exact names and
- * paths that `plugin-ts` generates without hardcoding the conventions.
+ * Default resolver used by `@kubb/plugin-ts`. Decides the names and file paths
+ * for every generated TypeScript type. Import this in other plugins that need
+ * to reference the exact names `plugin-ts` produces without duplicating the
+ * casing/file-layout rules.
  *
- * The `default` method is automatically injected by `defineResolver` — it uses `camelCase`
- * for identifiers/files and `pascalCase` for type names.
+ * The `default` method is supplied by `defineResolver`. It uses PascalCase for
+ * type names and PascalCase-with-isFile for files.
  *
- * @example
+ * @example Resolve a type and file name
  * ```ts
- * import { resolver } from '@kubb/plugin-ts'
+ * import { resolverTs } from '@kubb/plugin-ts'
  *
- * resolver.default('list pets', 'type')              // → 'ListPets'
- * resolver.resolveName('list pets status 200')        // → 'ListPetsStatus200'
- * resolver.resolvePathName('list pets', 'file')       // → 'listPets'
+ * resolverTs.default('list pets', 'type')        // 'ListPets'
+ * resolverTs.resolvePathName('list pets', 'file') // 'ListPets'
+ * resolverTs.resolveResponseStatusName(node, 200) // 'ListPetsStatus200'
  * ```
  */
 export const resolverTs = defineResolver<PluginTs>(() => {
@@ -24,13 +25,15 @@ export const resolverTs = defineResolver<PluginTs>(() => {
     name: 'default',
     pluginName: 'plugin-ts',
     default(name, type) {
-      return pascalCase(name, { isFile: type === 'file' })
+      const resolved = pascalCase(name, { isFile: type === 'file' })
+      return type === 'file' ? resolved : ensureValidVarName(resolved)
     },
     resolveTypeName(name) {
-      return pascalCase(name)
+      return ensureValidVarName(pascalCase(name))
     },
     resolvePathName(name, type) {
-      return pascalCase(name, { isFile: type === 'file' })
+      const resolved = pascalCase(name, { isFile: type === 'file' })
+      return type === 'file' ? resolved : ensureValidVarName(resolved)
     },
     resolveParamName(node, param) {
       return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)

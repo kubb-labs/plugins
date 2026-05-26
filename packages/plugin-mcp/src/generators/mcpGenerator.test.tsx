@@ -32,13 +32,13 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
     dataReturnType: 'data',
   },
   paramsCasing: undefined,
-  group: undefined,
+  group: null,
   resolver: resolverMcp,
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

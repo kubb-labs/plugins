@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/fetch'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus } from './FindPetsByTags'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { fetch } from './.kubb/fetch'
+import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = (params: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>) =>
+export const findPetsByTagsQueryKey = (params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>) =>
   ['findPetsByTags', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
@@ -24,23 +24,23 @@ export async function findPetsByTags(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return FindPetsByTagsResponse.parse(res.data)
 }
 
 export function findPetsByTagsQueryOptions(
-  params: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
+  params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
-  return queryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsResponse>({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200>({
     enabled: () => !!toValue(params),
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags(toValue(params), { ...config, signal: config.signal ?? signal })
+      return findPetsByTags(toValue(params!), { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -48,10 +48,10 @@ export function findPetsByTagsQueryOptions(
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTags<TData = FindPetsByTagsResponse, TQueryData = FindPetsByTagsResponse, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
-  params: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
+export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
+  params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
   options: {
-    query?: Partial<UseQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<UseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
@@ -64,7 +64,7 @@ export function useFindPetsByTags<TData = FindPetsByTagsResponse, TQueryData = F
       ...findPetsByTagsQueryOptions(params, config),
       ...resolvedOptions,
       queryKey,
-    } as unknown as UseQueryOptions<FindPetsByTagsResponse, ResponseErrorConfig<Error>, TData, FindPetsByTagsResponse, TQueryKey>,
+    } as unknown as UseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, FindPetsByTagsStatus200, TQueryKey>,
     toValue(queryClient),
   ) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 

@@ -8,7 +8,14 @@ export type FindPetsByStatusPathStepId = string
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200 = Array<Pet>
+export type FindPetsByStatusStatus200Json = Array<Pet>
+
+/**
+ * @type array
+ */
+export type FindPetsByStatusStatus200Xml = Array<Pet>
+
+export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
 /**
  * @type any

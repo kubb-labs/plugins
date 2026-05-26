@@ -6,7 +6,7 @@
 import type { User } from '../models/User.ts'
 import { faker } from '@faker-js/faker'
 
-export function createUser(data?: Partial<User>): Required<User> {
+export function createUser<TData extends Partial<User> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = {
     id: faker.number.bigInt(),
@@ -21,5 +21,5 @@ export function createUser(data?: Partial<User>): Required<User> {
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<User>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

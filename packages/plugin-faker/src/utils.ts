@@ -104,15 +104,16 @@ function shouldInlineSingleResponseSchema(schema: ast.SchemaNode): boolean {
  * Returns null if no responses are provided, or embeds single simple responses inline.
  */
 export function buildResponseUnionSchema(node: ast.OperationNode, resolver: ResolverFaker): ast.SchemaNode | null {
-  const responses = node.responses.filter((response) => response.schema)
+  const responses = node.responses.filter((response) => response.content?.[0]?.schema)
 
   if (!responses.length) {
     return null
   }
 
   if (responses.length === 1) {
-    if (shouldInlineSingleResponseSchema(responses[0]!.schema)) {
-      return responses[0]!.schema
+    const schema = responses[0]!.content?.[0]?.schema
+    if (schema && shouldInlineSingleResponseSchema(schema)) {
+      return schema
     }
 
     return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, responses[0]!.statusCode) })
@@ -225,7 +226,7 @@ export function resolveFakerTypeUsage(
   canOverride: boolean,
 ): {
   dataType: string
-  returnType: string | undefined
+  returnType: string | null
   usesTypeName: boolean
 } {
   const isArray = ARRAY_TYPES.has(node.type)
@@ -242,7 +243,7 @@ export function resolveFakerTypeUsage(
     dataType = getScalarType(node, typeName)
   }
 
-  let returnType = canOverride ? typeName : undefined
+  let returnType = canOverride ? typeName : null
 
   if (isScalar) {
     returnType = getScalarType(node, typeName)

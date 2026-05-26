@@ -12,4 +12,10 @@ export const updateUserStatusDefaultSchema = z.any()
 
 export const updateUserResponseSchema = updateUserStatusDefaultSchema
 
-export const updateUserDataSchema = z.optional(userSchema)
+export const updateUserDataSchemaJson = z.optional(userSchema)
+
+export const updateUserDataSchemaXml = z.optional(userSchema)
+
+export const updateUserDataSchemaFormUrlEncoded = z.optional(userSchema)
+
+export const updateUserDataSchema = z.union([updateUserDataSchemaJson, updateUserDataSchemaXml, updateUserDataSchemaFormUrlEncoded])

@@ -1,29 +1,36 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { cypressGenerator } from './generators/cypressGenerator.tsx'
 import { resolverCypress } from './resolvers/resolverCypress.ts'
 import type { PluginCypress } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-cypress`, used to identify the plugin
- * in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-cypress`. Used for driver lookups and
+ * cross-plugin dependency references.
  */
 export const pluginCypressName = 'plugin-cypress' satisfies PluginCypress['name']
 
 /**
- * The `@kubb/plugin-cypress` plugin factory.
- *
- * Generates Cypress `cy.request()` test functions from an OpenAPI/AST `RootNode`.
- * Walks operations, delegates rendering to the active generators,
- * and writes barrel files based on `output.barrelType`.
+ * Generates one typed `cy.request()` wrapper per OpenAPI operation. Each helper
+ * has typed path params, body, query, and a typed response, so failing API
+ * calls in Cypress show up at compile time instead of inside the test runner.
  *
  * @example
  * ```ts
- * import pluginCypress from '@kubb/plugin-cypress'
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginCypress } from '@kubb/plugin-cypress'
  *
  * export default defineConfig({
- *   plugins: [pluginCypress({ output: { path: 'cypress' } })],
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginCypress({
+ *       output: { path: './cypress' },
+ *     }),
+ *   ],
  * })
  * ```
  */
@@ -44,19 +51,7 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Requests`
-            },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Requests', honorName: true })
 
   return {
     name: pluginCypressName,

@@ -1,11 +1,11 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '../../../../tanstack-query-hook'
 import type {
-  FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
@@ -31,9 +31,9 @@ export function findPetsByTagsInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
   return infiniteQueryOptions<
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    InfiniteData<ResponseConfig<FindPetsByTagsResponse>>,
+    InfiniteData<ResponseConfig<FindPetsByTagsStatus200>>,
     typeof queryKey,
     number
   >({
@@ -53,7 +53,7 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = ResponseConfig<FindPetsByTagsResponse>,
+  TQueryFnData = ResponseConfig<FindPetsByTagsStatus200>,
   TError = ResponseErrorConfig<FindPetsByTagsStatus400>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,

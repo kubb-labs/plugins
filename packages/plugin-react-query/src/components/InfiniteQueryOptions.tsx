@@ -6,8 +6,8 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, resolveErrorNames } from '../utils.ts'
-import { buildEnabledCheck } from '@internals/tanstack-query'
+import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -46,7 +46,8 @@ export function InfiniteQueryOptions({
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -72,33 +73,33 @@ export function InfiniteQueryOptions({
       ? (() => {
           const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : undefined
+          return groupName !== individualName ? groupName : null
         })()
-      : undefined
+      : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
-
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource ? `enabled: !!(${enabledSource}),` : ''
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
+  const enabledText = enabledNames.length ? `enabled: !!(${enabledNames.join(' && ')}),` : ''
 
-  const hasNewParams = nextParam !== undefined || previousParam !== undefined
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
+  const clientCallStr = injectNonNullAssertions(rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }'), enabledNames)
+
+  const hasNewParams = nextParam != null || previousParam != null
 
   const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
     if (hasNewParams) {
-      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : undefined
-      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : undefined
+      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
+      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
       return [
-        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : undefined,
-        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : undefined,
+        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
+        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,
       ] as const
     }
     if (cursorParam) {

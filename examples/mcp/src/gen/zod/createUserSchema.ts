@@ -3,10 +3,21 @@
  * Do not edit manually.
  */
 
+import * as z from 'zod'
 import { userSchema } from './userSchema.js'
 
-export const createUserStatusDefaultSchema = userSchema
+export const createUserStatusDefaultSchemaJson = userSchema
+
+export const createUserStatusDefaultSchemaXml = userSchema
+
+export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSchemaJson, createUserStatusDefaultSchemaXml])
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export const createUserDataSchema = userSchema.optional().describe('Created user object')
+export const createUserDataSchemaJson = userSchema.optional().describe('Created user object')
+
+export const createUserDataSchemaXml = userSchema.optional().describe('Created user object')
+
+export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Created user object')
+
+export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])

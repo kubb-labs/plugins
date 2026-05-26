@@ -1,11 +1,11 @@
 import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type {
-  FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsHeaderXEXAMPLE,
+  FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/petController/FindPetsByTags.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
@@ -28,9 +28,9 @@ export function findPetsByTagsQueryOptions(
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    ResponseConfig<FindPetsByTagsResponse>,
+    ResponseConfig<FindPetsByTagsStatus200>,
     typeof queryKey
   >({
     queryKey,
@@ -46,8 +46,8 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<
-  TData = ResponseConfig<FindPetsByTagsResponse>,
-  TQueryData = ResponseConfig<FindPetsByTagsResponse>,
+  TData = ResponseConfig<FindPetsByTagsStatus200>,
+  TQueryData = ResponseConfig<FindPetsByTagsStatus200>,
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
   {
@@ -59,7 +59,7 @@ export function useFindPetsByTags<
   },
   options: {
     query?: Partial<
-      QueryObserverOptions<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>
+      QueryObserverOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

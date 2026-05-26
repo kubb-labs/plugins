@@ -1,7 +1,7 @@
 import path from 'node:path'
-import { getOperationParameters, resolveOperationTypeNames } from '@internals/shared'
+import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
-import { defineGenerator } from '@kubb/core'
+import { ast, defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -10,10 +10,17 @@ import { difference } from 'remeda'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import type { PluginVueQuery } from '../types'
 
+/**
+ * Built-in generator for `useInfiniteQuery` composables. Enabled when
+ * `pluginVueQuery({ infinite: { ... } })`. Emits one `useFooInfiniteQuery`
+ * composable per query operation, wiring the configured cursor path into
+ * TanStack Query's cursor-based pagination.
+ */
 export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   name: 'vue-query-infinite',
   renderer: jsxRendererSync,
   operation(node, ctx) {
+    if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
     const { output, query, mutation, infinite, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
 
@@ -26,7 +33,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       mutation !== false &&
       !isQuery &&
       difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
-    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : undefined
+    const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
 
     if (!isQuery || isMutation || !infiniteOptions) return null
 
@@ -48,11 +55,12 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
     const clientBaseName = resolver.resolveInfiniteClientName(node)
 
     const meta = {
-      file: resolver.resolveFile({ name: queryName, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output, group }),
-      fileTs: tsResolver.resolveFile(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group },
-      ),
+      file: resolver.resolveFile(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
+      fileTs: tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
+        root,
+        output: pluginTs.options?.output ?? output,
+        group: pluginTs.options?.group ?? undefined,
+      }),
     }
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
@@ -61,31 +69,29 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       order: 'body-response-first',
     })
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : undefined
-    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
+    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
     const fileZod = zodResolver
-      ? zodResolver.resolveFile(
-          { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          { root, output: pluginZod?.options?.output ?? output, group: pluginZod?.options?.group },
-        )
-      : undefined
+      ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
+          root,
+          output: pluginZod?.options?.output ?? output,
+          group: pluginZod?.options?.group ?? undefined,
+        })
+      : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver)
 
     const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
     const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
-    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : undefined
+    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : null
 
     const clientFile = shouldUseClientPlugin
-      ? clientResolver?.resolveFile(
-          { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-          {
-            root,
-            output: clientPlugin?.options?.output ?? output,
-            group: clientPlugin?.options?.group,
-          },
-        )
-      : undefined
+      ? clientResolver?.resolveFile(operationFileEntry(node, node.operationId), {
+          root,
+          output: clientPlugin?.options?.output ?? output,
+          group: clientPlugin?.options?.group ?? undefined,
+        })
+      : null
 
     const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientBaseName) : clientBaseName
 
@@ -94,27 +100,27 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
         baseName={meta.file.baseName}
         path={meta.file.path}
         meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config })}
+        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
+        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
         {clientOptions.importPath ? (
           <>
-            {!shouldUseClientPlugin && <File.Import name={'fetch'} path={clientOptions.importPath} />}
+            {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
             {clientOptions.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={clientOptions.importPath} isTypeOnly />}
           </>
         ) : (
           <>
-            {!shouldUseClientPlugin && <File.Import name={['fetch']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} />}
+            {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
             <File.Import
               name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
               root={meta.file.path}
-              path={path.resolve(root, '.kubb/fetch.ts')}
+              path={path.resolve(root, '.kubb/client.ts')}
               isTypeOnly
             />
             {clientOptions.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/fetch.ts')} isTypeOnly />
+              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
             )}
           </>
         )}

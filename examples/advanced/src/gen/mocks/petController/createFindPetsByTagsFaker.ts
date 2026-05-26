@@ -3,8 +3,11 @@ import type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsResponse,
   FindPetsByTagsStatus200,
+  FindPetsByTagsStatus200Json,
+  FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from '../../models/ts/petController/FindPetsByTags.ts'
+import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetFaker } from '../createPetFaker.ts'
 import { faker } from '@faker-js/faker'
 
@@ -20,15 +23,29 @@ export function createFindPetsByTagsQueryPageSizeFaker(data?: number): number {
   return data ?? faker.number.float()
 }
 
-export function createFindPetsByTagsHeaderXEXAMPLEFaker(data?: FindPetsByTagsHeaderXEXAMPLE): FindPetsByTagsHeaderXEXAMPLE {
-  return data ?? faker.helpers.arrayElement<FindPetsByTagsHeaderXEXAMPLE>(['ONE', 'TWO', 'THREE'])
+export function createFindPetsByTagsHeaderXEXAMPLEFaker(data?: Partial<FindPetsByTagsHeaderXEXAMPLE>): FindPetsByTagsHeaderXEXAMPLE {
+  return createCreatePetsXEXAMPLEFaker(data) as FindPetsByTagsHeaderXEXAMPLE
 }
 
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200Faker(data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
+export function createFindPetsByTagsStatus200FakerJson(data?: FindPetsByTagsStatus200Json): FindPetsByTagsStatus200Json {
   return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByTagsStatus200FakerXml(data?: FindPetsByTagsStatus200Xml): FindPetsByTagsStatus200Xml {
+  return [...faker.helpers.multiple(() => createPetFaker()), ...(data || [])]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByTagsStatus200Faker(_data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
+  return faker.helpers.arrayElement<any>([createFindPetsByTagsStatus200FakerJson(), createFindPetsByTagsStatus200FakerXml()])
 }
 
 /**

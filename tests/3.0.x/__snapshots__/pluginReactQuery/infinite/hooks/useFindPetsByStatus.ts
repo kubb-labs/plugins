@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
 import { queryOptions, useQuery } from "@tanstack/react-query";
@@ -19,12 +19,12 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * {@link /pet/findByStatus}
  */
 export async function findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
 
-  const res = await request<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: `/pet/findByStatus`, params, ...requestConfig })
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: `/pet/findByStatus`, params, ...requestConfig })
 
   return res.data
 }
@@ -32,7 +32,7 @@ export async function findPetsByStatus(params?: { status?: FindPetsByStatusQuery
 export function findPetsByStatusQueryOptions(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = findPetsByStatusQueryKey(params)
-        return queryOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusResponse, typeof queryKey>({
+        return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
 
          queryKey,
          queryFn: async ({ signal }) => {
@@ -47,8 +47,8 @@ export function findPetsByStatusQueryOptions(params?: { status?: FindPetsByStatu
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus<TData = FindPetsByStatusResponse, TQueryData = FindPetsByStatusResponse, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: { status?: FindPetsByStatusQueryStatus }, options: {
-  query?: Partial<QueryObserverOptions<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
+export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: { status?: FindPetsByStatusQueryStatus }, options: {
+  query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

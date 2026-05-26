@@ -138,7 +138,7 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  group: undefined,
+  group: null,
   mapper: {},
   dateParser: 'faker',
   regexGenerator: 'faker',
@@ -150,7 +150,7 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
 
 const defaultTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: 'types' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: 'types' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

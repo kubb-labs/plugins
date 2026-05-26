@@ -43,18 +43,18 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
   },
   suspense: false,
   infinite: false,
-  customOptions: undefined,
+  customOptions: null,
   exclude: [],
   include: undefined,
   override: [],
   output: { path: '.' },
-  group: undefined,
+  group: null,
   resolver: resolverReactQuery,
 }
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 

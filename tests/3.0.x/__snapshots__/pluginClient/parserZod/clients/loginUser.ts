@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserResponse, LoginUserStatus400 } from "../types/LoginUser.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { loginUserResponseSchema } from "../zod/loginUserSchema.ts";
 
@@ -19,12 +19,12 @@ function getLoginUserUrl() {
  * {@link /user/login}
  */
 export async function loginUser(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
 
-  const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: getLoginUserUrl().url.toString(), params, ...requestConfig })
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: getLoginUserUrl().url.toString(), params, ...requestConfig })
 
   return loginUserResponseSchema.parse(res.data)
 }

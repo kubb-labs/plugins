@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "5.0.0-beta.22",
+  "version": "5.0.0-beta.30",
   "description": "Generate type-safe HTTP clients from your OpenAPI specification. Supports Axios, Fetch, and custom client adapters with full TypeScript inference and zero boilerplate.",
   "keywords": [
     "api-client",

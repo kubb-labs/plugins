@@ -24,13 +24,13 @@ export function createUpdatePetQueryRequestSource(data?: string): string {
  * @description Success
  */
 export function createUpdatePetStatus200(data?: Partial<UpdatePetStatus200>): UpdatePetStatus200 {
-  return createPet(data)
+  return createPet(data) as UpdatePetStatus200
 }
 
 export function createUpdatePetData(data?: Partial<UpdatePetData>): UpdatePetData {
-  return createPetUpdate(data)
+  return createPetUpdate(data) as UpdatePetData
 }
 
 export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-  return createUpdatePetStatus200(data)
+  return createUpdatePetStatus200(data) as UpdatePetResponse
 }

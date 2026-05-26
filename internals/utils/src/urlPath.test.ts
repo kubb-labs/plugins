@@ -63,8 +63,8 @@ describe('URLPath', () => {
 
     expect(testPath.toObject()).toStrictEqual({
       url: '/test',
-      params: undefined,
+      params: null,
     })
-    expect(testPath.toObject({ type: 'template', stringify: true })).toStrictEqual('{url:`/test`}')
+    expect(testPath.toObject({ type: 'template', stringify: true })).toMatchInlineSnapshot(`"{url:\`/test\`,params:null}"`)
   })
 })

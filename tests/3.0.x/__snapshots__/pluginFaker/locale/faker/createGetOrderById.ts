@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
+import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json, GetOrderByIdStatus200Xml, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
 import { createOrder } from "./createOrder.ts";
 import { fakerDE as faker } from "@faker-js/faker";
 
@@ -14,8 +14,22 @@ export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
 /**
  * @description successful operation
  */
-export function createGetOrderByIdStatus200(data?: Partial<GetOrderByIdStatus200>): GetOrderByIdStatus200 {
-  return createOrder(data)
+export function createGetOrderByIdStatus200Json(data?: Partial<GetOrderByIdStatus200Json>): GetOrderByIdStatus200Json {
+  return createOrder(data) as GetOrderByIdStatus200Json
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetOrderByIdStatus200Xml(data?: Partial<GetOrderByIdStatus200Xml>): GetOrderByIdStatus200Xml {
+  return createOrder(data) as GetOrderByIdStatus200Xml
+}
+
+/**
+ * @description successful operation
+ */
+export function createGetOrderByIdStatus200(_data?: GetOrderByIdStatus200): GetOrderByIdStatus200 {
+  return faker.helpers.arrayElement<any>([createGetOrderByIdStatus200Json(), createGetOrderByIdStatus200Xml()])
 }
 
 /**

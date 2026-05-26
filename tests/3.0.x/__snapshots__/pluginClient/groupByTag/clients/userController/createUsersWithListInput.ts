@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../../types/CreateUsersWithListInput.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../../types/CreateUsersWithListInput.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getCreateUsersWithListInputUrl() {
@@ -19,13 +19,13 @@ function getCreateUsersWithListInputUrl() {
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
   const requestData = data
 
 
-  const res = await request<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
 
   return res.data
 }

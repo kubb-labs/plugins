@@ -1,24 +1,37 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { zodGenerator } from './generators/zodGenerator.tsx'
 import { resolverZod } from './resolvers/resolverZod.ts'
 import type { PluginZod } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-zod`, used in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-zod`. Used for driver lookups and
+ * cross-plugin dependency references.
  */
 export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
 
 /**
- * Generates Zod validation schemas from an OpenAPI specification.
- * Walks schemas and operations, delegates to generators, and writes barrel files
- * based on the configured `barrelType`.
+ * Generates Zod v4 schemas from an OpenAPI spec. Use them to validate API
+ * responses at runtime, build form schemas, or feed back into router libraries
+ * that consume Zod (tRPC, Hono, Elysia). Pair with `@kubb/plugin-client` and
+ * set the client's `parser: 'zod'` to validate every response automatically.
  *
- * @example Zod schema generator
+ * @example
  * ```ts
- * import pluginZod from '@kubb/plugin-zod'
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginZod } from '@kubb/plugin-zod'
+ *
  * export default defineConfig({
- *   plugins: [pluginZod({ output: { path: 'zod' } })]
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginZod({
+ *       output: { path: './zod' },
+ *       typed: true,
+ *     }),
+ *   ],
  * })
  * ```
  */
@@ -44,17 +57,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: (ctx) => {
-          if (group.type === 'path') {
-            return `${ctx.group.split('/')[1]}`
-          }
-          return `${camelCase(ctx.group)}Controller`
-        },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginZodName,

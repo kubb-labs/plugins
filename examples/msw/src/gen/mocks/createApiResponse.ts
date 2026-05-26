@@ -6,11 +6,11 @@
 import type { ApiResponse } from '../models/ApiResponse.ts'
 import { faker } from '@faker-js/faker'
 
-export function createApiResponse(data?: Partial<ApiResponse>): Required<ApiResponse> {
+export function createApiResponse<TData extends Partial<ApiResponse> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = { code: faker.number.int(), type: faker.string.alpha(), message: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<ApiResponse>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

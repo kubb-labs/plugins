@@ -1,27 +1,36 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { typeGenerator } from './generators/typeGenerator.tsx'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import type { PluginTs } from './types.ts'
 
 /**
- * Canonical plugin name for `@kubb/plugin-ts`, used to identify the plugin in driver lookups and warnings.
+ * Canonical plugin name for `@kubb/plugin-ts`. Used for driver lookups and
+ * cross-plugin dependency references.
  */
 export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
 
 /**
- * The `@kubb/plugin-ts` plugin factory.
- *
- * Generates TypeScript type declarations from an OpenAPI/AST `RootNode`.
- * Walks schemas and operations, delegates rendering to the active generators,
- * and writes barrel files based on `output.barrelType`.
+ * Generates TypeScript `type` aliases and `interface` declarations from an
+ * OpenAPI spec. The foundation that every other Kubb plugin builds on:
+ * clients, query hooks, mocks, and validators all reference the names this
+ * plugin produces.
  *
  * @example
  * ```ts
- * import pluginTs from '@kubb/plugin-ts'
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
  *
  * export default defineConfig({
- *   plugins: [pluginTs({ output: { path: 'types' }, enumType: 'asConst' })],
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs({
+ *       output: { path: './types' },
+ *       enumType: 'asConst',
+ *       optionalType: 'questionTokenAndUndefined',
+ *     }),
+ *   ],
  * })
  * ```
  */
@@ -45,17 +54,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: (ctx) => {
-          if (group.type === 'path') {
-            return `${ctx.group.split('/')[1]}`
-          }
-          return `${camelCase(ctx.group)}Controller`
-        },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginTsName,

@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { createPetsXEXAMPLESchema } from '../createPetsXEXAMPLESchema.ts'
 import { petNotFoundSchema } from '../petNotFoundSchema.ts'
 
 export const createPetsQueryBoolParamSchema = z.literal(true).optional()
@@ -13,7 +14,7 @@ export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset *
 
 export type CreatePetsQueryOffsetSchema = z.infer<typeof createPetsQueryOffsetSchema>
 
-export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
+export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
 
 export type CreatePetsHeaderXEXAMPLESchema = z.infer<typeof createPetsHeaderXEXAMPLESchema>
 

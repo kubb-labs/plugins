@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
-import type { GetOrderByIdPathOrderId, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
+import client from "@kubb/plugin-client/clients/axios";
+import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 
 function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
@@ -19,12 +19,12 @@ function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
  * {@link /store/order/:orderId}
  */
 export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 
 
-  const res = await request<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
+  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
 
   return res
 }

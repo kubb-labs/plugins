@@ -8,7 +8,14 @@ import type { User } from "./User.ts";
 /**
  * @type object
 */
-export type CreateUserStatusDefault = User;
+export type CreateUserStatusDefaultJson = User;
+
+/**
+ * @type object
+*/
+export type CreateUserStatusDefaultXml = User;
+
+export type CreateUserStatusDefault = (CreateUserStatusDefaultJson | CreateUserStatusDefaultXml);
 
 /**
  * @description Created user object

@@ -13,7 +13,7 @@ type Props = {
    * then merges in any user-supplied `printer.nodes` overrides.
    */
   printer: ast.Printer<PrinterZodFactory> | ast.Printer<PrinterZodMiniFactory>
-  inferTypeName?: string
+  inferTypeName?: string | null
 }
 
 export function Zod({ name, node, printer, inferTypeName }: Props): KubbReactNode {

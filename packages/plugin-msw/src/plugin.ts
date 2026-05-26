@@ -1,13 +1,43 @@
-import { camelCase } from '@internals/utils'
-import { definePlugin, type Group } from '@kubb/core'
+import { createGroupConfig } from '@internals/shared'
+import { definePlugin } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { handlersGenerator, mswGenerator } from './generators'
 import { resolverMsw } from './resolvers/resolverMsw.ts'
 import type { PluginMsw } from './types.ts'
 
+/**
+ * Canonical plugin name for `@kubb/plugin-msw`. Used for driver lookups and
+ * cross-plugin dependency references.
+ */
 export const pluginMswName = 'plugin-msw' satisfies PluginMsw['name']
 
+/**
+ * Generates MSW request handlers from an OpenAPI spec. Drop them into your
+ * test setup or service worker to mock the API end-to-end. Request path,
+ * method, status, and response body all stay in sync with the spec. Combine
+ * with `@kubb/plugin-faker` (via `parser: 'faker'`) to seed handlers with
+ * realistic data.
+ *
+ * @example
+ * ```ts
+ * import { defineConfig } from 'kubb'
+ * import { pluginTs } from '@kubb/plugin-ts'
+ * import { pluginMsw } from '@kubb/plugin-msw'
+ *
+ * export default defineConfig({
+ *   input: { path: './petStore.yaml' },
+ *   output: { path: './src/gen' },
+ *   plugins: [
+ *     pluginTs(),
+ *     pluginMsw({
+ *       output: { path: './handlers' },
+ *       handlers: true,
+ *     }),
+ *   ],
+ * })
+ * ```
+ */
 export const pluginMsw = definePlugin<PluginMsw>((options) => {
   const {
     output = { path: 'handlers', barrelType: 'named' },
@@ -23,24 +53,12 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = group
-    ? ({
-        ...group,
-        name: group.name
-          ? group.name
-          : (ctx: { group: string }) => {
-              if (group.type === 'path') {
-                return `${ctx.group.split('/')[1]}`
-              }
-              return `${camelCase(ctx.group)}Controller`
-            },
-      } satisfies Group)
-    : undefined
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
 
   return {
     name: pluginMswName,
     options,
-    dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, parser === 'faker' ? pluginFakerName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverMsw, ...userResolver } : resolverMsw

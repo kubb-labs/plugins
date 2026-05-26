@@ -6,11 +6,11 @@
 import type { PetNotFound } from '../models/PetNotFound.ts'
 import { faker } from '@faker-js/faker'
 
-export function createPetNotFound(data?: Partial<PetNotFound>): Required<PetNotFound> {
+export function createPetNotFound<TData extends Partial<PetNotFound> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<PetNotFound>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

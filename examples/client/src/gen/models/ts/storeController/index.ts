@@ -13,6 +13,8 @@ export type {
   GetOrderByIdResponse,
   GetOrderByIdResponses,
   GetOrderByIdStatus200,
+  GetOrderByIdStatus200Json,
+  GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from './GetOrderById.js'

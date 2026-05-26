@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from "../types/UpdatePetWithForm.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import { updatePetWithFormResponseSchema } from "../zod/updatePetWithFormSchema.ts";
@@ -19,7 +19,7 @@ function getUpdatePetWithFormUrl(petId: UpdatePetWithFormPathPetId) {
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

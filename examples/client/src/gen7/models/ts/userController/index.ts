@@ -6,6 +6,8 @@ export type {
   CreateUserResponse,
   CreateUserResponses,
   CreateUserStatusDefault,
+  CreateUserStatusDefaultJson,
+  CreateUserStatusDefaultXml,
   CreateUserXmlData,
 } from './CreateUser.ts'
 export type {
@@ -14,6 +16,8 @@ export type {
   CreateUsersWithListInputResponse,
   CreateUsersWithListInputResponses,
   CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatus200Json,
+  CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
 } from './CreateUsersWithListInput.ts'
 export type {
@@ -30,6 +34,8 @@ export type {
   GetUserByNameResponse,
   GetUserByNameResponses,
   GetUserByNameStatus200,
+  GetUserByNameStatus200Json,
+  GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
 } from './GetUserByName.ts'
@@ -40,6 +46,8 @@ export type {
   LoginUserResponse,
   LoginUserResponses,
   LoginUserStatus200,
+  LoginUserStatus200Json,
+  LoginUserStatus200Xml,
   LoginUserStatus400,
 } from './LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'

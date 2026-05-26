@@ -9,7 +9,11 @@ export const loginUserQueryUsernameSchema = z.optional(z.string())
 
 export const loginUserQueryPasswordSchema = z.optional(z.string())
 
-export const loginUserStatus200Schema = z.string()
+export const loginUserStatus200SchemaXml = z.string()
+
+export const loginUserStatus200SchemaJson = z.string()
+
+export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, loginUserStatus200SchemaJson])
 
 export const loginUserStatus400Schema = z.any()
 

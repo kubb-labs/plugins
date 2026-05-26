@@ -30,7 +30,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   clientType: 'function',
   importPath: undefined,
   bundle: false,
-  parser: 'client',
+  parser: false,
   output: {
     path: '.',
     banner: '/* eslint-disable no-alert, no-console */',
@@ -38,7 +38,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  group: undefined,
+  group: null,
   urlType: 'export',
   sdk: undefined,
   baseURL: undefined,
@@ -47,7 +47,7 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
 
 const mockedTsPlugin = createMockedPlugin<PluginTs>({
   name: 'plugin-ts',
-  options: { output: { path: '.' }, group: undefined } as PluginTs['resolvedOptions'],
+  options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
 
@@ -172,6 +172,22 @@ const underscoredPathParamsNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const downloadFileNode = ast.createOperation({
+  operationId: 'downloadFile',
+  method: 'GET',
+  path: '/files/{fileId}',
+  tags: ['files'],
+  parameters: [ast.createParameter({ name: 'fileId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.createResponse({
+      statusCode: '200',
+      description: 'The file',
+      schema: ast.createSchema({ type: 'string' }),
+      content: [{ contentType: 'application/octet-stream', schema: ast.createSchema({ type: 'string' }) }],
+    }),
+  ],
+})
+
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -191,6 +207,7 @@ describe('clientGenerator operation', () => {
     { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const, pathParamsType: 'inline' as const } },
     { name: 'requiredOneOfRequestBody', node: requiredOneOfRequestBodyNode, options: {} },
     { name: 'multiContentType', node: multiContentTypeNode, options: {} },
+    { name: 'downloadFileBlob', node: downloadFileNode, options: {} },
     { name: 'dashedPathParams', node: dashedPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'object' as const } },
     { name: 'dashedPathParamsInline', node: dashedPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const } },
     { name: 'underscoredPathParams', node: underscoredPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'object' as const } },

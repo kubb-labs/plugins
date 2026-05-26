@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse } from "../types/GetInventory.ts";
+import type { GetInventoryStatus200 } from "../types/GetInventory.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
 import { getInventory } from "../clients/getInventory.ts";
@@ -16,7 +16,7 @@ type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryK
 export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
 
         const queryKey = getInventorySuspenseQueryKey()
-        return queryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryResponse, typeof queryKey>({
+        return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
 
          queryKey,
          queryFn: async ({ signal }) => {
@@ -31,8 +31,8 @@ export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> 
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export function useGetInventorySuspense<TData = GetInventoryResponse, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
-  query?: Partial<UseSuspenseQueryOptions<GetInventoryResponse, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
+export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
+  query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
 

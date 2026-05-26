@@ -13,6 +13,11 @@ type BuildDocsOptions = {
   templateOptions?: any
 }
 
+/**
+ * Renders a self-contained Redoc HTML page for an OpenAPI document. The page
+ * embeds the spec inline and pulls Redoc's bundle from a CDN at runtime, so
+ * the generated file works without further build steps.
+ */
 export async function getPageHTML(api: AdapterOas['document'], { title, disableGoogleFont, templateOptions }: BuildDocsOptions = {}) {
   const templateFileName = path.join(__dirname, '../static/redoc.hbs')
   const template = pkg.compile(fs.readFileSync(templateFileName).toString())

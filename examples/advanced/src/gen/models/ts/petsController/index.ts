@@ -1,4 +1,5 @@
 export type {
+  CreatePetsBoolParamKey,
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
@@ -10,3 +11,4 @@ export type {
   CreatePetsStatus201,
   CreatePetsStatusDefault,
 } from './CreatePets.ts'
+export { createPetsBoolParam } from './CreatePets.ts'

@@ -5,25 +5,21 @@
 
 import type { AddPetRequest } from './AddPetRequest.js'
 import type { Pet } from './Pet.js'
+import type { PetNotFound } from './PetNotFound.js'
 
 /**
  * @type object
  */
-export type AddPetStatus200 = Omit<NonNullable<Pet>, 'name'>
+export type AddPetStatus200Json = Omit<NonNullable<Pet>, 'name'>
 
 /**
  * @type object
  */
-export type AddPetStatus405 = {
-  /**
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
-}
+export type AddPetStatus200Xml = Omit<NonNullable<Pet>, 'name'>
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
+
+export type AddPetStatus405 = PetNotFound
 
 /**
  * @description Create a new pet in the store

@@ -2,7 +2,7 @@ $schema: 'https://kubb.dev/schemas/extension.json'
 kind: plugin
 id: plugin-msw
 name: MSW
-description: Generate Mock Service Worker (MSW) handlers from OpenAPI specifications.
+description: Generate MSW request handlers from OpenAPI so you can mock the entire API in tests and during local development.
 category: mocks
 type: official
 npmPackage: '@kubb/plugin-msw'
@@ -38,14 +38,16 @@ icon:
 intro: |
   # @kubb/plugin-msw
 
-  Generate [MSW](https://mswjs.io/) API mock handlers from your OpenAPI schema. Mock API requests in development and tests with type-safe handlers.
+  Generate [MSW](https://mswjs.io/) handlers from your OpenAPI spec. Drop them into your test setup or service worker to mock the API end-to-end — request path, method, status, and response body all stay in sync with the spec.
+
+  Combine with `@kubb/plugin-faker` to seed handlers with realistic data, or feed them custom payloads from tests.
 
 options:
   - name: output
     type: Output
     required: false
     default: "{ path: 'handlers', barrel: { type: 'named' } }"
-    description: Specify the export location for the files and define the behavior of the output.
+    description: Where the generated MSW handlers are written and how they are exported.
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'handlers'"
@@ -58,7 +60,18 @@ options:
     type: boolean
     required: false
     default: 'false'
-    description: Create a `handlers.ts` file with all handlers grouped by methods.
+    description: |
+      Emits a `handlers.ts` file that re-exports every generated handler grouped by HTTP method. Drop this file into your MSW `setupServer(...handlers)` or `setupWorker(...handlers)` call.
+    examples:
+      - name: setup.ts
+        files:
+          - lang: typescript
+            twoslash: false
+            code: |
+              import { setupServer } from 'msw/node'
+              import { handlersGet, handlersPost } from './gen/handlers'
+
+              export const server = setupServer(...handlersGet, ...handlersPost)
 
   - extends: ./_shared/core/content-type.yaml
 
@@ -71,16 +84,37 @@ options:
         type: '(context: GroupContext) => string'
         required: false
         default: "(ctx) => `${ctx.group}Controller`"
-        description: Return the name of a group based on the group name. This is used for file and identifier generation.
+        description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: parser
     type: "'data' | 'faker'"
     required: false
     default: "'data'"
-    description: Choose which parser to use when generating response data.
-    body: |
-      - `'faker'` will use `@kubb/plugin-faker` to generate the data for the response.
-      - `'data'` will use your custom data to generate the data for the response.
+    description: |
+      Source of the response body returned by each generated handler.
+
+      - `'data'` (default) — handlers return a typed empty/example payload, ready for you to fill in from tests.
+      - `'faker'` — handlers return a value produced by `@kubb/plugin-faker`. Requires the Faker plugin in the plugins array.
+    examples:
+      - name: "'faker'"
+        files:
+          - lang: typescript
+            twoslash: false
+            code: |
+              import { defineConfig } from 'kubb'
+              import { pluginTs } from '@kubb/plugin-ts'
+              import { pluginFaker } from '@kubb/plugin-faker'
+              import { pluginMsw } from '@kubb/plugin-msw'
+
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginTs(),
+                  pluginFaker(),
+                  pluginMsw({ parser: 'faker' }),
+                ],
+              })
 
   - extends: ./_shared/core/include.yaml
   - extends: ./_shared/core/exclude.yaml
@@ -93,27 +127,19 @@ examples:
   - name: kubb.config.ts
     files:
       - lang: typescript
+        twoslash: false
         code: |
           import { defineConfig } from 'kubb'
           import { pluginMsw } from '@kubb/plugin-msw'
           import { pluginTs } from '@kubb/plugin-ts'
 
           export default defineConfig({
-            input: {
-              path: './petStore.yaml',
-            },
-            output: {
-              path: './src/gen',
-            },
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
             plugins: [
               pluginTs(),
               pluginMsw({
-                output: {
-                  path: './mocks',
-                  barrel: { type: 'named' },
-                  banner: '/* eslint-disable no-alert, no-console */',
-                  footer: '',
-                },
+                output: { path: './mocks' },
                 group: {
                   type: 'tag',
                   name: ({ group }) => `${group}Service`,
@@ -122,4 +148,3 @@ examples:
               }),
             ],
           })
-        twoslash: false

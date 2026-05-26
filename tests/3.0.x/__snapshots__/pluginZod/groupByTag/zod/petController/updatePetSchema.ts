@@ -6,7 +6,11 @@
 import * as z from "zod";
 import { petSchema } from "../petSchema.ts";
 
-export const updatePetStatus200Schema = petSchema
+export const updatePetStatus200SchemaJson = petSchema
+
+export const updatePetStatus200SchemaXml = petSchema
+
+export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
 export const updatePetStatus400Schema = z.any()
 
@@ -16,4 +20,10 @@ export const updatePetStatus405Schema = z.any()
 
 export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
 
-export const updatePetDataSchema = petSchema.describe("Update an existent pet in the store")
+export const updatePetDataSchemaJson = petSchema.describe("Update an existent pet in the store")
+
+export const updatePetDataSchemaXml = petSchema.describe("Update an existent pet in the store")
+
+export const updatePetDataSchemaFormUrlEncoded = petSchema.describe("Update an existent pet in the store")
+
+export const updatePetDataSchema = z.union([updatePetDataSchemaJson, updatePetDataSchemaXml, updatePetDataSchemaFormUrlEncoded])

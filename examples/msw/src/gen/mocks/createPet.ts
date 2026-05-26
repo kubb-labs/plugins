@@ -5,10 +5,11 @@
 
 import type { Pet } from '../models/Pet.ts'
 import { createCategory } from './createCategory.ts'
+import { createPetStatusEnum } from './createPetStatusEnum.ts'
 import { createTag } from './createTag.ts'
 import { faker } from '@faker-js/faker'
 
-export function createPet(data?: Partial<Pet>): Required<Pet> {
+export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
   faker.seed([220])
   const defaultFakeData = {
     id: faker.number.bigInt(),
@@ -16,10 +17,10 @@ export function createPet(data?: Partial<Pet>): Required<Pet> {
     category: createCategory(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
     tags: faker.helpers.multiple(() => createTag()),
-    status: faker.helpers.arrayElement<NonNullable<Pet>['status']>(['available', 'pending', 'sold']),
+    status: createPetStatusEnum(),
   }
   return {
     ...defaultFakeData,
     ...(data || {}),
-  } as Required<Pet>
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }

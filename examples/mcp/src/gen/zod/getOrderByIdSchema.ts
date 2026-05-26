@@ -8,7 +8,11 @@ import { orderSchema } from './orderSchema.js'
 
 export const getOrderByIdPathOrderIdSchema = z.int().describe('ID of order that needs to be fetched')
 
-export const getOrderByIdStatus200Schema = orderSchema
+export const getOrderByIdStatus200SchemaJson = orderSchema
+
+export const getOrderByIdStatus200SchemaXml = orderSchema
+
+export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 
 export const getOrderByIdStatus400Schema = z.any()
 

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UpdateUserData } from '../../models/UpdateUser.ts'
+import type { UpdateUserData, UpdateUserFormUrlEncodedData, UpdateUserJsonData, UpdateUserXmlData } from '../../models/UpdateUser.ts'
 import { createUser } from '../createUser.ts'
 import { faker } from '@faker-js/faker'
 
@@ -25,10 +25,37 @@ export function createUpdateUserStatusDefault() {
 /**
  * @description Update an existent user in the store
  */
-export function createUpdateUserData(data?: Partial<UpdateUserData>): UpdateUserData {
+export function createUpdateUserJsonData(data?: Partial<UpdateUserJsonData>): UpdateUserJsonData {
   faker.seed([220])
 
-  return createUser(data)
+  return createUser(data) as UpdateUserJsonData
+}
+
+/**
+ * @description Update an existent user in the store
+ */
+export function createUpdateUserXmlData(data?: Partial<UpdateUserXmlData>): UpdateUserXmlData {
+  faker.seed([220])
+
+  return createUser(data) as UpdateUserXmlData
+}
+
+/**
+ * @description Update an existent user in the store
+ */
+export function createUpdateUserFormUrlEncodedData(data?: Partial<UpdateUserFormUrlEncodedData>): UpdateUserFormUrlEncodedData {
+  faker.seed([220])
+
+  return createUser(data) as UpdateUserFormUrlEncodedData
+}
+
+/**
+ * @description Update an existent user in the store
+ */
+export function createUpdateUserData(_data?: UpdateUserData): UpdateUserData {
+  faker.seed([220])
+
+  return faker.helpers.arrayElement<any>([createUpdateUserJsonData(), createUpdateUserXmlData(), createUpdateUserFormUrlEncodedData()])
 }
 
 export function createUpdateUserResponse() {

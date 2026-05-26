@@ -3,6 +3,7 @@
  * Do not edit manually.
  */
 
+import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
 import type { Pet } from './Pet.js'
 
 /**
@@ -25,14 +26,20 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 
 /**
  * @description Header parameters
- * @type string
  */
-export type FindPetsByTagsHeaderXEXAMPLE = 'ONE' | 'TWO' | 'THREE'
+export type FindPetsByTagsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
 
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200 = Pet[]
+export type FindPetsByTagsStatus200Json = Pet[]
+
+/**
+ * @type array
+ */
+export type FindPetsByTagsStatus200Xml = Pet[]
+
+export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
 /**
  * @type any

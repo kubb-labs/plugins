@@ -5,25 +5,21 @@
 
 import type { AddPetRequest } from '../AddPetRequest.ts'
 import type { Pet } from '../Pet.ts'
+import type { PetNotFound } from '../PetNotFound.ts'
 
 /**
  * @type object
  */
-export type AddPetStatus200 = Pet
+export type AddPetStatus200Json = Pet
 
 /**
  * @type object
  */
-export type AddPetStatus405 = {
-  /**
-   * @type integer | undefined
-   */
-  code?: number
-  /**
-   * @type string | undefined
-   */
-  message?: string
-}
+export type AddPetStatus200Xml = Pet
+
+export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
+
+export type AddPetStatus405 = PetNotFound
 
 /**
  * @description Create a new pet in the store

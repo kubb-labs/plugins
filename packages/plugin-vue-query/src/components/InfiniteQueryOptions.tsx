@@ -6,9 +6,9 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { resolveErrorNames } from '../utils.ts'
+import { resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
-import { buildEnabledCheck } from '@internals/tanstack-query'
+import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -47,7 +47,8 @@ export function InfiniteQueryOptions({
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
-  const responseName = tsResolver.resolveResponseName(node)
+  const successNames = resolveSuccessNames(node, tsResolver)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryFnDataType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -73,38 +74,33 @@ export function InfiniteQueryOptions({
       ? (() => {
           const groupName = tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
           const individualName = tsResolver.resolveParamName(node, rawQueryParams[0]!)
-          return groupName !== individualName ? groupName : undefined
+          return groupName !== individualName ? groupName : null
         })()
-      : undefined
+      : null
 
-  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : undefined
+  const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
-
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledSource = buildEnabledCheck(queryKeyParamsNode)
-  const enabledText = enabledSource
-    ? `enabled: () => ${enabledSource
-        .split(' && ')
-        .map((n) => `!!toValue(${n.trim()})`)
-        .join(' && ')},`
-    : ''
+  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
+  const enabledText = enabledNames.length ? `enabled: () => ${enabledNames.map((n) => `!!toValue(${n})`).join(' && ')},` : ''
 
-  const hasNewParams = nextParam !== undefined || previousParam !== undefined
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
+  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
+
+  const hasNewParams = nextParam != null || previousParam != null
 
   const [getNextPageParamExpr, getPreviousPageParamExpr] = (() => {
     if (hasNewParams) {
-      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : undefined
-      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : undefined
+      const nextAccessor = nextParam ? getNestedAccessor(nextParam, 'lastPage') : null
+      const prevAccessor = previousParam ? getNestedAccessor(previousParam, 'firstPage') : null
       return [
-        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : undefined,
-        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : undefined,
+        nextAccessor ? `getNextPageParam: (lastPage) => ${nextAccessor}` : null,
+        prevAccessor ? `getPreviousPageParam: (firstPage) => ${prevAccessor}` : null,
       ] as const
     }
     if (cursorParam) {
@@ -144,7 +140,7 @@ export function InfiniteQueryOptions({
        queryKey,
        queryFn: async ({ signal, pageParam }) => {
           ${infiniteOverrideParams}
-          return ${clientName}(${addToValueCalls(clientCallStr)})
+          return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
         },
        ${queryOptionsArr.join(',\n')}
       })
@@ -163,7 +159,7 @@ export function InfiniteQueryOptions({
        ${enabledText}
        queryKey,
        queryFn: async ({ signal }) => {
-          return ${clientName}(${addToValueCalls(clientCallStr)})
+          return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
         },
        ${queryOptionsArr.join(',\n')}
       })
@@ -173,15 +169,17 @@ export function InfiniteQueryOptions({
   )
 }
 
-function addToValueCalls(callStr: string): string {
+function addToValueCalls(callStr: string, enabledNames: ReadonlyArray<string> = []): string {
+  const optional = new Set(enabledNames)
   // Step 1: Transform shorthand object params like { petId } → { petId: toValue(petId) }
+  // Params that drive the `enabled` guard are optional, so assert non-null: toValue(petId!)
   let result = callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
     if (inner.includes(':') || inner.includes('...')) return match
     const keys = inner
       .split(',')
       .map((k: string) => k.trim())
       .filter(Boolean)
-    const wrapped = keys.map((k: string) => `${k}: toValue(${k})`).join(', ')
+    const wrapped = keys.map((k: string) => `${k}: toValue(${optional.has(k) ? `${k}!` : k})`).join(', ')
     return `{ ${wrapped} }`
   })
 
@@ -189,7 +187,7 @@ function addToValueCalls(callStr: string): string {
   result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => {
     if (name === 'config' || name === 'signal' || name === 'undefined') return match
     if (match.includes('toValue(')) return match
-    return `toValue(${name})`
+    return `toValue(${optional.has(name) ? `${name}!` : name})`
   })
 
   return result

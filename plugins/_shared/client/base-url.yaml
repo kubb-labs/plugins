@@ -1,8 +1,28 @@
 # Shared option: client/base-url
 
-# ────────────────────────── client.baseURL ──────────────────────────
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
 name: baseURL
 type: string
 required: false
-description: Sets a custom base URL for all generated calls. When not set, the base URL is automatically taken from the OAS spec via the adapter (e.g. the `servers[0].url` field).
+description: |
+  Base URL prepended to every request URL in the generated client. When omitted, the URL comes from the OpenAPI spec's `servers[0].url` (or whichever index the adapter is configured to read).
+
+  Set this when the generated client should point at a different environment (staging, production) than the one written in the spec.
+examples:
+  - name: Override the spec's server URL
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginClient } from '@kubb/plugin-client'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginClient({
+                baseURL: 'https://petstore.swagger.io/v2',
+              }),
+            ],
+          })

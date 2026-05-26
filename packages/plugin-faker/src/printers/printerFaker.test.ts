@@ -108,6 +108,57 @@ describe('printerFaker', () => {
     )
   })
 
+  test('narrows discriminated oneOf variants to their own branch', () => {
+    const makeVariant = (protocol: string, algorithms: Array<string>) =>
+      ast.createSchema({
+        type: 'object',
+        properties: [
+          ast.createProperty({ name: 'protocol', required: true, schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: [protocol] }) }),
+          ast.createProperty({ name: 'algorithm', schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: algorithms }) }),
+        ],
+      })
+
+    const node = ast.createSchema({
+      type: 'union',
+      discriminatorPropertyName: 'protocol',
+      members: [makeVariant('udp', ['random', 'rotate']), makeVariant('tcp', ['source'])],
+    })
+
+    const result = printerFaker({ resolver: resolverFaker, typeName: 'NodeBalancerConfig' }).print(node)
+
+    // Each variant indexes through its own discriminated branch, not the bare union.
+    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "udp" }>')
+    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "tcp" }>')
+    expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
+  })
+
+  test('guards member property access in non-discriminated unions of objects', () => {
+    // A `oneOf` without a discriminator carries `+order` on only one branch, so a plain
+    // `NonNullable<Filter>["+order"]` would be a TS2339. Members index via
+    // `(NonNullable<Filter> & Record<"+order", unknown>)["+order"]`, which stays valid and
+    // resolves to `unknown` rather than `any`.
+    const node = ast.createSchema({
+      type: 'union',
+      name: 'Filter',
+      members: [
+        ast.createSchema({ type: 'object', properties: [] }),
+        ast.createSchema({
+          type: 'object',
+          properties: [
+            ast.createProperty({
+              name: '+order',
+              schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['asc', 'desc'] }),
+            }),
+          ],
+        }),
+      ],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
+      `"faker.helpers.arrayElement<any>([{}, {"+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"])}])"`,
+    )
+  })
+
   test('memoizing getters return a stable reference and data overrides replace the getter', () => {
     // Simulate the runtime object-literal pattern the printer generates for cyclic
     // properties (e.g. Cat.friends → Pet → Cat).  The getter must memoize its value

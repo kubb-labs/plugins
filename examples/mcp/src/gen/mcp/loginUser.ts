@@ -1,4 +1,4 @@
-import fetch from '../../client.js'
+import client from '../../client.js'
 import type { ResponseErrorConfig } from '../../client.js'
 import type { LoginUserQueryPassword, LoginUserQueryUsername, LoginUserResponse, LoginUserStatus400 } from '../models/ts/LoginUser.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
@@ -12,7 +12,7 @@ export async function loginUserHandler(
   { params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {},
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await fetch<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>(
+  const res = await client<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>(
     { method: 'GET', url: `/user/login`, baseURL: `https://petstore.swagger.io/v2`, params },
     request,
   )

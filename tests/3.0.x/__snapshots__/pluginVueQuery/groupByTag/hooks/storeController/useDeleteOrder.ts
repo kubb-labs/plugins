@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import fetch from "@kubb/plugin-client/clients/axios";
+import client from "@kubb/plugin-client/clients/axios";
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "../../types/DeleteOrder.ts";
 import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
 import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
@@ -18,7 +18,7 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
  * {@link /store/order/:orderId}
  */
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
 
 

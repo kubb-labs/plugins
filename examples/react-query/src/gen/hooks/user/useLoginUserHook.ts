@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../models/LoginUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../models/LoginUser.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
@@ -23,9 +23,9 @@ export async function loginUserHook(
   params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
     url: `/user/login`,
     params,
@@ -40,7 +40,7 @@ export function loginUserQueryOptionsHook(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = loginUserQueryKey(params)
-  return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse, typeof queryKey>({
+  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUserHook(params, { ...config, signal: config.signal ?? signal })
@@ -52,10 +52,10 @@ export function loginUserQueryOptionsHook(
  * @summary Logs user into the system
  * {@link /user/login}
  */
-export function useLoginUserHook<TData = LoginUserResponse, TQueryData = LoginUserResponse, TQueryKey extends QueryKey = LoginUserQueryKey>(
+export function useLoginUserHook<TData = LoginUserStatus200, TQueryData = LoginUserStatus200, TQueryKey extends QueryKey = LoginUserQueryKey>(
   params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },
   options: {
-    query?: Partial<QueryObserverOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<QueryObserverOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

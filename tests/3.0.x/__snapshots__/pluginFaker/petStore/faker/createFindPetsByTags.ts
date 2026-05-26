@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
+import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus200Json, FindPetsByTagsStatus200Xml, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
 import { createPet } from "./createPet.ts";
 import { faker } from "@faker-js/faker";
 
@@ -17,11 +17,28 @@ export function createFindPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): F
 /**
  * @description successful operation
  */
-export function createFindPetsByTagsStatus200(data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
+export function createFindPetsByTagsStatus200Json(data?: FindPetsByTagsStatus200Json): FindPetsByTagsStatus200Json {
   return [
     ...faker.helpers.multiple(() => (createPet())),
     ...(data || [])
   ]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByTagsStatus200Xml(data?: FindPetsByTagsStatus200Xml): FindPetsByTagsStatus200Xml {
+  return [
+    ...faker.helpers.multiple(() => (createPet())),
+    ...(data || [])
+  ]
+}
+
+/**
+ * @description successful operation
+ */
+export function createFindPetsByTagsStatus200(_data?: FindPetsByTagsStatus200): FindPetsByTagsStatus200 {
+  return faker.helpers.arrayElement<any>([createFindPetsByTagsStatus200Json(), createFindPetsByTagsStatus200Xml()])
 }
 
 /**

@@ -7,12 +7,23 @@ function capitalize(name: string): string {
 }
 
 /**
- * Naming convention resolver for React Query plugin.
+ * Default resolver used by `@kubb/plugin-react-query`. Decides the names and
+ * file paths for every generated TanStack Query hook (`useFooQuery`,
+ * `useFooMutation`, `useFooInfiniteQuery`, ...) and its companion helpers
+ * (`fooQueryKey`, `fooQueryOptions`).
  *
- * Provides default naming helpers using camelCase for functions and file paths.
+ * Functions and files use camelCase; hooks get the `use` prefix; suspense and
+ * infinite variants are suffixed with `Suspense`/`Infinite`.
  *
- * @example
- * `resolverReactQuery.default('list pets', 'function')  // → 'listPets'`
+ * @example Resolve hook and helper names
+ * ```ts
+ * import { resolverReactQuery } from '@kubb/plugin-react-query'
+ *
+ * resolverReactQuery.resolveQueryName(operationNode)       // 'useGetPetById'
+ * resolverReactQuery.resolveMutationName(operationNode)    // 'useUpdatePet'
+ * resolverReactQuery.resolveQueryKeyName(operationNode)    // 'getPetByIdQueryKey'
+ * resolverReactQuery.resolveQueryOptionsName(operationNode) // 'getPetByIdQueryOptions'
+ * ```
  */
 export const resolverReactQuery = defineResolver<PluginReactQuery>(() => ({
   name: 'default',

@@ -3,9 +3,16 @@ import { defineResolver } from '@kubb/core'
 import type { PluginMsw } from '../types.ts'
 
 /**
- * Naming convention resolver for MSW plugin.
+ * Default resolver used by `@kubb/plugin-msw`. Decides the names and file
+ * paths for every generated MSW handler. Function names get a `Handler`
+ * suffix; the aggregate export is always `handlers`.
  *
- * Provides default naming helpers using camelCase with a `handler` suffix.
+ * @example Resolve a handler name
+ * ```ts
+ * import { resolverMsw } from '@kubb/plugin-msw'
+ *
+ * resolverMsw.resolveName('addPet') // 'addPetHandler'
+ * ```
  */
 export const resolverMsw = defineResolver<PluginMsw>(() => ({
   name: 'default',

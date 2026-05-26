@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/fetch.ts'
-import type { LoginUserResponse, LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus400 } from '../../models/LoginUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../models/LoginUser.ts'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { fetch } from '../../.kubb/fetch.ts'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const loginUserSuspenseQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) =>
@@ -23,9 +23,9 @@ export async function loginUserSuspenseHook(
   params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const { client: request = fetch, ...requestConfig } = config
+  const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
     url: `/user/login`,
     params,
@@ -40,7 +40,7 @@ export function loginUserSuspenseQueryOptionsHook(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = loginUserSuspenseQueryKey(params)
-  return queryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, LoginUserResponse, typeof queryKey>({
+  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUserSuspenseHook(params, { ...config, signal: config.signal ?? signal })
@@ -52,10 +52,10 @@ export function loginUserSuspenseQueryOptionsHook(
  * @summary Logs user into the system
  * {@link /user/login}
  */
-export function useLoginUserSuspenseHook<TData = LoginUserResponse, TQueryKey extends QueryKey = LoginUserSuspenseQueryKey>(
+export function useLoginUserSuspenseHook<TData = LoginUserStatus200, TQueryKey extends QueryKey = LoginUserSuspenseQueryKey>(
   params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword },
   options: {
-    query?: Partial<UseSuspenseQueryOptions<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<UseSuspenseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
