@@ -314,19 +314,12 @@ describe('fakerGenerator — operation', () => {
       new Set(['createWidgetResponse']),
     )
 
-    expect(imports).toMatchInlineSnapshot(`
-      [
-        {
-          "name": [
-            {
-              "name": "createWidgetResponseSchema",
-              "propertyName": "createWidgetResponse",
-            },
-          ],
-          "path": "./createWidgetResponse.ts",
-        },
-      ]
-    `)
+    expect(imports).toStrictEqual([
+      {
+        name: [{ propertyName: 'createWidgetResponse', name: 'createWidgetResponseSchema' }],
+        path: './createWidgetResponse.ts',
+      },
+    ])
     expect(rewriteAliasedImports('return createWidgetResponse(data)', aliases)).toBe('return createWidgetResponseSchema(data)')
   })
 
