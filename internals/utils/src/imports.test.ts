@@ -10,23 +10,10 @@ describe('import utilities', () => {
       { name: [{ propertyName: 'createUser', name: 'makeUser' }], path: './user.ts' },
     ]
 
-    expect(filterUsedImports(imports, 'createPet(data); makeUser(data); const value = unused')).toMatchInlineSnapshot(`
-      [
-        {
-          "name": "createPet",
-          "path": "./pet.ts",
-        },
-        {
-          "name": [
-            {
-              "name": "makeUser",
-              "propertyName": "createUser",
-            },
-          ],
-          "path": "./user.ts",
-        },
-      ]
-    `)
+    expect(filterUsedImports(imports, 'createPet(data); makeUser(data); const value = unused')).toStrictEqual([
+      { name: 'createPet', path: './pet.ts' },
+      { name: [{ propertyName: 'createUser', name: 'makeUser' }], path: './user.ts' },
+    ])
   })
 
   test('skips selected import names', () => {
@@ -41,29 +28,10 @@ describe('import utilities', () => {
 
     const { imports, aliases } = aliasConflictingImports(importEntries, ['createPet'])
 
-    expect(imports).toMatchInlineSnapshot(`
-      [
-        {
-          "name": [
-            {
-              "name": "createPetSchema",
-              "propertyName": "createPet",
-            },
-            "createUser",
-          ],
-          "path": "./api.ts",
-        },
-        {
-          "name": [
-            {
-              "name": "storeFactory",
-              "propertyName": "createStore",
-            },
-          ],
-          "path": "./store.ts",
-        },
-      ]
-    `)
+    expect(imports).toStrictEqual([
+      { name: [{ propertyName: 'createPet', name: 'createPetSchema' }, 'createUser'], path: './api.ts' },
+      { name: [{ propertyName: 'createStore', name: 'storeFactory' }], path: './store.ts' },
+    ])
     expect(aliases).toStrictEqual(new Map([['createPet', 'createPetSchema']]))
   })
 

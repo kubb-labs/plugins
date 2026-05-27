@@ -7,12 +7,10 @@ describe('buildParamsMapping', () => {
   })
 
   test('returns original to mapped names when at least one name changed', () => {
-    expect(buildParamsMapping([{ name: 'pet-id' }, { name: 'limit' }], [{ name: 'petId' }, { name: 'limit' }])).toMatchInlineSnapshot(`
-      {
-        "limit": "limit",
-        "pet-id": "petId",
-      }
-    `)
+    expect(buildParamsMapping([{ name: 'pet-id' }, { name: 'limit' }], [{ name: 'petId' }, { name: 'limit' }])).toStrictEqual({
+      'pet-id': 'petId',
+      limit: 'limit',
+    })
   })
 })
 
