@@ -48,13 +48,15 @@ describe('getContentTypeInfo', () => {
   test('returns defaults for operations without a request body', () => {
     const node = ast.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(getContentTypeInfo(node)).toStrictEqual({
-      contentTypes: [],
-      isMultipleContentTypes: false,
-      contentTypeUnion: '',
-      defaultContentType: 'application/json',
-      hasFormData: false,
-    })
+    expect(getContentTypeInfo(node)).toMatchInlineSnapshot(`
+      {
+        "contentTypeUnion": "",
+        "contentTypes": [],
+        "defaultContentType": "application/json",
+        "hasFormData": false,
+        "isMultipleContentTypes": false,
+      }
+    `)
   })
 
   test('detects multiple content types and form data', () => {
@@ -70,13 +72,18 @@ describe('getContentTypeInfo', () => {
       },
     })
 
-    expect(getContentTypeInfo(node)).toStrictEqual({
-      contentTypes: ['application/json', 'multipart/form-data'],
-      isMultipleContentTypes: true,
-      contentTypeUnion: '"application/json" | "multipart/form-data"',
-      defaultContentType: 'application/json',
-      hasFormData: true,
-    })
+    expect(getContentTypeInfo(node)).toMatchInlineSnapshot(`
+      {
+        "contentTypeUnion": ""application/json" | "multipart/form-data"",
+        "contentTypes": [
+          "application/json",
+          "multipart/form-data",
+        ],
+        "defaultContentType": "application/json",
+        "hasFormData": true,
+        "isMultipleContentTypes": true,
+      }
+    `)
   })
 })
 
@@ -129,12 +136,14 @@ describe('buildOperationComments', () => {
       deprecated: true,
     })
 
-    expect(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true })).toStrictEqual([
-      '@description Show pet',
-      'details',
-      '{@link /pets/:pet-id}',
-      '@deprecated',
-    ])
+    expect(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true })).toMatchInlineSnapshot(`
+      [
+        "@description Show pet",
+        "details",
+        "{@link /pets/:pet-id}",
+        "@deprecated",
+      ]
+    `)
   })
 })
 
@@ -236,14 +245,16 @@ describe('resolveOperationTypeNames', () => {
       ],
     })
 
-    expect(resolveOperationTypeNames(node, resolver, { paramsCasing: 'camelcase', exclude: ['Status200'] })).toStrictEqual([
-      'petIdPathParams',
-      'pageSizeQueryParams',
-      'xApiKeyHeaderParams',
-      'showPetData',
-      'showPetResponse',
-      'Status400',
-    ])
+    expect(resolveOperationTypeNames(node, resolver, { paramsCasing: 'camelcase', exclude: ['Status200'] })).toMatchInlineSnapshot(`
+      [
+        "petIdPathParams",
+        "pageSizeQueryParams",
+        "xApiKeyHeaderParams",
+        "showPetData",
+        "showPetResponse",
+        "Status400",
+      ]
+    `)
   })
 
   test('can include only error status type names', () => {
