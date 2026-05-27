@@ -150,7 +150,7 @@ describe('fetch client', () => {
           method: 'GET',
         }),
       )
-      expect(response.data).toEqual({ data: 'test' })
+      expect(response.data).toStrictEqual({ data: 'test' })
     })
 
     it('should handle query parameters', async () => {
@@ -215,7 +215,7 @@ describe('fetch client', () => {
         }),
       )
 
-      expect(getConfig()).toEqual({
+      expect(getConfig()).toStrictEqual({
         baseURL: 'https://api.example.com',
         headers: { Authorization: 'Bearer token' },
       })
@@ -234,7 +234,7 @@ describe('fetch client', () => {
         method: 'DELETE',
       })
 
-      expect(response.data).toEqual({})
+      expect(response.data).toStrictEqual({})
       expect(response.status).toBe(204)
     })
 
@@ -370,7 +370,7 @@ describe('fetch client', () => {
 
       const response = await client({ url: '/api/unknown', method: 'GET' })
 
-      expect(response.data).toEqual({ parsed: true })
+      expect(response.data).toStrictEqual({ parsed: true })
     })
   })
 })

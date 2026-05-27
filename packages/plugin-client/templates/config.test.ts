@@ -74,7 +74,7 @@ describe('buildFormData', () => {
 
       const tags = formData.getAll('tags')
       expect(tags).toHaveLength(3)
-      expect(tags).toEqual(['javascript', 'typescript', 'kubb'])
+      expect(tags).toStrictEqual(['javascript', 'typescript', 'kubb'])
     })
 
     it('should handle number arrays', () => {
@@ -83,7 +83,7 @@ describe('buildFormData', () => {
 
       const scores = formData.getAll('scores')
       expect(scores).toHaveLength(3)
-      expect(scores).toEqual(['10', '20', '30'])
+      expect(scores).toStrictEqual(['10', '20', '30'])
     })
 
     it('should handle boolean arrays', () => {
@@ -92,7 +92,7 @@ describe('buildFormData', () => {
 
       const flags = formData.getAll('flags')
       expect(flags).toHaveLength(3)
-      expect(flags).toEqual(['true', 'false', 'true'])
+      expect(flags).toStrictEqual(['true', 'false', 'true'])
     })
 
     it('should handle File arrays', () => {
@@ -115,7 +115,7 @@ describe('buildFormData', () => {
 
       const items = formData.getAll('items')
       expect(items).toHaveLength(3)
-      expect(items).toEqual(['string', '123', 'true'])
+      expect(items).toStrictEqual(['string', '123', 'true'])
     })
 
     it('should handle empty arrays', () => {
@@ -132,7 +132,7 @@ describe('buildFormData', () => {
 
       const tags = formData.getAll('tags')
       expect(tags).toHaveLength(2)
-      expect(tags).toEqual(['valid', 'another'])
+      expect(tags).toStrictEqual(['valid', 'another'])
     })
 
     it('should filter out undefined values in arrays', () => {
@@ -141,7 +141,7 @@ describe('buildFormData', () => {
 
       const tags = formData.getAll('tags')
       expect(tags).toHaveLength(2)
-      expect(tags).toEqual(['valid', 'another'])
+      expect(tags).toStrictEqual(['valid', 'another'])
     })
 
     it('should filter out both null and undefined in arrays', () => {
@@ -150,7 +150,7 @@ describe('buildFormData', () => {
 
       const tags = formData.getAll('tags')
       expect(tags).toHaveLength(3)
-      expect(tags).toEqual(['first', 'middle', 'last'])
+      expect(tags).toStrictEqual(['first', 'middle', 'last'])
     })
   })
 
@@ -199,7 +199,7 @@ describe('buildFormData', () => {
       expect(formData.get('isPublic')).toBe('true')
       expect(formData.get('file')).toBe(file)
       expect(formData.get('createdAt')).toBe('2024-01-15T10:30:00.000Z')
-      expect(formData.getAll('tags')).toEqual(['tag1', 'tag2'])
+      expect(formData.getAll('tags')).toStrictEqual(['tag1', 'tag2'])
       expect(formData.get('metadata')).toBeInstanceOf(Blob)
       expect(await (formData.get('metadata') as Blob).text()).toBe('{"author":"John"}')
     })
@@ -336,7 +336,7 @@ describe('buildFormData', () => {
       expect(formData.get('file')).toBe(file)
       expect(formData.get('title')).toBe('Important Document')
       expect(formData.get('description')).toBe('This is a test document')
-      expect(formData.getAll('tags')).toEqual(['work', 'important'])
+      expect(formData.getAll('tags')).toStrictEqual(['work', 'important'])
       expect(formData.get('isPublic')).toBe('false')
       expect(formData.get('uploadDate')).toBe('2024-01-15T10:30:00.000Z')
     })
@@ -377,7 +377,7 @@ describe('buildFormData', () => {
 
       expect(formData.get('title')).toBe('Post Title')
       expect(formData.get('content')).toBe('Post content here')
-      expect(formData.getAll('tags')).toEqual(['blog', 'tech'])
+      expect(formData.getAll('tags')).toStrictEqual(['blog', 'tech'])
       expect(formData.has('publishDate')).toBe(false)
       expect(formData.get('isDraft')).toBe('false')
       expect(formData.has('metadata')).toBe(false)
@@ -399,7 +399,7 @@ describe('buildFormData', () => {
       expect(attachments[1]).toBe(file2)
 
       const labels = formData.getAll('labels')
-      expect(labels).toEqual(['urgent', 'review-needed'])
+      expect(labels).toStrictEqual(['urgent', 'review-needed'])
       expect(formData.get('priority')).toBe('1')
     })
 
@@ -417,7 +417,7 @@ describe('buildFormData', () => {
 
       const tags = formData.getAll('tags')
       expect(tags).toHaveLength(3)
-      expect(tags).toEqual(['tag1', 'tag2', 'tag3'])
+      expect(tags).toStrictEqual(['tag1', 'tag2', 'tag3'])
     })
   })
 
