@@ -4,7 +4,7 @@
 */
 
 import type { Order } from "../types/Order.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createOrder<TData extends Partial<Order> = object>(data?: TData)
 {

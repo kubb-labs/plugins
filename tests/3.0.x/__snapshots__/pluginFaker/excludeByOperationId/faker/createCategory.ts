@@ -4,7 +4,7 @@
 */
 
 import type { Category } from "../types/Category.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createCategory<TData extends Partial<Category> = object>(data?: TData)
 {

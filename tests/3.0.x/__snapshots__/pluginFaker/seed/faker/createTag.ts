@@ -5,7 +5,7 @@
 
 import type { Tag } from "../types/Tag.ts";
 import { createCategory } from "./createCategory.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createTag(data?: Partial<Tag>): Tag {
   faker.seed([42])

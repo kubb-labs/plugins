@@ -5,7 +5,7 @@
 
 import type { GetUserByNameResponse, GetUserByNameStatus200, GetUserByNameStatus200Json, GetUserByNameStatus200Xml, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
 import { createUser } from "./createUser.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createGetUserByNamePathUsername(data?: string): string {
   return data ?? faker.string.alpha()

@@ -4,7 +4,7 @@
 */
 
 import type { PetUpdate } from "../types/PetUpdate.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createPetUpdate<TData extends Partial<PetUpdate> = object>(data?: TData)
 {

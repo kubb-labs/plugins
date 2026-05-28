@@ -5,7 +5,7 @@
 
 import type { PlaceOrderData, PlaceOrderFormUrlEncodedData, PlaceOrderJsonData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405, PlaceOrderXmlData } from "../../types/PlaceOrder.ts";
 import { createOrder } from "../createOrder.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 /**
  * @description successful operation

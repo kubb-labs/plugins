@@ -7,7 +7,7 @@ import type { AddPetRequest } from "../types/AddPetRequest.ts";
 import { createCategory } from "./createCategory.ts";
 import { createPetStatusEnum } from "./createPetStatusEnum.ts";
 import { createTag } from "./createTag.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData)
 {
