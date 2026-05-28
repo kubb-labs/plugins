@@ -315,31 +315,6 @@ options:
                       }),
                     ],
                   })
-  - name: contentType
-    type: "'application/json' | (string & {})"
-    required: false
-    description: |
-      Selects which request/response media type the generator reads from the OpenAPI spec.
-
-      When omitted, Kubb picks the first JSON-compatible media type it finds (`application/json`, `application/vnd.api+json`, anything ending in `+json`). Set this when your spec defines multiple media types for the same operation and you want a non-default one.
-    examples:
-      - name: JSON API media type
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              import { defineConfig } from 'kubb'
-              import { pluginTs } from '@kubb/plugin-ts'
-
-              export default defineConfig({
-                input: { path: './petStore.yaml' },
-                output: { path: './src/gen' },
-                plugins: [
-                  pluginTs({
-                    contentType: 'application/vnd.api+json',
-                  }),
-                ],
-              })
   - name: group
     type: Group
     required: false
@@ -895,18 +870,18 @@ options:
 
               const petClient = new Pet()
               const pet = await petClient.getPetById({ petId: 1 })
-  - name: wrapper
+  - name: sdk
     type: '{ className: string }'
     required: false
     description: |
-      Generates a single top-level class that composes the per-tag client classes into one entry point. Only meaningful when `clientType: 'class'` (or `'staticClass'`) and `group: { type: 'tag' }` are also set.
+      Generates a single SDK class that composes the per-tag client classes into one entry point. Setting `sdk` automatically enables `clientType: 'class'`, so you only need to add `group: { type: 'tag' }` to split the clients per tag.
 
-      Use this when you want a single object to hand around your app (`api.pet.findById`, `api.user.login`) instead of importing each tag client separately.
+      Use this when you want a single object to hand around your app (`api.petController.findById`, `api.userController.login`) instead of importing each tag client separately.
     properties:
       - name: className
         type: string
         required: true
-        description: Name of the generated wrapper class — used as the export name and file name.
+        description: Name of the generated SDK class — used as the export name and file name.
         examples:
           - name: A composed PetStoreClient
             files:
@@ -925,9 +900,8 @@ options:
                       pluginTs(),
                       pluginClient({
                         output: { path: './clients' },
-                        clientType: 'class',
                         group: { type: 'tag' },
-                        wrapper: { className: 'PetStoreClient' },
+                        sdk: { className: 'PetStoreClient' },
                       }),
                     ],
                   })
@@ -936,19 +910,19 @@ options:
                 twoslash: false
                 code: |
                   import type { Client, RequestConfig } from './.kubb/client'
-                  import { Pet } from './petController/Pet'
-                  import { Store } from './storeController/Store'
-                  import { User } from './userController/User'
+                  import { petController } from './petController/petController'
+                  import { storeController } from './storeController/storeController'
+                  import { userController } from './userController/userController'
 
                   export class PetStoreClient {
-                    readonly pet: Pet
-                    readonly store: Store
-                    readonly user: User
+                    readonly petController: petController
+                    readonly storeController: storeController
+                    readonly userController: userController
 
                     constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
-                      this.pet = new Pet(config)
-                      this.store = new Store(config)
-                      this.user = new User(config)
+                      this.petController = new petController(config)
+                      this.storeController = new storeController(config)
+                      this.userController = new userController(config)
                     }
                   }
               - name: usage.ts
@@ -959,8 +933,8 @@ options:
 
                   const api = new PetStoreClient({ baseURL: 'https://petstore.swagger.io/v2' })
 
-                  const pets = await api.pet.findPetsByTags({ tags: ['available'] })
-                  const user = await api.user.getUserByName({ username: 'john' })
+                  const pets = await api.petController.findPetsByTags({ tags: ['available'] })
+                  const user = await api.userController.getUserByName({ username: 'john' })
   - name: bundle
     type: boolean
     required: false

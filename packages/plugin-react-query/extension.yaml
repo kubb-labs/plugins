@@ -317,31 +317,6 @@ options:
                       }),
                     ],
                   })
-  - name: contentType
-    type: "'application/json' | (string & {})"
-    required: false
-    description: |
-      Selects which request/response media type the generator reads from the OpenAPI spec.
-
-      When omitted, Kubb picks the first JSON-compatible media type it finds (`application/json`, `application/vnd.api+json`, anything ending in `+json`). Set this when your spec defines multiple media types for the same operation and you want a non-default one.
-    examples:
-      - name: JSON API media type
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              import { defineConfig } from 'kubb'
-              import { pluginTs } from '@kubb/plugin-ts'
-
-              export default defineConfig({
-                input: { path: './petStore.yaml' },
-                output: { path: './src/gen' },
-                plugins: [
-                  pluginTs({
-                    contentType: 'application/vnd.api+json',
-                  }),
-                ],
-              })
   - name: group
     type: Group
     required: false
@@ -1046,13 +1021,13 @@ options:
       - name: methods
         type: Array<HttpMethod>
         required: false
-        default: "['post', 'put', 'delete']"
+        default: "['post', 'put', 'patch', 'delete']"
         description: |
           HTTP methods treated as mutations. Operations using one of these methods generate a `useMutation`-style hook instead of a query.
 
-          Defaults to `['post', 'put', 'delete']`. Add `'patch'` if your API uses it for partial updates.
+          Defaults to `['post', 'put', 'patch', 'delete']`. Narrow the list if your API uses one of these methods for reads.
         examples:
-          - name: Include PATCH as a mutation
+          - name: Treat only POST and PUT as mutations
             files:
               - lang: typescript
                 twoslash: false
@@ -1065,7 +1040,7 @@ options:
                     output: { path: './src/gen' },
                     plugins: [
                       pluginReactQuery({
-                        mutation: { methods: ['post', 'put', 'patch', 'delete'] },
+                        mutation: { methods: ['post', 'put'] },
                       }),
                     ],
                   })
@@ -1385,7 +1360,9 @@ options:
       | --- | --- |
       | `@kubb/plugin-ts` | `resolverTs` |
       | `@kubb/plugin-zod` | `resolverZod` |
+      | `@kubb/plugin-faker` | `resolverFaker` |
       | `@kubb/plugin-cypress` | `resolverCypress` |
+      | `@kubb/plugin-msw` | `resolverMsw` |
       | `@kubb/plugin-mcp` | `resolverMcp` |
       | `@kubb/plugin-client` | `resolverClient` |
     codeBlock:
