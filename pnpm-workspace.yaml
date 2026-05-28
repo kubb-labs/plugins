@@ -14,8 +14,12 @@ allowBuilds:
 catalog:
   '@kubb/adapter-oas': 5.0.0-beta.31
   '@kubb/agent': 5.0.0-beta.31
+  '@kubb/ast': 5.0.0-beta.31
+  '@kubb/cli': 5.0.0-beta.31
   '@kubb/core': 5.0.0-beta.31
   '@kubb/middleware-barrel': 5.0.0-beta.31
+  '@kubb/mcp': 5.0.0-beta.31
+  '@kubb/parser-md': 5.0.0-beta.31
   '@kubb/parser-ts': 5.0.0-beta.31
   '@kubb/renderer-jsx': 5.0.0-beta.31
   '@size-limit/file': ^12.1.0
