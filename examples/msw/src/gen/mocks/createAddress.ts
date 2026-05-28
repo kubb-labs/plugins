@@ -4,7 +4,7 @@
  */
 
 import type { Address } from '../models/Address.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAddress<TData extends Partial<Address> = object>(data?: TData) {
   faker.seed([220])

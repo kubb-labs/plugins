@@ -17,7 +17,7 @@ import type {
   UpdatePetXmlData,
 } from '../../models/UpdatePet.ts'
 import { createPet } from '../createPet.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Successful operation

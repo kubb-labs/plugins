@@ -4,7 +4,7 @@
  */
 
 import type { DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../models/DeleteOrder.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeleteOrderPathOrderId(data?: bigint): bigint {
   return data ?? faker.number.bigInt()

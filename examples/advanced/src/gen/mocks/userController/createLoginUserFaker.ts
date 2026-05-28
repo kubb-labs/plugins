@@ -1,5 +1,5 @@
 import type { LoginUserResponse, LoginUserStatus200, LoginUserStatus400 } from '../../models/ts/userController/LoginUser.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createLoginUserQueryUsernameFaker(data?: string): string {
   return data ?? faker.string.alpha()

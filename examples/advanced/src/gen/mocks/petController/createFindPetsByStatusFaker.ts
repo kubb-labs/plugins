@@ -6,7 +6,7 @@ import type {
   FindPetsByStatusStatus400,
 } from '../../models/ts/petController/FindPetsByStatus.ts'
 import { createPetFaker } from '../createPetFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusPathStepIdFaker(data?: string): string {
   return data ?? faker.string.alpha()

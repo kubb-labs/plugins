@@ -12,7 +12,7 @@ import type {
   FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags.ts'
 import { createPet } from '../createPet.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
   faker.seed([220])
