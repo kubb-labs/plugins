@@ -7,7 +7,7 @@ import type {
   GetUserByNameStatus404,
 } from '../../models/ts/userController/GetUserByName.ts'
 import { createUserFaker } from '../createUserFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetUserByNamePathUsernameFaker(data?: string): string {
   return data ?? faker.string.alpha()

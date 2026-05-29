@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUpdatePetWithFormPathPetIdFaker(data?: number): number {
   return data ?? faker.number.int()

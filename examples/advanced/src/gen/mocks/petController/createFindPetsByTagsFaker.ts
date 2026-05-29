@@ -9,7 +9,7 @@ import type {
 } from '../../models/ts/petController/FindPetsByTags.ts'
 import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetFaker } from '../createPetFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQueryTagsFaker(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
   return [...faker.helpers.multiple(() => faker.string.alpha()), ...(data || [])]

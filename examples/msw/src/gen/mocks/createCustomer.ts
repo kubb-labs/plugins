@@ -5,7 +5,7 @@
 
 import type { Customer } from '../models/Customer.ts'
 import { createAddress } from './createAddress.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCustomer<TData extends Partial<Customer> = object>(data?: TData) {
   faker.seed([220])

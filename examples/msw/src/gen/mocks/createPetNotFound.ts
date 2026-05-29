@@ -4,7 +4,7 @@
  */
 
 import type { PetNotFound } from '../models/PetNotFound.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPetNotFound<TData extends Partial<PetNotFound> = object>(data?: TData) {
   faker.seed([220])

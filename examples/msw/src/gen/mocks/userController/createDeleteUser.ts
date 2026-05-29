@@ -4,7 +4,7 @@
  */
 
 import type { DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../models/DeleteUser.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeleteUserPathUsername(data?: string): string {
   faker.seed([220])

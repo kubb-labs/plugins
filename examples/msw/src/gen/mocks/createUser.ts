@@ -4,7 +4,7 @@
  */
 
 import type { User } from '../models/User.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUser<TData extends Partial<User> = object>(data?: TData) {
   faker.seed([220])

@@ -8,7 +8,7 @@ import type {
 } from '../../models/ts/petsController/CreatePets.ts'
 import { createCreatePetsXEXAMPLEFaker } from '../createCreatePetsXEXAMPLEFaker.ts'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCreatePetsQueryBoolParamFaker(data?: CreatePetsQueryBoolParam): CreatePetsQueryBoolParam {
   return data ?? faker.helpers.arrayElement<CreatePetsQueryBoolParam>([true])
