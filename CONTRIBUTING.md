@@ -1,16 +1,20 @@
 # Contributing to Kubb
 
-This repository is home to both **official** and **community** plugins for [Kubb](https://kubb.dev) — the meta framework for code generation. Contributions are welcome.
+This repository is home to both official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. We welcome contributions, and there are a few ways to get involved:
+
+- Found a bug? File it in the [issue tracker](https://github.com/kubb-labs/plugins/issues).
+- Have an idea for a plugin or improvement? [Open an issue](https://github.com/kubb-labs/plugins/issues/new) to share it.
+- Need help? Ask the community on [Discord](https://discord.gg/4dQjA6vrWX).
 
 Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 
-## Before You Start
+## Before you start
 
 * Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR.
 * For significant changes, open an issue first and wait for maintainer feedback.
 * Small fixes (typos, docs, tests) can go straight to a PR.
 
-## Tech Stack
+## Tech stack
 
 | Tool | Purpose |
 |------|---------|
@@ -84,7 +88,7 @@ pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts
 └── .github/                 # GitHub workflows & templates
 ```
 
-## Pull Request Checklist
+## Pull request checklist
 
 Run checks in this order before opening a PR:
 
@@ -102,7 +106,7 @@ pnpm changeset   # required if you changed any published package
 
 Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages: `feat:`, `fix:`, `docs:`, `chore:`, etc.
 
-## Adding a Plugin
+## Adding a plugin
 
 Plugins live under `packages/plugin-<name>/`. Each plugin follows this layout:
 

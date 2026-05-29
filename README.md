@@ -22,24 +22,9 @@
 
 ## About
 
-This monorepo is the home for **official and community plugins** for [Kubb](https://kubb.dev) — the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates everything you need: TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
+This monorepo is home to official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-## What's inside
-
-| Tool | Purpose |
-|---|---|
-| [pnpm](https://pnpm.io/) | Workspaces + dependency catalog |
-| [Turborepo](https://turbo.build/) | Monorepo task runner |
-| [tsdown](https://github.com/sxzz/tsdown) | Bundler + `.d.ts` generation |
-| [oxlint](https://oxc.rs/docs/guide/usage/linter.html) | Linter (Rust-based) |
-| [oxfmt](https://github.com/oxc-project/oxfmt) | Formatter (Rust-based) |
-| [Vitest](https://vitest.dev/) | Test runner |
-| [CSpell](https://cspell.org/) | Spell checker |
-| [Changesets](https://github.com/changesets/changesets) | Versioning + changelogs |
-| [GitHub Actions](https://github.com/features/actions) | CI/CD |
-| [taze](https://github.com/antfu-collective/taze) | Dependency upgrades |
 
 ## Official plugins
 
@@ -89,7 +74,7 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 
 Plugins built and maintained by the community. Want to add yours? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-> No community plugins listed yet — be the first to [contribute one](./CONTRIBUTING.md#adding-a-plugin)!
+> No community plugins listed yet. Be the first to [contribute one](./CONTRIBUTING.md#adding-a-plugin).
 
 ## Examples
 
@@ -109,7 +94,7 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 
 ## Contributing
 
-Want to contribute to an existing plugin or add a new one — official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the project structure, prerequisites, local setup, and commands.
+Want to contribute to an existing plugin or add a new one, official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the project structure, prerequisites, local setup, and commands.
 
 ## License
 
