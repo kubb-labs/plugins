@@ -27,7 +27,7 @@
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "dayjs": "^1.11.20",
+    "dayjs": "^1.11.21",
     "kubb": "catalog:",
     "react": "^19.2.6"
   },
