@@ -1,7 +1,6 @@
 <div align="center">
-  <h1>@kubb/plugin-swr</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
+    <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
 [![npm version][npm-version-src]][npm-version-href]
@@ -11,8 +10,6 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/swr" target="_blank">View Demo</a>
-<span> · </span>
 <a href="https://kubb.dev/plugins/swr" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/plugins/issues/" target="_blank">Report Bug</a>
@@ -21,14 +18,13 @@
 </h4>
 </div>
 
+<br />
+
+# @kubb/plugin-swr
+
+### Generate SWR hooks from OpenAPI
+
 `@kubb/plugin-swr` generates SWR hooks from your OpenAPI specification. Each operation becomes a typed `useSWR` or `useSWRMutation` hook.
-
-## Features
-
-- Generates `useSWR` and `useSWRMutation` hooks
-- Infers request, response, and error types from the spec
-- Groups output files by tag, operation, or a custom strategy
-- Works with `@kubb/plugin-ts`, `@kubb/plugin-zod`, and `@kubb/plugin-client`
 
 ## Installation
 
@@ -44,9 +40,21 @@ npm install @kubb/plugin-swr
 
 See the [full documentation](https://kubb.dev/plugins/swr) for configuration options and examples.
 
+## Supporting Kubb
+
+Kubb is an open source project, and its development is funded entirely by sponsors. If you would like to become a sponsor, please consider:
+
+- [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
+
+<p align="center">
+  <a href="https://github.com/sponsors/stijnvanhulle">
+    <img src="https://raw.githubusercontent.com/stijnvanhulle/sponsors/main/sponsors.svg" alt="My sponsors" />
+  </a>
+</p>
+
 ## License
 
-Made with ♥ published under [MIT](LICENSE).
+[MIT](https://github.com/kubb-labs/plugins/blob/main/LICENSE)
 
 <!-- Badges -->
 
