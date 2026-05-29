@@ -1,5 +1,14 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.33
+
+### Patch Changes
+
+- [#268](https://github.com/kubb-labs/plugins/pull/268) [`0c5a8e5`](https://github.com/kubb-labs/plugins/commit/0c5a8e557f4468cb8b6f3a5afb347f66f06a2397) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Default the `locale` option to `'en'`. Generated mock files now import `fakerEN` from `@faker-js/faker` when no locale is set, instead of the base `faker` instance.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.33
+
 ## 5.0.0-beta.31
 
 ### Minor Changes
