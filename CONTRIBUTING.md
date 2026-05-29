@@ -33,7 +33,6 @@ Kubb spans a few repositories. Knowing where code lives saves time:
 
 - [kubb-labs/kubb](https://github.com/kubb-labs/kubb) is the core. It holds the engine that runs the plugin system, the OpenAPI adapter, the AST and JSX renderer, the CLI, and the MCP server. The plugin APIs you build against live here.
 - [kubb-labs/plugins](https://github.com/kubb-labs/plugins) (this repo) holds the official plugins and a runnable example per plugin. Work here on a specific generator or to add a new plugin.
-- [kubb-labs/platform](https://github.com/kubb-labs/platform) holds the documentation site ([kubb.dev](https://kubb.dev)), Kubb Studio ([kubb.studio](https://kubb.studio)), and the shared UI package.
 
 ## What is inside this repo
 
