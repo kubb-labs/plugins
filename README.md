@@ -1,12 +1,9 @@
 <div align="center">
-  <h1>Kubb Plugins</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
     <img width="180" src="./assets/logo.png" alt="Kubb logo">
   </a>
 
 [![License][license-src]][license-href]
-
-  <p><strong>Official and community plugins for <a href="https://kubb.dev">Kubb</a>.</strong></p>
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
@@ -18,6 +15,10 @@
 </div>
 
 <br />
+
+# Kubb Plugins
+
+**Official and community plugins for [Kubb](https://kubb.dev).**
 
 ## About
 
