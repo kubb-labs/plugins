@@ -1,7 +1,6 @@
 <div align="center">
-  <h1>@kubb/plugin-msw</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
+    <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
 [![npm version][npm-version-src]][npm-version-href]
@@ -11,8 +10,6 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/msw" target="_blank">View Demo</a>
-<span> · </span>
 <a href="https://kubb.dev/plugins/msw" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
@@ -21,14 +18,13 @@
 </h4>
 </div>
 
+<br />
+
+# @kubb/plugin-msw
+
+### Generate MSW request handlers from OpenAPI
+
 `@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers from your OpenAPI specification. The handlers work in both browser and Node.js environments via MSW v2.
-
-## Features
-
-- Generates one handler per OpenAPI operation
-- Infers request and response types from the spec
-- Works in both browser (via service worker) and Node.js test environments
-- Works with `@kubb/plugin-faker` to serve realistic response data
 
 ## Installation
 
@@ -46,7 +42,7 @@ See the [full documentation](https://kubb.dev/plugins/msw) for configuration opt
 
 ## Supporting Kubb
 
-Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an open source project, and its development is funded entirely by sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 
@@ -55,6 +51,10 @@ Kubb is an MIT-licensed open source project with its ongoing development made po
     <img src="https://raw.githubusercontent.com/stijnvanhulle/sponsors/main/sponsors.svg" alt="My sponsors" />
   </a>
 </p>
+
+## License
+
+[MIT](https://github.com/kubb-labs/plugins/blob/main/LICENSE)
 
 <!-- Badges -->
 

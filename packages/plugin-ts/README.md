@@ -1,7 +1,6 @@
 <div align="center">
-  <h1>@kubb/plugin-ts</h1>
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="https://raw.githubusercontent.com/kubb-labs/kubb/main/assets/logo.png" alt="Kubb logo">
+    <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
 [![npm version][npm-version-src]][npm-version-href]
@@ -11,8 +10,6 @@
 [![Sponsors][sponsors-src]][sponsors-href]
 
 <h4>
-<a href="https://codesandbox.io/s/github/kubb-labs/plugins/tree/main/examples/typescript" target="_blank">View Demo</a>
-<span> · </span>
 <a href="https://kubb.dev/plugins/ts" target="_blank">Documentation</a>
 <span> · </span>
 <a href="https://github.com/kubb-labs/kubb/issues/" target="_blank">Report Bug</a>
@@ -21,14 +18,13 @@
 </h4>
 </div>
 
+<br />
+
+# @kubb/plugin-ts
+
+### Generate TypeScript types from OpenAPI
+
 `@kubb/plugin-ts` generates TypeScript types from your OpenAPI specification. It produces interfaces, enums, union types, and string literals that other Kubb plugins import and build on.
-
-## Features
-
-- Generates interfaces, enums, union types, and string literals from OpenAPI schemas
-- Other plugins — `@kubb/plugin-client`, `@kubb/plugin-zod`, and the query plugins — import from its output
-- Supports strict typing mode for required vs optional fields
-- Controls output organization by tag, operation, or a custom grouping
 
 ## Installation
 
@@ -46,7 +42,7 @@ See the [full documentation](https://kubb.dev/plugins/ts) for configuration opti
 
 ## Supporting Kubb
 
-Kubb is an MIT-licensed open source project with its ongoing development made possible entirely by the support of Sponsors. If you would like to become a sponsor, please consider:
+Kubb is an open source project, and its development is funded entirely by sponsors. If you would like to become a sponsor, please consider:
 
 - [Become a Sponsor on GitHub](https://github.com/sponsors/stijnvanhulle)
 
@@ -55,6 +51,10 @@ Kubb is an MIT-licensed open source project with its ongoing development made po
     <img src="https://raw.githubusercontent.com/stijnvanhulle/sponsors/main/sponsors.svg" alt="My sponsors" />
   </a>
 </p>
+
+## License
+
+[MIT](https://github.com/kubb-labs/plugins/blob/main/LICENSE)
 
 <!-- Badges -->
 
