@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://kubb.dev" target="_blank" rel="noopener noreferrer">
-    <img width="180" src="./assets/logo.png" alt="Kubb logo">
+    <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
 [![License][license-src]][license-href]
