@@ -31,7 +31,9 @@
     "sdk-pet-store": "0.0.1",
     "@internals/shared": "0.0.0",
     "@internals/tanstack-query": "0.0.0",
-    "@internals/utils": "0.0.0"
+    "@internals/utils": "0.0.0",
+    "swr-pet-store": "0.0.0",
+    "@kubb/plugin-swr": "5.0.0-beta.32"
   },
   "changesets": [
     "circular-schema-detection-shared",
@@ -56,6 +58,7 @@
     "plugin-client-v5-migration",
     "plugin-cypress-v5-upgrade",
     "plugin-faker-fix-rce-identifier-validation",
+    "plugin-faker-locale-default-en",
     "plugin-faker-locale-support",
     "plugin-faker-stable-cyclic-getters",
     "plugin-faker-type-precision-fix",
@@ -96,6 +99,7 @@
     "shared-group-config-helper",
     "shared-operation-file-entry",
     "standardize-client-runtime-symbol",
+    "swr-enabled-params-client-alignment",
     "tanstack-query-optional-enabled-params",
     "tanstack-tdata-success-only",
     "ts-discriminator-string-types",
