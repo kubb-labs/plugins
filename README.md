@@ -106,50 +106,9 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 | [`mcp`](./examples/mcp) | Generate MCP tools |
 | [`advanced`](./examples/advanced) | Advanced multi-plugin configuration |
 
-## Layout
-
-```
-plugins/
-├── packages/              # Kubb plugins
-│   ├── plugin-ts/         # TypeScript generation
-│   ├── plugin-client/     # API client generation
-│   ├── plugin-zod/        # Zod schemas
-│   ├── plugin-react-query/# React Query hooks
-│   ├── plugin-vue-query/  # Vue Query composables
-│   ├── plugin-faker/      # Faker.js mocks
-│   ├── plugin-msw/        # MSW handlers
-│   ├── plugin-cypress/    # Cypress tests
-│   ├── plugin-redoc/      # ReDoc documentation
-│   └── plugin-mcp/        # MCP integration
-├── internals/             # Shared internal utilities (not published)
-│   ├── utils/             # @internals/utils
-│   └── tanstack-query/    # @internals/tanstack-query
-├── examples/              # Usage examples
-└── tests/                 # Performance and e2e tests
-```
-
-## Prerequisites
-
-- [Node.js](https://nodejs.org/) >= 22
-- [pnpm](https://pnpm.io/) >= 11
-
-## Commands
-
-```bash
-pnpm install          # Install dependencies
-pnpm build            # Build all packages
-pnpm build:examples   # Build examples
-pnpm test             # Run all tests
-pnpm test:watch       # Watch mode
-pnpm typecheck        # Type-check all packages
-pnpm lint             # Lint with oxlint
-pnpm format           # Format with oxfmt
-pnpm changeset        # Add a changelog entry
-```
-
 ## Contributing
 
-Want to contribute to an existing plugin or add a new one — official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md).
+Want to contribute to an existing plugin or add a new one — official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the project structure, prerequisites, local setup, and commands.
 
 ## License
 

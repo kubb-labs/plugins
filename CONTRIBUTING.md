@@ -15,7 +15,7 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 | Tool | Purpose |
 |------|---------|
 | [Node.js](https://nodejs.org/) ≥ 22 | Runtime |
-| [pnpm](https://pnpm.io/) ≥ 10 | Package manager |
+| [pnpm](https://pnpm.io/) ≥ 11 | Package manager |
 | [Turborepo](https://turbo.build/) | Monorepo task runner |
 | [TypeScript](https://www.typescriptlang.org/) | Language (strict, ESM-only) |
 | [tsdown](https://github.com/sxzz/tsdown) | Bundler |
@@ -54,6 +54,34 @@ To run tests for a single package:
 pnpm vitest run --config ./configs/vitest.config.ts packages/plugin-ts
 # Update snapshots
 pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts
+```
+
+## Project structure
+
+```
+.
+├── packages/                # Plugin implementations
+│   ├── plugin-ts/           # TypeScript type generation
+│   ├── plugin-client/       # Client generator (fetch, axios, etc.)
+│   ├── plugin-faker/        # Faker.js mock data generation
+│   ├── plugin-zod/          # Zod schema generation
+│   ├── plugin-msw/          # MSW mock handlers
+│   ├── plugin-react-query/  # React Query/TanStack Query hooks
+│   ├── plugin-vue-query/    # Vue Query hooks
+│   ├── plugin-cypress/      # Cypress test generation
+│   ├── plugin-redoc/        # ReDoc documentation
+│   └── plugin-mcp/          # MCP (Model Context Protocol) integration
+├── internals/               # Shared internal utilities
+│   ├── tanstack-query/      # Shared TanStack Query utilities
+│   └── utils/               # General utilities
+├── examples/                # Example projects demonstrating plugins
+├── tests/                   # Test suites (e2e, performance, version-specific)
+├── plugins/                 # YAML plugin configurations
+├── schemas/                 # OpenAPI schema definitions
+├── docs/                    # Documentation
+├── configs/                 # Shared configurations
+├── assets/                  # Static assets
+└── .github/                 # GitHub workflows & templates
 ```
 
 ## Pull Request Checklist

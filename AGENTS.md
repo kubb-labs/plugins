@@ -11,35 +11,10 @@ This repository contains the plugin ecosystem for Kubb, organized around:
 - YAML based plugin configuration
 - Test suites and working examples
 
-## Folder structure
+## Project structure and commands
 
-The monorepo is structured as follows:
-
-```
-.
-├── packages/                # Plugin implementations
-│   ├── plugin-ts/           # TypeScript type generation
-│   ├── plugin-client/       # Client generator (fetch, axios, etc.)
-│   ├── plugin-faker/        # Faker.js mock data generation
-│   ├── plugin-zod/          # Zod schema generation
-│   ├── plugin-msw/          # MSW mock handlers
-│   ├── plugin-react-query/  # React Query/TanStack Query hooks
-│   ├── plugin-vue-query/    # Vue Query hooks
-│   ├── plugin-cypress/      # Cypress test generation
-│   ├── plugin-redoc/        # ReDoc documentation
-│   └── plugin-mcp/          # MCP (Model Context Protocol) integration
-├── internals/               # Shared internal utilities
-│   ├── tanstack-query/      # Shared TanStack Query utilities
-│   └── utils/               # General utilities
-├── examples/                # Example projects demonstrating plugins
-├── tests/                   # Test suites (e2e, performance, version-specific)
-├── plugins/                 # YAML plugin configurations
-├── schemas/                 # OpenAPI schema definitions
-├── docs/                    # Documentation
-├── configs/                 # Shared configurations
-├── assets/                  # Static assets
-└── .github/                 # GitHub workflows & templates
-```
+The full folder structure, repository setup, and commands live in
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Plugin ecosystem
 
@@ -93,24 +68,6 @@ The `plugins/` directory contains YAML configuration files for each plugin, with
 | Tests | Vitest |
 | Versioning | Changesets |
 | CI/CD | GitHub Actions |
-
-## Commands
-
-```bash
-pnpm install                 # Install dependencies
-pnpm clean                   # Clean build artifacts
-pnpm build                   # Build all packages
-pnpm generate                # Generate code from OpenAPI specs
-pnpm perf                    # Run performance tests
-pnpm test                    # Run tests
-pnpm typecheck               # Type check all packages
-pnpm typecheck:examples      # Type check examples
-pnpm format                  # Format code
-pnpm lint                    # Lint code
-pnpm lint:fix                # Lint and fix issues
-pnpm changeset               # Create changelog entry
-pnpm run upgrade && pnpm i   # Upgrade dependencies
-```
 
 ## Token optimized CLI (rtk)
 
