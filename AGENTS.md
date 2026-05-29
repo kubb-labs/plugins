@@ -16,6 +16,21 @@ This repository contains the plugin ecosystem for Kubb, organized around:
 The full folder structure, repository setup, and commands live in
 [CONTRIBUTING.md](CONTRIBUTING.md).
 
+## Repository setup
+
+| Aspect | Choice |
+| --- | --- |
+| Monorepo | pnpm workspaces + Turborepo |
+| Module system | ESM-only (`type: "module"`) |
+| Node version | 22 |
+| Package manager | pnpm 11+ |
+| Linter | oxlint |
+| Formatter | oxfmt |
+| Bundler | tsdown |
+| Tests | Vitest |
+| Versioning | Changesets |
+| CI/CD | GitHub Actions |
+
 ## Plugin ecosystem
 
 ### Plugin packages
@@ -53,21 +68,6 @@ The `plugins/` directory contains YAML configuration files for each plugin, with
 - Examples are working projects for each plugin (fetch, TypeScript, React-Query, Vue-Query, Zod, MSW, Faker, Cypress, custom generators)
 - Tests cover e2e, performance, and version-specific suites
 - Schemas are OpenAPI definitions for testing
-
-## Repository setup
-
-| Aspect | Choice |
-| --- | --- |
-| Monorepo | pnpm workspaces + Turborepo |
-| Module system | ESM-only (`type: "module"`) |
-| Node version | 22 |
-| Package manager | pnpm 11+ |
-| Linter | oxlint |
-| Formatter | oxfmt |
-| Bundler | tsdown |
-| Tests | Vitest |
-| Versioning | Changesets |
-| CI/CD | GitHub Actions |
 
 ## Token optimized CLI (rtk)
 

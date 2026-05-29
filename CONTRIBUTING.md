@@ -106,6 +106,13 @@ pnpm vitest run --config ./configs/vitest.config.ts packages/plugin-ts
 pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts   # update snapshots
 ```
 
+## Development workflow
+
+1. Create a branch from `main`.
+2. Make your change, with tests for new behavior.
+3. Build and verify locally with `pnpm build && pnpm typecheck && pnpm test`.
+4. Regenerate examples with `pnpm generate` after a plugin change, then fix style with `pnpm format && pnpm lint:fix`.
+
 ## Plugin options and docs
 
 A plugin's options are documented in YAML, not by editing the generated file:
