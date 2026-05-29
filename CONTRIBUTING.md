@@ -1,4 +1,4 @@
-# Contributing to Kubb
+# Contributing to Kubb plugins
 
 This repository is home to both official and community plugins for [Kubb](https://kubb.dev), the meta framework for code generation. We welcome contributions, and there are a few ways to get involved:
 
@@ -6,109 +6,118 @@ This repository is home to both official and community plugins for [Kubb](https:
 - Have an idea for a plugin or improvement? [Open an issue](https://github.com/kubb-labs/plugins/issues/new) to share it.
 - Need help? Ask the community on [Discord](https://discord.gg/4dQjA6vrWX).
 
-Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
+Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating. Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR. For significant changes, open an issue first and wait for maintainer feedback. Small fixes (typos, docs, tests) can go straight to a PR.
 
-## Before you start
+## Prerequisites
 
-* Search the [issue tracker](https://github.com/kubb-labs/plugins/issues) before opening a new issue or PR.
-* For significant changes, open an issue first and wait for maintainer feedback.
-* Small fixes (typos, docs, tests) can go straight to a PR.
+- Node.js 22 or newer
+- pnpm 11 or newer. The repo pins a version in `packageManager`, so the easiest way to match it is `corepack enable` and let Corepack pick the right pnpm
+- Git
 
-## Tech stack
+## Getting started
 
-| Tool | Purpose |
-|------|---------|
-| [Node.js](https://nodejs.org/) ≥ 22 | Runtime |
-| [pnpm](https://pnpm.io/) ≥ 11 | Package manager |
-| [Turborepo](https://turbo.build/) | Monorepo task runner |
-| [TypeScript](https://www.typescriptlang.org/) | Language (strict, ESM-only) |
-| [tsdown](https://github.com/sxzz/tsdown) | Bundler |
-| [Vitest](https://vitest.dev/) | Testing |
-| [oxlint](https://oxc.rs/docs/guide/usage/linter) | Linter |
-| [oxfmt](https://github.com/nicolo-ribaudo/oxfmt) | Formatter |
-| [Changesets](https://github.com/changesets/changesets) | Versioning |
-
-## Setup
+Fork the repo, then clone your fork and install:
 
 ```bash
-gh repo fork kubb-labs/plugins --clone
+gh repo fork kubb-labs/plugins --clone   # or: git clone https://github.com/kubb-labs/plugins.git
 cd plugins
 pnpm install
 pnpm build
 ```
 
+`pnpm build` compiles every plugin with tsdown so the examples and tests resolve local versions.
+
+## The Kubb ecosystem
+
+Kubb spans a few repositories. Knowing where code lives saves time:
+
+- [kubb-labs/kubb](https://github.com/kubb-labs/kubb) is the core. It holds the engine that runs the plugin system, the OpenAPI adapter, the AST and JSX renderer, the CLI, and the MCP server. The plugin APIs you build against live here.
+- [kubb-labs/plugins](https://github.com/kubb-labs/plugins) (this repo) holds the official plugins and a runnable example per plugin. Work here on a specific generator or to add a new plugin.
+- [kubb-labs/platform](https://github.com/kubb-labs/platform) holds the documentation site ([kubb.dev](https://kubb.dev)), Kubb Studio ([kubb.studio](https://kubb.studio)), and the shared UI package.
+
+## What is inside this repo
+
+```
+plugins/
+├── packages/                # The plugins themselves
+│   ├── plugin-ts/           # TypeScript types and interfaces
+│   ├── plugin-client/       # API client (axios, fetch, or a custom client)
+│   ├── plugin-react-query/  # TanStack Query hooks for React
+│   ├── plugin-vue-query/    # TanStack Query hooks for Vue
+│   ├── plugin-swr/          # SWR hooks
+│   ├── plugin-zod/          # Zod schemas
+│   ├── plugin-faker/        # Faker mock data
+│   ├── plugin-msw/          # MSW handlers
+│   ├── plugin-cypress/      # Cypress tests
+│   ├── plugin-redoc/        # ReDoc documentation
+│   └── plugin-mcp/          # MCP integration
+├── internals/               # Shared, non-published helpers
+│   ├── tanstack-query/      # Shared TanStack Query utilities
+│   └── utils/               # General utilities
+├── plugins/                 # YAML option definitions that feed the docs (source of truth)
+│   └── _shared/             # Shared option fragments referenced with extends:
+├── examples/                # A runnable project per plugin
+├── tests/                   # End-to-end, performance, and version-specific suites
+├── schemas/                 # OpenAPI specs used for testing
+├── scripts/                 # Build scripts (for example build-extension-yaml.ts)
+├── configs/                 # Shared build and test configuration
+└── assets/                  # Static assets
+```
+
+Each plugin under `packages/` follows the same shape: `src/plugin.ts` defines the plugin, `src/generators/` holds the generation logic, `src/components/` holds JSX-renderer components, and `src/*.test.ts` holds the tests.
+
+## Tech stack
+
+| Tool | Purpose |
+|------|---------|
+| [TypeScript](https://www.typescriptlang.org/) | Language (strict, ESM only) |
+| [pnpm](https://pnpm.io/) | Package manager with workspaces |
+| [Turborepo](https://turbo.build/) | Monorepo task runner |
+| [tsdown](https://github.com/sxzz/tsdown) | Bundler |
+| [Vitest](https://vitest.dev/) | Testing |
+| [oxlint](https://oxc.rs/docs/guide/usage/linter.html) | Linter |
+| [oxfmt](https://github.com/oxc-project/oxfmt) | Formatter |
+| [CSpell](https://cspell.org/) | Spell checker |
+| [Changesets](https://github.com/changesets/changesets) | Versioning |
+| [GitHub Actions](https://github.com/features/actions) | CI/CD |
+
 ## Commands
 
 ```bash
-pnpm build          # Build all packages
-pnpm generate       # Run all examples against local packages
-pnpm test           # Run all tests
-pnpm test:watch     # Watch mode
-pnpm test:bench     # Performance benchmarks
-pnpm format         # Format code
-pnpm lint:fix       # Lint and auto-fix
-pnpm typecheck      # Type check all packages
-pnpm lint:spell     # Spell check .ts and .md files
-pnpm changeset      # Create a changeset for versioning
+pnpm build               # Build all plugins
+pnpm build:examples      # Build the examples
+pnpm generate            # Regenerate every example against local plugins
+pnpm test                # Run all tests once
+pnpm test:watch          # Run tests in watch mode
+pnpm test:bench          # Performance benchmarks
+pnpm typecheck           # Type-check the plugins
+pnpm typecheck:examples  # Type-check the examples
+pnpm lint                # Lint with oxlint
+pnpm lint:fix            # Lint and auto-fix
+pnpm format              # Format with oxfmt
+pnpm lint:spell          # Spell-check .ts and .md files
+pnpm changeset           # Create a changeset
 ```
 
-To run tests for a single package:
+To run a single plugin's tests:
 
 ```bash
 pnpm vitest run --config ./configs/vitest.config.ts packages/plugin-ts
-# Update snapshots
-pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts
+pnpm vitest run --config ./configs/vitest.config.ts -u packages/plugin-ts   # update snapshots
 ```
 
-## Project structure
+## Plugin options and docs
 
-```
-.
-├── packages/                # Plugin implementations
-│   ├── plugin-ts/           # TypeScript type generation
-│   ├── plugin-client/       # Client generator (fetch, axios, etc.)
-│   ├── plugin-faker/        # Faker.js mock data generation
-│   ├── plugin-zod/          # Zod schema generation
-│   ├── plugin-msw/          # MSW mock handlers
-│   ├── plugin-react-query/  # React Query/TanStack Query hooks
-│   ├── plugin-vue-query/    # Vue Query hooks
-│   ├── plugin-cypress/      # Cypress test generation
-│   ├── plugin-redoc/        # ReDoc documentation
-│   └── plugin-mcp/          # MCP (Model Context Protocol) integration
-├── internals/               # Shared internal utilities
-│   ├── tanstack-query/      # Shared TanStack Query utilities
-│   └── utils/               # General utilities
-├── examples/                # Example projects demonstrating plugins
-├── tests/                   # Test suites (e2e, performance, version-specific)
-├── plugins/                 # YAML plugin configurations
-├── schemas/                 # OpenAPI schema definitions
-├── docs/                    # Documentation
-├── configs/                 # Shared configurations
-├── assets/                  # Static assets
-└── .github/                 # GitHub workflows & templates
-```
+A plugin's options are documented in YAML, not by editing the generated file:
 
-## Pull request checklist
-
-Run checks in this order before opening a PR:
-
-```bash
-pnpm format && pnpm lint:fix
-pnpm typecheck
-pnpm test
-pnpm generate    # update generated examples after plugin changes
-pnpm changeset   # required if you changed any published package
-```
-
-* Target the `main` branch.
-* Fill out the PR template completely.
-* Include a changeset for every code change that affects a published package.
-
-Use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages: `feat:`, `fix:`, `docs:`, `chore:`, etc.
+- The source of truth is `plugins/<name>.yaml` plus the shared fragments in `plugins/_shared/**`. A source file can pull in a fragment with `extends: ./_shared/...`.
+- `packages/<name>/extension.yaml` is generated by `scripts/build-extension-yaml.ts`. Never edit it by hand, since the next build overwrites it.
+- After editing a source file, regenerate with `pnpm build:extension-yaml` and commit both the source and the regenerated `packages/*/extension.yaml`.
+- An option belongs in the YAML only if it exists in the plugin's `src/types.ts` `Options` type and is honored in `src/plugin.ts`. Keep documented defaults in step with the destructuring defaults in `plugin.ts`.
 
 ## Adding a plugin
 
-Plugins live under `packages/plugin-<name>/`. Each plugin follows this layout:
+Plugins live under `packages/plugin-<name>/` and follow this layout:
 
 ```
 packages/plugin-<name>/
@@ -124,8 +133,31 @@ packages/plugin-<name>/
 └── vitest.config.ts
 ```
 
-After scaffolding:
+After scaffolding, add a runnable example under `examples/`, add tests in `src/`, and open a PR with a changeset.
 
-1. Add a runnable example under `examples/`.
-2. Add tests in `src/`.
-3. Open a PR with a changeset.
+## Opening a pull request
+
+1. Run the full check locally first, in this order:
+
+   ```bash
+   pnpm format && pnpm lint:fix
+   pnpm typecheck
+   pnpm test
+   pnpm generate    # update generated examples after a plugin change
+   ```
+
+2. Add a changeset for any change that affects a published package (see below).
+3. Commit with [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:`, `perf:`.
+4. Push your branch and open a PR against `main`, then fill out the template.
+
+### Changesets
+
+Changesets drive versioning and the changelog. When your change affects a published package, run:
+
+```bash
+pnpm changeset
+```
+
+Pick the packages you changed, choose the bump (patch for fixes, minor for features, major for breaking changes), and write a short summary aimed at users. Commit the generated file under `.changeset/`. Docs-only or internal changes that touch no published package do not need one.
+
+Spell-check false positives: fix typos in code, or add technical terms and proper nouns to the `words` array in `cspell.json`.
