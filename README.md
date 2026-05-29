@@ -38,34 +38,34 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-client`](./packages/plugin-client) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-client.svg)](https://www.npmjs.com/package/@kubb/plugin-client) | API client generation (Axios, Fetch) |
+| [`@kubb/plugin-client`](./packages/plugin-client) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-client.svg)](https://www.npmjs.com/package/@kubb/plugin-client) | API client generation ([Axios](https://github.com/axios/axios), Fetch) |
 
 ### Zod
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://www.npmjs.com/package/@kubb/plugin-zod) | Zod schema generation for runtime validation |
+| [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://www.npmjs.com/package/@kubb/plugin-zod) | [Zod](https://github.com/colinhacks/zod) schema generation for runtime validation |
 
 ### Data fetching
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://www.npmjs.com/package/@kubb/plugin-react-query) | TanStack Query hooks for React |
-| [`@kubb/plugin-vue-query`](./packages/plugin-vue-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://www.npmjs.com/package/@kubb/plugin-vue-query) | TanStack Query composables for Vue |
+| [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://www.npmjs.com/package/@kubb/plugin-react-query) | [TanStack Query](https://github.com/TanStack/query) hooks for React |
+| [`@kubb/plugin-vue-query`](./packages/plugin-vue-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://www.npmjs.com/package/@kubb/plugin-vue-query) | [TanStack Query](https://github.com/TanStack/query) composables for Vue |
 
 ### Testing and mocking
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-faker`](./packages/plugin-faker) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-faker.svg)](https://www.npmjs.com/package/@kubb/plugin-faker) | Faker.js mock data generation |
-| [`@kubb/plugin-msw`](./packages/plugin-msw) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-msw.svg)](https://www.npmjs.com/package/@kubb/plugin-msw) | Mock Service Worker handlers |
-| [`@kubb/plugin-cypress`](./packages/plugin-cypress) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-cypress.svg)](https://www.npmjs.com/package/@kubb/plugin-cypress) | Cypress e2e test generation |
+| [`@kubb/plugin-faker`](./packages/plugin-faker) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-faker.svg)](https://www.npmjs.com/package/@kubb/plugin-faker) | [Faker.js](https://github.com/faker-js/faker) mock data generation |
+| [`@kubb/plugin-msw`](./packages/plugin-msw) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-msw.svg)](https://www.npmjs.com/package/@kubb/plugin-msw) | [Mock Service Worker](https://github.com/mswjs/msw) handlers |
+| [`@kubb/plugin-cypress`](./packages/plugin-cypress) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-cypress.svg)](https://www.npmjs.com/package/@kubb/plugin-cypress) | [Cypress](https://github.com/cypress-io/cypress) e2e test generation |
 
 ### Documentation and AI
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://www.npmjs.com/package/@kubb/plugin-redoc) | ReDoc API documentation generation |
+| [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://www.npmjs.com/package/@kubb/plugin-redoc) | [ReDoc](https://github.com/Redocly/redoc) API documentation generation |
 | [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://www.npmjs.com/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
 
 ## Community plugins
