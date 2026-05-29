@@ -17,7 +17,7 @@ import type {
 import { createAddPetRequest } from '../createAddPetRequest.ts'
 import { createPet } from '../createPet.ts'
 import { createPetNotFound } from '../createPetNotFound.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Successful operation

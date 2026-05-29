@@ -1,6 +1,6 @@
 import type { User } from '../models/ts/User.ts'
 import { createTagTagFaker } from './tag/createTagFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUserFaker<TData extends Partial<User> = object>(data?: TData) {
   const defaultFakeData = {

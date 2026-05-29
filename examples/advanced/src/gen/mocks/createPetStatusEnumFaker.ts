@@ -1,5 +1,5 @@
 import type { PetStatusEnumKey } from '../models/ts/PetStatusEnum.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description pet status in the store

@@ -348,7 +348,9 @@ options:
       | --- | --- |
       | `@kubb/plugin-ts` | `resolverTs` |
       | `@kubb/plugin-zod` | `resolverZod` |
+      | `@kubb/plugin-faker` | `resolverFaker` |
       | `@kubb/plugin-cypress` | `resolverCypress` |
+      | `@kubb/plugin-msw` | `resolverMsw` |
       | `@kubb/plugin-mcp` | `resolverMcp` |
       | `@kubb/plugin-client` | `resolverClient` |
     codeBlock:
@@ -655,6 +657,21 @@ options:
                       }),
                     ],
                   })
+      - name: clientType
+        type: "'function' | 'class' | 'staticClass'"
+        required: false
+        description: |
+          Shape of the underlying client the handlers call into. Mirrors `pluginClient`'s `clientType` option.
+      - name: bundle
+        type: boolean
+        required: false
+        description: |
+          Copies the HTTP client runtime into the generated output so consumers do not need `@kubb/plugin-client` at runtime. Mirrors `pluginClient`'s `bundle` option.
+      - name: paramsCasing
+        type: "'camelcase'"
+        required: false
+        description: |
+          Renames parameter properties passed to the underlying client. Mirrors `pluginClient`'s `paramsCasing` option.
   - name: include
     type: Array<Include>
     required: false

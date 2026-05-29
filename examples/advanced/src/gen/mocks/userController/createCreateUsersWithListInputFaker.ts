@@ -7,7 +7,7 @@ import type {
   CreateUsersWithListInputStatusDefault,
 } from '../../models/ts/userController/CreateUsersWithListInput.ts'
 import { createUserFaker } from '../createUserFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Successful operation

@@ -1,6 +1,6 @@
 import type { Order } from '../models/ts/Order.ts'
 import { createOrderParamsFaker } from './createOrderParamsFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createOrderFaker<TData extends Partial<Order> = object>(data?: TData) {
   const defaultFakeData = {

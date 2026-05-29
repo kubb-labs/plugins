@@ -5,7 +5,7 @@
 
 import type { UploadFileResponse, UploadFileStatus200 } from "../types/UploadFile.ts";
 import { createApiResponse } from "./createApiResponse.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createUploadFilePathPetId(data?: bigint): bigint {
   faker.seed([42])

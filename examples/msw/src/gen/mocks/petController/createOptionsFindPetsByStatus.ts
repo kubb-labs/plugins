@@ -5,7 +5,7 @@
 
 import type { OptionsFindPetsByStatusResponse, OptionsFindPetsByStatusStatus200 } from '../../models/OptionsFindPetsByStatus.ts'
 import { createPet } from '../createPet.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

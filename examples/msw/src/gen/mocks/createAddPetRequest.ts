@@ -5,7 +5,7 @@
 
 import type { AddPetRequest } from '../models/AddPetRequest.ts'
 import { createPet } from './createPet.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAddPetRequest(data?: Partial<AddPetRequest>): AddPetRequest {
   faker.seed([220])

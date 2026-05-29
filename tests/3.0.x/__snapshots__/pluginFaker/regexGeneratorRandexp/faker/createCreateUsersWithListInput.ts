@@ -5,7 +5,7 @@
 
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatus200Json, CreateUsersWithListInputStatus200Xml, CreateUsersWithListInputStatusDefault } from "../types/CreateUsersWithListInput.ts";
 import { createUser } from "./createUser.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 /**
  * @description Successful operation
