@@ -1,7 +1,7 @@
 import type { Customer } from '../models/ts/Customer.ts'
 import { createAddressFaker } from './createAddressFaker.ts'
 import { createOrderParamsFaker } from './createOrderParamsFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCustomerFaker<TData extends Partial<Customer> = object>(data?: TData) {
   const defaultFakeData = {

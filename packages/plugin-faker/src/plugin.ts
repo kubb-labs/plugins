@@ -39,7 +39,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {
     output = { path: 'mocks', barrelType: 'named' },
     seed,
-    locale,
+    locale = 'en',
     group,
     exclude = [],
     include,

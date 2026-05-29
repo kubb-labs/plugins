@@ -1,5 +1,5 @@
 import type { OrderParamsStatusEnumKey } from '../models/ts/OrderParamsStatusEnum.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Order Status

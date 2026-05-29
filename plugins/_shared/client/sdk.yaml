@@ -1,18 +1,18 @@
-# Shared option: client/wrapper
+# Shared option: client/sdk
 
 $schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
-name: wrapper
+name: sdk
 type: '{ className: string }'
 required: false
 description: |
-  Generates a single top-level class that composes the per-tag client classes into one entry point. Only meaningful when `clientType: 'class'` (or `'staticClass'`) and `group: { type: 'tag' }` are also set.
+  Generates a single SDK class that composes the per-tag client classes into one entry point. Setting `sdk` automatically enables `clientType: 'class'`, so you only need to add `group: { type: 'tag' }` to split the clients per tag.
 
-  Use this when you want a single object to hand around your app (`api.pet.findById`, `api.user.login`) instead of importing each tag client separately.
+  Use this when you want a single object to hand around your app (`api.petController.findById`, `api.userController.login`) instead of importing each tag client separately.
 properties:
   - name: className
     type: string
     required: true
-    description: Name of the generated wrapper class — used as the export name and file name.
+    description: Name of the generated SDK class — used as the export name and file name.
     examples:
       - name: A composed PetStoreClient
         files:
@@ -31,9 +31,8 @@ properties:
                   pluginTs(),
                   pluginClient({
                     output: { path: './clients' },
-                    clientType: 'class',
                     group: { type: 'tag' },
-                    wrapper: { className: 'PetStoreClient' },
+                    sdk: { className: 'PetStoreClient' },
                   }),
                 ],
               })
@@ -42,19 +41,19 @@ properties:
             twoslash: false
             code: |
               import type { Client, RequestConfig } from './.kubb/client'
-              import { Pet } from './petController/Pet'
-              import { Store } from './storeController/Store'
-              import { User } from './userController/User'
+              import { petController } from './petController/petController'
+              import { storeController } from './storeController/storeController'
+              import { userController } from './userController/userController'
 
               export class PetStoreClient {
-                readonly pet: Pet
-                readonly store: Store
-                readonly user: User
+                readonly petController: petController
+                readonly storeController: storeController
+                readonly userController: userController
 
                 constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
-                  this.pet = new Pet(config)
-                  this.store = new Store(config)
-                  this.user = new User(config)
+                  this.petController = new petController(config)
+                  this.storeController = new storeController(config)
+                  this.userController = new userController(config)
                 }
               }
           - name: usage.ts
@@ -65,5 +64,5 @@ properties:
 
               const api = new PetStoreClient({ baseURL: 'https://petstore.swagger.io/v2' })
 
-              const pets = await api.pet.findPetsByTags({ tags: ['available'] })
-              const user = await api.user.getUserByName({ username: 'john' })
+              const pets = await api.petController.findPetsByTags({ tags: ['available'] })
+              const user = await api.userController.getUserByName({ username: 'john' })

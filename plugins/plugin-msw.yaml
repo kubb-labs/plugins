@@ -73,8 +73,6 @@ options:
 
               export const server = setupServer(...handlersGet, ...handlersPost)
 
-  - extends: ./_shared/core/content-type.yaml
-
   - extends: ./_shared/client/base-url.yaml
 
   - extends: ./_shared/core/group.yaml
@@ -122,6 +120,31 @@ options:
 
   - extends: ./_shared/core/generators.yaml
     type: 'Array<Generator<PluginMsw>>'
+
+  - extends: ./_shared/core/resolver.yaml
+    type: 'Partial<ResolverMsw> & ThisType<ResolverMsw>'
+    codeBlock:
+      lang: typescript
+      title: Prefix every handler name with "Mock"
+      code: |
+        import { defineConfig } from 'kubb'
+        import { pluginMsw } from '@kubb/plugin-msw'
+
+        export default defineConfig({
+          input: { path: './petStore.yaml' },
+          output: { path: './src/gen' },
+          plugins: [
+            pluginMsw({
+              resolver: {
+                resolveName(name) {
+                  return `Mock${this.default(name, 'function')}`
+                },
+              },
+            }),
+          ],
+        })
+
+  - extends: ./_shared/core/transformer.yaml
 
 examples:
   - name: kubb.config.ts

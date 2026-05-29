@@ -41,6 +41,7 @@ options:
   - name: output
     type: '{ path: string }'
     required: false
+    default: "{ path: 'docs.html' }"
     description: Output location of the generated HTML file.
     properties:
       - extends: ./_shared/core/output-path.yaml

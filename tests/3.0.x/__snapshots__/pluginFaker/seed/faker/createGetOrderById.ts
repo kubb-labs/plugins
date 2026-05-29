@@ -5,7 +5,7 @@
 
 import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json, GetOrderByIdStatus200Xml, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
 import { createOrder } from "./createOrder.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
   faker.seed([42])

@@ -1,5 +1,5 @@
 import type { CreatePetsXEXAMPLEKey } from '../models/ts/CreatePetsXEXAMPLE.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Header parameters

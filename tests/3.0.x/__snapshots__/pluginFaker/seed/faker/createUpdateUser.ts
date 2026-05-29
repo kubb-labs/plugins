@@ -5,7 +5,7 @@
 
 import type { UpdateUserData, UpdateUserFormUrlEncodedData, UpdateUserJsonData, UpdateUserXmlData } from "../types/UpdateUser.ts";
 import { createUser } from "./createUser.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createUpdateUserPathUsername(data?: string): string {
   faker.seed([42])

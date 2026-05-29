@@ -11,7 +11,7 @@
  * Output files:  packages/<name>/extension.yaml  (fully resolved, no extends:)
  */
 
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { ast, createKubb } from '@kubb/core'
 import { parse, stringify } from 'yaml'
@@ -131,7 +131,7 @@ const kubb = createKubb({
           for (const { name, sourcePath, packageDir } of resolved) {
             const raw = readFileSync(sourcePath, 'utf8')
             const doc = parse(raw) as PluginYaml
-            const output = stringify(resolvePluginYaml(doc, dirname(sourcePath)), { blockQuote: 'literal', lineWidth: 0 })
+            const output = stringify(resolvePluginYaml(doc, dirname(sourcePath)), { blockQuote: 'literal', lineWidth: 0, singleQuote: true })
 
             injectFile({
               baseName: 'extension.yaml',
@@ -148,5 +148,13 @@ const kubb = createKubb({
 })
 
 await kubb.build()
+
+// kubb's file writer trims the trailing newline; restore it so the generated
+// files keep a final newline (POSIX convention) and regeneration stays idempotent.
+for (const { packageDir } of resolved) {
+  const outPath = join(packageDir, 'extension.yaml')
+  const content = readFileSync(outPath, 'utf8')
+  if (!content.endsWith('\n')) writeFileSync(outPath, `${content}\n`)
+}
 
 console.log(`\nDone: ${resolved.length} created, ${sourceFiles.length - resolved.length} skipped`)

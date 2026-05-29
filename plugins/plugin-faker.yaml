@@ -179,7 +179,9 @@ options:
     required: false
     default: "'en'"
     description: |
-      Faker locale used for generated mock values. Switches the named import to `fakerXX` from `@faker-js/faker`.
+      Faker locale used for generated mock values. Switches the named import to `fakerXX` from `@faker-js/faker` so names, addresses, and phone numbers reflect the target region.
+
+      Defaults to `'en'`, which imports `fakerEN`.
     tip: |
       See [Faker.js localization](https://fakerjs.dev/api/localization.html) for the full list of locale codes.
     examples:

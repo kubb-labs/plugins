@@ -12,7 +12,7 @@ import type {
   GetOrderByIdStatus404,
 } from '../models/GetOrderById.ts'
 import { createOrder } from './createOrder.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
   return data ?? faker.number.bigInt()

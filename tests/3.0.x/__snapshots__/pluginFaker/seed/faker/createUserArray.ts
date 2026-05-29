@@ -5,7 +5,7 @@
 
 import type { UserArray } from "../types/UserArray.ts";
 import { createUser } from "./createUser.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createUserArray(data?: UserArray): UserArray {
   faker.seed([42])

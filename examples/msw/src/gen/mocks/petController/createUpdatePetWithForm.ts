@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUpdatePetWithFormPathPetId(data?: bigint): bigint {
   faker.seed([220])
