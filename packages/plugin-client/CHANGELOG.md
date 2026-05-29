@@ -1,5 +1,13 @@
 # @kubb/plugin-client
 
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.32
+  - @kubb/plugin-zod@5.0.0-beta.32
+
 ## 5.0.0-beta.31
 
 ### Minor Changes

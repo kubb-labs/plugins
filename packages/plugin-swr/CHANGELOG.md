@@ -1,1 +1,15 @@
 # @kubb/plugin-swr
+
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- [#164](https://github.com/kubb-labs/plugins/pull/164) [`7cf78fe`](https://github.com/kubb-labs/plugins/commit/7cf78fea60cc058ee8b963c57c8c58e0e95cfb7b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Align `@kubb/plugin-swr` with the React Query / Vue Query plugins:
+  - Make enabled-guarded params optional in the generated `queryKey`, `queryOptions`, and hook signatures, asserting non-null at the client call. Because SWR has no `enabled` option, the param-presence check is folded into the null-key gate (`useSWR(shouldFetch && !!(petId) ? queryKey : null, ...)`), so passing `undefined` disables the request.
+  - Import the generated client as `client` (matching the current `@kubb/plugin-client` output) instead of `fetch`, and bundle it as `.kubb/client.ts`.
+  - Default the `client` `parser` option to `false` instead of the removed `'client'` value.
+
+- Updated dependencies []:
+  - @kubb/plugin-client@5.0.0-beta.32
+  - @kubb/plugin-ts@5.0.0-beta.32
+  - @kubb/plugin-zod@5.0.0-beta.32

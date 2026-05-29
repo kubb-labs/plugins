@@ -1,5 +1,18 @@
 # e2e
 
+## 0.0.1-beta.9
+
+### Patch Changes
+
+- Updated dependencies [[`0c5a8e5`](https://github.com/kubb-labs/plugins/commit/0c5a8e557f4468cb8b6f3a5afb347f66f06a2397)]:
+  - @kubb/plugin-faker@5.0.0-beta.32
+  - @kubb/plugin-msw@5.0.0-beta.32
+  - @kubb/plugin-client@5.0.0-beta.32
+  - @kubb/plugin-cypress@5.0.0-beta.32
+  - @kubb/plugin-react-query@5.0.0-beta.32
+  - @kubb/plugin-ts@5.0.0-beta.32
+  - @kubb/plugin-zod@5.0.0-beta.32
+
 ## 0.0.1-beta.8
 
 ### Patch Changes
