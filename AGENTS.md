@@ -2,7 +2,7 @@
 
 Kubb is a plugin-based code-generation toolkit for generating TypeScript, React-Query, Zod, Faker.js, MSW and more from OpenAPI specifications.
 
-## High-Level Architecture
+## High-level architecture
 
 This repository contains the plugin ecosystem for Kubb, organized around:
 
@@ -11,7 +11,7 @@ This repository contains the plugin ecosystem for Kubb, organized around:
 - YAML based plugin configuration
 - Test suites and working examples
 
-## Directory Organization
+## Folder structure
 
 The monorepo is structured as follows:
 
@@ -41,9 +41,9 @@ The monorepo is structured as follows:
 └── .github/                 # GitHub workflows & templates
 ```
 
-## Plugin Ecosystem
+## Plugin ecosystem
 
-### Plugin Packages
+### Plugin packages
 
 Each plugin in the `packages/` directory follows a consistent structure:
 
@@ -52,14 +52,14 @@ Each plugin in the `packages/` directory follows a consistent structure:
 - `src/*.test.ts` - Tests
 - `package.json` - Plugin metadata
 
-### Shared Utilities
+### Shared utilities
 
 The `internals/` directory provides shared utilities:
 
 - `tanstack-query` holds shared TanStack Query utilities
 - `utils` holds general utility functions
 
-### Plugin Configurations
+### Plugin configurations
 
 The `plugins/` directory contains YAML configuration files for each plugin, with shared templates in `_shared/`. These files document every plugin option (name, type, default, description, examples) and feed the plugin reference pages on [kubb.dev](https://kubb.dev).
 
@@ -73,13 +73,13 @@ The `plugins/` directory contains YAML configuration files for each plugin, with
 > - **Exception:** `plugin-swr` has no source file in `plugins/` and is not part of the build script, so its `packages/plugin-swr/extension.yaml` is hand-maintained — edit it directly until a `plugins/plugin-swr.yaml` source is added.
 > - **Keep docs in sync with code:** an option only belongs in the YAML if it exists in that plugin's `src/types.ts` `Options` type and is honored in `src/plugin.ts`. Match documented `default:` values to the destructuring defaults in `plugin.ts`.
 
-### Examples & Tests
+### Examples and tests
 
 - Examples are working projects for each plugin (fetch, TypeScript, React-Query, Vue-Query, Zod, MSW, Faker, Cypress, custom generators)
 - Tests cover e2e, performance, and version-specific suites
 - Schemas are OpenAPI definitions for testing
 
-## Repository Setup
+## Repository setup
 
 | Aspect | Choice |
 | --- | --- |
@@ -89,6 +89,7 @@ The `plugins/` directory contains YAML configuration files for each plugin, with
 | Package manager | pnpm 11+ |
 | Linter | oxlint |
 | Formatter | oxfmt |
+| Bundler | tsdown |
 | Tests | Vitest |
 | Versioning | Changesets |
 | CI/CD | GitHub Actions |

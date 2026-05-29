@@ -4,18 +4,43 @@
     <img width="180" src="./assets/logo.png" alt="Kubb logo">
   </a>
 
+[![License][license-src]][license-href]
+
   <p><strong>Official and community plugins for <a href="https://kubb.dev">Kubb</a>.</strong></p>
 
-[![License][license-src]][license-href]
+  <h4>
+    <a href="https://kubb.dev" target="_blank">Documentation</a>
+    <span> · </span>
+    <a href="https://github.com/kubb-labs/plugins/issues/" target="_blank">Report Bug</a>
+    <span> · </span>
+    <a href="https://github.com/kubb-labs/plugins/issues/" target="_blank">Request Feature</a>
+  </h4>
 </div>
 
-## Overview
+<br />
+
+## About
 
 This monorepo is the home for **official and community plugins** for [Kubb](https://kubb.dev) — the meta framework for code generation. Point Kubb at your OpenAPI specification and it generates everything you need: TypeScript types, API clients, Zod schemas, React/Vue/Svelte/Solid Query hooks, Faker mocks, MSW handlers, and more.
 
 Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
-## Official Plugins
+## What's inside
+
+| Tool | Purpose |
+|---|---|
+| [pnpm](https://pnpm.io/) | Workspaces + dependency catalog |
+| [Turborepo](https://turbo.build/) | Monorepo task runner |
+| [tsdown](https://github.com/sxzz/tsdown) | Bundler + `.d.ts` generation |
+| [oxlint](https://oxc.rs/docs/guide/usage/linter.html) | Linter (Rust-based) |
+| [oxfmt](https://github.com/oxc-project/oxfmt) | Formatter (Rust-based) |
+| [Vitest](https://vitest.dev/) | Test runner |
+| [CSpell](https://cspell.org/) | Spell checker |
+| [Changesets](https://github.com/changesets/changesets) | Versioning + changelogs |
+| [GitHub Actions](https://github.com/features/actions) | CI/CD |
+| [taze](https://github.com/antfu-collective/taze) | Dependency upgrades |
+
+## Official plugins
 
 Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
 
@@ -37,14 +62,14 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 |---------|---------|-------------|
 | [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://www.npmjs.com/package/@kubb/plugin-zod) | Zod schema generation for runtime validation |
 
-### Data Fetching
+### Data fetching
 
 | Package | Version | Description |
 |---------|---------|-------------|
 | [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://www.npmjs.com/package/@kubb/plugin-react-query) | TanStack Query hooks for React |
 | [`@kubb/plugin-vue-query`](./packages/plugin-vue-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://www.npmjs.com/package/@kubb/plugin-vue-query) | TanStack Query composables for Vue |
 
-### Testing & Mocking
+### Testing and mocking
 
 | Package | Version | Description |
 |---------|---------|-------------|
@@ -52,14 +77,14 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 | [`@kubb/plugin-msw`](./packages/plugin-msw) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-msw.svg)](https://www.npmjs.com/package/@kubb/plugin-msw) | Mock Service Worker handlers |
 | [`@kubb/plugin-cypress`](./packages/plugin-cypress) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-cypress.svg)](https://www.npmjs.com/package/@kubb/plugin-cypress) | Cypress e2e test generation |
 
-### Documentation & AI
+### Documentation and AI
 
 | Package | Version | Description |
 |---------|---------|-------------|
 | [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://www.npmjs.com/package/@kubb/plugin-redoc) | ReDoc API documentation generation |
 | [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://www.npmjs.com/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
 
-## Community Plugins
+## Community plugins
 
 Plugins built and maintained by the community. Want to add yours? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
@@ -81,7 +106,7 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 | [`mcp`](./examples/mcp) | Generate MCP tools |
 | [`advanced`](./examples/advanced) | Advanced multi-plugin configuration |
 
-## Monorepo Structure
+## Layout
 
 ```
 plugins/
@@ -103,43 +128,23 @@ plugins/
 └── tests/                 # Performance and e2e tests
 ```
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 - [Node.js](https://nodejs.org/) >= 22
-- [pnpm](https://pnpm.io/) >= 10
+- [pnpm](https://pnpm.io/) >= 11
 
-### Install
-
-```bash
-pnpm install
-```
-
-### Build
+## Commands
 
 ```bash
-# Build all packages
-pnpm build
-
-# Build examples
-pnpm build:examples
-```
-
-### Test
-
-```bash
-# Run all tests
-pnpm test
-
-# Watch mode
-pnpm test:watch
-```
-
-### Typecheck
-
-```bash
-pnpm typecheck
+pnpm install          # Install dependencies
+pnpm build            # Build all packages
+pnpm build:examples   # Build examples
+pnpm test             # Run all tests
+pnpm test:watch       # Watch mode
+pnpm typecheck        # Type-check all packages
+pnpm lint             # Lint with oxlint
+pnpm format           # Format with oxfmt
+pnpm changeset        # Add a changelog entry
 ```
 
 ## Contributing
