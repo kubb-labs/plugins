@@ -94,6 +94,12 @@ Plugins built and maintained by the community. Want to add yours? See [CONTRIBUT
 
 ## Contributing
 
+We welcome contributions, and there are a few ways to get involved:
+
+- Found a bug? File it in the [issue tracker](https://github.com/kubb-labs/plugins/issues).
+- Have an idea for a plugin or improvement? [Open an issue](https://github.com/kubb-labs/plugins/issues/new) to share it.
+- Need help? Ask the community on [Discord](https://discord.gg/4dQjA6vrWX).
+
 Want to contribute to an existing plugin or add a new one, official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the project structure, prerequisites, local setup, and commands.
 
 ## License
