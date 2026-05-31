@@ -31,7 +31,7 @@ jobs:
     with:
       mode: ${{ inputs.mode || 'staged' }}
       owner: 'kubb-labs'
-      test-command: 'pnpm run test --coverage'
+      test: 'pnpm run test --coverage'
       codecov: true
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
