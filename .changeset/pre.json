@@ -44,6 +44,7 @@
     "enforce-array-type-syntax",
     "faker-discriminated-union-variant-types",
     "fix-object-header-serialization",
+    "jolly-maps-taste",
     "kubb-core-beta-23-alignment",
     "kubb-core-beta-24-alignment",
     "kubb-core-beta-29-alignment",
