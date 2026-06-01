@@ -42,19 +42,11 @@
       "outputs": [],
       "cache": false
     },
-    "release": {
-      "dependsOn": ["build"],
-      "outputs": []
-    },
     "generate": {
       "dependsOn": [],
       "outputs": ["src/gen/**"],
       "inputs": ["kubb.config.ts", "package.json"],
       "cache": false
-    },
-    "release:canary": {
-      "dependsOn": ["build"],
-      "outputs": []
     }
   }
 }
