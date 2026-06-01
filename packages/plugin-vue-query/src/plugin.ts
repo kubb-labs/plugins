@@ -72,7 +72,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     options.generators ??
     [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginVueQueryName,

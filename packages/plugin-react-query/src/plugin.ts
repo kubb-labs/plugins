@@ -90,7 +90,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
       customHookOptionsFileGenerator,
     ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginReactQueryName,
