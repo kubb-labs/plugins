@@ -29,7 +29,7 @@
     "lint": "oxlint -c oxlint.config.ts ./packages ./examples",
     "lint:fix": "oxlint -c oxlint.config.ts --fix ./packages ./examples",
     "postgenerate": "pnpm run lint:fix && pnpm run format",
-    "release:stage": "node scripts/release-stage.mjs",
+    "release": "node scripts/release-stage.mjs",
     "start": "turbo run start --filter=./packages/*",
     "test": "vitest run --config ./configs/vitest.config.ts",
     "test:bench": "vitest bench --config ./configs/vitest.bench.config.ts",
