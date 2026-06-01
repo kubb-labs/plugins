@@ -23,13 +23,10 @@ describe('createGroupConfig', () => {
     expect(requestsName({ group: 'pet store' })).toBe('petStoreRequests')
   })
 
-  it('ignores a user-provided name unless honorName is set', () => {
+  it('honors a user-provided name over the default namer', () => {
     const custom = (): string => 'Custom'
 
-    const ignored = createGroupConfig({ type: 'tag', name: custom }, { suffix: 'Controller' })
-    expect(ignored?.name).not.toBe(custom)
-
-    const honored = createGroupConfig({ type: 'tag', name: custom }, { suffix: 'Controller', honorName: true })
+    const honored = createGroupConfig({ type: 'tag', name: custom }, { suffix: 'Controller' })
     expect(honored?.name).toBe(custom)
   })
 })

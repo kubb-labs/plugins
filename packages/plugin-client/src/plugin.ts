@@ -80,7 +80,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
       operations ? operationsGenerator : null,
     ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginClientName,
