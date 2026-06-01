@@ -43,6 +43,7 @@
     "dull-areas-happen",
     "enforce-array-type-syntax",
     "faker-discriminated-union-variant-types",
+    "fix-group-name-callback-ts-zod",
     "fix-object-header-serialization",
     "jolly-maps-taste",
     "kubb-core-beta-23-alignment",
