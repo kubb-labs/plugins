@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-ts",
-  "version": "5.0.0-beta.35",
+  "version": "5.0.0-beta.34",
   "description": "Generate TypeScript types, interfaces, and enums from your OpenAPI specification. The foundational plugin that powers type safety across the entire Kubb ecosystem.",
   "keywords": [
     "code-generation",
