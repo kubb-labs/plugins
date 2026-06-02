@@ -12,7 +12,7 @@ import type {
   GetUserByNameStatus404,
 } from '../../models/GetUserByName.ts'
 import { createUser } from '../createUser.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetUserByNamePathUsername(data?: string): string {
   faker.seed([220])

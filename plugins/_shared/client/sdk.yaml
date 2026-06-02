@@ -1,0 +1,68 @@
+# Shared option: client/sdk
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: sdk
+type: '{ className: string }'
+required: false
+description: |
+  Generates a single SDK class that composes the per-tag client classes into one entry point. Setting `sdk` automatically enables `clientType: 'class'`, so you only need to add `group: { type: 'tag' }` to split the clients per tag.
+
+  Use this when you want a single object to hand around your app (`api.petController.findById`, `api.userController.login`) instead of importing each tag client separately.
+properties:
+  - name: className
+    type: string
+    required: true
+    description: Name of the generated SDK class — used as the export name and file name.
+    examples:
+      - name: A composed PetStoreClient
+        files:
+          - name: kubb.config.ts
+            lang: typescript
+            twoslash: false
+            code: |
+              import { defineConfig } from 'kubb'
+              import { pluginClient } from '@kubb/plugin-client'
+              import { pluginTs } from '@kubb/plugin-ts'
+
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginTs(),
+                  pluginClient({
+                    output: { path: './clients' },
+                    group: { type: 'tag' },
+                    sdk: { className: 'PetStoreClient' },
+                  }),
+                ],
+              })
+          - name: Generated PetStoreClient.ts
+            lang: typescript
+            twoslash: false
+            code: |
+              import type { Client, RequestConfig } from './.kubb/client'
+              import { petController } from './petController/petController'
+              import { storeController } from './storeController/storeController'
+              import { userController } from './userController/userController'
+
+              export class PetStoreClient {
+                readonly petController: petController
+                readonly storeController: storeController
+                readonly userController: userController
+
+                constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+                  this.petController = new petController(config)
+                  this.storeController = new storeController(config)
+                  this.userController = new userController(config)
+                }
+              }
+          - name: usage.ts
+            lang: typescript
+            twoslash: false
+            code: |
+              import { PetStoreClient } from './gen/clients/PetStoreClient'
+
+              const api = new PetStoreClient({ baseURL: 'https://petstore.swagger.io/v2' })
+
+              const pets = await api.petController.findPetsByTags({ tags: ['available'] })
+              const user = await api.userController.getUserByName({ username: 'john' })

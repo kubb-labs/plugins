@@ -8,20 +8,20 @@ import type { Group } from '@kubb/core'
  * - `path` groups use the second path segment (`/pet/findByStatus` → `pet`).
  * - other groups use `${camelCase(group)}${suffix}` (e.g. `petController`).
  *
- * Returns `null` when grouping is disabled, matching the per-plugin convention.
+ * A user-provided `group.name` always wins over the default namer, so callers stay in
+ * control of their output folders. Returns `null` when grouping is disabled, matching the
+ * per-plugin convention.
  *
  * @param group - The user-supplied group option, or `undefined` to disable grouping.
  * @param options.suffix - Appended to non-`path` group names, e.g. `'Controller'` or `'Requests'`.
- * @param options.honorName - When `true`, a user-provided `group.name` overrides the default namer.
  *
  * @example
  * ```ts
- * createGroupConfig(group, { suffix: 'Controller' })                  // plugin-ts, plugin-zod
- * createGroupConfig(group, { suffix: 'Controller', honorName: true }) // plugin-faker, plugin-client, …
- * createGroupConfig(group, { suffix: 'Requests', honorName: true })   // plugin-cypress, plugin-mcp
+ * createGroupConfig(group, { suffix: 'Controller' }) // plugin-ts, plugin-client, …
+ * createGroupConfig(group, { suffix: 'Requests' })   // plugin-cypress, plugin-mcp
  * ```
  */
-export function createGroupConfig(group: Group | undefined, options: { suffix: string; honorName?: boolean }): Group | null {
+export function createGroupConfig(group: Group | undefined, options: { suffix: string }): Group | null {
   if (!group) {
     return null
   }
@@ -36,6 +36,6 @@ export function createGroupConfig(group: Group | undefined, options: { suffix: s
 
   return {
     ...group,
-    name: options.honorName && group.name ? group.name : defaultName,
+    name: group.name ? group.name : defaultName,
   } satisfies Group
 }

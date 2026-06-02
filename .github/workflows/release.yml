@@ -2,15 +2,18 @@ name: Release
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Optional: Custom tag for canary release'
-        required: false
-        type: string
+      mode:
+        description: 'Release mode (version = open the Version Packages PR only, no npm publish)'
+        type: choice
+        options: [version, staged, publish]
+        default: version
   push:
     branches: ['main', 'alpha', 'beta', 'rc']
     paths:
       - '.changeset/**'
       - 'packages/**'
+      - '.github/workflows/release.yml'
+
 permissions: {}
 
 concurrency:
@@ -20,19 +23,18 @@ concurrency:
 jobs:
   release:
     name: Release
-    if: github.repository_owner == 'kubb-labs'
+    if: github.repository_owner == 'kubb-labs' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    # id-token: write enables npm OIDC trusted publishing — no NPM_TOKEN needed.
     permissions:
-      actions: write
       contents: write
       id-token: write
       packages: write
       pull-requests: write
       issues: write
     outputs:
-      published_packages: ${{ steps.changesets.outputs.publishedPackages }}
-      published: ${{ steps.changesets.outputs.published }}
+      released: ${{ steps.changesets.outputs.staged == 'true' || steps.changesets.outputs.published == 'true' }}
     steps:
       - name: Check out code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
@@ -40,108 +42,67 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Tools
-        uses: kubb-labs/config/.github/setup@8508e66e6014b9ca1416591bc20791027b6ccf5c # main
+        uses: kubb-labs/config/.github/setup@61cdd3211cf116b44033357a5baff45dc28f0ca5 # main
         with:
           node-version: '22'
           cache: 'false'
+          force-install: 'true'
 
-      - name: Reinstall dependencies (release hardening)
-        # Defense-in-depth: re-install so the release build does not implicitly
-        # trust a pnpm store restored from cache by the composite Setup Tools
-        # step. Lockfile integrity hashes still gate content.
-        run: pnpm install --frozen-lockfile --force
+      - name: Resolve release command
+        id: cmd
+        shell: bash
+        # MODE comes from env to avoid script injection from workflow inputs.
+        env:
+          MODE: ${{ inputs.mode || 'publish' }}
+        run: |
+          case "$MODE" in
+            publish) echo "publish=pnpm exec changeset publish" >> "$GITHUB_OUTPUT" ;;
+            staged) echo "publish=pnpm release:stage:ci" >> "$GITHUB_OUTPUT" ;;
+            version) echo "publish=" >> "$GITHUB_OUTPUT" ;;
+            *) echo "Unknown mode: $MODE" >&2; exit 1 ;;
+          esac
 
       - name: Build
+        if: ${{ steps.cmd.outputs.publish != '' }}
         run: pnpm run build
 
       - name: Test
+        if: ${{ steps.cmd.outputs.publish != '' }}
         run: pnpm run test --coverage
 
       - name: Upload coverage reports to Codecov
+        if: ${{ steps.cmd.outputs.publish != '' }}
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Publish
+      - name: Release
         id: changesets
         uses: changesets/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b # v1
-        if: ${{ github.event.inputs.tag == '' }}
         with:
-          publish: pnpm release
+          version: pnpm exec changeset version
+          publish: ${{ steps.cmd.outputs.publish }}
           commit: 'ci(changesets): version packages'
+          title: 'ci(changesets): version packages'
           setupGitUser: false
         env:
           NPM_CONFIG_PROVENANCE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish ${{ inputs.tag || 'canary' }}
-        id: canary
-        if: steps.changesets.outputs.published != 'true'
+      - name: Publish canary
+        if: ${{ steps.changesets.outputs.published != 'true' && steps.changesets.outputs.staged != 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-          RELEASE_TAG: ${{ inputs.tag || 'canary' }}
+        # Stamp each package to a unique canary version so it can't collide
+        # with the `latest` tag, then rebuild and publish.
         run: |
-          git checkout main
-          pnpm version:canary
-          pnpm release:canary --tag "$RELEASE_TAG"
-
-  get-version:
-    name: Get Published Version
-    if: needs.release.outputs.published == 'true'
-    needs: [release]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      version: ${{ steps.version.outputs.result }}
-    steps:
-      - name: Get version
-        id: version
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          PUBLISHED_PACKAGES: ${{ needs.release.outputs.published_packages }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          result-encoding: string
-          script: |
-            const publishedPackages = JSON.parse(process.env.PUBLISHED_PACKAGES || '[]');
-            const corePackage = publishedPackages.find(pkg => pkg.name === '@kubb/core');
-            return corePackage?.version || '';
-
-  notify:
-    name: Send Discord Notification
-    if: needs.release.outputs.published == 'true'
-    needs: [release]
-    runs-on: ubuntu-latest
-    permissions: {}
-    steps:
-      - name: Send a discord notification
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          PUBLISHED_PACKAGES: ${{ needs.release.outputs.published_packages }}
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const publishedPackages = JSON.parse(process.env.PUBLISHED_PACKAGES || '[]');
-            const corePackage = publishedPackages.find(pkg => pkg.name === '@kubb/core');
-            const version = corePackage?.version || '';
-            const versionSlug = version.replace(/\./g, '-');
-            const docsUrl = version ? `https://www.kubb.dev/kubb/changelog#_${versionSlug}` : 'https://www.kubb.dev/kubb/changelog';
-
-            fetch(process.env.DISCORD_WEBHOOK_URL, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                content: `A new release is available 🎉. \n [Read the changelog](https://github.com/kubb-labs/kubb/releases) \n [View docs changelog](${docsUrl})`
-              }),
-            })
-            .then((res) => {
-              console.log('Sent discord notification', res)
-            })
-            .catch((err) => {
-              console.error('Error sending discord notification', err)
-            })
+          pnpm -r exec bash -c '
+            npm --no-git-tag-version version minor || true
+            version=$(node -p "require(\"./package.json\").version")
+            canary_version="${version}-canary.$(date +%Y%m%dT%H%M%S)"
+            echo "Version that will be published: ${canary_version}"
+            npm --no-git-tag-version version "${canary_version}" || true
+          '
+          pnpm run build
+          pnpm exec changeset publish --tag canary

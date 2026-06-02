@@ -6,7 +6,7 @@
 import type { AddPetData, AddPetFormUrlEncodedData, AddPetJsonData, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml, AddPetStatus405, AddPetXmlData } from "../../types/AddPet.ts";
 import { createAddPetRequest } from "../createAddPetRequest.ts";
 import { createPet } from "../createPet.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 /**
  * @description Successful operation

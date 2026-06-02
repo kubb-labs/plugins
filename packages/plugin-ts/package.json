@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-ts",
-  "version": "5.0.0-beta.31",
+  "version": "5.0.0-beta.36",
   "description": "Generate TypeScript types, interfaces, and enums from your OpenAPI specification. The foundational plugin that powers type safety across the entire Kubb ecosystem.",
   "keywords": [
     "code-generation",
@@ -52,6 +52,7 @@
     "lint:fix": "oxlint --fix .",
     "release": "pnpm publish --no-git-check",
     "release:canary": "bash ../../.github/canary.sh && node ../../scripts/build.js canary && pnpm publish --no-git-check",
+    "release:stage": "pnpm stage publish --no-git-check",
     "start": "tsdown --watch",
     "test": "vitest --passWithNoTests",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"

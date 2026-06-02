@@ -1,5 +1,19 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.36
+
+### Patch Changes
+
+- [#288](https://github.com/kubb-labs/plugins/pull/288) [`9f9e0fa`](https://github.com/kubb-labs/plugins/commit/9f9e0fae5d361ad1fd1465af2f34b4876b89ad0b) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Honor a user-provided `group.name` callback in `pluginTs` and `pluginZod`. Both plugins ignored the callback and always fell back to the default `${camelCase(tag)}Controller` naming, unlike every other plugin. The `honorName` flag on the shared `createGroupConfig` helper that caused this discrepancy has been removed so a user-provided `group.name` always wins.
+
+## 5.0.0-beta.35
+
+### Patch Changes
+
+- [`0aa1ff1`](https://github.com/kubb-labs/plugins/commit/0aa1ff1b9e74790931889a4569d91e66e47fabb1) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - sync packages with Kubb core
+
+## 5.0.0-beta.33
+
 ## 5.0.0-beta.31
 
 ### Minor Changes

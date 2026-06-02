@@ -12,7 +12,7 @@ import type {
 import { createAddPetRequestFaker } from '../createAddPetRequestFaker.ts'
 import { createPetFaker } from '../createPetFaker.ts'
 import { createPetNotFoundFaker } from '../createPetNotFoundFaker.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Pet not found

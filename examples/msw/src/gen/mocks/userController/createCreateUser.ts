@@ -14,7 +14,7 @@ import type {
   CreateUserXmlData,
 } from '../../models/CreateUser.ts'
 import { createUser } from '../createUser.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

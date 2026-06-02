@@ -314,7 +314,7 @@ describe('fakerGenerator — operation', () => {
       new Set(['createWidgetResponse']),
     )
 
-    expect(imports).toEqual([
+    expect(imports).toStrictEqual([
       {
         name: [{ propertyName: 'createWidgetResponse', name: 'createWidgetResponseSchema' }],
         path: './createWidgetResponse.ts',

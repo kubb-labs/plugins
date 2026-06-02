@@ -5,7 +5,7 @@
 
 import type { GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus200Json, GetPetByIdStatus200Xml, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
 import { createPet } from "./createPet.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createGetPetByIdPathPetId(data?: bigint): bigint {
   faker.seed([42])

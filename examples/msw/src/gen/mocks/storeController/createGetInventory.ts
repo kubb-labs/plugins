@@ -4,7 +4,7 @@
  */
 
 import type { GetInventoryResponse, GetInventoryStatus200 } from '../../models/GetInventory.ts'
-import { faker } from '@faker-js/faker'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

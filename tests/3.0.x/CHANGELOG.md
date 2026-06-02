@@ -1,5 +1,56 @@
 # tests-3.0.x
 
+## 0.0.1-beta.18
+
+### Patch Changes
+
+- Updated dependencies [[`9f9e0fa`](https://github.com/kubb-labs/plugins/commit/9f9e0fae5d361ad1fd1465af2f34b4876b89ad0b)]:
+  - @kubb/plugin-ts@5.0.0-beta.36
+  - @kubb/plugin-zod@5.0.0-beta.36
+  - @kubb/plugin-client@5.0.0-beta.36
+  - @kubb/plugin-cypress@5.0.0-beta.36
+  - @kubb/plugin-faker@5.0.0-beta.36
+  - @kubb/plugin-mcp@5.0.0-beta.36
+  - @kubb/plugin-msw@5.0.0-beta.36
+  - @kubb/plugin-react-query@5.0.0-beta.36
+  - @kubb/plugin-swr@5.0.0-beta.36
+  - @kubb/plugin-vue-query@5.0.0-beta.36
+  - @kubb/plugin-redoc@5.0.0-beta.36
+
+## 0.0.1-beta.17
+
+### Patch Changes
+
+- Updated dependencies [[`0aa1ff1`](https://github.com/kubb-labs/plugins/commit/0aa1ff1b9e74790931889a4569d91e66e47fabb1)]:
+  - @kubb/plugin-react-query@5.0.0-beta.35
+  - @kubb/plugin-vue-query@5.0.0-beta.35
+  - @kubb/plugin-cypress@5.0.0-beta.35
+  - @kubb/plugin-client@5.0.0-beta.35
+  - @kubb/plugin-faker@5.0.0-beta.35
+  - @kubb/plugin-redoc@5.0.0-beta.35
+  - @kubb/plugin-mcp@5.0.0-beta.35
+  - @kubb/plugin-msw@5.0.0-beta.35
+  - @kubb/plugin-swr@5.0.0-beta.35
+  - @kubb/plugin-zod@5.0.0-beta.35
+  - @kubb/plugin-ts@5.0.0-beta.35
+
+## 0.0.1-beta.16
+
+### Patch Changes
+
+- Updated dependencies [[`0c5a8e5`](https://github.com/kubb-labs/plugins/commit/0c5a8e557f4468cb8b6f3a5afb347f66f06a2397), [`7cf78fe`](https://github.com/kubb-labs/plugins/commit/7cf78fea60cc058ee8b963c57c8c58e0e95cfb7b)]:
+  - @kubb/plugin-faker@5.0.0-beta.33
+  - @kubb/plugin-swr@5.0.0-beta.33
+  - @kubb/plugin-msw@5.0.0-beta.33
+  - @kubb/plugin-client@5.0.0-beta.33
+  - @kubb/plugin-cypress@5.0.0-beta.33
+  - @kubb/plugin-mcp@5.0.0-beta.33
+  - @kubb/plugin-react-query@5.0.0-beta.33
+  - @kubb/plugin-redoc@5.0.0-beta.33
+  - @kubb/plugin-ts@5.0.0-beta.33
+  - @kubb/plugin-vue-query@5.0.0-beta.33
+  - @kubb/plugin-zod@5.0.0-beta.33
+
 ## 0.0.1-beta.15
 
 ### Patch Changes

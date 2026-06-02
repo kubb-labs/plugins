@@ -67,3 +67,7 @@ packages/ui/static/**
 ## Nitro
 .output
 .nitro
+
+## Codecov uploader artifacts, keep only the config
+codecov.*
+!codecov.yml

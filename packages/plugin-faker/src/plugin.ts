@@ -39,7 +39,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {
     output = { path: 'mocks', barrelType: 'named' },
     seed,
-    locale,
+    locale = 'en',
     group,
     exclude = [],
     include,
@@ -54,7 +54,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     transformer: userTransformer,
   } = options
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller', honorName: true })
+  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
 
   return {
     name: pluginFakerName,

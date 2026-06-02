@@ -6,7 +6,7 @@
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200 } from "../types/UpdatePet.ts";
 import { createPet } from "./createPet.ts";
 import { createPetUpdate } from "./createPetUpdate.ts";
-import { faker } from "@faker-js/faker";
+import { fakerEN as faker } from "@faker-js/faker";
 
 export function createUpdatePetPathPetId(data?: string): string {
   return data ?? faker.string.alpha()

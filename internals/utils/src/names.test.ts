@@ -7,21 +7,21 @@ describe('uniqueName', () => {
       const data: Record<string, number> = {}
       const result = getUniqueName('test', data)
       expect(result).toBe('test')
-      expect(data).toEqual({ test: 1 })
+      expect(data).toStrictEqual({ test: 1 })
     })
 
     it('should append number for duplicate names', () => {
       const data: Record<string, number> = { test: 1 }
       const result = getUniqueName('test', data)
       expect(result).toBe('test2')
-      expect(data).toEqual({ test: 2, test2: 1 })
+      expect(data).toStrictEqual({ test: 2, test2: 1 })
     })
 
     it('should increment number for multiple duplicates', () => {
       const data: Record<string, number> = { test: 2, test2: 1 }
       const result = getUniqueName('test', data)
       expect(result).toBe('test3')
-      expect(data).toEqual({ test: 3, test2: 1, test3: 1 })
+      expect(data).toStrictEqual({ test: 3, test2: 1, test3: 1 })
     })
 
     it('should handle different names independently', () => {
@@ -33,7 +33,7 @@ describe('uniqueName', () => {
       expect(result1).toBe('foo')
       expect(result2).toBe('bar')
       expect(result3).toBe('foo2')
-      expect(data).toEqual({ foo: 2, bar: 1, foo2: 1 })
+      expect(data).toStrictEqual({ foo: 2, bar: 1, foo2: 1 })
     })
   })
 })
