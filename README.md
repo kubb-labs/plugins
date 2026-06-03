@@ -3,7 +3,9 @@
     <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
+[![Stars][stars-src]][stars-href]
 [![License][license-src]][license-href]
+[![Coverage][coverage-src]][coverage-href]
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
@@ -26,47 +28,47 @@ Want to build your own plugin? See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## Official plugins
 
-Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://www.npmjs.com/package/@kubb/adapter-oas) as the adapter layer.
+Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](https://npmx.dev/package/@kubb/adapter-oas) as the adapter layer.
 
 ### TypeScript
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-ts`](./packages/plugin-ts) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-ts.svg)](https://www.npmjs.com/package/@kubb/plugin-ts) | TypeScript types and interfaces generation |
+| [`@kubb/plugin-ts`](./packages/plugin-ts) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-ts.svg)](https://npmx.dev/package/@kubb/plugin-ts) | TypeScript types and interfaces generation |
 
 ### Clients
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-client`](./packages/plugin-client) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-client.svg)](https://www.npmjs.com/package/@kubb/plugin-client) | API client generation ([Axios](https://github.com/axios/axios), Fetch) |
+| [`@kubb/plugin-client`](./packages/plugin-client) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-client.svg)](https://npmx.dev/package/@kubb/plugin-client) | API client generation ([Axios](https://github.com/axios/axios), Fetch) |
 
 ### Zod
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://www.npmjs.com/package/@kubb/plugin-zod) | [Zod](https://github.com/colinhacks/zod) schema generation for runtime validation |
+| [`@kubb/plugin-zod`](./packages/plugin-zod) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-zod.svg)](https://npmx.dev/package/@kubb/plugin-zod) | [Zod](https://github.com/colinhacks/zod) schema generation for runtime validation |
 
 ### Data fetching
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://www.npmjs.com/package/@kubb/plugin-react-query) | [TanStack Query](https://github.com/TanStack/query) hooks for React |
-| [`@kubb/plugin-vue-query`](./packages/plugin-vue-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://www.npmjs.com/package/@kubb/plugin-vue-query) | [TanStack Query](https://github.com/TanStack/query) composables for Vue |
+| [`@kubb/plugin-react-query`](./packages/plugin-react-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-react-query.svg)](https://npmx.dev/package/@kubb/plugin-react-query) | [TanStack Query](https://github.com/TanStack/query) hooks for React |
+| [`@kubb/plugin-vue-query`](./packages/plugin-vue-query) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-vue-query.svg)](https://npmx.dev/package/@kubb/plugin-vue-query) | [TanStack Query](https://github.com/TanStack/query) composables for Vue |
 
 ### Testing and mocking
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-faker`](./packages/plugin-faker) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-faker.svg)](https://www.npmjs.com/package/@kubb/plugin-faker) | [Faker.js](https://github.com/faker-js/faker) mock data generation |
-| [`@kubb/plugin-msw`](./packages/plugin-msw) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-msw.svg)](https://www.npmjs.com/package/@kubb/plugin-msw) | [Mock Service Worker](https://github.com/mswjs/msw) handlers |
-| [`@kubb/plugin-cypress`](./packages/plugin-cypress) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-cypress.svg)](https://www.npmjs.com/package/@kubb/plugin-cypress) | [Cypress](https://github.com/cypress-io/cypress) e2e test generation |
+| [`@kubb/plugin-faker`](./packages/plugin-faker) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-faker.svg)](https://npmx.dev/package/@kubb/plugin-faker) | [Faker.js](https://github.com/faker-js/faker) mock data generation |
+| [`@kubb/plugin-msw`](./packages/plugin-msw) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-msw.svg)](https://npmx.dev/package/@kubb/plugin-msw) | [Mock Service Worker](https://github.com/mswjs/msw) handlers |
+| [`@kubb/plugin-cypress`](./packages/plugin-cypress) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-cypress.svg)](https://npmx.dev/package/@kubb/plugin-cypress) | [Cypress](https://github.com/cypress-io/cypress) e2e test generation |
 
 ### Documentation and AI
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://www.npmjs.com/package/@kubb/plugin-redoc) | [ReDoc](https://github.com/Redocly/redoc) API documentation generation |
-| [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://www.npmjs.com/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
+| [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://npmx.dev/package/@kubb/plugin-redoc) | [ReDoc](https://github.com/Redocly/redoc) API documentation generation |
+| [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://npmx.dev/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
 
 ## Community plugins
 
@@ -104,5 +106,11 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 [MIT](./LICENSE) © [Stijn Van Hulle](https://github.com/stijnvanhulle)
 
-[license-src]: https://img.shields.io/github/license/kubb-labs/plugins.svg
+<!-- Badges -->
+
+[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[stars-href]: https://github.com/kubb-labs/plugins
+[license-src]: https://shieldcn.dev/npm/license/@kubb/plugin-ts.svg?variant=secondary&size=xs&theme=zinc
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
+[coverage-src]: https://shieldcn.dev/codecov/github/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[coverage-href]: https://app.codecov.io/gh/kubb-labs/plugins
