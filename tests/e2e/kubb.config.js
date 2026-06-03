@@ -16,7 +16,7 @@ const schemas = [
   { name: 'spotify', path: 'https://raw.githubusercontent.com/sonallux/spotify-web-api/refs/heads/main/official-spotify-open-api.yml', strict: false },
   // OpenAPI 3.0
   { name: 'discriminator', path: '../../schemas/3.0.x/discriminator.yaml' },
-  // { name: 'bunq.com', path: '../../schemas/3.0.x/bunq.com.json', strict: false },  // TS2300: duplicate barrel exports in hook index files
+  { name: 'bunq.com', path: '../../schemas/3.0.x/bunq.com.json', strict: false },
   // Note: developer.atlassian.com, petstore3.swagger.io, and openapi.vercel.sh are omitted here.
   // They block CI/bot traffic with 403s and flake the e2e run; the local fixtures plus the
   // raw.githubusercontent.com specs below give equivalent coverage.
