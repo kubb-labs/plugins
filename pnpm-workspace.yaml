@@ -33,21 +33,21 @@ catalog:
   typescript: ^6.0.3
   unplugin-kubb: 5.0.0-beta.37
   vitest: ^4.1.7
-
-overrides:
-  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
-  '@kubb/agent': link:../kubb/packages/agent
-  '@kubb/ast': link:../kubb/packages/ast
-  '@kubb/cli': link:../kubb/packages/cli
-  '@kubb/core': link:../kubb/packages/core
-  '@kubb/mcp': link:../kubb/packages/mcp
-  '@kubb/middleware-barrel': link:../kubb/packages/middleware-barrel
-  '@kubb/parser-md': link:../kubb/packages/parser-md
-  '@kubb/parser-ts': link:../kubb/packages/parser-ts
-  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
-  '@kubb/tui': link:../kubb/packages/tui
-  kubb: link:../kubb/packages/kubb
-  unplugin-kubb: link:../kubb/packages/unplugin-kubb
+#
+#overrides:
+#  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
+#  '@kubb/agent': link:../kubb/packages/agent
+#  '@kubb/ast': link:../kubb/packages/ast
+#  '@kubb/cli': link:../kubb/packages/cli
+#  '@kubb/core': link:../kubb/packages/core
+#  '@kubb/mcp': link:../kubb/packages/mcp
+#  '@kubb/middleware-barrel': link:../kubb/packages/middleware-barrel
+#  '@kubb/parser-md': link:../kubb/packages/parser-md
+#  '@kubb/parser-ts': link:../kubb/packages/parser-ts
+#  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx
+#  '@kubb/tui': link:../kubb/packages/tui
+#  kubb: link:../kubb/packages/kubb
+#  unplugin-kubb: link:../kubb/packages/unplugin-kubb
 
 minimumReleaseAge: 4320 # 72 hours, matches .npmrc min-package-age
 minimumReleaseAgeExclude:
