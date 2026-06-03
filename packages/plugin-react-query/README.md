@@ -59,12 +59,12 @@ Kubb is an open source project, and its development is funded entirely by sponso
 <!-- Badges -->
 
 [npm-version-src]: https://shieldcn.dev/npm/v/@kubb/plugin-react-query.svg?variant=branded&size=xs&theme=zinc&mode=dark
-[npm-version-href]: https://npmjs.com/package/@kubb/plugin-react-query
+[npm-version-href]: https://npmx.dev/package/@kubb/plugin-react-query
 [npm-downloads-src]: https://shieldcn.dev/npm/dm/@kubb/plugin-react-query.svg?variant=branded&size=xs&theme=zinc&mode=dark
-[npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-react-query
+[npm-downloads-href]: https://npmx.dev/package/@kubb/plugin-react-query
 [stars-src]: https://shieldcn.dev/github/stars/kubb-labs/kubb.svg?variant=branded&size=xs&theme=zinc&mode=dark
 [stars-href]: https://github.com/kubb-labs/kubb
 [license-src]: https://shieldcn.dev/npm/license/@kubb/plugin-react-query.svg?variant=branded&size=xs&theme=zinc&mode=dark
 [license-href]: https://github.com/kubb-labs/kubb/blob/main/LICENSE
 [node-src]: https://shieldcn.dev/npm/node/@kubb/plugin-react-query.svg?variant=branded&size=xs&theme=zinc&mode=dark
-[node-href]: https://npmjs.com/package/@kubb/plugin-react-query
+[node-href]: https://npmx.dev/package/@kubb/plugin-react-query

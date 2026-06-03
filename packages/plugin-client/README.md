@@ -59,12 +59,12 @@ Kubb is an open source project, and its development is funded entirely by sponso
 <!-- Badges -->
 
 [npm-version-src]: https://shieldcn.dev/npm/v/@kubb/plugin-client.svg?variant=branded&size=xs&theme=zinc&mode=dark
-[npm-version-href]: https://npmjs.com/package/@kubb/plugin-client
+[npm-version-href]: https://npmx.dev/package/@kubb/plugin-client
 [npm-downloads-src]: https://shieldcn.dev/npm/dm/@kubb/plugin-client.svg?variant=branded&size=xs&theme=zinc&mode=dark
-[npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-client
+[npm-downloads-href]: https://npmx.dev/package/@kubb/plugin-client
 [stars-src]: https://shieldcn.dev/github/stars/kubb-labs/kubb.svg?variant=branded&size=xs&theme=zinc&mode=dark
 [stars-href]: https://github.com/kubb-labs/kubb
 [license-src]: https://shieldcn.dev/npm/license/@kubb/plugin-client.svg?variant=branded&size=xs&theme=zinc&mode=dark
 [license-href]: https://github.com/kubb-labs/kubb/blob/main/LICENSE
 [node-src]: https://shieldcn.dev/npm/node/@kubb/plugin-client.svg?variant=branded&size=xs&theme=zinc&mode=dark
-[node-href]: https://npmjs.com/package/@kubb/plugin-client
+[node-href]: https://npmx.dev/package/@kubb/plugin-client
