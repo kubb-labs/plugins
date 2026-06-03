@@ -51,8 +51,10 @@ const baseConfig = {
   output: {
     path: './gen',
     clean: true,
-    lint: 'auto',
-    format: 'auto',
+    // The `gen` output is gitignored, which oxlint skips during directory traversal. Linting and
+    // formatting are handled by ./scripts/lintFormatGen.mjs via the `done` hook instead.
+    lint: false,
+    format: false,
   },
   plugins: [
     pluginTs({
@@ -122,19 +124,22 @@ const baseConfig = {
 
 export default defineConfig(() => {
   return schemas.map(({ name, path, strict, typecheck, lint }) => {
+    const genDir = `./gen/${name}`
     return {
       ...baseConfig,
       name,
       output: {
         ...baseConfig.output,
-        path: `./gen/${name}`,
-        lint: lint === false ? false : baseConfig.output.lint,
+        path: genDir,
       },
       input: {
         path,
       },
       hooks: {
-        done: [typecheck ? (strict ? 'npm run typecheck -- --strict' : 'npm run typecheck') : undefined].filter(Boolean),
+        done: [
+          `node ./scripts/lintFormatGen.mjs ${genDir}${lint === false ? ' --no-lint' : ''}`,
+          typecheck ? (strict ? 'npm run typecheck -- --strict' : 'npm run typecheck') : undefined,
+        ].filter(Boolean),
       },
     }
   })
