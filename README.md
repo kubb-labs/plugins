@@ -108,9 +108,9 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 <!-- Badges -->
 
-[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=secondary&size=sm&theme=zinc&mode=dark
 [stars-href]: https://github.com/kubb-labs/plugins
-[license-src]: https://shieldcn.dev/badge/license-MIT-blue.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[license-src]: https://shieldcn.dev/badge/license-MIT-blue.svg?variant=secondary&size=sm&theme=zinc&mode=dark
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
-[coverage-src]: https://shieldcn.dev/codecov/github/kubb-labs/plugins.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[coverage-src]: https://shieldcn.dev/codecov/github/kubb-labs/plugins.svg?variant=secondary&size=sm&theme=zinc&mode=dark
 [coverage-href]: https://app.codecov.io/gh/kubb-labs/plugins
