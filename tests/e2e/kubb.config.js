@@ -51,8 +51,9 @@ const baseConfig = {
   output: {
     path: './gen',
     clean: true,
-    // The `gen` output is gitignored, which oxlint skips during directory traversal. Linting and
-    // formatting are handled by ./scripts/lintFormatGen.mjs via the `done` hook instead.
+    // The `gen` output is gitignored, which oxlint skips during directory traversal (its
+    // `--no-ignore` flag only disables `.eslintignore`), so linting and formatting are disabled
+    // for these e2e fixtures.
     lint: false,
     format: false,
   },
@@ -123,23 +124,19 @@ const baseConfig = {
 }
 
 export default defineConfig(() => {
-  return schemas.map(({ name, path, strict, typecheck, lint }) => {
-    const genDir = `./gen/${name}`
+  return schemas.map(({ name, path, strict, typecheck }) => {
     return {
       ...baseConfig,
       name,
       output: {
         ...baseConfig.output,
-        path: genDir,
+        path: `./gen/${name}`,
       },
       input: {
         path,
       },
       hooks: {
-        done: [
-          `node ./scripts/lintFormatGen.mjs ${genDir}${lint === false ? ' --no-lint' : ''}`,
-          typecheck ? (strict ? 'npm run typecheck -- --strict' : 'npm run typecheck') : undefined,
-        ].filter(Boolean),
+        done: [typecheck ? (strict ? 'npm run typecheck -- --strict' : 'npm run typecheck') : undefined].filter(Boolean),
       },
     }
   })
