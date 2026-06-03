@@ -3,11 +3,9 @@
     <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
-[![npm version][npm-version-src]][npm-version-href]
-[![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![Coverage][coverage-src]][coverage-href]
-[![License][license-src]][license-href]
-[![Sponsors][sponsors-src]][sponsors-href]
+<a href="https://npmjs.com/package/@kubb/plugin-msw" target="_blank">
+  <img alt="@kubb/plugin-msw badges" src="https://shieldcn.dev/group/npm/v/@kubb/plugin-msw+npm/dm/@kubb/plugin-msw+github/stars/kubb-labs/kubb+codecov/c/github/kubb-labs/kubb+github/license/kubb-labs/kubb+github/sponsors/stijnvanhulle.svg?variant=branded&size=xs&theme=zinc&mode=dark">
+</a>
 
 <h4>
 <a href="https://kubb.dev/plugins/msw" target="_blank">Documentation</a>
@@ -55,20 +53,3 @@ Kubb is an open source project, and its development is funded entirely by sponso
 ## License
 
 [MIT](https://github.com/kubb-labs/plugins/blob/main/LICENSE)
-
-<!-- Badges -->
-
-[npm-version-src]: https://img.shields.io/npm/v/@kubb/plugin-msw?flat&colorA=18181B&colorB=f58517
-[npm-version-href]: https://npmjs.com/package/@kubb/plugin-msw
-[npm-downloads-src]: https://img.shields.io/npm/dm/@kubb/plugin-msw?flat&colorA=18181B&colorB=f58517
-[npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-msw
-[license-src]: https://img.shields.io/github/license/kubb-labs/kubb.svg?flat&colorA=18181B&colorB=f58517
-[license-href]: https://github.com/kubb-labs/kubb/blob/main/LICENSE
-[build-src]: https://img.shields.io/github/actions/workflow/status/kubb-labs/kubb/ci.yaml?style=flat&colorA=18181B&colorB=f58517
-[build-href]: https://www.npmjs.com/package/@kubb/plugin-msw
-[minified-src]: https://img.shields.io/bundlephobia/min/@kubb/plugin-msw?style=flat&colorA=18181B&colorB=f58517
-[minified-href]: https://www.npmjs.com/package/@kubb/plugin-msw
-[coverage-src]: https://img.shields.io/codecov/c/github/kubb-labs/kubb?style=flat&colorA=18181B&colorB=f58517
-[coverage-href]: https://www.npmjs.com/package/@kubb/plugin-msw
-[sponsors-src]: https://img.shields.io/github/sponsors/stijnvanhulle?style=flat&colorA=18181B&colorB=f58517
-[sponsors-href]: https://github.com/sponsors/stijnvanhulle/
