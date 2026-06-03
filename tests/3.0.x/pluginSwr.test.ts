@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-type BuildConfig = Omit<Config, 'plugins' | 'storage'> & { plugins: unknown }
+type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
   // ─── basic ──────────────────────────────────────────────────────────────

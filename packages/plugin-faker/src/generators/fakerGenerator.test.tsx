@@ -1,6 +1,6 @@
 import { aliasConflictingImports, rewriteAliasedImports } from '@internals/utils'
 import type { Config } from '@kubb/core'
-import { ast, FileProcessor, memoryStorage } from '@kubb/core'
+import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs } from '@kubb/plugin-ts'
@@ -129,6 +129,7 @@ const testConfig: Config = {
   output: { path: 'test' },
   plugins: [],
   parsers: [],
+  reporters: [],
   adapter: createMockedAdapter(),
   storage: memoryStorage(),
 }
@@ -212,11 +213,7 @@ describe('fakerGenerator — schema', () => {
     const file = driver.fileManager.files.find((item) => item.baseName === 'createEmoji.ts')
     expect(file).toBeDefined()
 
-    const fileProcessor = new FileProcessor({
-      storage: memoryStorage(),
-      parsers: new Map([['.ts', parserTs]]),
-    })
-    const output = await format(fileProcessor.parse(file!))
+    const output = await format(parserTs.parse(file!))
 
     expect(output).toContain('export function createEmoji(data?: string): string')
     expect(output).not.toContain('import type { Emoji }')
