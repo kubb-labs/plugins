@@ -5,6 +5,7 @@
 
 [![Stars][stars-src]][stars-href]
 [![License][license-src]][license-href]
+[![Coverage][coverage-src]][coverage-href]
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
@@ -111,3 +112,5 @@ Want to contribute to an existing plugin or add a new one, official or community
 [stars-href]: https://github.com/kubb-labs/plugins
 [license-src]: https://shieldcn.dev/badge/license-MIT-blue.svg?variant=branded&size=xs&theme=zinc&mode=dark
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
+[coverage-src]: https://shieldcn.dev/codecov/github/kubb-labs/plugins.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[coverage-href]: https://app.codecov.io/gh/kubb-labs/plugins
