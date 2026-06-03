@@ -432,6 +432,28 @@ describe('Code Generation', () => {
       ),
     ).toMatchSnapshot()
   })
+
+  it('should quote enum keys that are not valid identifiers', async () => {
+    // Enum values like `#VERCEL_SKIP` are not valid TS identifiers and must be emitted as
+    // quoted string keys, otherwise they parse as illegal private identifiers.
+    const output = await formatTS(
+      createEnumDeclaration({
+        type: 'asConst',
+        name: 'hello',
+        typeName: 'Hello',
+        enums: [
+          ['#VERCEL_SKIP', '#VERCEL_SKIP'],
+          ['VALID_KEY', 'VALID_KEY'],
+        ],
+      }),
+    )
+
+    expect(output).toContain("'#VERCEL_SKIP': '#VERCEL_SKIP'")
+    // the key is never emitted as a bare (unquoted) identifier
+    expect(output).not.toMatch(/[\n{]\s*#VERCEL_SKIP:/)
+    // valid identifiers stay unquoted
+    expect(output).toContain("VALID_KEY: 'VALID_KEY'")
+  })
 })
 
 describe('Import/Export Sorting Consistency', () => {

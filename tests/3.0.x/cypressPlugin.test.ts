@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, fsStorage, type KubbHooks } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, Diagnostics, fsStorage, type KubbHooks } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename)
 
 const version = '3.0.x'
 
-type BuildConfig = Omit<Config, 'plugins' | 'storage'> & { plugins: unknown }
+type BuildConfig = Omit<Config, 'plugins' | 'storage' | 'reporters'> & { plugins: unknown }
 
 const configs: Array<{ name: string; config: BuildConfig }> = [
   {
@@ -78,7 +78,7 @@ describe(`plugin-cypress options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
     const output = path.join(tmpDir, name)
-    const { files, failedPlugins, error } = await createKubb(
+    const { files, diagnostics } = await createKubb(
       {
         ...config,
         storage: fsStorage(),
@@ -93,8 +93,7 @@ describe(`plugin-cypress options ${version}`, () => {
     ).safeBuild()
 
     expect(files.length).toBeGreaterThan(0)
-    expect(failedPlugins.size).toBe(0)
-    expect(error).toBeUndefined()
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
     for (const file of files) {
       const fileContent = await fs.readFile(file.path, 'utf-8')
