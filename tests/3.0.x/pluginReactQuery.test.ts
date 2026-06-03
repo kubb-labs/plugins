@@ -4,7 +4,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
-import { AsyncEventEmitter, type Config, createKubb, type KubbHooks, fsStorage } from '@kubb/core'
+import { AsyncEventEmitter, type Config, createKubb, Diagnostics, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
@@ -295,7 +295,7 @@ describe(`plugin-react-query options ${version}`, () => {
   test.each(configs)('config testing with config as $name', async ({ name, config }) => {
     const tmpDir = path.join(os.tmpdir(), `kubb-test-${name}-${Date.now()}`)
     const output = path.join(tmpDir, name)
-    const { files, failedPlugins, error } = await createKubb(
+    const { files, diagnostics } = await createKubb(
       {
         ...config,
         output: {
@@ -309,8 +309,7 @@ describe(`plugin-react-query options ${version}`, () => {
     ).safeBuild()
 
     expect(files.length).toBeGreaterThan(0)
-    expect(failedPlugins.size).toBe(0)
-    expect(error).toBeUndefined()
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
 
     for (const file of files) {
       try {

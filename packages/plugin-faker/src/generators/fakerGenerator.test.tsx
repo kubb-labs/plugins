@@ -212,12 +212,11 @@ describe('fakerGenerator — schema', () => {
     const file = driver.fileManager.files.find((item) => item.baseName === 'createEmoji.ts')
     expect(file).toBeDefined()
 
-    const fileProcessor = new FileProcessor()
-    const output = await format(
-      await fileProcessor.parse(file!, {
-        parsers: new Map([['.ts', parserTs]]),
-      }),
-    )
+    const fileProcessor = new FileProcessor({
+      storage: memoryStorage(),
+      parsers: new Map([['.ts', parserTs]]),
+    })
+    const output = await format(fileProcessor.parse(file!))
 
     expect(output).toContain('export function createEmoji(data?: string): string')
     expect(output).not.toContain('import type { Emoji }')

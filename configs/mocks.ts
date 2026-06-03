@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { camelCase } from '@internals/utils'
-import { type ast, FileProcessor } from '@kubb/core'
+import { type ast, FileProcessor, memoryStorage } from '@kubb/core'
 import { createMockedPluginDriver } from '@kubb/core/mocks'
 import { parserTs } from '@kubb/parser-ts'
 import type { Options } from 'prettier'
@@ -33,9 +33,10 @@ export const mockedPluginDriver = createMockedPluginDriver()
 export async function matchFiles(files: Array<ast.FileNode> | undefined, pre?: string) {
   if (!files?.length) return
 
-  const fileProcessor = new FileProcessor()
   const parsers = new Map<`.${string}`, any>()
   parsers.set('.ts', parserTs)
+
+  const fileProcessor = new FileProcessor({ storage: memoryStorage(), parsers })
 
   const processed = new Map<string, string>()
 
@@ -48,7 +49,7 @@ export async function matchFiles(files: Array<ast.FileNode> | undefined, pre?: s
       continue
     }
 
-    const parsed = await fileProcessor.parse(file as any, { parsers })
+    const parsed = fileProcessor.parse(file as any)
     const code = file.baseName.endsWith('.json') ? parsed : await format(parsed)
 
     processed.set(file.path, code)
