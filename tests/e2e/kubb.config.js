@@ -17,7 +17,9 @@ const schemas = [
   // OpenAPI 3.0
   { name: 'discriminator', path: '../../schemas/3.0.x/discriminator.yaml' },
   // { name: 'bunq.com', path: '../../schemas/3.0.x/bunq.com.json', strict: false },  // TS2300: duplicate barrel exports in hook index files
-  { name: 'atlassian.com', path: 'https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json', strict: false },
+  // ~8k generated files: kubb's explicit-file lint overflows oxlint (RangeError/E2BIG). Skip it here;
+  // `pnpm lint:gen` lints this output in chunks afterwards (see scripts/lint-gen.mjs).
+  { name: 'atlassian.com', path: 'https://developer.atlassian.com/cloud/jira/platform/swagger-v3.v3.json', strict: false, lint: false },
   { name: 'optionalParameters', path: '../../schemas/3.0.x/optionalParameters.json' },
   { name: 'allOf', path: '../../schemas/3.0.x/allOf.json' },
   { name: 'anyOf', path: '../../schemas/3.0.x/anyOf.json' },
@@ -33,7 +35,9 @@ const schemas = [
   { name: 'dataset_api', path: '../../schemas/3.0.x/dataset_api.yaml' },
   { name: 'petStoreV3', path: 'https://petstore3.swagger.io/api/v3/openapi.json' },
   { name: 'openai', path: 'https://raw.githubusercontent.com/openai/openai-openapi/refs/heads/manual_spec/openapi.yaml', strict: false },
-  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false },
+  // ~11k generated files: kubb's explicit-file lint overflows oxlint (RangeError/E2BIG). Skip it here;
+  // `pnpm lint:gen` lints this output in chunks afterwards (see scripts/lint-gen.mjs).
+  { name: 'stripe', path: 'https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json', strict: false, lint: false },
   { name: 'vercel', path: 'https://openapi.vercel.sh/', strict: false },
 ]
 
@@ -117,13 +121,14 @@ const baseConfig = {
 }
 
 export default defineConfig(() => {
-  return schemas.map(({ name, path, strict, typecheck }) => {
+  return schemas.map(({ name, path, strict, typecheck, lint }) => {
     return {
       ...baseConfig,
       name,
       output: {
         ...baseConfig.output,
         path: `./gen/${name}`,
+        lint: lint === false ? false : baseConfig.output.lint,
       },
       input: {
         path,
