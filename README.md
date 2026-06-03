@@ -3,9 +3,9 @@
     <img src="https://kubb.dev/og.png" alt="Kubb banner">
   </a>
 
-<a href="https://github.com/kubb-labs/plugins" target="_blank">
-  <img alt="kubb-labs/plugins badges" src="https://shieldcn.dev/group/github/stars/kubb-labs/plugins+badge/license-MIT-blue+badge/sponsors-stijnvanhulle-EA4AAA.svg?variant=branded&size=xs&theme=zinc&mode=dark">
-</a>
+[![Stars][stars-src]][stars-href]
+[![License][license-src]][license-href]
+[![Sponsors][sponsors-src]][sponsors-href]
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
@@ -106,3 +106,11 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 [MIT](./LICENSE) © [Stijn Van Hulle](https://github.com/stijnvanhulle)
 
+<!-- Badges -->
+
+[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[stars-href]: https://github.com/kubb-labs/plugins
+[license-src]: https://shieldcn.dev/badge/license-MIT-blue.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
+[sponsors-src]: https://shieldcn.dev/badge/sponsors-stijnvanhulle-EA4AAA.svg?variant=branded&size=xs&theme=zinc&mode=dark
+[sponsors-href]: https://github.com/sponsors/stijnvanhulle
