@@ -58,13 +58,13 @@ Kubb is an open source project, and its development is funded entirely by sponso
 
 <!-- Badges -->
 
-[npm-version-src]: https://shieldcn.dev/npm/v/@kubb/plugin-swr.svg?variant=secondary&size=sm&theme=zinc&mode=dark
+[npm-version-src]: https://shieldcn.dev/npm/v/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [npm-version-href]: https://npmx.dev/package/@kubb/plugin-swr
-[npm-downloads-src]: https://shieldcn.dev/npm/dm/@kubb/plugin-swr.svg?variant=secondary&size=sm&theme=zinc&mode=dark
+[npm-downloads-src]: https://shieldcn.dev/npm/dm/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [npm-downloads-href]: https://npmx.dev/package/@kubb/plugin-swr
-[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=secondary&size=sm&theme=zinc&mode=dark
+[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [stars-href]: https://github.com/kubb-labs/plugins
-[license-src]: https://shieldcn.dev/npm/license/@kubb/plugin-swr.svg?variant=secondary&size=sm&theme=zinc&mode=dark
+[license-src]: https://shieldcn.dev/npm/license/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
-[node-src]: https://shieldcn.dev/npm/node/@kubb/plugin-swr.svg?variant=secondary&size=sm&theme=zinc&mode=dark
+[node-src]: https://shieldcn.dev/npm/node/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [node-href]: https://npmx.dev/package/@kubb/plugin-swr
