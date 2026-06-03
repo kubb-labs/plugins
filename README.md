@@ -5,7 +5,6 @@
 
 [![Stars][stars-src]][stars-href]
 [![License][license-src]][license-href]
-[![Coverage][coverage-src]][coverage-href]
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
