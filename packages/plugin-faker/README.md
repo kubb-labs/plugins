@@ -4,7 +4,7 @@
   </a>
 
 <a href="https://npmjs.com/package/@kubb/plugin-faker" target="_blank">
-  <img alt="@kubb/plugin-faker badges" src="https://shieldcn.dev/group/npm/v/@kubb/plugin-faker+npm/dm/@kubb/plugin-faker+github/stars/kubb-labs/kubb+codecov/c/github/kubb-labs/kubb+github/license/kubb-labs/kubb+github/sponsors/stijnvanhulle.svg?variant=branded&size=xs&theme=zinc&mode=dark">
+  <img alt="@kubb/plugin-faker badges" src="https://shieldcn.dev/group/npm/v/@kubb/plugin-faker+npm/dm/@kubb/plugin-faker+github/stars/kubb-labs/kubb+npm/l/@kubb/plugin-faker+badge/sponsors-stijnvanhulle-EA4AAA.svg?variant=branded&size=xs&theme=zinc&mode=dark">
 </a>
 
 <h4>

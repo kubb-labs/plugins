@@ -4,7 +4,7 @@
   </a>
 
 <a href="https://github.com/kubb-labs/plugins" target="_blank">
-  <img alt="kubb-labs/plugins badges" src="https://shieldcn.dev/group/github/stars/kubb-labs/plugins+github/license/kubb-labs/plugins+github/sponsors/stijnvanhulle.svg?variant=branded&size=xs&theme=zinc&mode=dark">
+  <img alt="kubb-labs/plugins badges" src="https://shieldcn.dev/group/github/stars/kubb-labs/plugins+badge/license-MIT-blue+badge/sponsors-stijnvanhulle-EA4AAA.svg?variant=branded&size=xs&theme=zinc&mode=dark">
 </a>
 
   <h4>

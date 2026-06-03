@@ -4,7 +4,7 @@
   </a>
 
 <a href="https://npmjs.com/package/@kubb/plugin-swr" target="_blank">
-  <img alt="@kubb/plugin-swr badges" src="https://shieldcn.dev/group/npm/v/@kubb/plugin-swr+npm/dm/@kubb/plugin-swr+github/stars/kubb-labs/plugins+github/license/kubb-labs/plugins+github/sponsors/stijnvanhulle.svg?variant=branded&size=xs&theme=zinc&mode=dark">
+  <img alt="@kubb/plugin-swr badges" src="https://shieldcn.dev/group/npm/v/@kubb/plugin-swr+npm/dm/@kubb/plugin-swr+github/stars/kubb-labs/plugins+npm/l/@kubb/plugin-swr+badge/sponsors-stijnvanhulle-EA4AAA.svg?variant=branded&size=xs&theme=zinc&mode=dark">
 </a>
 
 <h4>
