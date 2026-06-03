@@ -35,9 +35,22 @@ function isValidIdentifier(str: string): boolean {
   if (!str.length || str.trim() !== str) {
     return false
   }
-  const node = ts.parseIsolatedEntityName(str, ts.ScriptTarget.Latest)
 
-  return !!node && node.kind === ts.SyntaxKind.Identifier && ts.identifierToKeywordKind(node.kind as unknown as ts.Identifier) === undefined
+  // Mirrors `ts.isIdentifierText`, which is not in the public type declarations.
+  // Walking by code point with `isIdentifierStart`/`isIdentifierPart` rejects
+  // invalid names such as private identifiers (`#FOO`), forcing `propertyName`
+  // to quote them.
+  let ch = str.codePointAt(0)!
+  if (!ts.isIdentifierStart(ch, ts.ScriptTarget.Latest)) {
+    return false
+  }
+  for (let i = ch > 0xffff ? 2 : 1; i < str.length; i += ch > 0xffff ? 2 : 1) {
+    ch = str.codePointAt(i)!
+    if (!ts.isIdentifierPart(ch, ts.ScriptTarget.Latest)) {
+      return false
+    }
+  }
+  return true
 }
 
 function propertyName(name: string | ts.PropertyName): ts.PropertyName {

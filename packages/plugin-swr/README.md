@@ -5,9 +5,9 @@
 
 [![npm version][npm-version-src]][npm-version-href]
 [![npm downloads][npm-downloads-src]][npm-downloads-href]
-[![Coverage][coverage-src]][coverage-href]
+[![Stars][stars-src]][stars-href]
 [![License][license-src]][license-href]
-[![Sponsors][sponsors-src]][sponsors-href]
+[![Node][node-src]][node-href]
 
 <h4>
 <a href="https://kubb.dev/plugins/swr" target="_blank">Documentation</a>
@@ -58,13 +58,13 @@ Kubb is an open source project, and its development is funded entirely by sponso
 
 <!-- Badges -->
 
-[npm-version-src]: https://img.shields.io/npm/v/@kubb/plugin-swr?style=flat&colorA=18181B&colorB=f58517
-[npm-version-href]: https://npmjs.com/package/@kubb/plugin-swr
-[npm-downloads-src]: https://img.shields.io/npm/dm/@kubb/plugin-swr?style=flat&colorA=18181B&colorB=f58517
-[npm-downloads-href]: https://npmjs.com/package/@kubb/plugin-swr
-[coverage-src]: https://qlty.sh/badges/8959bd5b-d8a3-4811-8762-3a8be3bd2c34/test_coverage.svg
-[coverage-href]: https://qlty.sh/gh/kubb-labs/projects/plugins
-[license-src]: https://img.shields.io/github/license/kubb-labs/plugins.svg?style=flat&colorA=18181B&colorB=f58517
+[npm-version-src]: https://shieldcn.dev/npm/v/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[npm-version-href]: https://npmx.dev/package/@kubb/plugin-swr
+[npm-downloads-src]: https://shieldcn.dev/npm/dm/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[npm-downloads-href]: https://npmx.dev/package/@kubb/plugin-swr
+[stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[stars-href]: https://github.com/kubb-labs/plugins
+[license-src]: https://shieldcn.dev/npm/license/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
-[sponsors-src]: https://img.shields.io/github/sponsors/stijnvanhulle?style=flat&colorA=18181B&colorB=f58517
-[sponsors-href]: https://github.com/sponsors/stijnvanhulle
+[node-src]: https://shieldcn.dev/npm/node/@kubb/plugin-swr.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[node-href]: https://npmx.dev/package/@kubb/plugin-swr

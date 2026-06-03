@@ -16,6 +16,7 @@ const testConfig: Config = {
   output: { path: 'test' },
   plugins: [],
   parsers: [],
+  reporters: [],
   adapter: createMockedAdapter(),
   storage: memoryStorage(),
 }
