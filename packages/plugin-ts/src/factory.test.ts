@@ -454,6 +454,25 @@ describe('Code Generation', () => {
     // valid identifiers stay unquoted
     expect(output).toContain("VALID_KEY: 'VALID_KEY'")
   })
+
+  it('quotes #-prefixed hex colour enum keys (regression for kubb-labs/kubb#3476)', async () => {
+    const output = await formatTS(
+      createEnumDeclaration({
+        type: 'asConst',
+        name: 'labelsColor',
+        typeName: 'LabelsColor',
+        enums: [
+          ['#0099ff', '#0099ff'],
+          ['#ccff9a', '#ccff9a'],
+        ],
+      }),
+    )
+
+    expect(output).toContain("'#0099ff': '#0099ff'")
+    expect(output).toContain("'#ccff9a': '#ccff9a'")
+    expect(output).not.toMatch(/[\n{]\s*#0099ff:/)
+    expect(output).not.toMatch(/[\n{]\s*#ccff9a:/)
+  })
 })
 
 describe('Import/Export Sorting Consistency', () => {
