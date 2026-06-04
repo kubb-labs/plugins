@@ -64,11 +64,11 @@ function rank(param: ast.FunctionParameterNode | ast.ParameterGroupNode): number
 }
 
 function sortParams(params: ReadonlyArray<ast.FunctionParameterNode | ast.ParameterGroupNode>): Array<ast.FunctionParameterNode | ast.ParameterGroupNode> {
-  return [...params].sort((a, b) => rank(a) - rank(b))
+  return params.toSorted((a, b) => rank(a) - rank(b))
 }
 
 function sortChildParams(params: Array<ast.FunctionParameterNode>): Array<ast.FunctionParameterNode> {
-  return [...params].sort((a, b) => rank(a) - rank(b))
+  return params.toSorted((a, b) => rank(a) - rank(b))
 }
 
 /**

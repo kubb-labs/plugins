@@ -22,11 +22,13 @@ function getImportNames(entry: ImportEntry): Array<string> {
 }
 
 export function filterUsedImports(imports: Array<ImportEntry>, text: string, skipImportNames: Array<string> = []): Array<ImportEntry> {
+  const skip = new Set(skipImportNames)
+
   return imports.filter((entry) => {
     const names = getImportNames(entry)
 
     return names.some((name) => {
-      if (skipImportNames.includes(name)) {
+      if (skip.has(name)) {
         return false
       }
 

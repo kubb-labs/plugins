@@ -51,9 +51,6 @@ catalogs:
     prettier:
       specifier: ^3.8.3
       version: 3.8.3
-    remeda:
-      specifier: ^2.37.0
-      version: 2.37.0
     size-limit:
       specifier: ^12.1.0
       version: 12.1.0
@@ -865,9 +862,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-beta.40
-      remeda:
-        specifier: 'catalog:'
-        version: 2.37.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -912,9 +906,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-beta.40
-      remeda:
-        specifier: 'catalog:'
-        version: 2.37.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -937,9 +928,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-beta.40
-      remeda:
-        specifier: 'catalog:'
-        version: 2.37.0
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -968,9 +956,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-beta.40
-      remeda:
-        specifier: 'catalog:'
-        version: 2.37.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
@@ -990,9 +975,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-beta.40
-      remeda:
-        specifier: 'catalog:'
-        version: 2.37.0
     devDependencies:
       '@internals/shared':
         specifier: workspace:*
