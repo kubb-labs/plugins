@@ -455,7 +455,7 @@ describe('Code Generation', () => {
     expect(output).toContain("VALID_KEY: 'VALID_KEY'")
   })
 
-  it('quotes #-prefixed hex colour enum keys (regression for kubb-labs/kubb#3476)', async () => {
+  it('quotes #-prefixed hex color enum keys (regression for kubb-labs/kubb#3476)', async () => {
     const output = await formatTS(
       createEnumDeclaration({
         type: 'asConst',
