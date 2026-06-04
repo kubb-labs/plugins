@@ -16,6 +16,7 @@ body: |
   | Plugin | Default resolver |
   | --- | --- |
   | `@kubb/plugin-ts` | `resolverTs` |
+  | `@kubb/plugin-valibot` | `resolverValibot` |
   | `@kubb/plugin-zod` | `resolverZod` |
   | `@kubb/plugin-faker` | `resolverFaker` |
   | `@kubb/plugin-cypress` | `resolverCypress` |

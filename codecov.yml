@@ -93,6 +93,10 @@ component_management:
       name: '@kubb/plugin-vue-query'
       paths:
         - packages/plugin-vue-query/**
+    - component_id: plugin-valibot
+      name: '@kubb/plugin-valibot'
+      paths:
+        - packages/plugin-valibot/**
     - component_id: plugin-zod
       name: '@kubb/plugin-zod'
       paths:

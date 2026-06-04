@@ -98,6 +98,9 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:packages/plugin-ts
+      '@kubb/plugin-valibot':
+        specifier: workspace:*
+        version: link:packages/plugin-valibot
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:packages/plugin-zod
@@ -627,6 +630,24 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
+  examples/valibot:
+    dependencies:
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ts
+      '@kubb/plugin-valibot':
+        specifier: workspace:*
+        version: link:../../packages/plugin-valibot
+      kubb:
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.69(@kubb/renderer-jsx@5.0.0-alpha.69)(typescript@6.0.3)
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+      valibot:
+        specifier: ^1.3.1
+        version: 1.3.1(typescript@6.0.3)
+
   examples/vue-query:
     dependencies:
       '@kubb/adapter-oas':
@@ -951,6 +972,25 @@ importers:
         specifier: workspace:*
         version: link:../../internals/utils
 
+  packages/plugin-valibot:
+    dependencies:
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.69(@kubb/renderer-jsx@5.0.0-alpha.69)
+      '@kubb/renderer-jsx':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.69
+      remeda:
+        specifier: 'catalog:'
+        version: 2.33.7
+    devDependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+      '@kubb/parser-ts':
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.69(@kubb/renderer-jsx@5.0.0-alpha.69)
+
   packages/plugin-vue-query:
     dependencies:
       '@kubb/core':
@@ -1042,6 +1082,9 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+      '@kubb/plugin-valibot':
+        specifier: workspace:*
+        version: link:../../packages/plugin-valibot
       '@kubb/plugin-vue-query':
         specifier: workspace:*
         version: link:../../packages/plugin-vue-query
@@ -1082,6 +1125,9 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+      '@kubb/plugin-valibot':
+        specifier: workspace:*
+        version: link:../../packages/plugin-valibot
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
@@ -1143,6 +1189,9 @@ importers:
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
+      '@kubb/plugin-valibot':
+        specifier: workspace:*
+        version: link:../../packages/plugin-valibot
       '@kubb/plugin-zod':
         specifier: workspace:*
         version: link:../../packages/plugin-zod
@@ -4981,6 +5030,14 @@ packages:
 
   valibot@1.4.1:
     resolution: {integrity: sha512-klCmFTz2jeDluy9RwX+F884TCiogtdBJ/YaxSx1EOBYXa3NXNWj8kR1jjN8rzluwojJVWWaHJ4r1U5LfICnM3g==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  valibot@1.3.1:
+    resolution: {integrity: sha512-sfdRir/QFM0JaF22hqTroPc5xy4DimuGQVKFrzF1YfGwaS1nJot3Y8VqMdLO2Lg27fMzat2yD3pY5PbAYO39Gg==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -9081,6 +9138,10 @@ snapshots:
   utils-merge@1.0.1: {}
 
   valibot@1.4.1(typescript@6.0.3):
+    optionalDependencies:
+      typescript: 6.0.3
+
+  valibot@1.3.1(typescript@6.0.3):
     optionalDependencies:
       typescript: 6.0.3
 

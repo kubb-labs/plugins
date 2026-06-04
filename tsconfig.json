@@ -27,6 +27,7 @@
       "@kubb/plugin-redoc": ["./packages/plugin-redoc/src/index.ts"],
       "@kubb/plugin-faker": ["./packages/plugin-faker/src/index.ts"],
       "@kubb/plugin-cypress": ["./packages/plugin-cypress/src/index.ts"],
+      "@kubb/plugin-valibot": ["./packages/plugin-valibot/src/index.ts"],
       "@kubb/plugin-zod/utils": ["./packages/plugin-zod/src/utils/index.ts"],
       "@kubb/plugin-zod/templates/ToZod.source": ["./packages/plugin-zod/src/templates/ToZod.source.ts"],
       "@kubb/plugin-zod": ["./packages/plugin-zod/src/index.ts"]

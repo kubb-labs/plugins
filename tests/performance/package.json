@@ -22,6 +22,7 @@
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
+    "@kubb/plugin-valibot": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "kubb": "catalog:"
   },

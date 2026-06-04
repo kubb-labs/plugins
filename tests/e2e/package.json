@@ -29,6 +29,7 @@
     "@kubb/plugin-msw": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
+    "@kubb/plugin-valibot": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@tanstack/react-query": "^5.100.14",
     "@tanstack/vue-query": "^5.100.14",
