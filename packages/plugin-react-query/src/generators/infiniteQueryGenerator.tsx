@@ -6,7 +6,6 @@ import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRendererSync } from '@kubb/renderer-jsx'
-import { difference } from 'remeda'
 import { InfiniteQuery, InfiniteQueryOptions, QueryKey } from '../components'
 import type { PluginReactQuery } from '../types'
 
@@ -29,10 +28,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     const tsResolver = driver.getResolver(pluginTsName)
 
     const isQuery = query === false || (!!query && query.methods.some((method) => node.method.toLowerCase() === method.toLowerCase()))
+    const queryMethods = new Set(query ? query.methods : [])
     const isMutation =
       mutation !== false &&
       !isQuery &&
-      difference(mutation ? mutation.methods : [], query ? query.methods : []).some((method) => node.method.toLowerCase() === method.toLowerCase())
+      (mutation ? mutation.methods : []).some((method) => !queryMethods.has(method) && node.method.toLowerCase() === method.toLowerCase())
     const infiniteOptions = infinite && typeof infinite === 'object' ? infinite : null
 
     if (!isQuery || isMutation || !infiniteOptions) return null

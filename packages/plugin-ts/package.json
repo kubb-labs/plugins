@@ -61,7 +61,6 @@
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/renderer-jsx": "catalog:",
-    "remeda": "catalog:",
     "typescript": "catalog:"
   },
   "devDependencies": {

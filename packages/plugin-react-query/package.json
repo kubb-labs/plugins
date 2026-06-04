@@ -84,8 +84,7 @@
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@kubb/renderer-jsx": "catalog:",
-    "remeda": "catalog:"
+    "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
     "@internals/shared": "workspace:*",
