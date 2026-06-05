@@ -1,5 +1,13 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.37
+
+### Patch Changes
+
+- [#310](https://github.com/kubb-labs/plugins/pull/310) [`e2e83ad`](https://github.com/kubb-labs/plugins/commit/e2e83ada993bcc02f2a382862cf2fb3a930fc405) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Adopt native Node 22 features and drop the `remeda` dependency. The query and mutation generators now resolve their HTTP methods through a `Set` instead of `remeda`'s `difference`, `plugin-ts` sorts imports and exports with `Array.prototype.toSorted` and a local numeric guard, and `plugin-redoc` resolves its template path through `import.meta.dirname`. The shared TypeScript config moves to an ES2024 target with the ES2025 collection and iterator libraries.
+
+- [#313](https://github.com/kubb-labs/plugins/pull/313) [`7075bff`](https://github.com/kubb-labs/plugins/commit/7075bffb7c06f6b04c8470c0761ef808615f45eb) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add regression tests covering the v4 plugin-ts enum bugs from kubb-labs/kubb#3475 (array-of-objects with a nested enum collapsing to a bare enum array under `enumType: 'asConst'`) and kubb-labs/kubb#3476 (`#`-prefixed enum values like hex colors emitting as unquoted object keys). The v5 rewrites of `Type.tsx` and `isValidIdentifier` already prevent both, the new tests lock the scenarios in.
+
 ## 5.0.0-beta.36
 
 ### Patch Changes
