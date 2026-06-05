@@ -1,7 +1,7 @@
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { Const, File, Function } from '@kubb/renderer-jsx'
+import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginMcp } from '../types.ts'
 import type { ZodParam } from '../utils.ts'
@@ -58,68 +58,57 @@ type Props = {
 const keysPrinter = functionPrinter({ mode: 'keys' })
 
 export function Server({ name, serverName, serverVersion, paramsCasing, operations }: Props): KubbReactNode {
-  return (
-    <File.Source name={name} isExportable isIndexable>
-      <Const name={'server'} export>
-        {`
-          new McpServer({
-  name: '${serverName}',
-  version: '${serverVersion}',
-})
-          `}
-      </Const>
+  const registrations = operations
+    .map(({ tool, mcp, zod, node }) => {
+      const { path: pathParams } = getOperationParameters(node, { paramsCasing })
 
-      {operations
-        .map(({ tool, mcp, zod, node }) => {
-          const { path: pathParams } = getOperationParameters(node, { paramsCasing })
+      const pathEntries: Array<{ key: string; value: string }> = []
+      const otherEntries: Array<{ key: string; value: string }> = []
 
-          const pathEntries: Array<{ key: string; value: string }> = []
-          const otherEntries: Array<{ key: string; value: string }> = []
+      for (const p of pathParams) {
+        const zodParam = zod.pathParams.find((zp) => zp.name === p.name)
+        pathEntries.push({ key: p.name, value: zodParam ? zodParam.schemaName : zodExprFromSchemaNode(p.schema) })
+      }
 
-          for (const p of pathParams) {
-            const zodParam = zod.pathParams.find((zp) => zp.name === p.name)
-            pathEntries.push({ key: p.name, value: zodParam ? zodParam.schemaName : zodExprFromSchemaNode(p.schema) })
-          }
+      if (zod.requestName) {
+        otherEntries.push({ key: 'data', value: zod.requestName })
+      }
 
-          if (zod.requestName) {
-            otherEntries.push({ key: 'data', value: zod.requestName })
-          }
+      if (zod.queryParams) {
+        otherEntries.push({ key: 'params', value: zodGroupExpr(zod.queryParams) })
+      }
 
-          if (zod.queryParams) {
-            otherEntries.push({ key: 'params', value: zodGroupExpr(zod.queryParams) })
-          }
+      if (zod.headerParams) {
+        otherEntries.push({ key: 'headers', value: zodGroupExpr(zod.headerParams) })
+      }
 
-          if (zod.headerParams) {
-            otherEntries.push({ key: 'headers', value: zodGroupExpr(zod.headerParams) })
-          }
+      otherEntries.sort((a, b) => a.key.localeCompare(b.key))
+      const entries = [...pathEntries, ...otherEntries]
 
-          otherEntries.sort((a, b) => a.key.localeCompare(b.key))
-          const entries = [...pathEntries, ...otherEntries]
+      const paramsNode = entries.length
+        ? ast.createFunctionParameters({
+            params: [
+              ast.createParameterGroup({
+                properties: entries.map((e) => ast.createFunctionParameter({ name: e.key, optional: false })),
+              }),
+            ],
+          })
+        : null
 
-          const paramsNode = entries.length
-            ? ast.createFunctionParameters({
-                params: [
-                  ast.createParameterGroup({
-                    properties: entries.map((e) => ast.createFunctionParameter({ name: e.key, optional: false })),
-                  }),
-                ],
-              })
-            : null
+      const destructured = paramsNode ? (keysPrinter.print(paramsNode) ?? '') : ''
+      const inputSchema = entries.length ? `{ ${entries.map((e) => `${e.key}: ${e.value}`).join(', ')} }` : null
+      const outputSchema = zod.responseName
 
-          const destructured = paramsNode ? (keysPrinter.print(paramsNode) ?? '') : ''
-          const inputSchema = entries.length ? `{ ${entries.map((e) => `${e.key}: ${e.value}`).join(', ')} }` : null
-          const outputSchema = zod.responseName
+      const config = [
+        tool.title ? `title: ${JSON.stringify(tool.title)}` : null,
+        `description: ${JSON.stringify(tool.description)}`,
+        outputSchema ? `outputSchema: { data: ${outputSchema} }` : null,
+      ]
+        .filter(Boolean)
+        .join(',\n  ')
 
-          const config = [
-            tool.title ? `title: ${JSON.stringify(tool.title)}` : null,
-            `description: ${JSON.stringify(tool.description)}`,
-            outputSchema ? `outputSchema: { data: ${outputSchema} }` : null,
-          ]
-            .filter(Boolean)
-            .join(',\n  ')
-
-          if (inputSchema) {
-            return `
+      if (inputSchema) {
+        return `
 server.registerTool(${JSON.stringify(tool.name)}, {
   ${config},
   inputSchema: ${inputSchema},
@@ -127,20 +116,33 @@ server.registerTool(${JSON.stringify(tool.name)}, {
   return ${mcp.name}(${destructured}, request)
 })
           `
-          }
+      }
 
-          return `
+      return `
 server.registerTool(${JSON.stringify(tool.name)}, {
   ${config},
 }, async (request) => {
   return ${mcp.name}(request)
 })
           `
-        })
-        .filter(Boolean)}
+    })
+    .filter(Boolean)
+    .join('\n')
+
+  return (
+    <File.Source name={name} isExportable isIndexable>
+      <Function name="getServer" export>
+        {`const server = new McpServer({
+  name: '${serverName}',
+  version: '${serverVersion}',
+})
+${registrations}
+return server`}
+      </Function>
 
       <Function name="startServer" async export>
         {`try {
+    const server = getServer()
     const transport = new StdioServerTransport()
     await server.connect(transport)
 

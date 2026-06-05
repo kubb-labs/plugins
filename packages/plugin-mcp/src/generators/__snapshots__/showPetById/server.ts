@@ -8,25 +8,29 @@ import { showPetByIdPathPetIdSchema, showPetByIdStatus200Schema } from './showPe
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 
-export const server = new McpServer({
-  name: 'server',
-  version: '0.0.0',
-})
+export function getServer() {
+  const server = new McpServer({
+    name: 'server',
+    version: '0.0.0',
+  })
 
-server.registerTool(
-  'showPetById',
-  {
-    description: 'Make a GET request to /pets/{petId}',
-    outputSchema: { data: showPetByIdStatus200Schema },
-    inputSchema: { petId: showPetByIdPathPetIdSchema },
-  },
-  async ({ petId }, request) => {
-    return showPetByIdHandler({ petId }, request)
-  },
-)
+  server.registerTool(
+    'showPetById',
+    {
+      description: 'Make a GET request to /pets/{petId}',
+      outputSchema: { data: showPetByIdStatus200Schema },
+      inputSchema: { petId: showPetByIdPathPetIdSchema },
+    },
+    async ({ petId }, request) => {
+      return showPetByIdHandler({ petId }, request)
+    },
+  )
 
+  return server
+}
 export async function startServer() {
   try {
+    const server = getServer()
     const transport = new StdioServerTransport()
     await server.connect(transport)
   } catch (error) {
