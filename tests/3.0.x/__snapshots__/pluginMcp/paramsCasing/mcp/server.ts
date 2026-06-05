@@ -25,9 +25,9 @@ export function getServer() {
 
   return server
 }
+export const server = getServer()
 export async function startServer() {
   try {
-      const server = getServer()
       const transport = new StdioServerTransport()
       await server.connect(transport)
 

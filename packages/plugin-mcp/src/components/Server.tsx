@@ -1,7 +1,7 @@
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
-import { File, Function } from '@kubb/renderer-jsx'
+import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginMcp } from '../types.ts'
 import type { ZodParam } from '../utils.ts'
@@ -140,9 +140,12 @@ ${registrations}
 return server`}
       </Function>
 
+      <Const name={'server'} export>
+        {'getServer()'}
+      </Const>
+
       <Function name="startServer" async export>
         {`try {
-    const server = getServer()
     const transport = new StdioServerTransport()
     await server.connect(transport)
 
