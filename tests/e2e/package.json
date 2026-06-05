@@ -38,7 +38,7 @@
     "msw": "^2.14.6",
     "oxfmt": "catalog:",
     "oxlint": "catalog:",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "vue": "^3.5.35",
     "zod": "^4.4.3"
   },
