@@ -23,90 +23,92 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
 import { z } from "zod";
 
-export const server = 
-          new McpServer({
-  name: 'Swagger PetStore - OpenAPI 3.0',
-  version: '1.0.11',
-})
-          
+export function getServer() {
+  const server = new McpServer({
+    name: 'Swagger PetStore - OpenAPI 3.0',
+    version: '1.0.11',
+  })
 
-server.registerTool("updatePet", {
-  title: "Update an existing pet",
-  description: "Update an existing pet by Id",
-  outputSchema: { data: updatePetStatus200Schema },
-  inputSchema: { data: updatePetDataSchema },
-}, async ({ data }, request) => {
-  return updatePetHandler({ data }, request)
-})
-          
+  server.registerTool("updatePet", {
+    title: "Update an existing pet",
+    description: "Update an existing pet by Id",
+    outputSchema: { data: updatePetStatus200Schema },
+    inputSchema: { data: updatePetDataSchema },
+  }, async ({ data }, request) => {
+    return updatePetHandler({ data }, request)
+  })
 
-server.registerTool("addPet", {
-  title: "Add a new pet to the store",
-  description: "Add a new pet to the store",
-  outputSchema: { data: addPetStatus200Schema },
-  inputSchema: { data: addPetDataSchema },
-}, async ({ data }, request) => {
-  return addPetHandler({ data }, request)
-})
-          
 
-server.registerTool("findPetsByStatus", {
-  title: "Finds Pets by status",
-  description: "Multiple status values can be provided with comma separated strings",
-  outputSchema: { data: findPetsByStatusStatus200Schema },
-  inputSchema: { params: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
-}, async ({ params }, request) => {
-  return findPetsByStatusHandler({ params }, request)
-})
-          
+  server.registerTool("addPet", {
+    title: "Add a new pet to the store",
+    description: "Add a new pet to the store",
+    outputSchema: { data: addPetStatus200Schema },
+    inputSchema: { data: addPetDataSchema },
+  }, async ({ data }, request) => {
+    return addPetHandler({ data }, request)
+  })
 
-server.registerTool("findPetsByTags", {
-  title: "Finds Pets by tags",
-  description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-  outputSchema: { data: findPetsByTagsStatus200Schema },
-  inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
-}, async ({ params }, request) => {
-  return findPetsByTagsHandler({ params }, request)
-})
-          
 
-server.registerTool("getPetById", {
-  title: "Find pet by ID",
-  description: "Returns a single pet",
-  outputSchema: { data: getPetByIdStatus200Schema },
-  inputSchema: { petId: getPetByIdPathPetIdSchema },
-}, async ({ petId }, request) => {
-  return getPetByIdHandler({ petId }, request)
-})
-          
+  server.registerTool("findPetsByStatus", {
+    title: "Finds Pets by status",
+    description: "Multiple status values can be provided with comma separated strings",
+    outputSchema: { data: findPetsByStatusStatus200Schema },
+    inputSchema: { params: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
+  }, async ({ params }, request) => {
+    return findPetsByStatusHandler({ params }, request)
+  })
 
-server.registerTool("updatePetWithForm", {
-  title: "Updates a pet in the store with form data",
-  description: "Make a POST request to /pet/{petId}",
-  inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
-}, async ({ petId, params }, request) => {
-  return updatePetWithFormHandler({ petId, params }, request)
-})
-          
 
-server.registerTool("deletePet", {
-  title: "Deletes a pet",
-  description: "delete a pet",
-  inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ "api_key": deletePetHeaderApiKeySchema }) },
-}, async ({ petId, headers }, request) => {
-  return deletePetHandler({ petId, headers }, request)
-})
-          
+  server.registerTool("findPetsByTags", {
+    title: "Finds Pets by tags",
+    description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+    outputSchema: { data: findPetsByTagsStatus200Schema },
+    inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
+  }, async ({ params }, request) => {
+    return findPetsByTagsHandler({ params }, request)
+  })
 
-server.registerTool("uploadFile", {
-  title: "uploads an image",
-  description: "Make a POST request to /pet/{petId}/uploadImage",
-  outputSchema: { data: uploadFileStatus200Schema },
-  inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
-}, async ({ petId, data, params }, request) => {
-  return uploadFileHandler({ petId, data, params }, request)
-})
-          
+
+  server.registerTool("getPetById", {
+    title: "Find pet by ID",
+    description: "Returns a single pet",
+    outputSchema: { data: getPetByIdStatus200Schema },
+    inputSchema: { petId: getPetByIdPathPetIdSchema },
+  }, async ({ petId }, request) => {
+    return getPetByIdHandler({ petId }, request)
+  })
+
+
+  server.registerTool("updatePetWithForm", {
+    title: "Updates a pet in the store with form data",
+    description: "Make a POST request to /pet/{petId}",
+    inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
+  }, async ({ petId, params }, request) => {
+    return updatePetWithFormHandler({ petId, params }, request)
+  })
+
+
+  server.registerTool("deletePet", {
+    title: "Deletes a pet",
+    description: "delete a pet",
+    inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ "api_key": deletePetHeaderApiKeySchema }) },
+  }, async ({ petId, headers }, request) => {
+    return deletePetHandler({ petId, headers }, request)
+  })
+
+
+  server.registerTool("uploadFile", {
+    title: "uploads an image",
+    description: "Make a POST request to /pet/{petId}/uploadImage",
+    outputSchema: { data: uploadFileStatus200Schema },
+    inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
+  }, async ({ petId, data, params }, request) => {
+    return uploadFileHandler({ petId, data, params }, request)
+  })
+
+  return server
+}
+export const server = getServer()
 export async function startServer() {
   try {
       const transport = new StdioServerTransport()
