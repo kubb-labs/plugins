@@ -1,2 +1,2 @@
-export { handlersGenerator } from './handlersGenerator.tsx'
+export { handlersGenerator } from './handlersGenerator.ts'
 export { mswGenerator } from './mswGenerator.tsx'
