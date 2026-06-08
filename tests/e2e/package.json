@@ -13,7 +13,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "format": "echo 'empty'",
     "generate": "kubb generate",
     "generate:petstore": "kubb generate --config kubb-petstore.config.js",

@@ -13,7 +13,7 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts && node ./build.ts",
     "generate:build": "node ./build.ts",
     "test": "vitest",
