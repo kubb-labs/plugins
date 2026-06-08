@@ -37,4 +37,12 @@ describe.each(resolvers)('plugin conformance: $name', ({ resolver }) => {
 
     expect(path.resolve(file.path).startsWith(outputRoot)).toBe(true)
   })
+
+  test('default produces non-empty identifiers', () => {
+    for (const type of ['function', 'file'] as const) {
+      const resolved = resolver.default('list pets', type)
+      expect(typeof resolved).toBe('string')
+      expect(resolved.length).toBeGreaterThan(0)
+    }
+  })
 })
