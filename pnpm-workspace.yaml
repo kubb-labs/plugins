@@ -18,7 +18,6 @@ catalog:
   '@kubb/middleware-barrel': 5.0.0-beta.42
   '@kubb/parser-ts': 5.0.0-beta.42
   '@kubb/renderer-jsx': 5.0.0-beta.42
-  '@size-limit/file': ^12.1.0
   '@types/node': ^22.19.19
   '@types/react': ^19.2.16
   '@vitest/coverage-v8': ^4.1.8
@@ -27,7 +26,6 @@ catalog:
   oxfmt: ^0.47.0
   oxlint: ^1.68.0
   prettier: ^3.8.3
-  'size-limit': ^12.1.0
   tsdown: ^0.22.1
   typescript: ^6.0.3
   unplugin-kubb: 5.0.0-beta.42

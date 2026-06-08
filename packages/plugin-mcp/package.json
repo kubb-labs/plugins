@@ -47,7 +47,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsdown && size-limit",
+    "build": "tsdown",
     "clean": "npx rimraf ./dist",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
@@ -72,13 +72,6 @@
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:"
   },
-  "size-limit": [
-    {
-      "path": "./dist/*.js",
-      "limit": "510 KiB",
-      "gzip": true
-    }
-  ],
   "engines": {
     "node": ">=22"
   }

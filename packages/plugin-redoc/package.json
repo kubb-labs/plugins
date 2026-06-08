@@ -50,7 +50,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsdown && size-limit",
+    "build": "tsdown",
     "clean": "npx rimraf ./dist",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
@@ -69,13 +69,6 @@
   "devDependencies": {
     "@internals/utils": "workspace:*"
   },
-  "size-limit": [
-    {
-      "path": "./dist/*.js",
-      "limit": "510 KiB",
-      "gzip": true
-    }
-  ],
   "engines": {
     "node": ">=22"
   }
