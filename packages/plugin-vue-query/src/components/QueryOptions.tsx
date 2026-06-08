@@ -1,9 +1,9 @@
-import { ast } from '@kubb/core'
+import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
+import { buildQueryOptionsParams, getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
 import { resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
@@ -32,27 +32,7 @@ export function getQueryOptionsParams(
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
-
-  const baseParams = ast.createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver,
-    extraParams: [
-      ast.createFunctionParameter({
-        name: 'config',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
-        }),
-        default: '{}',
-      }),
-    ],
-  })
-
-  return wrapWithMaybeRefOrGetter(baseParams, (name) => name === 'config')
+  return wrapWithMaybeRefOrGetter(buildQueryOptionsParams(node, options), (name) => name === 'config')
 }
 
 export function QueryOptions({
