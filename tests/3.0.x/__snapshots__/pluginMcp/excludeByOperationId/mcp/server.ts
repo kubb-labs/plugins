@@ -40,174 +40,176 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
 import { z } from "zod";
 
-export const server = 
-          new McpServer({
-  name: 'Swagger PetStore - OpenAPI 3.0',
-  version: '1.0.11',
-})
-          
+export function getServer() {
+  const server = new McpServer({
+    name: 'Swagger PetStore - OpenAPI 3.0',
+    version: '1.0.11',
+  })
 
-server.registerTool("updatePet", {
-  title: "Update an existing pet",
-  description: "Update an existing pet by Id",
-  outputSchema: { data: updatePetStatus200Schema },
-  inputSchema: { data: updatePetDataSchema },
-}, async ({ data }, request) => {
-  return updatePetHandler({ data }, request)
-})
-          
+  server.registerTool("updatePet", {
+    title: "Update an existing pet",
+    description: "Update an existing pet by Id",
+    outputSchema: { data: updatePetStatus200Schema },
+    inputSchema: { data: updatePetDataSchema },
+  }, async ({ data }, request) => {
+    return updatePetHandler({ data }, request)
+  })
 
-server.registerTool("findPetsByStatus", {
-  title: "Finds Pets by status",
-  description: "Multiple status values can be provided with comma separated strings",
-  outputSchema: { data: findPetsByStatusStatus200Schema },
-  inputSchema: { params: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
-}, async ({ params }, request) => {
-  return findPetsByStatusHandler({ params }, request)
-})
-          
 
-server.registerTool("findPetsByTags", {
-  title: "Finds Pets by tags",
-  description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-  outputSchema: { data: findPetsByTagsStatus200Schema },
-  inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
-}, async ({ params }, request) => {
-  return findPetsByTagsHandler({ params }, request)
-})
-          
+  server.registerTool("findPetsByStatus", {
+    title: "Finds Pets by status",
+    description: "Multiple status values can be provided with comma separated strings",
+    outputSchema: { data: findPetsByStatusStatus200Schema },
+    inputSchema: { params: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
+  }, async ({ params }, request) => {
+    return findPetsByStatusHandler({ params }, request)
+  })
 
-server.registerTool("getPetById", {
-  title: "Find pet by ID",
-  description: "Returns a single pet",
-  outputSchema: { data: getPetByIdStatus200Schema },
-  inputSchema: { petId: getPetByIdPathPetIdSchema },
-}, async ({ petId }, request) => {
-  return getPetByIdHandler({ petId }, request)
-})
-          
 
-server.registerTool("updatePetWithForm", {
-  title: "Updates a pet in the store with form data",
-  description: "Make a POST request to /pet/{petId}",
-  inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
-}, async ({ petId, params }, request) => {
-  return updatePetWithFormHandler({ petId, params }, request)
-})
-          
+  server.registerTool("findPetsByTags", {
+    title: "Finds Pets by tags",
+    description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
+    outputSchema: { data: findPetsByTagsStatus200Schema },
+    inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
+  }, async ({ params }, request) => {
+    return findPetsByTagsHandler({ params }, request)
+  })
 
-server.registerTool("uploadFile", {
-  title: "uploads an image",
-  description: "Make a POST request to /pet/{petId}/uploadImage",
-  outputSchema: { data: uploadFileStatus200Schema },
-  inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
-}, async ({ petId, data, params }, request) => {
-  return uploadFileHandler({ petId, data, params }, request)
-})
-          
 
-server.registerTool("getInventory", {
-  title: "Returns pet inventories by status",
-  description: "Returns a map of status codes to quantities",
-  outputSchema: { data: getInventoryStatus200Schema },
-}, async (request) => {
-  return getInventoryHandler(request)
-})
-          
+  server.registerTool("getPetById", {
+    title: "Find pet by ID",
+    description: "Returns a single pet",
+    outputSchema: { data: getPetByIdStatus200Schema },
+    inputSchema: { petId: getPetByIdPathPetIdSchema },
+  }, async ({ petId }, request) => {
+    return getPetByIdHandler({ petId }, request)
+  })
 
-server.registerTool("placeOrder", {
-  title: "Place an order for a pet",
-  description: "Place a new order in the store",
-  outputSchema: { data: placeOrderStatus200Schema },
-  inputSchema: { data: placeOrderDataSchema },
-}, async ({ data }, request) => {
-  return placeOrderHandler({ data }, request)
-})
-          
 
-server.registerTool("getOrderById", {
-  title: "Find purchase order by ID",
-  description: "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-  outputSchema: { data: getOrderByIdStatus200Schema },
-  inputSchema: { orderId: getOrderByIdPathOrderIdSchema },
-}, async ({ orderId }, request) => {
-  return getOrderByIdHandler({ orderId }, request)
-})
-          
+  server.registerTool("updatePetWithForm", {
+    title: "Updates a pet in the store with form data",
+    description: "Make a POST request to /pet/{petId}",
+    inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
+  }, async ({ petId, params }, request) => {
+    return updatePetWithFormHandler({ petId, params }, request)
+  })
 
-server.registerTool("deleteOrder", {
-  title: "Delete purchase order by ID",
-  description: "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-  inputSchema: { orderId: deleteOrderPathOrderIdSchema },
-}, async ({ orderId }, request) => {
-  return deleteOrderHandler({ orderId }, request)
-})
-          
 
-server.registerTool("createUser", {
-  title: "Create user",
-  description: "This can only be done by the logged in user.",
-  inputSchema: { data: createUserDataSchema },
-}, async ({ data }, request) => {
-  return createUserHandler({ data }, request)
-})
-          
+  server.registerTool("uploadFile", {
+    title: "uploads an image",
+    description: "Make a POST request to /pet/{petId}/uploadImage",
+    outputSchema: { data: uploadFileStatus200Schema },
+    inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
+  }, async ({ petId, data, params }, request) => {
+    return uploadFileHandler({ petId, data, params }, request)
+  })
 
-server.registerTool("createUsersWithListInput", {
-  title: "Creates list of users with given input array",
-  description: "Creates list of users with given input array",
-  outputSchema: { data: createUsersWithListInputStatus200Schema },
-  inputSchema: { data: createUsersWithListInputDataSchema },
-}, async ({ data }, request) => {
-  return createUsersWithListInputHandler({ data }, request)
-})
-          
 
-server.registerTool("loginUser", {
-  title: "Logs user into the system",
-  description: "Make a GET request to /user/login",
-  outputSchema: { data: loginUserStatus200Schema },
-  inputSchema: { params: z.object({ "username": loginUserQueryUsernameSchema, "password": loginUserQueryPasswordSchema }) },
-}, async ({ params }, request) => {
-  return loginUserHandler({ params }, request)
-})
-          
+  server.registerTool("getInventory", {
+    title: "Returns pet inventories by status",
+    description: "Returns a map of status codes to quantities",
+    outputSchema: { data: getInventoryStatus200Schema },
+  }, async (request) => {
+    return getInventoryHandler(request)
+  })
 
-server.registerTool("logoutUser", {
-  title: "Logs out current logged in user session",
-  description: "Make a GET request to /user/logout",
-}, async (request) => {
-  return logoutUserHandler(request)
-})
-          
 
-server.registerTool("getUserByName", {
-  title: "Get user by user name",
-  description: "Make a GET request to /user/{username}",
-  outputSchema: { data: getUserByNameStatus200Schema },
-  inputSchema: { username: getUserByNamePathUsernameSchema },
-}, async ({ username }, request) => {
-  return getUserByNameHandler({ username }, request)
-})
-          
+  server.registerTool("placeOrder", {
+    title: "Place an order for a pet",
+    description: "Place a new order in the store",
+    outputSchema: { data: placeOrderStatus200Schema },
+    inputSchema: { data: placeOrderDataSchema },
+  }, async ({ data }, request) => {
+    return placeOrderHandler({ data }, request)
+  })
 
-server.registerTool("updateUser", {
-  title: "Update user",
-  description: "This can only be done by the logged in user.",
-  inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
-}, async ({ username, data }, request) => {
-  return updateUserHandler({ username, data }, request)
-})
-          
 
-server.registerTool("deleteUser", {
-  title: "Delete user",
-  description: "This can only be done by the logged in user.",
-  inputSchema: { username: deleteUserPathUsernameSchema },
-}, async ({ username }, request) => {
-  return deleteUserHandler({ username }, request)
-})
-          
+  server.registerTool("getOrderById", {
+    title: "Find purchase order by ID",
+    description: "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
+    outputSchema: { data: getOrderByIdStatus200Schema },
+    inputSchema: { orderId: getOrderByIdPathOrderIdSchema },
+  }, async ({ orderId }, request) => {
+    return getOrderByIdHandler({ orderId }, request)
+  })
+
+
+  server.registerTool("deleteOrder", {
+    title: "Delete purchase order by ID",
+    description: "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
+    inputSchema: { orderId: deleteOrderPathOrderIdSchema },
+  }, async ({ orderId }, request) => {
+    return deleteOrderHandler({ orderId }, request)
+  })
+
+
+  server.registerTool("createUser", {
+    title: "Create user",
+    description: "This can only be done by the logged in user.",
+    inputSchema: { data: createUserDataSchema },
+  }, async ({ data }, request) => {
+    return createUserHandler({ data }, request)
+  })
+
+
+  server.registerTool("createUsersWithListInput", {
+    title: "Creates list of users with given input array",
+    description: "Creates list of users with given input array",
+    outputSchema: { data: createUsersWithListInputStatus200Schema },
+    inputSchema: { data: createUsersWithListInputDataSchema },
+  }, async ({ data }, request) => {
+    return createUsersWithListInputHandler({ data }, request)
+  })
+
+
+  server.registerTool("loginUser", {
+    title: "Logs user into the system",
+    description: "Make a GET request to /user/login",
+    outputSchema: { data: loginUserStatus200Schema },
+    inputSchema: { params: z.object({ "username": loginUserQueryUsernameSchema, "password": loginUserQueryPasswordSchema }) },
+  }, async ({ params }, request) => {
+    return loginUserHandler({ params }, request)
+  })
+
+
+  server.registerTool("logoutUser", {
+    title: "Logs out current logged in user session",
+    description: "Make a GET request to /user/logout",
+  }, async (request) => {
+    return logoutUserHandler(request)
+  })
+
+
+  server.registerTool("getUserByName", {
+    title: "Get user by user name",
+    description: "Make a GET request to /user/{username}",
+    outputSchema: { data: getUserByNameStatus200Schema },
+    inputSchema: { username: getUserByNamePathUsernameSchema },
+  }, async ({ username }, request) => {
+    return getUserByNameHandler({ username }, request)
+  })
+
+
+  server.registerTool("updateUser", {
+    title: "Update user",
+    description: "This can only be done by the logged in user.",
+    inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
+  }, async ({ username, data }, request) => {
+    return updateUserHandler({ username, data }, request)
+  })
+
+
+  server.registerTool("deleteUser", {
+    title: "Delete user",
+    description: "This can only be done by the logged in user.",
+    inputSchema: { username: deleteUserPathUsernameSchema },
+  }, async ({ username }, request) => {
+    return deleteUserHandler({ username }, request)
+  })
+
+  return server
+}
+export const server = getServer()
 export async function startServer() {
   try {
       const transport = new StdioServerTransport()

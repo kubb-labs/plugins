@@ -1,10 +1,23 @@
 import { camelCase, pascalCase, screamingSnakeCase, snakeCase } from '@internals/utils'
 import { ast } from '@kubb/core'
-import { isNumber, sortBy } from 'remeda'
 import ts from 'typescript'
 import { OPTIONAL_ADDS_UNDEFINED } from './constants.ts'
 
 const { SyntaxKind, factory } = ts
+
+/**
+ * Compares two strings by UTF-16 code unit, keeping sorted output identical across platforms
+ * regardless of locale.
+ */
+function compareStrings(a: string, b: string): number {
+  if (a < b) return -1
+  if (a > b) return 1
+  return 0
+}
+
+function isNumber(value: unknown): value is number {
+  return typeof value === 'number' && !Number.isNaN(value)
+}
 
 // https://ts-ast-viewer.com/
 
@@ -397,7 +410,7 @@ export function createImportDeclaration({
   }
 
   // Sort the imports alphabetically for consistent output across platforms
-  const sortedName = sortBy(name, [(item) => (typeof item === 'object' ? item.propertyName : item), 'asc'])
+  const sortedName = name.toSorted((a, b) => compareStrings(typeof a === 'object' ? a.propertyName : a, typeof b === 'object' ? b.propertyName : b))
 
   return factory.createImportDeclaration(
     undefined,
@@ -456,7 +469,7 @@ export function createExportDeclaration({
   }
 
   // Sort the exports alphabetically for consistent output across platforms
-  const sortedName = sortBy(name, [(propertyName) => (typeof propertyName === 'string' ? propertyName : propertyName.text), 'asc'])
+  const sortedName = name.toSorted((a, b) => compareStrings(typeof a === 'string' ? a : a.text, typeof b === 'string' ? b : b.text))
 
   return factory.createExportDeclaration(
     undefined,

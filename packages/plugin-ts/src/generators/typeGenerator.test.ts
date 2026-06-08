@@ -273,6 +273,53 @@ describe('typeGenerator — Operation', () => {
       }),
     },
     {
+      // Regression for kubb-labs/kubb#3475: with `enumType: 'asConst'`, an array whose items
+      // are an object containing a nested enum property must keep its object shape, not
+      // collapse into an array of the (first) nested enum.
+      name: 'arrayOfObjectWithNestedEnum — regression for kubb-labs/kubb#3475',
+      node: ast.createOperation({
+        operationId: 'getArrayOfObject',
+        method: 'GET',
+        path: '/array-of-object',
+        tags: ['regression'],
+        parameters: [],
+        responses: [
+          ast.createResponse({
+            statusCode: '200',
+            description: 'OK',
+            schema: ast.createSchema({
+              type: 'array',
+              name: 'ArrayOfObject',
+              items: [
+                ast.createSchema({
+                  type: 'object',
+                  name: 'ArrayOfObject',
+                  primitive: 'object',
+                  properties: [
+                    ast.createProperty({
+                      name: 'id',
+                      required: true,
+                      schema: ast.createSchema({ type: 'integer', primitive: 'number', name: 'ArrayOfObjectId' }),
+                    }),
+                    ast.createProperty({
+                      name: 'status',
+                      required: true,
+                      schema: ast.createSchema({
+                        type: 'enum',
+                        primitive: 'string',
+                        name: 'ArrayOfObjectStatusEnum',
+                        enumValues: ['active', 'inactive'],
+                      }),
+                    }),
+                  ],
+                }),
+              ],
+            }),
+          }),
+        ],
+      }),
+    },
+    {
       name: 'multiContentType — POST with json and form-data request body',
       node: ast.createOperation({
         operationId: 'uploadFile',

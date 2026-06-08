@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-cypress",
-  "version": "5.0.0-beta.36",
+  "version": "5.0.0-beta.42",
   "description": "Generate Cypress request commands and e2e test fixtures from your OpenAPI specification, enabling automated API testing with zero manual setup.",
   "keywords": [
     "code-generation",
@@ -48,7 +48,7 @@
   },
   "scripts": {
     "build": "tsdown && size-limit",
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "start": "tsdown --watch",

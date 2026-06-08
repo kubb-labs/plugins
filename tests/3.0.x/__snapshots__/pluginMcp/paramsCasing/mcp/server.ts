@@ -9,21 +9,23 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
 import { z } from "zod";
 
-export const server = 
-          new McpServer({
-  name: 'Params Casing Test',
-  version: '1.0.0',
-})
-          
+export function getServer() {
+  const server = new McpServer({
+    name: 'Params Casing Test',
+    version: '1.0.0',
+  })
 
-server.registerTool("updatePet", {
-  description: "Make a POST request to /pets/{pet_id}",
-  outputSchema: { data: updatePetStatus200Schema },
-  inputSchema: { petId: updatePetPathPetIdSchema, data: updatePetDataSchema, params: z.object({ "includeDeleted": updatePetQueryIncludeDeletedSchema, "requestSource": updatePetQueryRequestSourceSchema }) },
-}, async ({ petId, data, params }, request) => {
-  return updatePetHandler({ petId, data, params }, request)
-})
-          
+  server.registerTool("updatePet", {
+    description: "Make a POST request to /pets/{pet_id}",
+    outputSchema: { data: updatePetStatus200Schema },
+    inputSchema: { petId: updatePetPathPetIdSchema, data: updatePetDataSchema, params: z.object({ "includeDeleted": updatePetQueryIncludeDeletedSchema, "requestSource": updatePetQueryRequestSourceSchema }) },
+  }, async ({ petId, data, params }, request) => {
+    return updatePetHandler({ petId, data, params }, request)
+  })
+
+  return server
+}
+export const server = getServer()
 export async function startServer() {
   try {
       const transport = new StdioServerTransport()

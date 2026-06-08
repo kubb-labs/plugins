@@ -2,7 +2,6 @@ import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRendererSync, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { difference } from 'remeda'
 import type { PluginReactQuery } from '../types'
 import { resolveOperationOverrides } from '../utils.ts'
 
@@ -48,10 +47,11 @@ export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
         nodeQuery === false
           ? !!query && query.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
           : !!nodeQuery && nodeQuery.methods.some((m) => node.method.toLowerCase() === m.toLowerCase())
+      const nodeQueryMethods = new Set(nodeQuery ? nodeQuery.methods : [])
       const isMutationOp =
         nodeMutation !== false &&
         !isQueryOp &&
-        difference(nodeMutation ? nodeMutation.methods : [], nodeQuery ? nodeQuery.methods : []).some((m) => node.method.toLowerCase() === m.toLowerCase())
+        (nodeMutation ? nodeMutation.methods : []).some((m) => !nodeQueryMethods.has(m) && node.method.toLowerCase() === m.toLowerCase())
       const isSuspenseOp = !!suspense
       const isInfiniteOp = !!nodeInfiniteOptions
 

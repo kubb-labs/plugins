@@ -76,7 +76,6 @@ Each plugin under `packages/` follows the same shape: `src/plugin.ts` defines th
 | [Vitest](https://vitest.dev/) | Testing |
 | [oxlint](https://oxc.rs/docs/guide/usage/linter.html) | Linter |
 | [oxfmt](https://github.com/oxc-project/oxfmt) | Formatter |
-| [CSpell](https://cspell.org/) | Spell checker |
 | [Changesets](https://github.com/changesets/changesets) | Versioning |
 | [GitHub Actions](https://github.com/features/actions) | CI/CD |
 
@@ -94,7 +93,6 @@ pnpm typecheck:examples  # Type-check the examples
 pnpm lint                # Lint with oxlint
 pnpm lint:fix            # Lint and auto-fix
 pnpm format              # Format with oxfmt
-pnpm lint:spell          # Spell-check .ts and .md files
 pnpm changeset           # Create a changeset
 ```
 
@@ -165,5 +163,3 @@ pnpm changeset
 ```
 
 Pick the packages you changed, choose the bump (patch for fixes, minor for features, major for breaking changes), and write a short summary aimed at users. Commit the generated file under `.changeset/`. Docs-only or internal changes that touch no published package do not need one.
-
-Spell-check false positives: fix typos in code, or add technical terms and proper nouns to the `words` array in `cspell.json`.

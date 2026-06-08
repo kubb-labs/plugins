@@ -27,10 +27,10 @@
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
-    "@tanstack/react-query": "^5.100.14",
-    "axios": "^1.16.1",
+    "@tanstack/react-query": "^5.101.0",
+    "axios": "^1.17.0",
     "kubb": "catalog:",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "typescript": "catalog:",
     "zod": "^4.4.3"
   }

@@ -12,27 +12,26 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.40
-  '@kubb/agent': 5.0.0-beta.40
-  '@kubb/core': 5.0.0-beta.40
-  '@kubb/middleware-barrel': 5.0.0-beta.40
-  '@kubb/parser-ts': 5.0.0-beta.40
-  '@kubb/renderer-jsx': 5.0.0-beta.40
+  '@kubb/adapter-oas': 5.0.0-beta.42
+  '@kubb/agent': 5.0.0-beta.42
+  '@kubb/core': 5.0.0-beta.42
+  '@kubb/middleware-barrel': 5.0.0-beta.42
+  '@kubb/parser-ts': 5.0.0-beta.42
+  '@kubb/renderer-jsx': 5.0.0-beta.42
   '@size-limit/file': ^12.1.0
-  '@types/node': ^22.19.19
-  '@types/react': ^19.2.16
-  '@vitest/coverage-v8': ^4.1.7
-  '@vitest/ui': ^4.1.7
-  kubb: 5.0.0-beta.40
+  '@types/node': ^22.19.20
+  '@types/react': ^19.2.17
+  '@vitest/coverage-v8': ^4.1.8
+  '@vitest/ui': ^4.1.8
+  kubb: 5.0.0-beta.42
   oxfmt: ^0.47.0
-  oxlint: ^1.67.0
+  oxlint: ^1.68.0
   prettier: ^3.8.3
-  remeda: ^2.37.0
   'size-limit': ^12.1.0
-  tsdown: ^0.22.1
+  tsdown: ^0.22.2
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.40
-  vitest: ^4.1.7
+  unplugin-kubb: 5.0.0-beta.42
+  vitest: ^4.1.8
 #
 #overrides:
 #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas

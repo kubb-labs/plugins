@@ -12,7 +12,7 @@
   },
   "sideEffects": false,
   "scripts": {
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
     "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
@@ -24,12 +24,12 @@
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:",
-    "axios": "^1.16.1",
+    "axios": "^1.17.0",
     "kubb": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",
-    "react": "^19.2.6",
+    "react": "^19.2.7",
     "typescript": "catalog:"
   },
   "engines": {

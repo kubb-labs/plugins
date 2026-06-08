@@ -1,11 +1,4 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import type { AdapterOas } from '@kubb/adapter-oas'
-import pkg from 'handlebars'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 type BuildDocsOptions = {
   title?: string
@@ -13,17 +6,31 @@ type BuildDocsOptions = {
   templateOptions?: any
 }
 
+const htmlEscapes: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#x27;',
+  '`': '&#x60;',
+  '=': '&#x3D;',
+}
+
+function escapeHtml(value: string) {
+  return value.replace(/[&<>"'`=]/g, (char) => htmlEscapes[char] ?? char)
+}
+
 /**
  * Renders a self-contained Redoc HTML page for an OpenAPI document. The page
  * embeds the spec inline and pulls Redoc's bundle from a CDN at runtime, so
  * the generated file works without further build steps.
  */
-export async function getPageHTML(api: AdapterOas['document'], { title, disableGoogleFont, templateOptions }: BuildDocsOptions = {}) {
-  const templateFileName = path.join(__dirname, '../static/redoc.hbs')
-  const template = pkg.compile(fs.readFileSync(templateFileName).toString())
-  return template({
-    title: title || api.info.title || 'ReDoc documentation',
-    redocHTML: `
+export async function getPageHTML(api: AdapterOas['document'], { title, disableGoogleFont }: BuildDocsOptions = {}) {
+  const pageTitle = escapeHtml(title || api.info.title || 'ReDoc documentation')
+  const googleFont = disableGoogleFont
+    ? ''
+    : `<link href='https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700' rel='stylesheet' />`
+  const redocHTML = `
      <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"> </script>
  <div id="redoc-container"></div>
  <script>
@@ -32,8 +39,27 @@ export async function getPageHTML(api: AdapterOas['document'], { title, disableG
      "expandResponses": "200,400"
    }, document.getElementById('redoc-container'))
  </script>
-    `,
-    disableGoogleFont,
-    templateOptions,
-  })
+    `
+
+  return `<html>
+
+  <head>
+    <meta charset='utf8' />
+    <title>${pageTitle}</title>
+    <!-- needed for adaptive design -->
+    <meta name='viewport' content='width=device-width, initial-scale=1' />
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+    ${googleFont}
+  </head>
+
+  <body>
+    ${redocHTML}
+  </body>
+
+</html>`
 }

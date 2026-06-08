@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "5.0.0-beta.36",
+  "version": "5.0.0-beta.42",
   "description": "Generate type-safe HTTP clients from your OpenAPI specification. Supports Axios, Fetch, and custom client adapters with full TypeScript inference and zero boilerplate.",
   "keywords": [
     "api-client",
@@ -88,7 +88,7 @@
   },
   "scripts": {
     "build": "tsdown && size-limit",
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "start": "tsdown --watch",
@@ -104,7 +104,7 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "axios": "^1.16.1"
+    "axios": "^1.17.0"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:",

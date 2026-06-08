@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-redoc",
-  "version": "5.0.0-beta.36",
+  "version": "5.0.0-beta.42",
   "description": "Generate a beautiful, interactive ReDoc API reference page from your OpenAPI specification. Produces a standalone HTML file with a responsive, developer-friendly UI.",
   "keywords": [
     "api-docs",
@@ -24,7 +24,6 @@
   "files": [
     "src",
     "dist",
-    "static",
     "extension.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
@@ -51,7 +50,7 @@
   },
   "scripts": {
     "build": "tsdown && size-limit",
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "start": "tsdown --watch",
@@ -60,8 +59,7 @@
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/core": "catalog:",
-    "handlebars": "^4.7.9"
+    "@kubb/core": "catalog:"
   },
   "devDependencies": {
     "@internals/utils": "workspace:*"
