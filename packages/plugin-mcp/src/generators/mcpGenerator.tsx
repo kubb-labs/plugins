@@ -2,7 +2,7 @@ import path from 'node:path'
 import { resolveOperationTypeNames } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { McpHandler } from '../components/McpHandler.tsx'
 import type { PluginMcp } from '../types.ts'
 
@@ -14,7 +14,7 @@ import type { PluginMcp } from '../types.ts'
  */
 export const mcpGenerator = defineGenerator<PluginMcp>({
   name: 'mcp',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { resolver, driver, root } = ctx

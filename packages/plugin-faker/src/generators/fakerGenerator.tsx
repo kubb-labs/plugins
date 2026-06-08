@@ -2,7 +2,7 @@ import { getPerContentTypeName, resolveContentTypeVariants } from '@internals/sh
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
 import { printerFaker } from '../printers/printerFaker.ts'
 import type { PluginFaker } from '../types.ts'
@@ -16,7 +16,7 @@ import { buildResponseUnionSchema, canOverrideSchema, localeToFakerImport, resol
  */
 export const fakerGenerator = defineGenerator<PluginFaker>({
   name: 'faker',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options

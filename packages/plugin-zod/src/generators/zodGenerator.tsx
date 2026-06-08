@@ -2,7 +2,7 @@ import { resolveContentTypeVariants } from '@internals/shared'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Operations } from '../components/Operations.tsx'
 import { Zod } from '../components/Zod.tsx'
 import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
@@ -54,7 +54,7 @@ function getMiniPrinter(resolver: ResolverZod, params: { guidType: unknown; wrap
  */
 export const zodGenerator = defineGenerator<PluginZod>({
   name: 'zod',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   schema(node, ctx) {
     const { adapter, config, resolver, root } = ctx
     const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options

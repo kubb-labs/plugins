@@ -1,6 +1,6 @@
 import { resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
 import { printerTs } from '../printers/printerTs.ts'
@@ -15,7 +15,7 @@ import { buildData, buildResponses, buildResponseUnion } from '../utils.ts'
  */
 export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   schema(node, ctx) {
     const { enumType, enumTypeSuffix, enumKeyCasing, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx

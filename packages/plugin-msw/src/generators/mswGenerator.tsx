@@ -2,7 +2,7 @@ import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/s
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mock, MockWithFaker, Response } from '../components'
 import type { PluginMsw } from '../types'
 import { resolveFakerMeta } from '../utils.ts'
@@ -15,7 +15,7 @@ import { resolveFakerMeta } from '../utils.ts'
  */
 export const mswGenerator = defineGenerator<PluginMsw>({
   name: 'msw',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { driver, resolver, config, root } = ctx

@@ -3,13 +3,13 @@ import { ast, defineGenerator } from '@kubb/core'
 import type { PluginClient } from '@kubb/plugin-client'
 import { Client } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 
 const toURL = (path: string) => path.replaceAll('{', ':').replaceAll('}', '')
 
 export const clientStaticGenerator = defineGenerator<PluginClient>({
   name: 'client',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver } = ctx
