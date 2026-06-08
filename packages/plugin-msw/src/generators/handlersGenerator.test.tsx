@@ -5,7 +5,7 @@ import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { resolverMsw } from '../resolvers/resolverMsw.ts'
 import type { PluginMsw } from '../types.ts'
-import { handlersGenerator } from './handlersGenerator.tsx'
+import { handlersGenerator } from './handlersGenerator.ts'
 
 const testConfig: Config = {
   root: '.',

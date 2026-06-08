@@ -3,7 +3,7 @@ import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
 import type { PluginClient } from '../types'
@@ -15,7 +15,7 @@ import type { PluginClient } from '../types'
  */
 export const clientGenerator = defineGenerator<PluginClient>({
   name: 'client',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx

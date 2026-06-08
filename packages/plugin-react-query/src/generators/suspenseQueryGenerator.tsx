@@ -5,7 +5,7 @@ import { ast, defineGenerator } from '@kubb/core'
 import { Client, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
+import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { QueryKey, QueryOptions, SuspenseQuery } from '../components'
 import type { PluginReactQuery } from '../types'
 
@@ -17,7 +17,7 @@ import type { PluginReactQuery } from '../types'
  */
 export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-suspense-query',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx

@@ -7,7 +7,7 @@ import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { resolverClient } from '../resolvers/resolverClient.ts'
 import type { PluginClient } from '../types.ts'
-import { operationsGenerator } from './operationsGenerator.tsx'
+import { operationsGenerator } from './operationsGenerator.ts'
 
 const testConfig: Config = {
   root: '.',

@@ -1,5 +1,37 @@
 import { ast } from '@kubb/core'
-import type { PluginTs } from '@kubb/plugin-ts'
+import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import type { ParamsCasing, ParamsType, PathParamsType } from './types.ts'
+
+/**
+ * Builds the shared `(…params, config = {})` parameter list for a TanStack
+ * query-options function. The trailing `config` parameter is typed as a partial
+ * `RequestConfig` with an optional `client`. Framework plugins wrap the result
+ * when needed, for example vue-query applies `MaybeRefOrGetter`.
+ */
+export function buildQueryOptionsParams(
+  node: ast.OperationNode,
+  options: { paramsType: ParamsType; paramsCasing: ParamsCasing; pathParamsType: PathParamsType; resolver: ResolverTs },
+): ast.FunctionParametersNode {
+  const { paramsType, paramsCasing, pathParamsType, resolver } = options
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+
+  return ast.createOperationParams(node, {
+    paramsType,
+    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
+    paramsCasing,
+    resolver,
+    extraParams: [
+      ast.createFunctionParameter({
+        name: 'config',
+        type: ast.createParamsType({
+          variant: 'reference',
+          name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+        }),
+        default: '{}',
+      }),
+    ],
+  })
+}
 
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
   return transformers?.name?.(name, type) || name
