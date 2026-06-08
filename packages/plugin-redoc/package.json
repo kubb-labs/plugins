@@ -24,7 +24,6 @@
   "files": [
     "src",
     "dist",
-    "static",
     "extension.yaml",
     "!/**/**.test.**",
     "!/**/__tests__/**",
@@ -51,7 +50,7 @@
   },
   "scripts": {
     "build": "tsdown",
-    "clean": "npx rimraf ./dist",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "release": "pnpm publish --no-git-check",
@@ -63,8 +62,7 @@
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/core": "catalog:",
-    "handlebars": "^4.7.9"
+    "@kubb/core": "catalog:"
   },
   "devDependencies": {
     "@internals/utils": "workspace:*"
