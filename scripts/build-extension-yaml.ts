@@ -94,6 +94,7 @@ const sourceFiles = [
   'plugin-msw',
   'plugin-react-query',
   'plugin-redoc',
+  'plugin-swr',
   'plugin-ts',
   'plugin-vue-query',
   'plugin-zod',

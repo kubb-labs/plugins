@@ -64,7 +64,7 @@ options:
     default: "'inline'"
     description: Defines how pathParams are passed to generated functions.
   - name: parser
-    type: false | 'zod'
+    type: "false | 'zod'"
     required: false
     default: false
     description: |
