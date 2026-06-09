@@ -1,4 +1,4 @@
-import { jsStringEscape } from '@internals/utils'
+import { jsStringEscape } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'

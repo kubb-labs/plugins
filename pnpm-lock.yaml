@@ -12,6 +12,9 @@ catalogs:
     '@kubb/agent':
       specifier: 5.0.0-beta.43
       version: 5.0.0-beta.43
+    '@kubb/ast':
+      specifier: 5.0.0-beta.43
+      version: 5.0.0-beta.43
     '@kubb/core':
       specifier: 5.0.0-beta.43
       version: 5.0.0-beta.43
@@ -722,6 +725,9 @@ importers:
 
   packages/plugin-client:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.43
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.43(@kubb/renderer-jsx@5.0.0-beta.43)
@@ -766,6 +772,9 @@ importers:
 
   packages/plugin-faker:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.43
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.43(@kubb/renderer-jsx@5.0.0-beta.43)
@@ -832,6 +841,9 @@ importers:
 
   packages/plugin-react-query:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.43
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.43(@kubb/renderer-jsx@5.0.0-beta.43)
@@ -901,6 +913,9 @@ importers:
 
   packages/plugin-ts:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.43
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.43(@kubb/renderer-jsx@5.0.0-beta.43)
@@ -923,6 +938,9 @@ importers:
 
   packages/plugin-vue-query:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.43
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.43(@kubb/renderer-jsx@5.0.0-beta.43)
@@ -951,6 +969,9 @@ importers:
 
   packages/plugin-zod:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.43
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.43(@kubb/renderer-jsx@5.0.0-beta.43)

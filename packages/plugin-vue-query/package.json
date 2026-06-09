@@ -82,6 +82,7 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:",
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",

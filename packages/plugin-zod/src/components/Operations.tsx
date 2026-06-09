@@ -1,4 +1,4 @@
-import { stringifyObject } from '@internals/utils'
+import { stringifyObject } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import { Const, File, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'

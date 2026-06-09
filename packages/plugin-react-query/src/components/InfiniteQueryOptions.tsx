@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { getNestedAccessor } from '@internals/utils'
+import { getNestedAccessor } from '@kubb/ast/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'

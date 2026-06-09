@@ -1,4 +1,4 @@
-import { stringify, toRegExpString } from '@internals/utils'
+import { stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 

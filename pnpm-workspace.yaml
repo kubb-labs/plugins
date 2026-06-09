@@ -14,6 +14,7 @@ allowBuilds:
 catalog:
   '@kubb/adapter-oas': 5.0.0-beta.43
   '@kubb/agent': 5.0.0-beta.43
+  '@kubb/ast': 5.0.0-beta.43
   '@kubb/core': 5.0.0-beta.43
   '@kubb/middleware-barrel': 5.0.0-beta.43
   '@kubb/parser-ts': 5.0.0-beta.43

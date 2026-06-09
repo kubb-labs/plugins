@@ -1,4 +1,4 @@
-import { stringify } from '@internals/utils'
+import { stringify } from '@kubb/ast/utils'
 
 import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'

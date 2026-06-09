@@ -1,5 +1,6 @@
 import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
-import { buildJSDoc, stringify, URLPath } from '@internals/utils'
+import { URLPath } from '@internals/utils'
+import { buildJSDoc, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'

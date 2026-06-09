@@ -7,7 +7,8 @@ import {
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
-import { isValidVarName, stringify, URLPath } from '@internals/utils'
+import { isValidVarName, URLPath } from '@internals/utils'
+import { stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
