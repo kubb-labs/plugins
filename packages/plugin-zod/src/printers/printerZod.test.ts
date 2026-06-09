@@ -216,17 +216,22 @@ describe('printerZod', () => {
           ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
         ],
       })
-      expect(printer.print(node)).toBe('z.object({\n    "id": z.int(),\n    "name": z.string()\n    })')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          id: z.int(),
+          name: z.string(),
+        })"
+      `)
     })
 
     test('object with additionalProperties: true → .catchall(z.unknown())', () => {
       const node = ast.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: true })
-      expect(printer.print(node)).toBe('z.object({\n    \n    }).catchall(z.unknown())')
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.unknown())"`)
     })
 
     test('object with additionalProperties: false → .strict()', () => {
       const node = ast.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: false })
-      expect(printer.print(node)).toBe('z.object({\n    \n    }).strict()')
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).strict()"`)
     })
 
     test('object with additionalProperties schema → .catchall(schema)', () => {
@@ -236,7 +241,7 @@ describe('printerZod', () => {
         properties: [],
         additionalProperties: ast.createSchema({ type: 'string' }),
       })
-      expect(printer.print(node)).toBe('z.object({\n    \n    }).catchall(z.string())')
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
     })
   })
 
@@ -291,7 +296,12 @@ describe('printerZod', () => {
         ],
       })
 
-      expect(printer.print(node)).toBe('z.object({\n    "category": Category.optional(),\n    "name": z.string()\n    })')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          category: Category.optional(),
+          name: z.string(),
+        })"
+      `)
     })
 
     test('object self-ref property uses getter with bare name', () => {
@@ -309,7 +319,12 @@ describe('printerZod', () => {
         ],
       })
 
-      expect(p.print(node)).toBe('z.object({\n    get "children"() { return TreeNode.optional() },\n    "name": z.string()\n    })')
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          get children() { return TreeNode.optional() },
+          name: z.string(),
+        })"
+      `)
     })
 
     test('object indirect-cycle property uses getter with bare schema name (no double z.lazy)', () => {
@@ -329,7 +344,12 @@ describe('printerZod', () => {
       })
 
       // z.lazy() should be stripped inside getter (getter already defers evaluation)
-      expect(p.print(node)).toBe('z.object({\n    get "archEnemy"() { return Pet.optional() },\n    "name": z.string()\n    })')
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          get archEnemy() { return Pet.optional() },
+          name: z.string(),
+        })"
+      `)
     })
   })
 
@@ -421,9 +441,13 @@ describe('printerZod', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe(
-        'z.union([z.object({\n    "valueA": z.string()\n    }).strict(), z.object({\n    "valueB": z.number()\n    }).strict()])',
-      )
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.union([z.object({
+          valueA: z.string(),
+        }).strict(), z.object({
+          valueB: z.number(),
+        }).strict()])"
+      `)
     })
 
     test('oneOf union with resolved object refs uses strict refs', () => {
@@ -500,9 +524,15 @@ describe('printerZod', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe(
-        'z.discriminatedUnion("status", [z.object({\n    "status": z.enum(["active"]),\n    "name": z.string()\n    }), z.object({\n    "status": z.enum(["inactive"]),\n    "reason": z.string()\n    })])',
-      )
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.discriminatedUnion("status", [z.object({
+          status: z.enum(["active"]),
+          name: z.string(),
+        }), z.object({
+          status: z.enum(["inactive"]),
+          reason: z.string(),
+        })])"
+      `)
     })
 
     test('falls back to z.union when a member is an intersection', () => {
@@ -524,7 +554,11 @@ describe('printerZod', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe('z.union([Cat, BasePet.and(z.object({\n    "petType": z.string()\n    }))])')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.union([Cat, BasePet.and(z.object({
+          petType: z.string(),
+        }))])"
+      `)
     })
 
     test('discriminated union with three or more ref members', () => {
@@ -592,7 +626,12 @@ describe('printerZod', () => {
           ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
         ],
       })
-      expect(p.print(node)).toBe('z.object({\n    "id": z.int(),\n    "name": z.string()\n    }).omit({ "id": true })')
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          id: z.int(),
+          name: z.string(),
+        }).omit({ "id": true })"
+      `)
     })
 
     test('omits multiple keys from object schema', () => {
@@ -606,9 +645,13 @@ describe('printerZod', () => {
           ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
         ],
       })
-      expect(p.print(node)).toBe(
-        'z.object({\n    "id": z.int(),\n    "createdAt": z.string(),\n    "name": z.string()\n    }).omit({ "id": true, "createdAt": true })',
-      )
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          id: z.int(),
+          createdAt: z.string(),
+          name: z.string(),
+        }).omit({ "id": true, "createdAt": true })"
+      `)
     })
 
     test('no omit when keysToOmit is empty', () => {
@@ -651,7 +694,11 @@ describe('printerZod', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe('z.object({\n    "notificationType": z.enum(["PING"])\n    })')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          notificationType: z.enum(["PING"]),
+        })"
+      `)
     })
   })
 

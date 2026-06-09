@@ -175,7 +175,12 @@ describe('printerZodMini', () => {
         ],
       })
       const result = printer.print(node)
-      expect(result).toBe('z.object({\n    "id": z.int(),\n    "name": z.string()\n    })')
+      expect(result).toMatchInlineSnapshot(`
+        "z.object({
+          id: z.int(),
+          name: z.string(),
+        })"
+      `)
     })
   })
 
@@ -264,7 +269,12 @@ describe('printerZodMini', () => {
         ],
       })
 
-      expect(printer.print(node)).toBe('z.object({\n    "category": z.optional(Category),\n    "name": z.string()\n    })')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          category: z.optional(Category),
+          name: z.string(),
+        })"
+      `)
     })
 
     test('object self-ref property uses getter with bare name', () => {
@@ -282,7 +292,12 @@ describe('printerZodMini', () => {
         ],
       })
 
-      expect(p.print(node)).toBe('z.object({\n    get "children"() { return z.optional(TreeNode) },\n    "name": z.string()\n    })')
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          get children() { return z.optional(TreeNode) },
+          name: z.string(),
+        })"
+      `)
     })
 
     test('object indirect-cycle property uses getter with bare schema name (no double z.lazy)', () => {
@@ -302,7 +317,12 @@ describe('printerZodMini', () => {
       })
 
       // z.lazy() should be stripped inside getter (getter already defers evaluation)
-      expect(p.print(node)).toBe('z.object({\n    get "archEnemy"() { return z.optional(Pet) },\n    "name": z.string()\n    })')
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          get archEnemy() { return z.optional(Pet) },
+          name: z.string(),
+        })"
+      `)
     })
   })
 
@@ -394,7 +414,13 @@ describe('printerZodMini', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe('z.union([z.strictObject({\n    "valueA": z.string()\n    }), z.strictObject({\n    "valueB": z.number()\n    })])')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.union([z.strictObject({
+          valueA: z.string(),
+        }), z.strictObject({
+          valueB: z.number(),
+        })])"
+      `)
     })
 
     test('single member union', () => {
@@ -449,9 +475,15 @@ describe('printerZodMini', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe(
-        'z.discriminatedUnion("status", [z.object({\n    "status": z.enum(["active"]),\n    "name": z.string()\n    }), z.object({\n    "status": z.enum(["inactive"]),\n    "reason": z.string()\n    })])',
-      )
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.discriminatedUnion("status", [z.object({
+          status: z.enum(["active"]),
+          name: z.string(),
+        }), z.object({
+          status: z.enum(["inactive"]),
+          reason: z.string(),
+        })])"
+      `)
     })
 
     test('falls back to z.union when a member is an intersection', () => {
@@ -473,7 +505,11 @@ describe('printerZodMini', () => {
           }),
         ],
       })
-      expect(printer.print(node)).toBe('z.union([Cat, z.intersection(BasePet, z.object({\n    "petType": z.string()\n    }))])')
+      expect(printer.print(node)).toMatchInlineSnapshot(`
+        "z.union([Cat, z.intersection(BasePet, z.object({
+          petType: z.string(),
+        }))])"
+      `)
     })
 
     test('discriminated union with three or more ref members', () => {
@@ -510,7 +546,12 @@ describe('printerZodMini', () => {
           ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
         ],
       })
-      expect(p.print(node)).toBe('z.object({\n    "id": z.int(),\n    "name": z.string()\n    }).omit({ "id": true })')
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          id: z.int(),
+          name: z.string(),
+        }).omit({ "id": true })"
+      `)
     })
 
     test('omits multiple keys from object schema', () => {
@@ -524,9 +565,13 @@ describe('printerZodMini', () => {
           ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
         ],
       })
-      expect(p.print(node)).toBe(
-        'z.object({\n    "id": z.int(),\n    "createdAt": z.string(),\n    "name": z.string()\n    }).omit({ "id": true, "createdAt": true })',
-      )
+      expect(p.print(node)).toMatchInlineSnapshot(`
+        "z.object({
+          id: z.int(),
+          createdAt: z.string(),
+          name: z.string(),
+        }).omit({ "id": true, "createdAt": true })"
+      `)
     })
 
     test('no omit when keysToOmit is empty', () => {

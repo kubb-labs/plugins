@@ -18,7 +18,13 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Pet', schemaName: 'Pet' }).print(node)).toMatchInlineSnapshot(
-      `"{"id": faker.number.int({ min: 1, max: 10 }),"name": faker.string.alpha(),"category": createCategory()}"`,
+      `
+      "{
+        id: faker.number.int({ min: 1, max: 10 }),
+        name: faker.string.alpha(),
+        category: createCategory(),
+      }"
+    `,
     )
   })
 
@@ -155,7 +161,11 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
-      `"faker.helpers.arrayElement<any>([{}, {"+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"])}])"`,
+      `
+      "faker.helpers.arrayElement<any>([{}, {
+        "+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"]),
+      }])"
+    `,
     )
   })
 

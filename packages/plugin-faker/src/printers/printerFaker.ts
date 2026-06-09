@@ -369,32 +369,30 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
       },
       object(node): string {
         const cyclicSchemas = this.options.cyclicSchemas
-        const properties = (node.properties ?? [])
-          .map((property): string => {
-            if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
-              return `"${property.name}": ${this.options.mapper[property.name]}`
-            }
+        const entries = (node.properties ?? []).map((property): string => {
+          if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
+            return `${ast.objectKey(property.name)}: ${this.options.mapper[property.name]}`
+          }
 
-            const value: string =
-              printNested(property.schema, {
-                typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
-                nestedInObject: true,
-              }) ?? 'undefined'
+          const value: string =
+            printNested(property.schema, {
+              typeName: this.options.typeName ? indexedTypeName(this.options.typeName, property.name, this.options.nestedInUnion) : undefined,
+              nestedInObject: true,
+            }) ?? 'undefined'
 
-            // When the property's schema transitively references a schema that is
-            // part of a circular dependency (other than the current schema itself),
-            // emit a memoizing lazy getter. On first access it computes the value,
-            // replaces itself with a plain data property via Object.defineProperty,
-            // and returns the cached value – so every subsequent read is stable.
-            if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-              return `get ${property.name}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
-            }
+          // When the property's schema transitively references a schema that is
+          // part of a circular dependency (other than the current schema itself),
+          // emit a memoizing lazy getter. On first access it computes the value,
+          // replaces itself with a plain data property via Object.defineProperty,
+          // and returns the cached value – so every subsequent read is stable.
+          if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+            return `get ${ast.objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
+          }
 
-            return `"${property.name}": ${value}`
-          })
-          .join(',')
+          return `${ast.objectKey(property.name)}: ${value}`
+        })
 
-        return `{${properties}}`
+        return ast.buildObject(entries)
       },
       ...options.nodes,
     },

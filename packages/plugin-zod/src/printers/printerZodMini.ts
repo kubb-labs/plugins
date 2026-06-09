@@ -171,44 +171,42 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
         return resolvedName
       },
       object(node) {
-        const properties = node.properties
-          .map((prop) => {
-            const { name: propName, schema } = prop
+        const entries = node.properties.map((prop) => {
+          const { name: propName, schema } = prop
 
-            const meta = ast.syncSchemaRef(schema)
+          const meta = ast.syncSchemaRef(schema)
 
-            const isNullable = meta.nullable
-            const isOptional = schema.optional
-            const isNullish = schema.nullish
+          const isNullable = meta.nullable
+          const isOptional = schema.optional
+          const isNullish = schema.nullish
 
-            const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
-            // Inside a getter the getter itself defers evaluation, so suppress
-            // z.lazy() wrapping on nested refs by temporarily clearing cyclicSchemas.
-            // Save before clearing: this.options === options (same reference via definePrinter),
-            // so reading options.cyclicSchemas after mutation would return undefined.
-            const savedCyclicSchemas = this.options.cyclicSchemas
-            if (hasSelfRef) this.options.cyclicSchemas = undefined
-            const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
-            if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
+          const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
+          // Inside a getter the getter itself defers evaluation, so suppress
+          // z.lazy() wrapping on nested refs by temporarily clearing cyclicSchemas.
+          // Save before clearing: this.options === options (same reference via definePrinter),
+          // so reading options.cyclicSchemas after mutation would return undefined.
+          const savedCyclicSchemas = this.options.cyclicSchemas
+          if (hasSelfRef) this.options.cyclicSchemas = undefined
+          const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
+          if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
 
-            const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
+          const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
 
-            const value = applyMiniModifiers({
-              value: wrappedOutput,
-              nullable: isNullable,
-              optional: isOptional,
-              nullish: isNullish,
-              defaultValue: meta.default,
-            })
-
-            if (hasSelfRef) {
-              return `get "${propName}"() { return ${value} }`
-            }
-            return `"${propName}": ${value}`
+          const value = applyMiniModifiers({
+            value: wrappedOutput,
+            nullable: isNullable,
+            optional: isOptional,
+            nullish: isNullish,
+            defaultValue: meta.default,
           })
-          .join(',\n    ')
 
-        return `z.object({\n    ${properties}\n    })`
+          if (hasSelfRef) {
+            return `get ${ast.objectKey(propName)}() { return ${value} }`
+          }
+          return `${ast.objectKey(propName)}: ${value}`
+        })
+
+        return `z.object(${ast.buildObject(entries)})`
       },
       array(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
