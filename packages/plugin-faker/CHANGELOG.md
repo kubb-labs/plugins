@@ -1,5 +1,23 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.44
+
+### Minor Changes
+
+- [#323](https://github.com/kubb-labs/plugins/pull/323) [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit generated string literals with single quotes and tighten client function spacing so output reads cleanly without a formatter. The shared `stringify` helper now produces single-quoted literals, so zod enums, `.describe(...)`, defaults, and faker values use single quotes. The client component drops the redundant `<br/>` breaks: the config destructure is followed by one blank line (not two), and `requestData`/`formData` are grouped with no blank between them. HTTP method, content type, and response type are emitted single-quoted via `stringify`.
+
+- [#323](https://github.com/kubb-labs/plugins/pull/323) [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Assemble generated schemas and query options so they read cleanly before any formatter runs. Object schemas use the shared `ast.buildObject` helper (two-space indentation, closing brace at column zero, unquoted keys when valid, trailing commas), and `z.union`/`z.discriminatedUnion`/`z.tuple` use `ast.buildList` so object members nest one level deeper instead of sitting inline. The infinite-query option bodies in `@kubb/plugin-react-query` and `@kubb/plugin-vue-query` are re-authored with consistent two-space indentation so their options no longer drop to column zero. Requires the `@kubb/ast` release that adds `buildObject`/`buildList`/`objectKey`.
+
+### Patch Changes
+
+- [#319](https://github.com/kubb-labs/plugins/pull/319) [`27fbf2f`](https://github.com/kubb-labs/plugins/commit/27fbf2f16bf4da0aba6e0966f521bb350c675681) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Import the renderer as `jsxRenderer` from `@kubb/renderer-jsx`. The `jsxRendererSync` and `jsxRenderer` exports were the same function behind two names, and the next `@kubb/renderer-jsx` major keeps only `jsxRenderer`. Generated output is unchanged.
+
+- [#323](https://github.com/kubb-labs/plugins/pull/323) [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Consume the shared codegen helpers (`stringify`, `trimQuotes`, `jsStringEscape`, `toRegExpString`,
+  `stringifyObject`, `getNestedAccessor`, `buildJSDoc`) from `@kubb/ast/utils` instead of keeping
+  local copies in `@internals/utils`. Generated output is unchanged.
+- Updated dependencies [[`27fbf2f`](https://github.com/kubb-labs/plugins/commit/27fbf2f16bf4da0aba6e0966f521bb350c675681), [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75)]:
+  - @kubb/plugin-ts@5.0.0-beta.44
+
 ## 5.0.0-beta.42
 
 ### Patch Changes

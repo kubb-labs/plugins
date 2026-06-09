@@ -1,6 +1,6 @@
 {
   "name": "performance",
-  "version": "0.0.1-beta.19",
+  "version": "0.0.1-beta.20",
   "private": true,
   "description": "Performance benchmarks for Kubb plugin generation",
   "repository": {
