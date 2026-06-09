@@ -1,5 +1,5 @@
 import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
-import { buildJSDoc, URLPath } from '@internals/utils'
+import { buildJSDoc, stringify, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -76,7 +76,7 @@ function generateMethod({
   const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
 
   const methodBody = [
-    `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
+    `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
     '',
     requestDataLine,
     formDataLine,

@@ -5,15 +5,15 @@
 
 import * as z from 'zod'
 
-export const updatePetWithFormPathPetIdSchema = z.bigint().describe("ID of pet that needs to be updated")
+export const updatePetWithFormPathPetIdSchema = z.bigint().describe('ID of pet that needs to be updated')
 
 export type UpdatePetWithFormPathPetIdSchema = z.infer<typeof updatePetWithFormPathPetIdSchema>
 
-export const updatePetWithFormQueryNameSchema = z.string().optional().describe("Name of pet that needs to be updated")
+export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
 export type UpdatePetWithFormQueryNameSchema = z.infer<typeof updatePetWithFormQueryNameSchema>
 
-export const updatePetWithFormQueryStatusSchema = z.string().optional().describe("Status of pet that needs to be updated")
+export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
 export type UpdatePetWithFormQueryStatusSchema = z.infer<typeof updatePetWithFormQueryStatusSchema>
 

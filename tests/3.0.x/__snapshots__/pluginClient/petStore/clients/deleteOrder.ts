@@ -22,9 +22,7 @@ export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Parti
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: "DELETE", url: getDeleteOrderUrl(orderId).url.toString(), ...requestConfig })
+  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: getDeleteOrderUrl(orderId).url.toString(), ...requestConfig })
 
   return res.data
 }

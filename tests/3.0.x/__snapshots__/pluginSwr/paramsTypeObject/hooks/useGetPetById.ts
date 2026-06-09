@@ -22,9 +22,7 @@ export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, conf
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: `/pet/${petId}`, ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
 
   return res.data
 }

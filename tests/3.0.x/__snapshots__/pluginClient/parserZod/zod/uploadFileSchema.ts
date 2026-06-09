@@ -6,9 +6,9 @@
 import * as z from 'zod'
 import { apiResponseSchema } from './apiResponseSchema.ts'
 
-export const uploadFilePathPetIdSchema = z.bigint().describe("ID of pet to update")
+export const uploadFilePathPetIdSchema = z.bigint().describe('ID of pet to update')
 
-export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe("Additional Metadata")
+export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
 export const uploadFileStatus200Schema = apiResponseSchema
 

@@ -21,14 +21,11 @@ function getUpdatePetUrl(petId: UpdatePetPathPetId) {
 export async function updatePet(petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const mappedParams = params ? { "include_deleted": params.includeDeleted, "request_source": params.requestSource } : undefined
-
 
   const requestData = data
 
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: getUpdatePetUrl(petId).url.toString(), params: mappedParams, data: requestData, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: getUpdatePetUrl(petId).url.toString(), params: mappedParams, data: requestData, ...requestConfig })
 
   return res.data
 }

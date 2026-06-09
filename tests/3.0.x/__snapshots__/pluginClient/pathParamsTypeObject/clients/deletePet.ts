@@ -22,9 +22,7 @@ export async function deletePet({ petId }: { petId: DeletePetPathPetId }, header
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: getDeletePetUrl({ petId }).url.toString(), ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
+  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: getDeletePetUrl({ petId }).url.toString(), ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
   return res.data
 }

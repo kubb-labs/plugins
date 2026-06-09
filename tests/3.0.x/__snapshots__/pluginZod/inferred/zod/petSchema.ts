@@ -15,7 +15,7 @@ export const petSchema = z.object({
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(tagSchema).optional(),
-  status: petStatusEnumSchema.optional().describe("pet status in the store"),
+  status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })
 
 export type PetSchema = z.infer<typeof petSchema>

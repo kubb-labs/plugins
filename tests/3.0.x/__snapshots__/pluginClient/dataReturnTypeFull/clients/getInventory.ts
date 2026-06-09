@@ -22,9 +22,7 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: getGetInventoryUrl().url.toString(), ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getGetInventoryUrl().url.toString(), ...requestConfig })
 
   return res
 }

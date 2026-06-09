@@ -22,9 +22,7 @@ export async function getInventorySuspense(config: Partial<RequestConfig> & { cl
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory`, ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }

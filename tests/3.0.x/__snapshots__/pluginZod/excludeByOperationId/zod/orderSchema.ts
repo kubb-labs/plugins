@@ -10,6 +10,6 @@ export const orderSchema = z.object({
   petId: z.bigint().optional(),
   quantity: z.int().optional(),
   shipDate: z.iso.datetime().optional(),
-  status: z.enum(["placed", "approved", "delivered"]).optional().describe("Order Status"),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
   complete: z.boolean().optional(),
 })

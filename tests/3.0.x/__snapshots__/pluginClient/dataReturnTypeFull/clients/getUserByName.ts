@@ -21,9 +21,7 @@ export async function getUserByName(username: GetUserByNamePathUsername, config:
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: getGetUserByNameUrl(username).url.toString(), ...requestConfig })
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: 'GET', url: getGetUserByNameUrl(username).url.toString(), ...requestConfig })
 
   return res
 }

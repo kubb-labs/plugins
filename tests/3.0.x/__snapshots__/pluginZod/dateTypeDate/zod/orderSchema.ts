@@ -10,7 +10,7 @@ export const orderSchema = z.object({
   petId: z.bigint().optional(),
   quantity: z.int().optional(),
   shipDate: z.iso.datetime().transform((value) => new Date(value)).optional(),
-  status: z.enum(["placed", "approved", "delivered"]).optional().describe("Order Status"),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
   complete: z.boolean().optional(),
 })
 
@@ -19,6 +19,6 @@ export const orderInputSchema = z.object({
   petId: z.bigint().optional(),
   quantity: z.int().optional(),
   shipDate: z.date().transform((value) => value.toISOString()).optional(),
-  status: z.enum(["placed", "approved", "delivered"]).optional().describe("Order Status"),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
   complete: z.boolean().optional(),
 })

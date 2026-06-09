@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 export const deletePetHeaderApiKeySchema = z.string().optional()
 
-export const deletePetPathPetIdSchema = z.bigint().describe("Pet id to delete")
+export const deletePetPathPetIdSchema = z.bigint().describe('Pet id to delete')
 
 export const deletePetStatus400Schema = z.any()
 

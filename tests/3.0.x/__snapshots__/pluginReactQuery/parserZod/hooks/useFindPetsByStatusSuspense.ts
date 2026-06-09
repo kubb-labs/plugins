@@ -23,9 +23,7 @@ export async function findPetsByStatusSuspense(params?: { status?: FindPetsBySta
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: `/pet/findByStatus`, params, ...requestConfig })
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, params, ...requestConfig })
 
   return findPetsByStatusResponseSchema.parse(res.data)
 }

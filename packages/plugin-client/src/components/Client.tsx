@@ -7,7 +7,7 @@ import {
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
-import { isValidVarName, URLPath } from '@internals/utils'
+import { isValidVarName, stringify, URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -159,7 +159,7 @@ export function Client({
       mode: 'object',
       children: {
         method: {
-          value: JSON.stringify(node.method.toUpperCase()),
+          value: stringify(node.method.toUpperCase()),
         },
         url: {
           value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : path.template,
@@ -182,7 +182,7 @@ export function Client({
             }
           : null,
         contentType: isConfigurable && isMultipleContentTypes ? {} : null,
-        responseType: responseType ? { value: JSON.stringify(responseType) } : null,
+        responseType: responseType ? { value: stringify(responseType) } : null,
         requestConfig: isConfigurable
           ? {
               mode: 'inlineSpread',
@@ -224,27 +224,20 @@ export function Client({
           returnType={returnType}
         >
           {isConfigurable
-            ? `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${JSON.stringify(contentType)}, ` : ''}...requestConfig } = config`
+            ? `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = config`
             : ''}
-          <br />
           <br />
           {pathParamsMapping &&
             Object.entries(pathParamsMapping)
               .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
               .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
               .join('\n')}
-          {pathParamsMapping && (
-            <>
-              <br />
-              <br />
-            </>
-          )}
+          {pathParamsMapping && <br />}
           {queryParamsMapping && queryParamsName && (
             <>
               {`const mappedParams = params ? { ${Object.entries(queryParamsMapping)
                 .map(([originalName, camelCaseName]) => `"${originalName}": params.${camelCaseName}`)
                 .join(', ')} } : undefined`}
-              <br />
               <br />
             </>
           )}
@@ -254,11 +247,9 @@ export function Client({
                 .map(([originalName, camelCaseName]) => `"${originalName}": headers.${camelCaseName}`)
                 .join(', ')} } : undefined`}
               <br />
-              <br />
             </>
           )}
           {parser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
-          <br />
           {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
           <br />
           {isConfigurable

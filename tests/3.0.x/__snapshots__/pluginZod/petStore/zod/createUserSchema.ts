@@ -14,10 +14,10 @@ export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSch
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export const createUserDataSchemaJson = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaJson = userSchema.optional().describe('Created user object')
 
-export const createUserDataSchemaXml = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaXml = userSchema.optional().describe('Created user object')
 
-export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Created user object')
 
 export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])

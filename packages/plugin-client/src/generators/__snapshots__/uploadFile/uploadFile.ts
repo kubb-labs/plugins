@@ -18,7 +18,6 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
   const { client: request = client, ...requestConfig } = config
 
   const requestData = data
-
   const formData = buildFormData(requestData)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({

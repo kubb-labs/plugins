@@ -14,7 +14,7 @@ export function createOrder<TData extends Partial<Order> = object>(data?: TData)
   petId: faker.number.bigInt(),
   quantity: faker.number.int(),
   shipDate: faker.date.anytime().toISOString(),
-  status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),
+  status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(['placed', 'approved', 'delivered']),
   complete: faker.datatype.boolean(),
 }
   return {

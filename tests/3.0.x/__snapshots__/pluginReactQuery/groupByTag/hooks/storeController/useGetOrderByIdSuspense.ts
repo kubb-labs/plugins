@@ -22,9 +22,7 @@ export async function getOrderByIdSuspense(orderId: GetOrderByIdPathOrderId, con
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: `/store/order/${orderId}`, ...requestConfig })
+  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: 'GET', url: `/store/order/${orderId}`, ...requestConfig })
 
   return res.data
 }

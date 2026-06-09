@@ -6,7 +6,7 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.ts'
 
-export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe("Tags to filter by")
+export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
 export type FindPetsByTagsQueryTagsSchema = z.infer<typeof findPetsByTagsQueryTagsSchema>
 

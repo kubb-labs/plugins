@@ -127,7 +127,7 @@ describe('printerZodMini', () => {
   describe('enum', () => {
     test('string enum', () => {
       const result = printer.print(ast.createSchema({ type: 'enum', enumValues: ['a', 'b', 'c'] }))
-      expect(result).toBe(`z.enum(["a", "b", "c"])`)
+      expect(result).toMatchInlineSnapshot(`"z.enum(['a', 'b', 'c'])"`)
     })
 
     test('number enum', () => {
@@ -219,7 +219,7 @@ describe('printerZodMini', () => {
   describe('default (functional syntax)', () => {
     test('string default', () => {
       const node = ast.createSchema({ type: 'string', default: 'hello' })
-      expect(printer.print(node)).toBe('z._default(z.string(), "hello")')
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z._default(z.string(), 'hello')"`)
     })
 
     test('number default', () => {
@@ -443,7 +443,7 @@ describe('printerZodMini', () => {
           ast.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
         ],
       })
-      expect(printer.print(node)).toBe('z.discriminatedUnion("petType", [Cat, Dog])')
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
 
     test('discriminated union with single member', () => {
@@ -479,13 +479,13 @@ describe('printerZodMini', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.discriminatedUnion("status", [
+        "z.discriminatedUnion('status', [
           z.object({
-            status: z.enum(["active"]),
+            status: z.enum(['active']),
             "name": z.string(),
           }),
           z.object({
-            status: z.enum(["inactive"]),
+            status: z.enum(['inactive']),
             reason: z.string(),
           }),
         ])"
@@ -531,7 +531,7 @@ describe('printerZodMini', () => {
           ast.createSchema({ type: 'ref', name: 'Bird', ref: '#/components/schemas/Bird' }),
         ],
       })
-      expect(printer.print(node)).toBe('z.discriminatedUnion("type", [Cat, Dog, Bird])')
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('type', [Cat, Dog, Bird])"`)
     })
 
     test('empty discriminated union returns empty string', () => {
@@ -600,7 +600,7 @@ describe('printerZodMini', () => {
           ast.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
         ],
       })
-      expect(p.print(node)).toBe('z.discriminatedUnion("petType", [Cat, Dog])')
+      expect(p.print(node)).toMatchInlineSnapshot(`"z.discriminatedUnion('petType', [Cat, Dog])"`)
     })
   })
 

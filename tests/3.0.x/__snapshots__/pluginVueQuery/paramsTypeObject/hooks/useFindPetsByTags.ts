@@ -24,9 +24,7 @@ export async function findPetsByTags({ params }: { params?: { tags?: FindPetsByT
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: "GET", url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return res.data
 }

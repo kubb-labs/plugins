@@ -22,9 +22,7 @@ export async function getUserByNameSuspense(username: GetUserByNamePathUsername,
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}`, ...requestConfig })
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: 'GET', url: `/user/${username}`, ...requestConfig })
 
   return getUserByNameResponseSchema.parse(res.data)
 }

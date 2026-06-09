@@ -22,9 +22,7 @@ export async function deleteUser({ username }: { username: DeleteUserPathUsernam
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: "DELETE", url: `/user/${username}`, ...requestConfig })
+  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
 
   return res.data
 }

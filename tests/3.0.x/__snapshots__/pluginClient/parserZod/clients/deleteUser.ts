@@ -23,9 +23,7 @@ export async function deleteUser(username: DeleteUserPathUsername, config: Parti
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: "DELETE", url: getDeleteUserUrl(username).url.toString(), ...requestConfig })
+  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: getDeleteUserUrl(username).url.toString(), ...requestConfig })
 
   return deleteUserResponseSchema.parse(res.data)
 }

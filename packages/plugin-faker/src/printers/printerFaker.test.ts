@@ -37,7 +37,7 @@ describe('printerFaker', () => {
     })
 
     expect(printerFaker({ resolver: resolverFaker, typeName: 'PetStatus' }).print(node)).toMatchInlineSnapshot(
-      `"faker.helpers.arrayElement<PetStatus>(["available", "pending", "sold"])"`,
+      `"faker.helpers.arrayElement<PetStatus>(['available', 'pending', 'sold'])"`,
     )
   })
 
@@ -110,7 +110,7 @@ describe('printerFaker', () => {
         typeName: `NonNullable<Address>["identifier"]`,
       }).print(node),
     ).toMatchInlineSnapshot(
-      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(["NW", "NE", "SW", "SE"])]"`,
+      `"[faker.number.int(), faker.string.alpha(), faker.helpers.arrayElement<NonNullable<NonNullable<Address>["identifier"]>[2]>(['NW', 'NE', 'SW', 'SE'])]"`,
     )
   })
 
@@ -133,8 +133,8 @@ describe('printerFaker', () => {
     const result = printerFaker({ resolver: resolverFaker, typeName: 'NodeBalancerConfig' }).print(node)
 
     // Each variant indexes through its own discriminated branch, not the bare union.
-    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "udp" }>')
-    expect(result).toContain('Extract<NonNullable<NodeBalancerConfig>, { "protocol": "tcp" }>')
+    expect(result).toContain(`Extract<NonNullable<NodeBalancerConfig>, { "protocol": 'udp' }>`)
+    expect(result).toContain(`Extract<NonNullable<NodeBalancerConfig>, { "protocol": 'tcp' }>`)
     expect(result).not.toContain('NonNullable<NodeBalancerConfig>["algorithm"]')
   })
 
@@ -163,7 +163,7 @@ describe('printerFaker', () => {
     expect(printerFaker({ resolver: resolverFaker, typeName: 'Filter', schemaName: 'Filter' }).print(node)).toMatchInlineSnapshot(
       `
       "faker.helpers.arrayElement<any>([{}, {
-        "+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(["asc", "desc"]),
+        "+order": faker.helpers.arrayElement<(NonNullable<Filter> & Record<"+order", unknown>)["+order"]>(['asc', 'desc']),
       }])"
     `,
     )

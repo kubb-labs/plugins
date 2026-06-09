@@ -6,7 +6,7 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.ts'
 
-export const findPetsByTagsQueryTagsSchema = z.array(z.coerce.string()).optional().describe("Tags to filter by")
+export const findPetsByTagsQueryTagsSchema = z.array(z.coerce.string()).optional().describe('Tags to filter by')
 
 export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
 

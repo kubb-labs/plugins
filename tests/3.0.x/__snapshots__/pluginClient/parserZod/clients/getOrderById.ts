@@ -23,9 +23,7 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
+  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: 'GET', url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
 
   return getOrderByIdResponseSchema.parse(res.data)
 }

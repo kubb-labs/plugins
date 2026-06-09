@@ -19,13 +19,11 @@ function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
  * {@link /user/:username}
  */
 export async function updateUser({ username }: { username: UpdateUserPathUsername }, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: getUpdateUserUrl({ username }).url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: getUpdateUserUrl({ username }).url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

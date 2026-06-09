@@ -21,9 +21,7 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: getLoginUserUrl().url.toString(), params, ...requestConfig })
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: getLoginUserUrl().url.toString(), params, ...requestConfig })
 
   return res
 }

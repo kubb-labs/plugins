@@ -21,11 +21,9 @@ function getCreateUsersWithListInputUrl() {
 export async function createUsersWithListInput({ data }: { data?: CreateUsersWithListInputData } = {}, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const requestData = data
 
-
-  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
 
   return res.data
 }

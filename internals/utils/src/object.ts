@@ -1,15 +1,19 @@
 import { trimQuotes } from './string.ts'
 
 /**
- * Serializes a primitive value to a JSON string literal, stripping any surrounding quote characters first.
+ * Serializes a primitive value to a single-quoted string literal, stripping any surrounding quote
+ * characters first. Escaping is taken from `JSON.stringify`, then the quote style is switched to
+ * single quotes so generated code matches the repo style without a formatter.
  *
  * @example
- * stringify('hello')   // '"hello"'
- * stringify('"hello"') // '"hello"'
+ * stringify('hello')   // "'hello'"
+ * stringify('"hello"') // "'hello'"
  */
 export function stringify(value: string | number | boolean | undefined): string {
-  if (value === undefined || value === null) return '""'
-  return JSON.stringify(trimQuotes(value.toString()))
+  if (value === undefined || value === null) return "''"
+  const json = JSON.stringify(trimQuotes(value.toString()))
+  const inner = json.slice(1, -1).replace(/\\"/g, '"').replace(/'/g, "\\'")
+  return `'${inner}'`
 }
 
 /**

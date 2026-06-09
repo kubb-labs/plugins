@@ -22,9 +22,7 @@ export async function findPetsByStatus({ params }: { params?: { status?: FindPet
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: getFindPetsByStatusUrl().url.toString(), params, ...requestConfig })
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: getFindPetsByStatusUrl().url.toString(), params, ...requestConfig })
 
   return res.data
 }

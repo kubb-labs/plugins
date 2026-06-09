@@ -6,7 +6,7 @@
 import * as z from 'zod'
 import { petSchema } from './petSchema.ts'
 
-export const getPetByIdPathPetIdSchema = z.coerce.bigint().describe("ID of pet to return")
+export const getPetByIdPathPetIdSchema = z.coerce.bigint().describe('ID of pet to return')
 
 export const getPetByIdStatus200SchemaJson = petSchema
 

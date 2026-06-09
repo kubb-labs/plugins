@@ -10,5 +10,5 @@ import { fakerEN as faker } from '@faker-js/faker'
  * @description pet status in the store
  */
 export function createPetStatusEnum(data?: PetStatusEnumKey): PetStatusEnumKey {
-  return data ?? faker.helpers.arrayElement<PetStatusEnumKey>(["available", "pending", "sold"])
+  return data ?? faker.helpers.arrayElement<PetStatusEnumKey>(['available', 'pending', 'sold'])
 }

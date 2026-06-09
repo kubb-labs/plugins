@@ -15,5 +15,5 @@ export const petSchema = z.object({
   category: categorySchema.optional(),
   photoUrls: z.array(z.coerce.string()),
   tags: z.array(tagSchema).optional(),
-  status: petStatusEnumSchema.optional().describe("pet status in the store"),
+  status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })

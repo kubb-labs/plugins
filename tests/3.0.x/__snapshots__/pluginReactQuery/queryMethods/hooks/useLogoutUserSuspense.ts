@@ -21,9 +21,7 @@ export async function logoutUserSuspense(config: Partial<RequestConfig> & { clie
   const { client: request = client, ...requestConfig } = config
 
 
-
-
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/user/logout`, ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
   return res.data
 }
