@@ -32,3 +32,12 @@ const parsers = new Map<`.${string}`, any>([['.ts', parserTs]])
 export function matchFiles(files: Array<ast.FileNode> | undefined, pre?: string) {
   return matchFilesBase(files, { parsers, format, pre })
 }
+
+/**
+ * Renders the driver's `.ts` files to their raw, unformatted source. Snapshots run through
+ * prettier (see {@link format}), which silently repairs whitespace, so tests that need to guard
+ * the generator's own output must inspect this raw text instead.
+ */
+export function rawSources(files: Array<ast.FileNode> | undefined): Array<string> {
+  return (files ?? []).filter((file) => file.baseName.endsWith('.ts')).map((file) => parserTs.parse(file))
+}

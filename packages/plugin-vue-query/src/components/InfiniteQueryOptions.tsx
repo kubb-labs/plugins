@@ -134,8 +134,7 @@ export function InfiniteQueryOptions({
         <Function name={name} export params={paramsSignature}>
           {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
-  ${enabledText}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
   queryKey,
   queryFn: async ({ signal, pageParam }) => {
     ${infiniteOverrideParams}
@@ -154,8 +153,7 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       <Function name={name} export params={paramsSignature}>
         {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
-  ${enabledText}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
   queryKey,
   queryFn: async ({ signal }) => {
     return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})

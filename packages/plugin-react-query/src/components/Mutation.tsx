@@ -108,11 +108,10 @@ export function Mutation({ name, mutationOptionsName, paramsCasing, dataReturnTy
         const { client: queryClient, ...mutationOptions } = mutation;
         const mutationKey = mutationOptions.mutationKey ?? ${mutationKeyName}()
 
-        const baseOptions = ${mutationOptionsName}(${mutationOptionsParamsCall}) as UseMutationOptions<${generics}>
-        ${customOptions ? `const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' }) as UseMutationOptions<${generics}>` : ''}
+        const baseOptions = ${mutationOptionsName}(${mutationOptionsParamsCall}) as UseMutationOptions<${generics}>${customOptions ? `\n        const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' }) as UseMutationOptions<${generics}>` : ''}
 
         return useMutation<${generics}>({
-          ...baseOptions,${customOptions ? '\n...customOptions,' : ''}
+          ...baseOptions,${customOptions ? '\n          ...customOptions,' : ''}
           mutationKey,
           ...mutationOptions,
         }, queryClient) as ${returnType}

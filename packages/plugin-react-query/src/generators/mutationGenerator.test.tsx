@@ -3,8 +3,8 @@ import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
-import { describe, test } from 'vitest'
-import { matchFiles } from '#mocks'
+import { describe, expect, test } from 'vitest'
+import { matchFiles, rawSources } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverReactQuery } from '../resolvers/resolverReactQuery.ts'
 import type { PluginReactQuery } from '../types.ts'
@@ -157,6 +157,11 @@ describe('mutationGenerator operation', () => {
       options,
       resolver: resolverReactQuery,
     })
+
+    for (const source of rawSources(driver.fileManager.files)) {
+      expect(source, 'raw output has no double blank lines').not.toMatch(/\n[ \t]*\n[ \t]*\n/)
+      expect(source, 'raw output has no blank line right after an opening bracket').not.toMatch(/[([{][ \t]*\n[ \t]*\n/)
+    }
 
     await matchFiles(driver.fileManager.files, props.name)
   })

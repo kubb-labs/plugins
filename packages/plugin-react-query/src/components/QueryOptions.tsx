@@ -72,8 +72,7 @@ export function QueryOptions({
       <Function name={name} export params={paramsSignature}>
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({
-       ${enabledText}
+      return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({${enabledText ? `\n       ${enabledText}` : ''}
        queryKey,
        queryFn: async ({ signal }) => {
           return ${clientName}(${clientCallStr})
