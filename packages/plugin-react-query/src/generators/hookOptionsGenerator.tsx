@@ -1,6 +1,6 @@
 import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
-import { File, jsxRendererSync, Type } from '@kubb/renderer-jsx'
+import { File, jsxRenderer, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types'
 import { resolveOperationOverrides } from '../utils.ts'
@@ -16,7 +16,7 @@ type MutationOption = PluginReactQuery['resolvedOptions']['mutation']
  */
 export const hookOptionsGenerator = defineGenerator<PluginReactQuery>({
   name: 'react-query-hook-options',
-  renderer: jsxRendererSync,
+  renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { resolver, config, root } = ctx
     const { output, customOptions, query, mutation, suspense, infinite, group, override } = ctx.options

@@ -4,6 +4,7 @@ export type { ParamsCasing, ParamsType, PathParamsType, Transformer } from './ty
 export {
   buildGroupParam,
   buildQueryKeyParams,
+  buildQueryOptionsParams,
   getEnabledParamNames,
   injectNonNullAssertions,
   markParamsOptional,

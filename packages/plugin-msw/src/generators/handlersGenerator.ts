@@ -1,6 +1,4 @@
-import { defineGenerator } from '@kubb/core'
-import { File, jsxRendererSync } from '@kubb/renderer-jsx'
-import { Handlers } from '../components/Handlers.tsx'
+import { ast, defineGenerator } from '@kubb/core'
 import type { PluginMsw } from '../types'
 
 /**
@@ -11,7 +9,6 @@ import type { PluginMsw } from '../types'
  */
 export const handlersGenerator = defineGenerator<PluginMsw>({
   name: 'plugin-msw',
-  renderer: jsxRendererSync,
   operations(nodes, ctx) {
     const { resolver, config, root } = ctx
     const { output, group } = ctx.options
@@ -25,23 +22,28 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         { name: resolver.resolveName(node.operationId), extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       )
-
-      return <File.Import key={operationFile.path} name={[operationName]} root={file.path} path={operationFile.path} />
+      return ast.createImport({ name: [operationName], root: file.path, path: operationFile.path })
     })
 
     const handlers = nodes.map((node) => `${resolver.resolveHandlerName(node)}()`)
 
-    return (
-      <File
-        baseName={file.baseName}
-        path={file.path}
-        meta={file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
-      >
-        {imports}
-        <Handlers name={handlersName} handlers={handlers} />
-      </File>
-    )
+    return [
+      ast.createFile({
+        baseName: file.baseName,
+        path: file.path,
+        meta: file.meta,
+        banner: resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
+        footer: resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
+        imports,
+        sources: [
+          ast.createSource({
+            name: handlersName,
+            isIndexable: true,
+            isExportable: true,
+            nodes: [ast.createText(`export const ${handlersName} = ${JSON.stringify(handlers).replaceAll('"', '')} as const`)],
+          }),
+        ],
+      }),
+    ]
   },
 })
