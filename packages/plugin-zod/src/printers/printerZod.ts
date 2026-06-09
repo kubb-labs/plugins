@@ -287,7 +287,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       tuple(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
 
-        return `z.tuple([${items.join(', ')}])`
+        return `z.tuple(${ast.buildList(items)})`
       },
       union(node) {
         const nodeMembers = node.members ?? []
@@ -303,10 +303,10 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
           // z.discriminatedUnion requires ZodObject members; intersections (ZodIntersection) are not
           // assignable to $ZodDiscriminant, so fall back to z.union when any member is an intersection.
-          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, [${members.join(', ')}])`
+          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${ast.buildList(members)})`
         }
 
-        return `z.union([${members.join(', ')}])`
+        return `z.union(${ast.buildList(members)})`
       },
       intersection(node) {
         const members = node.members ?? []

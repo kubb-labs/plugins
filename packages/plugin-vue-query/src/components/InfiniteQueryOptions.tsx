@@ -134,16 +134,16 @@ export function InfiniteQueryOptions({
       <File.Source name={name} isExportable isIndexable>
         <Function name={name} export params={paramsSignature}>
           {`
-      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
-       ${enabledText}
-       queryKey,
-       queryFn: async ({ signal, pageParam }) => {
-          ${infiniteOverrideParams}
-          return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
-        },
-       ${queryOptionsArr.join(',\n')}
-      })
+const queryKey = ${queryKeyName}(${queryKeyParamsCall})
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
+  ${enabledText}
+  queryKey,
+  queryFn: async ({ signal, pageParam }) => {
+    ${infiniteOverrideParams}
+    return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
+  },
+  ${queryOptionsArr.join(',\n  ')}
+})
 `}
         </Function>
       </File.Source>
@@ -154,15 +154,15 @@ export function InfiniteQueryOptions({
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature}>
         {`
-      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
-       ${enabledText}
-       queryKey,
-       queryFn: async ({ signal }) => {
-          return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
-        },
-       ${queryOptionsArr.join(',\n')}
-      })
+const queryKey = ${queryKeyName}(${queryKeyParamsCall})
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
+  ${enabledText}
+  queryKey,
+  queryFn: async ({ signal }) => {
+    return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
+  },
+  ${queryOptionsArr.join(',\n  ')}
+})
 `}
       </Function>
     </File.Source>

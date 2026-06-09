@@ -415,11 +415,14 @@ describe('printerZodMini', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.union([z.strictObject({
-          valueA: z.string(),
-        }), z.strictObject({
-          valueB: z.number(),
-        })])"
+        "z.union([
+          z.strictObject({
+            valueA: z.string(),
+          }),
+          z.strictObject({
+            valueB: z.number(),
+          }),
+        ])"
       `)
     })
 
@@ -476,13 +479,16 @@ describe('printerZodMini', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.discriminatedUnion("status", [z.object({
-          status: z.enum(["active"]),
-          name: z.string(),
-        }), z.object({
-          status: z.enum(["inactive"]),
-          reason: z.string(),
-        })])"
+        "z.discriminatedUnion("status", [
+          z.object({
+            status: z.enum(["active"]),
+            name: z.string(),
+          }),
+          z.object({
+            status: z.enum(["inactive"]),
+            reason: z.string(),
+          }),
+        ])"
       `)
     })
 
@@ -506,9 +512,12 @@ describe('printerZodMini', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.union([Cat, z.intersection(BasePet, z.object({
-          petType: z.string(),
-        }))])"
+        "z.union([
+          Cat,
+          z.intersection(BasePet, z.object({
+            petType: z.string(),
+          })),
+        ])"
       `)
     })
 

@@ -133,16 +133,16 @@ export function InfiniteQueryOptions({
       <File.Source name={name} isExportable isIndexable>
         <Function name={name} export params={paramsSignature}>
           {`
-      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-       ${enabledText}
-       queryKey,
-       queryFn: async ({ signal, pageParam }) => {
-          ${infiniteOverrideParams}
-          return ${clientName}(${clientCallStr})
-        },
-       ${queryOptionsArr.join(',\n')}
-      })
+const queryKey = ${queryKeyName}(${queryKeyParamsCall})
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
+  ${enabledText}
+  queryKey,
+  queryFn: async ({ signal, pageParam }) => {
+    ${infiniteOverrideParams}
+    return ${clientName}(${clientCallStr})
+  },
+  ${queryOptionsArr.join(',\n  ')}
+})
 `}
         </Function>
       </File.Source>
@@ -153,15 +153,15 @@ export function InfiniteQueryOptions({
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature}>
         {`
-      const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
-       ${enabledText}
-       queryKey,
-       queryFn: async ({ signal }) => {
-          return ${clientName}(${clientCallStr})
-        },
-       ${queryOptionsArr.join(',\n')}
-      })
+const queryKey = ${queryKeyName}(${queryKeyParamsCall})
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
+  ${enabledText}
+  queryKey,
+  queryFn: async ({ signal }) => {
+    return ${clientName}(${clientCallStr})
+  },
+  ${queryOptionsArr.join(',\n  ')}
+})
 `}
       </Function>
     </File.Source>

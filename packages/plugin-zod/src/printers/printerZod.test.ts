@@ -442,11 +442,14 @@ describe('printerZod', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.union([z.object({
-          valueA: z.string(),
-        }).strict(), z.object({
-          valueB: z.number(),
-        }).strict()])"
+        "z.union([
+          z.object({
+            valueA: z.string(),
+          }).strict(),
+          z.object({
+            valueB: z.number(),
+          }).strict(),
+        ])"
       `)
     })
 
@@ -525,13 +528,16 @@ describe('printerZod', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.discriminatedUnion("status", [z.object({
-          status: z.enum(["active"]),
-          name: z.string(),
-        }), z.object({
-          status: z.enum(["inactive"]),
-          reason: z.string(),
-        })])"
+        "z.discriminatedUnion("status", [
+          z.object({
+            status: z.enum(["active"]),
+            name: z.string(),
+          }),
+          z.object({
+            status: z.enum(["inactive"]),
+            reason: z.string(),
+          }),
+        ])"
       `)
     })
 
@@ -555,9 +561,12 @@ describe('printerZod', () => {
         ],
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`
-        "z.union([Cat, BasePet.and(z.object({
-          petType: z.string(),
-        }))])"
+        "z.union([
+          Cat,
+          BasePet.and(z.object({
+            petType: z.string(),
+          })),
+        ])"
       `)
     })
 
