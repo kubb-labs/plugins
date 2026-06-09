@@ -21,7 +21,6 @@ export async function addFiles(
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
-
   const formData = buildFormData(requestData)
 
   const res = await request<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
