@@ -48,7 +48,7 @@ export const pluginClientName = 'plugin-client' satisfies PluginClient['name']
  */
 export const pluginClient = definePlugin<PluginClient>((options) => {
   const {
-    output = { path: 'clients', barrelType: 'named' },
+    output = { path: 'clients', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

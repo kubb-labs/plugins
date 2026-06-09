@@ -68,11 +68,11 @@ options:
   - name: importPath
     type: string
     required: false
-    default: "'zod'"
+    default: "mini ? 'zod/mini' : 'zod'"
     description: |
       Module specifier used in the `import { z } from '...'` statement at the top of generated files.
 
-      Use `'zod/mini'` to import from the tree-shakeable Mini bundle, or a custom path when re-exporting Zod from your own module.
+      Defaults to `'zod'`, or `'zod/mini'` when the `mini` option is enabled. Set it explicitly to import from a custom path, for example when re-exporting Zod from your own module.
     examples:
       - name: Use Zod's mini bundle
         files:

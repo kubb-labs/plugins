@@ -115,7 +115,7 @@ export type Options = {
    * Module specifier used in the `import { z } from '...'` statement.
    * Use `'zod/mini'` for the tree-shakeable bundle.
    *
-   * @default 'zod'
+   * @default mini ? 'zod/mini' : 'zod'
    */
   importPath?: 'zod' | 'zod/mini' | (string & {})
   /**

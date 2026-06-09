@@ -36,7 +36,7 @@ export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
  */
 export const pluginTs = definePlugin<PluginTs>((options) => {
   const {
-    output = { path: 'types', barrelType: 'named' },
+    output = { path: 'types', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

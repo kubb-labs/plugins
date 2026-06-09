@@ -16,7 +16,7 @@ export const pluginSwrName = 'plugin-swr' satisfies PluginSwr['name']
 
 export const pluginSwr = definePlugin<PluginSwr>((options) => {
   const {
-    output = { path: 'hooks', barrelType: 'named' },
+    output = { path: 'hooks', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

@@ -40,7 +40,7 @@ export const pluginMswName = 'plugin-msw' satisfies PluginMsw['name']
  */
 export const pluginMsw = definePlugin<PluginMsw>((options) => {
   const {
-    output = { path: 'handlers', barrelType: 'named' },
+    output = { path: 'handlers', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

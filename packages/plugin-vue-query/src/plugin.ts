@@ -45,7 +45,7 @@ export const pluginVueQueryName = 'plugin-vue-query' satisfies PluginVueQuery['n
  */
 export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   const {
-    output = { path: 'hooks', barrelType: 'named' },
+    output = { path: 'hooks', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

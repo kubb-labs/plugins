@@ -49,7 +49,7 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  */
 export const pluginMcp = definePlugin<PluginMcp>((options) => {
   const {
-    output = { path: 'mcp', barrelType: 'named' },
+    output = { path: 'mcp', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

@@ -36,7 +36,7 @@ export const pluginCypressName = 'plugin-cypress' satisfies PluginCypress['name'
  */
 export const pluginCypress = definePlugin<PluginCypress>((options) => {
   const {
-    output = { path: 'cypress', barrelType: 'named' },
+    output = { path: 'cypress', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

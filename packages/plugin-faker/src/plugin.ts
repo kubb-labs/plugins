@@ -37,7 +37,7 @@ export const pluginFakerName = 'plugin-faker' satisfies PluginFaker['name']
  */
 export const pluginFaker = definePlugin<PluginFaker>((options) => {
   const {
-    output = { path: 'mocks', barrelType: 'named' },
+    output = { path: 'mocks', barrel: { type: 'named' } },
     seed,
     locale = 'en',
     group,
