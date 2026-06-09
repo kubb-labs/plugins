@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
-import type { MaybeRefOrGetter } from "vue";
-import { deleteUserResponseSchema } from "../zod/deleteUserSchema.ts";
-import { useMutation } from "@tanstack/vue-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import { deleteUserResponseSchema } from '../zod/deleteUserSchema.ts'
+import { useMutation } from '@tanstack/vue-query'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -21,10 +21,7 @@ export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 export async function deleteUser(username: DeleteUserPathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: "DELETE", url: `/user/${username}`, ...requestConfig })
+  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
 
   return deleteUserResponseSchema.parse(res.data)
 }
@@ -38,17 +35,15 @@ export function useDeleteUser<TContext>(options: {
   mutation?: MutationObserverOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, {username: MaybeRefOrGetter<DeleteUserPathUsername>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client },
 } = {}) {
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions?.mutationKey ?? deleteUserMutationKey()
 
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions?.mutationKey ?? deleteUserMutationKey()
-
-          return useMutation<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, {username: DeleteUserPathUsername}, TContext>({
-            mutationFn: async({ username }) => {
-              return deleteUser(username, config)
-            },
-            mutationKey,
-            ...mutationOptions
-          }, queryClient)
-
+  return useMutation<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, {username: DeleteUserPathUsername}, TContext>({
+    mutationFn: async({ username }) => {
+      return deleteUser(username, config)
+    },
+    mutationKey,
+    ...mutationOptions
+  }, queryClient)
 }

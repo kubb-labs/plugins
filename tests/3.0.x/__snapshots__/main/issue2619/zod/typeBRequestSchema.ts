@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { contactDetailsTypeSchema } from "./contactDetailsTypeSchema.ts";
+import * as z from 'zod'
+import { contactDetailsTypeSchema } from './contactDetailsTypeSchema.ts'
 
 export const typeBRequestSchema = z.object({
-    "actorId": z.string(),
-    "ticketId": z.string(),
-    "contactDetails": contactDetailsTypeSchema
-    })
+  actorId: z.string(),
+  ticketId: z.string(),
+  contactDetails: contactDetailsTypeSchema,
+})

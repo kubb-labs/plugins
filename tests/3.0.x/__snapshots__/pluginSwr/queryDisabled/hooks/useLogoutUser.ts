@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { LogoutUserResponse } from "../types/LogoutUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
@@ -18,20 +18,15 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/user/logout`, ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
   return res.data
 }
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return logoutUser(config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return logoutUser(config)
+    },
+  }
 }

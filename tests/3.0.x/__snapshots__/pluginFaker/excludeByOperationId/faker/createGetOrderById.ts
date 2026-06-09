@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json, GetOrderByIdStatus200Xml, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
-import { createOrder } from "./createOrder.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { GetOrderByIdResponse, GetOrderByIdStatus200, GetOrderByIdStatus200Json, GetOrderByIdStatus200Xml, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
+import { createOrder } from './createOrder.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createGetOrderByIdPathOrderId(data?: bigint): bigint {
   return data ?? faker.number.bigInt()

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeleteUserPathUsername(data?: string): string {
   return data ?? faker.string.alpha()

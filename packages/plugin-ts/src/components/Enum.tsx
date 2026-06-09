@@ -1,4 +1,5 @@
-import { camelCase, trimQuotes } from '@internals/utils'
+import { camelCase } from '@internals/utils'
+import { trimQuotes } from '@kubb/ast/utils'
 import type { ast } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import { File } from '@kubb/renderer-jsx'

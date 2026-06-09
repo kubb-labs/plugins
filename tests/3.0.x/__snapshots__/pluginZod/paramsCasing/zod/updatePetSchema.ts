@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { petSchema } from "./petSchema.ts";
-import { petUpdateSchema } from "./petUpdateSchema.ts";
+import * as z from 'zod'
+import { petSchema } from './petSchema.ts'
+import { petUpdateSchema } from './petUpdateSchema.ts'
 
 export const updatePetPathPetIdSchema = z.string()
 

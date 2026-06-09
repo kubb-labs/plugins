@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWRMutation from "swr/mutation";
-import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from "../types/UpdateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRMutationConfiguration } from "swr/mutation";
-import { updateUserResponseSchema, updateUserDataSchema } from "../zod/updateUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWRMutation from 'swr/mutation'
+import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../types/UpdateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRMutationConfiguration } from 'swr/mutation'
+import { updateUserResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -20,13 +20,11 @@ export type UpdateUserMutationKey = ReturnType<typeof updateUserMutationKey>
  * {@link /user/:username}
  */
 export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = updateUserDataSchema.parse(data)
 
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
 
   return updateUserResponseSchema.parse(res.data)
 }
@@ -43,16 +41,14 @@ export function useUpdateUser(options: {
   client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = updateUserMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = updateUserMutationKey()
-
-          return useSWRMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { username, data } }) => {
-              return updateUser(username, data, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserMutationKey | null, UpdateUserMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { username, data } }) => {
+      return updateUser(username, data, config)
+    },
+    mutationOptions
+  )
 }

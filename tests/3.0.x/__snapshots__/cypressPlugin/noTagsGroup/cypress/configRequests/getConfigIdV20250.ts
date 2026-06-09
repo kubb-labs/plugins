@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetConfigIdV20250PathConfigId, GetConfigIdV20250Response } from "../../types/GetConfigIdV20250.ts";
+import type { GetConfigIdV20250PathConfigId, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250.ts'
 
 export function getConfigIdV20250(config_id: GetConfigIdV20250PathConfigId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
   return cy.request<GetConfigIdV20250Response>({

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import { updatePetHandler } from "./updatePet.ts";
-import { updatePetDataSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from "../zod/updatePetSchema.ts";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
-import { z } from "zod";
+import { updatePetHandler } from './updatePet.ts'
+import { updatePetDataSchema, updatePetPathPetIdSchema, updatePetQueryIncludeDeletedSchema, updatePetQueryRequestSourceSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { z } from 'zod'
 
 export function getServer() {
   const server = new McpServer({
@@ -25,7 +25,9 @@ export function getServer() {
 
   return server
 }
+
 export const server = getServer()
+
 export async function startServer() {
   try {
       const transport = new StdioServerTransport()

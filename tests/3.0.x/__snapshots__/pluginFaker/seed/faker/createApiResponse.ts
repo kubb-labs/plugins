@@ -3,13 +3,18 @@
 * Do not edit manually.
 */
 
-import type { ApiResponse } from "../types/ApiResponse.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { ApiResponse } from '../types/ApiResponse.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createApiResponse<TData extends Partial<ApiResponse> = object>(data?: TData)
+
 {
   faker.seed([42])
-  const defaultFakeData = {"code": faker.number.int(),"type": faker.string.alpha(),"message": faker.string.alpha()}
+  const defaultFakeData = {
+  code: faker.number.int(),
+  type: faker.string.alpha(),
+  message: faker.string.alpha(),
+}
   return {
     ...defaultFakeData,
     ...(data || {}),

@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetStatus200 } from "../types/UpdatePet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
-import type { MaybeRefOrGetter } from "vue";
-import { useMutation } from "@tanstack/vue-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import { useMutation } from '@tanstack/vue-query'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 
@@ -18,17 +18,13 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 export async function updatePet(petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const pet_id = petId
-
 
   const mappedParams = params ? { "include_deleted": params.includeDeleted, "request_source": params.requestSource } : undefined
 
-
   const requestData = data
 
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${pet_id}`, params: mappedParams, data: requestData, ...requestConfig })
 
   return res.data
 }
@@ -40,17 +36,15 @@ export function useUpdatePet<TContext>(options: {
   mutation?: MutationObserverOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: MaybeRefOrGetter<UpdatePetPathPetId>, data: MaybeRefOrGetter<UpdatePetData>, params?: MaybeRefOrGetter<{ includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
 } = {}) {
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions?.mutationKey ?? updatePetMutationKey()
 
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions?.mutationKey ?? updatePetMutationKey()
-
-          return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>({
-            mutationFn: async({ petId, data, params }) => {
-              return updatePet(petId, data, params, config)
-            },
-            mutationKey,
-            ...mutationOptions
-          }, queryClient)
-
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>({
+    mutationFn: async({ petId, data, params }) => {
+      return updatePet(petId, data, params, config)
+    },
+    mutationKey,
+    ...mutationOptions
+  }, queryClient)
 }

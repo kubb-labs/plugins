@@ -40,7 +40,9 @@ export function createUpdatePetStatus200Faker(_data?: UpdatePetStatus200): Updat
  * @description accepted operation
  */
 export function createUpdatePetStatus202Faker<TData extends Partial<UpdatePetStatus202> = object>(data?: TData) {
-  const defaultFakeData = { id: faker.number.int() }
+  const defaultFakeData = {
+    id: faker.number.int(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

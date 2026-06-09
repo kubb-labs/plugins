@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { parcelSchema } from "./parcelSchema.ts";
+import * as z from 'zod'
+import { parcelSchema } from './parcelSchema.ts'
 
 export const resultSchema = z.object({
-    "returnId": z.string(),
-    "state": z.enum(["ACCEPTED", "REJECTED"]),
-    "parcels": z.array(parcelSchema).optional()
-    })
+  returnId: z.string(),
+  state: z.enum(['ACCEPTED', 'REJECTED']),
+  parcels: z.array(parcelSchema).optional(),
+})

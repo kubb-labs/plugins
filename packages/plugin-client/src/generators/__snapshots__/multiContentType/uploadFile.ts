@@ -22,7 +22,6 @@ export async function uploadFile(
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
-
   const formData = buildFormData(requestData)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWR from "swr";
-import type { GetUserByNameResponse, GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../../types/GetUserByName.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWR from 'swr'
+import type { GetUserByNameResponse, GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../types/GetUserByName.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
 
 export const getUserByNameQueryKey = (username?: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
 
@@ -20,22 +20,17 @@ type GetUserByNameQueryKey = ReturnType<typeof getUserByNameQueryKey>
 export async function getUserByName(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}`, ...requestConfig })
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: 'GET', url: `/user/${username}`, ...requestConfig })
 
   return res.data
 }
 
 export function getUserByNameQueryOptions(username?: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return getUserByName(username!, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return getUserByName(username!, config)
+    },
+  }
 }
 
 /**
@@ -48,22 +43,20 @@ export function useGetUserByName(username?: GetUserByNamePathUsername, options: 
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = getUserByNameQueryKey(username)
 
-         const queryKey = getUserByNameQueryKey(username)
-
-         return useSWR<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameQueryKey | null>(
-          shouldFetch && !!(username) ? queryKey : null,
-          {
-            ...getUserByNameQueryOptions(username, config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameQueryKey | null>(
+   shouldFetch && !!(username) ? queryKey : null,
+   {
+     ...getUserByNameQueryOptions(username, config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

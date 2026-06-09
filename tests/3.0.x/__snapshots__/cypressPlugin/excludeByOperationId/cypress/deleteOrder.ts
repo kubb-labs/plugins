@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { DeleteOrderPathOrderId, DeleteOrderResponse } from "../types/DeleteOrder.ts";
+import type { DeleteOrderPathOrderId, DeleteOrderResponse } from '../types/DeleteOrder.ts'
 
 export function deleteOrder(orderId: DeleteOrderPathOrderId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeleteOrderResponse> {
   return cy.request<DeleteOrderResponse>({

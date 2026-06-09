@@ -3,12 +3,13 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse, GetInventoryStatus200 } from "../../types/GetInventory.ts";
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../../types/GetInventory.ts'
 
 /**
    * @description successful operation
    */
   export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData)
+
 {
   const defaultFakeData = {}
   return {

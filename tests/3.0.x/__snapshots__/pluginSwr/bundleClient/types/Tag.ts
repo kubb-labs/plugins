@@ -3,6 +3,6 @@
 * Do not edit manually.
 */
 
-import type { Category } from "./Category.ts";
+import type { Category } from './Category.ts'
 
 export type Tag = Category;

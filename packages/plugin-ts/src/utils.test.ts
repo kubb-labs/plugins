@@ -214,7 +214,7 @@ describe('buildPropertyJSDocComments', () => {
 
     expect(comments).toContain('@description A pet name')
     expect(comments).toContain('@deprecated')
-    expect(comments).toContain('@default "Fluffy"')
+    expect(comments).toContain("@default 'Fluffy'")
   })
 
   it('does not emit @minLength/@maxLength for array schemas', () => {

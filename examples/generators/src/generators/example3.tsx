@@ -24,6 +24,7 @@ export const example3 = defineGenerator<PluginClient>({
 
     return (
       <File baseName={file.baseName} path={file.path} meta={file.meta}>
+        <File.Source>{'/** @jsxImportSource react */'}</File.Source>
         <File.Source>
           <Function name={componentName} export>
             <Const name="href">{`'${href}'`}</Const>

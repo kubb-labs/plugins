@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWRMutation from "swr/mutation";
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRMutationConfiguration } from "swr/mutation";
-import { deleteUserResponseSchema } from "../zod/deleteUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWRMutation from 'swr/mutation'
+import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRMutationConfiguration } from 'swr/mutation'
+import { deleteUserResponseSchema } from '../zod/deleteUserSchema.ts'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -22,10 +22,7 @@ export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
 export async function deleteUser(username: DeleteUserPathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: "DELETE", url: `/user/${username}`, ...requestConfig })
+  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
 
   return deleteUserResponseSchema.parse(res.data)
 }
@@ -42,16 +39,14 @@ export function useDeleteUser(options: {
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = deleteUserMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = deleteUserMutationKey()
-
-          return useSWRMutation<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { username } }) => {
-              return deleteUser(username, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { username } }) => {
+      return deleteUser(username, config)
+    },
+    mutationOptions
+  )
 }

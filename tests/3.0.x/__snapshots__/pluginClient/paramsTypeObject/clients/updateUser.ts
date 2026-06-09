@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from "../types/UpdateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
   const res = { method: 'PUT', url: `/user/${username}` as const }
@@ -19,13 +19,11 @@ function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
  * {@link /user/:username}
  */
 export async function updateUser({ username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData }, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: getUpdateUserUrl({ username }).url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: getUpdateUserUrl({ username }).url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

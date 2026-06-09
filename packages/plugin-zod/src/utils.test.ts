@@ -19,7 +19,7 @@ import {
 
 describe('formatDefault', () => {
   test('string value is quoted', () => {
-    expect(formatDefault('hello')).toBe('"hello"')
+    expect(formatDefault('hello')).toMatchInlineSnapshot(`"'hello'"`)
   })
 
   test('number value is stringified', () => {
@@ -45,7 +45,7 @@ describe('formatDefault', () => {
 
 describe('formatLiteral', () => {
   test('string value is quoted', () => {
-    expect(formatLiteral('cat')).toBe('"cat"')
+    expect(formatLiteral('cat')).toMatchInlineSnapshot(`"'cat'"`)
   })
 
   test('number value is raw', () => {
@@ -213,7 +213,7 @@ describe('applyModifiers', () => {
   })
 
   test('default value (string)', () => {
-    expect(applyModifiers({ value: 'z.string()', defaultValue: 'hi' })).toBe('z.string().default("hi")')
+    expect(applyModifiers({ value: 'z.string()', defaultValue: 'hi' })).toMatchInlineSnapshot(`"z.string().default('hi')"`)
   })
 
   test('default value (number)', () => {
@@ -225,12 +225,12 @@ describe('applyModifiers', () => {
   })
 
   test('description', () => {
-    expect(applyModifiers({ value: 'z.string()', description: 'A name' })).toBe('z.string().describe("A name")')
+    expect(applyModifiers({ value: 'z.string()', description: 'A name' })).toMatchInlineSnapshot(`"z.string().describe('A name')"`)
   })
 
   test('all modifiers combined', () => {
-    expect(applyModifiers({ value: 'z.string()', optional: true, nullable: true, defaultValue: 'x', description: 'desc' })).toBe(
-      'z.string().nullish().default("x").describe("desc")',
+    expect(applyModifiers({ value: 'z.string()', optional: true, nullable: true, defaultValue: 'x', description: 'desc' })).toMatchInlineSnapshot(
+      `"z.string().nullish().default('x').describe('desc')"`,
     )
   })
 })
@@ -257,7 +257,7 @@ describe('applyMiniModifiers', () => {
   })
 
   test('default value', () => {
-    expect(applyMiniModifiers({ value: 'z.string()', defaultValue: 'hi' })).toBe('z._default(z.string(), "hi")')
+    expect(applyMiniModifiers({ value: 'z.string()', defaultValue: 'hi' })).toMatchInlineSnapshot(`"z._default(z.string(), 'hi')"`)
   })
 
   test('default value (object)', () => {

@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWRMutation from "swr/mutation";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRMutationConfiguration } from "swr/mutation";
-import { createUserResponseSchema, createUserDataSchema } from "../zod/createUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWRMutation from 'swr/mutation'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRMutationConfiguration } from 'swr/mutation'
+import { createUserResponseSchema, createUserDataSchema } from '../zod/createUserSchema.ts'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -20,13 +20,11 @@ export type CreateUserMutationKey = ReturnType<typeof createUserMutationKey>
  * {@link /user}
  */
 export async function createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = createUserDataSchema.parse(data)
 
-
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData, contentType, ...requestConfig })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
 
   return createUserResponseSchema.parse(res.data)
 }
@@ -43,16 +41,14 @@ export function useCreateUser(options: {
   client?: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = createUserMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = createUserMutationKey()
-
-          return useSWRMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { data } }) => {
-              return createUser(data, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserMutationKey | null, CreateUserMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { data } }) => {
+      return createUser(data, config)
+    },
+    mutationOptions
+  )
 }

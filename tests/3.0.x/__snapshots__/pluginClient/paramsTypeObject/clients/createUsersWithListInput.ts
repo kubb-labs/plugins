@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: `/user/createWithList` as const }
@@ -21,11 +21,9 @@ function getCreateUsersWithListInputUrl() {
 export async function createUsersWithListInput({ data }: { data?: CreateUsersWithListInputData } = {}, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const requestData = data
 
-
-  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
 
   return res.data
 }

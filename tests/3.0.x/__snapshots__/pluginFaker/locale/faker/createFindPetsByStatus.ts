@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
-import { createPet } from "./createPet.ts";
-import { createPetStatusEnum } from "./createPetStatusEnum.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus200Json, FindPetsByStatusStatus200Xml, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
+import { createPet } from './createPet.ts'
+import { createPetStatusEnum } from './createPetStatusEnum.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createFindPetsByStatusQueryStatus(data?: Partial<FindPetsByStatusQueryStatus>): FindPetsByStatusQueryStatus {
   return createPetStatusEnum(data) as FindPetsByStatusQueryStatus

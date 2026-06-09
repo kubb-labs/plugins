@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWR from "swr";
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
-import { findPetsByTagsResponseSchema } from "../zod/findPetsByTagsSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWR from 'swr'
+import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
+import { findPetsByTagsResponseSchema } from '../zod/findPetsByTagsSchema.ts'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
@@ -22,22 +22,17 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: "GET", url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
   return findPetsByTagsResponseSchema.parse(res.data)
 }
 
 export function findPetsByTagsQueryOptions(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return findPetsByTags(params, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return findPetsByTags(params, config)
+    },
+  }
 }
 
 /**
@@ -51,22 +46,20 @@ export function useFindPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, o
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = findPetsByTagsQueryKey(params)
 
-         const queryKey = findPetsByTagsQueryKey(params)
-
-         return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(
-          shouldFetch ? queryKey : null,
-          {
-            ...findPetsByTagsQueryOptions(params, config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(
+   shouldFetch ? queryKey : null,
+   {
+     ...findPetsByTagsQueryOptions(params, config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

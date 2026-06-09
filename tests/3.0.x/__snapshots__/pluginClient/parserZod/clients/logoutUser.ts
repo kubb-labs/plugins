@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { LogoutUserResponse } from "../types/LogoutUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { logoutUserResponseSchema } from "../zod/logoutUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { logoutUserResponseSchema } from '../zod/logoutUserSchema.ts'
 
 function getLogoutUserUrl() {
   const res = { method: 'GET', url: `/user/logout` as const }
@@ -21,10 +21,7 @@ function getLogoutUserUrl() {
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: getLogoutUserUrl().url.toString(), ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getLogoutUserUrl().url.toString(), ...requestConfig })
 
   return logoutUserResponseSchema.parse(res.data)
 }

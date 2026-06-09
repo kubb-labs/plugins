@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWR from "swr";
-import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetInventory.ts";
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWR from 'swr'
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -21,22 +21,17 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory`, ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res
 }
 
 export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return getInventory(config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return getInventory(config)
+    },
+  }
 }
 
 /**
@@ -50,22 +45,20 @@ export function useGetInventory(options: {
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = getInventoryQueryKey()
 
-         const queryKey = getInventoryQueryKey()
-
-         return useSWR<ResponseConfig<GetInventoryResponse>, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(
-          shouldFetch ? queryKey : null,
-          {
-            ...getInventoryQueryOptions(config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<ResponseConfig<GetInventoryResponse>, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(
+   shouldFetch ? queryKey : null,
+   {
+     ...getInventoryQueryOptions(config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

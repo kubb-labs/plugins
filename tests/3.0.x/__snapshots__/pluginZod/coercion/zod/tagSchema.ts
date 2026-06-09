@@ -3,6 +3,6 @@
 * Do not edit manually.
 */
 
-import { categorySchema } from "./categorySchema.ts";
+import { categorySchema } from './categorySchema.ts'
 
 export const tagSchema = categorySchema

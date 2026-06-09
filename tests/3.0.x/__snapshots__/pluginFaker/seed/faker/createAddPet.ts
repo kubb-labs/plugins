@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { AddPetData, AddPetFormUrlEncodedData, AddPetJsonData, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml, AddPetStatus405, AddPetXmlData } from "../types/AddPet.ts";
-import { createAddPetRequest } from "./createAddPetRequest.ts";
-import { createPet } from "./createPet.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { AddPetData, AddPetFormUrlEncodedData, AddPetJsonData, AddPetResponse, AddPetStatus200, AddPetStatus200Json, AddPetStatus200Xml, AddPetStatus405, AddPetXmlData } from '../types/AddPet.ts'
+import { createAddPetRequest } from './createAddPetRequest.ts'
+import { createPet } from './createPet.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description Successful operation

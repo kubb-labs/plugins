@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
-export const deleteUserPathUsernameSchema = z.coerce.string().describe("The name that needs to be deleted")
+export const deleteUserPathUsernameSchema = z.coerce.string().describe('The name that needs to be deleted')
 
 export const deleteUserStatus400Schema = z.any()
 

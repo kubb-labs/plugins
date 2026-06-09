@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWRMutation from "swr/mutation";
-import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRMutationConfiguration } from "swr/mutation";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWRMutation from 'swr/mutation'
+import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -19,13 +19,11 @@ export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
  * {@link /pet}
  */
 export async function updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return res
 }
@@ -42,16 +40,14 @@ export function useUpdatePet(options: {
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = updatePetMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = updatePetMutationKey()
-
-          return useSWRMutation<ResponseConfig<UpdatePetResponse>, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { data } }) => {
-              return updatePet(data, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<ResponseConfig<UpdatePetResponse>, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { data } }) => {
+      return updatePet(data, config)
+    },
+    mutationOptions
+  )
 }

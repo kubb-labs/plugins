@@ -1,8 +1,8 @@
-import client from "@kubb/plugin-client/clients/axios";
-import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from "../../types/DeletePet.ts";
-import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
-import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
+import client from '@kubb/plugin-client/clients/axios'
+import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description delete a pet
@@ -10,10 +10,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from "@modelco
  * {@link /pet/:petId}
  */
 export async function deletePetHandler({ petId, headers }: { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, headers: { ...headers } }, request)
 
   return {

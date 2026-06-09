@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const loginUserSuspenseQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) => [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
@@ -20,25 +20,20 @@ type LoginUserSuspenseQueryKey = ReturnType<typeof loginUserSuspenseQueryKey>
 export async function loginUserSuspense(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: `/user/login`, params, ...requestConfig })
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: `/user/login`, params, ...requestConfig })
 
   return res.data
 }
 
 export function loginUserSuspenseQueryOptions(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = loginUserSuspenseQueryKey(params)
+  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
 
-        const queryKey = loginUserSuspenseQueryKey(params)
-        return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
-
-         queryKey,
-         queryFn: async ({ signal }) => {
-            return loginUserSuspense(params, { ...config, signal: config.signal ?? signal })
-         },
-        })
-
+   queryKey,
+   queryFn: async ({ signal }) => {
+      return loginUserSuspense(params, { ...config, signal: config.signal ?? signal })
+   },
+  })
 }
 
 /**
@@ -49,20 +44,18 @@ export function useLoginUserSuspense<TData = LoginUserStatus200, TQueryKey exten
   query?: Partial<UseSuspenseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
+  const { query: queryConfig = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? loginUserSuspenseQueryKey(params)
 
-         const { query: queryConfig = {}, client: config = {} } = options ?? {}
-         const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? loginUserSuspenseQueryKey(params)
 
+  const query = useSuspenseQuery({
+   ...loginUserSuspenseQueryOptions(params, config),
+   ...resolvedOptions,
+   queryKey,
+  } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<LoginUserStatus400>> & { queryKey: TQueryKey }
 
-         const query = useSuspenseQuery({
-          ...loginUserSuspenseQueryOptions(params, config),
-          ...resolvedOptions,
-          queryKey,
-         } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<LoginUserStatus400>> & { queryKey: TQueryKey }
+  query.queryKey = queryKey as TQueryKey
 
-         query.queryKey = queryKey as TQueryKey
-
-         return query
-
+  return query
 }

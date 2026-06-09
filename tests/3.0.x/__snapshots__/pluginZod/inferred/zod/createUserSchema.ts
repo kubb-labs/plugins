@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { userSchema } from "./userSchema.ts";
+import * as z from 'zod'
+import { userSchema } from './userSchema.ts'
 
 export const createUserStatusDefaultSchemaJson = userSchema
 
@@ -22,15 +22,15 @@ export const createUserResponseSchema = createUserStatusDefaultSchema
 
 export type CreateUserResponseSchema = z.infer<typeof createUserResponseSchema>
 
-export const createUserDataSchemaJson = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaJson = userSchema.optional().describe('Created user object')
 
 export type CreateUserDataSchemaJson = z.infer<typeof createUserDataSchemaJson>
 
-export const createUserDataSchemaXml = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaXml = userSchema.optional().describe('Created user object')
 
 export type CreateUserDataSchemaXml = z.infer<typeof createUserDataSchemaXml>
 
-export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe("Created user object")
+export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Created user object')
 
 export type CreateUserDataSchemaFormUrlEncoded = z.infer<typeof createUserDataSchemaFormUrlEncoded>
 

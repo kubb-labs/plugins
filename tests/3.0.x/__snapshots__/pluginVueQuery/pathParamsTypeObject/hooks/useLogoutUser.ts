@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { LogoutUserResponse } from "../types/LogoutUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from "@tanstack/vue-query";
-import { queryOptions, useQuery } from "@tanstack/vue-query";
-import { toValue } from "vue";
+import client from '@kubb/plugin-client/clients/axios'
+import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
+import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
@@ -21,25 +21,20 @@ export type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/user/logout`, ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
   return res.data
 }
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = logoutUserQueryKey()
+  return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse>({
 
-        const queryKey = logoutUserQueryKey()
-        return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse>({
-
-         queryKey,
-         queryFn: async ({ signal }) => {
-            return logoutUser({ ...config, signal: config.signal ?? signal })
-         },
-        })
-
+   queryKey,
+   queryFn: async ({ signal }) => {
+      return logoutUser({ ...config, signal: config.signal ?? signal })
+   },
+  })
 }
 
 /**
@@ -50,19 +45,17 @@ export function useLogoutUser<TData = LogoutUserResponse, TQueryData = LogoutUse
   query?: Partial<UseQueryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
+  const { query: queryConfig = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? logoutUserQueryKey()
 
-         const { query: queryConfig = {}, client: config = {} } = options ?? {}
-         const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? logoutUserQueryKey()
+  const query = useQuery({
+   ...logoutUserQueryOptions(config),
+   ...resolvedOptions,
+   queryKey
+  } as unknown as UseQueryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, TData, LogoutUserResponse, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-         const query = useQuery({
-          ...logoutUserQueryOptions(config),
-          ...resolvedOptions,
-          queryKey
-         } as unknown as UseQueryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, TData, LogoutUserResponse, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  query.queryKey = queryKey as TQueryKey
 
-         query.queryKey = queryKey as TQueryKey
-
-         return query
-
+  return query
 }

@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { orderSchema } from "./orderSchema.ts";
+import * as z from 'zod'
+import { orderSchema } from './orderSchema.ts'
 
-export const getOrderByIdPathOrderIdSchema = z.bigint().describe("ID of order that needs to be fetched")
+export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
 export type GetOrderByIdPathOrderIdSchema = z.infer<typeof getOrderByIdPathOrderIdSchema>
 

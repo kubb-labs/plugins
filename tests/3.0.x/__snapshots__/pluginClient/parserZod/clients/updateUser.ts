@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from "../types/UpdateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { updateUserResponseSchema, updateUserDataSchema } from "../zod/updateUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { updateUserResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
   const res = { method: 'PUT', url: `/user/${username}` as const }
@@ -20,13 +20,11 @@ function getUpdateUserUrl(username: UpdateUserPathUsername) {
  * {@link /user/:username}
  */
 export async function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = updateUserDataSchema.parse(data)
 
-
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: getUpdateUserUrl(username).url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: getUpdateUserUrl(username).url.toString(), data: requestData, contentType, ...requestConfig })
 
   return updateUserResponseSchema.parse(res.data)
 }

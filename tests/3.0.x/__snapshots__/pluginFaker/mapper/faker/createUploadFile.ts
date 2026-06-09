@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UploadFileResponse, UploadFileStatus200 } from "../types/UploadFile.ts";
-import { createApiResponse } from "./createApiResponse.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile.ts'
+import { createApiResponse } from './createApiResponse.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUploadFilePathPetId(data?: bigint): bigint {
   return data ?? faker.number.bigInt()

@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from "../types/DeletePet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const deletePetQueryKey = (petId?: DeletePetPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
@@ -19,20 +19,15 @@ type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
 export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
+  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
   return res.data
 }
 
 export function deletePetQueryOptions(petId?: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return deletePet(petId!, headers, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return deletePet(petId!, headers, config)
+    },
+  }
 }

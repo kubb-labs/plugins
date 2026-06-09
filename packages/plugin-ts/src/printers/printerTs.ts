@@ -1,3 +1,4 @@
+import { extractRefName } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
 import type ts from 'typescript'
@@ -173,7 +174,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         // Use the canonical name from the $ref path — node.name may have been overridden
         // (e.g. by single-member allOf flatten using the property-derived child name).
         // Inline refs (without $ref) from utils already carry resolved type names.
-        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
+        const refName = node.ref ? (extractRefName(node.ref) ?? node.name) : node.name
 
         // When a Key suffix is configured, enum refs must use the suffixed name (e.g. `StatusKey`)
         // so the reference matches what the enum file actually exports.

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { GetInventoryStatus200 } from "../types/GetInventory.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from "@tanstack/react-query";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -21,25 +21,20 @@ type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryK
 export async function getInventorySuspense(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory`, ...requestConfig })
+  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
   return res.data
 }
 
 export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = getInventorySuspenseQueryKey()
+  return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
 
-        const queryKey = getInventorySuspenseQueryKey()
-        return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
-
-         queryKey,
-         queryFn: async ({ signal }) => {
-            return getInventorySuspense({ ...config, signal: config.signal ?? signal })
-         },
-        })
-
+   queryKey,
+   queryFn: async ({ signal }) => {
+      return getInventorySuspense({ ...config, signal: config.signal ?? signal })
+   },
+  })
 }
 
 /**
@@ -51,20 +46,18 @@ export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey
   query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
+  const { query: queryConfig = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
 
-         const { query: queryConfig = {}, client: config = {} } = options ?? {}
-         const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
 
+  const query = useSuspenseQuery({
+   ...getInventorySuspenseQueryOptions(config),
+   ...resolvedOptions,
+   queryKey,
+  } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-         const query = useSuspenseQuery({
-          ...getInventorySuspenseQueryOptions(config),
-          ...resolvedOptions,
-          queryKey,
-         } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
+  query.queryKey = queryKey as TQueryKey
 
-         query.queryKey = queryKey as TQueryKey
-
-         return query
-
+  return query
 }

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { petSchema } from "./petSchema.ts";
+import * as z from 'zod'
+import { petSchema } from './petSchema.ts'
 
 export const updatePetStatus200SchemaJson = petSchema
 
@@ -34,15 +34,15 @@ export const updatePetResponseSchema = z.union([updatePetStatus200Schema, update
 
 export type UpdatePetResponseSchema = z.infer<typeof updatePetResponseSchema>
 
-export const updatePetDataSchemaJson = petSchema.describe("Update an existent pet in the store")
+export const updatePetDataSchemaJson = petSchema.describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchemaJson = z.infer<typeof updatePetDataSchemaJson>
 
-export const updatePetDataSchemaXml = petSchema.describe("Update an existent pet in the store")
+export const updatePetDataSchemaXml = petSchema.describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchemaXml = z.infer<typeof updatePetDataSchemaXml>
 
-export const updatePetDataSchemaFormUrlEncoded = petSchema.describe("Update an existent pet in the store")
+export const updatePetDataSchemaFormUrlEncoded = petSchema.describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchemaFormUrlEncoded = z.infer<typeof updatePetDataSchemaFormUrlEncoded>
 

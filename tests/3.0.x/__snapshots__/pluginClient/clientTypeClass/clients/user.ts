@@ -3,16 +3,16 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
-import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from "../types/GetUserByName.ts";
-import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
-import type { LogoutUserResponse } from "../types/LogoutUser.ts";
-import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from "../types/UpdateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { mergeConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
+import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
+import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../types/GetUserByName.ts'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
+import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../types/UpdateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { mergeConfig } from '@kubb/plugin-client/clients/axios'
 
 export class User {
   #config: Partial<RequestConfig> & { client?: Client }
@@ -27,7 +27,7 @@ export class User {
    * {@link /user}
    */
   async createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-    const { client: request = client, contentType = "application/json", ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ ...requestConfig, method: "POST", url: `/user`, data: requestData, contentType })
     return res.data
@@ -81,7 +81,7 @@ export class User {
    * {@link /user/:username}
    */
   async updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, config: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-    const { client: request = client, contentType = "application/json", ...requestConfig } = mergeConfig(this.#config, config)
+    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ ...requestConfig, method: "PUT", url: `/user/${username}`, data: requestData, contentType })
     return res.data

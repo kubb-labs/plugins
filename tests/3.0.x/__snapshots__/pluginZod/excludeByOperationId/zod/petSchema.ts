@@ -3,17 +3,17 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { categorySchema } from "./categorySchema.ts";
-import { petStatusEnumSchema } from "./petStatusEnumSchema.ts";
-import { tagSchema } from "./tagSchema.ts";
+import * as z from 'zod'
+import { categorySchema } from './categorySchema.ts'
+import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
+import { tagSchema } from './tagSchema.ts'
 
 export const petSchema = z.object({
-    "id": z.bigint().optional(),
-    "name": z.string(),
-    "log": z.string().min(2).max(42).regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/).optional(),
-    "category": categorySchema.optional(),
-    "photoUrls": z.array(z.string()),
-    "tags": z.array(tagSchema).optional(),
-    "status": petStatusEnumSchema.optional().describe("pet status in the store")
-    })
+  id: z.bigint().optional(),
+  name: z.string(),
+  log: z.string().min(2).max(42).regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/).optional(),
+  category: categorySchema.optional(),
+  photoUrls: z.array(z.string()),
+  tags: z.array(tagSchema).optional(),
+  status: petStatusEnumSchema.optional().describe('pet status in the store'),
+})

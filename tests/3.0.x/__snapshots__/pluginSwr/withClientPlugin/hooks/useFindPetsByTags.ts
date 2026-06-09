@@ -3,24 +3,22 @@
 * Do not edit manually.
 */
 
-import useSWR from "swr";
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
-import { findPetsByTags } from "../clients/findPetsByTags.ts";
+import useSWR from 'swr'
+import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
+import { findPetsByTags } from '../clients/findPetsByTags.ts'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return findPetsByTags(params, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return findPetsByTags(params, config)
+    },
+  }
 }
 
 /**
@@ -34,22 +32,20 @@ export function useFindPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, o
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = findPetsByTagsQueryKey(params)
 
-         const queryKey = findPetsByTagsQueryKey(params)
-
-         return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(
-          shouldFetch ? queryKey : null,
-          {
-            ...findPetsByTagsQueryOptions(params, config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(
+   shouldFetch ? queryKey : null,
+   {
+     ...findPetsByTagsQueryOptions(params, config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

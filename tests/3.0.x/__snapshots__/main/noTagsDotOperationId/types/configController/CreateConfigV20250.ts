@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Config } from "../Config.ts";
-import type { ConfigCreate } from "../ConfigCreate.ts";
+import type { Config } from '../Config.ts'
+import type { ConfigCreate } from '../ConfigCreate.ts'
 
 /**
  * @type object

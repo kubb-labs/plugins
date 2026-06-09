@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const orderSchema = z.object({
-    "id": z.coerce.bigint().optional(),
-    "petId": z.coerce.bigint().optional(),
-    "quantity": z.coerce.number().int().optional(),
-    "shipDate": z.iso.datetime().optional(),
-    "status": z.enum(["placed", "approved", "delivered"]).optional().describe("Order Status"),
-    "complete": z.boolean().optional()
-    })
+  id: z.coerce.bigint().optional(),
+  petId: z.coerce.bigint().optional(),
+  quantity: z.coerce.number().int().optional(),
+  shipDate: z.iso.datetime().optional(),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
+  complete: z.boolean().optional(),
+})

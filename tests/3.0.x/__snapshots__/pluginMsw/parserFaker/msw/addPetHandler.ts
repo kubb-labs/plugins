@@ -3,27 +3,25 @@
 * Do not edit manually.
 */
 
-import type { AddPetResponse, AddPetStatus405, AddPetData } from "../types/AddPet.ts";
-import type { HttpResponseResolver } from "msw";
-import { createAddPetResponse } from "../faker/createAddPet.ts";
-import { http } from "msw";
+import type { AddPetResponse, AddPetStatus405, AddPetData } from '../types/AddPet.ts'
+import type { HttpResponseResolver } from 'msw'
+import { createAddPetResponse } from '../faker/createAddPet.ts'
+import { http } from 'msw'
 
 export function addPetHandlerResponse200(data: AddPetResponse) {
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-          headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+  return new Response(JSON.stringify(data), {
+    status: 200,
+      headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 }
 
 export function addPetHandlerResponse405(data?: AddPetStatus405) {
+  return new Response(JSON.stringify(data), {
+    status: 405,
 
-      return new Response(JSON.stringify(data), {
-        status: 405,
-
-      })
+  })
 }
 
 export function addPetHandler(data?: AddPetResponse | HttpResponseResolver<Record<string, string>, AddPetData, any>) {

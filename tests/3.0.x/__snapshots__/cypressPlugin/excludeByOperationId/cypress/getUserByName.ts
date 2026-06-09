@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { GetUserByNamePathUsername, GetUserByNameResponse } from "../types/GetUserByName.ts";
+import type { GetUserByNamePathUsername, GetUserByNameResponse } from '../types/GetUserByName.ts'
 
 export function getUserByName(username: GetUserByNamePathUsername, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetUserByNameResponse> {
   return cy.request<GetUserByNameResponse>({

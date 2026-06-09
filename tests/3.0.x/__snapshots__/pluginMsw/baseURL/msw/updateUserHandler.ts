@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UpdateUserData } from "../types/UpdateUser.ts";
-import type { HttpResponseResolver } from "msw";
-import { http } from "msw";
+import type { UpdateUserData } from '../types/UpdateUser.ts'
+import type { HttpResponseResolver } from 'msw'
+import { http } from 'msw'
 
 export function updateUserHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, UpdateUserData, any>) {
   return http.put<Record<string, string>, UpdateUserData, any>(`http://localhost:3000/user/:username`, function handler(info) {

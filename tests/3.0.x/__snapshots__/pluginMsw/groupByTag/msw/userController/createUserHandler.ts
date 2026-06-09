@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { CreateUserData } from "../../types/CreateUser.ts";
-import type { HttpResponseResolver } from "msw";
-import { http } from "msw";
+import type { CreateUserData } from '../../types/CreateUser.ts'
+import type { HttpResponseResolver } from 'msw'
+import { http } from 'msw'
 
 export function createUserHandler(data?: string | number | boolean | null | object | HttpResponseResolver<Record<string, string>, CreateUserData, any>) {
   return http.post<Record<string, string>, CreateUserData, any>(`/user`, function handler(info) {

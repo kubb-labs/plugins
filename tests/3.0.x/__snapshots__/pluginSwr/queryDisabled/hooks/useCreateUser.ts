@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const createUserQueryKey = (data?: CreateUserData) => [{ url: '/user' }, ...(data ? [data] : [])] as const
 
@@ -17,23 +17,19 @@ type CreateUserQueryKey = ReturnType<typeof createUserQueryKey>
  * {@link /user}
  */
 export async function createUser(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
-
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData, contentType, ...requestConfig })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
 
   return res.data
 }
 
 export function createUserQueryOptions(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return createUser(data, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return createUser(data, config)
+    },
+  }
 }

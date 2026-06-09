@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { LogoutUserResponse } from "../types/LogoutUser.ts";
+import type { LogoutUserResponse } from '../types/LogoutUser.ts'
 
 export function logoutUser(options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<LogoutUserResponse> {
   return cy.request<LogoutUserResponse>({

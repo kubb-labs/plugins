@@ -3,23 +3,21 @@
 * Do not edit manually.
 */
 
-import type { DeleteUserStatus400, DeleteUserStatus404 } from "../types/DeleteUser.ts";
-import { http } from "msw";
+import type { DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
+import { http } from 'msw'
 
 export function deleteUserHandlerResponse400(data?: DeleteUserStatus400) {
+  return new Response(JSON.stringify(data), {
+    status: 400,
 
-      return new Response(JSON.stringify(data), {
-        status: 400,
-
-      })
+  })
 }
 
 export function deleteUserHandlerResponse404(data?: DeleteUserStatus404) {
+  return new Response(JSON.stringify(data), {
+    status: 404,
 
-      return new Response(JSON.stringify(data), {
-        status: 404,
-
-      })
+  })
 }
 
 export function deleteUserHandler(data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.delete>[1]>[0]) => Response | Promise<Response>)) {

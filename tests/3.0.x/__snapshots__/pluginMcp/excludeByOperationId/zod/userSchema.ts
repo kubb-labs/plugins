@@ -3,15 +3,15 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const userSchema = z.object({
-    "id": z.bigint().optional(),
-    "username": z.string().optional(),
-    "firstName": z.string().optional(),
-    "lastName": z.string().optional(),
-    "email": z.string().optional(),
-    "password": z.string().optional(),
-    "phone": z.string().optional(),
-    "userStatus": z.int().optional().describe("User Status")
-    })
+  id: z.bigint().optional(),
+  username: z.string().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+  phone: z.string().optional(),
+  userStatus: z.int().optional().describe('User Status'),
+})

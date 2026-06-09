@@ -3,25 +3,23 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from "../types/FindPetsByStatus.ts";
-import { http } from "msw";
+import type { FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
+import { http } from 'msw'
 
 export function findPetsByStatusHandlerResponse200(data: FindPetsByStatusResponse) {
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-          headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+  return new Response(JSON.stringify(data), {
+    status: 200,
+      headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 }
 
 export function findPetsByStatusHandlerResponse400(data?: FindPetsByStatusStatus400) {
+  return new Response(JSON.stringify(data), {
+    status: 400,
 
-      return new Response(JSON.stringify(data), {
-        status: 400,
-
-      })
+  })
 }
 
 export function findPetsByStatusHandler(data?: FindPetsByStatusResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {

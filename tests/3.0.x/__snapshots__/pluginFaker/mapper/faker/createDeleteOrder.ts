@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createDeleteOrderPathOrderId(data?: bigint): bigint {
   return data ?? faker.number.bigInt()

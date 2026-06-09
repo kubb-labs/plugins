@@ -1,3 +1,5 @@
+/** @jsxImportSource react */
+
 export function ListPets() {
   const href = '/pets'
 

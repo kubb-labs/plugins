@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetStatusEnumKey } from "../types/PetStatusEnum.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { PetStatusEnumKey } from '../types/PetStatusEnum.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description pet status in the store
@@ -12,5 +12,5 @@ import { fakerEN as faker } from "@faker-js/faker";
 export function createPetStatusEnum(data?: PetStatusEnumKey): PetStatusEnumKey {
   faker.seed([42])
 
-  return data ?? faker.helpers.arrayElement<PetStatusEnumKey>(["available", "pending", "sold"])
+  return data ?? faker.helpers.arrayElement<PetStatusEnumKey>(['available', 'pending', 'sold'])
 }

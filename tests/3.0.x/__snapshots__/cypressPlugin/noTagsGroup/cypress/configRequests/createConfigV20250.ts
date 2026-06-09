@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { CreateConfigV20250Data, CreateConfigV20250Response } from "../../types/CreateConfigV20250.ts";
+import type { CreateConfigV20250Data, CreateConfigV20250Response } from '../../types/CreateConfigV20250.ts'
 
 export function createConfigV20250(data: CreateConfigV20250Data, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateConfigV20250Response> {
   return cy.request<CreateConfigV20250Response>({

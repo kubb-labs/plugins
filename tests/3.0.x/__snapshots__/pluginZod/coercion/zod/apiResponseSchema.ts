@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const apiResponseSchema = z.object({
-    "code": z.coerce.number().int().optional(),
-    "type": z.coerce.string().optional(),
-    "message": z.coerce.string().optional()
-    })
+  code: z.coerce.number().int().optional(),
+  type: z.coerce.string().optional(),
+  message: z.coerce.string().optional(),
+})

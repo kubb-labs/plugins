@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { itemSchema } from "./itemSchema.ts";
+import * as z from 'zod'
+import { itemSchema } from './itemSchema.ts'
 
 export const getItemPathIdSchema = z.bigint()
 
-export const getItemStatus200Schema = itemSchema.describe("A simple item")
+export const getItemStatus200Schema = itemSchema.describe('A simple item')
 
 export const getItemResponseSchema = getItemStatus200Schema

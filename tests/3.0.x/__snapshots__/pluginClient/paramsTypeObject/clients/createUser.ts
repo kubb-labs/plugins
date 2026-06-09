@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getCreateUserUrl() {
   const res = { method: 'POST', url: `/user` as const }
@@ -19,13 +19,11 @@ function getCreateUserUrl() {
  * {@link /user}
  */
 export async function createUser({ data }: { data?: CreateUserData } = {}, config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = "application/json", ...requestConfig } = config
-
+  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
 
-
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: getCreateUserUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: getCreateUserUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return res.data
 }

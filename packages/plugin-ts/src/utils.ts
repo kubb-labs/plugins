@@ -1,4 +1,4 @@
-import { jsStringEscape, stringify } from '@internals/utils'
+import { jsStringEscape, stringify } from '@kubb/ast/utils'
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from './types.ts'

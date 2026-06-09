@@ -3,33 +3,30 @@
 * Do not edit manually.
 */
 
-import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
-import { http } from "msw";
+import type { GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
+import { http } from 'msw'
 
 export function getOrderByIdHandlerResponse200(data: GetOrderByIdResponse) {
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-          headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+  return new Response(JSON.stringify(data), {
+    status: 200,
+      headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 }
 
 export function getOrderByIdHandlerResponse400(data?: GetOrderByIdStatus400) {
+  return new Response(JSON.stringify(data), {
+    status: 400,
 
-      return new Response(JSON.stringify(data), {
-        status: 400,
-
-      })
+  })
 }
 
 export function getOrderByIdHandlerResponse404(data?: GetOrderByIdStatus404) {
+  return new Response(JSON.stringify(data), {
+    status: 404,
 
-      return new Response(JSON.stringify(data), {
-        status: 404,
-
-      })
+  })
 }
 
 export function getOrderByIdHandler(data?: GetOrderByIdResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {

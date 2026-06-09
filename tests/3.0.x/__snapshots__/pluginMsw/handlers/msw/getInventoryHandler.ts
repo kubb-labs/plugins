@@ -3,17 +3,16 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse } from "../types/GetInventory.ts";
-import { http } from "msw";
+import type { GetInventoryResponse } from '../types/GetInventory.ts'
+import { http } from 'msw'
 
 export function getInventoryHandlerResponse200(data: GetInventoryResponse) {
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-          headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+  return new Response(JSON.stringify(data), {
+    status: 200,
+      headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 }
 
 export function getInventoryHandler(data?: GetInventoryResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {

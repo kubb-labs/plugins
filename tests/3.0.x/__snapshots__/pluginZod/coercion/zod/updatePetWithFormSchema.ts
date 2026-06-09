@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
-export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().describe("ID of pet that needs to be updated")
+export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().describe('ID of pet that needs to be updated')
 
-export const updatePetWithFormQueryNameSchema = z.coerce.string().optional().describe("Name of pet that needs to be updated")
+export const updatePetWithFormQueryNameSchema = z.coerce.string().optional().describe('Name of pet that needs to be updated')
 
-export const updatePetWithFormQueryStatusSchema = z.coerce.string().optional().describe("Status of pet that needs to be updated")
+export const updatePetWithFormQueryStatusSchema = z.coerce.string().optional().describe('Status of pet that needs to be updated')
 
 export const updatePetWithFormStatus405Schema = z.any()
 

@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../types/GetPetById.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { getPetByIdResponseSchema } from "../zod/getPetByIdSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { getPetByIdResponseSchema } from '../zod/getPetByIdSchema.ts'
 
 function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
   const res = { method: 'GET', url: `/pet/${petId}` as const }
@@ -22,10 +22,7 @@ function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
 export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
-
-
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: "GET", url: getGetPetByIdUrl(petId).url.toString(), ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl(petId).url.toString(), ...requestConfig })
 
   return getPetByIdResponseSchema.parse(res.data)
 }

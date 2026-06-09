@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus200Json, FindPetsByTagsStatus200Xml, FindPetsByTagsStatus400 } from "../types/FindPetsByTags.ts";
-import { createPet } from "./createPet.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { FindPetsByTagsQueryTags, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus200Json, FindPetsByTagsStatus200Xml, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
+import { createPet } from './createPet.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createFindPetsByTagsQueryTags(data?: FindPetsByTagsQueryTags): FindPetsByTagsQueryTags {
   return [

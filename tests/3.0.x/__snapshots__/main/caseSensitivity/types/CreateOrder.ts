@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Order } from "./Order.ts";
-import type { OrderRequest } from "./OrderRequest.ts";
+import type { Order } from './Order.ts'
+import type { OrderRequest } from './OrderRequest.ts'
 
 /**
  * @type object

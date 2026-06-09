@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { petSchema } from "../petSchema.ts";
-import { petStatusEnumSchema } from "../petStatusEnumSchema.ts";
+import * as z from 'zod'
+import { petSchema } from '../petSchema.ts'
+import { petStatusEnumSchema } from '../petStatusEnumSchema.ts'
 
-export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema.optional().default("available").describe("Status values that need to be considered for filter")
+export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema.optional().default('available').describe('Status values that need to be considered for filter')
 
 export const findPetsByStatusStatus200SchemaJson = z.array(petSchema)
 

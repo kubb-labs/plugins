@@ -17,7 +17,10 @@ export function createCreatePetStatus201(data?: Partial<CreatePetStatus201>): Cr
  * @description Pet to add
  */
 export function createCreatePetData<TData extends Partial<CreatePetData> = object>(data?: TData) {
-  const defaultFakeData = { name: faker.string.alpha(), category: createCategory() }
+  const defaultFakeData = {
+    name: faker.string.alpha(),
+    category: createCategory(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

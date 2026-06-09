@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { userSchema } from "./userSchema.ts";
+import * as z from 'zod'
+import { userSchema } from './userSchema.ts'
 
-export const getUserByNamePathUsernameSchema = z.string().describe("The name that needs to be fetched. Use user1 for testing. ")
+export const getUserByNamePathUsernameSchema = z.string().describe('The name that needs to be fetched. Use user1 for testing. ')
 
 export const getUserByNameStatus200SchemaJson = userSchema
 

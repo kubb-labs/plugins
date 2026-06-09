@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-faker",
-  "version": "5.0.0-beta.42",
+  "version": "5.0.0-beta.43",
   "description": "Generate Faker.js mock data factories from your OpenAPI schemas. Produces realistic seed data, test fixtures, and datasets for development and testing.",
   "keywords": [
     "code-generation",
@@ -78,6 +78,7 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"

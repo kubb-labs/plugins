@@ -1,4 +1,4 @@
-import { stringify, toRegExpString } from '@internals/utils'
+import { extractRefName, stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from './types.ts'
 
@@ -86,7 +86,7 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
 
   if (node.type === 'ref') {
     if (!node.ref) return false
-    const refName = ast.extractRefName(node.ref)
+    const refName = extractRefName(node.ref)
     if (refName) {
       if (seen.has(refName)) return false
       seen.add(refName)

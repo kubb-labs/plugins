@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { ProductResponse } from "./ProductResponse.ts";
+import type { ProductResponse } from './ProductResponse.ts'
 
 export type GetProductsStatus200 = ProductResponse;
 

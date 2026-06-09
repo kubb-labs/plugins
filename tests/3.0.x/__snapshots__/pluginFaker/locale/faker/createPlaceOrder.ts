@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderData, PlaceOrderFormUrlEncodedData, PlaceOrderJsonData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405, PlaceOrderXmlData } from "../types/PlaceOrder.ts";
-import { createOrder } from "./createOrder.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { PlaceOrderData, PlaceOrderFormUrlEncodedData, PlaceOrderJsonData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405, PlaceOrderXmlData } from '../types/PlaceOrder.ts'
+import { createOrder } from './createOrder.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

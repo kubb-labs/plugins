@@ -3,12 +3,22 @@
 * Do not edit manually.
 */
 
-import type { User } from "../types/User.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { User } from '../types/User.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createUser<TData extends Partial<User> = object>(data?: TData)
+
 {
-  const defaultFakeData = {"id": faker.number.bigInt(),"username": faker.string.alpha(),"firstName": faker.string.alpha(),"lastName": faker.string.alpha(),"email": faker.string.alpha(),"password": faker.string.alpha(),"phone": faker.string.alpha(),"userStatus": faker.number.int()}
+  const defaultFakeData = {
+  id: faker.number.bigInt(),
+  username: faker.string.alpha(),
+  firstName: faker.string.alpha(),
+  lastName: faker.string.alpha(),
+  email: faker.string.alpha(),
+  password: faker.string.alpha(),
+  phone: faker.string.alpha(),
+  userStatus: faker.number.int(),
+}
   return {
     ...defaultFakeData,
     ...(data || {}),
