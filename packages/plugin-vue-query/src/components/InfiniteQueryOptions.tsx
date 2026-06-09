@@ -122,11 +122,10 @@ export function InfiniteQueryOptions({
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName
-      ? `
-          params = {
-            ...(params ?? {}),
-            ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
-          } as ${queryParamsTypeName}`
+      ? `params = {
+      ...(params ?? {}),
+      ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
+    } as ${queryParamsTypeName}`
       : ''
 
   if (infiniteOverrideParams) {
