@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from "../../types/LoginUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from "@tanstack/vue-query";
-import type { MaybeRefOrGetter } from "vue";
-import { queryOptions, useQuery } from "@tanstack/vue-query";
-import { toValue } from "vue";
+import client from '@kubb/plugin-client/clients/axios'
+import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../types/LoginUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const loginUserQueryKey = (params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>) => [{ url: '/user/login' }, ...(params ? [params] : [])] as const
 
@@ -31,16 +31,14 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
 }
 
 export function loginUserQueryOptions(params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = loginUserQueryKey(params)
+  return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({
 
-        const queryKey = loginUserQueryKey(params)
-        return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({
-
-         queryKey,
-         queryFn: async ({ signal }) => {
-            return loginUser(toValue(params), { ...config, signal: config.signal ?? signal })
-         },
-        })
-
+   queryKey,
+   queryFn: async ({ signal }) => {
+      return loginUser(toValue(params), { ...config, signal: config.signal ?? signal })
+   },
+  })
 }
 
 /**
@@ -51,19 +49,17 @@ export function useLoginUser<TData = LoginUserStatus200, TQueryData = LoginUserS
   query?: Partial<UseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
+  const { query: queryConfig = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? loginUserQueryKey(params)
 
-         const { query: queryConfig = {}, client: config = {} } = options ?? {}
-         const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? loginUserQueryKey(params)
+  const query = useQuery({
+   ...loginUserQueryOptions(params, config),
+   ...resolvedOptions,
+   queryKey
+  } as unknown as UseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, LoginUserStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<LoginUserStatus400>> & { queryKey: TQueryKey }
 
-         const query = useQuery({
-          ...loginUserQueryOptions(params, config),
-          ...resolvedOptions,
-          queryKey
-         } as unknown as UseQueryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, TData, LoginUserStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<LoginUserStatus400>> & { queryKey: TQueryKey }
+  query.queryKey = queryKey as TQueryKey
 
-         query.queryKey = queryKey as TQueryKey
-
-         return query
-
+  return query
 }

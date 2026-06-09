@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from "../types/UpdateUser.ts";
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
 
 export function updateUser(username: UpdateUserPathUsername, data?: UpdateUserData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdateUserResponse> {
   return cy.request<UpdateUserResponse>({

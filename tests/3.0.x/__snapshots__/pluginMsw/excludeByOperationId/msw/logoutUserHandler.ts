@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import { http } from "msw";
+import { http } from 'msw'
 
 export function logoutUserHandler(data?: string | number | boolean | null | object | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {
   return http.get(`/user/logout`, function handler(info) {

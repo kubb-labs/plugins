@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { UpdateUserData, UpdateUserFormUrlEncodedData, UpdateUserJsonData, UpdateUserXmlData } from "../types/UpdateUser.ts";
-import { createUser } from "./createUser.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { UpdateUserData, UpdateUserFormUrlEncodedData, UpdateUserJsonData, UpdateUserXmlData } from '../types/UpdateUser.ts'
+import { createUser } from './createUser.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createUpdateUserPathUsername(data?: string): string {
   return data ?? faker.string.alpha()

@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { ElectricCar } from "./ElectricCar.ts";
-import type { SUV } from "./SUV.ts";
-import type { Sedan } from "./Sedan.ts";
-import type { TypeEnumKey } from "./TypeEnum.ts";
-import type { TypeEnum2Key } from "./TypeEnum2.ts";
-import type { TypeEnum3Key } from "./TypeEnum3.ts";
+import type { ElectricCar } from './ElectricCar.ts'
+import type { SUV } from './SUV.ts'
+import type { Sedan } from './Sedan.ts'
+import type { TypeEnumKey } from './TypeEnum.ts'
+import type { TypeEnum2Key } from './TypeEnum2.ts'
+import type { TypeEnum3Key } from './TypeEnum3.ts'
 
 export type VehicleChoice = ((Sedan & {
     type: TypeEnumKey;

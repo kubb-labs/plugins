@@ -21,7 +21,7 @@ describe('printerFaker', () => {
       `
       "{
         id: faker.number.int({ min: 1, max: 10 }),
-        name: faker.string.alpha(),
+        "name": faker.string.alpha(),
         category: createCategory(),
       }"
     `,

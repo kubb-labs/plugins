@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const placeOrderQueryKey = (data?: PlaceOrderData) => [{ url: '/store/order' }, ...(data ? [data] : [])] as const
 
@@ -29,11 +29,9 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 }
 
 export function placeOrderQueryOptions(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return placeOrder(data, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return placeOrder(data, config)
+    },
+  }
 }

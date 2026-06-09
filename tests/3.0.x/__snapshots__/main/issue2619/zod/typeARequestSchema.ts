@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { contactDetailsTypeSchema } from "./contactDetailsTypeSchema.ts";
-import { productDetailsSchema } from "./productDetailsSchema.ts";
+import * as z from 'zod'
+import { contactDetailsTypeSchema } from './contactDetailsTypeSchema.ts'
+import { productDetailsSchema } from './productDetailsSchema.ts'
 
 export const typeARequestSchema = z.object({
-    "actorId": z.string(),
-    "contactDetails": contactDetailsTypeSchema,
-    "productDetails": productDetailsSchema
-    })
+  actorId: z.string(),
+  contactDetails: contactDetailsTypeSchema,
+  productDetails: productDetailsSchema,
+})

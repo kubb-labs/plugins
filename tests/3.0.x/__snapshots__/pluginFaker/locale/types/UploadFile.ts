@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { ApiResponse } from "./ApiResponse.ts";
+import type { ApiResponse } from './ApiResponse.ts'
 
 /**
  * @description ID of pet to update

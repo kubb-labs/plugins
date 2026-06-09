@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const createUserQueryKey = (data?: CreateUserData) => [{ url: '/user' }, ...(data ? [data] : [])] as const
 
@@ -29,11 +29,9 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 }
 
 export function createUserQueryOptions(data?: CreateUserData, config: Partial<RequestConfig<CreateUserData>> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return createUser(data, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return createUser(data, config)
+    },
+  }
 }

@@ -3,13 +3,18 @@
 * Do not edit manually.
 */
 
-import type { Customer } from "../types/Customer.ts";
-import { createAddress } from "./createAddress.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { Customer } from '../types/Customer.ts'
+import { createAddress } from './createAddress.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createCustomer<TData extends Partial<Customer> = object>(data?: TData)
+
 {
-  const defaultFakeData = {"id": faker.number.bigInt(),"username": faker.string.alpha(),"address": faker.helpers.multiple(() => (createAddress()))}
+  const defaultFakeData = {
+  id: faker.number.bigInt(),
+  username: faker.string.alpha(),
+  address: faker.helpers.multiple(() => (createAddress())),
+}
   return {
     ...defaultFakeData,
     ...(data || {}),

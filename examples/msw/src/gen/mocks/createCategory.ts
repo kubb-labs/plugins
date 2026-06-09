@@ -8,7 +8,10 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCategory<TData extends Partial<Category> = object>(data?: TData) {
   faker.seed([220])
-  const defaultFakeData = { id: faker.number.bigInt(), name: faker.string.alpha() }
+  const defaultFakeData = {
+    id: faker.number.bigInt(),
+    name: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

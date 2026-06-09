@@ -3,13 +3,21 @@
 * Do not edit manually.
 */
 
-import type { Order } from "../types/Order.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { Order } from '../types/Order.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createOrder<TData extends Partial<Order> = object>(data?: TData)
+
 {
   faker.seed([42])
-  const defaultFakeData = {"id": faker.number.bigInt(),"petId": faker.number.bigInt(),"quantity": faker.number.int(),"shipDate": faker.date.anytime().toISOString(),"status": faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),"complete": faker.datatype.boolean()}
+  const defaultFakeData = {
+  id: faker.number.bigInt(),
+  petId: faker.number.bigInt(),
+  quantity: faker.number.int(),
+  shipDate: faker.date.anytime().toISOString(),
+  status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(["placed", "approved", "delivered"]),
+  complete: faker.datatype.boolean(),
+}
   return {
     ...defaultFakeData,
     ...(data || {}),

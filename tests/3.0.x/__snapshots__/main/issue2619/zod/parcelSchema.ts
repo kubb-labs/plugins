@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const parcelSchema = z.object({
-    "parcelNo": z.string().optional(),
-    "trackingNumber": z.string().optional()
-    })
+  parcelNo: z.string().optional(),
+  trackingNumber: z.string().optional(),
+})

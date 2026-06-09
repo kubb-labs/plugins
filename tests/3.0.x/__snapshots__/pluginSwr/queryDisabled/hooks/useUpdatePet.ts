@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const updatePetQueryKey = (data?: UpdatePetData) => [{ url: '/pet' }, ...(data ? [data] : [])] as const
 
@@ -29,11 +29,9 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 }
 
 export function updatePetQueryOptions(data?: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return updatePet(data!, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return updatePet(data!, config)
+    },
+  }
 }

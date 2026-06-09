@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { petSchema } from "./petSchema.ts";
+import * as z from 'zod'
+import { petSchema } from './petSchema.ts'
 
 export const getPetByIdPathPetIdSchema = z.bigint().describe("ID of pet to return")
 

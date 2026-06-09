@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Address } from "./Address.ts";
+import type { Address } from './Address.ts'
 
 /**
  * @type object

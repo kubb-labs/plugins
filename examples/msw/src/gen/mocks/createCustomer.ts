@@ -9,7 +9,11 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createCustomer<TData extends Partial<Customer> = object>(data?: TData) {
   faker.seed([220])
-  const defaultFakeData = { id: faker.number.bigInt(), username: faker.string.alpha(), address: faker.helpers.multiple(() => createAddress()) }
+  const defaultFakeData = {
+    id: faker.number.bigInt(),
+    username: faker.string.alpha(),
+    address: faker.helpers.multiple(() => createAddress()),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
-import { mutationOptions, useMutation } from "@tanstack/react-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -29,15 +29,13 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 }
 
 export function createUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-
-        const mutationKey = createUserMutationKey()
-        return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
-          mutationKey,
-          mutationFn: async({ data }) => {
-            return createUser(data, config)
-          },
-        })
-
+  const mutationKey = createUserMutationKey()
+  return mutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
+    mutationKey,
+    mutationFn: async({ data }) => {
+      return createUser(data, config)
+    },
+  })
 }
 
 /**
@@ -49,18 +47,16 @@ export function useCreateUser<TContext>(options: {
   mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions.mutationKey ?? createUserMutationKey()
 
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions.mutationKey ?? createUserMutationKey()
-
-          const baseOptions = createUserMutationOptions(config) as UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>
+  const baseOptions = createUserMutationOptions(config) as UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>
 
 
-          return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
-            ...baseOptions,
-            mutationKey,
-            ...mutationOptions,
-          }, queryClient) as UseMutationResult<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>
-
+  return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
+    ...baseOptions,
+    mutationKey,
+    ...mutationOptions,
+  }, queryClient) as UseMutationResult<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>
 }

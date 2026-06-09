@@ -28,7 +28,9 @@ export function getServer() {
 
   return server
 }
+
 export const server = getServer()
+
 export async function startServer() {
   try {
     const transport = new StdioServerTransport()

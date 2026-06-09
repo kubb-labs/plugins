@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from "../types/UpdateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { updateUserResponseSchema, updateUserDataSchema } from "../zod/updateUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { updateUserResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
   const res = { method: 'PUT', url: `/user/${username}` as const }

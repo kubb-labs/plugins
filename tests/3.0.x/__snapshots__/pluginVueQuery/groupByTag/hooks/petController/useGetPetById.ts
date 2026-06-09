@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from "../../types/GetPetById.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from "@tanstack/vue-query";
-import type { MaybeRefOrGetter } from "vue";
-import { queryOptions, useQuery } from "@tanstack/vue-query";
-import { toValue } from "vue";
+import client from '@kubb/plugin-client/clients/axios'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import { queryOptions, useQuery } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const getPetByIdQueryKey = (petId?: MaybeRefOrGetter<GetPetByIdPathPetId>) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
@@ -32,16 +32,14 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
 }
 
 export function getPetByIdQueryOptions(petId?: MaybeRefOrGetter<GetPetByIdPathPetId>, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        const queryKey = getPetByIdQueryKey(petId)
-        return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
-         enabled: () => !!toValue(petId),
-         queryKey,
-         queryFn: async ({ signal }) => {
-            return getPetById(toValue(petId!), { ...config, signal: config.signal ?? signal })
-         },
-        })
-
+  const queryKey = getPetByIdQueryKey(petId)
+  return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
+   enabled: () => !!toValue(petId),
+   queryKey,
+   queryFn: async ({ signal }) => {
+      return getPetById(toValue(petId!), { ...config, signal: config.signal ?? signal })
+   },
+  })
 }
 
 /**
@@ -53,19 +51,17 @@ export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetBy
   query?: Partial<UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
+  const { query: queryConfig = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...resolvedOptions } = queryConfig
+  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getPetByIdQueryKey(petId)
 
-         const { query: queryConfig = {}, client: config = {} } = options ?? {}
-         const { client: queryClient, ...resolvedOptions } = queryConfig
-         const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getPetByIdQueryKey(petId)
+  const query = useQuery({
+   ...getPetByIdQueryOptions(petId, config),
+   ...resolvedOptions,
+   queryKey
+  } as unknown as UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, GetPetByIdStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-         const query = useQuery({
-          ...getPetByIdQueryOptions(petId, config),
-          ...resolvedOptions,
-          queryKey
-         } as unknown as UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, GetPetByIdStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
+  query.queryKey = queryKey as TQueryKey
 
-         query.queryKey = queryKey as TQueryKey
-
-         return query
-
+  return query
 }

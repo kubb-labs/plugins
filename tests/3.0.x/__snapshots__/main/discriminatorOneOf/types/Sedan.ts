@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { SedanTypeEnumKey } from "./SedanTypeEnum.ts";
-import type { Vehicle } from "./Vehicle.ts";
+import type { SedanTypeEnumKey } from './SedanTypeEnum.ts'
+import type { Vehicle } from './Vehicle.ts'
 
 export type Sedan = (Vehicle & {
     type?: SedanTypeEnumKey;

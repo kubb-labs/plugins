@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from "../types/PlaceOrder.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { placeOrderResponseSchema, placeOrderDataSchema } from "../zod/placeOrderSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
 
 function getPlaceOrderUrl() {
   const res = { method: 'POST', url: `/store/order` as const }

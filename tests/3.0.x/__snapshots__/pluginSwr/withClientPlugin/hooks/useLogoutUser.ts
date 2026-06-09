@@ -3,24 +3,22 @@
 * Do not edit manually.
 */
 
-import useSWR from "swr";
-import type { LogoutUserResponse } from "../types/LogoutUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
-import { logoutUser } from "../clients/logoutUser.ts";
+import useSWR from 'swr'
+import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
+import { logoutUser } from '../clients/logoutUser.ts'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
 type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return logoutUser(config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return logoutUser(config)
+    },
+  }
 }
 
 /**
@@ -33,22 +31,20 @@ export function useLogoutUser(options: {
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = logoutUserQueryKey()
 
-         const queryKey = logoutUserQueryKey()
-
-         return useSWR<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserQueryKey | null>(
-          shouldFetch ? queryKey : null,
-          {
-            ...logoutUserQueryOptions(config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserQueryKey | null>(
+   shouldFetch ? queryKey : null,
+   {
+     ...logoutUserQueryOptions(config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

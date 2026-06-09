@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { CreateUserData, CreateUserFormUrlEncodedData, CreateUserJsonData, CreateUserResponse, CreateUserStatusDefault, CreateUserStatusDefaultJson, CreateUserStatusDefaultXml, CreateUserXmlData } from "../../types/CreateUser.ts";
-import { createUser } from "../createUser.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { CreateUserData, CreateUserFormUrlEncodedData, CreateUserJsonData, CreateUserResponse, CreateUserStatusDefault, CreateUserStatusDefaultJson, CreateUserStatusDefaultXml, CreateUserXmlData } from '../../types/CreateUser.ts'
+import { createUser } from '../createUser.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
  * @description successful operation

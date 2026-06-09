@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUserData, CreateUserResponse } from "../types/CreateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { createUserResponseSchema, createUserDataSchema } from "../zod/createUserSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { createUserResponseSchema, createUserDataSchema } from '../zod/createUserSchema.ts'
 
 function getCreateUserUrl() {
   const res = { method: 'POST', url: `/user` as const }

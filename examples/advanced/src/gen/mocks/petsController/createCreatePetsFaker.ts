@@ -41,7 +41,10 @@ export function createCreatePetsStatusDefaultFaker(data?: Partial<CreatePetsStat
 }
 
 export function createCreatePetsDataFaker<TData extends Partial<CreatePetsData> = object>(data?: TData) {
-  const defaultFakeData = { name: faker.string.alpha(), tag: faker.string.alpha() }
+  const defaultFakeData = {
+    name: faker.string.alpha(),
+    tag: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

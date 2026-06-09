@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { petSchema } from "../petSchema.ts";
+import * as z from 'zod'
+import { petSchema } from '../petSchema.ts'
 
 export const updatePetStatus200SchemaJson = petSchema
 

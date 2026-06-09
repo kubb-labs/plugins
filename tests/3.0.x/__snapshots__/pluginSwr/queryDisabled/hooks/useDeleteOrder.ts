@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const deleteOrderQueryKey = (orderId?: DeleteOrderPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
@@ -28,11 +28,9 @@ export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Parti
 }
 
 export function deleteOrderQueryOptions(orderId?: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return deleteOrder(orderId!, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return deleteOrder(orderId!, config)
+    },
+  }
 }

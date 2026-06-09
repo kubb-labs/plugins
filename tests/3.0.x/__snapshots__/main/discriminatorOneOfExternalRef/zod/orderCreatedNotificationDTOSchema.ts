@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { notificationTypeSchema } from "./notificationTypeSchema.ts";
+import * as z from 'zod'
+import { notificationTypeSchema } from './notificationTypeSchema.ts'
 
 export const orderCreatedNotificationDTOSchema = z.object({
-    "notificationType": notificationTypeSchema.describe("Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled"),
-    "orderId": z.string()
-    })
+  notificationType: notificationTypeSchema.describe("Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled"),
+  orderId: z.string(),
+})

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const addressSchema = z.object({
-    "street": z.coerce.string().optional(),
-    "city": z.coerce.string().optional(),
-    "state": z.coerce.string().optional(),
-    "zip": z.coerce.string().optional()
-    })
+  street: z.coerce.string().optional(),
+  city: z.coerce.string().optional(),
+  state: z.coerce.string().optional(),
+  zip: z.coerce.string().optional(),
+})

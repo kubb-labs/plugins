@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { notificationTypeSchema } from "./notificationTypeSchema.ts";
-import { sendNotificationRequestSchema } from "./sendNotificationRequestSchema.ts";
+import * as z from 'zod'
+import { notificationTypeSchema } from './notificationTypeSchema.ts'
+import { sendNotificationRequestSchema } from './sendNotificationRequestSchema.ts'
 
 export const pingNotificationDTOSchema = z.object({
-    "notificationType": notificationTypeSchema.describe("Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled"),
-    "message": z.string(),
-    get "relatedNotification"() { return sendNotificationRequestSchema.optional().describe("Notification payload.") }
-    })
+  notificationType: notificationTypeSchema.describe("Notification type: PING — test, ORDER_CREATED — new order, ORDER_CANCELLED — order cancelled"),
+  message: z.string(),
+  get relatedNotification() { return sendNotificationRequestSchema.optional().describe("Notification payload.") },
+})

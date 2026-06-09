@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderData, PlaceOrderResponse } from "../types/PlaceOrder.ts";
+import type { PlaceOrderData, PlaceOrderResponse } from '../types/PlaceOrder.ts'
 
 export function placeOrder(data?: PlaceOrderData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
   return cy.request<PlaceOrderResponse>({

@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { User } from "./User.ts";
+import type { User } from './User.ts'
 
 /**
  * @description name that need to be deleted

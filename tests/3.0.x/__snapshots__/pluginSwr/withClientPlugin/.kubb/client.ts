@@ -1,1 +1,1 @@
-export * from "@kubb/plugin-client/clients/axios";
+export * from '@kubb/plugin-client/clients/axios'

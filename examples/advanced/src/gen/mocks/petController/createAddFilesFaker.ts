@@ -24,7 +24,9 @@ export function createAddFilesStatus405Faker() {
 }
 
 export function createAddFilesDataFakerJson<TData extends Partial<AddFilesJsonData> = object>(data?: TData) {
-  const defaultFakeData = { url: faker.internet.url() }
+  const defaultFakeData = {
+    url: faker.internet.url(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

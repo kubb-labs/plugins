@@ -8,7 +8,10 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPetNotFound<TData extends Partial<PetNotFound> = object>(data?: TData) {
   faker.seed([220])
-  const defaultFakeData = { code: faker.number.int(), message: faker.string.alpha() }
+  const defaultFakeData = {
+    code: faker.number.int(),
+    message: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

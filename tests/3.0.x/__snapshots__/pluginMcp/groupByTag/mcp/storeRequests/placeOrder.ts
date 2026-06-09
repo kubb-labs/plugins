@@ -1,8 +1,8 @@
-import client from "@kubb/plugin-client/clients/axios";
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from "../../types/PlaceOrder.ts";
-import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
-import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
+import client from '@kubb/plugin-client/clients/axios'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../types/PlaceOrder.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Place a new order in the store

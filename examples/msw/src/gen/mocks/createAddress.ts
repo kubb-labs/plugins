@@ -8,7 +8,12 @@ import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAddress<TData extends Partial<Address> = object>(data?: TData) {
   faker.seed([220])
-  const defaultFakeData = { street: faker.string.alpha(), city: faker.string.alpha(), state: faker.string.alpha(), zip: faker.string.alpha() }
+  const defaultFakeData = {
+    street: faker.string.alpha(),
+    city: faker.string.alpha(),
+    state: faker.string.alpha(),
+    zip: faker.string.alpha(),
+  }
   return {
     ...defaultFakeData,
     ...(data || {}),

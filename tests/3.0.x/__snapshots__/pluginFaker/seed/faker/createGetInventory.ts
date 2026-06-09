@@ -3,13 +3,14 @@
 * Do not edit manually.
 */
 
-import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetInventory.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 /**
    * @description successful operation
    */
   export function createGetInventoryStatus200<TData extends Partial<GetInventoryStatus200> = object>(data?: TData)
+
 {
   faker.seed([42])
   const defaultFakeData = {}

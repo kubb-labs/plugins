@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { BankTransferPayment2 } from "./BankTransferPayment2.ts";
-import type { PaymentMethodMapped } from "./PaymentMethodMapped.ts";
+import type { BankTransferPayment2 } from './BankTransferPayment2.ts'
+import type { PaymentMethodMapped } from './PaymentMethodMapped.ts'
 
 export type BankTransferPaymentMapped = (PaymentMethodMapped & BankTransferPayment2);

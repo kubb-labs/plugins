@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWR from "swr";
-import type { GetOrderByIdResponse, GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from "../types/GetOrderById.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
-import { getOrderByIdResponseSchema } from "../zod/getOrderByIdSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWR from 'swr'
+import type { GetOrderByIdResponse, GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
+import { getOrderByIdResponseSchema } from '../zod/getOrderByIdSchema.ts'
 
 export const getOrderByIdQueryKey = (orderId?: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
@@ -31,13 +31,11 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
 }
 
 export function getOrderByIdQueryOptions(orderId?: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return getOrderById(orderId!, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return getOrderById(orderId!, config)
+    },
+  }
 }
 
 /**
@@ -51,22 +49,20 @@ export function useGetOrderById(orderId?: GetOrderByIdPathOrderId, options: {
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = getOrderByIdQueryKey(orderId)
 
-         const queryKey = getOrderByIdQueryKey(orderId)
-
-         return useSWR<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
-          shouldFetch && !!(orderId) ? queryKey : null,
-          {
-            ...getOrderByIdQueryOptions(orderId, config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
+   shouldFetch && !!(orderId) ? queryKey : null,
+   {
+     ...getOrderByIdQueryOptions(orderId, config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

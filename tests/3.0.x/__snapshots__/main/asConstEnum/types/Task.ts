@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PriorityKey } from "./Priority.ts";
-import type { StatusKey } from "./Status.ts";
+import type { PriorityKey } from './Priority.ts'
+import type { StatusKey } from './Status.ts'
 
 /**
  * @type object

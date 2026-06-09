@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import { fakerDE as faker } from "@faker-js/faker";
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createDeletePetHeaderApiKey(data?: string): string {
   return data ?? faker.string.alpha()

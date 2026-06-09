@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import useSWRMutation from "swr/mutation";
-import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from "../types/UpdatePetWithForm.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRMutationConfiguration } from "swr/mutation";
-import { updatePetWithForm } from "../clients/updatePetWithForm.ts";
+import useSWRMutation from 'swr/mutation'
+import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from '../types/UpdatePetWithForm.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRMutationConfiguration } from 'swr/mutation'
+import { updatePetWithForm } from '../clients/updatePetWithForm.ts'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -24,16 +24,14 @@ export function useUpdatePetWithForm(options: {
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = updatePetWithFormMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = updatePetWithFormMutationKey()
-
-          return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { petId, params } }) => {
-              return updatePetWithForm(petId, params, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { petId, params } }) => {
+      return updatePetWithForm(petId, params, config)
+    },
+    mutationOptions
+  )
 }

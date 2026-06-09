@@ -3,15 +3,23 @@
 * Do not edit manually.
 */
 
-import type { AddPetRequest } from "../types/AddPetRequest.ts";
-import { createCategory } from "./createCategory.ts";
-import { createPetStatusEnum } from "./createPetStatusEnum.ts";
-import { createTag } from "./createTag.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { AddPetRequest } from '../types/AddPetRequest.ts'
+import { createCategory } from './createCategory.ts'
+import { createPetStatusEnum } from './createPetStatusEnum.ts'
+import { createTag } from './createTag.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData)
+
 {
-  const defaultFakeData = {"id": faker.number.bigInt(),"name": faker.string.alpha(),"category": createCategory(),"photoUrls": faker.helpers.multiple(() => (faker.string.alpha())),"tags": faker.helpers.multiple(() => (createTag())),"status": createPetStatusEnum()}
+  const defaultFakeData = {
+  id: faker.number.bigInt(),
+  "name": faker.string.alpha(),
+  category: createCategory(),
+  photoUrls: faker.helpers.multiple(() => (faker.string.alpha())),
+  tags: faker.helpers.multiple(() => (createTag())),
+  status: createPetStatusEnum(),
+}
   return {
     ...defaultFakeData,
     ...(data || {}),

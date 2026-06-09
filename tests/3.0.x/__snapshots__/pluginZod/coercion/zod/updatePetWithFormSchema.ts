@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const updatePetWithFormPathPetIdSchema = z.coerce.bigint().describe("ID of pet that needs to be updated")
 

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PetStatusEnumKey } from "../types/PetStatusEnum.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { PetStatusEnumKey } from '../types/PetStatusEnum.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 /**
  * @description pet status in the store

@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { addPetRequestSchema } from "../addPetRequestSchema.ts";
-import { petSchema } from "../petSchema.ts";
+import * as z from 'zod'
+import { addPetRequestSchema } from '../addPetRequestSchema.ts'
+import { petSchema } from '../petSchema.ts'
 
 export const addPetStatus200SchemaJson = petSchema
 

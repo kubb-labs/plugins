@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const productDetailsSchema = z.object({
-    "productCount": z.number().optional(),
-    "itemIds": z.array(z.string())
-    })
+  productCount: z.number().optional(),
+  itemIds: z.array(z.string()),
+})

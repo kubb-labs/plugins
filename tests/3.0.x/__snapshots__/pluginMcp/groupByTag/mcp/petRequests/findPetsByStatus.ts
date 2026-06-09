@@ -1,8 +1,8 @@
-import client from "@kubb/plugin-client/clients/axios";
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from "../../types/FindPetsByStatus.ts";
-import type { ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { RequestHandlerExtra } from "@modelcontextprotocol/sdk/shared/protocol";
-import type { CallToolResult, ServerNotification, ServerRequest } from "@modelcontextprotocol/sdk/types";
+import client from '@kubb/plugin-client/clients/axios'
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../types/FindPetsByStatus.ts'
+import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
+import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
 /**
  * @description Multiple status values can be provided with comma separated strings

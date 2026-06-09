@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from "../../types/UpdateUser.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { MutationObserverOptions, QueryClient } from "@tanstack/vue-query";
-import type { MaybeRefOrGetter } from "vue";
-import { useMutation } from "@tanstack/vue-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../types/UpdateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import type { MaybeRefOrGetter } from 'vue'
+import { useMutation } from '@tanstack/vue-query'
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -38,17 +38,15 @@ export function useUpdateUser<TContext>(options: {
   mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, {username: MaybeRefOrGetter<UpdateUserPathUsername>, data?: MaybeRefOrGetter<UpdateUserData>}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdateUserData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions?.mutationKey ?? updateUserMutationKey()
 
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions?.mutationKey ?? updateUserMutationKey()
-
-          return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathUsername, data?: UpdateUserData}, TContext>({
-            mutationFn: async({ username, data }) => {
-              return updateUser(username, data, config)
-            },
-            mutationKey,
-            ...mutationOptions
-          }, queryClient)
-
+  return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathUsername, data?: UpdateUserData}, TContext>({
+    mutationFn: async({ username, data }) => {
+      return updateUser(username, data, config)
+    },
+    mutationKey,
+    ...mutationOptions
+  }, queryClient)
 }

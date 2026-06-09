@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { User } from "./User.ts";
+import type { User } from './User.ts'
 
 /**
  * @description The name that needs to be fetched. Use user1 for testing.

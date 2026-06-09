@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
-import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from "../types/DeleteOrder.ts";
-import type { SWRMutationConfiguration } from "swr/mutation";
-import { client } from "../.kubb/client.ts";
+import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
+import type { SWRMutationConfiguration } from 'swr/mutation'
+import { client } from '../.kubb/client.ts'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
@@ -41,16 +41,14 @@ export function useDeleteOrder(options: {
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = deleteOrderMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = deleteOrderMutationKey()
-
-          return useSWRMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { orderId } }) => {
-              return deleteOrder(orderId, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { orderId } }) => {
+      return deleteOrder(orderId, config)
+    },
+    mutationOptions
+  )
 }

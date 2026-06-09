@@ -3,18 +3,17 @@
 * Do not edit manually.
 */
 
-import type { UploadFileResponse, UploadFileData } from "../types/UploadFile.ts";
-import type { HttpResponseResolver } from "msw";
-import { http } from "msw";
+import type { UploadFileResponse, UploadFileData } from '../types/UploadFile.ts'
+import type { HttpResponseResolver } from 'msw'
+import { http } from 'msw'
 
 export function uploadFileHandlerResponse200(data: UploadFileResponse) {
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-          headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+  return new Response(JSON.stringify(data), {
+    status: 200,
+      headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 }
 
 export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {

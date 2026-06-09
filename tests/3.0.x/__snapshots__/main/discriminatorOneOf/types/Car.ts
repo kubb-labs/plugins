@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { SUV } from "./SUV.ts";
-import type { SUVTypeEnumKey } from "./SUVTypeEnum.ts";
-import type { Sedan } from "./Sedan.ts";
-import type { SedanTypeEnumKey } from "./SedanTypeEnum.ts";
+import type { SUV } from './SUV.ts'
+import type { SUVTypeEnumKey } from './SUVTypeEnum.ts'
+import type { Sedan } from './Sedan.ts'
+import type { SedanTypeEnumKey } from './SedanTypeEnum.ts'
 
 export type Car = ((Sedan & {
     type: SedanTypeEnumKey;

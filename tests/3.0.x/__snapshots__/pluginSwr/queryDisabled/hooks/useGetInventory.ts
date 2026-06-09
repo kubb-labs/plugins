@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { GetInventoryStatus200 } from "../types/GetInventory.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -28,11 +28,9 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
 }
 
 export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return getInventory(config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return getInventory(config)
+    },
+  }
 }

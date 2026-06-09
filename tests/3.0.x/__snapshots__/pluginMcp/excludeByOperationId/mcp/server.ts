@@ -3,42 +3,42 @@
 * Do not edit manually.
 */
 
-import { createUserHandler } from "./createUser.ts";
-import { createUsersWithListInputHandler } from "./createUsersWithListInput.ts";
-import { deleteOrderHandler } from "./deleteOrder.ts";
-import { deleteUserHandler } from "./deleteUser.ts";
-import { findPetsByStatusHandler } from "./findPetsByStatus.ts";
-import { findPetsByTagsHandler } from "./findPetsByTags.ts";
-import { getInventoryHandler } from "./getInventory.ts";
-import { getOrderByIdHandler } from "./getOrderById.ts";
-import { getPetByIdHandler } from "./getPetById.ts";
-import { getUserByNameHandler } from "./getUserByName.ts";
-import { loginUserHandler } from "./loginUser.ts";
-import { logoutUserHandler } from "./logoutUser.ts";
-import { placeOrderHandler } from "./placeOrder.ts";
-import { updatePetHandler } from "./updatePet.ts";
-import { updatePetWithFormHandler } from "./updatePetWithForm.ts";
-import { updateUserHandler } from "./updateUser.ts";
-import { uploadFileHandler } from "./uploadFile.ts";
-import { createUserDataSchema } from "../zod/createUserSchema.ts";
-import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from "../zod/createUsersWithListInputSchema.ts";
-import { deleteOrderPathOrderIdSchema } from "../zod/deleteOrderSchema.ts";
-import { deleteUserPathUsernameSchema } from "../zod/deleteUserSchema.ts";
-import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from "../zod/findPetsByStatusSchema.ts";
-import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from "../zod/findPetsByTagsSchema.ts";
-import { getInventoryStatus200Schema } from "../zod/getInventorySchema.ts";
-import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from "../zod/getOrderByIdSchema.ts";
-import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from "../zod/getPetByIdSchema.ts";
-import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from "../zod/getUserByNameSchema.ts";
-import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from "../zod/loginUserSchema.ts";
-import { placeOrderDataSchema, placeOrderStatus200Schema } from "../zod/placeOrderSchema.ts";
-import { updatePetDataSchema, updatePetStatus200Schema } from "../zod/updatePetSchema.ts";
-import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from "../zod/updatePetWithFormSchema.ts";
-import { updateUserDataSchema, updateUserPathUsernameSchema } from "../zod/updateUserSchema.ts";
-import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from "../zod/uploadFileSchema.ts";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
-import { z } from "zod";
+import { createUserHandler } from './createUser.ts'
+import { createUsersWithListInputHandler } from './createUsersWithListInput.ts'
+import { deleteOrderHandler } from './deleteOrder.ts'
+import { deleteUserHandler } from './deleteUser.ts'
+import { findPetsByStatusHandler } from './findPetsByStatus.ts'
+import { findPetsByTagsHandler } from './findPetsByTags.ts'
+import { getInventoryHandler } from './getInventory.ts'
+import { getOrderByIdHandler } from './getOrderById.ts'
+import { getPetByIdHandler } from './getPetById.ts'
+import { getUserByNameHandler } from './getUserByName.ts'
+import { loginUserHandler } from './loginUser.ts'
+import { logoutUserHandler } from './logoutUser.ts'
+import { placeOrderHandler } from './placeOrder.ts'
+import { updatePetHandler } from './updatePet.ts'
+import { updatePetWithFormHandler } from './updatePetWithForm.ts'
+import { updateUserHandler } from './updateUser.ts'
+import { uploadFileHandler } from './uploadFile.ts'
+import { createUserDataSchema } from '../zod/createUserSchema.ts'
+import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from '../zod/createUsersWithListInputSchema.ts'
+import { deleteOrderPathOrderIdSchema } from '../zod/deleteOrderSchema.ts'
+import { deleteUserPathUsernameSchema } from '../zod/deleteUserSchema.ts'
+import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.ts'
+import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from '../zod/findPetsByTagsSchema.ts'
+import { getInventoryStatus200Schema } from '../zod/getInventorySchema.ts'
+import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema.ts'
+import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
+import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from '../zod/getUserByNameSchema.ts'
+import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from '../zod/loginUserSchema.ts'
+import { placeOrderDataSchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.ts'
+import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
+import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.ts'
+import { updateUserDataSchema, updateUserPathUsernameSchema } from '../zod/updateUserSchema.ts'
+import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { z } from 'zod'
 
 export function getServer() {
   const server = new McpServer({
@@ -209,7 +209,9 @@ export function getServer() {
 
   return server
 }
+
 export const server = getServer()
+
 export async function startServer() {
   try {
       const transport = new StdioServerTransport()

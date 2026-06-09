@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from "../types/UpdatePet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import { updatePetResponseSchema, updatePetDataSchema } from "../zod/updatePetSchema.ts";
+import client from '@kubb/plugin-client/clients/axios'
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { updatePetResponseSchema, updatePetDataSchema } from '../zod/updatePetSchema.ts'
 
 function getUpdatePetUrl() {
   const res = { method: 'PUT', url: `/pet` as const }

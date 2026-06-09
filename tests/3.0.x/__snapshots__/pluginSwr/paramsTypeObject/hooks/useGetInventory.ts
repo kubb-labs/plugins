@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWR from "swr";
-import type { GetInventoryResponse, GetInventoryStatus200 } from "../types/GetInventory.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRConfiguration } from "swr";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWR from 'swr'
+import type { GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRConfiguration } from 'swr'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -30,13 +30,11 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
 }
 
 export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return getInventory(config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return getInventory(config)
+    },
+  }
 }
 
 /**
@@ -50,22 +48,20 @@ export function useGetInventory(options: {
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
+  const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-         const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
+  const queryKey = getInventoryQueryKey()
 
-         const queryKey = getInventoryQueryKey()
-
-         return useSWR<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(
-          shouldFetch ? queryKey : null,
-          {
-            ...getInventoryQueryOptions(config),
-            ...(immutable ? {
-                revalidateIfStale: false,
-                revalidateOnFocus: false,
-                revalidateOnReconnect: false
-              } : { }),
-            ...queryOptions,
-          }
-         )
-
+  return useSWR<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(
+   shouldFetch ? queryKey : null,
+   {
+     ...getInventoryQueryOptions(config),
+     ...(immutable ? {
+         revalidateIfStale: false,
+         revalidateOnFocus: false,
+         revalidateOnReconnect: false
+       } : { }),
+     ...queryOptions,
+   }
+  )
 }

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import useSWRMutation from "swr/mutation";
-import type { UpdatePetData, UpdatePetResponse, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetStatus200 } from "../types/UpdatePet.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { SWRMutationConfiguration } from "swr/mutation";
+import client from '@kubb/plugin-client/clients/axios'
+import useSWRMutation from 'swr/mutation'
+import type { UpdatePetData, UpdatePetResponse, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { SWRMutationConfiguration } from 'swr/mutation'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 
@@ -44,16 +44,14 @@ export function useUpdatePet(options: {
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = updatePetMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = updatePetMutationKey()
-
-          return useSWRMutation<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { petId, data, params } }) => {
-              return updatePet(petId, data, params, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { petId, data, params } }) => {
+      return updatePet(petId, data, params, config)
+    },
+    mutationOptions
+  )
 }

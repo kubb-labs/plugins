@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from "../types/CreateUsersWithListInput.ts";
+import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse } from '../types/CreateUsersWithListInput.ts'
 
 export function createUsersWithListInput(data?: CreateUsersWithListInputData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreateUsersWithListInputResponse> {
   return cy.request<CreateUsersWithListInputResponse>({

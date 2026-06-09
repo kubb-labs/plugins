@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
-import type { UseMutationOptions, UseMutationResult, QueryClient } from "@tanstack/react-query";
-import { mutationOptions, useMutation } from "@tanstack/react-query";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
@@ -29,15 +29,13 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 }
 
 export function createUsersWithListInputMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
-
-        const mutationKey = createUsersWithListInputMutationKey()
-        return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
-          mutationKey,
-          mutationFn: async({ data }) => {
-            return createUsersWithListInput(data, config)
-          },
-        })
-
+  const mutationKey = createUsersWithListInputMutationKey()
+  return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
+    mutationKey,
+    mutationFn: async({ data }) => {
+      return createUsersWithListInput(data, config)
+    },
+  })
 }
 
 /**
@@ -49,18 +47,16 @@ export function useCreateUsersWithListInput<TContext>(options: {
   mutation?: UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client },
 } = {}) {
+  const { mutation = {}, client: config = {} } = options ?? {}
+  const { client: queryClient, ...mutationOptions } = mutation;
+  const mutationKey = mutationOptions.mutationKey ?? createUsersWithListInputMutationKey()
 
-          const { mutation = {}, client: config = {} } = options ?? {}
-          const { client: queryClient, ...mutationOptions } = mutation;
-          const mutationKey = mutationOptions.mutationKey ?? createUsersWithListInputMutationKey()
-
-          const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
+  const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
 
 
-          return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
-            ...baseOptions,
-            mutationKey,
-            ...mutationOptions,
-          }, queryClient) as UseMutationResult<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
-
+  return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
+    ...baseOptions,
+    mutationKey,
+    ...mutationOptions,
+  }, queryClient) as UseMutationResult<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
 }

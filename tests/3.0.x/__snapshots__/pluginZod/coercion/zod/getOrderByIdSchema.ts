@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { orderSchema } from "./orderSchema.ts";
+import * as z from 'zod'
+import { orderSchema } from './orderSchema.ts'
 
 export const getOrderByIdPathOrderIdSchema = z.coerce.bigint().describe("ID of order that needs to be fetched")
 

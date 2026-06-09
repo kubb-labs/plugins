@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { NotificationTypeA } from "./NotificationTypeA.ts";
-import type { NotificationTypeB } from "./NotificationTypeB.ts";
+import type { NotificationTypeA } from './NotificationTypeA.ts'
+import type { NotificationTypeB } from './NotificationTypeB.ts'
 
 /**
  * @type array

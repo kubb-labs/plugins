@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const loginUserQueryUsernameSchema = z.coerce.string().optional().describe("The user name for login")
 

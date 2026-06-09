@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { addressSchema } from "./addressSchema.ts";
+import * as z from 'zod'
+import { addressSchema } from './addressSchema.ts'
 
 export const customerSchema = z.object({
-    "id": z.bigint().optional(),
-    "username": z.string().optional(),
-    "address": z.array(addressSchema).optional()
-    })
+  id: z.bigint().optional(),
+  username: z.string().optional(),
+  address: z.array(addressSchema).optional(),
+})

@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from "@kubb/plugin-client/clients/axios";
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from "../types/CreateUsersWithListInput.ts";
-import type { Client, RequestConfig, ResponseErrorConfig } from "@kubb/plugin-client/clients/axios";
+import client from '@kubb/plugin-client/clients/axios'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const createUsersWithListInputQueryKey = (data?: CreateUsersWithListInputData) => [{ url: '/user/createWithList' }, ...(data ? [data] : [])] as const
 
@@ -29,11 +29,9 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 }
 
 export function createUsersWithListInputQueryOptions(data?: CreateUsersWithListInputData, config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {
-
-        return {
-          fetcher: async () => {
-            return createUsersWithListInput(data, config)
-          },
-        }
-
+  return {
+    fetcher: async () => {
+      return createUsersWithListInput(data, config)
+    },
+  }
 }

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import useSWRMutation from "swr/mutation";
-import type { Client, RequestConfig, ResponseErrorConfig } from "../.kubb/client.ts";
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from "../types/UploadFile.ts";
-import type { SWRMutationConfiguration } from "swr/mutation";
-import { client } from "../.kubb/client.ts";
+import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { SWRMutationConfiguration } from 'swr/mutation'
+import { client } from '../.kubb/client.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -40,16 +40,14 @@ export function useUploadFile(options: {
   client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
+  const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
+  const mutationKey = uploadFileMutationKey()
 
-          const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
-          const mutationKey = uploadFileMutationKey()
-
-          return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
-            shouldFetch ? mutationKey : null,
-            async (_url, { arg: { petId, data, params } }) => {
-              return uploadFile(petId, data, params, config)
-            },
-            mutationOptions
-          )
-
+  return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
+    shouldFetch ? mutationKey : null,
+    async (_url, { arg: { petId, data, params } }) => {
+      return uploadFile(petId, data, params, config)
+    },
+    mutationOptions
+  )
 }

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { categorySchema } from "./categorySchema.ts";
+import * as z from 'zod'
+import { categorySchema } from './categorySchema.ts'
 
 export const tagSchema = categorySchema
 

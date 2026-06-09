@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { userSchema } from "../userSchema.ts";
+import * as z from 'zod'
+import { userSchema } from '../userSchema.ts'
 
 export const updateUserPathUsernameSchema = z.string().describe("name that need to be deleted")
 

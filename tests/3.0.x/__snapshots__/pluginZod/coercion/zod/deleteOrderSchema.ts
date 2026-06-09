@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
+import * as z from 'zod'
 
 export const deleteOrderPathOrderIdSchema = z.coerce.bigint().describe("ID of the order that needs to be deleted")
 

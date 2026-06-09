@@ -3,25 +3,23 @@
 * Do not edit manually.
 */
 
-import type { LoginUserResponse, LoginUserStatus400 } from "../../types/LoginUser.ts";
-import { http } from "msw";
+import type { LoginUserResponse, LoginUserStatus400 } from '../../types/LoginUser.ts'
+import { http } from 'msw'
 
 export function loginUserHandlerResponse200(data: LoginUserResponse) {
-
-      return new Response(JSON.stringify(data), {
-        status: 200,
-          headers: {
-          'Content-Type': 'application/json'
-        },
-      })
+  return new Response(JSON.stringify(data), {
+    status: 200,
+      headers: {
+      'Content-Type': 'application/json'
+    },
+  })
 }
 
 export function loginUserHandlerResponse400(data?: LoginUserStatus400) {
+  return new Response(JSON.stringify(data), {
+    status: 400,
 
-      return new Response(JSON.stringify(data), {
-        status: 400,
-
-      })
+  })
 }
 
 export function loginUserHandler(data?: LoginUserResponse | ((info: Parameters<Parameters<typeof http.get>[1]>[0]) => Response | Promise<Response>)) {

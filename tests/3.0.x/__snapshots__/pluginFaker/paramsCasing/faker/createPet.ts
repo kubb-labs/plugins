@@ -3,12 +3,16 @@
 * Do not edit manually.
 */
 
-import type { Pet } from "../types/Pet.ts";
-import { fakerEN as faker } from "@faker-js/faker";
+import type { Pet } from '../types/Pet.ts'
+import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData)
+
 {
-  const defaultFakeData = {"id": faker.string.alpha(),"name": faker.string.alpha()}
+  const defaultFakeData = {
+  id: faker.string.alpha(),
+  "name": faker.string.alpha(),
+}
   return {
     ...defaultFakeData,
     ...(data || {}),

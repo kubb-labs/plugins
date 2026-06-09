@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Tag } from "../types/Tag.ts";
-import { createCategory } from "./createCategory.ts";
+import type { Tag } from '../types/Tag.ts'
+import { createCategory } from './createCategory.ts'
 
 export function createTag(data?: Partial<Tag>): Tag {
   return createCategory(data) as Tag

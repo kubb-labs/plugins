@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { LoginUserResponse, LoginUserStatus200, LoginUserStatus400 } from "../types/LoginUser.ts";
-import { fakerDE as faker } from "@faker-js/faker";
+import type { LoginUserResponse, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
+import { fakerDE as faker } from '@faker-js/faker'
 
 export function createLoginUserQueryUsername(data?: string): string {
   return data ?? faker.string.alpha()

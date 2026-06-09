@@ -3,25 +3,25 @@
 * Do not edit manually.
 */
 
-import { addPetHandler } from "./addPet.ts";
-import { deletePetHandler } from "./deletePet.ts";
-import { findPetsByStatusHandler } from "./findPetsByStatus.ts";
-import { findPetsByTagsHandler } from "./findPetsByTags.ts";
-import { getPetByIdHandler } from "./getPetById.ts";
-import { updatePetHandler } from "./updatePet.ts";
-import { updatePetWithFormHandler } from "./updatePetWithForm.ts";
-import { uploadFileHandler } from "./uploadFile.ts";
-import { addPetDataSchema, addPetStatus200Schema } from "../zod/addPetSchema.ts";
-import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from "../zod/deletePetSchema.ts";
-import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from "../zod/findPetsByStatusSchema.ts";
-import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from "../zod/findPetsByTagsSchema.ts";
-import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from "../zod/getPetByIdSchema.ts";
-import { updatePetDataSchema, updatePetStatus200Schema } from "../zod/updatePetSchema.ts";
-import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from "../zod/updatePetWithFormSchema.ts";
-import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from "../zod/uploadFileSchema.ts";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio";
-import { z } from "zod";
+import { addPetHandler } from './addPet.ts'
+import { deletePetHandler } from './deletePet.ts'
+import { findPetsByStatusHandler } from './findPetsByStatus.ts'
+import { findPetsByTagsHandler } from './findPetsByTags.ts'
+import { getPetByIdHandler } from './getPetById.ts'
+import { updatePetHandler } from './updatePet.ts'
+import { updatePetWithFormHandler } from './updatePetWithForm.ts'
+import { uploadFileHandler } from './uploadFile.ts'
+import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.ts'
+import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.ts'
+import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.ts'
+import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from '../zod/findPetsByTagsSchema.ts'
+import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
+import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
+import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.ts'
+import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { z } from 'zod'
 
 export function getServer() {
   const server = new McpServer({
@@ -108,7 +108,9 @@ export function getServer() {
 
   return server
 }
+
 export const server = getServer()
+
 export async function startServer() {
   try {
       const transport = new StdioServerTransport()

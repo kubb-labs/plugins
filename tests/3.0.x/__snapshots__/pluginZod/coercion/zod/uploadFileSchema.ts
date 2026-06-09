@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import * as z from "zod";
-import { apiResponseSchema } from "./apiResponseSchema.ts";
+import * as z from 'zod'
+import { apiResponseSchema } from './apiResponseSchema.ts'
 
 export const uploadFilePathPetIdSchema = z.coerce.bigint().describe("ID of pet to update")
 
