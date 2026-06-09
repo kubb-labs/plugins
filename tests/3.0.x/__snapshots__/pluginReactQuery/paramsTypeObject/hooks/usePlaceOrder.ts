@@ -51,7 +51,6 @@ export function usePlaceOrder<TContext>(options: {
 
   const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>
 
-
   return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
     ...baseOptions,
     mutationKey,

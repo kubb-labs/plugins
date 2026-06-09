@@ -29,7 +29,6 @@ export async function findPetsByStatusSuspense({ params }: { params?: { status?:
 export function findPetsByStatusSuspenseQueryOptions({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByStatusSuspenseQueryKey(params)
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return findPetsByStatusSuspense({ params }, { ...config, signal: config.signal ?? signal })
@@ -49,7 +48,6 @@ export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, T
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusSuspenseQueryKey(params)
-
 
   const query = useSuspenseQuery({
    ...findPetsByStatusSuspenseQueryOptions({ params }, config),

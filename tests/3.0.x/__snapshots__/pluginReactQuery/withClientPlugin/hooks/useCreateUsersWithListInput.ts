@@ -36,7 +36,6 @@ export function useCreateUsersWithListInput<TContext>(options: {
 
   const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>
 
-
   return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, {data?: CreateUsersWithListInputData}, TContext>({
     ...baseOptions,
     mutationKey,

@@ -12,12 +12,12 @@ export async function logoutUserHandler(request: RequestHandlerExtra<ServerReque
   const res = await client<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/user/logout` }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }

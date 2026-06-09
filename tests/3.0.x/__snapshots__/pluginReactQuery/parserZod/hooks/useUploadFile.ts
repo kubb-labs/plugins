@@ -50,7 +50,6 @@ export function useUploadFile<TContext>(options: {
 
   const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, {petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }}, TContext>
 
-
   return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, {petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }}, TContext>({
     ...baseOptions,
     mutationKey,

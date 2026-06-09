@@ -31,7 +31,6 @@ export async function findPetsByStatus({ params }: { params?: { status?: FindPet
 export function findPetsByStatusQueryOptions({ params }: { params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }> } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByStatusQueryKey(params)
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return findPetsByStatus({ params: toValue(params) }, { ...config, signal: config.signal ?? signal })

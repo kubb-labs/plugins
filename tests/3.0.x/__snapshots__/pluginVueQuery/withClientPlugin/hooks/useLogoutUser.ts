@@ -17,7 +17,6 @@ export type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = logoutUserQueryKey()
   return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return logoutUser({ ...config, signal: config.signal ?? signal })

@@ -51,7 +51,6 @@ export function useCreateUser<TContext>(options: {
 
   const baseOptions = createUserMutationOptions(config) as UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>
 
-
   return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, {data?: CreateUserData}, TContext>({
     ...baseOptions,
     mutationKey,

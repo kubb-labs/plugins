@@ -29,7 +29,6 @@ export async function getInventorySuspense(config: Partial<RequestConfig> & { cl
 export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getInventorySuspenseQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return getInventorySuspense({ ...config, signal: config.signal ?? signal })
@@ -49,7 +48,6 @@ export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
-
 
   const query = useSuspenseQuery({
    ...getInventorySuspenseQueryOptions(config),

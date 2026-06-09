@@ -36,7 +36,6 @@ export function useDeleteUser<TContext>(options: {
 
   const baseOptions = deleteUserMutationOptions(config) as UseMutationOptions<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, {username: DeleteUserPathUsername}, TContext>
 
-
   return useMutation<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, {username: DeleteUserPathUsername}, TContext>({
     ...baseOptions,
     mutationKey,
