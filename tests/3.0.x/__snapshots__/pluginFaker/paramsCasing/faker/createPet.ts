@@ -11,7 +11,7 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData)
 {
   const defaultFakeData = {
   id: faker.string.alpha(),
-  "name": faker.string.alpha(),
+  name: faker.string.alpha(),
 }
   return {
     ...defaultFakeData,

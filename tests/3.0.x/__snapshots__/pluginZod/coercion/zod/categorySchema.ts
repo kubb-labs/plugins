@@ -7,5 +7,5 @@ import * as z from 'zod'
 
 export const categorySchema = z.object({
   id: z.coerce.bigint().optional(),
-  "name": z.coerce.string().optional(),
+  name: z.coerce.string().optional(),
 })

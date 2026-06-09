@@ -20,7 +20,6 @@ function getLoginUserUrl() {
 export async function loginUser(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: getLoginUserUrl().url.toString(), params, ...requestConfig })
 
   return res

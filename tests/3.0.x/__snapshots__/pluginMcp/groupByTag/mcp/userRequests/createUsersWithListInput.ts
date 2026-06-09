@@ -10,10 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInputHandler({ data }: { data?: CreateUsersWithListInputData } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
   const requestData = data
-
 
   const res = await client<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData }, request)
 

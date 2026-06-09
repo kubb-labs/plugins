@@ -21,7 +21,6 @@ function getDeleteUserUrl({ username }: { username: DeleteUserPathUsername }) {
 export async function deleteUser({ username }: { username: DeleteUserPathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: getDeleteUserUrl({ username }).url.toString(), ...requestConfig })
 
   return res.data

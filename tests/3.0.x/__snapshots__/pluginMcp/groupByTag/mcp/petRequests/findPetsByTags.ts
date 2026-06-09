@@ -10,10 +10,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsHandler({ params }: { params?: { tags?: FindPetsByTagsQueryTags } } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: "GET", url: `/pet/findByTags`, params }, request)
 
   return {

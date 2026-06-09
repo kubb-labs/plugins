@@ -10,10 +10,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /user/:username}
  */
 export async function deleteUserHandler({ username }: { username: DeleteUserPathUsername }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: "DELETE", url: `/user/${username}` }, request)
 
   return {

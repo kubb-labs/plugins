@@ -11,7 +11,7 @@ export function createCategory<TData extends Partial<Category> = object>(data?: 
 {
   const defaultFakeData = {
   id: faker.number.bigInt(),
-  "name": faker.string.alpha(),
+  name: faker.string.alpha(),
 }
   return {
     ...defaultFakeData,

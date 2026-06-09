@@ -10,7 +10,7 @@ export function createPetUpdate<TData extends Partial<PetUpdate> = object>(data?
 
 {
   const defaultFakeData = {
-  "name": faker.string.alpha(),
+  name: faker.string.alpha(),
   description: faker.string.alpha(),
 }
   return {

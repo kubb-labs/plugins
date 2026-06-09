@@ -10,10 +10,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /store/order/:orderId}
  */
 export async function getOrderByIdHandler({ orderId }: { orderId: GetOrderByIdPathOrderId }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: "GET", url: `/store/order/${orderId}` }, request)
 
   return {

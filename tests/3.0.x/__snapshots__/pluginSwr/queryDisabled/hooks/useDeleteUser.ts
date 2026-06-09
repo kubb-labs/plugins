@@ -19,7 +19,6 @@ type DeleteUserQueryKey = ReturnType<typeof deleteUserQueryKey>
 export async function deleteUser(username: DeleteUserPathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
 
   return res.data

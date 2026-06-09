@@ -15,7 +15,7 @@ export function createAddPetRequest<TData extends Partial<AddPetRequest> = objec
   faker.seed([42])
   const defaultFakeData = {
   id: faker.number.bigInt(),
-  "name": faker.string.alpha(),
+  name: faker.string.alpha(),
   category: createCategory(),
   photoUrls: faker.helpers.multiple(() => (faker.string.alpha())),
   tags: faker.helpers.multiple(() => (createTag())),

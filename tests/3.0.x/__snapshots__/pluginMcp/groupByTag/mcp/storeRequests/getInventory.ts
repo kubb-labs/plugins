@@ -10,10 +10,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /store/inventory}
  */
 export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory` }, request)
 
   return {

@@ -10,7 +10,7 @@ import { tagSchema } from './tagSchema.ts'
 
 export const addPetRequestSchema = z.object({
   id: z.coerce.bigint().optional(),
-  "name": z.coerce.string(),
+  name: z.coerce.string(),
   category: categorySchema.optional(),
   photoUrls: z.array(z.coerce.string()),
   tags: z.array(tagSchema).optional(),

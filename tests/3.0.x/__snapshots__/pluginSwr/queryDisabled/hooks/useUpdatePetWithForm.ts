@@ -18,7 +18,6 @@ type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
 export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: 'POST', url: `/pet/${petId}`, params, ...requestConfig })
 
   return res.data

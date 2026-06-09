@@ -9,10 +9,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFileHandler({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
   const requestData = data
-
 
   const res = await client<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({ method: "POST", url: `/pet/${petId}/uploadImage`, params, data: requestData, headers: { 'Content-Type': 'application/octet-stream' } }, request)
 

@@ -20,7 +20,6 @@ function getUpdatePetWithFormUrl(petId: UpdatePetWithFormPathPetId) {
 export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: 'POST', url: getUpdatePetWithFormUrl(petId).url.toString(), params, ...requestConfig })
 
   return res

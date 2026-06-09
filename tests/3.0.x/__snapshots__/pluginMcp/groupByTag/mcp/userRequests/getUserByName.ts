@@ -9,10 +9,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /user/:username}
  */
 export async function getUserByNameHandler({ username }: { username: GetUserByNamePathUsername }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}` }, request)
 
   return {

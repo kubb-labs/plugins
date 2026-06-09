@@ -10,10 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /user/:username}
  */
 export async function updateUserHandler({ username, data }: { username: UpdateUserPathUsername; data?: UpdateUserData }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
   const requestData = data
-
 
   const res = await client<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: "PUT", url: `/user/${username}`, data: requestData }, request)
 

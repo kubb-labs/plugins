@@ -9,10 +9,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /user/logout}
  */
 export async function logoutUserHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/user/logout` }, request)
 
   return {

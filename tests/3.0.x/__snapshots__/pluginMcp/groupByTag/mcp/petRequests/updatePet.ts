@@ -10,10 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /pet}
  */
 export async function updatePetHandler({ data }: { data: UpdatePetData }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
   const requestData = data
-
 
   const res = await client<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: "PUT", url: `/pet`, data: requestData }, request)
 

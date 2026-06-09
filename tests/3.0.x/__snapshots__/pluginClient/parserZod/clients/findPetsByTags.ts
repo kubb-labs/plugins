@@ -22,7 +22,6 @@ function getFindPetsByTagsUrl() {
 export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: 'GET', url: getFindPetsByTagsUrl().url.toString(), params, ...requestConfig })
 
   return findPetsByTagsResponseSchema.parse(res.data)

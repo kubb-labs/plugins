@@ -21,7 +21,6 @@ function getDeletePetUrl(petId: DeletePetPathPetId) {
 export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: getDeletePetUrl(petId).url.toString(), ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
   return res

@@ -9,10 +9,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /user/login}
  */
 export async function loginUserHandler({ params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<LoginUserResponse, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: "GET", url: `/user/login`, params }, request)
 
   return {

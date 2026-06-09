@@ -21,7 +21,6 @@ function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
 export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: 'GET', url: getGetOrderByIdUrl(orderId).url.toString(), ...requestConfig })
 
   return res.data

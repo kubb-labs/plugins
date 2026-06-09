@@ -9,10 +9,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /pet/:petId}
  */
 export async function updatePetWithFormHandler({ petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: "POST", url: `/pet/${petId}`, params }, request)
 
   return {

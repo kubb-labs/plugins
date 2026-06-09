@@ -10,10 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /store/order}
  */
 export async function placeOrderHandler({ data }: { data?: PlaceOrderData } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
   const requestData = data
-
 
   const res = await client<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, data: requestData }, request)
 

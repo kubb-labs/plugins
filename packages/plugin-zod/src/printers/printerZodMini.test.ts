@@ -178,7 +178,7 @@ describe('printerZodMini', () => {
       expect(result).toMatchInlineSnapshot(`
         "z.object({
           id: z.int(),
-          "name": z.string(),
+          name: z.string(),
         })"
       `)
     })
@@ -272,7 +272,7 @@ describe('printerZodMini', () => {
       expect(printer.print(node)).toMatchInlineSnapshot(`
         "z.object({
           category: z.optional(Category),
-          "name": z.string(),
+          name: z.string(),
         })"
       `)
     })
@@ -295,7 +295,7 @@ describe('printerZodMini', () => {
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.object({
           get children() { return z.optional(TreeNode) },
-          "name": z.string(),
+          name: z.string(),
         })"
       `)
     })
@@ -320,7 +320,7 @@ describe('printerZodMini', () => {
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.object({
           get archEnemy() { return z.optional(Pet) },
-          "name": z.string(),
+          name: z.string(),
         })"
       `)
     })
@@ -482,7 +482,7 @@ describe('printerZodMini', () => {
         "z.discriminatedUnion('status', [
           z.object({
             status: z.enum(['active']),
-            "name": z.string(),
+            name: z.string(),
           }),
           z.object({
             status: z.enum(['inactive']),
@@ -558,7 +558,7 @@ describe('printerZodMini', () => {
       expect(p.print(node)).toMatchInlineSnapshot(`
         "z.object({
           id: z.int(),
-          "name": z.string(),
+          name: z.string(),
         }).omit({ "id": true })"
       `)
     })
@@ -578,7 +578,7 @@ describe('printerZodMini', () => {
         "z.object({
           id: z.int(),
           createdAt: z.string(),
-          "name": z.string(),
+          name: z.string(),
         }).omit({ "id": true, "createdAt": true })"
       `)
     })

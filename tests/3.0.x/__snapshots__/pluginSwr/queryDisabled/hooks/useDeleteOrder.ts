@@ -19,7 +19,6 @@ type DeleteOrderQueryKey = ReturnType<typeof deleteOrderQueryKey>
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: `/store/order/${orderId}`, ...requestConfig })
 
   return res.data

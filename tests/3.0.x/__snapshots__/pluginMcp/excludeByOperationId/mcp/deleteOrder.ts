@@ -10,10 +10,6 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /store/order/:orderId}
  */
 export async function deleteOrderHandler({ orderId }: { orderId: DeleteOrderPathOrderId }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-
-
-
-
   const res = await client<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: "DELETE", url: `/store/order/${orderId}` }, request)
 
   return {
