@@ -35,7 +35,6 @@ export function useUpdatePetWithForm<TContext>(options: {
 
   const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, {petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }}, TContext>
 
-
   return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, {petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }}, TContext>({
     ...baseOptions,
     mutationKey,

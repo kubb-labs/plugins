@@ -16,7 +16,6 @@ type GetUserByNameSuspenseQueryKey = ReturnType<typeof getUserByNameSuspenseQuer
 export function getUserByNameSuspenseQueryOptions(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getUserByNameSuspenseQueryKey(username)
   return queryOptions<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return getUserByName(username, { ...config, signal: config.signal ?? signal })
@@ -35,7 +34,6 @@ export function useGetUserByNameSuspense<TData = GetUserByNameStatus200, TQueryK
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getUserByNameSuspenseQueryKey(username)
-
 
   const query = useSuspenseQuery({
    ...getUserByNameSuspenseQueryOptions(username, config),

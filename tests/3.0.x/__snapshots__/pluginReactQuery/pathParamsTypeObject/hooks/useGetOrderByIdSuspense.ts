@@ -29,7 +29,6 @@ export async function getOrderByIdSuspense({ orderId }: { orderId: GetOrderByIdP
 export function getOrderByIdSuspenseQueryOptions({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getOrderByIdSuspenseQueryKey({ orderId })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return getOrderByIdSuspense({ orderId }, { ...config, signal: config.signal ?? signal })
@@ -49,7 +48,6 @@ export function useGetOrderByIdSuspense<TData = GetOrderByIdStatus200, TQueryKey
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey({ orderId })
-
 
   const query = useSuspenseQuery({
    ...getOrderByIdSuspenseQueryOptions({ orderId }, config),

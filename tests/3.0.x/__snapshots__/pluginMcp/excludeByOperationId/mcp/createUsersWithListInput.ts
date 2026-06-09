@@ -15,12 +15,12 @@ export async function createUsersWithListInputHandler({ data }: { data?: CreateU
   const res = await client<CreateUsersWithListInputResponse, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: "POST", url: `/user/createWithList`, data: requestData }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }

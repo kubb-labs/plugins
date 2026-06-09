@@ -52,7 +52,6 @@ export function useUpdateUser<TContext>(options: {
 
   const baseOptions = updateUserMutationOptions(config) as UseMutationOptions<UpdateUserResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathUsername, data?: UpdateUserData}, TContext>
 
-
   return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, {username: UpdateUserPathUsername, data?: UpdateUserData}, TContext>({
     ...baseOptions,
     mutationKey,

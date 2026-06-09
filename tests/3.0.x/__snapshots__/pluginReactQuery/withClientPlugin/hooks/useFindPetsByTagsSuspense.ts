@@ -16,7 +16,6 @@ type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQu
 export function findPetsByTagsSuspenseQueryOptions(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByTagsSuspenseQueryKey(params)
   return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return findPetsByTags(params, { ...config, signal: config.signal ?? signal })
@@ -36,7 +35,6 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseQueryKey(params)
-
 
   const query = useSuspenseQuery({
    ...findPetsByTagsSuspenseQueryOptions(params, config),

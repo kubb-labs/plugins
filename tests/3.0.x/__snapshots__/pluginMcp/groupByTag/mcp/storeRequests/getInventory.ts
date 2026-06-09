@@ -13,12 +13,12 @@ export async function getInventoryHandler(request: RequestHandlerExtra<ServerReq
   const res = await client<GetInventoryResponse, ResponseErrorConfig<Error>, unknown>({ method: "GET", url: `/store/inventory` }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }

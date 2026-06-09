@@ -15,12 +15,12 @@ export async function createUserHandler({ data }: { data?: CreateUserData } = {}
   const res = await client<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: "POST", url: `/user`, data: requestData }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }

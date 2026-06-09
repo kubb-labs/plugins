@@ -16,7 +16,6 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 export function findPetsByTagsQueryOptions(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return findPetsByTags(params, { ...config, signal: config.signal ?? signal })
@@ -36,7 +35,6 @@ export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = 
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey(params)
-
 
   const query = useQuery({
    ...findPetsByTagsQueryOptions(params, config),

@@ -51,7 +51,6 @@ export function useUpdatePet<TContext>(options: {
 
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>
 
-
   return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>({
     ...baseOptions,
     mutationKey,

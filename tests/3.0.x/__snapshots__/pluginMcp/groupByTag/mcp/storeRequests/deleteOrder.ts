@@ -13,12 +13,12 @@ export async function deleteOrderHandler({ orderId }: { orderId: DeleteOrderPath
   const res = await client<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: "DELETE", url: `/store/order/${orderId}` }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }

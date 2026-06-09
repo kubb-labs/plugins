@@ -16,7 +16,6 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getInventoryQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return getInventory({ ...config, signal: config.signal ?? signal })
@@ -36,7 +35,6 @@ export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetI
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getInventoryQueryKey()
-
 
   const query = useQuery({
    ...getInventoryQueryOptions(config),

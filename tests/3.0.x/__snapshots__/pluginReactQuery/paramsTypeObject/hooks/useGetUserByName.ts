@@ -48,7 +48,6 @@ export function useGetUserByName<TData = GetUserByNameStatus200, TQueryData = Ge
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getUserByNameQueryKey({ username })
 
-
   const query = useQuery({
    ...getUserByNameQueryOptions({ username }, config),
    ...resolvedOptions,

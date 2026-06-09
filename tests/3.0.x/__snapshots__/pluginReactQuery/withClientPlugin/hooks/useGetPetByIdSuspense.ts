@@ -16,7 +16,6 @@ type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 export function getPetByIdSuspenseQueryOptions(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdSuspenseQueryKey(petId)
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return getPetById(petId, { ...config, signal: config.signal ?? signal })
@@ -36,7 +35,6 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey(petId)
-
 
   const query = useSuspenseQuery({
    ...getPetByIdSuspenseQueryOptions(petId, config),

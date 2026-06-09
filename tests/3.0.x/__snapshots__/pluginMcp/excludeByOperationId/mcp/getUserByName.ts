@@ -12,12 +12,12 @@ export async function getUserByNameHandler({ username }: { username: GetUserByNa
   const res = await client<GetUserByNameResponse, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: "GET", url: `/user/${username}` }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }

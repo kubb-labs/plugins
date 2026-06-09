@@ -51,7 +51,6 @@ export function useAddPet<TContext>(options: {
 
   const baseOptions = addPetMutationOptions(config) as UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>
 
-
   return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
     ...baseOptions,
     mutationKey,

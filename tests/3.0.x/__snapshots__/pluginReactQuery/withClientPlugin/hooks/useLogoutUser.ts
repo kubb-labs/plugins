@@ -16,7 +16,6 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = logoutUserQueryKey()
   return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return logoutUser({ ...config, signal: config.signal ?? signal })
@@ -35,7 +34,6 @@ export function useLogoutUser<TData = LogoutUserResponse, TQueryData = LogoutUse
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? logoutUserQueryKey()
-
 
   const query = useQuery({
    ...logoutUserQueryOptions(config),

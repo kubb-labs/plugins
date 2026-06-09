@@ -16,7 +16,6 @@ type LogoutUserSuspenseQueryKey = ReturnType<typeof logoutUserSuspenseQueryKey>
 export function logoutUserSuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = logoutUserSuspenseQueryKey()
   return queryOptions<LogoutUserResponse, ResponseErrorConfig<Error>, LogoutUserResponse, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return logoutUser({ ...config, signal: config.signal ?? signal })
@@ -35,7 +34,6 @@ export function useLogoutUserSuspense<TData = LogoutUserResponse, TQueryKey exte
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? logoutUserSuspenseQueryKey()
-
 
   const query = useSuspenseQuery({
    ...logoutUserSuspenseQueryOptions(config),

@@ -28,7 +28,6 @@ export async function loginUserSuspense(params?: { username?: LoginUserQueryUser
 export function loginUserSuspenseQueryOptions(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = loginUserSuspenseQueryKey(params)
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return loginUserSuspense(params, { ...config, signal: config.signal ?? signal })
@@ -47,7 +46,6 @@ export function useLoginUserSuspense<TData = LoginUserStatus200, TQueryKey exten
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? loginUserSuspenseQueryKey(params)
-
 
   const query = useSuspenseQuery({
    ...loginUserSuspenseQueryOptions(params, config),

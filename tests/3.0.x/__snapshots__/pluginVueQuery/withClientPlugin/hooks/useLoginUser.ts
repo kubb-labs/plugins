@@ -18,7 +18,6 @@ export type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 export function loginUserQueryOptions(params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = loginUserQueryKey(params)
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return loginUser(toValue(params), { ...config, signal: config.signal ?? signal })

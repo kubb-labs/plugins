@@ -50,7 +50,6 @@ export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetBy
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey({ petId })
 
-
   const query = useQuery({
    ...getPetByIdQueryOptions({ petId }, config),
    ...resolvedOptions,

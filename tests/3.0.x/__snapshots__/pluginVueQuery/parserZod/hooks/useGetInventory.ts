@@ -31,7 +31,6 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
 export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getInventoryQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return getInventory({ ...config, signal: config.signal ?? signal })

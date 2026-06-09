@@ -49,7 +49,6 @@ export function useDeletePet<TContext>(options: {
 
   const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, {petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }}, TContext>
 
-
   return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, {petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }}, TContext>({
     ...baseOptions,
     mutationKey,

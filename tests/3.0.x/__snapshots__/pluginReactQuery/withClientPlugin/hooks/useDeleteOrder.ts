@@ -36,7 +36,6 @@ export function useDeleteOrder<TContext>(options: {
 
   const baseOptions = deleteOrderMutationOptions(config) as UseMutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, {orderId: DeleteOrderPathOrderId}, TContext>
 
-
   return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, {orderId: DeleteOrderPathOrderId}, TContext>({
     ...baseOptions,
     mutationKey,

@@ -28,7 +28,6 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
 export function loginUserQueryOptions(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = loginUserQueryKey(params)
   return queryOptions<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, LoginUserStatus200, typeof queryKey>({
-
    queryKey,
    queryFn: async ({ signal }) => {
       return loginUser(params, { ...config, signal: config.signal ?? signal })
@@ -47,7 +46,6 @@ export function useLoginUser<TData = LoginUserStatus200, TQueryData = LoginUserS
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? loginUserQueryKey(params)
-
 
   const query = useQuery({
    ...loginUserQueryOptions(params, config),

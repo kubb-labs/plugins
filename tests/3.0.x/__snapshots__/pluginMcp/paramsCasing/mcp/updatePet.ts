@@ -17,12 +17,12 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
   const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
 
   return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(res.data)
-                }
-              ],
-              structuredContent: { data: res.data }
-             }
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(res.data)
+      }
+    ],
+    structuredContent: { data: res.data }
+  }
 }
