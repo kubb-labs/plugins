@@ -1,5 +1,18 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- [#326](https://github.com/kubb-labs/plugins/pull/326) [`2d6e478`](https://github.com/kubb-labs/plugins/commit/2d6e4787d61a959ce56b06ecdecbfab4b20de324) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Clean up whitespace in the raw generated output (the source emitted before any external formatter runs):
+  - **react-query / vue-query**: empty conditional fragments (`enabled`, `customOptions`) no longer leave stray blank lines. This removes the double blank line in mutation/query hooks and the blank line that appeared right after `queryOptions<…, typeof queryKey>({`.
+  - **mcp**: the handler `return { content: […], structuredContent: {…} }` block is now indented at the function-body baseline instead of being over-indented.
+
+- Updated dependencies []:
+  - @kubb/plugin-client@5.0.0-beta.45
+  - @kubb/plugin-ts@5.0.0-beta.45
+  - @kubb/plugin-zod@5.0.0-beta.45
+
 ## 5.0.0-beta.44
 
 ### Patch Changes

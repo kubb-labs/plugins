@@ -1,5 +1,15 @@
 # performance
 
+## 0.0.1-beta.21
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-client@5.0.0-beta.45
+  - @kubb/plugin-faker@5.0.0-beta.45
+  - @kubb/plugin-ts@5.0.0-beta.45
+  - @kubb/plugin-zod@5.0.0-beta.45
+
 ## 0.0.1-beta.20
 
 ### Patch Changes

@@ -37,6 +37,7 @@
   },
   "changesets": [
     "circular-schema-detection-shared",
+    "clean-raw-generated-whitespace",
     "client-banner-aggregation-context",
     "client-parser-false",
     "consolidate-jsx-renderer",
