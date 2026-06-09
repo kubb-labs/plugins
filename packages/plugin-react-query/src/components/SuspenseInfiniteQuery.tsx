@@ -143,11 +143,10 @@ export function SuspenseInfiniteQuery({
         {`
        const { query: queryConfig = {}, client: config = {} } = options ?? {}
        const { client: queryClient, ...resolvedOptions } = queryConfig
-       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})
-       ${customOptions ? `const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
+       const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
        const query = useSuspenseInfiniteQuery({
-        ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n...customOptions,' : ''}
+        ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n        ...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
        } as unknown as UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient) as ${returnType}

@@ -94,26 +94,16 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   if (requestName) fetchConfig.push(`data: ${isFormData ? 'formData as FormData' : 'requestData'}`)
   if (headers.length) fetchConfig.push(`headers: { ${headers.join(', ')} }`)
 
-  const callToolResult =
-    dataReturnType === 'data'
-      ? `return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(res.data)
-              }
-            ],
-            structuredContent: { data: res.data }
-           }`
-      : `return {
-            content: [
-              {
-                type: 'text',
-                text: JSON.stringify(res)
-              }
-            ],
-            structuredContent: { data: res.data }
-           }`
+  const payload = dataReturnType === 'data' ? 'res.data' : 'res'
+  const callToolResult = `return {
+  content: [
+    {
+      type: 'text',
+      text: JSON.stringify(${payload})
+    }
+  ],
+  structuredContent: { data: res.data }
+}`
 
   return (
     <File.Source name={name} isExportable isIndexable>
