@@ -1,4 +1,4 @@
-import { stringify } from '@kubb/ast/utils'
+import { buildList, buildObject, extractRefName, objectKey, stringify } from '@kubb/ast/utils'
 
 import { ast } from '@kubb/core'
 import type { PluginZod, ResolverZod } from '../types.ts'
@@ -203,7 +203,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       },
       ref(node) {
         if (!node.name) return null
-        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name) : node.name
+        const refName = node.ref ? (extractRefName(node.ref) ?? node.name) : node.name
 
         // In the input direction, a date-bearing component resolves to its `${name}InputSchema`
         // variant so request bodies encode `Date → string` instead of decoding.
@@ -257,12 +257,12 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
           })
 
           if (hasSelfRef) {
-            return `get ${ast.objectKey(propName)}() { return ${value} }`
+            return `get ${objectKey(propName)}() { return ${value} }`
           }
-          return `${ast.objectKey(propName)}: ${value}`
+          return `${objectKey(propName)}: ${value}`
         })
 
-        const objectBase = `z.object(${ast.buildObject(entries)})`
+        const objectBase = `z.object(${buildObject(entries)})`
 
         // Handle additionalProperties as .catchall() or .strict()
         const result = (() => {
@@ -287,7 +287,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       tuple(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
 
-        return `z.tuple(${ast.buildList(items)})`
+        return `z.tuple(${buildList(items)})`
       },
       union(node) {
         const nodeMembers = node.members ?? []
@@ -303,10 +303,10 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         if (node.discriminatorPropertyName && !nodeMembers.some((m) => m.type === 'intersection')) {
           // z.discriminatedUnion requires ZodObject members; intersections (ZodIntersection) are not
           // assignable to $ZodDiscriminant, so fall back to z.union when any member is an intersection.
-          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${ast.buildList(members)})`
+          return `z.discriminatedUnion(${stringify(node.discriminatorPropertyName)}, ${buildList(members)})`
         }
 
-        return `z.union(${ast.buildList(members)})`
+        return `z.union(${buildList(members)})`
       },
       intersection(node) {
         const members = node.members ?? []

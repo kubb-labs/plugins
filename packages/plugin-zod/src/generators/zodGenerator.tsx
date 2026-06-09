@@ -1,4 +1,5 @@
 import { resolveContentTypeVariants } from '@internals/shared'
+import { extractRefName } from '@kubb/ast/utils'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
@@ -75,7 +76,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const codecRefNames = new Set(
       hasCodec
         ? ast.collect<string>(node, {
-            schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
+            schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (extractRefName(n.ref) ?? undefined) : undefined),
           })
         : [],
     )
@@ -171,7 +172,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         direction === 'input' && !mini
           ? new Set(
               ast.collect<string>(schema, {
-                schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (ast.extractRefName(n.ref) ?? undefined) : undefined),
+                schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (extractRefName(n.ref) ?? undefined) : undefined),
               }),
             )
           : null

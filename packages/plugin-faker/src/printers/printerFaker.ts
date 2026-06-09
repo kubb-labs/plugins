@@ -1,4 +1,4 @@
-import { stringify, toRegExpString } from '@kubb/ast/utils'
+import { buildObject, extractRefName, objectKey, stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
@@ -284,7 +284,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         // Use the canonical name from the $ref path — node.name may have been overridden
         // (e.g. by single-member allOf flatten using the property-derived child name).
         // Inline refs (without $ref) from faker utils already carry resolved helper names.
-        const refName = node.ref ? (ast.extractRefName(node.ref) ?? node.name ?? node.schema?.name) : (node.name ?? node.schema?.name)
+        const refName = node.ref ? (extractRefName(node.ref) ?? node.name ?? node.schema?.name) : (node.name ?? node.schema?.name)
 
         if (!refName) {
           throw new Error('Name not defined for ref node')
@@ -371,7 +371,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const cyclicSchemas = this.options.cyclicSchemas
         const entries = (node.properties ?? []).map((property): string => {
           if (this.options.mapper && Object.hasOwn(this.options.mapper, property.name)) {
-            return `${ast.objectKey(property.name)}: ${this.options.mapper[property.name]}`
+            return `${objectKey(property.name)}: ${this.options.mapper[property.name]}`
           }
 
           const value: string =
@@ -386,13 +386,13 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value – so every subsequent read is stable.
           if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
-            return `get ${ast.objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
+            return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 
-          return `${ast.objectKey(property.name)}: ${value}`
+          return `${objectKey(property.name)}: ${value}`
         })
 
-        return ast.buildObject(entries)
+        return buildObject(entries)
       },
       ...options.nodes,
     },
