@@ -1,5 +1,22 @@
 # tests-3.0.x
 
+## 0.0.1-beta.20
+
+### Patch Changes
+
+- Updated dependencies [[`27fbf2f`](https://github.com/kubb-labs/plugins/commit/27fbf2f16bf4da0aba6e0966f521bb350c675681), [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75), [`27fbf2f`](https://github.com/kubb-labs/plugins/commit/27fbf2f16bf4da0aba6e0966f521bb350c675681), [`27fbf2f`](https://github.com/kubb-labs/plugins/commit/27fbf2f16bf4da0aba6e0966f521bb350c675681), [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75), [`27fbf2f`](https://github.com/kubb-labs/plugins/commit/27fbf2f16bf4da0aba6e0966f521bb350c675681), [`92482b1`](https://github.com/kubb-labs/plugins/commit/92482b1ee0a0b70c2bc0293f5d3d8dbd5519af75)]:
+  - @kubb/plugin-client@5.0.0-beta.44
+  - @kubb/plugin-cypress@5.0.0-beta.44
+  - @kubb/plugin-faker@5.0.0-beta.44
+  - @kubb/plugin-mcp@5.0.0-beta.44
+  - @kubb/plugin-msw@5.0.0-beta.44
+  - @kubb/plugin-react-query@5.0.0-beta.44
+  - @kubb/plugin-swr@5.0.0-beta.44
+  - @kubb/plugin-ts@5.0.0-beta.44
+  - @kubb/plugin-vue-query@5.0.0-beta.44
+  - @kubb/plugin-zod@5.0.0-beta.44
+  - @kubb/plugin-redoc@5.0.0-beta.44
+
 ## 0.0.1-beta.19
 
 ### Patch Changes

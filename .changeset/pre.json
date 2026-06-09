@@ -39,6 +39,8 @@
     "circular-schema-detection-shared",
     "client-banner-aggregation-context",
     "client-parser-false",
+    "consolidate-jsx-renderer",
+    "consume-ast-utils",
     "core-plugins-beta-12-alignment",
     "dull-areas-happen",
     "enforce-array-type-syntax",
@@ -58,6 +60,7 @@
     "operation-optional-method-path",
     "plugin-client-drop-dead-transformers-yaml",
     "plugin-client-export-clients-barrel",
+    "plugin-client-operations-builder",
     "plugin-client-params-casing-unused-var",
     "plugin-client-v5-migration",
     "plugin-cypress-v5-upgrade",
@@ -71,6 +74,7 @@
     "plugin-mcp-enum-path-params",
     "plugin-mcp-request-headers",
     "plugin-mcp-v5-migration",
+    "plugin-msw-handlers-builder",
     "plugin-msw-typed-request-body",
     "plugin-msw-v5-migration",
     "plugin-redoc-direct-adapter",
@@ -103,13 +107,16 @@
     "sanitize-leading-digit-identifiers",
     "shared-group-config-helper",
     "shared-operation-file-entry",
+    "single-quote-output-spacing",
     "standardize-client-runtime-symbol",
     "swr-enabled-params-client-alignment",
     "tanstack-query-optional-enabled-params",
+    "tanstack-shared-query-options-params",
     "tanstack-tdata-success-only",
     "ts-discriminator-string-types",
     "ts-fix-request-body-description",
     "vue-query-enabled-tovalue",
-    "zod-date-roundtrip"
+    "zod-date-roundtrip",
+    "zod-faker-object-builder"
   ]
 }
