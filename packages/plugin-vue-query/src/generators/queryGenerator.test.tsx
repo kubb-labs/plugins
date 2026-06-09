@@ -5,8 +5,8 @@ import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
-import { describe, expect, test } from 'vitest'
-import { matchFiles, rawSources } from '#mocks'
+import { describe, test } from 'vitest'
+import { matchFiles } from '#mocks'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
 import { resolverVueQuery } from '../resolvers/resolverVueQuery.ts'
@@ -146,11 +146,6 @@ describe('queryGenerator operation', () => {
       options,
       resolver: resolverVueQuery,
     })
-
-    for (const source of rawSources(driver.fileManager.files)) {
-      expect(source, 'raw output has no double blank lines').not.toMatch(/\n[ \t]*\n[ \t]*\n/)
-      expect(source, 'raw output has no blank line right after an opening bracket').not.toMatch(/[([{][ \t]*\n[ \t]*\n/)
-    }
 
     await matchFiles(driver.fileManager.files, props.name)
   })

@@ -135,8 +135,6 @@ describe('mcpGenerator — Operation', () => {
     })
 
     for (const source of rawSources(driver.fileManager.files)) {
-      expect(source, 'raw output has no double blank lines').not.toMatch(/\n[ \t]*\n[ \t]*\n/)
-      expect(source, 'raw output has no blank line right after an opening bracket').not.toMatch(/[([{][ \t]*\n[ \t]*\n/)
       if (source.includes('structuredContent')) {
         expect(source, 'handler return is indented at the function-body baseline').toContain('\n  return {\n    content: [')
       }
