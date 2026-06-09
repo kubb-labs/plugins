@@ -53,7 +53,7 @@ export const pluginReactQueryName = 'plugin-react-query' satisfies PluginReactQu
  */
 export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   const {
-    output = { path: 'hooks', barrelType: 'named' },
+    output = { path: 'hooks', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

@@ -37,7 +37,7 @@ export const pluginZodName = 'plugin-zod' satisfies PluginZod['name']
  */
 export const pluginZod = definePlugin<PluginZod>((options) => {
   const {
-    output = { path: 'zod', barrelType: 'named' },
+    output = { path: 'zod', barrel: { type: 'named' } },
     group,
     exclude = [],
     include,

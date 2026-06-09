@@ -66,7 +66,7 @@ options:
   - name: parser
     type: "false | 'zod'"
     required: false
-    default: 'false'
+    default: false
     description: |
       Runtime validator applied to the response body before it is returned.
 
