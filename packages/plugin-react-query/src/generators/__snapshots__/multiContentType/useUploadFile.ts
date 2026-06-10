@@ -6,6 +6,7 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileStatus200 } from './UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import type { z } from 'zod'
 import { client } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
 import { UploadFileResponse, UploadFileData } from './UploadFile'
@@ -26,7 +27,7 @@ export async function uploadFile(
   const requestData = UploadFileData.parse(data)
   const formData = buildFormData(requestData)
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.output<typeof UploadFileData>>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
