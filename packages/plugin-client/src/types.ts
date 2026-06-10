@@ -163,7 +163,7 @@ export type Options = {
    * Shape of the value returned by each generated client function.
    * - `'data'` — only the response body.
    * - `'full'` — the full response as a discriminated union keyed by HTTP status code.
-   *   Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`,
+   *   Each member is `{ status: N; data: StatusNType; statusText: string }`,
    *   so narrowing on `res.status` also narrows `res.data` to the matching response type.
    *
    * @default 'data'

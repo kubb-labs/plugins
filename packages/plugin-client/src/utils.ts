@@ -54,7 +54,7 @@ export function resolveResponseParser(parser: ParserOption | undefined | false):
 export function buildStatusUnionType(node: ast.OperationNode, tsResolver: ResolverTs): string {
   const members = node.responses.map((r) => {
     const typeName = tsResolver.resolveResponseStatusName(node, r.statusCode)
-    return `{ status: ${Number.parseInt(r.statusCode, 10)}; data: ${typeName}; statusText: string; headers: Headers }`
+    return `{ status: ${Number.parseInt(r.statusCode, 10)}; data: ${typeName}; statusText: string }`
   })
   if (members.length === 1) return members[0]!
   return `(${members.join(' | ')})`

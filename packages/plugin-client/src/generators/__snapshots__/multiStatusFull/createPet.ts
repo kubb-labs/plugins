@@ -25,7 +25,5 @@ export async function createPet(data?: CreatePetData, config: Partial<RequestCon
     ...requestConfig,
   })
 
-  return res as
-    | { status: 201; data: CreatePetStatus201; statusText: string; headers: Headers }
-    | { status: 405; data: CreatePetStatus405; statusText: string; headers: Headers }
+  return res as { status: 201; data: CreatePetStatus201; statusText: string } | { status: 405; data: CreatePetStatus405; statusText: string }
 }

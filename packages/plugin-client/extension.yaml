@@ -490,7 +490,7 @@ options:
       Shape of the value returned from each generated client function.
 
       - `'data'` returns only the response body (`response.data`).
-      - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`. Narrowing on `res.status` also narrows `res.data` to the matching response type.
+      - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string }`. Narrowing on `res.status` also narrows `res.data` to the matching response type.
     examples:
       - name: "'data' (default)"
         files:
@@ -518,8 +518,8 @@ options:
               export async function addPet(data: AddPetData, config = {}) {
                 const res = await request<AddPetStatus200 | AddPetStatus405, ...>(...)
                 return res as
-                  | { status: 200; data: AddPetStatus200; statusText: string; headers: Headers }
-                  | { status: 405; data: AddPetStatus405; statusText: string; headers: Headers }
+                  | { status: 200; data: AddPetStatus200; statusText: string }
+                  | { status: 405; data: AddPetStatus405; statusText: string }
               }
           - name: usage.ts
             lang: typescript

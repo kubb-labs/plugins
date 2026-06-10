@@ -4,7 +4,7 @@
 
 `dataReturnType: 'full'` now returns a status-discriminated union instead of a flat `ResponseConfig<TData>`.
 
-Each union member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`. Narrowing on `res.status` also narrows `res.data` to the matching response type. The function's response generic covers every documented status code.
+Each union member is `{ status: N; data: StatusNType; statusText: string }`. Narrowing on `res.status` also narrows `res.data` to the matching response type. The function's response generic covers every documented status code.
 
 ```ts
 pluginClient({ dataReturnType: 'full' })
