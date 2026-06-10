@@ -3,30 +3,27 @@ import { createGroupConfig } from './group.ts'
 
 describe('createGroupConfig', () => {
   it('returns null when grouping is disabled', () => {
-    expect(createGroupConfig(undefined, { suffix: 'Controller' })).toBeNull()
+    expect(createGroupConfig(undefined)).toBeNull()
   })
 
   it('names path groups by the second path segment', () => {
-    const config = createGroupConfig({ type: 'path' }, { suffix: 'Controller' })
+    const config = createGroupConfig({ type: 'path' })
     const name = config?.name as (ctx: { group: string }) => string
 
     expect(name({ group: '/pet/findByStatus' })).toBe('pet')
   })
 
-  it('names tag groups with the camelCased group plus suffix', () => {
-    const controller = createGroupConfig({ type: 'tag' }, { suffix: 'Controller' })
-    const requests = createGroupConfig({ type: 'tag' }, { suffix: 'Requests' })
-    const controllerName = controller?.name as (ctx: { group: string }) => string
-    const requestsName = requests?.name as (ctx: { group: string }) => string
+  it('names tag groups with the plain camelCased group', () => {
+    const config = createGroupConfig({ type: 'tag' })
+    const name = config?.name as (ctx: { group: string }) => string
 
-    expect(controllerName({ group: 'pet store' })).toBe('petStoreController')
-    expect(requestsName({ group: 'pet store' })).toBe('petStoreRequests')
+    expect(name({ group: 'pet store' })).toBe('petStore')
   })
 
   it('honors a user-provided name over the default namer', () => {
     const custom = (): string => 'Custom'
 
-    const honored = createGroupConfig({ type: 'tag', name: custom }, { suffix: 'Controller' })
+    const honored = createGroupConfig({ type: 'tag', name: custom })
     expect(honored?.name).toBe(custom)
   })
 })

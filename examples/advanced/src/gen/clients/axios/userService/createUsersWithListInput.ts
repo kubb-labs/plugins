@@ -1,7 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/userController/CreateUsersWithListInput.ts'
-import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../../../zod/userController/createUsersWithListInputSchema.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/user/CreateUsersWithListInput.ts'
+import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../../../zod/user/createUsersWithListInputSchema.ts'
 
 export function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/user/createWithList` as const }

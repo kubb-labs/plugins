@@ -51,7 +51,7 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Requests' })
+  const groupConfig = createGroupConfig(group)
 
   return {
     name: pluginCypressName,

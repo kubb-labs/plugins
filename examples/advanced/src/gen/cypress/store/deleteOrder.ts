@@ -1,0 +1,11 @@
+import type { DeleteOrderPathOrderId, DeleteOrderResponse } from '../../models/ts/store/DeleteOrder.ts'
+
+export function deleteOrder(orderId: DeleteOrderPathOrderId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeleteOrderResponse> {
+  return cy
+    .request<DeleteOrderResponse>({
+      method: 'DELETE',
+      url: `/store/order/${orderId}`,
+      ...options,
+    })
+    .then((res) => res.body)
+}

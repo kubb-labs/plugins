@@ -7,7 +7,7 @@ import type {
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
-} from '../../../models/ts/petController/UpdatePetWithForm.js'
+} from '../../../models/ts/pet/UpdatePetWithForm.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {

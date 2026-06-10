@@ -64,7 +64,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Requests' })
+  const groupConfig = createGroupConfig(group)
 
   return {
     name: pluginMcpName,

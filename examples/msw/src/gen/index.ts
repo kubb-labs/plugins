@@ -231,13 +231,8 @@ export {
   createAddPetStatus200Xml,
   createAddPetStatus405,
   createAddPetXmlData,
-} from './mocks/petController/createAddPet.ts'
-export {
-  createDeletePetHeaderApiKey,
-  createDeletePetPathPetId,
-  createDeletePetResponse,
-  createDeletePetStatus400,
-} from './mocks/petController/createDeletePet.ts'
+} from './mocks/pet/createAddPet.ts'
+export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './mocks/pet/createDeletePet.ts'
 export {
   createFindPetsByStatusQueryStatus,
   createFindPetsByStatusResponse,
@@ -245,7 +240,7 @@ export {
   createFindPetsByStatusStatus200Json,
   createFindPetsByStatusStatus200Xml,
   createFindPetsByStatusStatus400,
-} from './mocks/petController/createFindPetsByStatus.ts'
+} from './mocks/pet/createFindPetsByStatus.ts'
 export {
   createFindPetsByTagsQueryPage,
   createFindPetsByTagsQueryPageSize,
@@ -255,7 +250,7 @@ export {
   createFindPetsByTagsStatus200Json,
   createFindPetsByTagsStatus200Xml,
   createFindPetsByTagsStatus400,
-} from './mocks/petController/createFindPetsByTags.ts'
+} from './mocks/pet/createFindPetsByTags.ts'
 export {
   createGetPetByIdPathPetId,
   createGetPetByIdResponse,
@@ -264,8 +259,8 @@ export {
   createGetPetByIdStatus200Xml,
   createGetPetByIdStatus400,
   createGetPetByIdStatus404,
-} from './mocks/petController/createGetPetById.ts'
-export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './mocks/petController/createOptionsFindPetsByStatus.ts'
+} from './mocks/pet/createGetPetById.ts'
+export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './mocks/pet/createOptionsFindPetsByStatus.ts'
 export {
   createUpdatePetData,
   createUpdatePetFormUrlEncodedData,
@@ -278,28 +273,28 @@ export {
   createUpdatePetStatus404,
   createUpdatePetStatus405,
   createUpdatePetXmlData,
-} from './mocks/petController/createUpdatePet.ts'
+} from './mocks/pet/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
   createUpdatePetWithFormQueryName,
   createUpdatePetWithFormQueryStatus,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
-} from './mocks/petController/createUpdatePetWithForm.ts'
+} from './mocks/pet/createUpdatePetWithForm.ts'
 export {
   createUploadFileData,
   createUploadFilePathPetId,
   createUploadFileQueryAdditionalMetadata,
   createUploadFileResponse,
   createUploadFileStatus200,
-} from './mocks/petController/createUploadFile.ts'
+} from './mocks/pet/createUploadFile.ts'
 export {
   createDeleteOrderPathOrderId,
   createDeleteOrderResponse,
   createDeleteOrderStatus400,
   createDeleteOrderStatus404,
-} from './mocks/storeController/createDeleteOrder.ts'
-export { createGetInventoryResponse, createGetInventoryStatus200 } from './mocks/storeController/createGetInventory.ts'
+} from './mocks/store/createDeleteOrder.ts'
+export { createGetInventoryResponse, createGetInventoryStatus200 } from './mocks/store/createGetInventory.ts'
 export {
   createGetOrderByIdPathOrderId,
   createGetOrderByIdResponse,
@@ -308,7 +303,7 @@ export {
   createGetOrderByIdStatus200Xml,
   createGetOrderByIdStatus400,
   createGetOrderByIdStatus404,
-} from './mocks/storeController/createGetOrderById.ts'
+} from './mocks/store/createGetOrderById.ts'
 export {
   createPlaceOrderData,
   createPlaceOrderFormUrlEncodedData,
@@ -317,7 +312,7 @@ export {
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
   createPlaceOrderXmlData,
-} from './mocks/storeController/createPlaceOrder.ts'
+} from './mocks/store/createPlaceOrder.ts'
 export {
   createPlaceOrderPatchData,
   createPlaceOrderPatchFormUrlEncodedData,
@@ -326,7 +321,7 @@ export {
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
   createPlaceOrderPatchXmlData,
-} from './mocks/storeController/createPlaceOrderPatch.ts'
+} from './mocks/store/createPlaceOrderPatch.ts'
 export {
   createCreateUserData,
   createCreateUserFormUrlEncodedData,
@@ -336,7 +331,7 @@ export {
   createCreateUserStatusDefaultJson,
   createCreateUserStatusDefaultXml,
   createCreateUserXmlData,
-} from './mocks/userController/createCreateUser.ts'
+} from './mocks/user/createCreateUser.ts'
 export {
   createCreateUsersWithListInputData,
   createCreateUsersWithListInputResponse,
@@ -344,13 +339,8 @@ export {
   createCreateUsersWithListInputStatus200Json,
   createCreateUsersWithListInputStatus200Xml,
   createCreateUsersWithListInputStatusDefault,
-} from './mocks/userController/createCreateUsersWithListInput.ts'
-export {
-  createDeleteUserPathUsername,
-  createDeleteUserResponse,
-  createDeleteUserStatus400,
-  createDeleteUserStatus404,
-} from './mocks/userController/createDeleteUser.ts'
+} from './mocks/user/createCreateUsersWithListInput.ts'
+export { createDeleteUserPathUsername, createDeleteUserResponse, createDeleteUserStatus400, createDeleteUserStatus404 } from './mocks/user/createDeleteUser.ts'
 export {
   createGetUserByNamePathUsername,
   createGetUserByNameResponse,
@@ -359,7 +349,7 @@ export {
   createGetUserByNameStatus200Xml,
   createGetUserByNameStatus400,
   createGetUserByNameStatus404,
-} from './mocks/userController/createGetUserByName.ts'
+} from './mocks/user/createGetUserByName.ts'
 export {
   createLoginUserQueryPassword,
   createLoginUserQueryUsername,
@@ -368,8 +358,8 @@ export {
   createLoginUserStatus200Json,
   createLoginUserStatus200Xml,
   createLoginUserStatus400,
-} from './mocks/userController/createLoginUser.ts'
-export { createLogoutUserResponse, createLogoutUserStatusDefault } from './mocks/userController/createLogoutUser.ts'
+} from './mocks/user/createLoginUser.ts'
+export { createLogoutUserResponse, createLogoutUserStatusDefault } from './mocks/user/createLogoutUser.ts'
 export {
   createUpdateUserData,
   createUpdateUserFormUrlEncodedData,
@@ -378,7 +368,7 @@ export {
   createUpdateUserResponse,
   createUpdateUserStatusDefault,
   createUpdateUserXmlData,
-} from './mocks/userController/createUpdateUser.ts'
+} from './mocks/user/createUpdateUser.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/PetStatusEnum.ts'
 export { handlers } from './msw/handlers.ts'

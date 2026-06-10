@@ -54,7 +54,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     transformer: userTransformer,
   } = options
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
+  const groupConfig = createGroupConfig(group)
 
   return {
     name: pluginFakerName,

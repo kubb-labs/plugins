@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.js'
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getFindPetsByStatusUrl() {

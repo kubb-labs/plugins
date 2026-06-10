@@ -6,8 +6,8 @@ import type {
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
-} from '../../../models/ts/petController/UpdatePetWithForm.ts'
-import { updatePetWithFormResponseSchema } from '../../../zod/petController/updatePetWithFormSchema.ts'
+} from '../../../models/ts/pet/UpdatePetWithForm.ts'
+import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
 export function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}:search` as const }

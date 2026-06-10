@@ -7,7 +7,7 @@ import type {
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
-} from '../../../models/ts/petController/FindPetsByTags.js'
+} from '../../../models/ts/pet/FindPetsByTags.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getFindPetsByTagsUrl() {

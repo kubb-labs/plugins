@@ -1,13 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type {
-  UpdatePetData,
-  UpdatePetStatus200,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../../../models/ts/petController/UpdatePet.js'
+import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../../models/ts/pet/UpdatePet.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdatePetUrl() {

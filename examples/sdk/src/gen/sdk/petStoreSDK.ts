@@ -4,18 +4,18 @@
  */
 
 import type { Client, RequestConfig } from '@kubb/plugin-client/clients/fetch'
-import { petController } from './petController/petController.ts'
-import { storeController } from './storeController/storeController.ts'
-import { userController } from './userController/userController.ts'
+import { pet } from './pet/pet.ts'
+import { store } from './store/store.ts'
+import { user } from './user/user.ts'
 
 export class PetStoreSDK {
-  readonly petController: petController
-  readonly storeController: storeController
-  readonly userController: userController
+  readonly pet: pet
+  readonly store: store
+  readonly user: user
 
   constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    this.petController = new petController(config)
-    this.storeController = new storeController(config)
-    this.userController = new userController(config)
+    this.pet = new pet(config)
+    this.store = new store(config)
+    this.user = new user(config)
   }
 }

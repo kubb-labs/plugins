@@ -69,7 +69,7 @@ options:
       - name: name
         type: '(context: GroupContext) => string'
         required: false
-        default: "(ctx) => `${ctx.group}Requests`"
+        default: "(ctx) => `${ctx.group}`"
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - extends: ./_shared/core/include.yaml

@@ -20,8 +20,8 @@ export {
   createAddPetStatus200Xml,
   createAddPetStatus405,
   createAddPetXmlData,
-} from './petController/createAddPet.ts'
-export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './petController/createDeletePet.ts'
+} from './pet/createAddPet.ts'
+export { createDeletePetHeaderApiKey, createDeletePetPathPetId, createDeletePetResponse, createDeletePetStatus400 } from './pet/createDeletePet.ts'
 export {
   createFindPetsByStatusQueryStatus,
   createFindPetsByStatusResponse,
@@ -29,7 +29,7 @@ export {
   createFindPetsByStatusStatus200Json,
   createFindPetsByStatusStatus200Xml,
   createFindPetsByStatusStatus400,
-} from './petController/createFindPetsByStatus.ts'
+} from './pet/createFindPetsByStatus.ts'
 export {
   createFindPetsByTagsQueryPage,
   createFindPetsByTagsQueryPageSize,
@@ -39,7 +39,7 @@ export {
   createFindPetsByTagsStatus200Json,
   createFindPetsByTagsStatus200Xml,
   createFindPetsByTagsStatus400,
-} from './petController/createFindPetsByTags.ts'
+} from './pet/createFindPetsByTags.ts'
 export {
   createGetPetByIdPathPetId,
   createGetPetByIdResponse,
@@ -48,8 +48,8 @@ export {
   createGetPetByIdStatus200Xml,
   createGetPetByIdStatus400,
   createGetPetByIdStatus404,
-} from './petController/createGetPetById.ts'
-export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './petController/createOptionsFindPetsByStatus.ts'
+} from './pet/createGetPetById.ts'
+export { createOptionsFindPetsByStatusResponse, createOptionsFindPetsByStatusStatus200 } from './pet/createOptionsFindPetsByStatus.ts'
 export {
   createUpdatePetData,
   createUpdatePetFormUrlEncodedData,
@@ -62,28 +62,23 @@ export {
   createUpdatePetStatus404,
   createUpdatePetStatus405,
   createUpdatePetXmlData,
-} from './petController/createUpdatePet.ts'
+} from './pet/createUpdatePet.ts'
 export {
   createUpdatePetWithFormPathPetId,
   createUpdatePetWithFormQueryName,
   createUpdatePetWithFormQueryStatus,
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
-} from './petController/createUpdatePetWithForm.ts'
+} from './pet/createUpdatePetWithForm.ts'
 export {
   createUploadFileData,
   createUploadFilePathPetId,
   createUploadFileQueryAdditionalMetadata,
   createUploadFileResponse,
   createUploadFileStatus200,
-} from './petController/createUploadFile.ts'
-export {
-  createDeleteOrderPathOrderId,
-  createDeleteOrderResponse,
-  createDeleteOrderStatus400,
-  createDeleteOrderStatus404,
-} from './storeController/createDeleteOrder.ts'
-export { createGetInventoryResponse, createGetInventoryStatus200 } from './storeController/createGetInventory.ts'
+} from './pet/createUploadFile.ts'
+export { createDeleteOrderPathOrderId, createDeleteOrderResponse, createDeleteOrderStatus400, createDeleteOrderStatus404 } from './store/createDeleteOrder.ts'
+export { createGetInventoryResponse, createGetInventoryStatus200 } from './store/createGetInventory.ts'
 export {
   createGetOrderByIdPathOrderId,
   createGetOrderByIdResponse,
@@ -92,7 +87,7 @@ export {
   createGetOrderByIdStatus200Xml,
   createGetOrderByIdStatus400,
   createGetOrderByIdStatus404,
-} from './storeController/createGetOrderById.ts'
+} from './store/createGetOrderById.ts'
 export {
   createPlaceOrderData,
   createPlaceOrderFormUrlEncodedData,
@@ -101,7 +96,7 @@ export {
   createPlaceOrderStatus200,
   createPlaceOrderStatus405,
   createPlaceOrderXmlData,
-} from './storeController/createPlaceOrder.ts'
+} from './store/createPlaceOrder.ts'
 export {
   createPlaceOrderPatchData,
   createPlaceOrderPatchFormUrlEncodedData,
@@ -110,7 +105,7 @@ export {
   createPlaceOrderPatchStatus200,
   createPlaceOrderPatchStatus405,
   createPlaceOrderPatchXmlData,
-} from './storeController/createPlaceOrderPatch.ts'
+} from './store/createPlaceOrderPatch.ts'
 export {
   createCreateUserData,
   createCreateUserFormUrlEncodedData,
@@ -120,7 +115,7 @@ export {
   createCreateUserStatusDefaultJson,
   createCreateUserStatusDefaultXml,
   createCreateUserXmlData,
-} from './userController/createCreateUser.ts'
+} from './user/createCreateUser.ts'
 export {
   createCreateUsersWithListInputData,
   createCreateUsersWithListInputResponse,
@@ -128,13 +123,8 @@ export {
   createCreateUsersWithListInputStatus200Json,
   createCreateUsersWithListInputStatus200Xml,
   createCreateUsersWithListInputStatusDefault,
-} from './userController/createCreateUsersWithListInput.ts'
-export {
-  createDeleteUserPathUsername,
-  createDeleteUserResponse,
-  createDeleteUserStatus400,
-  createDeleteUserStatus404,
-} from './userController/createDeleteUser.ts'
+} from './user/createCreateUsersWithListInput.ts'
+export { createDeleteUserPathUsername, createDeleteUserResponse, createDeleteUserStatus400, createDeleteUserStatus404 } from './user/createDeleteUser.ts'
 export {
   createGetUserByNamePathUsername,
   createGetUserByNameResponse,
@@ -143,7 +133,7 @@ export {
   createGetUserByNameStatus200Xml,
   createGetUserByNameStatus400,
   createGetUserByNameStatus404,
-} from './userController/createGetUserByName.ts'
+} from './user/createGetUserByName.ts'
 export {
   createLoginUserQueryPassword,
   createLoginUserQueryUsername,
@@ -152,8 +142,8 @@ export {
   createLoginUserStatus200Json,
   createLoginUserStatus200Xml,
   createLoginUserStatus400,
-} from './userController/createLoginUser.ts'
-export { createLogoutUserResponse, createLogoutUserStatusDefault } from './userController/createLogoutUser.ts'
+} from './user/createLoginUser.ts'
+export { createLogoutUserResponse, createLogoutUserStatusDefault } from './user/createLogoutUser.ts'
 export {
   createUpdateUserData,
   createUpdateUserFormUrlEncodedData,
@@ -162,4 +152,4 @@ export {
   createUpdateUserResponse,
   createUpdateUserStatusDefault,
   createUpdateUserXmlData,
-} from './userController/createUpdateUser.ts'
+} from './user/createUpdateUser.ts'

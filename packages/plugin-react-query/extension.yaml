@@ -170,11 +170,11 @@ options:
                 twoslash: false
                 code: |
                   src/gen/types/
-                  ├── index.ts          # re-exports ./petController and ./storeController
-                  ├── petController/
+                  ├── index.ts          # re-exports ./pet and ./store
+                  ├── pet/
                   │   ├── index.ts      # re-exports Pet, Store, ...
                   │   └── Pet.ts
-                  └── storeController/
+                  └── store/
                       ├── index.ts
                       └── Store.ts
           - name: 'false'
@@ -340,25 +340,24 @@ options:
                 output: { path: './src/gen' },
                 plugins: [
                   pluginTs({
-                    group: {
-                      type: 'tag',
-                      name: ({ group }) => `${group}Controller`,
-                    },
+                    group: { type: 'tag' },
                   }),
                 ],
               })
     body: |
-      With the configuration above, the generator emits:
+      With the configuration above, the generator emits one folder per tag, named after the camelCased tag:
 
       ```text
       src/gen/
-      ├── petController/
+      ├── pet/
       │   ├── AddPet.ts
       │   └── GetPet.ts
-      └── storeController/
+      └── store/
           ├── CreateStore.ts
           └── GetStoreById.ts
       ```
+
+      Pass `group.name` to customize the folder name, for example `name: ({ group }) => \`${group}Controller\`` to keep the pre-v5 `petController/` layout.
     properties:
       - name: type
         type: "'tag'"
@@ -372,7 +371,7 @@ options:
       - name: name
         type: '(context: GroupContext) => string'
         required: false
-        default: (ctx) => `${ctx.group}Controller`
+        default: (ctx) => `${ctx.group}`
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
   - name: client
     type: ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle? }
@@ -1092,7 +1091,7 @@ options:
           code: |-
             import { useQueryClient, type QueryClient } from '@tanstack/react-query'
             import type { HookOptions } from '../gen/hookOptions'
-            import { getUserByNameQueryKey } from '../gen/hooks/userController/useGetUserByNameHook'
+            import { getUserByNameQueryKey } from '../gen/hooks/user/useGetUserByNameHook'
 
             function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Partial<HookOptions> {
               return {

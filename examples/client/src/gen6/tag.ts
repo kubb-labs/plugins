@@ -4,11 +4,11 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/storeController/DeleteOrder.ts'
-import type { GetInventoryStatus200 } from './models/ts/storeController/GetInventory.ts'
-import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/storeController/GetOrderById.ts'
-import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from './models/ts/storeController/PlaceOrder.ts'
-import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from './models/ts/storeController/PlaceOrderPatch.ts'
+import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/store/DeleteOrder.ts'
+import type { GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
+import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/store/GetOrderById.ts'
+import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from './models/ts/store/PlaceOrder.ts'
+import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from './models/ts/store/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getGetInventoryUrl() {

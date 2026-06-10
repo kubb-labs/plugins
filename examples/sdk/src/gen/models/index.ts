@@ -22,7 +22,7 @@ export type {
   AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
-} from './petController/AddPet.ts'
+} from './pet/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -30,7 +30,7 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus400,
-} from './petController/DeletePet.ts'
+} from './pet/DeletePet.ts'
 export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
@@ -40,7 +40,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './petController/FindPetsByStatus.ts'
+} from './pet/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
@@ -52,7 +52,7 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './petController/FindPetsByTags.ts'
+} from './pet/FindPetsByTags.ts'
 export type {
   GetPetByIdPathPetId,
   GetPetByIdRequestConfig,
@@ -63,7 +63,7 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './petController/GetPetById.ts'
+} from './pet/GetPetById.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -78,7 +78,7 @@ export type {
   UpdatePetStatus404,
   UpdatePetStatus405,
   UpdatePetXmlData,
-} from './petController/UpdatePet.ts'
+} from './pet/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
@@ -87,7 +87,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './petController/UpdatePetWithForm.ts'
+} from './pet/UpdatePetWithForm.ts'
 export type {
   UploadFileData,
   UploadFileFormData,
@@ -98,7 +98,7 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './petController/UploadFile.ts'
+} from './pet/UploadFile.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -106,8 +106,8 @@ export type {
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-} from './storeController/DeleteOrder.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './storeController/GetInventory.ts'
+} from './store/DeleteOrder.ts'
+export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './store/GetInventory.ts'
 export type {
   GetOrderByIdPathOrderId,
   GetOrderByIdRequestConfig,
@@ -118,7 +118,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './storeController/GetOrderById.ts'
+} from './store/GetOrderById.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -129,7 +129,7 @@ export type {
   PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
-} from './storeController/PlaceOrder.ts'
+} from './store/PlaceOrder.ts'
 export type {
   PlaceOrderPatchData,
   PlaceOrderPatchFormUrlEncodedData,
@@ -140,7 +140,7 @@ export type {
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
-} from './storeController/PlaceOrderPatch.ts'
+} from './store/PlaceOrderPatch.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -152,7 +152,7 @@ export type {
   CreateUserStatusDefaultJson,
   CreateUserStatusDefaultXml,
   CreateUserXmlData,
-} from './userController/CreateUser.ts'
+} from './user/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
@@ -162,7 +162,7 @@ export type {
   CreateUsersWithListInputStatus200Json,
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
-} from './userController/CreateUsersWithListInput.ts'
+} from './user/CreateUsersWithListInput.ts'
 export type {
   DeleteUserPathUsername,
   DeleteUserRequestConfig,
@@ -170,7 +170,7 @@ export type {
   DeleteUserResponses,
   DeleteUserStatus400,
   DeleteUserStatus404,
-} from './userController/DeleteUser.ts'
+} from './user/DeleteUser.ts'
 export type {
   GetUserByNamePathUsername,
   GetUserByNameRequestConfig,
@@ -181,7 +181,7 @@ export type {
   GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-} from './userController/GetUserByName.ts'
+} from './user/GetUserByName.ts'
 export type {
   LoginUserQueryPassword,
   LoginUserQueryUsername,
@@ -192,8 +192,8 @@ export type {
   LoginUserStatus200Json,
   LoginUserStatus200Xml,
   LoginUserStatus400,
-} from './userController/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './userController/LogoutUser.ts'
+} from './user/LoginUser.ts'
+export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './user/LogoutUser.ts'
 export type {
   UpdateUserData,
   UpdateUserFormUrlEncodedData,
@@ -204,6 +204,6 @@ export type {
   UpdateUserResponses,
   UpdateUserStatusDefault,
   UpdateUserXmlData,
-} from './userController/UpdateUser.ts'
+} from './user/UpdateUser.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './Order.ts'
 export { petStatusEnum } from './PetStatusEnum.ts'

@@ -52,7 +52,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
+  const groupConfig = createGroupConfig(group)
 
   const resolvedEnum = {
     type: enumOptions.type ?? 'asConst',

@@ -1,7 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/userController/DeleteUser.ts'
-import { deleteUserResponseSchema } from '../../../zod/userController/deleteUserSchema.ts'
+import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.ts'
+import { deleteUserResponseSchema } from '../../../zod/user/deleteUserSchema.ts'
 
 export function getDeleteUserUrl({ username }: { username: DeleteUserPathUsername }) {
   const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }

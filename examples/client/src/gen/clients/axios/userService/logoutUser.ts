@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { LogoutUserResponse } from '../../../models/ts/userController/LogoutUser.js'
+import type { LogoutUserResponse } from '../../../models/ts/user/LogoutUser.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getLogoutUserUrl() {

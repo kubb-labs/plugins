@@ -1,7 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { FindPetsByStatusPathStepId, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/petController/FindPetsByStatus.ts'
-import { findPetsByStatusResponseSchema } from '../../../zod/petController/findPetsByStatusSchema.ts'
+import type { FindPetsByStatusPathStepId, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.ts'
+import { findPetsByStatusResponseSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
 export function getFindPetsByStatusUrl({ stepId }: { stepId: FindPetsByStatusPathStepId }) {
   const step_id = stepId

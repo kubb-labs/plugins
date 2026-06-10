@@ -62,7 +62,7 @@ options:
       - name: name
         type: '(context: GroupContext) => string'
         required: false
-        default: "(ctx) => `${ctx.group}Controller`"
+        default: "(ctx) => `${ctx.group}`"
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: client
@@ -366,7 +366,7 @@ options:
           code: |-
             import { useQueryClient, type QueryClient } from '@tanstack/react-query'
             import type { HookOptions } from '../gen/hookOptions'
-            import { getUserByNameQueryKey } from '../gen/hooks/userController/useGetUserByNameHook'
+            import { getUserByNameQueryKey } from '../gen/hooks/user/useGetUserByNameHook'
 
             function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Partial<HookOptions> {
               return {

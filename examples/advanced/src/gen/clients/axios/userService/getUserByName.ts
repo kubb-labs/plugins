@@ -5,8 +5,8 @@ import type {
   GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-} from '../../../models/ts/userController/GetUserByName.ts'
-import { getUserByNameResponseSchema } from '../../../zod/userController/getUserByNameSchema.ts'
+} from '../../../models/ts/user/GetUserByName.ts'
+import { getUserByNameResponseSchema } from '../../../zod/user/getUserByNameSchema.ts'
 
 export function getGetUserByNameUrl({ username }: { username: GetUserByNamePathUsername }) {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }

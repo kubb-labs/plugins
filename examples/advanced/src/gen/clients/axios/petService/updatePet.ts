@@ -7,8 +7,8 @@ import type {
   UpdatePetStatus400,
   UpdatePetStatus404,
   UpdatePetStatus405,
-} from '../../../models/ts/petController/UpdatePet.ts'
-import { updatePetResponseSchema, updatePetDataSchema } from '../../../zod/petController/updatePetSchema.ts'
+} from '../../../models/ts/pet/UpdatePet.ts'
+import { updatePetResponseSchema, updatePetDataSchema } from '../../../zod/pet/updatePetSchema.ts'
 
 export function getUpdatePetUrl() {
   const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/pet` as const }

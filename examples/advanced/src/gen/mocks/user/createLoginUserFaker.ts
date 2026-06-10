@@ -1,0 +1,42 @@
+import type { LoginUserResponse, LoginUserStatus200, LoginUserStatus400 } from '../../models/ts/user/LoginUser.ts'
+import { fakerEN as faker } from '@faker-js/faker'
+
+export function createLoginUserQueryUsernameFaker(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+export function createLoginUserQueryPasswordFaker(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200FakerXml(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200FakerJson(data?: string): string {
+  return data ?? faker.string.alpha()
+}
+
+/**
+ * @description successful operation
+ */
+export function createLoginUserStatus200Faker(_data?: LoginUserStatus200): LoginUserStatus200 {
+  return faker.helpers.arrayElement<any>([createLoginUserStatus200FakerXml(), createLoginUserStatus200FakerJson()])
+}
+
+/**
+ * @description Invalid username/password supplied
+ */
+export function createLoginUserStatus400Faker() {
+  return undefined
+}
+
+export function createLoginUserResponseFaker(_data?: LoginUserResponse): LoginUserResponse {
+  return faker.helpers.arrayElement<any>([createLoginUserStatus200Faker(), createLoginUserStatus400Faker()])
+}

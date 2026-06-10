@@ -41,7 +41,7 @@ examples:
         twoslash: false
         code: |
           import client from '@kubb/plugin-client/clients/fetch'
-          import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
+          import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/pet/GetPetById'
           import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
           export class Pet {
@@ -94,7 +94,7 @@ examples:
         twoslash: false
         code: |
           import client from '@kubb/plugin-client/clients/fetch'
-          import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/petController/GetPetById'
+          import type { GetPetByIdPathParams, GetPetByIdQueryResponse } from '../../models/ts/pet/GetPetById'
           import type { RequestConfig } from '@kubb/plugin-client/clients/fetch'
 
           export class Pet {

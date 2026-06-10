@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.js'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/user/UpdateUser.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {

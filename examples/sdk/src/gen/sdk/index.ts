@@ -1,4 +1,4 @@
-export * from './petController/index.ts'
+export * from './pet/index.ts'
 export * from './petStoreSDK.ts'
-export * from './storeController/index.ts'
-export * from './userController/index.ts'
+export * from './store/index.ts'
+export * from './user/index.ts'

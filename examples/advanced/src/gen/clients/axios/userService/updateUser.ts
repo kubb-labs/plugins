@@ -1,7 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/userController/UpdateUser.ts'
-import { updateUserResponseSchema, updateUserDataSchema } from '../../../zod/userController/updateUserSchema.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/user/UpdateUser.ts'
+import { updateUserResponseSchema, updateUserDataSchema } from '../../../zod/user/updateUserSchema.ts'
 
 export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
   const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/user/${username}` as const }

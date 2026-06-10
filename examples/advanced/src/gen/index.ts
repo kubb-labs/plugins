@@ -25,7 +25,7 @@ export type {
   AddFilesResponses,
   AddFilesStatus200,
   AddFilesStatus405,
-} from './models/ts/petController/AddFiles.ts'
+} from './models/ts/pet/AddFiles.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
@@ -38,7 +38,7 @@ export type {
   AddPetStatusDefaultJson,
   AddPetStatusDefaultXml,
   AddPetXmlData,
-} from './models/ts/petController/AddPet.ts'
+} from './models/ts/pet/AddPet.ts'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -46,7 +46,7 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus400,
-} from './models/ts/petController/DeletePet.ts'
+} from './models/ts/pet/DeletePet.ts'
 export type {
   FindPetsByStatusPathStepId,
   FindPetsByStatusRequestConfig,
@@ -56,7 +56,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './models/ts/petController/FindPetsByStatus.ts'
+} from './models/ts/pet/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
@@ -69,7 +69,7 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './models/ts/petController/FindPetsByTags.ts'
+} from './models/ts/pet/FindPetsByTags.ts'
 export type {
   GetPetByIdPathPetId,
   GetPetByIdRequestConfig,
@@ -80,7 +80,7 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './models/ts/petController/GetPetById.ts'
+} from './models/ts/pet/GetPetById.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -96,7 +96,7 @@ export type {
   UpdatePetStatus404,
   UpdatePetStatus405,
   UpdatePetXmlData,
-} from './models/ts/petController/UpdatePet.ts'
+} from './models/ts/pet/UpdatePet.ts'
 export type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
@@ -105,7 +105,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './models/ts/petController/UpdatePetWithForm.ts'
+} from './models/ts/pet/UpdatePetWithForm.ts'
 export type {
   UploadFileData,
   UploadFilePathPetId,
@@ -114,7 +114,7 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './models/ts/petController/UploadFile.ts'
+} from './models/ts/pet/UploadFile.ts'
 export type {
   CreatePetsBoolParamKey,
   CreatePetsData,
@@ -127,7 +127,7 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
-} from './models/ts/petsController/CreatePets.ts'
+} from './models/ts/pets/CreatePets.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -135,8 +135,8 @@ export type {
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-} from './models/ts/storeController/DeleteOrder.ts'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/storeController/GetInventory.ts'
+} from './models/ts/store/DeleteOrder.ts'
+export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
 export type {
   GetOrderByIdPathOrderId,
   GetOrderByIdRequestConfig,
@@ -147,7 +147,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './models/ts/storeController/GetOrderById.ts'
+} from './models/ts/store/GetOrderById.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -158,7 +158,7 @@ export type {
   PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
-} from './models/ts/storeController/PlaceOrder.ts'
+} from './models/ts/store/PlaceOrder.ts'
 export type {
   PlaceOrderPatchData,
   PlaceOrderPatchFormUrlEncodedData,
@@ -169,7 +169,7 @@ export type {
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
-} from './models/ts/storeController/PlaceOrderPatch.ts'
+} from './models/ts/store/PlaceOrderPatch.ts'
 export type { TagTag } from './models/ts/tag/Tag.ts'
 export type {
   CreateUserData,
@@ -182,7 +182,7 @@ export type {
   CreateUserStatusDefaultJson,
   CreateUserStatusDefaultXml,
   CreateUserXmlData,
-} from './models/ts/userController/CreateUser.ts'
+} from './models/ts/user/CreateUser.ts'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
@@ -192,7 +192,7 @@ export type {
   CreateUsersWithListInputStatus200Json,
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
-} from './models/ts/userController/CreateUsersWithListInput.ts'
+} from './models/ts/user/CreateUsersWithListInput.ts'
 export type {
   DeleteUserPathUsername,
   DeleteUserRequestConfig,
@@ -200,7 +200,7 @@ export type {
   DeleteUserResponses,
   DeleteUserStatus400,
   DeleteUserStatus404,
-} from './models/ts/userController/DeleteUser.ts'
+} from './models/ts/user/DeleteUser.ts'
 export type {
   GetUserByNamePathUsername,
   GetUserByNameRequestConfig,
@@ -211,7 +211,7 @@ export type {
   GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-} from './models/ts/userController/GetUserByName.ts'
+} from './models/ts/user/GetUserByName.ts'
 export type {
   LoginUserQueryPassword,
   LoginUserQueryUsername,
@@ -222,8 +222,8 @@ export type {
   LoginUserStatus200Json,
   LoginUserStatus200Xml,
   LoginUserStatus400,
-} from './models/ts/userController/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/userController/LogoutUser.ts'
+} from './models/ts/user/LoginUser.ts'
+export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/user/LogoutUser.ts'
 export type {
   UpdateUserData,
   UpdateUserFormUrlEncodedData,
@@ -234,7 +234,7 @@ export type {
   UpdateUserResponses,
   UpdateUserStatusDefault,
   UpdateUserXmlData,
-} from './models/ts/userController/UpdateUser.ts'
+} from './models/ts/user/UpdateUser.ts'
 export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema.ts'
 export type { AddressSchemaType } from './zod/addressSchema.ts'
 export type { AnimalSchemaType } from './zod/animalSchema.ts'
@@ -255,7 +255,7 @@ export type {
   AddFilesResponseSchemaType,
   AddFilesStatus200SchemaType,
   AddFilesStatus405SchemaType,
-} from './zod/petController/addFilesSchema.ts'
+} from './zod/pet/addFilesSchema.ts'
 export type {
   AddPetDataSchemaFormUrlEncodedType,
   AddPetDataSchemaJsonType,
@@ -266,13 +266,13 @@ export type {
   AddPetStatusDefaultSchemaJsonType,
   AddPetStatusDefaultSchemaType,
   AddPetStatusDefaultSchemaXmlType,
-} from './zod/petController/addPetSchema.ts'
+} from './zod/pet/addPetSchema.ts'
 export type {
   DeletePetHeaderApiKeySchemaType,
   DeletePetPathPetIdSchemaType,
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
-} from './zod/petController/deletePetSchema.ts'
+} from './zod/pet/deletePetSchema.ts'
 export type {
   FindPetsByStatusPathStepIdSchemaType,
   FindPetsByStatusResponseSchemaType,
@@ -280,7 +280,7 @@ export type {
   FindPetsByStatusStatus200SchemaType,
   FindPetsByStatusStatus200SchemaXmlType,
   FindPetsByStatusStatus400SchemaType,
-} from './zod/petController/findPetsByStatusSchema.ts'
+} from './zod/pet/findPetsByStatusSchema.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLESchemaType,
   FindPetsByTagsQueryPageSchemaType,
@@ -291,7 +291,7 @@ export type {
   FindPetsByTagsStatus200SchemaType,
   FindPetsByTagsStatus200SchemaXmlType,
   FindPetsByTagsStatus400SchemaType,
-} from './zod/petController/findPetsByTagsSchema.ts'
+} from './zod/pet/findPetsByTagsSchema.ts'
 export type {
   GetPetByIdPathPetIdSchemaType,
   GetPetByIdResponseSchemaType,
@@ -300,7 +300,7 @@ export type {
   GetPetByIdStatus200SchemaXmlType,
   GetPetByIdStatus400SchemaType,
   GetPetByIdStatus404SchemaType,
-} from './zod/petController/getPetByIdSchema.ts'
+} from './zod/pet/getPetByIdSchema.ts'
 export type {
   UpdatePetDataSchemaFormUrlEncodedType,
   UpdatePetDataSchemaJsonType,
@@ -314,21 +314,21 @@ export type {
   UpdatePetStatus400SchemaType,
   UpdatePetStatus404SchemaType,
   UpdatePetStatus405SchemaType,
-} from './zod/petController/updatePetSchema.ts'
+} from './zod/pet/updatePetSchema.ts'
 export type {
   UpdatePetWithFormPathPetIdSchemaType,
   UpdatePetWithFormQueryNameSchemaType,
   UpdatePetWithFormQueryStatusSchemaType,
   UpdatePetWithFormResponseSchemaType,
   UpdatePetWithFormStatus405SchemaType,
-} from './zod/petController/updatePetWithFormSchema.ts'
+} from './zod/pet/updatePetWithFormSchema.ts'
 export type {
   UploadFileDataSchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
-} from './zod/petController/uploadFileSchema.ts'
+} from './zod/pet/uploadFileSchema.ts'
 export type { PetNotFoundSchemaType } from './zod/petNotFoundSchema.ts'
 export type { PetSchemaType } from './zod/petSchema.ts'
 export type { PetStatusEnumSchemaType } from './zod/petStatusEnumSchema.ts'
@@ -341,9 +341,8 @@ export type {
   CreatePetsResponseSchemaType,
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
-} from './zod/petsController/createPetsSchema.ts'
+} from './zod/pets/createPetsSchema.ts'
 export type { TagTagSchemaType } from './zod/tag/tagSchema.ts'
-export type { UserArraySchemaType } from './zod/userArraySchema.ts'
 export type {
   CreateUserDataSchemaFormUrlEncodedType,
   CreateUserDataSchemaJsonType,
@@ -353,7 +352,7 @@ export type {
   CreateUserStatusDefaultSchemaJsonType,
   CreateUserStatusDefaultSchemaType,
   CreateUserStatusDefaultSchemaXmlType,
-} from './zod/userController/createUserSchema.ts'
+} from './zod/user/createUserSchema.ts'
 export type {
   CreateUsersWithListInputDataSchemaType,
   CreateUsersWithListInputResponseSchemaType,
@@ -361,13 +360,13 @@ export type {
   CreateUsersWithListInputStatus200SchemaType,
   CreateUsersWithListInputStatus200SchemaXmlType,
   CreateUsersWithListInputStatusDefaultSchemaType,
-} from './zod/userController/createUsersWithListInputSchema.ts'
+} from './zod/user/createUsersWithListInputSchema.ts'
 export type {
   DeleteUserPathUsernameSchemaType,
   DeleteUserResponseSchemaType,
   DeleteUserStatus400SchemaType,
   DeleteUserStatus404SchemaType,
-} from './zod/userController/deleteUserSchema.ts'
+} from './zod/user/deleteUserSchema.ts'
 export type {
   GetUserByNamePathUsernameSchemaType,
   GetUserByNameResponseSchemaType,
@@ -376,7 +375,7 @@ export type {
   GetUserByNameStatus200SchemaXmlType,
   GetUserByNameStatus400SchemaType,
   GetUserByNameStatus404SchemaType,
-} from './zod/userController/getUserByNameSchema.ts'
+} from './zod/user/getUserByNameSchema.ts'
 export type {
   LoginUserQueryPasswordSchemaType,
   LoginUserQueryUsernameSchemaType,
@@ -385,8 +384,8 @@ export type {
   LoginUserStatus200SchemaType,
   LoginUserStatus200SchemaXmlType,
   LoginUserStatus400SchemaType,
-} from './zod/userController/loginUserSchema.ts'
-export type { LogoutUserResponseSchemaType, LogoutUserStatusDefaultSchemaType } from './zod/userController/logoutUserSchema.ts'
+} from './zod/user/loginUserSchema.ts'
+export type { LogoutUserResponseSchemaType, LogoutUserStatusDefaultSchemaType } from './zod/user/logoutUserSchema.ts'
 export type {
   UpdateUserDataSchemaFormUrlEncodedType,
   UpdateUserDataSchemaJsonType,
@@ -395,7 +394,8 @@ export type {
   UpdateUserPathUsernameSchemaType,
   UpdateUserResponseSchemaType,
   UpdateUserStatusDefaultSchemaType,
-} from './zod/userController/updateUserSchema.ts'
+} from './zod/user/updateUserSchema.ts'
+export type { UserArraySchemaType } from './zod/userArraySchema.ts'
 export type { UserSchemaType } from './zod/userSchema.ts'
 export { operations } from './clients/axios/operations.ts'
 export { addFiles, getAddFilesUrl } from './clients/axios/petService/addFiles.ts'
@@ -418,32 +418,28 @@ export { getLoginUserUrl, loginUser } from './clients/axios/userService/loginUse
 export { getLogoutUserUrl, logoutUser } from './clients/axios/userService/logoutUser.ts'
 export { getUpdateUserUrl, updateUser } from './clients/axios/userService/updateUser.ts'
 export { userService } from './clients/axios/userService/userService.ts'
-export { addFilesMutationKey, addFilesMutationOptions, useAddFiles } from './clients/hooks/petController/useAddFiles.ts'
-export { addPetMutationKey, addPetMutationOptions, useAddPet } from './clients/hooks/petController/useAddPet.ts'
-export { deletePetMutationKey, deletePetMutationOptions, useDeletePet } from './clients/hooks/petController/useDeletePet.ts'
-export { findPetsByStatusQueryKey, findPetsByStatusQueryOptions, useFindPetsByStatus } from './clients/hooks/petController/useFindPetsByStatus.ts'
-export { findPetsByTagsQueryKey, findPetsByTagsQueryOptions, useFindPetsByTags } from './clients/hooks/petController/useFindPetsByTags.ts'
-export {
-  findPetsByTagsInfiniteQueryKey,
-  findPetsByTagsInfiniteQueryOptions,
-  useFindPetsByTagsInfinite,
-} from './clients/hooks/petController/useFindPetsByTagsInfinite.ts'
-export { getPetByIdQueryKey, getPetByIdQueryOptions, useGetPetById } from './clients/hooks/petController/useGetPetById.ts'
-export { updatePetMutationKey, updatePetMutationOptions, useUpdatePet } from './clients/hooks/petController/useUpdatePet.ts'
-export { updatePetWithFormMutationKey, updatePetWithFormMutationOptions, useUpdatePetWithForm } from './clients/hooks/petController/useUpdatePetWithForm.ts'
-export { uploadFileMutationKey, uploadFileMutationOptions, useUploadFile } from './clients/hooks/petController/useUploadFile.ts'
-export { createPetsMutationKey, createPetsMutationOptions, useCreatePets } from './clients/hooks/petsController/useCreatePets.ts'
-export { createUserMutationKey, createUserMutationOptions, useCreateUser } from './clients/hooks/userController/useCreateUser.ts'
+export { addFilesMutationKey, addFilesMutationOptions, useAddFiles } from './clients/hooks/pet/useAddFiles.ts'
+export { addPetMutationKey, addPetMutationOptions, useAddPet } from './clients/hooks/pet/useAddPet.ts'
+export { deletePetMutationKey, deletePetMutationOptions, useDeletePet } from './clients/hooks/pet/useDeletePet.ts'
+export { findPetsByStatusQueryKey, findPetsByStatusQueryOptions, useFindPetsByStatus } from './clients/hooks/pet/useFindPetsByStatus.ts'
+export { findPetsByTagsQueryKey, findPetsByTagsQueryOptions, useFindPetsByTags } from './clients/hooks/pet/useFindPetsByTags.ts'
+export { findPetsByTagsInfiniteQueryKey, findPetsByTagsInfiniteQueryOptions, useFindPetsByTagsInfinite } from './clients/hooks/pet/useFindPetsByTagsInfinite.ts'
+export { getPetByIdQueryKey, getPetByIdQueryOptions, useGetPetById } from './clients/hooks/pet/useGetPetById.ts'
+export { updatePetMutationKey, updatePetMutationOptions, useUpdatePet } from './clients/hooks/pet/useUpdatePet.ts'
+export { updatePetWithFormMutationKey, updatePetWithFormMutationOptions, useUpdatePetWithForm } from './clients/hooks/pet/useUpdatePetWithForm.ts'
+export { uploadFileMutationKey, uploadFileMutationOptions, useUploadFile } from './clients/hooks/pet/useUploadFile.ts'
+export { createPetsMutationKey, createPetsMutationOptions, useCreatePets } from './clients/hooks/pets/useCreatePets.ts'
+export { createUserMutationKey, createUserMutationOptions, useCreateUser } from './clients/hooks/user/useCreateUser.ts'
 export {
   createUsersWithListInputMutationKey,
   createUsersWithListInputMutationOptions,
   useCreateUsersWithListInput,
-} from './clients/hooks/userController/useCreateUsersWithListInput.ts'
-export { deleteUserMutationKey, deleteUserMutationOptions, useDeleteUser } from './clients/hooks/userController/useDeleteUser.ts'
-export { getUserByNameQueryKey, getUserByNameQueryOptions, useGetUserByName } from './clients/hooks/userController/useGetUserByName.ts'
-export { loginUserQueryKey, loginUserQueryOptions, useLoginUser } from './clients/hooks/userController/useLoginUser.ts'
-export { logoutUserQueryKey, logoutUserQueryOptions, useLogoutUser } from './clients/hooks/userController/useLogoutUser.ts'
-export { updateUserMutationKey, updateUserMutationOptions, useUpdateUser } from './clients/hooks/userController/useUpdateUser.ts'
+} from './clients/hooks/user/useCreateUsersWithListInput.ts'
+export { deleteUserMutationKey, deleteUserMutationOptions, useDeleteUser } from './clients/hooks/user/useDeleteUser.ts'
+export { getUserByNameQueryKey, getUserByNameQueryOptions, useGetUserByName } from './clients/hooks/user/useGetUserByName.ts'
+export { loginUserQueryKey, loginUserQueryOptions, useLoginUser } from './clients/hooks/user/useLoginUser.ts'
+export { logoutUserQueryKey, logoutUserQueryOptions, useLogoutUser } from './clients/hooks/user/useLogoutUser.ts'
+export { updateUserMutationKey, updateUserMutationOptions, useUpdateUser } from './clients/hooks/user/useUpdateUser.ts'
 export { createAddPetRequestFaker } from './mocks/createAddPetRequestFaker.ts'
 export { createAddressFaker } from './mocks/createAddressFaker.ts'
 export { createAnimalFaker } from './mocks/createAnimalFaker.ts'
@@ -469,7 +465,7 @@ export {
   createAddFilesResponseFaker,
   createAddFilesStatus200Faker,
   createAddFilesStatus405Faker,
-} from './mocks/petController/createAddFilesFaker.ts'
+} from './mocks/pet/createAddFilesFaker.ts'
 export {
   createAddPetDataFaker,
   createAddPetDataFakerFormUrlEncoded,
@@ -480,13 +476,13 @@ export {
   createAddPetStatusDefaultFaker,
   createAddPetStatusDefaultFakerJson,
   createAddPetStatusDefaultFakerXml,
-} from './mocks/petController/createAddPetFaker.ts'
+} from './mocks/pet/createAddPetFaker.ts'
 export {
   createDeletePetHeaderApiKeyFaker,
   createDeletePetPathPetIdFaker,
   createDeletePetResponseFaker,
   createDeletePetStatus400Faker,
-} from './mocks/petController/createDeletePetFaker.ts'
+} from './mocks/pet/createDeletePetFaker.ts'
 export {
   createFindPetsByStatusPathStepIdFaker,
   createFindPetsByStatusResponseFaker,
@@ -494,7 +490,7 @@ export {
   createFindPetsByStatusStatus200FakerJson,
   createFindPetsByStatusStatus200FakerXml,
   createFindPetsByStatusStatus400Faker,
-} from './mocks/petController/createFindPetsByStatusFaker.ts'
+} from './mocks/pet/createFindPetsByStatusFaker.ts'
 export {
   createFindPetsByTagsHeaderXEXAMPLEFaker,
   createFindPetsByTagsQueryPageFaker,
@@ -505,7 +501,7 @@ export {
   createFindPetsByTagsStatus200FakerJson,
   createFindPetsByTagsStatus200FakerXml,
   createFindPetsByTagsStatus400Faker,
-} from './mocks/petController/createFindPetsByTagsFaker.ts'
+} from './mocks/pet/createFindPetsByTagsFaker.ts'
 export {
   createGetPetByIdPathPetIdFaker,
   createGetPetByIdResponseFaker,
@@ -514,7 +510,7 @@ export {
   createGetPetByIdStatus200FakerXml,
   createGetPetByIdStatus400Faker,
   createGetPetByIdStatus404Faker,
-} from './mocks/petController/createGetPetByIdFaker.ts'
+} from './mocks/pet/createGetPetByIdFaker.ts'
 export {
   createUpdatePetDataFaker,
   createUpdatePetDataFakerFormUrlEncoded,
@@ -528,21 +524,21 @@ export {
   createUpdatePetStatus400Faker,
   createUpdatePetStatus404Faker,
   createUpdatePetStatus405Faker,
-} from './mocks/petController/createUpdatePetFaker.ts'
+} from './mocks/pet/createUpdatePetFaker.ts'
 export {
   createUpdatePetWithFormPathPetIdFaker,
   createUpdatePetWithFormQueryNameFaker,
   createUpdatePetWithFormQueryStatusFaker,
   createUpdatePetWithFormResponseFaker,
   createUpdatePetWithFormStatus405Faker,
-} from './mocks/petController/createUpdatePetWithFormFaker.ts'
+} from './mocks/pet/createUpdatePetWithFormFaker.ts'
 export {
   createUploadFileDataFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
   createUploadFileResponseFaker,
   createUploadFileStatus200Faker,
-} from './mocks/petController/createUploadFileFaker.ts'
+} from './mocks/pet/createUploadFileFaker.ts'
 export {
   createCreatePetsDataFaker,
   createCreatePetsHeaderXEXAMPLEFaker,
@@ -552,7 +548,7 @@ export {
   createCreatePetsResponseFaker,
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
-} from './mocks/petsController/createCreatePetsFaker.ts'
+} from './mocks/pets/createCreatePetsFaker.ts'
 export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
 export {
   createCreateUserDataFaker,
@@ -563,7 +559,7 @@ export {
   createCreateUserStatusDefaultFaker,
   createCreateUserStatusDefaultFakerJson,
   createCreateUserStatusDefaultFakerXml,
-} from './mocks/userController/createCreateUserFaker.ts'
+} from './mocks/user/createCreateUserFaker.ts'
 export {
   createCreateUsersWithListInputDataFaker,
   createCreateUsersWithListInputResponseFaker,
@@ -571,13 +567,13 @@ export {
   createCreateUsersWithListInputStatus200FakerJson,
   createCreateUsersWithListInputStatus200FakerXml,
   createCreateUsersWithListInputStatusDefaultFaker,
-} from './mocks/userController/createCreateUsersWithListInputFaker.ts'
+} from './mocks/user/createCreateUsersWithListInputFaker.ts'
 export {
   createDeleteUserPathUsernameFaker,
   createDeleteUserResponseFaker,
   createDeleteUserStatus400Faker,
   createDeleteUserStatus404Faker,
-} from './mocks/userController/createDeleteUserFaker.ts'
+} from './mocks/user/createDeleteUserFaker.ts'
 export {
   createGetUserByNamePathUsernameFaker,
   createGetUserByNameResponseFaker,
@@ -586,7 +582,7 @@ export {
   createGetUserByNameStatus200FakerXml,
   createGetUserByNameStatus400Faker,
   createGetUserByNameStatus404Faker,
-} from './mocks/userController/createGetUserByNameFaker.ts'
+} from './mocks/user/createGetUserByNameFaker.ts'
 export {
   createLoginUserQueryPasswordFaker,
   createLoginUserQueryUsernameFaker,
@@ -595,8 +591,8 @@ export {
   createLoginUserStatus200FakerJson,
   createLoginUserStatus200FakerXml,
   createLoginUserStatus400Faker,
-} from './mocks/userController/createLoginUserFaker.ts'
-export { createLogoutUserResponseFaker, createLogoutUserStatusDefaultFaker } from './mocks/userController/createLogoutUserFaker.ts'
+} from './mocks/user/createLoginUserFaker.ts'
+export { createLogoutUserResponseFaker, createLogoutUserStatusDefaultFaker } from './mocks/user/createLogoutUserFaker.ts'
 export {
   createUpdateUserDataFaker,
   createUpdateUserDataFakerFormUrlEncoded,
@@ -605,25 +601,20 @@ export {
   createUpdateUserPathUsernameFaker,
   createUpdateUserResponseFaker,
   createUpdateUserStatusDefaultFaker,
-} from './mocks/userController/createUpdateUserFaker.ts'
+} from './mocks/user/createUpdateUserFaker.ts'
 export { animalTypeEnum } from './models/ts/Animal.ts'
 export { createPetsXEXAMPLE } from './models/ts/CreatePetsXEXAMPLE.ts'
 export { orderHttpStatusEnum, orderOrderTypeEnum } from './models/ts/Order.ts'
 export { orderParamsStatusEnum } from './models/ts/OrderParamsStatusEnum.ts'
 export { petStatusEnum } from './models/ts/PetStatusEnum.ts'
-export { createPetsBoolParam } from './models/ts/petsController/CreatePets.ts'
+export { createPetsBoolParam } from './models/ts/pets/CreatePets.ts'
 export { handlers } from './msw/handlers.ts'
-export { addFilesHandler, addFilesHandlerResponse200, addFilesHandlerResponse405 } from './msw/petController/addFilesHandler.ts'
-export { addPetHandler, addPetHandlerResponse405 } from './msw/petController/addPetHandler.ts'
-export { deletePetHandler, deletePetHandlerResponse400 } from './msw/petController/deletePetHandler.ts'
-export { findPetsByStatusHandler, findPetsByStatusHandlerResponse200, findPetsByStatusHandlerResponse400 } from './msw/petController/findPetsByStatusHandler.ts'
-export { findPetsByTagsHandler, findPetsByTagsHandlerResponse200, findPetsByTagsHandlerResponse400 } from './msw/petController/findPetsByTagsHandler.ts'
-export {
-  getPetByIdHandler,
-  getPetByIdHandlerResponse200,
-  getPetByIdHandlerResponse400,
-  getPetByIdHandlerResponse404,
-} from './msw/petController/getPetByIdHandler.ts'
+export { addFilesHandler, addFilesHandlerResponse200, addFilesHandlerResponse405 } from './msw/pet/addFilesHandler.ts'
+export { addPetHandler, addPetHandlerResponse405 } from './msw/pet/addPetHandler.ts'
+export { deletePetHandler, deletePetHandlerResponse400 } from './msw/pet/deletePetHandler.ts'
+export { findPetsByStatusHandler, findPetsByStatusHandlerResponse200, findPetsByStatusHandlerResponse400 } from './msw/pet/findPetsByStatusHandler.ts'
+export { findPetsByTagsHandler, findPetsByTagsHandlerResponse200, findPetsByTagsHandlerResponse400 } from './msw/pet/findPetsByTagsHandler.ts'
+export { getPetByIdHandler, getPetByIdHandlerResponse200, getPetByIdHandlerResponse400, getPetByIdHandlerResponse404 } from './msw/pet/getPetByIdHandler.ts'
 export {
   updatePetHandler,
   updatePetHandlerResponse200,
@@ -631,22 +622,22 @@ export {
   updatePetHandlerResponse400,
   updatePetHandlerResponse404,
   updatePetHandlerResponse405,
-} from './msw/petController/updatePetHandler.ts'
-export { updatePetWithFormHandler, updatePetWithFormHandlerResponse405 } from './msw/petController/updatePetWithFormHandler.ts'
-export { uploadFileHandler, uploadFileHandlerResponse200 } from './msw/petController/uploadFileHandler.ts'
-export { createPetsHandler, createPetsHandlerResponse201 } from './msw/petsController/createPetsHandler.ts'
-export { createUserHandler } from './msw/userController/createUserHandler.ts'
-export { createUsersWithListInputHandler, createUsersWithListInputHandlerResponse200 } from './msw/userController/createUsersWithListInputHandler.ts'
-export { deleteUserHandler, deleteUserHandlerResponse400, deleteUserHandlerResponse404 } from './msw/userController/deleteUserHandler.ts'
+} from './msw/pet/updatePetHandler.ts'
+export { updatePetWithFormHandler, updatePetWithFormHandlerResponse405 } from './msw/pet/updatePetWithFormHandler.ts'
+export { uploadFileHandler, uploadFileHandlerResponse200 } from './msw/pet/uploadFileHandler.ts'
+export { createPetsHandler, createPetsHandlerResponse201 } from './msw/pets/createPetsHandler.ts'
+export { createUserHandler } from './msw/user/createUserHandler.ts'
+export { createUsersWithListInputHandler, createUsersWithListInputHandlerResponse200 } from './msw/user/createUsersWithListInputHandler.ts'
+export { deleteUserHandler, deleteUserHandlerResponse400, deleteUserHandlerResponse404 } from './msw/user/deleteUserHandler.ts'
 export {
   getUserByNameHandler,
   getUserByNameHandlerResponse200,
   getUserByNameHandlerResponse400,
   getUserByNameHandlerResponse404,
-} from './msw/userController/getUserByNameHandler.ts'
-export { loginUserHandler, loginUserHandlerResponse200, loginUserHandlerResponse400 } from './msw/userController/loginUserHandler.ts'
-export { logoutUserHandler } from './msw/userController/logoutUserHandler.ts'
-export { updateUserHandler } from './msw/userController/updateUserHandler.ts'
+} from './msw/user/getUserByNameHandler.ts'
+export { loginUserHandler, loginUserHandlerResponse200, loginUserHandlerResponse400 } from './msw/user/loginUserHandler.ts'
+export { logoutUserHandler } from './msw/user/logoutUserHandler.ts'
+export { updateUserHandler } from './msw/user/updateUserHandler.ts'
 export { addPetRequestSchema } from './zod/addPetRequestSchema.ts'
 export { addressSchema } from './zod/addressSchema.ts'
 export { animalSchema } from './zod/animalSchema.ts'
@@ -667,7 +658,7 @@ export {
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
-} from './zod/petController/addFilesSchema.ts'
+} from './zod/pet/addFilesSchema.ts'
 export {
   addPetDataSchema,
   addPetDataSchemaFormUrlEncoded,
@@ -678,13 +669,8 @@ export {
   addPetStatusDefaultSchema,
   addPetStatusDefaultSchemaJson,
   addPetStatusDefaultSchemaXml,
-} from './zod/petController/addPetSchema.ts'
-export {
-  deletePetHeaderApiKeySchema,
-  deletePetPathPetIdSchema,
-  deletePetResponseSchema,
-  deletePetStatus400Schema,
-} from './zod/petController/deletePetSchema.ts'
+} from './zod/pet/addPetSchema.ts'
+export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './zod/pet/deletePetSchema.ts'
 export {
   findPetsByStatusPathStepIdSchema,
   findPetsByStatusResponseSchema,
@@ -692,7 +678,7 @@ export {
   findPetsByStatusStatus200SchemaJson,
   findPetsByStatusStatus200SchemaXml,
   findPetsByStatusStatus400Schema,
-} from './zod/petController/findPetsByStatusSchema.ts'
+} from './zod/pet/findPetsByStatusSchema.ts'
 export {
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
@@ -703,7 +689,7 @@ export {
   findPetsByTagsStatus200SchemaJson,
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
-} from './zod/petController/findPetsByTagsSchema.ts'
+} from './zod/pet/findPetsByTagsSchema.ts'
 export {
   getPetByIdPathPetIdSchema,
   getPetByIdResponseSchema,
@@ -712,7 +698,7 @@ export {
   getPetByIdStatus200SchemaXml,
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
-} from './zod/petController/getPetByIdSchema.ts'
+} from './zod/pet/getPetByIdSchema.ts'
 export {
   updatePetDataSchema,
   updatePetDataSchemaFormUrlEncoded,
@@ -726,21 +712,21 @@ export {
   updatePetStatus400Schema,
   updatePetStatus404Schema,
   updatePetStatus405Schema,
-} from './zod/petController/updatePetSchema.ts'
+} from './zod/pet/updatePetSchema.ts'
 export {
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
-} from './zod/petController/updatePetWithFormSchema.ts'
+} from './zod/pet/updatePetWithFormSchema.ts'
 export {
   uploadFileDataSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
-} from './zod/petController/uploadFileSchema.ts'
+} from './zod/pet/uploadFileSchema.ts'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
 export { petSchema } from './zod/petSchema.ts'
 export { petStatusEnumSchema } from './zod/petStatusEnumSchema.ts'
@@ -753,9 +739,8 @@ export {
   createPetsResponseSchema,
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
-} from './zod/petsController/createPetsSchema.ts'
+} from './zod/pets/createPetsSchema.ts'
 export { tagTagSchema } from './zod/tag/tagSchema.ts'
-export { userArraySchema } from './zod/userArraySchema.ts'
 export {
   createUserDataSchema,
   createUserDataSchemaFormUrlEncoded,
@@ -765,7 +750,7 @@ export {
   createUserStatusDefaultSchema,
   createUserStatusDefaultSchemaJson,
   createUserStatusDefaultSchemaXml,
-} from './zod/userController/createUserSchema.ts'
+} from './zod/user/createUserSchema.ts'
 export {
   createUsersWithListInputDataSchema,
   createUsersWithListInputResponseSchema,
@@ -773,13 +758,8 @@ export {
   createUsersWithListInputStatus200SchemaJson,
   createUsersWithListInputStatus200SchemaXml,
   createUsersWithListInputStatusDefaultSchema,
-} from './zod/userController/createUsersWithListInputSchema.ts'
-export {
-  deleteUserPathUsernameSchema,
-  deleteUserResponseSchema,
-  deleteUserStatus400Schema,
-  deleteUserStatus404Schema,
-} from './zod/userController/deleteUserSchema.ts'
+} from './zod/user/createUsersWithListInputSchema.ts'
+export { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './zod/user/deleteUserSchema.ts'
 export {
   getUserByNamePathUsernameSchema,
   getUserByNameResponseSchema,
@@ -788,7 +768,7 @@ export {
   getUserByNameStatus200SchemaXml,
   getUserByNameStatus400Schema,
   getUserByNameStatus404Schema,
-} from './zod/userController/getUserByNameSchema.ts'
+} from './zod/user/getUserByNameSchema.ts'
 export {
   loginUserQueryPasswordSchema,
   loginUserQueryUsernameSchema,
@@ -797,8 +777,8 @@ export {
   loginUserStatus200SchemaJson,
   loginUserStatus200SchemaXml,
   loginUserStatus400Schema,
-} from './zod/userController/loginUserSchema.ts'
-export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './zod/userController/logoutUserSchema.ts'
+} from './zod/user/loginUserSchema.ts'
+export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './zod/user/logoutUserSchema.ts'
 export {
   updateUserDataSchema,
   updateUserDataSchemaFormUrlEncoded,
@@ -807,5 +787,6 @@ export {
   updateUserPathUsernameSchema,
   updateUserResponseSchema,
   updateUserStatusDefaultSchema,
-} from './zod/userController/updateUserSchema.ts'
+} from './zod/user/updateUserSchema.ts'
+export { userArraySchema } from './zod/userArraySchema.ts'
 export { userSchema } from './zod/userSchema.ts'
