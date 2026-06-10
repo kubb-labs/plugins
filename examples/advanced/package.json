@@ -18,7 +18,6 @@
     "mcp": "kubb mcp",
     "generate:watch": "KUBB_DISABLE_TELEMETRY=1 kubb generate --watch",
     "generate:debug": "NODE_OPTIONS='--inspect-brk' KUBB_DISABLE_TELEMETRY=1 kubb generate",
-    "agent": "kubb agent start --port 4002",
     "init": "kubb init -y",
     "generate:ts": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config configs/kubb.config.ts",
     "test": "vitest",
@@ -51,7 +50,6 @@
   },
   "devDependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/agent": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:",
     "typescript": "catalog:"
