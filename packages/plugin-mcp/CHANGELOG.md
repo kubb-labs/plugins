@@ -1,5 +1,22 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- [#326](https://github.com/kubb-labs/plugins/pull/326) [`2d6e478`](https://github.com/kubb-labs/plugins/commit/2d6e4787d61a959ce56b06ecdecbfab4b20de324) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Clean up whitespace in the raw generated output (the source emitted before any external formatter runs):
+  - **react-query / vue-query**: empty conditional fragments (`enabled`, `customOptions`) no longer leave stray blank lines. This removes the double blank line in mutation/query hooks and the blank line that appeared right after `queryOptions<…, typeof queryKey>({`.
+  - **mcp**: the handler `return { content: […], structuredContent: {…} }` block is now indented at the function-body baseline instead of being over-indented.
+
+- [#328](https://github.com/kubb-labs/plugins/pull/328) [`47713fa`](https://github.com/kubb-labs/plugins/commit/47713fa4d933484fd4661782025e098be2300889) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the stale v4 `barrelType: 'named'` key in every plugin's `output` destructuring default with the v5 `barrel: { type: 'named' }` object. Generated output is unchanged: `@kubb/middleware-barrel` never read the dead key and already fell back to `{ type: 'named' }`. The code now matches the documented default in each plugin's option docs.
+
+  Docs metadata fixes in the same pass: `@kubb/plugin-zod` documents that `importPath` defaults to `'zod/mini'` when `mini` is enabled, and `@kubb/plugin-swr` documents the `parser` default as the boolean `false` instead of the string `'false'`.
+
+- Updated dependencies [[`696e974`](https://github.com/kubb-labs/plugins/commit/696e974fecfc1efcb48f88a1f1c19da7e20bfbb5), [`47713fa`](https://github.com/kubb-labs/plugins/commit/47713fa4d933484fd4661782025e098be2300889), [`fdd85ac`](https://github.com/kubb-labs/plugins/commit/fdd85acb9f6989dbf332eee204e4a8da238d0a74), [`1de83e0`](https://github.com/kubb-labs/plugins/commit/1de83e076bf302b82a3ecbb8b63808016f01d268)]:
+  - @kubb/plugin-client@5.0.0-beta.45
+  - @kubb/plugin-ts@5.0.0-beta.45
+  - @kubb/plugin-zod@5.0.0-beta.45
+
 ## 5.0.0-beta.44
 
 ### Patch Changes
