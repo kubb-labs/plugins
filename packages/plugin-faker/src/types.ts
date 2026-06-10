@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -71,17 +71,13 @@ export type ResolverFaker = Resolver &
     resolveHeaderParamsName(this: ResolverFaker, node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
-export type Options = {
-  /**
-   * Where the generated mock factories are written and how they are exported.
-   *
-   * @default { path: 'mocks', barrel: { type: 'named' } }
-   */
-  output?: Output
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
+/**
+ * Where the generated mock factories are written and how they are exported, plus the optional
+ * `group` strategy. With `output.mode: 'group'` the `group` option is required.
+ *
+ * @default { path: 'mocks', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * Skip operations matching at least one entry in the list.
    */

@@ -75,7 +75,7 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        output: { path: './tagObject.ts' },
+        output: { path: './tagObject.ts', mode: 'file' },
         generators: [clientStaticGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
         group: {
@@ -96,7 +96,7 @@ export default defineConfig([
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       pluginClient({
-        output: { path: './tagClientOperation.ts' },
+        output: { path: './tagClientOperation.ts', mode: 'file' },
         generators: [clientOperationGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
         dataReturnType: 'full',
@@ -111,7 +111,7 @@ export default defineConfig([
     adapter: adapterOas({ dateType: 'date' }),
     plugins: [
       pluginClient({
-        output: { path: './tagClientOperationReact.ts' },
+        output: { path: './tagClientOperationReact.ts', mode: 'file' },
         generators: [clientOperationReactGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
         dataReturnType: 'full',
@@ -127,7 +127,7 @@ export default defineConfig([
     plugins: [
       tsPlugin,
       pluginClient({
-        output: { path: './tag.ts' },
+        output: { path: './tag.ts', mode: 'file' },
         parser: false,
         include: [{ type: 'tag', pattern: 'store' }],
         group: {

@@ -49,11 +49,11 @@ options:
         type: string
         required: true
         description: |
-          Folder (or single file) where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
+          Folder where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
 
-          Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). Use a single file when you want everything in one place, for example `'api.ts'`.
+          Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). To put everything in one file, set `output.mode: 'file'` and point `path` at that file (or a name with no extension, which gets `.ts` appended).
         tip: |
-          When `output.path` points to a single file, the `group` option cannot be used because every operation ends up in the same file.
+          `output.path` sets where files go, `output.mode` sets how many. See `output.mode` for the single-file and one-file-per-group layouts.
         examples:
           - name: kubb.config.ts
             files:
@@ -83,6 +83,52 @@ options:
                           ├── Pet.ts
                           └── Store.ts
         default: "'cypress'"
+      - name: mode
+        type: "'directory' | 'group' | 'file'"
+        required: false
+        default: "'directory'"
+        description: |
+          How the plugin consolidates its generated code into files.
+
+          - `'directory'` writes one file per operation or schema under `output.path`. This is the default.
+          - `'group'` writes one file per resolved group and needs the `group` option set.
+          - `'file'` writes everything into a single file. When `output.path` has no extension the default `.ts` is appended, so `'types'` becomes `'types.ts'`.
+        tip: |
+          `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
+        examples:
+          - name: kubb.config.ts
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  import { defineConfig } from 'kubb'
+                  import { pluginTs } from '@kubb/plugin-ts'
+                  import { pluginClient } from '@kubb/plugin-client'
+
+                  export default defineConfig({
+                    input: { path: './petStore.yaml' },
+                    output: { path: './src/gen' },
+                    plugins: [
+                      pluginTs({
+                        output: { path: 'types', mode: 'file' },
+                      }),
+                      pluginClient({
+                        output: { path: 'clients', mode: 'group' },
+                        group: { type: 'tag' },
+                      }),
+                    ],
+                  })
+          - name: Resulting tree
+            files:
+              - lang: text
+                twoslash: false
+                code: |
+                  src/
+                  └── gen/
+                      ├── types.ts
+                      └── clients/
+                          ├── pet.ts
+                          └── store.ts
       - name: barrel
         type: "{ type: 'named' | 'all', nested?: boolean } | false"
         required: false
@@ -577,6 +623,8 @@ options:
       Without `group`, every file lands in the plugin's `output.path` folder. With `group`, files are bucketed under `{output.path}/{groupName}/`, where `groupName` is derived from the operation's first tag.
     tip: |
       Use `group` to mirror your API's domain structure (pet, store, user) in the generated code. Combine it with `output.barrel: { type: 'named', nested: true }` to get per-tag barrel files.
+
+      By default each group becomes a folder. Set `output.mode: 'group'` to collapse each group into a single file (`{output.path}/{groupName}.ts`) instead.
     examples:
       - name: kubb.config.ts
         files:

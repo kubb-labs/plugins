@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import path from 'node:path'
 import { camelCase, ensureValidVarName } from '@internals/utils'
-import { defineResolver, KubbDriver } from '@kubb/core'
+import { defineResolver } from '@kubb/core'
 import type { PluginFaker } from '../types.ts'
 
 /**
@@ -31,17 +31,17 @@ export const resolverFaker = defineResolver<PluginFaker>(() => {
       return this.default(name, type)
     },
     resolveFile({ name, extname, tag, path: groupPath }, context) {
-      const pathMode = KubbDriver.getMode(path.resolve(context.root, context.output.path))
-      const baseName = `${pathMode === 'single' ? '' : this.resolveName(name, 'file')}${extname}` as `${string}.${string}`
+      const resolvedName = context.output.mode === 'file' ? '' : this.resolveName(name, 'file')
+      const inputBaseName = `${resolvedName}${extname}` as `${string}.${string}`
       const filePath = this.resolvePath(
         {
-          baseName,
-          pathMode,
+          baseName: inputBaseName,
           tag,
           path: groupPath,
         },
         context,
       )
+      const baseName = path.basename(filePath) as `${string}.${string}`
 
       return {
         kind: 'File',

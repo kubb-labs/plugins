@@ -485,6 +485,55 @@ describe('typeGenerator — Operation — group', () => {
   })
 })
 
+describe('typeGenerator — Operation — output.mode', () => {
+  const node = ast.createOperation({
+    operationId: 'listPets',
+    method: 'GET',
+    path: '/pets',
+    tags: ['pets'],
+    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' })],
+  })
+
+  test("mode 'file' writes the operation into the single output file", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types.ts', mode: 'file' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    const file = driver.fileManager.files.at(0)
+    expect(file).toBeDefined()
+    expect(file!.path).toBe(path.resolve(testConfig.root, testConfig.output.path, 'types.ts'))
+    expect(file!.baseName).toBe('types.ts')
+  })
+
+  test("mode 'group' consolidates a tag into one file per group", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types', mode: 'group' }, group: { type: 'tag' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === 'pets.ts')
+    expect(file).toBeDefined()
+    expect(file!.path).toBe(path.resolve(testConfig.root, testConfig.output.path, 'types', 'pets.ts'))
+  })
+})
+
 describe('typeGenerator — paramsCasing', () => {
   test('paramsCasing undefined — snake_case params kept as-is', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, paramsCasing: undefined }

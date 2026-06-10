@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -22,22 +22,18 @@ export type ResolverMsw = Resolver & {
   resolveHandlersName(this: ResolverMsw): string
 }
 
-export type Options = {
-  /**
-   * Where the generated MSW handlers are written and how they are exported.
-   *
-   * @default { path: 'handlers', barrel: { type: 'named' } }
-   */
-  output?: Output
+/**
+ * Where the generated MSW handlers are written and how they are exported, plus the optional
+ * `group` strategy. With `output.mode: 'group'` the `group` option is required.
+ *
+ * @default { path: 'handlers', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * Base URL prepended to every handler's request URL. When omitted, falls back
    * to the adapter's server URL (typically `servers[0].url`).
    */
   baseURL?: string
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
   /**
    * Skip operations matching at least one entry in the list.
    */

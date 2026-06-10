@@ -23,7 +23,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
     if (!node.name) {
       return
     }
-    const mode = ctx.getMode(output)
     // Build a set of schema names that are enums so the ref handler and getImports
     // callback can use the suffixed type name (e.g. `StatusKey`) for those refs.
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
@@ -70,10 +69,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {mode === 'split' &&
-          imports.map((imp) => (
-            <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
-          ))}
+        {imports.map((imp) => (
+          <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
+        ))}
         <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
     )
@@ -81,8 +79,6 @@ export const typeGenerator = defineGenerator<PluginTs>({
   operation(node, ctx) {
     const { enum: enumOptions, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
-
-    const mode = ctx.getMode(output)
 
     const params = ast.caseParams(node.parameters, paramsCasing)
 
@@ -127,10 +123,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
       return (
         <>
-          {mode === 'split' &&
-            imports.map((imp) => (
-              <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
-            ))}
+          {imports.map((imp) => (
+            <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
+          ))}
           <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
         </>
       )

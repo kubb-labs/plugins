@@ -10,6 +10,8 @@ description: |
   Without `group`, every file lands in the plugin's `output.path` folder. With `group`, files are bucketed under `{output.path}/{groupName}/`, where `groupName` is derived from the operation's first tag.
 tip: |
   Use `group` to mirror your API's domain structure (pet, store, user) in the generated code. Combine it with `output.barrel: { type: 'named', nested: true }` to get per-tag barrel files.
+
+  By default each group becomes a folder. Set `output.mode: 'group'` to collapse each group into a single file (`{output.path}/{groupName}.ts`) instead.
 examples:
   - name: kubb.config.ts
     files:

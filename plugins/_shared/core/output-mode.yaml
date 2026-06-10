@@ -1,0 +1,49 @@
+# Shared option: core/output-mode
+
+$schema: 'https://raw.githubusercontent.com/kubb-labs/kubb/main/schemas/plugins/plugin.json#plugin-options'
+name: mode
+type: "'directory' | 'group' | 'file'"
+required: false
+default: "'directory'"
+description: |
+  How the plugin consolidates its generated code into files.
+
+  - `'directory'` writes one file per operation or schema under `output.path`. This is the default.
+  - `'group'` writes one file per resolved group and needs the `group` option set.
+  - `'file'` writes everything into a single file. When `output.path` has no extension the default `.ts` is appended, so `'types'` becomes `'types.ts'`.
+tip: |
+  `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
+examples:
+  - name: kubb.config.ts
+    files:
+      - lang: typescript
+        twoslash: false
+        code: |
+          import { defineConfig } from 'kubb'
+          import { pluginTs } from '@kubb/plugin-ts'
+          import { pluginClient } from '@kubb/plugin-client'
+
+          export default defineConfig({
+            input: { path: './petStore.yaml' },
+            output: { path: './src/gen' },
+            plugins: [
+              pluginTs({
+                output: { path: 'types', mode: 'file' },
+              }),
+              pluginClient({
+                output: { path: 'clients', mode: 'group' },
+                group: { type: 'tag' },
+              }),
+            ],
+          })
+  - name: Resulting tree
+    files:
+      - lang: text
+        twoslash: false
+        code: |
+          src/
+          └── gen/
+              ├── types.ts
+              └── clients/
+                  ├── pet.ts
+                  └── store.ts

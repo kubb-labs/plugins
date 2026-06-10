@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * The concrete resolver type for `@kubb/plugin-client`.
@@ -117,17 +117,13 @@ type ParamsTypeOptions =
       pathParamsType?: 'object' | 'inline'
     }
 
-export type Options = {
-  /**
-   * Where the generated client files are written and how they are exported.
-   *
-   * @default { path: 'clients', barrel: { type: 'named' } }
-   */
-  output?: Output
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
+/**
+ * Where the generated client files are written and how they are exported, plus the optional
+ * `group` strategy. With `output.mode: 'group'` the `group` option is required.
+ *
+ * @default { path: 'clients', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * Skip operations matching at least one entry in the list.
    */

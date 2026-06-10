@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 /**
@@ -22,13 +22,13 @@ export type ResolverMcp = Resolver & {
   resolveHandlerName(this: ResolverMcp, node: ast.OperationNode): string
 }
 
-export type Options = {
-  /**
-   * Where the generated MCP tool handlers are written and how they are exported.
-   *
-   * @default { path: 'mcp', barrel: { type: 'named' } }
-   */
-  output?: Output
+/**
+ * Where the generated MCP tool handlers are written and how they are exported, plus the optional
+ * `group` strategy. With `output.mode: 'group'` the `group` option is required.
+ *
+ * @default { path: 'mcp', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * HTTP client used by each MCP handler to call the underlying API. Mirrors a
    * subset of `pluginClient` options.
@@ -41,10 +41,6 @@ export type Options = {
    * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
   /**
    * Skip operations matching at least one entry in the list.
    */

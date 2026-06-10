@@ -65,7 +65,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
       return
     }
 
-    const mode = ctx.getMode(output)
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
     const cyclicSchemas = new Set<string>(ctx.meta.circularNames)
 
@@ -117,8 +116,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         <File.Import name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
-        {mode === 'split' &&
-          imports.map((imp) => <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
+        {imports.map((imp) => (
+          <File.Import key={[node.name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+        ))}
 
         <Zod name={meta.name} node={node} printer={schemaPrinter} inferTypeName={inferTypeName} />
         {hasCodec && stdPrinters && (
@@ -138,7 +138,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
     const { output, coercion, guidType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
     const dateType = (adapter as Adapter<AdapterOas>).options.dateType
 
-    const mode = ctx.getMode(output)
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
 
     const params = ast.caseParams(node.parameters, paramsCasing)
@@ -191,8 +190,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
       return (
         <>
-          {mode === 'split' &&
-            imports.map((imp) => <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
+          {imports.map((imp) => (
+            <File.Import key={[name, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+          ))}
           <Zod name={name} node={schema} printer={schemaPrinter} inferTypeName={inferTypeName} />
         </>
       )

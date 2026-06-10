@@ -33,16 +33,18 @@ export default defineConfig([
         },
       }),
       pluginTs({
-        output: { path: 'models.ts', clean: true },
+        output: { path: 'models.ts', mode: 'file', clean: true },
       }),
       pluginReactQuery({
         output: {
           path: './hooks.ts',
+          mode: 'file',
         },
       }),
       pluginZod({
         output: {
           path: './zod.ts',
+          mode: 'file',
         },
         operations: false,
       }),

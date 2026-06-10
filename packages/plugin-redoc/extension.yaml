@@ -52,7 +52,7 @@ options:
 
           Use a `.html` extension. Unlike most plugins, this option points at a single file rather than a directory.
         tip: |
-          When `output.path` points to a single file, the `group` option cannot be used because every operation ends up in the same file.
+          `output.path` sets where files go, `output.mode` sets how many. See `output.mode` for the single-file and one-file-per-group layouts.
         examples:
           - name: kubb.config.ts
             files:

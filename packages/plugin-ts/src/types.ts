@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -197,17 +197,13 @@ type EnumOptions =
       keyCasing?: never
     }
 
-export type Options = {
-  /**
-   * Where the generated `.ts` files are written and how they are exported.
-   *
-   * @default { path: 'types', barrel: { type: 'named' } }
-   */
-  output?: Output
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
+/**
+ * Where the generated `.ts` files are written and how they are exported, plus the optional
+ * `group` strategy. With `output.mode: 'group'` the `group` option is required.
+ *
+ * @default { path: 'types', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * Skip operations matching at least one entry in the list.
    */
