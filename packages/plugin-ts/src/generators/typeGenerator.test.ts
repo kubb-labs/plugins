@@ -558,7 +558,10 @@ describe('typeGenerator — numeric enum keys', () => {
     { enumType: 'asConst', keyCasing: 'none' },
     { enumType: 'asConst', keyCasing: 'screamingSnakeCase' },
     { enumType: 'enum', keyCasing: 'none' },
-  ] as const satisfies Array<{ enumType: NonNullable<PluginTs['resolvedOptions']['enum']['type']>; keyCasing: NonNullable<PluginTs['resolvedOptions']['enum']['keyCasing']> }>
+  ] as const satisfies Array<{
+    enumType: NonNullable<PluginTs['resolvedOptions']['enum']['type']>
+    keyCasing: NonNullable<PluginTs['resolvedOptions']['enum']['keyCasing']>
+  }>
 
   test.each(cases)('enumType $enumType keyCasing $keyCasing', async ({ enumType, keyCasing }) => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType, keyCasing } }
