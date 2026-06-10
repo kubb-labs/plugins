@@ -13,7 +13,6 @@ allowBuilds:
 
 catalog:
   '@kubb/adapter-oas': 5.0.0-beta.46
-  '@kubb/agent': 5.0.0-beta.46
   '@kubb/ast': 5.0.0-beta.46
   '@kubb/core': 5.0.0-beta.46
   '@kubb/middleware-barrel': 5.0.0-beta.46
@@ -34,7 +33,6 @@ catalog:
 #
 #overrides:
 #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas
-#  '@kubb/agent': link:../kubb/packages/agent
 #  '@kubb/ast': link:../kubb/packages/ast
 #  '@kubb/cli': link:../kubb/packages/cli
 #  '@kubb/core': link:../kubb/packages/core
