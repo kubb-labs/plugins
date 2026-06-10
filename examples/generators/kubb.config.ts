@@ -20,7 +20,7 @@ export default defineConfig([
     },
     plugins: [
       pluginClient({
-        output: { path: './example1.ts' },
+        output: { path: './example1.ts', mode: 'file' },
         generators: [example1],
       }),
     ],
@@ -32,7 +32,7 @@ export default defineConfig([
     output: { path: './src/gen2', format: false, lint: false },
     plugins: [
       pluginClient({
-        output: { path: './example2.ts' },
+        output: { path: './example2.ts', mode: 'file' },
         generators: [example2],
       }),
     ],
@@ -47,7 +47,7 @@ export default defineConfig([
     },
     plugins: [
       pluginClient({
-        output: { path: './example3.tsx' },
+        output: { path: './example3.tsx', mode: 'file' },
         generators: [example3],
       }),
     ],

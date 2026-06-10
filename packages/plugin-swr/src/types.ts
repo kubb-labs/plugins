@@ -1,5 +1,5 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
@@ -101,16 +101,13 @@ type Mutation = {
   importPath?: string
 }
 
-export type Options = {
-  /**
-   * Specify the export location for the files and define the behavior of the output
-   * @default { path: 'hooks', barrelType: 'named' }
-   */
-  output?: Output
-  /**
-   * Group the SWR hooks based on the provided name.
-   */
-  group?: Group
+/**
+ * Where the generated SWR hooks are written and how they are exported, plus the optional `group`
+ * strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
+ *
+ * @default { path: 'hooks', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
    * Tags, operations, or paths to exclude from generation.

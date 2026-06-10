@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * Resolver for Cypress that provides naming methods for test functions.
@@ -46,13 +46,13 @@ type ParamsTypeOptions =
       pathParamsType?: 'object' | 'inline'
     }
 
-export type Options = {
-  /**
-   * Where the generated Cypress helpers are written and how they are exported.
-   *
-   * @default { path: 'cypress', barrel: { type: 'named' } }
-   */
-  output?: Output
+/**
+ * Where the generated Cypress helpers are written and how they are exported, plus the optional
+ * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
+ *
+ * @default { path: 'cypress', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * Shape of the value returned from each helper.
    * - `'data'` — only the response body.
@@ -72,10 +72,6 @@ export type Options = {
    * adapter's server URL (typically `servers[0].url`).
    */
   baseURL?: string
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
   /**
    * Skip operations matching at least one entry in the list.
    */

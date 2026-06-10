@@ -67,6 +67,7 @@ options:
     properties:
       - extends: ./_shared/core/output-path.yaml
         default: "'mcp'"
+      - extends: ./_shared/core/output-mode.yaml
       - extends: ./_shared/core/output-barrel.yaml
       - extends: ./_shared/core/output-banner.yaml
       - extends: ./_shared/core/output-footer.yaml

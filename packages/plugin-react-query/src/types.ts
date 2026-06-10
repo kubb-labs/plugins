@@ -1,5 +1,5 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
@@ -224,17 +224,13 @@ type CustomOptions = {
   name?: string
 }
 
-export type Options = {
-  /**
-   * Where the generated hooks are written and how they are exported.
-   *
-   * @default { path: 'hooks', barrel: { type: 'named' } }
-   */
-  output?: Output
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
+/**
+ * Where the generated hooks are written and how they are exported, plus the optional `group`
+ * strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
+ *
+ * @default { path: 'hooks', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * HTTP client used inside every generated hook. Mirrors a subset of
    * `pluginClient` options.

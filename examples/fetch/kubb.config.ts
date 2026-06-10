@@ -23,7 +23,7 @@ export default defineConfig(() => {
     adapter: adapterOas({ serverIndex: 0 }),
     plugins: [
       pluginTs({
-        output: { path: 'models.ts' },
+        output: { path: 'models.ts', mode: 'file' },
       }),
       pluginClient({
         output: {

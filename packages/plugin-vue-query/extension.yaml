@@ -51,11 +51,11 @@ options:
         type: string
         required: true
         description: |
-          Folder (or single file) where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
+          Folder where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
 
-          Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). Use a single file when you want everything in one place, for example `'api.ts'`.
+          Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). To put everything in one file, set `output.mode: 'file'` and point `path` at the target file including its extension (e.g. `'types.ts'`).
         tip: |
-          When `output.path` points to a single file, the `group` option cannot be used because every operation ends up in the same file.
+          `output.path` sets where files go, `output.mode` sets how many. See `output.mode` for the single-file and one-file-per-group layouts.
         examples:
           - name: kubb.config.ts
             files:
@@ -85,6 +85,53 @@ options:
                           ├── Pet.ts
                           └── Store.ts
         default: "'hooks'"
+      - name: mode
+        type: "'directory' | 'file'"
+        required: false
+        default: "'directory'"
+        description: |
+          How the plugin consolidates its generated code into files.
+
+          - `'directory'` writes one file per operation or schema under `output.path`. This is the default.
+          - `'file'` writes everything into a single file. The `output.path` must include the file extension (e.g. `'types.ts'`, `'models.py'`).
+        tip: |
+          Pair `'directory'` with the `group` option to organize output into per-tag or per-path subdirectories. `mode: 'file'` forbids `group` — a single-file output has nothing to group, and combining them stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
+        examples:
+          - name: kubb.config.ts
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  import { defineConfig } from 'kubb'
+                  import { pluginTs } from '@kubb/plugin-ts'
+                  import { pluginClient } from '@kubb/plugin-client'
+
+                  export default defineConfig({
+                    input: { path: './petStore.yaml' },
+                    output: { path: './src/gen' },
+                    plugins: [
+                      pluginTs({
+                        output: { path: 'types.ts', mode: 'file' },
+                      }),
+                      pluginClient({
+                        output: { path: 'clients', mode: 'directory' },
+                        group: { type: 'tag' },
+                      }),
+                    ],
+                  })
+          - name: Resulting tree
+            files:
+              - lang: text
+                twoslash: false
+                code: |
+                  src/
+                  └── gen/
+                      ├── types.ts
+                      └── clients/
+                          ├── pet/
+                          │   └── getPetById.ts
+                          └── store/
+                              └── getInventory.ts
       - name: barrel
         type: "{ type: 'named' | 'all', nested?: boolean } | false"
         required: false
@@ -326,6 +373,8 @@ options:
       Without `group`, every file lands in the plugin's `output.path` folder. With `group`, files are bucketed under `{output.path}/{groupName}/`, where `groupName` is derived from the operation's first tag.
     tip: |
       Use `group` to mirror your API's domain structure (pet, store, user) in the generated code. Combine it with `output.barrel: { type: 'named', nested: true }` to get per-tag barrel files.
+
+      `group` only applies to `output.mode: 'directory'` (the default), where each group becomes a folder. It is not valid with `output.mode: 'file'` — a single-file output has no grouping concept.
     examples:
       - name: kubb.config.ts
         files:

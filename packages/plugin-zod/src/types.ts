@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterZodNodes } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
 
@@ -88,17 +88,13 @@ export type ResolverZod = Resolver &
     resolveHeaderParamsName(this: ResolverZod, node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
-export type Options = {
-  /**
-   * Where the generated Zod schemas are written and how they are exported.
-   *
-   * @default { path: 'zod', barrel: { type: 'named' } }
-   */
-  output?: Output
-  /**
-   * Split generated files into subfolders based on the operation's tag.
-   */
-  group?: Group
+/**
+ * Where the generated Zod schemas are written and how they are exported, plus the optional
+ * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
+ *
+ * @default { path: 'zod', barrel: { type: 'named' } }
+ */
+export type Options = OutputOptions & {
   /**
    * Skip operations matching at least one entry in the list.
    */

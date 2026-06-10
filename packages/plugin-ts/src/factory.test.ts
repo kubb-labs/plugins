@@ -473,47 +473,6 @@ describe('Code Generation', () => {
     expect(output).not.toMatch(/[\n{]\s*#0099ff:/)
     expect(output).not.toMatch(/[\n{]\s*#ccff9a:/)
   })
-
-  it('prefixes numeric asConst keys with the enum name (regression for kubb-labs/plugins#338)', async () => {
-    // Numeric enum values are not valid identifiers, so `asConst` used to emit quoted digit keys
-    // (`'1': 1`). Mirror the `enum` branch and prefix them with the PascalCase name instead.
-    const output = await formatTS(
-      createEnumDeclaration({
-        type: 'asConst',
-        name: 'priority',
-        typeName: 'PriorityKey',
-        enums: [
-          ['1', 1],
-          ['2', 2],
-          ['3', 3],
-        ],
-      }),
-    )
-
-    expect(output).toContain('Priority_1: 1')
-    expect(output).toContain('Priority_2: 2')
-    expect(output).toContain('Priority_3: 3')
-    // the bare digit key is never emitted
-    expect(output).not.toMatch(/['"]1['"]:/)
-  })
-
-  it('applies enumKeyCasing on top of the numeric asConst prefix', async () => {
-    const output = await formatTS(
-      createEnumDeclaration({
-        type: 'asConst',
-        name: 'priority',
-        typeName: 'PriorityKey',
-        enumKeyCasing: 'screamingSnakeCase',
-        enums: [
-          ['1', 1],
-          ['2', 2],
-        ],
-      }),
-    )
-
-    expect(output).toContain('PRIORITY_1: 1')
-    expect(output).toContain('PRIORITY_2: 2')
-  })
 })
 
 describe('Import/Export Sorting Consistency', () => {

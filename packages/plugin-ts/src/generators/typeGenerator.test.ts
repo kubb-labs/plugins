@@ -49,13 +49,6 @@ const multiWordEnumSchema = ast.createSchema({
   enumValues: ['in_progress', 'awaiting_payment', 'fully_shipped'],
 })
 
-const numericEnumSchema = ast.createSchema({
-  type: 'enum',
-  name: 'priority',
-  primitive: 'number',
-  enumValues: [1, 2, 3],
-})
-
 const objectSchema = ast.createSchema({
   type: 'object',
   name: 'Pet',
@@ -492,6 +485,55 @@ describe('typeGenerator — Operation — group', () => {
   })
 })
 
+describe('typeGenerator — Operation — output.mode', () => {
+  const node = ast.createOperation({
+    operationId: 'listPets',
+    method: 'GET',
+    path: '/pets',
+    tags: ['pets'],
+    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' })],
+  })
+
+  test("mode 'file' writes the operation into the single output file", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types.ts', mode: 'file' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    const file = driver.fileManager.files.at(0)
+    expect(file).toBeDefined()
+    expect(file!.path).toBe(path.resolve(testConfig.root, testConfig.output.path, 'types.ts'))
+    expect(file!.baseName).toBe('types.ts')
+  })
+
+  test("mode 'directory' with group places a tagged operation in a per-tag subdirectory", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types', mode: 'directory' }, group: { type: 'tag' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
+
+    await renderGeneratorOperation(typeGenerator, node, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
+    const file = driver.fileManager.files.find((f: ast.FileNode) => path.dirname(f.path) === path.resolve(root, 'pets'))
+    expect(file).toBeDefined()
+  })
+})
+
 describe('typeGenerator — paramsCasing', () => {
   test('paramsCasing undefined — snake_case params kept as-is', async () => {
     const options: PluginTs['resolvedOptions'] = { ...defaultOptions, paramsCasing: undefined }
@@ -548,36 +590,6 @@ describe('typeGenerator — enumType', () => {
     })
 
     await matchFiles(driver.fileManager.files, `enumType ${enumType}`)
-  })
-})
-
-describe('typeGenerator — numeric enum keys', () => {
-  // Regression for kubb-labs/plugins#338: numeric enum values must produce identifier-safe keys
-  // (`Priority_1`) in `asConst`, consistent with the `enum` mode, instead of quoted digit keys.
-  const cases = [
-    { enumType: 'asConst', keyCasing: 'none' },
-    { enumType: 'asConst', keyCasing: 'screamingSnakeCase' },
-    { enumType: 'enum', keyCasing: 'none' },
-  ] as const satisfies Array<{
-    enumType: NonNullable<PluginTs['resolvedOptions']['enum']['type']>
-    keyCasing: NonNullable<PluginTs['resolvedOptions']['enum']['keyCasing']>
-  }>
-
-  test.each(cases)('enumType $enumType keyCasing $keyCasing', async ({ enumType, keyCasing }) => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType, keyCasing } }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
-    const driver = createMockedPluginDriver({ name: `numeric enum ${enumType} ${keyCasing}` })
-
-    await renderGeneratorSchema(typeGenerator, numericEnumSchema, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverTs,
-    })
-
-    await matchFiles(driver.fileManager.files, `numeric enum ${enumType} ${keyCasing}`)
   })
 })
 

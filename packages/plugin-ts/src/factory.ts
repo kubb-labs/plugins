@@ -631,9 +631,6 @@ export function createEnumDeclaration({
   // name is already cased by the caller (camelCase or pascalCase, driven by enum.constCasing).
   // typeName carries the typeSuffix for the type alias, so we use name for the const identifier.
   const identifierName = name
-  // Numeric values are not valid identifiers, so prefix them with the PascalCase enum name the same
-  // way the `enum` branch does (`Priority_1`) instead of emitting quoted digit keys (`'1'`).
-  const enumPascalName = pascalCase(name)
 
   // When there are no enum items (empty or all-null enum), don't generate a runtime const.
   // Return undefined for nameNode so the barrel won't try to export a non-existent symbol.
@@ -679,11 +676,6 @@ export function createEnumDeclaration({
 
                     if (typeof value === 'boolean') {
                       initializer = value ? factory.createTrue() : factory.createFalse()
-                    }
-
-                    if (isNumber(Number.parseInt(key.toString(), 10))) {
-                      const casingKey = applyEnumKeyCasing(`${enumPascalName}_${key}`, enumKeyCasing)
-                      return factory.createPropertyAssignment(propertyName(casingKey), initializer)
                     }
 
                     if (key) {

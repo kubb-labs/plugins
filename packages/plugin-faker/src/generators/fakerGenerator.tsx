@@ -29,7 +29,6 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
     const schemaName = node.name
-    const mode = ctx.getMode(output)
     const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
     const tsEnumType = pluginTs.options?.enum?.type
     const tsEnumTypeSuffix = pluginTs.options?.enum?.typeSuffix ?? 'Key'
@@ -66,12 +65,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeFilePath: meta.typeFile.path,
     })
 
-    const imports = adapter
-      .getImports(node, (schemaName) => ({
-        name: resolver.resolveName(schemaName),
-        path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
-      }))
-      .filter((entry) => entry.path !== meta.file.path)
+    const imports = adapter.getImports(node, (schemaName) => ({
+      name: resolver.resolveName(schemaName),
+      path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
+    }))
     const usedImports = filterUsedImports(imports, fakerText)
 
     return (
@@ -86,8 +83,9 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         {regexGenerator === 'randexp' && <File.Import name={'RandExp'} path={'randexp'} />}
         {dateParser !== 'faker' && <File.Import path={dateParser} name={dateParser} />}
         {typeReference.importPath && <File.Import isTypeOnly root={meta.file.path} path={typeReference.importPath} name={[meta.typeName]} />}
-        {mode === 'split' &&
-          usedImports.map((imp) => <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />)}
+        {usedImports.map((imp) => (
+          <File.Import key={[schemaName, imp.path, imp.name].join('-')} root={meta.file.path} path={imp.path} name={imp.name} />
+        ))}
         <Faker
           name={meta.name}
           typeName={typeReference.typeName}

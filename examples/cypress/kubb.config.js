@@ -18,6 +18,7 @@ export default defineConfig([
       pluginTs({
         output: {
           path: 'models.ts',
+          mode: 'file',
         },
       }),
       pluginCypress({
@@ -40,7 +41,7 @@ export default defineConfig([
     output: { path: './src/gen-v4', clean: true },
     plugins: [
       pluginTs({
-        output: { path: 'models.ts' },
+        output: { path: 'models.ts', mode: 'file' },
       }),
       pluginCypress({
         output: { path: 'cypress' },
