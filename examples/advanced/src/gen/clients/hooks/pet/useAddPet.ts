@@ -1,5 +1,5 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { AddPetData, AddPetStatus405, AddPetStatusDefault } from '../../../models/ts/pet/AddPet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addPet } from '../../axios/petService/addPet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -13,7 +13,12 @@ export function addPetMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>({
+  return mutationOptions<
+    { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
+    ResponseErrorConfig<AddPetStatus405>,
+    { data: AddPetData },
+    TContext
+  >({
     mutationKey,
     mutationFn: async ({ data }) => {
       return addPet({ data }, config)
@@ -28,9 +33,12 @@ export function addPetMutationOptions<TContext = unknown>(
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: UseMutationOptions<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: UseMutationOptions<
+      { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
+      ResponseErrorConfig<AddPetStatus405>,
+      { data: AddPetData },
+      TContext
+    > & { client?: QueryClient }
     client?: Partial<RequestConfig<AddPetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -42,18 +50,28 @@ export function useAddPet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addPetMutationKey()
 
   const baseOptions = addPetMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<AddPetResponse>,
+    { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
     ResponseErrorConfig<AddPetStatus405>,
     { data: AddPetData },
     TContext
   >
 
-  return useMutation<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>(
+  return useMutation<
+    { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
+    ResponseErrorConfig<AddPetStatus405>,
+    { data: AddPetData },
+    TContext
+  >(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<ResponseConfig<AddPetResponse>, ResponseErrorConfig<AddPetStatus405>, { data: AddPetData }, TContext>
+  ) as UseMutationResult<
+    { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
+    ResponseErrorConfig<AddPetStatus405>,
+    { data: AddPetData },
+    TContext
+  >
 }

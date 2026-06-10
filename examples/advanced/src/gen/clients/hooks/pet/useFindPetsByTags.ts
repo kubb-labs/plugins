@@ -1,4 +1,4 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type {
   FindPetsByTagsQueryTags,
@@ -28,9 +28,9 @@ export function findPetsByTagsQueryOptions(
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<
-    ResponseConfig<FindPetsByTagsStatus200>,
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    ResponseConfig<FindPetsByTagsStatus200>,
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
     typeof queryKey
   >({
     queryKey,
@@ -46,8 +46,8 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<
-  TData = ResponseConfig<FindPetsByTagsStatus200>,
-  TQueryData = ResponseConfig<FindPetsByTagsStatus200>,
+  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+  TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
   {
@@ -59,7 +59,13 @@ export function useFindPetsByTags<
   },
   options: {
     query?: Partial<
-      QueryObserverOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>
+      QueryObserverOptions<
+        { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+        ResponseErrorConfig<FindPetsByTagsStatus400>,
+        TData,
+        TQueryData,
+        TQueryKey
+      >
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

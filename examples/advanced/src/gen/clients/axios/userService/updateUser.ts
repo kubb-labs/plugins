@@ -1,6 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../../../models/ts/user/UpdateUser.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserStatusDefault } from '../../../models/ts/user/UpdateUser.ts'
+import type { z } from 'zod'
 import { updateUserResponseSchema, updateUserDataSchema } from '../../../zod/user/updateUserSchema.ts'
 
 export function getUpdateUserUrl({ username }: { username: UpdateUserPathUsername }) {
@@ -25,7 +26,7 @@ export async function updateUser(
 
   const requestData = updateUserDataSchema.parse(data)
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({
+  const res = await request<UpdateUserStatusDefault, ResponseErrorConfig<Error>, z.output<typeof updateUserDataSchema>>({
     method: 'PUT',
     url: getUpdateUserUrl({ username }).url.toString(),
     data: requestData,
@@ -33,5 +34,5 @@ export async function updateUser(
     ...requestConfig,
   })
 
-  return { ...res, data: updateUserResponseSchema.parse(res.data) }
+  return { ...res, data: updateUserResponseSchema.parse(res.data) } as { status: number; data: UpdateUserStatusDefault; statusText: string }
 }
