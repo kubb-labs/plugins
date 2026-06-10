@@ -218,8 +218,22 @@ const getStatusNode = ast.createOperation({
   path: '/status',
   tags: ['status'],
   responses: [
-    ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'status', required: true, schema: ast.createSchema({ type: 'string' }) })] }), description: 'Ok' }),
-    ast.createResponse({ statusCode: '422', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'detail', required: true, schema: ast.createSchema({ type: 'string' }) })] }), description: 'Err' }),
+    ast.createResponse({
+      statusCode: '200',
+      schema: ast.createSchema({
+        type: 'object',
+        properties: [ast.createProperty({ name: 'status', required: true, schema: ast.createSchema({ type: 'string' }) })],
+      }),
+      description: 'Ok',
+    }),
+    ast.createResponse({
+      statusCode: '422',
+      schema: ast.createSchema({
+        type: 'object',
+        properties: [ast.createProperty({ name: 'detail', required: true, schema: ast.createSchema({ type: 'string' }) })],
+      }),
+      description: 'Err',
+    }),
   ],
 })
 

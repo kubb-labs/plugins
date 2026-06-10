@@ -278,9 +278,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
           })()
         : null
 
-    const successResponsesWithSchema = node.responses.filter(
-      (res) => isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema),
-    )
+    const successResponsesWithSchema = node.responses.filter((res) => isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema))
     const successResponseUnionSchema =
       successResponsesWithSchema.length > 0
         ? (() => {

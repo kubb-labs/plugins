@@ -83,9 +83,7 @@ type ZodSchemaNameResolverLike = {
 export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined): string[] {
   if (!zodResolver) return []
   const responseName = zodResolver.resolveSuccessResponseName?.(node) ?? zodResolver.resolveResponseName?.(node)
-  return [responseName, node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
-    (n): n is string => Boolean(n),
-  )
+  return [responseName, node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter((n): n is string => Boolean(n))
 }
 
 /**
