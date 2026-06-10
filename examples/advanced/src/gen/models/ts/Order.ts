@@ -11,7 +11,7 @@ export type OrderOrderTypeEnumKey = (typeof orderOrderTypeEnum)[keyof typeof ord
 export const orderHttpStatusEnum = {
   ok: 200,
   not_found: 400,
-  OrderHttpStatusEnum_500: 500,
+  '500': 500,
 } as const
 
 export type OrderHttpStatusEnumKey = (typeof orderHttpStatusEnum)[keyof typeof orderHttpStatusEnum]
