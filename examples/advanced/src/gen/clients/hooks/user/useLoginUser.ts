@@ -1,4 +1,4 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../../models/ts/user/LoginUser.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
@@ -14,7 +14,12 @@ export function loginUserQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = loginUserQueryKey(params)
-  return queryOptions<ResponseConfig<LoginUserStatus200>, ResponseErrorConfig<LoginUserStatus400>, ResponseConfig<LoginUserStatus200>, typeof queryKey>({
+  return queryOptions<
+    { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+    ResponseErrorConfig<LoginUserStatus400>,
+    { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
       return loginUser({ params }, { ...config, signal: config.signal ?? signal })
@@ -27,15 +32,21 @@ export function loginUserQueryOptions(
  * {@link /user/login}
  */
 export function useLoginUser<
-  TData = ResponseConfig<LoginUserStatus200>,
-  TQueryData = ResponseConfig<LoginUserStatus200>,
+  TData = { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+  TQueryData = { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
   TQueryKey extends QueryKey = LoginUserQueryKey,
 >(
   { params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {},
   options: {
-    query?: Partial<QueryObserverOptions<ResponseConfig<LoginUserStatus200>, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>> & {
-      client?: QueryClient
-    }
+    query?: Partial<
+      QueryObserverOptions<
+        { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+        ResponseErrorConfig<LoginUserStatus400>,
+        TData,
+        TQueryData,
+        TQueryKey
+      >
+    > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

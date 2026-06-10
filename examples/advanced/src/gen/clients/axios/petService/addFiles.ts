@@ -23,7 +23,7 @@ export async function addFiles(
   const requestData = data
   const formData = buildFormData(requestData)
 
-  const res = await request<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
+  const res = await request<AddFilesStatus200 | AddFilesStatus405, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
     method: 'POST',
     url: getAddFilesUrl().url.toString(),
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
@@ -31,5 +31,5 @@ export async function addFiles(
     ...requestConfig,
   })
 
-  return res
+  return res as { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string }
 }

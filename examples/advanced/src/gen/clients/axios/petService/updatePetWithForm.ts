@@ -4,7 +4,6 @@ import type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
   UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormResponse,
   UpdatePetWithFormStatus405,
 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
 import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
@@ -25,12 +24,12 @@ export async function updatePetWithForm(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
+  const res = await request<UpdatePetWithFormStatus405, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
     url: getUpdatePetWithFormUrl({ petId }).url.toString(),
     params,
     ...requestConfig,
   })
 
-  return { ...res, data: updatePetWithFormResponseSchema.parse(res.data) }
+  return { ...res, data: updatePetWithFormResponseSchema.parse(res.data) } as { status: 405; data: UpdatePetWithFormStatus405; statusText: string }
 }
