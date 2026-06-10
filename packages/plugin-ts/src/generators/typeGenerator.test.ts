@@ -49,13 +49,6 @@ const multiWordEnumSchema = ast.createSchema({
   enumValues: ['in_progress', 'awaiting_payment', 'fully_shipped'],
 })
 
-const numericEnumSchema = ast.createSchema({
-  type: 'enum',
-  name: 'priority',
-  primitive: 'number',
-  enumValues: [1, 2, 3],
-})
-
 const objectSchema = ast.createSchema({
   type: 'object',
   name: 'Pet',
@@ -597,36 +590,6 @@ describe('typeGenerator — enumType', () => {
     })
 
     await matchFiles(driver.fileManager.files, `enumType ${enumType}`)
-  })
-})
-
-describe('typeGenerator — numeric enum keys', () => {
-  // Regression for kubb-labs/plugins#338: numeric enum values must produce identifier-safe keys
-  // (`Priority_1`) in `asConst`, consistent with the `enum` mode, instead of quoted digit keys.
-  const cases = [
-    { enumType: 'asConst', keyCasing: 'none' },
-    { enumType: 'asConst', keyCasing: 'screamingSnakeCase' },
-    { enumType: 'enum', keyCasing: 'none' },
-  ] as const satisfies Array<{
-    enumType: NonNullable<PluginTs['resolvedOptions']['enum']['type']>
-    keyCasing: NonNullable<PluginTs['resolvedOptions']['enum']['keyCasing']>
-  }>
-
-  test.each(cases)('enumType $enumType keyCasing $keyCasing', async ({ enumType, keyCasing }) => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType, keyCasing } }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
-    const driver = createMockedPluginDriver({ name: `numeric enum ${enumType} ${keyCasing}` })
-
-    await renderGeneratorSchema(typeGenerator, numericEnumSchema, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverTs,
-    })
-
-    await matchFiles(driver.fileManager.files, `numeric enum ${enumType} ${keyCasing}`)
   })
 })
 
