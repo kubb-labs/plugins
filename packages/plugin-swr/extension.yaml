@@ -91,7 +91,7 @@ options:
           - `'group'` writes one file per resolved group and needs the `group` option set.
           - `'file'` writes everything into a single file. The `output.path` must include the file extension (e.g. `'types.ts'`, `'models.py'`).
         tip: |
-          `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
+          `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error. `mode: 'file'` forbids `group` — a single-file output has nothing to group.
         examples:
           - name: kubb.config.ts
             files:

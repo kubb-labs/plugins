@@ -93,7 +93,7 @@ options:
           - `'group'` writes one file per resolved group and needs the `group` option set.
           - `'file'` writes everything into a single file. The `output.path` must include the file extension (e.g. `'types.ts'`, `'models.py'`).
         tip: |
-          `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
+          `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error. `mode: 'file'` forbids `group` — a single-file output has nothing to group.
         examples:
           - name: kubb.config.ts
             files:
@@ -413,7 +413,7 @@ options:
     tip: |
       Use `group` to mirror your API's domain structure (pet, store, user) in the generated code. Combine it with `output.barrel: { type: 'named', nested: true }` to get per-tag barrel files.
 
-      By default each group becomes a folder. Set `output.mode: 'group'` to collapse each group into a single file (`{output.path}/{groupName}.ts`) instead.
+      By default each group becomes a folder. Set `output.mode: 'group'` to collapse each group into a single file (`{output.path}/{groupName}.ts`) instead. `group` is not valid with `output.mode: 'file'` — a single-file output has no grouping concept.
     examples:
       - name: kubb.config.ts
         files:
