@@ -52,10 +52,9 @@ function Pets() {
     {},
     {
       query: {
-        getNextPageParam: (lastPage, pages) => {
-          const numPages: number | undefined = lastPage.headers?.['x-pages']
+        getNextPageParam: (_lastPage, pages) => {
           const nextPage = pages.length + 1
-          return nextPage <= (numPages ?? 0) ? nextPage : undefined
+          return nextPage <= 3 ? nextPage : undefined
         },
       },
     },
@@ -65,10 +64,9 @@ function Pets() {
     {},
     {
       query: {
-        getNextPageParam: (lastPage, pages) => {
-          const numPages: number | undefined = lastPage.headers?.['x-pages']
+        getNextPageParam: (_lastPage, pages) => {
           const nextPage = pages.length + 1
-          return nextPage <= (numPages ?? 0) ? nextPage : undefined
+          return nextPage <= 3 ? nextPage : undefined
         },
         // select(data) {
         //   return data.pages[0]?.data.at(0)

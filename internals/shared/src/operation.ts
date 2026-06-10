@@ -262,7 +262,9 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
 export function buildStatusUnionType(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string {
   const members = node.responses.map((r) => {
     const typeName = resolver.resolveResponseStatusName(node, r.statusCode)
-    return `{ status: ${Number.parseInt(r.statusCode, 10)}; data: ${typeName}; statusText: string }`
+    const statusCode = Number.parseInt(r.statusCode, 10)
+    const statusLiteral = Number.isNaN(statusCode) ? 'number' : String(statusCode)
+    return `{ status: ${statusLiteral}; data: ${typeName}; statusText: string }`
   })
   if (members.length === 1) return members[0]!
   return `(${members.join(' | ')})`
