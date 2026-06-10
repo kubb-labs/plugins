@@ -14,6 +14,7 @@ import { source as axiosClientSource } from './templates/clients/axios.source.ts
 import { source as fetchClientSource } from './templates/clients/fetch.source.ts'
 import { source as configSource } from './templates/config.source.ts'
 import type { PluginClient } from './types.ts'
+import { isParserEnabled } from './utils.ts'
 
 /**
  * Canonical plugin name for `@kubb/plugin-client`. Used for driver lookups and
@@ -85,7 +86,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
   return {
     name: pluginClientName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : null].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isParserEnabled(parser) ? pluginZodName : null].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverClient, ...userResolver } : resolverClient

@@ -737,16 +737,19 @@ options:
                 // ...
               }
   - name: parser
-    type: false | 'zod'
+    type: "false | 'zod' | { request?: 'zod'; response?: 'zod' }"
     required: false
     default: 'false'
     description: |
-      Runtime validator applied to the response body before it is returned to the caller.
+      Runtime validator applied to request and response data using schemas from `@kubb/plugin-zod`.
 
-      - `false` (default) — no validation. The client has no runtime parser; the response is cast to the generated TypeScript type and returned as-is. Fastest path, trusts the API.
-      - `'zod'` — pipes the response through the Zod schema produced by `@kubb/plugin-zod`. Catches mismatches between spec and API at runtime, at the cost of a parse on every call.
+      - `false` (default): no validation. The client returns the response cast to the generated TypeScript type without parsing.
+      - `'zod'`: validates response bodies only (backward-compatible shorthand).
+      - `{ request?: 'zod', response?: 'zod' }`: opt in per direction. `request` validates the request body and query parameters before the call. `response` validates the response body after.
 
-      Use `'zod'` when you want a defensive boundary against drift between your OpenAPI spec and the live API. Requires `@kubb/plugin-zod` in the plugins list.
+      Requires `@kubb/plugin-zod` in the plugins list when either direction is set to `'zod'`.
+
+      With `coercion` enabled in `@kubb/plugin-zod`, request-side parsing also normalizes types (`z.coerce.number()` converts a stringified number from a form field).
     examples:
       - name: Validate responses with Zod
         files:
@@ -766,6 +769,27 @@ options:
                   pluginZod(),
                   pluginClient({
                     parser: 'zod',
+                  }),
+                ],
+              })
+      - name: Validate both request and response with Zod
+        files:
+          - lang: typescript
+            twoslash: false
+            code: |
+              import { defineConfig } from 'kubb'
+              import { pluginClient } from '@kubb/plugin-client'
+              import { pluginTs } from '@kubb/plugin-ts'
+              import { pluginZod } from '@kubb/plugin-zod'
+
+              export default defineConfig({
+                input: { path: './petStore.yaml' },
+                output: { path: './src/gen' },
+                plugins: [
+                  pluginTs(),
+                  pluginZod(),
+                  pluginClient({
+                    parser: { request: 'zod', response: 'zod' },
                   }),
                 ],
               })
