@@ -8,7 +8,16 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginClient } from '../types.ts'
-import { buildClassClientParams, buildFormDataLine, buildGenerics, buildHeaders, buildRequestDataLine, buildReturnStatement } from '../utils.ts'
+import {
+  buildClassClientParams,
+  buildFormDataLine,
+  buildGenerics,
+  buildHeaders,
+  buildQueryParamsLine,
+  buildRequestDataLine,
+  buildReturnStatement,
+  resolveQueryParamsParser,
+} from '../utils.ts'
 import { buildClientParamsNode } from './Client.tsx'
 
 type OperationData = {
@@ -69,10 +78,13 @@ function generateMethod({
   const generics = buildGenerics(node, tsResolver)
   const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers })
+  const { query: queryParams } = getOperationParameters(node)
+  const zodQueryParamsName = zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
+  const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers, zodQueryParamsName })
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
+  const queryParamsLine = buildQueryParamsLine({ parser, node, zodResolver })
   const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
   const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
 
@@ -80,6 +92,7 @@ function generateMethod({
     `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
     '',
     requestDataLine,
+    queryParamsLine,
     formDataLine,
     `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`,
     returnStatement,

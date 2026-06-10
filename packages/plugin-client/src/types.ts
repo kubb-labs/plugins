@@ -175,14 +175,19 @@ export type Options = {
    */
   paramsCasing?: 'camelcase'
   /**
-   * Validator applied to response bodies before they are returned to the caller.
-   * - `false` (default) — no validation. The client has no runtime parser; the response is
-   *   returned as-is, cast to the generated TypeScript type.
-   * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
+   * Validator applied to request and/or response bodies using schemas from `@kubb/plugin-zod`.
+   * - `false` (default) — no validation; the response is returned as-is.
+   * - `'zod'` — validates response bodies only (backward-compatible shorthand).
+   * - `{ request?: 'zod'; response?: 'zod' }` — opt in per direction. `request` validates the
+   *   request body and query parameters before the call; `response` validates the response body.
    *
    * @default false
+   * @example Response only (shorthand)
+   * `parser: 'zod'`
+   * @example Both directions
+   * `parser: { request: 'zod', response: 'zod' }`
    */
-  parser?: false | 'zod'
+  parser?: false | 'zod' | { request?: 'zod'; response?: 'zod' }
   /**
    * Shape of the generated client.
    * - `'function'` — one standalone async function per operation.
