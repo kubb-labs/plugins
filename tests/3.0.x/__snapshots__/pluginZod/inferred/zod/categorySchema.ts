@@ -10,4 +10,4 @@ export const categorySchema = z.object({
   name: z.string().optional(),
 })
 
-export type CategorySchema = z.infer<typeof categorySchema>
+export type CategorySchemaType = z.infer<typeof categorySchema>

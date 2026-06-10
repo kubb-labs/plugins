@@ -102,6 +102,17 @@ describe('classClientGenerator operations', () => {
         },
       } as Partial<PluginClient['resolvedOptions']>,
     },
+    {
+      // No `group` config, so the default `resolveGroupName` runs. The tag `pet`
+      // must produce `PetClient` (not `Pet`) so the barrel never collides with the
+      // `Pet` schema model. See https://github.com/kubb-labs/plugins/issues/331.
+      name: 'defaultGroupName',
+      options: {
+        sdk: {
+          className: 'PetStoreClient',
+        },
+      } as Partial<PluginClient['resolvedOptions']>,
+    },
   ] as const satisfies Array<{ name: string; options: Partial<PluginClient['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

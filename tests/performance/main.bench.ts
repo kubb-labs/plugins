@@ -43,7 +43,7 @@ describe('Plugin Generation Performance', () => {
               path: 'types',
               barrel: false,
             },
-            enumType: 'asConst',
+            enum: { type: 'asConst' },
           }),
         ] as Plugin[],
       })
@@ -76,7 +76,7 @@ describe('Plugin Generation Performance', () => {
               path: 'types',
               barrel: false,
             },
-            enumType: 'asConst',
+            enum: { type: 'asConst' },
           }),
           pluginClient({
             output: {
@@ -114,7 +114,7 @@ describe('Plugin Generation Performance', () => {
               path: 'types',
               barrel: false,
             },
-            enumType: 'asConst',
+            enum: { type: 'asConst' },
           }),
           pluginClient({
             output: {

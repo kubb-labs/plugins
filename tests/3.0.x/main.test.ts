@@ -280,7 +280,7 @@ const configs = [
             path: './types',
             barrel: false,
           },
-          enumType: 'asConst',
+          enum: { type: 'asConst' },
         }),
       ],
     },

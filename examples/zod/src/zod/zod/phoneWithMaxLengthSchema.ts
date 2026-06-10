@@ -8,4 +8,4 @@ import { phoneNumberSchema } from './phoneNumberSchema.ts'
 
 export const phoneWithMaxLengthSchema = phoneNumberSchema.max(15)
 
-export type PhoneWithMaxLengthSchema = z.infer<typeof phoneWithMaxLengthSchema>
+export type PhoneWithMaxLengthSchemaType = z.infer<typeof phoneWithMaxLengthSchema>

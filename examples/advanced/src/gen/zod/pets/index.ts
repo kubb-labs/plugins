@@ -1,12 +1,12 @@
 export type {
-  CreatePetsDataSchema,
-  CreatePetsHeaderXEXAMPLESchema,
-  CreatePetsPathUuidSchema,
-  CreatePetsQueryBoolParamSchema,
-  CreatePetsQueryOffsetSchema,
-  CreatePetsResponseSchema,
-  CreatePetsStatus201Schema,
-  CreatePetsStatusDefaultSchema,
+  CreatePetsDataSchemaType,
+  CreatePetsHeaderXEXAMPLESchemaType,
+  CreatePetsPathUuidSchemaType,
+  CreatePetsQueryBoolParamSchemaType,
+  CreatePetsQueryOffsetSchemaType,
+  CreatePetsResponseSchemaType,
+  CreatePetsStatus201SchemaType,
+  CreatePetsStatusDefaultSchemaType,
 } from './createPetsSchema.ts'
 export {
   createPetsDataSchema,

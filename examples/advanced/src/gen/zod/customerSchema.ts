@@ -9,4 +9,4 @@ export const customerSchema = z.object({
   address: z.array(addressSchema).optional(),
 })
 
-export type CustomerSchema = z.infer<typeof customerSchema>
+export type CustomerSchemaType = z.infer<typeof customerSchema>

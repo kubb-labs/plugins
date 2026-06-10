@@ -3,20 +3,20 @@ import { apiResponseSchema } from '../apiResponseSchema.ts'
 
 export const uploadFilePathPetIdSchema = z.int().describe('ID of pet to update')
 
-export type UploadFilePathPetIdSchema = z.infer<typeof uploadFilePathPetIdSchema>
+export type UploadFilePathPetIdSchemaType = z.infer<typeof uploadFilePathPetIdSchema>
 
 export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().describe('Additional Metadata')
 
-export type UploadFileQueryAdditionalMetadataSchema = z.infer<typeof uploadFileQueryAdditionalMetadataSchema>
+export type UploadFileQueryAdditionalMetadataSchemaType = z.infer<typeof uploadFileQueryAdditionalMetadataSchema>
 
 export const uploadFileStatus200Schema = apiResponseSchema
 
-export type UploadFileStatus200Schema = z.infer<typeof uploadFileStatus200Schema>
+export type UploadFileStatus200SchemaType = z.infer<typeof uploadFileStatus200Schema>
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
-export type UploadFileResponseSchema = z.infer<typeof uploadFileResponseSchema>
+export type UploadFileResponseSchemaType = z.infer<typeof uploadFileResponseSchema>
 
 export const uploadFileDataSchema = z.instanceof(File)
 
-export type UploadFileDataSchema = z.infer<typeof uploadFileDataSchema>
+export type UploadFileDataSchemaType = z.infer<typeof uploadFileDataSchema>

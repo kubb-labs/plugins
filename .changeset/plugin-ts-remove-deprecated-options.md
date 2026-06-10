@@ -11,3 +11,4 @@
 | `integerType` | `adapterOas({ integerType })` |
 | `unknownType` | `adapterOas({ unknownType })` |
 | `emptySchemaType` | `adapterOas({ emptySchemaType })` |
+| `contentType` | `adapterOas({ contentType })` |

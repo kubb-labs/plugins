@@ -7,4 +7,4 @@ import { z } from '../../zod.ts'
 
 export const petStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
 
-export type PetStatusEnumSchema = z.infer<typeof petStatusEnumSchema>
+export type PetStatusEnumSchemaType = z.infer<typeof petStatusEnumSchema>

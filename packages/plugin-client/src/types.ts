@@ -21,7 +21,12 @@ export type ResolverClient = Resolver & {
    */
   resolveClassName(this: ResolverClient, name: string): string
   /**
-   * Resolves the generated class name for tag-based client groups.
+   * Resolves the generated class name for tag-based client groups. The default
+   * appends a `Client` suffix (tag `pet` becomes `PetClient`) so the class never
+   * collides with the schema model of the same name in the barrel.
+   *
+   * @example Resolving tag-group class names
+   * `resolver.resolveGroupName('pet') // -> 'PetClient'`
    */
   resolveGroupName(this: ResolverClient, name: string): string
   /**
@@ -206,8 +211,8 @@ export type Options = {
    *   sdk: { className: 'PetStoreSDK' },
    * })
    * // class PetStoreSDK {
-   * //   readonly pet: pet
-   * //   readonly store: store
+   * //   readonly petClient: PetClient
+   * //   readonly storeClient: StoreClient
    * //   constructor(config = {}) { ... }
    * // }
    * ```

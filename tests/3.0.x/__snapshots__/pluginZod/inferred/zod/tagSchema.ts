@@ -8,4 +8,4 @@ import { categorySchema } from './categorySchema.ts'
 
 export const tagSchema = categorySchema
 
-export type TagSchema = z.infer<typeof tagSchema>
+export type TagSchemaType = z.infer<typeof tagSchema>

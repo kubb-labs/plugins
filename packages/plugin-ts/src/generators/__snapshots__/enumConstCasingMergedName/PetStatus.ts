@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-export const EnumNamesType = {
+export const PetStatus = {
   available: 'available',
   pending: 'pending',
   sold: 'sold',
 } as const
 
-export type EnumNamesTypeEnumKey = (typeof EnumNamesType)[keyof typeof EnumNamesType]
+export type PetStatus = (typeof PetStatus)[keyof typeof PetStatus]

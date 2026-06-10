@@ -3,32 +3,32 @@ import { userSchema } from '../userSchema.ts'
 
 export const createUserStatusDefaultSchemaJson = userSchema
 
-export type CreateUserStatusDefaultSchemaJson = z.infer<typeof createUserStatusDefaultSchemaJson>
+export type CreateUserStatusDefaultSchemaJsonType = z.infer<typeof createUserStatusDefaultSchemaJson>
 
 export const createUserStatusDefaultSchemaXml = userSchema
 
-export type CreateUserStatusDefaultSchemaXml = z.infer<typeof createUserStatusDefaultSchemaXml>
+export type CreateUserStatusDefaultSchemaXmlType = z.infer<typeof createUserStatusDefaultSchemaXml>
 
 export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSchemaJson, createUserStatusDefaultSchemaXml])
 
-export type CreateUserStatusDefaultSchema = z.infer<typeof createUserStatusDefaultSchema>
+export type CreateUserStatusDefaultSchemaType = z.infer<typeof createUserStatusDefaultSchema>
 
 export const createUserResponseSchema = createUserStatusDefaultSchema
 
-export type CreateUserResponseSchema = z.infer<typeof createUserResponseSchema>
+export type CreateUserResponseSchemaType = z.infer<typeof createUserResponseSchema>
 
 export const createUserDataSchemaJson = userSchema.optional().describe('Created user object')
 
-export type CreateUserDataSchemaJson = z.infer<typeof createUserDataSchemaJson>
+export type CreateUserDataSchemaJsonType = z.infer<typeof createUserDataSchemaJson>
 
 export const createUserDataSchemaXml = userSchema.optional().describe('Created user object')
 
-export type CreateUserDataSchemaXml = z.infer<typeof createUserDataSchemaXml>
+export type CreateUserDataSchemaXmlType = z.infer<typeof createUserDataSchemaXml>
 
 export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Created user object')
 
-export type CreateUserDataSchemaFormUrlEncoded = z.infer<typeof createUserDataSchemaFormUrlEncoded>
+export type CreateUserDataSchemaFormUrlEncodedType = z.infer<typeof createUserDataSchemaFormUrlEncoded>
 
 export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])
 
-export type CreateUserDataSchema = z.infer<typeof createUserDataSchema>
+export type CreateUserDataSchemaType = z.infer<typeof createUserDataSchema>

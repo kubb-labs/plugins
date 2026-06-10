@@ -10,36 +10,36 @@ import { petSchema } from './petSchema.ts'
 
 export const addPetStatus200SchemaJson = z.lazy(() => petSchema)
 
-export type AddPetStatus200SchemaJson = z.infer<typeof addPetStatus200SchemaJson>
+export type AddPetStatus200SchemaJsonType = z.infer<typeof addPetStatus200SchemaJson>
 
 export const addPetStatus200SchemaXml = z.lazy(() => petSchema)
 
-export type AddPetStatus200SchemaXml = z.infer<typeof addPetStatus200SchemaXml>
+export type AddPetStatus200SchemaXmlType = z.infer<typeof addPetStatus200SchemaXml>
 
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
-export type AddPetStatus200Schema = z.infer<typeof addPetStatus200Schema>
+export type AddPetStatus200SchemaType = z.infer<typeof addPetStatus200Schema>
 
 export const addPetStatus405Schema = petNotFoundSchema
 
-export type AddPetStatus405Schema = z.infer<typeof addPetStatus405Schema>
+export type AddPetStatus405SchemaType = z.infer<typeof addPetStatus405Schema>
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export type AddPetResponseSchema = z.infer<typeof addPetResponseSchema>
+export type AddPetResponseSchemaType = z.infer<typeof addPetResponseSchema>
 
 export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
-export type AddPetDataSchemaJson = z.infer<typeof addPetDataSchemaJson>
+export type AddPetDataSchemaJsonType = z.infer<typeof addPetDataSchemaJson>
 
 export const addPetDataSchemaXml = z.lazy(() => petSchema).describe('Create a new pet in the store')
 
-export type AddPetDataSchemaXml = z.infer<typeof addPetDataSchemaXml>
+export type AddPetDataSchemaXmlType = z.infer<typeof addPetDataSchemaXml>
 
 export const addPetDataSchemaFormUrlEncoded = z.lazy(() => petSchema).describe('Create a new pet in the store')
 
-export type AddPetDataSchemaFormUrlEncoded = z.infer<typeof addPetDataSchemaFormUrlEncoded>
+export type AddPetDataSchemaFormUrlEncodedType = z.infer<typeof addPetDataSchemaFormUrlEncoded>
 
 export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
-export type AddPetDataSchema = z.infer<typeof addPetDataSchema>
+export type AddPetDataSchemaType = z.infer<typeof addPetDataSchema>

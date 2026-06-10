@@ -62,7 +62,7 @@ const baseConfig = {
       group: {
         type: 'tag',
       },
-      enumType: 'asConst',
+      enum: { type: 'asConst' },
     }),
     pluginReactQuery({
       output: {

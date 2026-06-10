@@ -8,20 +8,20 @@ import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
 export const getThingsQueryLimitSchema = z.int().min(1).max(100).optional().default(100).describe('Maximum number of things to return')
 
-export type GetThingsQueryLimitSchema = z.infer<typeof getThingsQueryLimitSchema>
+export type GetThingsQueryLimitSchemaType = z.infer<typeof getThingsQueryLimitSchema>
 
 export const getThingsQuerySkipSchema = z.int().min(0).optional().default(0).describe('Number of things to skip')
 
-export type GetThingsQuerySkipSchema = z.infer<typeof getThingsQuerySkipSchema>
+export type GetThingsQuerySkipSchemaType = z.infer<typeof getThingsQuerySkipSchema>
 
 export const getThingsStatus201Schema = z.any()
 
-export type GetThingsStatus201Schema = z.infer<typeof getThingsStatus201Schema>
+export type GetThingsStatus201SchemaType = z.infer<typeof getThingsStatus201Schema>
 
 export const getThingsStatusDefaultSchema = petNotFoundSchema.describe('Pet not found')
 
-export type GetThingsStatusDefaultSchema = z.infer<typeof getThingsStatusDefaultSchema>
+export type GetThingsStatusDefaultSchemaType = z.infer<typeof getThingsStatusDefaultSchema>
 
 export const getThingsResponseSchema = z.union([getThingsStatus201Schema, getThingsStatusDefaultSchema])
 
-export type GetThingsResponseSchema = z.infer<typeof getThingsResponseSchema>
+export type GetThingsResponseSchemaType = z.infer<typeof getThingsResponseSchema>

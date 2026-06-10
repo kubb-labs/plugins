@@ -8,28 +8,28 @@ import { orderSchema } from './orderSchema.ts'
 
 export const placeOrderStatus200Schema = orderSchema
 
-export type PlaceOrderStatus200Schema = z.infer<typeof placeOrderStatus200Schema>
+export type PlaceOrderStatus200SchemaType = z.infer<typeof placeOrderStatus200Schema>
 
 export const placeOrderStatus405Schema = z.any()
 
-export type PlaceOrderStatus405Schema = z.infer<typeof placeOrderStatus405Schema>
+export type PlaceOrderStatus405SchemaType = z.infer<typeof placeOrderStatus405Schema>
 
 export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
 
-export type PlaceOrderResponseSchema = z.infer<typeof placeOrderResponseSchema>
+export type PlaceOrderResponseSchemaType = z.infer<typeof placeOrderResponseSchema>
 
 export const placeOrderDataSchemaJson = orderSchema.optional()
 
-export type PlaceOrderDataSchemaJson = z.infer<typeof placeOrderDataSchemaJson>
+export type PlaceOrderDataSchemaJsonType = z.infer<typeof placeOrderDataSchemaJson>
 
 export const placeOrderDataSchemaXml = orderSchema.optional()
 
-export type PlaceOrderDataSchemaXml = z.infer<typeof placeOrderDataSchemaXml>
+export type PlaceOrderDataSchemaXmlType = z.infer<typeof placeOrderDataSchemaXml>
 
 export const placeOrderDataSchemaFormUrlEncoded = orderSchema.optional()
 
-export type PlaceOrderDataSchemaFormUrlEncoded = z.infer<typeof placeOrderDataSchemaFormUrlEncoded>
+export type PlaceOrderDataSchemaFormUrlEncodedType = z.infer<typeof placeOrderDataSchemaFormUrlEncoded>
 
 export const placeOrderDataSchema = z.union([placeOrderDataSchemaJson, placeOrderDataSchemaXml, placeOrderDataSchemaFormUrlEncoded])
 
-export type PlaceOrderDataSchema = z.infer<typeof placeOrderDataSchema>
+export type PlaceOrderDataSchemaType = z.infer<typeof placeOrderDataSchema>

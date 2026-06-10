@@ -14,7 +14,7 @@ import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { mergeConfig } from '@kubb/plugin-client/clients/axios'
 
-export class User {
+export class UserClient {
   #config: Partial<RequestConfig> & { client?: Client }
 
   constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {

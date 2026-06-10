@@ -466,7 +466,7 @@ options:
     required: false
     default: 'false'
     description: |
-      Exports a `z.infer<typeof schema>` type alias next to every generated schema.
+      Exports a `z.infer<typeof schema>` type alias next to every generated schema. The alias is the PascalCased schema name with a `SchemaType` suffix (`petSchema` → `PetSchemaType`), so the schema value and its inferred type never share an identifier, even for all-uppercase names like `SUV` or `URL`.
 
       Use this when you want one source of truth (the Zod schema) and a TypeScript type derived from it, instead of importing types separately from `@kubb/plugin-ts`.
     codeBlock:
@@ -480,7 +480,7 @@ options:
           status: z.enum(['available', 'pending', 'sold']).optional(),
         })
 
-        export type Pet = z.infer<typeof petSchema>
+        export type PetSchemaType = z.infer<typeof petSchema>
   - name: integerType
     warning: |
       Moved to [`adapterOas`](/adapters/adapter-oas#integerType). Use `adapterOas({ integerType })` instead.

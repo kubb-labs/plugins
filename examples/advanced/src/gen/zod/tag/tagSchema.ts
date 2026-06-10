@@ -3,4 +3,4 @@ import { categorySchema } from '../categorySchema.ts'
 
 export const tagTagSchema = categorySchema
 
-export type TagTagSchema = z.infer<typeof tagTagSchema>
+export type TagTagSchemaType = z.infer<typeof tagTagSchema>

@@ -87,7 +87,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
     const controllers = nodes.reduce((acc, operationNode) => {
       if (!ast.isHttpOperationNode(operationNode)) return acc
       const tag = operationNode.tags[0]
-      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveGroupName('Client')
+      const groupName = tag ? (group?.name?.({ group: camelCase(tag) }) ?? resolver.resolveGroupName(tag)) : resolver.resolveClassName('Client')
 
       if (!tag && !group) {
         const name = resolver.resolveClassName('ApiClient')

@@ -31,12 +31,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
     const schemaName = node.name
     const mode = ctx.getMode(output)
     const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
-    const tsEnumType = pluginTs.options?.enumType
-    const tsEnumTypeSuffix = pluginTs.options?.enumTypeSuffix ?? 'Key'
+    const tsEnumType = pluginTs.options?.enum?.type
+    const tsEnumTypeSuffix = pluginTs.options?.enum?.typeSuffix ?? 'Key'
     const schemaTypeName =
-      isEnumSchema && (tsEnumType === 'asConst' || tsEnumType === 'asPascalConst')
-        ? tsResolver.resolveEnumKeyName({ name: schemaName }, tsEnumTypeSuffix)
-        : tsResolver.resolveTypeName(schemaName)
+      isEnumSchema && tsEnumType === 'asConst' ? tsResolver.resolveEnumKeyName({ name: schemaName }, tsEnumTypeSuffix) : tsResolver.resolveTypeName(schemaName)
     const meta = {
       name: resolver.resolveName(schemaName),
       file: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }),

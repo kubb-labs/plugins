@@ -7,20 +7,20 @@ import * as z from 'zod'
 
 export const updatePetWithFormPathPetIdSchema = z.bigint().describe('ID of pet that needs to be updated')
 
-export type UpdatePetWithFormPathPetIdSchema = z.infer<typeof updatePetWithFormPathPetIdSchema>
+export type UpdatePetWithFormPathPetIdSchemaType = z.infer<typeof updatePetWithFormPathPetIdSchema>
 
 export const updatePetWithFormQueryNameSchema = z.string().optional().describe('Name of pet that needs to be updated')
 
-export type UpdatePetWithFormQueryNameSchema = z.infer<typeof updatePetWithFormQueryNameSchema>
+export type UpdatePetWithFormQueryNameSchemaType = z.infer<typeof updatePetWithFormQueryNameSchema>
 
 export const updatePetWithFormQueryStatusSchema = z.string().optional().describe('Status of pet that needs to be updated')
 
-export type UpdatePetWithFormQueryStatusSchema = z.infer<typeof updatePetWithFormQueryStatusSchema>
+export type UpdatePetWithFormQueryStatusSchemaType = z.infer<typeof updatePetWithFormQueryStatusSchema>
 
 export const updatePetWithFormStatus405Schema = z.any()
 
-export type UpdatePetWithFormStatus405Schema = z.infer<typeof updatePetWithFormStatus405Schema>
+export type UpdatePetWithFormStatus405SchemaType = z.infer<typeof updatePetWithFormStatus405Schema>
 
 export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema
 
-export type UpdatePetWithFormResponseSchema = z.infer<typeof updatePetWithFormResponseSchema>
+export type UpdatePetWithFormResponseSchemaType = z.infer<typeof updatePetWithFormResponseSchema>
