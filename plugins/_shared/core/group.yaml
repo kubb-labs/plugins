@@ -24,22 +24,21 @@ examples:
             output: { path: './src/gen' },
             plugins: [
               pluginTs({
-                group: {
-                  type: 'tag',
-                  name: ({ group }) => `${group}Controller`,
-                },
+                group: { type: 'tag' },
               }),
             ],
           })
 body: |
-  With the configuration above, the generator emits:
+  With the configuration above, the generator emits one folder per tag, named after the camelCased tag:
 
   ```text
   src/gen/
-  ├── petController/
+  ├── pet/
   │   ├── AddPet.ts
   │   └── GetPet.ts
-  └── storeController/
+  └── store/
       ├── CreateStore.ts
       └── GetStoreById.ts
   ```
+
+  Pass `group.name` to customize the folder name, for example `name: ({ group }) => \`${group}Controller\`` to keep the pre-v5 `petController/` layout.

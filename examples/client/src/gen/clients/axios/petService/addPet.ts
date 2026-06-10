@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../../models/ts/petController/AddPet.js'
+import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../../models/ts/pet/AddPet.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getAddPetUrl() {

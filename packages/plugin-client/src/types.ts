@@ -206,8 +206,8 @@ export type Options = {
    *   sdk: { className: 'PetStoreSDK' },
    * })
    * // class PetStoreSDK {
-   * //   readonly petController: petController
-   * //   readonly storeController: storeController
+   * //   readonly pet: pet
+   * //   readonly store: store
    * //   constructor(config = {}) { ... }
    * // }
    * ```

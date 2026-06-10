@@ -22,7 +22,7 @@ export type {
   AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
-} from './petController/AddPet.js'
+} from './pet/AddPet.js'
 export type {
   DeletePetHeaderApiKey,
   DeletePetPathPetId,
@@ -30,7 +30,7 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus400,
-} from './petController/DeletePet.js'
+} from './pet/DeletePet.js'
 export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
@@ -40,7 +40,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
-} from './petController/FindPetsByStatus.js'
+} from './pet/FindPetsByStatus.js'
 export type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
@@ -52,7 +52,7 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
-} from './petController/FindPetsByTags.js'
+} from './pet/FindPetsByTags.js'
 export type {
   GetPetByIdPathPetId,
   GetPetByIdRequestConfig,
@@ -63,7 +63,7 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-} from './petController/GetPetById.js'
+} from './pet/GetPetById.js'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -78,7 +78,7 @@ export type {
   UpdatePetStatus404,
   UpdatePetStatus405,
   UpdatePetXmlData,
-} from './petController/UpdatePet.js'
+} from './pet/UpdatePet.js'
 export type {
   UpdatePetWithFormPathPetId,
   UpdatePetWithFormQueryName,
@@ -87,7 +87,7 @@ export type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
-} from './petController/UpdatePetWithForm.js'
+} from './pet/UpdatePetWithForm.js'
 export type {
   UploadFileData,
   UploadFileFormData,
@@ -98,7 +98,7 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-} from './petController/UploadFile.js'
+} from './pet/UploadFile.js'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -106,8 +106,8 @@ export type {
   DeleteOrderResponses,
   DeleteOrderStatus400,
   DeleteOrderStatus404,
-} from './storeController/DeleteOrder.js'
-export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './storeController/GetInventory.js'
+} from './store/DeleteOrder.js'
+export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './store/GetInventory.js'
 export type {
   GetOrderByIdPathOrderId,
   GetOrderByIdRequestConfig,
@@ -118,7 +118,7 @@ export type {
   GetOrderByIdStatus200Xml,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
-} from './storeController/GetOrderById.js'
+} from './store/GetOrderById.js'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -129,7 +129,7 @@ export type {
   PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
-} from './storeController/PlaceOrder.js'
+} from './store/PlaceOrder.js'
 export type {
   PlaceOrderPatchData,
   PlaceOrderPatchFormUrlEncodedData,
@@ -140,7 +140,7 @@ export type {
   PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
-} from './storeController/PlaceOrderPatch.js'
+} from './store/PlaceOrderPatch.js'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -152,7 +152,7 @@ export type {
   CreateUserStatusDefaultJson,
   CreateUserStatusDefaultXml,
   CreateUserXmlData,
-} from './userController/CreateUser.js'
+} from './user/CreateUser.js'
 export type {
   CreateUsersWithListInputData,
   CreateUsersWithListInputRequestConfig,
@@ -162,7 +162,7 @@ export type {
   CreateUsersWithListInputStatus200Json,
   CreateUsersWithListInputStatus200Xml,
   CreateUsersWithListInputStatusDefault,
-} from './userController/CreateUsersWithListInput.js'
+} from './user/CreateUsersWithListInput.js'
 export type {
   DeleteUserPathUsername,
   DeleteUserRequestConfig,
@@ -170,7 +170,7 @@ export type {
   DeleteUserResponses,
   DeleteUserStatus400,
   DeleteUserStatus404,
-} from './userController/DeleteUser.js'
+} from './user/DeleteUser.js'
 export type {
   GetUserByNamePathUsername,
   GetUserByNameRequestConfig,
@@ -181,7 +181,7 @@ export type {
   GetUserByNameStatus200Xml,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-} from './userController/GetUserByName.js'
+} from './user/GetUserByName.js'
 export type {
   LoginUserQueryPassword,
   LoginUserQueryUsername,
@@ -192,8 +192,8 @@ export type {
   LoginUserStatus200Json,
   LoginUserStatus200Xml,
   LoginUserStatus400,
-} from './userController/LoginUser.js'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './userController/LogoutUser.js'
+} from './user/LoginUser.js'
+export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './user/LogoutUser.js'
 export type {
   UpdateUserData,
   UpdateUserFormUrlEncodedData,
@@ -204,6 +204,6 @@ export type {
   UpdateUserResponses,
   UpdateUserStatusDefault,
   UpdateUserXmlData,
-} from './userController/UpdateUser.js'
+} from './user/UpdateUser.js'
 export { orderHttpStatusEnum, orderStatusEnum } from './Order.js'
 export { petStatusEnum } from './PetStatusEnum.js'

@@ -65,7 +65,7 @@ options:
       - name: name
         type: '(context: GroupContext) => string'
         required: false
-        default: "(ctx) => `${ctx.group}Controller`"
+        default: "(ctx) => `${ctx.group}`"
         description: |
           Function that turns a group key (the operation's first tag) into a folder/identifier name.
 
@@ -479,10 +479,7 @@ examples:
               pluginTs({
                 output: { path: './types' },
                 exclude: [{ type: 'tag', pattern: 'store' }],
-                group: {
-                  type: 'tag',
-                  name: ({ group }) => `${group}Controller`,
-                },
+                group: { type: 'tag' },
                 enumType: 'asConst',
                 optionalType: 'questionTokenAndUndefined',
                 paramsCasing: 'camelcase',

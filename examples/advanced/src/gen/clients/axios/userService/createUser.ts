@@ -1,7 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { CreateUserData, CreateUserResponse } from '../../../models/ts/userController/CreateUser.ts'
-import { createUserResponseSchema, createUserDataSchema } from '../../../zod/userController/createUserSchema.ts'
+import type { CreateUserData, CreateUserResponse } from '../../../models/ts/user/CreateUser.ts'
+import { createUserResponseSchema, createUserDataSchema } from '../../../zod/user/createUserSchema.ts'
 
 export function getCreateUserUrl() {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/user` as const }

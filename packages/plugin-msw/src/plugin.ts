@@ -53,7 +53,7 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
+  const groupConfig = createGroupConfig(group)
 
   return {
     name: pluginMswName,

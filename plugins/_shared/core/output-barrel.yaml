@@ -86,11 +86,11 @@ examples:
         twoslash: false
         code: |
           src/gen/types/
-          ├── index.ts          # re-exports ./petController and ./storeController
-          ├── petController/
+          ├── index.ts          # re-exports ./pet and ./store
+          ├── pet/
           │   ├── index.ts      # re-exports Pet, Store, ...
           │   └── Pet.ts
-          └── storeController/
+          └── store/
               ├── index.ts
               └── Store.ts
   - name: 'false'

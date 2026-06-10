@@ -7,8 +7,8 @@ import type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
-} from '../../../models/ts/petController/FindPetsByTags.ts'
-import { findPetsByTagsResponseSchema } from '../../../zod/petController/findPetsByTagsSchema.ts'
+} from '../../../models/ts/pet/FindPetsByTags.ts'
+import { findPetsByTagsResponseSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
 
 export function getFindPetsByTagsUrl() {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/findByTags` as const }

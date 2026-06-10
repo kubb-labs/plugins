@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { AddFilesData, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/petController/AddFiles.ts'
+import type { AddFilesData, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/pet/AddFiles.ts'
 import { buildFormData } from '../../../.kubb/config.ts'
 
 export function getAddFilesUrl() {

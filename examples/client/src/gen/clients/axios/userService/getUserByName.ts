@@ -6,7 +6,7 @@ import type {
   GetUserByNameStatus200,
   GetUserByNameStatus400,
   GetUserByNameStatus404,
-} from '../../../models/ts/userController/GetUserByName.js'
+} from '../../../models/ts/user/GetUserByName.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetUserByNameUrl({ username }: { username: GetUserByNamePathUsername }) {

@@ -6,22 +6,20 @@ import type { Group } from '@kubb/core'
  * shared default naming so every plugin groups output consistently:
  *
  * - `path` groups use the second path segment (`/pet/findByStatus` → `pet`).
- * - other groups use `${camelCase(group)}${suffix}` (e.g. `petController`).
+ * - other groups use the camelCased group (`pet store` → `petStore`).
  *
  * A user-provided `group.name` always wins over the default namer, so callers stay in
  * control of their output folders. Returns `null` when grouping is disabled, matching the
  * per-plugin convention.
  *
  * @param group - The user-supplied group option, or `undefined` to disable grouping.
- * @param options.suffix - Appended to non-`path` group names, e.g. `'Controller'` or `'Requests'`.
  *
  * @example
  * ```ts
- * createGroupConfig(group, { suffix: 'Controller' }) // plugin-ts, plugin-client, …
- * createGroupConfig(group, { suffix: 'Requests' })   // plugin-cypress, plugin-mcp
+ * createGroupConfig(group) // shared across every plugin
  * ```
  */
-export function createGroupConfig(group: Group | undefined, options: { suffix: string }): Group | null {
+export function createGroupConfig(group: Group | undefined): Group | null {
   if (!group) {
     return null
   }
@@ -31,7 +29,7 @@ export function createGroupConfig(group: Group | undefined, options: { suffix: s
       return `${ctx.group.split('/')[1]}`
     }
 
-    return `${camelCase(ctx.group)}${options.suffix}`
+    return camelCase(ctx.group)
   }
 
   return {

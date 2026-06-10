@@ -57,7 +57,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     generators: userGenerators = [],
   } = options
 
-  const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
+  const groupConfig = createGroupConfig(group)
 
   return {
     name: pluginZodName,

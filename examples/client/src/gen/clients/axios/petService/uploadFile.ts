@@ -1,12 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type {
-  UploadFilePathPetId,
-  UploadFileQueryAdditionalMetadata,
-  UploadFileData,
-  UploadFileStatus200,
-} from '../../../models/ts/petController/UploadFile.js'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from '../../../.kubb/config.js'
 

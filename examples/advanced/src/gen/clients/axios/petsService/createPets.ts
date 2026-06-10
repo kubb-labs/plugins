@@ -7,8 +7,8 @@ import type {
   CreatePetsHeaderXEXAMPLE,
   CreatePetsData,
   CreatePetsStatus201,
-} from '../../../models/ts/petsController/CreatePets.ts'
-import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/petsController/createPetsSchema.ts'
+} from '../../../models/ts/pets/CreatePets.ts'
+import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/pets/createPetsSchema.ts'
 
 export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathUuid }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${uuid}` as const }
