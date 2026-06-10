@@ -1,7 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.ts'
-import { uploadFileResponseSchema, uploadFileDataSchema } from '../../../zod/pet/uploadFileSchema.ts'
 
 export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}/uploadImage` as const }
@@ -19,7 +18,7 @@ export async function uploadFile(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = uploadFileDataSchema.parse(data)
+  const requestData = data
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
@@ -30,5 +29,5 @@ export async function uploadFile(
     headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })
 
-  return { ...res, data: uploadFileResponseSchema.parse(res.data) }
+  return res as { status: 200; data: UploadFileStatus200; statusText: string }
 }

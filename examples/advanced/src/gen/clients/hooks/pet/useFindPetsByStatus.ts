@@ -1,4 +1,4 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type { FindPetsByStatusPathStepId, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
@@ -15,9 +15,9 @@ export function findPetsByStatusQueryOptions(
 ) {
   const queryKey = findPetsByStatusQueryKey({ stepId })
   return queryOptions<
-    ResponseConfig<FindPetsByStatusStatus200>,
+    { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
     ResponseErrorConfig<FindPetsByStatusStatus400>,
-    ResponseConfig<FindPetsByStatusStatus200>,
+    { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
     typeof queryKey
   >({
     enabled: !!stepId,
@@ -34,14 +34,20 @@ export function findPetsByStatusQueryOptions(
  * {@link /pet/findByStatus/:step_id}
  */
 export function useFindPetsByStatus<
-  TData = ResponseConfig<FindPetsByStatusStatus200>,
-  TQueryData = ResponseConfig<FindPetsByStatusStatus200>,
+  TData = { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
+  TQueryData = { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
   { stepId }: { stepId?: FindPetsByStatusPathStepId } = {},
   options: {
     query?: Partial<
-      QueryObserverOptions<ResponseConfig<FindPetsByStatusStatus200>, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>
+      QueryObserverOptions<
+        { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
+        ResponseErrorConfig<FindPetsByStatusStatus400>,
+        TData,
+        TQueryData,
+        TQueryKey
+      >
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
