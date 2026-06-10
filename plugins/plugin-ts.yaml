@@ -57,7 +57,11 @@ options:
       - extends: ./_shared/core/output-footer.yaml
       - extends: ./_shared/core/output-override.yaml
 
-  - extends: ./_shared/core/content-type.yaml
+  - name: contentType
+    required: false
+    description: ''
+    warning: |
+      Moved to [`adapterOas`](/adapters/adapter-oas#contentType). Use `adapterOas({ contentType })` instead.
 
   - extends: ./_shared/core/group.yaml
     properties:
