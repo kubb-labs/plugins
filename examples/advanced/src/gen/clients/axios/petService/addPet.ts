@@ -1,6 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
+import type { z } from 'zod'
 import { addPetResponseSchema, addPetDataSchema } from '../../../zod/pet/addPetSchema.ts'
 
 export function getAddPetUrl() {
@@ -25,7 +26,7 @@ export async function addPet(
 
   const requestData = addPetDataSchema.parse(data)
 
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
+  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, z.output<typeof addPetDataSchema>>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
     data: requestData,

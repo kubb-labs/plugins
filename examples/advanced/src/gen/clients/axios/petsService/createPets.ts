@@ -8,6 +8,7 @@ import type {
   CreatePetsData,
   CreatePetsStatus201,
 } from '../../../models/ts/pets/CreatePets.ts'
+import type { z } from 'zod'
 import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/pets/createPetsSchema.ts'
 
 export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathUuid }) {
@@ -42,7 +43,7 @@ export async function createPets(
 
   const requestData = createPetsDataSchema.parse(data)
 
-  const res = await request<CreatePetsStatus201, ResponseErrorConfig<Error>, CreatePetsData>({
+  const res = await request<CreatePetsStatus201, ResponseErrorConfig<Error>, z.output<typeof createPetsDataSchema>>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,
