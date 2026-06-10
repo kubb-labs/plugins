@@ -37,8 +37,10 @@
   },
   "changesets": [
     "circular-schema-detection-shared",
+    "clean-raw-generated-whitespace",
     "client-banner-aggregation-context",
     "client-parser-false",
+    "client-tag-class-client-suffix",
     "consolidate-jsx-renderer",
     "consume-ast-utils",
     "core-plugins-beta-12-alignment",
@@ -48,6 +50,7 @@
     "fix-group-name-callback-ts-zod",
     "fix-mcp-singleton",
     "fix-object-header-serialization",
+    "fix-stale-barrel-type-defaults",
     "jolly-maps-taste",
     "kubb-core-beta-23-alignment",
     "kubb-core-beta-24-alignment",
