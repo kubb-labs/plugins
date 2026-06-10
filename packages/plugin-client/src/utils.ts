@@ -44,8 +44,12 @@ export function buildGenerics(
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName =
     options.dataReturnType === 'fullByStatus'
-      ? (allStatusNames.length > 0 ? allStatusNames.join(' | ') : tsResolver.resolveResponseName(node))
-      : (successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node))
+      ? allStatusNames.length > 0
+        ? allStatusNames.join(' | ')
+        : tsResolver.resolveResponseName(node)
+      : successNames.length > 0
+        ? successNames.join(' | ')
+        : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
