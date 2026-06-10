@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
+import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getDeletePetUrl(petId: DeletePetPathPetId) {
@@ -21,7 +21,7 @@ function getDeletePetUrl(petId: DeletePetPathPetId) {
 export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: getDeletePetUrl(petId).url.toString(), ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
+  const res = await request<DeletePetStatus400, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: getDeletePetUrl(petId).url.toString(), ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
-  return res
+  return res as { status: 400; data: DeletePetStatus400; statusText: string }
 }

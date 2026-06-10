@@ -5,8 +5,8 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '@kubb/plugin-client/clients/axios'
+import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
 export const getPetByIdQueryKey = (petId?: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
@@ -21,9 +21,9 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
+  const res = await request<GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
 
-  return res
+  return res as ({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string })
 }
 
 export function getPetByIdQueryOptions(petId?: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
@@ -40,7 +40,7 @@ export function getPetByIdQueryOptions(petId?: GetPetByIdPathPetId, config: Part
  * {@link /pet/:petId}
  */
 export function useGetPetById(petId?: GetPetByIdPathPetId, options: {
-  query?: SWRConfiguration<ResponseConfig<GetPetByIdResponse>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
+  query?: SWRConfiguration<({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string }), ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
   immutable?: boolean
@@ -49,7 +49,7 @@ export function useGetPetById(petId?: GetPetByIdPathPetId, options: {
 
   const queryKey = getPetByIdQueryKey(petId)
 
-  return useSWR<ResponseConfig<GetPetByIdResponse>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(
+  return useSWR<({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string }), ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(
    shouldFetch && !!(petId) ? queryKey : null,
    {
      ...getPetByIdQueryOptions(petId, config),

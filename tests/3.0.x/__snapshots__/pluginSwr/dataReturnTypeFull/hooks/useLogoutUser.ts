@@ -5,8 +5,8 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { LogoutUserResponse } from '../types/LogoutUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '@kubb/plugin-client/clients/axios'
+import type { LogoutUserStatusDefault } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
@@ -20,9 +20,9 @@ type LogoutUserQueryKey = ReturnType<typeof logoutUserQueryKey>
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
+  const res = await request<LogoutUserStatusDefault, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
-  return res
+  return res as { status: number; data: LogoutUserStatusDefault; statusText: string }
 }
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
@@ -38,7 +38,7 @@ export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client
  * {@link /user/logout}
  */
 export function useLogoutUser(options: {
-  query?: SWRConfiguration<ResponseConfig<LogoutUserResponse>, ResponseErrorConfig<Error>>,
+  query?: SWRConfiguration<{ status: number; data: LogoutUserStatusDefault; statusText: string }, ResponseErrorConfig<Error>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
   immutable?: boolean
@@ -47,7 +47,7 @@ export function useLogoutUser(options: {
 
   const queryKey = logoutUserQueryKey()
 
-  return useSWR<ResponseConfig<LogoutUserResponse>, ResponseErrorConfig<Error>, LogoutUserQueryKey | null>(
+  return useSWR<{ status: number; data: LogoutUserStatusDefault; statusText: string }, ResponseErrorConfig<Error>, LogoutUserQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...logoutUserQueryOptions(config),

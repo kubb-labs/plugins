@@ -5,8 +5,8 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '@kubb/plugin-client/clients/axios'
+import type { DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
@@ -21,9 +21,9 @@ export type DeleteUserMutationKey = ReturnType<typeof deleteUserMutationKey>
 export async function deleteUser(username: DeleteUserPathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
+  const res = await request<DeleteUserStatus400 | DeleteUserStatus404, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
 
-  return res
+  return res as ({ status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string })
 }
 
 export type DeleteUserMutationArg = { username: DeleteUserPathUsername }
@@ -34,14 +34,14 @@ export type DeleteUserMutationArg = { username: DeleteUserPathUsername }
  * {@link /user/:username}
  */
 export function useDeleteUser(options: {
-  mutation?: SWRMutationConfiguration<ResponseConfig<DeleteUserResponse>, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserMutationKey | null, DeleteUserMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<({ status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string }), ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserMutationKey | null, DeleteUserMutationArg> & { throwOnError?: boolean },
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = deleteUserMutationKey()
 
-  return useSWRMutation<ResponseConfig<DeleteUserResponse>, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
+  return useSWRMutation<({ status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string }), ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserMutationKey | null, DeleteUserMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { username } }) => {
       return deleteUser(username, config)

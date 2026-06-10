@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
+import type { UpdateUserPathUsername, UpdateUserData, UpdateUserStatusDefault } from '../types/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
@@ -23,7 +23,7 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
 
   const requestData = data
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: getUpdateUserUrl(username).url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserStatusDefault, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: getUpdateUserUrl(username).url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return res
+  return res as { status: number; data: UpdateUserStatusDefault; statusText: string }
 }

@@ -24,5 +24,5 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
-  return res
+  return res as { status: 200; data: UploadFileStatus200; statusText: string }
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/client'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type {
   FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
@@ -35,7 +35,7 @@ export async function findPetsByTagsSuspenseInfinite(
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return { ...res, data: FindPetsByTagsResponse.parse(res.data) }
+  return { ...res, data: FindPetsByTagsResponse.parse(res.data) } as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }
 
 export function findPetsByTagsSuspenseInfiniteQueryOptions(
@@ -44,9 +44,9 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey(params)
   return infiniteQueryOptions<
-    ResponseConfig<FindPetsByTagsStatus200>,
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
     ResponseErrorConfig<Error>,
-    InfiniteData<ResponseConfig<FindPetsByTagsStatus200>>,
+    InfiniteData<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }>,
     typeof queryKey,
     number
   >({
@@ -64,7 +64,7 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspenseInfinite<
-  TQueryFnData = ResponseConfig<FindPetsByTagsStatus200>,
+  TQueryFnData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TError = ResponseErrorConfig<Error>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,

@@ -23,7 +23,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const requestData = data
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: getAddPetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200 | AddPetStatus405, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: getAddPetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return res
+  return res as ({ status: 200; data: AddPetStatus200; statusText: string } | { status: 405; data: AddPetStatus405; statusText: string })
 }
