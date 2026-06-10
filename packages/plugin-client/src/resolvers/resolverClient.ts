@@ -13,6 +13,7 @@ import type { PluginClient } from '../types.ts'
  *
  * resolverClient.default('list pets', 'function') // 'listPets'
  * resolverClient.resolveClassName('pet')          // 'Pet'
+ * resolverClient.resolveGroupName('pet')          // 'PetClient'
  * resolverClient.resolveUrlName(operationNode)    // 'getShowPetByIdUrl'
  * ```
  */
@@ -33,7 +34,7 @@ export const resolverClient = defineResolver<PluginClient>(() => ({
     return ensureValidVarName(pascalCase(name))
   },
   resolveGroupName(name) {
-    return ensureValidVarName(pascalCase(name))
+    return ensureValidVarName(`${pascalCase(name)}Client`)
   },
   resolveClientPropertyName(name) {
     return ensureValidVarName(camelCase(name))

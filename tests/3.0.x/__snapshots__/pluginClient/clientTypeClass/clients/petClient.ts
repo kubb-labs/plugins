@@ -15,7 +15,7 @@ import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMeta
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { mergeConfig } from '@kubb/plugin-client/clients/axios'
 
-export class Pet {
+export class PetClient {
   #config: Partial<RequestConfig> & { client?: Client }
 
   constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {

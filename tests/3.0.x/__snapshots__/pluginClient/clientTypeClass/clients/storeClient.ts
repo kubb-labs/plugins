@@ -11,7 +11,7 @@ import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '.
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { mergeConfig } from '@kubb/plugin-client/clients/axios'
 
-export class Store {
+export class StoreClient {
   #config: Partial<RequestConfig> & { client?: Client }
 
   constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {

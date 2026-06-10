@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, type Config, createKubb, Diagnostics, fsStorage, type KubbHooks } from '@kubb/core'
+import { middlewareBarrel } from '@kubb/middleware-barrel'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -146,6 +147,29 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginClient({
           output: { path: './clients', barrel: false },
+          clientType: 'class',
+        }),
+      ],
+    },
+  },
+
+  // ─── clientType + barrel (regression: tag class must not collide with schema model) ─
+  // The petstore tag `pet` and schema `Pet` share a name. With the barrel middleware
+  // active, the root `index.ts` re-exports both; the tag class must be `PetClient` so the
+  // barrel typechecks without a TS2300 duplicate-identifier error. See issue #331.
+  {
+    name: 'clientTypeClassBarrel',
+    config: {
+      root: __dirname,
+      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      output: { path: './gen', barrel: { type: 'named' } },
+      adapter: adapterOas({ validate: false }),
+      parsers: [parserTs],
+      middleware: [middlewareBarrel()],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: { type: 'named' } } }),
+        pluginClient({
+          output: { path: './clients', barrel: { type: 'named' } },
           clientType: 'class',
         }),
       ],
