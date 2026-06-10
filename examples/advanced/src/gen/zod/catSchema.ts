@@ -8,4 +8,4 @@ export const catSchema = z
   })
   .strict()
 
-export type CatSchema = z.infer<typeof catSchema>
+export type CatSchemaType = z.infer<typeof catSchema>

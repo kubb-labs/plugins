@@ -15,7 +15,7 @@ export type ResolverZod = Resolver &
      * Resolves the schema type name (inferred type from schema).
      *
      * @example Schema type names
-     * `resolver.resolveSchemaTypeName('pet') // → 'Pet'`
+     * `resolver.resolveSchemaTypeName('pet') // → 'PetSchemaType'`
      */
     resolveSchemaTypeName(this: ResolverZod, name: string): string
     /**
@@ -30,14 +30,14 @@ export type ResolverZod = Resolver &
      * Resolves the inferred type name for the request (input) direction variant.
      *
      * @example Input schema type names
-     * `resolver.resolveInputSchemaTypeName('order') // → 'OrderInputSchema'`
+     * `resolver.resolveInputSchemaTypeName('order') // → 'OrderInputSchemaType'`
      */
     resolveInputSchemaTypeName(this: ResolverZod, name: string): string
     /**
      * Resolves the generated type name from the schema.
      *
      * @example Type names
-     * `resolver.resolveTypeName('pet') // → 'Pet'`
+     * `resolver.resolveTypeName('petSchema') // → 'PetSchemaType'`
      */
     resolveTypeName(this: ResolverZod, name: string): string
     /**

@@ -5,4 +5,4 @@ export const petNotFoundSchema = z.object({
   message: z.string().optional(),
 })
 
-export type PetNotFoundSchema = z.infer<typeof petNotFoundSchema>
+export type PetNotFoundSchemaType = z.infer<typeof petNotFoundSchema>

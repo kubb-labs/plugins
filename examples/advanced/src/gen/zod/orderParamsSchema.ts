@@ -6,4 +6,4 @@ export const orderParamsSchema = z.object({
   type: z.string(),
 })
 
-export type OrderParamsSchema = z.infer<typeof orderParamsSchema>
+export type OrderParamsSchemaType = z.infer<typeof orderParamsSchema>

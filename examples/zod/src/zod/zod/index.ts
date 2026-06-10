@@ -1,178 +1,193 @@
-export type { AddPetRequestSchema } from './addPetRequestSchema.ts'
+export type { AddPetRequestSchemaType } from './addPetRequestSchema.ts'
 export type {
-  AddPetDataSchema,
-  AddPetDataSchemaFormUrlEncoded,
-  AddPetDataSchemaJson,
-  AddPetDataSchemaXml,
-  AddPetResponseSchema,
-  AddPetStatus200Schema,
-  AddPetStatus200SchemaJson,
-  AddPetStatus200SchemaXml,
-  AddPetStatus405Schema,
+  AddPetDataSchemaFormUrlEncodedType,
+  AddPetDataSchemaJsonType,
+  AddPetDataSchemaType,
+  AddPetDataSchemaXmlType,
+  AddPetResponseSchemaType,
+  AddPetStatus200SchemaJsonType,
+  AddPetStatus200SchemaType,
+  AddPetStatus200SchemaXmlType,
+  AddPetStatus405SchemaType,
 } from './addPetSchema.ts'
-export type { AddressSchema } from './addressSchema.ts'
-export type { ApiResponseSchema } from './apiResponseSchema.ts'
-export type { CategorySchema } from './categorySchema.ts'
+export type { AddressSchemaType } from './addressSchema.ts'
+export type { ApiResponseSchemaType } from './apiResponseSchema.ts'
+export type { CategorySchemaType } from './categorySchema.ts'
 export type {
-  CreatePetsDataSchema,
-  CreatePetsHeaderXEXAMPLESchema,
-  CreatePetsPathUuidSchema,
-  CreatePetsQueryOffsetSchema,
-  CreatePetsResponseSchema,
-  CreatePetsStatus201Schema,
-  CreatePetsStatusDefaultSchema,
+  CreatePetsDataSchemaType,
+  CreatePetsHeaderXEXAMPLESchemaType,
+  CreatePetsPathUuidSchemaType,
+  CreatePetsQueryOffsetSchemaType,
+  CreatePetsResponseSchemaType,
+  CreatePetsStatus201SchemaType,
+  CreatePetsStatusDefaultSchemaType,
 } from './createPetsSchema.ts'
-export type { CreatePetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
+export type { CreatePetsXEXAMPLESchemaType } from './createPetsXEXAMPLESchema.ts'
 export type {
-  CreateUserDataSchema,
-  CreateUserDataSchemaFormUrlEncoded,
-  CreateUserDataSchemaJson,
-  CreateUserDataSchemaXml,
-  CreateUserResponseSchema,
-  CreateUserStatusDefaultSchema,
-  CreateUserStatusDefaultSchemaJson,
-  CreateUserStatusDefaultSchemaXml,
+  CreateUserDataSchemaFormUrlEncodedType,
+  CreateUserDataSchemaJsonType,
+  CreateUserDataSchemaType,
+  CreateUserDataSchemaXmlType,
+  CreateUserResponseSchemaType,
+  CreateUserStatusDefaultSchemaJsonType,
+  CreateUserStatusDefaultSchemaType,
+  CreateUserStatusDefaultSchemaXmlType,
 } from './createUserSchema.ts'
 export type {
-  CreateUsersWithListInputDataSchema,
-  CreateUsersWithListInputResponseSchema,
-  CreateUsersWithListInputStatus200Schema,
-  CreateUsersWithListInputStatus200SchemaJson,
-  CreateUsersWithListInputStatus200SchemaXml,
-  CreateUsersWithListInputStatusDefaultSchema,
+  CreateUsersWithListInputDataSchemaType,
+  CreateUsersWithListInputResponseSchemaType,
+  CreateUsersWithListInputStatus200SchemaJsonType,
+  CreateUsersWithListInputStatus200SchemaType,
+  CreateUsersWithListInputStatus200SchemaXmlType,
+  CreateUsersWithListInputStatusDefaultSchemaType,
 } from './createUsersWithListInputSchema.ts'
-export type { CustomerSchema } from './customerSchema.ts'
-export type { DeleteOrderPathOrderIdSchema, DeleteOrderResponseSchema, DeleteOrderStatus400Schema, DeleteOrderStatus404Schema } from './deleteOrderSchema.ts'
-export type { DeletePetHeaderApiKeySchema, DeletePetPathPetIdSchema, DeletePetResponseSchema, DeletePetStatus400Schema } from './deletePetSchema.ts'
-export type { DeleteUserPathUsernameSchema, DeleteUserResponseSchema, DeleteUserStatus400Schema, DeleteUserStatus404Schema } from './deleteUserSchema.ts'
+export type { CustomerSchemaType } from './customerSchema.ts'
 export type {
-  FindPetsByStatusQueryStatusSchema,
-  FindPetsByStatusResponseSchema,
-  FindPetsByStatusStatus200Schema,
-  FindPetsByStatusStatus200SchemaJson,
-  FindPetsByStatusStatus200SchemaXml,
-  FindPetsByStatusStatus400Schema,
+  DeleteOrderPathOrderIdSchemaType,
+  DeleteOrderResponseSchemaType,
+  DeleteOrderStatus400SchemaType,
+  DeleteOrderStatus404SchemaType,
+} from './deleteOrderSchema.ts'
+export type {
+  DeletePetHeaderApiKeySchemaType,
+  DeletePetPathPetIdSchemaType,
+  DeletePetResponseSchemaType,
+  DeletePetStatus400SchemaType,
+} from './deletePetSchema.ts'
+export type {
+  DeleteUserPathUsernameSchemaType,
+  DeleteUserResponseSchemaType,
+  DeleteUserStatus400SchemaType,
+  DeleteUserStatus404SchemaType,
+} from './deleteUserSchema.ts'
+export type {
+  FindPetsByStatusQueryStatusSchemaType,
+  FindPetsByStatusResponseSchemaType,
+  FindPetsByStatusStatus200SchemaJsonType,
+  FindPetsByStatusStatus200SchemaType,
+  FindPetsByStatusStatus200SchemaXmlType,
+  FindPetsByStatusStatus400SchemaType,
 } from './findPetsByStatusSchema.ts'
 export type {
-  FindPetsByTagsHeaderXEXAMPLESchema,
-  FindPetsByTagsQueryPageSchema,
-  FindPetsByTagsQueryPageSizeSchema,
-  FindPetsByTagsQueryTagsSchema,
-  FindPetsByTagsResponseSchema,
-  FindPetsByTagsStatus200Schema,
-  FindPetsByTagsStatus200SchemaJson,
-  FindPetsByTagsStatus200SchemaXml,
-  FindPetsByTagsStatus400Schema,
+  FindPetsByTagsHeaderXEXAMPLESchemaType,
+  FindPetsByTagsQueryPageSchemaType,
+  FindPetsByTagsQueryPageSizeSchemaType,
+  FindPetsByTagsQueryTagsSchemaType,
+  FindPetsByTagsResponseSchemaType,
+  FindPetsByTagsStatus200SchemaJsonType,
+  FindPetsByTagsStatus200SchemaType,
+  FindPetsByTagsStatus200SchemaXmlType,
+  FindPetsByTagsStatus400SchemaType,
 } from './findPetsByTagsSchema.ts'
-export type { GetInventoryResponseSchema, GetInventoryStatus200Schema } from './getInventorySchema.ts'
+export type { GetInventoryResponseSchemaType, GetInventoryStatus200SchemaType } from './getInventorySchema.ts'
 export type {
-  GetOrderByIdPathOrderIdSchema,
-  GetOrderByIdResponseSchema,
-  GetOrderByIdStatus200Schema,
-  GetOrderByIdStatus200SchemaJson,
-  GetOrderByIdStatus200SchemaXml,
-  GetOrderByIdStatus400Schema,
-  GetOrderByIdStatus404Schema,
+  GetOrderByIdPathOrderIdSchemaType,
+  GetOrderByIdResponseSchemaType,
+  GetOrderByIdStatus200SchemaJsonType,
+  GetOrderByIdStatus200SchemaType,
+  GetOrderByIdStatus200SchemaXmlType,
+  GetOrderByIdStatus400SchemaType,
+  GetOrderByIdStatus404SchemaType,
 } from './getOrderByIdSchema.ts'
 export type {
-  GetPetByIdPathPetIdSchema,
-  GetPetByIdResponseSchema,
-  GetPetByIdStatus200Schema,
-  GetPetByIdStatus200SchemaJson,
-  GetPetByIdStatus200SchemaXml,
-  GetPetByIdStatus400Schema,
-  GetPetByIdStatus404Schema,
+  GetPetByIdPathPetIdSchemaType,
+  GetPetByIdResponseSchemaType,
+  GetPetByIdStatus200SchemaJsonType,
+  GetPetByIdStatus200SchemaType,
+  GetPetByIdStatus200SchemaXmlType,
+  GetPetByIdStatus400SchemaType,
+  GetPetByIdStatus404SchemaType,
 } from './getPetByIdSchema.ts'
 export type {
-  GetThingsQueryLimitSchema,
-  GetThingsQuerySkipSchema,
-  GetThingsResponseSchema,
-  GetThingsStatus201Schema,
-  GetThingsStatusDefaultSchema,
+  GetThingsQueryLimitSchemaType,
+  GetThingsQuerySkipSchemaType,
+  GetThingsResponseSchemaType,
+  GetThingsStatus201SchemaType,
+  GetThingsStatusDefaultSchemaType,
 } from './getThingsSchema.ts'
 export type {
-  GetUserByNamePathUsernameSchema,
-  GetUserByNameResponseSchema,
-  GetUserByNameStatus200Schema,
-  GetUserByNameStatus200SchemaJson,
-  GetUserByNameStatus200SchemaXml,
-  GetUserByNameStatus400Schema,
-  GetUserByNameStatus404Schema,
+  GetUserByNamePathUsernameSchemaType,
+  GetUserByNameResponseSchemaType,
+  GetUserByNameStatus200SchemaJsonType,
+  GetUserByNameStatus200SchemaType,
+  GetUserByNameStatus200SchemaXmlType,
+  GetUserByNameStatus400SchemaType,
+  GetUserByNameStatus404SchemaType,
 } from './getUserByNameSchema.ts'
 export type {
-  LoginUserQueryPasswordSchema,
-  LoginUserQueryUsernameSchema,
-  LoginUserResponseSchema,
-  LoginUserStatus200Schema,
-  LoginUserStatus200SchemaJson,
-  LoginUserStatus200SchemaXml,
-  LoginUserStatus400Schema,
+  LoginUserQueryPasswordSchemaType,
+  LoginUserQueryUsernameSchemaType,
+  LoginUserResponseSchemaType,
+  LoginUserStatus200SchemaJsonType,
+  LoginUserStatus200SchemaType,
+  LoginUserStatus200SchemaXmlType,
+  LoginUserStatus400SchemaType,
 } from './loginUserSchema.ts'
-export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './logoutUserSchema.ts'
-export type { OrderSchema } from './orderSchema.ts'
-export type { PetNotFoundSchema } from './petNotFoundSchema.ts'
-export type { PetSchema } from './petSchema.ts'
-export type { PetStatusEnumSchema } from './petStatusEnumSchema.ts'
-export type { PhoneNumberSchema } from './phoneNumberSchema.ts'
-export type { PhoneWithMaxLengthExplicitSchema } from './phoneWithMaxLengthExplicitSchema.ts'
-export type { PhoneWithMaxLengthSchema } from './phoneWithMaxLengthSchema.ts'
+export type { LogoutUserResponseSchemaType, LogoutUserStatusDefaultSchemaType } from './logoutUserSchema.ts'
+export type { OrderSchemaType } from './orderSchema.ts'
+export type { PetNotFoundSchemaType } from './petNotFoundSchema.ts'
+export type { PetSchemaType } from './petSchema.ts'
+export type { PetStatusEnumSchemaType } from './petStatusEnumSchema.ts'
+export type { PhoneNumberSchemaType } from './phoneNumberSchema.ts'
+export type { PhoneWithMaxLengthExplicitSchemaType } from './phoneWithMaxLengthExplicitSchema.ts'
+export type { PhoneWithMaxLengthSchemaType } from './phoneWithMaxLengthSchema.ts'
 export type {
-  PlaceOrderPatchDataSchema,
-  PlaceOrderPatchDataSchemaFormUrlEncoded,
-  PlaceOrderPatchDataSchemaJson,
-  PlaceOrderPatchDataSchemaXml,
-  PlaceOrderPatchResponseSchema,
-  PlaceOrderPatchStatus200Schema,
-  PlaceOrderPatchStatus405Schema,
+  PlaceOrderPatchDataSchemaFormUrlEncodedType,
+  PlaceOrderPatchDataSchemaJsonType,
+  PlaceOrderPatchDataSchemaType,
+  PlaceOrderPatchDataSchemaXmlType,
+  PlaceOrderPatchResponseSchemaType,
+  PlaceOrderPatchStatus200SchemaType,
+  PlaceOrderPatchStatus405SchemaType,
 } from './placeOrderPatchSchema.ts'
 export type {
-  PlaceOrderDataSchema,
-  PlaceOrderDataSchemaFormUrlEncoded,
-  PlaceOrderDataSchemaJson,
-  PlaceOrderDataSchemaXml,
-  PlaceOrderResponseSchema,
-  PlaceOrderStatus200Schema,
-  PlaceOrderStatus405Schema,
+  PlaceOrderDataSchemaFormUrlEncodedType,
+  PlaceOrderDataSchemaJsonType,
+  PlaceOrderDataSchemaType,
+  PlaceOrderDataSchemaXmlType,
+  PlaceOrderResponseSchemaType,
+  PlaceOrderStatus200SchemaType,
+  PlaceOrderStatus405SchemaType,
 } from './placeOrderSchema.ts'
-export type { TagSchema } from './tagSchema.ts'
+export type { TagSchemaType } from './tagSchema.ts'
 export type {
-  UpdatePetDataSchema,
-  UpdatePetDataSchemaFormUrlEncoded,
-  UpdatePetDataSchemaJson,
-  UpdatePetDataSchemaXml,
-  UpdatePetResponseSchema,
-  UpdatePetStatus200Schema,
-  UpdatePetStatus200SchemaJson,
-  UpdatePetStatus200SchemaXml,
-  UpdatePetStatus400Schema,
-  UpdatePetStatus404Schema,
-  UpdatePetStatus405Schema,
+  UpdatePetDataSchemaFormUrlEncodedType,
+  UpdatePetDataSchemaJsonType,
+  UpdatePetDataSchemaType,
+  UpdatePetDataSchemaXmlType,
+  UpdatePetResponseSchemaType,
+  UpdatePetStatus200SchemaJsonType,
+  UpdatePetStatus200SchemaType,
+  UpdatePetStatus200SchemaXmlType,
+  UpdatePetStatus400SchemaType,
+  UpdatePetStatus404SchemaType,
+  UpdatePetStatus405SchemaType,
 } from './updatePetSchema.ts'
 export type {
-  UpdatePetWithFormPathPetIdSchema,
-  UpdatePetWithFormQueryNameSchema,
-  UpdatePetWithFormQueryStatusSchema,
-  UpdatePetWithFormResponseSchema,
-  UpdatePetWithFormStatus405Schema,
+  UpdatePetWithFormPathPetIdSchemaType,
+  UpdatePetWithFormQueryNameSchemaType,
+  UpdatePetWithFormQueryStatusSchemaType,
+  UpdatePetWithFormResponseSchemaType,
+  UpdatePetWithFormStatus405SchemaType,
 } from './updatePetWithFormSchema.ts'
 export type {
-  UpdateUserDataSchema,
-  UpdateUserDataSchemaFormUrlEncoded,
-  UpdateUserDataSchemaJson,
-  UpdateUserDataSchemaXml,
-  UpdateUserPathUsernameSchema,
-  UpdateUserResponseSchema,
-  UpdateUserStatusDefaultSchema,
+  UpdateUserDataSchemaFormUrlEncodedType,
+  UpdateUserDataSchemaJsonType,
+  UpdateUserDataSchemaType,
+  UpdateUserDataSchemaXmlType,
+  UpdateUserPathUsernameSchemaType,
+  UpdateUserResponseSchemaType,
+  UpdateUserStatusDefaultSchemaType,
 } from './updateUserSchema.ts'
 export type {
-  UploadFileDataSchema,
-  UploadFilePathPetIdSchema,
-  UploadFileQueryAdditionalMetadataSchema,
-  UploadFileResponseSchema,
-  UploadFileStatus200Schema,
+  UploadFileDataSchemaType,
+  UploadFilePathPetIdSchemaType,
+  UploadFileQueryAdditionalMetadataSchemaType,
+  UploadFileResponseSchemaType,
+  UploadFileStatus200SchemaType,
 } from './uploadFileSchema.ts'
-export type { UserArraySchema } from './userArraySchema.ts'
-export type { UserSchema } from './userSchema.ts'
+export type { UserArraySchemaType } from './userArraySchema.ts'
+export type { UserSchemaType } from './userSchema.ts'
 export { addPetRequestSchema } from './addPetRequestSchema.ts'
 export {
   addPetDataSchema,

@@ -11,4 +11,4 @@ export const apiResponseSchema = z.object({
   message: z.string().optional(),
 })
 
-export type ApiResponseSchema = z.infer<typeof apiResponseSchema>
+export type ApiResponseSchemaType = z.infer<typeof apiResponseSchema>

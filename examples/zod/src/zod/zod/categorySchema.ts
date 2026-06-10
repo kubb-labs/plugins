@@ -13,4 +13,4 @@ export const categorySchema = z.object({
   },
 })
 
-export type CategorySchema = z.infer<typeof categorySchema>
+export type CategorySchemaType = z.infer<typeof categorySchema>

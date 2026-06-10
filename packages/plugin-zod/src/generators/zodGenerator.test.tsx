@@ -197,6 +197,27 @@ describe('zodGenerator — Schema', () => {
     { name: 'coercion dates', node: ast.createSchema({ type: 'date', name: 'DateField', representation: 'date' }), options: { coercion: { dates: true } } },
     // inferred
     { name: 'inferred', node: stringSchema, options: { inferred: true } },
+    // inferred all-uppercase name — const and type must not collide (issue #332)
+    {
+      name: 'inferred all-uppercase',
+      node: ast.createSchema({
+        type: 'object',
+        primitive: 'object',
+        name: 'SUV',
+        properties: [ast.createProperty({ name: 'offroadCapability', schema: ast.createSchema({ type: 'boolean', optional: true }) })],
+      }),
+      options: { inferred: true },
+    },
+    {
+      name: 'typed inferred all-uppercase',
+      node: ast.createSchema({
+        type: 'object',
+        primitive: 'object',
+        name: 'SUV',
+        properties: [ast.createProperty({ name: 'offroadCapability', schema: ast.createSchema({ type: 'boolean', optional: true }) })],
+      }),
+      options: { typed: true, inferred: true },
+    },
     // mini mode
     { name: 'mini', node: objectSchema, options: { mini: true, importPath: 'zod/mini' } },
     { name: 'mini nullable', node: nullableSchema, options: { mini: true, importPath: 'zod/mini' } },

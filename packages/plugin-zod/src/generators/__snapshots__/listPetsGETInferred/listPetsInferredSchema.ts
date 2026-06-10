@@ -7,12 +7,12 @@ import * as z from 'zod'
 
 export const listPetsInferredQueryLimitSchema = z.int().optional()
 
-export type ListPetsInferredQueryLimitSchema = z.infer<typeof listPetsInferredQueryLimitSchema>
+export type ListPetsInferredQueryLimitSchemaType = z.infer<typeof listPetsInferredQueryLimitSchema>
 
 export const listPetsInferredStatus200Schema = z.object({})
 
-export type ListPetsInferredStatus200Schema = z.infer<typeof listPetsInferredStatus200Schema>
+export type ListPetsInferredStatus200SchemaType = z.infer<typeof listPetsInferredStatus200Schema>
 
 export const listPetsInferredResponseSchema = listPetsInferredStatus200Schema
 
-export type ListPetsInferredResponseSchema = z.infer<typeof listPetsInferredResponseSchema>
+export type ListPetsInferredResponseSchemaType = z.infer<typeof listPetsInferredResponseSchema>

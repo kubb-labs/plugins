@@ -7,28 +7,28 @@ import * as z from 'zod'
 
 export const loginUserQueryUsernameSchema = z.string().optional().describe('The user name for login')
 
-export type LoginUserQueryUsernameSchema = z.infer<typeof loginUserQueryUsernameSchema>
+export type LoginUserQueryUsernameSchemaType = z.infer<typeof loginUserQueryUsernameSchema>
 
 export const loginUserQueryPasswordSchema = z.string().optional().describe('The password for login in clear text')
 
-export type LoginUserQueryPasswordSchema = z.infer<typeof loginUserQueryPasswordSchema>
+export type LoginUserQueryPasswordSchemaType = z.infer<typeof loginUserQueryPasswordSchema>
 
 export const loginUserStatus200SchemaXml = z.string()
 
-export type LoginUserStatus200SchemaXml = z.infer<typeof loginUserStatus200SchemaXml>
+export type LoginUserStatus200SchemaXmlType = z.infer<typeof loginUserStatus200SchemaXml>
 
 export const loginUserStatus200SchemaJson = z.string()
 
-export type LoginUserStatus200SchemaJson = z.infer<typeof loginUserStatus200SchemaJson>
+export type LoginUserStatus200SchemaJsonType = z.infer<typeof loginUserStatus200SchemaJson>
 
 export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, loginUserStatus200SchemaJson])
 
-export type LoginUserStatus200Schema = z.infer<typeof loginUserStatus200Schema>
+export type LoginUserStatus200SchemaType = z.infer<typeof loginUserStatus200Schema>
 
 export const loginUserStatus400Schema = z.any()
 
-export type LoginUserStatus400Schema = z.infer<typeof loginUserStatus400Schema>
+export type LoginUserStatus400SchemaType = z.infer<typeof loginUserStatus400Schema>
 
 export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])
 
-export type LoginUserResponseSchema = z.infer<typeof loginUserResponseSchema>
+export type LoginUserResponseSchemaType = z.infer<typeof loginUserResponseSchema>

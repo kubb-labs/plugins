@@ -10,4 +10,4 @@ export const tagSchema = z.object({
   name: z.string().optional(),
 })
 
-export type TagSchema = z.infer<typeof tagSchema>
+export type TagSchemaType = z.infer<typeof tagSchema>

@@ -9,36 +9,36 @@ import { petSchema } from './petSchema.ts'
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
-export type FindPetsByTagsQueryTagsSchema = z.infer<typeof findPetsByTagsQueryTagsSchema>
+export type FindPetsByTagsQueryTagsSchemaType = z.infer<typeof findPetsByTagsQueryTagsSchema>
 
 export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to request with required page number or pagination')
 
-export type FindPetsByTagsQueryPageSchema = z.infer<typeof findPetsByTagsQueryPageSchema>
+export type FindPetsByTagsQueryPageSchemaType = z.infer<typeof findPetsByTagsQueryPageSchema>
 
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export type FindPetsByTagsQueryPageSizeSchema = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
+export type FindPetsByTagsQueryPageSizeSchemaType = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
 
 export const findPetsByTagsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
 
-export type FindPetsByTagsHeaderXEXAMPLESchema = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
+export type FindPetsByTagsHeaderXEXAMPLESchemaType = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
 
 export const findPetsByTagsStatus200SchemaJson = z.array(z.lazy(() => petSchema))
 
-export type FindPetsByTagsStatus200SchemaJson = z.infer<typeof findPetsByTagsStatus200SchemaJson>
+export type FindPetsByTagsStatus200SchemaJsonType = z.infer<typeof findPetsByTagsStatus200SchemaJson>
 
 export const findPetsByTagsStatus200SchemaXml = z.array(z.lazy(() => petSchema))
 
-export type FindPetsByTagsStatus200SchemaXml = z.infer<typeof findPetsByTagsStatus200SchemaXml>
+export type FindPetsByTagsStatus200SchemaXmlType = z.infer<typeof findPetsByTagsStatus200SchemaXml>
 
 export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200SchemaJson, findPetsByTagsStatus200SchemaXml])
 
-export type FindPetsByTagsStatus200Schema = z.infer<typeof findPetsByTagsStatus200Schema>
+export type FindPetsByTagsStatus200SchemaType = z.infer<typeof findPetsByTagsStatus200Schema>
 
 export const findPetsByTagsStatus400Schema = z.any()
 
-export type FindPetsByTagsStatus400Schema = z.infer<typeof findPetsByTagsStatus400Schema>
+export type FindPetsByTagsStatus400SchemaType = z.infer<typeof findPetsByTagsStatus400Schema>
 
 export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])
 
-export type FindPetsByTagsResponseSchema = z.infer<typeof findPetsByTagsResponseSchema>
+export type FindPetsByTagsResponseSchemaType = z.infer<typeof findPetsByTagsResponseSchema>

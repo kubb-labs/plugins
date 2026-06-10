@@ -19,4 +19,4 @@ export const addPetRequestSchema = z.object({
   status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })
 
-export type AddPetRequestSchema = z.infer<typeof addPetRequestSchema>
+export type AddPetRequestSchemaType = z.infer<typeof addPetRequestSchema>

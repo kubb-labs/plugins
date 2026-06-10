@@ -23,4 +23,4 @@ export const animalSchema = z
       .strict(),
   )
 
-export type AnimalSchema = z.infer<typeof animalSchema>
+export type AnimalSchemaType = z.infer<typeof animalSchema>
