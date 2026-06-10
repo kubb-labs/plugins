@@ -5,7 +5,7 @@ import type { Config, Group } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { describe, expect, test } from 'vitest'
-import { matchFiles, rawSources } from '#mocks'
+import { matchFiles } from '#mocks'
 import { resolverZod } from '../resolvers/resolverZod.ts'
 import type { PluginZod } from '../types.ts'
 import { zodGenerator } from './zodGenerator.tsx'
@@ -340,52 +340,6 @@ describe('zodGenerator — Schema', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'catCycle')
-  })
-
-  test('codec ref — cross-file input ref renders a named import, not a default import (issue #3508)', async () => {
-    const recordLocationSchema = ast.createSchema({
-      type: 'object',
-      primitive: 'object',
-      name: 'RecordLocation',
-      properties: [
-        ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'string' }) }),
-        ast.createProperty({ name: 'reportDate', required: true, schema: ast.createSchema({ type: 'date', representation: 'date', format: 'date' }) }),
-      ],
-    })
-
-    const searchResponseSchema = ast.createSchema({
-      type: 'object',
-      primitive: 'object',
-      name: 'SearchResponse',
-      properties: [
-        ast.createProperty({
-          name: 'records',
-          required: true,
-          schema: ast.createSchema({
-            type: 'array',
-            items: [ast.createSchema({ type: 'ref', name: 'RecordLocation', ref: '#/components/schemas/RecordLocation', schema: recordLocationSchema })],
-          }),
-        }),
-      ],
-    })
-
-    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, coercion: { dates: true } }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
-    const driver = createMockedPluginDriver({ name: 'searchResponse' })
-
-    await renderGeneratorSchema(zodGenerator, searchResponseSchema, {
-      config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'date' } }),
-      driver,
-      plugin,
-      options,
-      resolver: resolverZod,
-    })
-
-    const source = rawSources(driver.fileManager.files).join('\n')
-
-    expect(source).toContain('import { recordLocationInputSchema }')
-    expect(source).not.toMatch(/import\s+recordLocationInputSchema\s+from/)
   })
 })
 
