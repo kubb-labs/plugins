@@ -17,15 +17,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const {
-      enum: { type: enumType, constCasing: enumConstCasing, typeSuffix: enumTypeSuffix, keyCasing: enumKeyCasing },
-      syntaxType,
-      optionalType,
-      arrayType,
-      output,
-      group,
-      printer,
-    } = ctx.options
+    const { enum: enumOptions, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
     if (!node.name) {
@@ -37,8 +29,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
 
     function resolveImportName(schemaName: string): string {
-      if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && enumTypeSuffix && enumSchemaNames.has(schemaName)) {
-        return resolver.resolveEnumKeyName({ name: schemaName }, enumTypeSuffix)
+      if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
+        return resolver.resolveEnumKeyName({ name: schemaName }, enumOptions.typeSuffix)
       }
       return resolver.resolveTypeName(schemaName)
     }
@@ -51,15 +43,17 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const isEnumSchema = !!ast.narrowSchema(node, ast.schemaTypes.enum)
 
     const meta = {
-      name: ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && isEnumSchema ? resolver.resolveEnumKeyName(node, enumTypeSuffix) : resolver.resolveTypeName(node.name),
+      name:
+        ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && isEnumSchema
+          ? resolver.resolveEnumKeyName(node, enumOptions.typeSuffix)
+          : resolver.resolveTypeName(node.name),
       file: resolver.resolveFile({ name: node.name, extname: '.ts' }, { root, output, group: group ?? undefined }),
     } as const
 
     const schemaPrinter = printerTs({
       optionalType,
       arrayType,
-      enumType,
-      enumTypeSuffix,
+      enum: enumOptions,
       name: meta.name,
       syntaxType,
       description: node.description,
@@ -80,30 +74,12 @@ export const typeGenerator = defineGenerator<PluginTs>({
           imports.map((imp) => (
             <File.Import key={[node.name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
           ))}
-        <Type
-          name={meta.name}
-          node={node}
-          enumType={enumType}
-          enumConstCasing={enumConstCasing}
-          enumTypeSuffix={enumTypeSuffix}
-          enumKeyCasing={enumKeyCasing}
-          resolver={resolver}
-          printer={schemaPrinter}
-        />
+        <Type name={meta.name} node={node} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
       </File>
     )
   },
   operation(node, ctx) {
-    const {
-      enum: { type: enumType, constCasing: enumConstCasing, typeSuffix: enumTypeSuffix, keyCasing: enumKeyCasing },
-      optionalType,
-      arrayType,
-      syntaxType,
-      paramsCasing,
-      group,
-      output,
-      printer,
-    } = ctx.options
+    const { enum: enumOptions, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
     const mode = ctx.getMode(output)
@@ -122,8 +98,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const enumSchemaNames = new Set<string>(ctx.meta.enumNames)
 
     function resolveImportName(schemaName: string): string {
-      if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) && enumTypeSuffix && enumSchemaNames.has(schemaName)) {
-        return resolver.resolveEnumKeyName({ name: schemaName }, enumTypeSuffix)
+      if (ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) && enumOptions.typeSuffix && enumSchemaNames.has(schemaName)) {
+        return resolver.resolveEnumKeyName({ name: schemaName }, enumOptions.typeSuffix)
       }
       return resolver.resolveTypeName(schemaName)
     }
@@ -139,8 +115,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
       const schemaPrinter = printerTs({
         optionalType,
         arrayType,
-        enumType,
-        enumTypeSuffix,
+        enum: enumOptions,
         name,
         syntaxType,
         description: schema.description,
@@ -156,16 +131,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
             imports.map((imp) => (
               <File.Import key={[name, imp.path, imp.isTypeOnly].join('-')} root={meta.file.path} path={imp.path} name={imp.name} isTypeOnly />
             ))}
-          <Type
-            name={name}
-            node={schema}
-            enumType={enumType}
-            enumConstCasing={enumConstCasing}
-            enumTypeSuffix={enumTypeSuffix}
-            enumKeyCasing={enumKeyCasing}
-            resolver={resolver}
-            printer={schemaPrinter}
-          />
+          <Type name={name} node={schema} enum={enumOptions} resolver={resolver} printer={schemaPrinter} />
         </>
       )
     }

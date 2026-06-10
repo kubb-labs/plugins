@@ -6,6 +6,12 @@ import { format } from '#mocks'
 import { resolverTs } from '../resolvers/resolverTs.ts'
 import { printerTs } from './printerTs.ts'
 
+const inlineLiteralEnum = { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
+const enumEnum = { type: 'enum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
+const asConstEnum = { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
+const literalEnum = { type: 'literal', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
+const constEnumEnum = { type: 'constEnum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } as const
+
 /**
  * Wraps a `ts.TypeNode` in `type _ = <node>` so prettier can parse it as a
  * valid TypeScript statement, then strips the wrapper from the result.
@@ -24,7 +30,7 @@ const formatTS = async (node: ts.Node | null | undefined): Promise<string> => {
 }
 
 describe('printerTs', () => {
-  const printer = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral' })
+  const printer = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum })
 
   describe('scalar types', () => {
     it('any', async () => {
@@ -196,35 +202,35 @@ describe('printerTs', () => {
     })
 
     it('enum without name still renders inline literal even when enumType is not inlineLiteral', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'enum' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: enumEnum })
       const result = p.transform(ast.createSchema({ type: 'enum', enumValues: ['a', 'b'] }))
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`"'a' | 'b'"`)
     })
 
     it('enum with name and enumType=enum renders reference', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'enum' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: enumEnum })
       const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('Status')
     })
 
     it('enum with name and enumType=asConst renders reference with Key suffix', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'asConst', enumTypeSuffix: 'Key' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: asConstEnum })
       const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('StatusKey')
     })
 
     it('enum with name and enumType=literal renders reference', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'literal' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: literalEnum })
       const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('Status')
     })
 
     it('enum with name and enumType=constEnum renders reference without Key suffix', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'constEnum' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: constEnumEnum })
       const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('Status')
@@ -347,7 +353,7 @@ describe('printerTs', () => {
     })
 
     it('arrayType=generic renders Array<T>', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'generic', enumType: 'inlineLiteral' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'generic', enum: inlineLiteralEnum })
       const result = p.transform(
         ast.createSchema({
           type: 'array',
@@ -483,7 +489,7 @@ describe('printerTs', () => {
     })
 
     it('optional property with optionalType=undefined adds | undefined', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'undefined', arrayType: 'array', enumType: 'inlineLiteral' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'undefined', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.transform(
         ast.createSchema({
           type: 'object',
@@ -502,7 +508,7 @@ describe('printerTs', () => {
     })
 
     it('optional property with optionalType=questionTokenAndUndefined adds both', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionTokenAndUndefined', arrayType: 'array', enumType: 'inlineLiteral' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionTokenAndUndefined', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.transform(
         ast.createSchema({
           type: 'object',
@@ -659,7 +665,7 @@ describe('printerTs', () => {
     })
 
     it('nullish property with optionalType=undefined adds | undefined', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'undefined', arrayType: 'array', enumType: 'inlineLiteral' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'undefined', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.transform(
         ast.createSchema({
           type: 'object',
@@ -757,7 +763,7 @@ describe('printerTs', () => {
 
   describe('print', () => {
     it('without typeName returns raw type string', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.print(ast.createSchema({ type: 'string' }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
@@ -767,7 +773,7 @@ describe('printerTs', () => {
     })
 
     it('with typeName wraps in export type declaration', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral', name: 'MyType' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'MyType' })
       const result = p.print(ast.createSchema({ type: 'string' }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
@@ -780,7 +786,7 @@ describe('printerTs', () => {
     })
 
     it('with typeName and object uses interface syntax by default', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral', name: 'MyObject' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'MyObject' })
       const result = p.print(
         ast.createSchema({
           type: 'object',
@@ -807,7 +813,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'MyObject',
         syntaxType: 'type',
       })
@@ -833,7 +839,7 @@ describe('printerTs', () => {
     })
 
     it('nullable node adds | null to the declaration', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral', name: 'Status' })
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'Status' })
       const result = p.print(ast.createSchema({ type: 'string', nullable: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
@@ -850,7 +856,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'undefined',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'MaybeValue',
       })
       const result = p.print(ast.createSchema({ type: 'string', optional: true }))
@@ -869,7 +875,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'Described',
         description: 'A well-described type',
       })
@@ -890,7 +896,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'Partial',
         keysToOmit: ['id', 'createdAt'],
       })
@@ -935,7 +941,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'AddFiles200',
         keysToOmit: ['name'],
       })
@@ -952,7 +958,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'AddFiles200',
         keysToOmit: ['name'],
       })
@@ -969,7 +975,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         name: 'AddFilesMutationRequest',
       })
       const result = p.print(ast.createSchema({ type: 'ref', name: 'Pet', optional: true }))
@@ -987,7 +993,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         nodes: { date: () => ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
       })
       expect(await formatTS(p.transform(ast.createSchema({ type: 'date', representation: 'string' })))).toBe('string')
@@ -998,7 +1004,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         nodes: { date: () => ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
       })
       expect(await formatTS(p.transform(ast.createSchema({ type: 'number' })))).toBe('number')
@@ -1009,7 +1015,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         nodes: {
           array(node) {
             const itemNodes = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean) as Array<ts.TypeNode>
@@ -1026,7 +1032,7 @@ describe('printerTs', () => {
         resolver: resolverTs,
         optionalType: 'questionToken',
         arrayType: 'array',
-        enumType: 'inlineLiteral',
+        enum: inlineLiteralEnum,
         syntaxType: 'type',
         nodes: {
           string() {

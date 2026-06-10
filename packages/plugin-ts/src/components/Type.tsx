@@ -13,14 +13,11 @@ type Props = {
    * Created with `printerTs({ ..., nodes: options.printer?.nodes })`.
    */
   printer: ast.Printer<PrinterTsFactory>
-  enumType: PluginTs['resolvedOptions']['enum']['type']
-  enumConstCasing: PluginTs['resolvedOptions']['enum']['constCasing']
-  enumTypeSuffix: PluginTs['resolvedOptions']['enum']['typeSuffix']
-  enumKeyCasing: PluginTs['resolvedOptions']['enum']['keyCasing']
+  enum: PluginTs['resolvedOptions']['enum']
   resolver: ResolverTs
 }
 
-export function Type({ name, node, printer, enumType, enumConstCasing, enumTypeSuffix, enumKeyCasing, resolver }: Props): KubbReactNode {
+export function Type({ name, node, printer, enum: enumOptions, resolver }: Props): KubbReactNode {
   const enumSchemaNodes = ast.collect<ast.EnumSchemaNode>(node, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.narrowSchema(n, ast.schemaTypes.enum)
@@ -37,28 +34,17 @@ export function Type({ name, node, printer, enumType, enumConstCasing, enumTypeS
   const enums = [...new Map(enumSchemaNodes.map((n) => [n.name, n])).values()].map((node) => {
     return {
       node,
-      ...getEnumNames({ node, enumType, enumConstCasing, enumTypeSuffix, resolver }),
+      ...getEnumNames({ node, enum: enumOptions, resolver }),
     }
   })
 
   // Skip enum exports when using inlineLiteral
-  const shouldExportEnums = enumType !== 'inlineLiteral'
-  const shouldExportType = enumType === 'inlineLiteral' || enums.every((item) => item.typeName !== name)
+  const shouldExportEnums = enumOptions.type !== 'inlineLiteral'
+  const shouldExportType = enumOptions.type === 'inlineLiteral' || enums.every((item) => item.typeName !== name)
 
   return (
     <>
-      {shouldExportEnums &&
-        enums.map(({ node }) => (
-          <Enum
-            key={node.name}
-            node={node}
-            enumType={enumType}
-            enumConstCasing={enumConstCasing}
-            enumTypeSuffix={enumTypeSuffix}
-            enumKeyCasing={enumKeyCasing}
-            resolver={resolver}
-          />
-        ))}
+      {shouldExportEnums && enums.map(({ node }) => <Enum key={node.name} node={node} enum={enumOptions} resolver={resolver} />)}
       {shouldExportType && (
         <File.Source name={name} isTypeOnly isExportable isIndexable>
           {output}

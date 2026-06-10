@@ -51,23 +51,11 @@ export type PrinterTsOptions = {
    */
   arrayType: PluginTs['resolvedOptions']['arrayType']
   /**
-   * Enum output format.
-   * - `'inlineLiteral'` embeds literal unions inline
-   * - `'literal'` generates named literal unions
-   * - `'asConst'` generates as const declarations
-   *
-   * @default `'inlineLiteral'`
+   * Grouped enum settings. Only `type` (output format) and `typeSuffix` (enum key reference suffix)
+   * affect how references to enums are printed; `constCasing` and `keyCasing` are ignored here since
+   * the printer emits references, not the enum declarations themselves.
    */
-  enumType: PluginTs['resolvedOptions']['enum']['type']
-  /**
-   * Suffix appended to enum key reference names.
-   *
-   * @example Enum key naming
-   * `StatusKey` when `enumType` is `'asConst'`
-   *
-   * @default `'Key'`
-   */
-  enumTypeSuffix?: PluginTs['resolvedOptions']['enum']['typeSuffix']
+  enum: PluginTs['resolvedOptions']['enum']
   /**
    * Syntax for generated declarations.
    * - `'type'` generates type aliases
@@ -125,13 +113,13 @@ type PrinterTs = PrinterTsFactory
  *
  * @example Raw type node (no `typeName`)
  * ```ts
- * const printer = printerTs({ optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral' })
+ * const printer = printerTs({ optionalType: 'questionToken', arrayType: 'array', enum: { type: 'inlineLiteral' } })
  * const typeNode = printer.print(schemaNode) // ts.TypeNode
  * ```
  *
  * @example Full declaration (with `typeName`)
  * ```ts
- * const printer = printerTs({ optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral', typeName: 'MyType' })
+ * const printer = printerTs({ optionalType: 'questionToken', arrayType: 'array', enum: { type: 'inlineLiteral' }, typeName: 'MyType' })
  * const declaration = printer.print(schemaNode) // ts.TypeAliasDeclaration | ts.InterfaceDeclaration
  * ```
  */
@@ -179,10 +167,10 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         // When a Key suffix is configured, enum refs must use the suffixed name (e.g. `StatusKey`)
         // so the reference matches what the enum file actually exports.
         const isEnumRef =
-          node.ref && ENUM_TYPES_WITH_KEY_SUFFIX.has(this.options.enumType) && this.options.enumTypeSuffix && this.options.enumSchemaNames?.has(refName)
+          node.ref && ENUM_TYPES_WITH_KEY_SUFFIX.has(this.options.enum.type) && this.options.enum.typeSuffix && this.options.enumSchemaNames?.has(refName)
 
         const name = isEnumRef
-          ? this.options.resolver.resolveEnumKeyName({ name: refName }, this.options.enumTypeSuffix!)
+          ? this.options.resolver.resolveEnumKeyName({ name: refName }, this.options.enum.typeSuffix)
           : node.ref
             ? this.options.resolver.default(refName, 'type')
             : refName
@@ -192,7 +180,7 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
       enum(node) {
         const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
 
-        if (this.options.enumType === 'inlineLiteral' || !node.name) {
+        if (this.options.enum.type === 'inlineLiteral' || !node.name) {
           const literalNodes = values
             .filter((v): v is string | number | boolean => v !== null && v !== undefined)
             .map((value) => factory.constToTypeNode(value, typeof value as 'string' | 'number' | 'boolean'))
@@ -202,8 +190,8 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
         }
 
         const resolvedName =
-          ENUM_TYPES_WITH_KEY_SUFFIX.has(this.options.enumType) && this.options.enumTypeSuffix
-            ? this.options.resolver.resolveEnumKeyName(node, this.options.enumTypeSuffix)
+          ENUM_TYPES_WITH_KEY_SUFFIX.has(this.options.enum.type) && this.options.enum.typeSuffix
+            ? this.options.resolver.resolveEnumKeyName(node, this.options.enum.typeSuffix)
             : this.options.resolver.default(node.name, 'type')
 
         return factory.createTypeReferenceNode(resolvedName, undefined)
