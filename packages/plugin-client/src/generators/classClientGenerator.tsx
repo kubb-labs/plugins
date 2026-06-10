@@ -32,11 +32,7 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
   return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
 }
 
-function resolveZodImportNames(
-  node: ast.OperationNode,
-  zodResolver: ResolverZod,
-  parser: PluginClient['resolvedOptions']['parser'],
-): Array<string> {
+function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {
   const { query: queryParams } = getOperationParameters(node)
   const names: Array<string | null | undefined> = [
     resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
@@ -168,8 +164,9 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
     const files = controllers.map(({ name, file, operations: ops }) => {
       const { typeImportsByFile, typeFilesByPath } = collectTypeImports(ops)
-      const { zodImportsByFile, zodFilesByPath } =
-        isParserEnabled(parser) ? collectZodImports(ops) : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
+      const { zodImportsByFile, zodFilesByPath } = isParserEnabled(parser)
+        ? collectZodImports(ops)
+        : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
       const hasFormData = ops.some((op) => op.node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false)
 
       return (

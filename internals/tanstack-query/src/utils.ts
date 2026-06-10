@@ -116,11 +116,7 @@ export function resolveQueryParamsParser(parser: ParserOption): 'zod' | null {
  *
  * Returns an empty array when no resolver is provided or `parser` is falsy.
  */
-export function resolveZodSchemaNames(
-  node: ast.OperationNode,
-  zodResolver: ZodSchemaNameResolverLike | null | undefined,
-  parser: ParserOption,
-): string[] {
+export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined, parser: ParserOption): string[] {
   if (!zodResolver || !parser) return []
   const { query: queryParams } = getOperationParameters(node)
   return [
