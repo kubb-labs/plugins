@@ -1,5 +1,74 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.45
+
+### Minor Changes
+
+- [#350](https://github.com/kubb-labs/plugins/pull/350) [`35a600d`](https://github.com/kubb-labs/plugins/commit/35a600d7516f11270afbda25ed89e5bb8a9c9603) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Default tag group folders to the plain camelCased tag.
+
+  With `group: { type: 'tag' }`, every plugin now writes to `pet/` instead of `petController/` (and the Cypress and MCP plugins drop the `Requests` suffix too). The suffixes were a leftover convention nothing in the output referenced. To keep the old layout, pass `group: { type: 'tag', name: ({ group }) => \`${group}Controller\` }`.
+
+- [#349](https://github.com/kubb-labs/plugins/pull/349) [`fdd85ac`](https://github.com/kubb-labs/plugins/commit/fdd85acb9f6989dbf332eee204e4a8da238d0a74) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Group the `plugin-ts` enum options under a single `enum` object and add a `constCasing` control (kubb-labs/plugins#334).
+
+  The four loose top-level options collapse into one grouped object with clearer names:
+
+  ```typescript
+  // before
+  pluginTs({
+    enumType: "asConst",
+    enumTypeSuffix: "Key",
+    enumKeyCasing: "none",
+  });
+
+  // after
+  pluginTs({
+    enum: {
+      type: "asConst",
+      constCasing: "camelCase",
+      typeSuffix: "Key",
+      keyCasing: "none",
+    },
+  });
+  ```
+
+  The new `enum.constCasing` (`'camelCase'` default, or `'pascalCase'`) controls the casing of the generated const variable, which makes the old `enumType: 'asPascalConst'` redundant. `asPascalConst` is removed, so use `enum: { type: 'asConst', constCasing: 'pascalCase' }` instead.
+
+  Pairing `constCasing: 'pascalCase'` with `typeSuffix: ''` now emits a const and a type that share the schema's exact name (`export const VehicleType` + `export type VehicleType`), and the barrel exports that name once instead of producing a duplicate `export type`. This matches the convention most hand-written codebases use, so migrating an existing project keeps every annotation and value reference intact.
+
+  `plugin-faker` reads the new `enum.type` / `enum.typeSuffix` shape from `plugin-ts`.
+
+- [#354](https://github.com/kubb-labs/plugins/pull/354) [`84c6208`](https://github.com/kubb-labs/plugins/commit/84c62089eaeb00bd0411a4064ee21ad397ada994) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Prefix numeric enum keys in `asConst` mode so they are valid identifiers (kubb-labs/plugins#338).
+
+  A numeric enum used to emit quoted digit keys in `asConst`, which were only reachable through index access and had no autocomplete:
+
+  ```ts
+  export const priority = {
+    "1": 1,
+    "2": 2,
+    "3": 3,
+  } as const;
+  ```
+
+  Numeric values now get the PascalCase enum name as a prefix, matching what `enum` mode already does (`Priority_1 = 1`):
+
+  ```ts
+  export const priority = {
+    Priority_1: 1,
+    Priority_2: 2,
+    Priority_3: 3,
+  } as const;
+  ```
+
+  `enumKeyCasing` still applies on top, so `screamingSnakeCase` produces `PRIORITY_1`. Only the object keys change; the value side and the `typeof` type alias are untouched, and `literal` / `inlineLiteral` are unaffected.
+
+  This is a breaking change to the generated output for numeric enums in `asConst` / `asPascalConst` modes.
+
+### Patch Changes
+
+- [#328](https://github.com/kubb-labs/plugins/pull/328) [`47713fa`](https://github.com/kubb-labs/plugins/commit/47713fa4d933484fd4661782025e098be2300889) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the stale v4 `barrelType: 'named'` key in every plugin's `output` destructuring default with the v5 `barrel: { type: 'named' }` object. Generated output is unchanged: `@kubb/middleware-barrel` never read the dead key and already fell back to `{ type: 'named' }`. The code now matches the documented default in each plugin's option docs.
+
+  Docs metadata fixes in the same pass: `@kubb/plugin-zod` documents that `importPath` defaults to `'zod/mini'` when `mini` is enabled, and `@kubb/plugin-swr` documents the `parser` default as the boolean `false` instead of the string `'false'`.
+
 ## 5.0.0-beta.44
 
 ### Patch Changes

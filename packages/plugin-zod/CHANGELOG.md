@@ -1,5 +1,27 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.45
+
+### Minor Changes
+
+- [#350](https://github.com/kubb-labs/plugins/pull/350) [`35a600d`](https://github.com/kubb-labs/plugins/commit/35a600d7516f11270afbda25ed89e5bb8a9c9603) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Default tag group folders to the plain camelCased tag.
+
+  With `group: { type: 'tag' }`, every plugin now writes to `pet/` instead of `petController/` (and the Cypress and MCP plugins drop the `Requests` suffix too). The suffixes were a leftover convention nothing in the output referenced. To keep the old layout, pass `group: { type: 'tag', name: ({ group }) => \`${group}Controller\` }`.
+
+- [#345](https://github.com/kubb-labs/plugins/pull/345) [`1de83e0`](https://github.com/kubb-labs/plugins/commit/1de83e076bf302b82a3ecbb8b63808016f01d268) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Suffix inferred Zod type aliases with `Type` so they never collide with the schema value (kubb-labs/plugins#332).
+
+  With `inferred: true`, the `z.infer<typeof schema>` alias is now the PascalCased schema name plus a `SchemaType` suffix (`petSchema` → `PetSchemaType`). Previously the value and the type were told apart only by casing (`petSchema` vs `PetSchema`), so an all-uppercase schema name such as `SUV`, `URL`, or `API` produced the same identifier for both and the barrel re-exported it twice, failing with `TS2300: Duplicate identifier`.
+
+  This renames generated inferred types: `PetSchema` becomes `PetSchemaType`. Update any imports that referenced the old name.
+
+### Patch Changes
+
+- [#328](https://github.com/kubb-labs/plugins/pull/328) [`47713fa`](https://github.com/kubb-labs/plugins/commit/47713fa4d933484fd4661782025e098be2300889) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the stale v4 `barrelType: 'named'` key in every plugin's `output` destructuring default with the v5 `barrel: { type: 'named' }` object. Generated output is unchanged: `@kubb/middleware-barrel` never read the dead key and already fell back to `{ type: 'named' }`. The code now matches the documented default in each plugin's option docs.
+
+  Docs metadata fixes in the same pass: `@kubb/plugin-zod` documents that `importPath` defaults to `'zod/mini'` when `mini` is enabled, and `@kubb/plugin-swr` documents the `parser` default as the boolean `false` instead of the string `'false'`.
+
+- [#357](https://github.com/kubb-labs/plugins/pull/357) [`4458b2f`](https://github.com/kubb-labs/plugins/commit/4458b2fe9f69860351f1ba8ca03ff83f37ff5f36) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix cross-file input schema refs being emitted as default imports. When a codec schema (e.g. a `date` field with `dateType: 'date'` or `coercion.dates`) is referenced from another file, the generated input import now renders as a named import (`import { recordLocationInputSchema } from './recordLocationSchema'`) instead of a default import, resolving the `TS2613` "Module has no default export" error reported in kubb-labs/kubb#3508.
+
 ## 5.0.0-beta.44
 
 ### Minor Changes

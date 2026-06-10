@@ -37,8 +37,10 @@
   },
   "changesets": [
     "circular-schema-detection-shared",
+    "clean-raw-generated-whitespace",
     "client-banner-aggregation-context",
     "client-parser-false",
+    "client-tag-class-client-suffix",
     "consolidate-jsx-renderer",
     "consume-ast-utils",
     "core-plugins-beta-12-alignment",
@@ -48,6 +50,9 @@
     "fix-group-name-callback-ts-zod",
     "fix-mcp-singleton",
     "fix-object-header-serialization",
+    "fix-stale-barrel-type-defaults",
+    "group-folder-plain-tag",
+    "grouped-enum-options-const-casing",
     "jolly-maps-taste",
     "kubb-core-beta-23-alignment",
     "kubb-core-beta-24-alignment",
@@ -87,6 +92,7 @@
     "plugin-ts-legacy-flag",
     "plugin-ts-legacy-naming-parity",
     "plugin-ts-lock-v4-enum-regressions",
+    "plugin-ts-numeric-enum-keys",
     "plugin-ts-parserts-print",
     "plugin-ts-remove-deprecated-options",
     "plugin-ts-remove-mapper",
@@ -94,6 +100,7 @@
     "plugin-ts-v2-helpers",
     "plugin-vue-query-key-transformer-compat",
     "plugin-vue-query-v5-migration",
+    "plugin-zod-codec-ref-named-import",
     "plugin-zod-discriminator-ref-description",
     "plugin-zod-oneof-union",
     "plugin-zod-v5-rewrite",
@@ -117,6 +124,7 @@
     "ts-fix-request-body-description",
     "vue-query-enabled-tovalue",
     "zod-date-roundtrip",
-    "zod-faker-object-builder"
+    "zod-faker-object-builder",
+    "zod-inferred-type-suffix"
   ]
 }
