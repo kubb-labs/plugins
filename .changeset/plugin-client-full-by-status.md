@@ -2,12 +2,12 @@
 '@kubb/plugin-client': minor
 ---
 
-Add `dataReturnType: 'fullByStatus'` — a new return shape that produces a discriminated union keyed by HTTP status code.
+`dataReturnType: 'full'` now returns a status-discriminated union instead of a flat `ResponseConfig<TData>`.
 
-Each union member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`, so narrowing on `res.status` also narrows `res.data` to the matching response type from the spec. The `TData` generic on the underlying request call widens to cover all documented statuses, and the response is cast to the union at the return site.
+Each union member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`, so narrowing on `res.status` also narrows `res.data` to the matching per-spec response type. The `TData` generic on the underlying request widens to cover all documented statuses.
 
 ```ts
-pluginClient({ dataReturnType: 'fullByStatus' })
+pluginClient({ dataReturnType: 'full' })
 ```
 
 ```ts
