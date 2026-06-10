@@ -91,13 +91,20 @@ const operationNodes: Array<ast.OperationNode> = [
 describe('staticClassClientGenerator operations', () => {
   const testData = [
     {
-      name: 'findByTags',
+      name: 'static',
       options: {
         group: {
           type: 'tag' as const,
           name: ({ group }: { group: string }) => `${group}Service`,
         },
       } as Partial<PluginClient['resolvedOptions']>,
+    },
+    {
+      // No `group` config, so the default `resolveGroupName` runs. The tag `pet`
+      // must produce `PetClient` (not `Pet`) so the barrel never collides with the
+      // `Pet` schema model. See https://github.com/kubb-labs/plugins/issues/331.
+      name: 'staticDefaultGroupName',
+      options: {} as Partial<PluginClient['resolvedOptions']>,
     },
   ] as const satisfies Array<{ name: string; options: Partial<PluginClient['resolvedOptions']> }>
 
@@ -121,6 +128,6 @@ describe('staticClassClientGenerator operations', () => {
       resolver: resolverClient,
     })
 
-    await matchFiles(driver.fileManager.files, 'static')
+    await matchFiles(driver.fileManager.files, props.name)
   })
 })
