@@ -34,7 +34,7 @@ export const resolverClient = defineResolver<PluginClient>(() => ({
     return ensureValidVarName(pascalCase(name))
   },
   resolveGroupName(name) {
-    return ensureValidVarName(`${pascalCase(name)}Client`)
+    return ensureValidVarName(pascalCase(`${name} Client`))
   },
   resolveClientPropertyName(name) {
     return ensureValidVarName(camelCase(name))
