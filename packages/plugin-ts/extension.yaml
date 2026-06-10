@@ -592,7 +592,6 @@ options:
           | `'pascalCase'` | `EnumValue` |
           | `'camelCase'` | `enumValue` |
           | `'none'` (default) | as-is |
-
   - name: dateType
     required: false
     description: ''
