@@ -66,7 +66,7 @@ function generateMethod({
   const { header: headerParams } = getOperationParameters(node)
   const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
-  const generics = buildGenerics(node, tsResolver)
+  const generics = buildGenerics(node, tsResolver, { dataReturnType })
   const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers })
@@ -74,7 +74,7 @@ function generateMethod({
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
   const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
-  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver })
+  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver, tsResolver })
 
   const methodBody = [
     `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,

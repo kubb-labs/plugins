@@ -586,7 +586,7 @@ options:
         tip: |
           See the [custom client guide](https://kubb.dev/plugins/plugin-client#importpath) for a worked example.
       - name: dataReturnType
-        type: "'data' | 'full'"
+        type: "'data' | 'full' | 'fullByStatus'"
         required: false
         default: "'data'"
         description: |
@@ -594,6 +594,7 @@ options:
 
           - `'data'` returns only the response body (`response.data`). Concise and matches what most apps need.
           - `'full'` returns the full response config — body, status code, headers, and the original request. Use this when callers need to inspect headers or status.
+          - `'fullByStatus'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`, so narrowing on `res.status` also narrows `res.data` to the matching response type. Ideal for typed error handling without exceptions.
         examples:
           - name: "'data' (default)"
             files:
@@ -631,6 +632,26 @@ options:
                   //    ^? ResponseConfig<Pet>
                   console.log(response.status, response.headers)
                   const pet = response.data
+          - name: "'fullByStatus'"
+            files:
+              - name: addPet.ts
+                lang: typescript
+                twoslash: false
+                code: |
+                  export async function addPet(data: AddPetData, config = {}) {
+                    const res = await request<AddPetStatus200 | AddPetStatus405, ...>(...)
+                    return res as
+                      | { status: 200; data: AddPetStatus200; statusText: string; headers: Headers }
+                      | { status: 405; data: AddPetStatus405; statusText: string; headers: Headers }
+                  }
+              - name: usage.ts
+                lang: typescript
+                twoslash: false
+                code: |
+                  const res = await addPet(petData)
+                  if (res.status === 405) {
+                    res.data // narrowed to AddPetStatus405
+                  }
       - name: baseURL
         type: string
         required: false

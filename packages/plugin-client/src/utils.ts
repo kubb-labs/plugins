@@ -7,6 +7,19 @@ import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
 /**
+ * Builds a discriminated union type string for `fullByStatus` return shapes.
+ * Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`.
+ */
+export function buildStatusUnionType(node: ast.OperationNode, tsResolver: ResolverTs): string {
+  const members = node.responses.map((r) => {
+    const typeName = tsResolver.resolveResponseStatusName(node, r.statusCode)
+    return `{ status: ${Number.parseInt(r.statusCode, 10)}; data: ${typeName}; statusText: string; headers: Headers }`
+  })
+  if (members.length === 1) return members[0]!
+  return `(${members.join(' | ')})`
+}
+
+/**
  * Builds HTTP headers array for a client request.
  * Includes Content-Type (if not default) and spreads header parameters if present.
  */
@@ -20,10 +33,19 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 /**
  * Builds TypeScript generic parameters for a client method.
  * Includes response type, error type, and optional request type.
+ * When `dataReturnType` is `'fullByStatus'`, the response type is a union of all status types.
  */
-export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
+export function buildGenerics(
+  node: ast.OperationNode,
+  tsResolver: ResolverTs,
+  options: { dataReturnType?: PluginClient['resolvedOptions']['dataReturnType'] } = {},
+): Array<string> {
+  const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const responseName =
+    options.dataReturnType === 'fullByStatus'
+      ? (allStatusNames.length > 0 ? allStatusNames.join(' | ') : tsResolver.resolveResponseName(node))
+      : (successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node))
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -133,19 +155,31 @@ export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): str
 /**
  * Builds the return statement for a client method.
  * Applies Zod validation to response data if configured, otherwise returns raw response.
+ * For `'fullByStatus'`, returns a discriminated union cast keyed by HTTP status code.
  */
 export function buildReturnStatement({
   dataReturnType,
   parser,
   node,
   zodResolver,
+  tsResolver,
 }: {
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
+  tsResolver?: ResolverTs | null
 }): string {
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+
+  if (dataReturnType === 'fullByStatus' && tsResolver) {
+    const unionType = buildStatusUnionType(node, tsResolver)
+    if (parser === 'zod' && zodResponseName) {
+      return `return {...res, data: ${zodResponseName}.parse(res.data)} as ${unionType}`
+    }
+    return `return res as ${unionType}`
+  }
+
   if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {
     return `return {...res, data: ${zodResponseName}.parse(res.data)}`
   }

@@ -173,6 +173,18 @@ const underscoredPathParamsNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const multiStatusNode = ast.createOperation({
+  operationId: 'createPet',
+  method: 'POST',
+  path: '/pet',
+  tags: ['pet'],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Pet created' }),
+    ast.createResponse({ statusCode: '405', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
+  ],
+})
+
 const downloadFileNode = ast.createOperation({
   operationId: 'downloadFile',
   method: 'GET',
@@ -196,6 +208,10 @@ describe('clientGenerator operation', () => {
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
     { name: 'findByTagsFull', node: findByTagsNode, options: { dataReturnType: 'full' as const } },
     { name: 'findByTagsWithZodFull', node: findByTagsNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
+    { name: 'findByTagsFullByStatus', node: findByTagsNode, options: { dataReturnType: 'fullByStatus' as const } },
+    { name: 'findByTagsWithZodFullByStatus', node: findByTagsNode, options: { parser: 'zod' as const, dataReturnType: 'fullByStatus' as const } },
+    { name: 'multiStatusFullByStatus', node: multiStatusNode, options: { dataReturnType: 'fullByStatus' as const } },
+    { name: 'multiStatusWithZodFullByStatus', node: multiStatusNode, options: { parser: 'zod' as const, dataReturnType: 'fullByStatus' as const } },
     { name: 'importPath', node: findByTagsNode, options: { importPath: 'axios' as const } },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
