@@ -1,4 +1,4 @@
-import { getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
+import { buildStatusUnionType, getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -47,18 +47,7 @@ export function resolveResponseParser(parser: ParserOption | undefined | false):
   return parser.response ?? null
 }
 
-/**
- * Builds the discriminated union type string for `dataReturnType: 'full'` return shapes.
- * Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`.
- */
-export function buildStatusUnionType(node: ast.OperationNode, tsResolver: ResolverTs): string {
-  const members = node.responses.map((r) => {
-    const typeName = tsResolver.resolveResponseStatusName(node, r.statusCode)
-    return `{ status: ${Number.parseInt(r.statusCode, 10)}; data: ${typeName}; statusText: string }`
-  })
-  if (members.length === 1) return members[0]!
-  return `(${members.join(' | ')})`
-}
+export { buildStatusUnionType }
 
 /**
  * Builds HTTP headers array for a client request.

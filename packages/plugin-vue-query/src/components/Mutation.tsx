@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { buildRequestConfigType, getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -51,7 +51,7 @@ function buildMutationParamsNode(
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const mutationArgParamsNode = createMutationArgParams(node, { paramsCasing, resolver })
@@ -91,7 +91,7 @@ export function Mutation({
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const mutationArgParamsNode = createMutationArgParams(node, {

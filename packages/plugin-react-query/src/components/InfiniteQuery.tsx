@@ -6,7 +6,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
-import { buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -82,7 +82,7 @@ export function InfiniteQuery({
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const responseType = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const responseType = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null

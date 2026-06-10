@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildQueryOptionsParams, getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
-import { resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildStatusUnionType, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 
 type Props = {
@@ -50,7 +50,7 @@ export function QueryOptions({
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })

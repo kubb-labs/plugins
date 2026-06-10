@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
-import { buildRequestConfigType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildRequestConfigType, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -50,7 +50,7 @@ export function MutationOptions({
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const errorNames = resolveErrorNames(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 

@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
-import { buildQueryKeyParams, getComments, resolveErrorNames } from '../utils.ts'
+import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -39,7 +39,7 @@ function buildQueryParamsNode(
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const optionsParam = ast.createFunctionParameter({
@@ -80,7 +80,7 @@ export function Query({
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 
