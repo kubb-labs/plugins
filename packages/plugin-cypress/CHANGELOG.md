@@ -1,5 +1,22 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.45
+
+### Minor Changes
+
+- [#350](https://github.com/kubb-labs/plugins/pull/350) [`35a600d`](https://github.com/kubb-labs/plugins/commit/35a600d7516f11270afbda25ed89e5bb8a9c9603) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Default tag group folders to the plain camelCased tag.
+
+  With `group: { type: 'tag' }`, every plugin now writes to `pet/` instead of `petController/` (and the Cypress and MCP plugins drop the `Requests` suffix too). The suffixes were a leftover convention nothing in the output referenced. To keep the old layout, pass `group: { type: 'tag', name: ({ group }) => \`${group}Controller\` }`.
+
+### Patch Changes
+
+- [#328](https://github.com/kubb-labs/plugins/pull/328) [`47713fa`](https://github.com/kubb-labs/plugins/commit/47713fa4d933484fd4661782025e098be2300889) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the stale v4 `barrelType: 'named'` key in every plugin's `output` destructuring default with the v5 `barrel: { type: 'named' }` object. Generated output is unchanged: `@kubb/middleware-barrel` never read the dead key and already fell back to `{ type: 'named' }`. The code now matches the documented default in each plugin's option docs.
+
+  Docs metadata fixes in the same pass: `@kubb/plugin-zod` documents that `importPath` defaults to `'zod/mini'` when `mini` is enabled, and `@kubb/plugin-swr` documents the `parser` default as the boolean `false` instead of the string `'false'`.
+
+- Updated dependencies [[`47713fa`](https://github.com/kubb-labs/plugins/commit/47713fa4d933484fd4661782025e098be2300889), [`35a600d`](https://github.com/kubb-labs/plugins/commit/35a600d7516f11270afbda25ed89e5bb8a9c9603), [`fdd85ac`](https://github.com/kubb-labs/plugins/commit/fdd85acb9f6989dbf332eee204e4a8da238d0a74)]:
+  - @kubb/plugin-ts@5.0.0-beta.45
+
 ## 5.0.0-beta.44
 
 ### Patch Changes
