@@ -7,7 +7,7 @@ import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
 /**
- * Builds a discriminated union type string for `fullByStatus` return shapes.
+ * Builds the discriminated union type string for `dataReturnType: 'full'` return shapes.
  * Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`.
  */
 export function buildStatusUnionType(node: ast.OperationNode, tsResolver: ResolverTs): string {
@@ -33,7 +33,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 /**
  * Builds TypeScript generic parameters for a client method.
  * Includes response type, error type, and optional request type.
- * When `dataReturnType` is `'fullByStatus'`, the response type is a union of all status types.
+ * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented status types.
  */
 export function buildGenerics(
   node: ast.OperationNode,
@@ -158,8 +158,8 @@ export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): str
 
 /**
  * Builds the return statement for a client method.
- * Applies Zod validation to response data if configured, otherwise returns raw response.
- * For `'fullByStatus'`, returns a discriminated union cast keyed by HTTP status code.
+ * When `dataReturnType` is `'full'`, casts the response to the status-discriminated union type.
+ * When `parser` is `'zod'`, pipes the response body through the Zod schema before returning.
  */
 export function buildReturnStatement({
   dataReturnType,

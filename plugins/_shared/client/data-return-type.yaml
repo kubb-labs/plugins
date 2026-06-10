@@ -8,8 +8,8 @@ default: "'data'"
 description: |
   Shape of the value returned from each generated client function.
 
-  - `'data'` returns only the response body (`response.data`). Concise and matches what most apps need.
-  - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`, so narrowing on `res.status` also narrows `res.data` to the matching response type.
+  - `'data'` returns only the response body (`response.data`).
+  - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`. Narrowing on `res.status` also narrows `res.data` to the matching response type.
 examples:
   - name: "'data' (default)"
     files:
