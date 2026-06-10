@@ -185,11 +185,6 @@ export type Options = {
    */
   output?: Output
   /**
-   * Media type read from the OpenAPI spec when an operation defines several.
-   * Defaults to the first JSON-compatible media type Kubb finds.
-   */
-  contentType?: 'application/json' | (string & {})
-  /**
    * Split generated files into subfolders based on the operation's tag.
    */
   group?: Group

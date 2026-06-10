@@ -57,8 +57,6 @@ options:
       - extends: ./_shared/core/output-footer.yaml
       - extends: ./_shared/core/output-override.yaml
 
-  - extends: ./_shared/core/content-type.yaml
-
   - extends: ./_shared/core/group.yaml
     properties:
       - extends: ./_shared/core/group-type.yaml
