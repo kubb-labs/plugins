@@ -13,13 +13,14 @@ type Props = {
    * Created with `printerTs({ ..., nodes: options.printer?.nodes })`.
    */
   printer: ast.Printer<PrinterTsFactory>
-  enumType: PluginTs['resolvedOptions']['enumType']
-  enumTypeSuffix: PluginTs['resolvedOptions']['enumTypeSuffix']
-  enumKeyCasing: PluginTs['resolvedOptions']['enumKeyCasing']
+  enumType: PluginTs['resolvedOptions']['enum']['type']
+  enumConstCasing: PluginTs['resolvedOptions']['enum']['constCasing']
+  enumTypeSuffix: PluginTs['resolvedOptions']['enum']['typeSuffix']
+  enumKeyCasing: PluginTs['resolvedOptions']['enum']['keyCasing']
   resolver: ResolverTs
 }
 
-export function Type({ name, node, printer, enumType, enumTypeSuffix, enumKeyCasing, resolver }: Props): KubbReactNode {
+export function Type({ name, node, printer, enumType, enumConstCasing, enumTypeSuffix, enumKeyCasing, resolver }: Props): KubbReactNode {
   const enumSchemaNodes = ast.collect<ast.EnumSchemaNode>(node, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.narrowSchema(n, ast.schemaTypes.enum)
@@ -36,7 +37,7 @@ export function Type({ name, node, printer, enumType, enumTypeSuffix, enumKeyCas
   const enums = [...new Map(enumSchemaNodes.map((n) => [n.name, n])).values()].map((node) => {
     return {
       node,
-      ...getEnumNames({ node, enumType, enumTypeSuffix, resolver }),
+      ...getEnumNames({ node, enumType, enumConstCasing, enumTypeSuffix, resolver }),
     }
   })
 
@@ -48,7 +49,15 @@ export function Type({ name, node, printer, enumType, enumTypeSuffix, enumKeyCas
     <>
       {shouldExportEnums &&
         enums.map(({ node }) => (
-          <Enum key={node.name} node={node} enumType={enumType} enumTypeSuffix={enumTypeSuffix} enumKeyCasing={enumKeyCasing} resolver={resolver} />
+          <Enum
+            key={node.name}
+            node={node}
+            enumType={enumType}
+            enumConstCasing={enumConstCasing}
+            enumTypeSuffix={enumTypeSuffix}
+            enumKeyCasing={enumKeyCasing}
+            resolver={resolver}
+          />
         ))}
       {shouldExportType && (
         <File.Source name={name} isTypeOnly isExportable isIndexable>

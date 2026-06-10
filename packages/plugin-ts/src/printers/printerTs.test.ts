@@ -216,13 +216,6 @@ describe('printerTs', () => {
       expect(await formatTS(result)).toBe('StatusKey')
     })
 
-    it('enum with name and enumType=asPascalConst renders reference with Key suffix', async () => {
-      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'asPascalConst', enumTypeSuffix: 'Key' })
-      const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
-
-      expect(await formatTS(result)).toBe('StatusKey')
-    })
-
     it('enum with name and enumType=literal renders reference', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'literal' })
       const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))

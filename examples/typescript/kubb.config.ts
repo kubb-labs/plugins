@@ -31,7 +31,7 @@ export default defineConfig([
             }
           },
         },
-        enumType: 'enum',
+        enum: { type: 'enum' },
         syntaxType: 'interface',
       }),
     ],
@@ -54,9 +54,8 @@ export default defineConfig([
           path: 'models.ts',
           barrel: false,
         },
-        enumType: 'asConst',
+        enum: { type: 'asConst', keyCasing: 'screamingSnakeCase' },
         arrayType: 'generic',
-        enumKeyCasing: 'screamingSnakeCase',
         syntaxType: 'interface',
       }),
     ],
@@ -74,8 +73,7 @@ export default defineConfig([
           path: 'modelsConst.ts',
           barrel: false,
         },
-        enumType: 'asConst',
-        enumTypeSuffix: 'enumType',
+        enum: { type: 'asConst', typeSuffix: 'enumType' },
       }),
     ],
   },
@@ -92,7 +90,7 @@ export default defineConfig([
           path: 'modelsPascalConst.ts',
           barrel: false,
         },
-        enumType: 'asPascalConst',
+        enum: { type: 'asConst', constCasing: 'pascalCase' },
       }),
     ],
   },
@@ -109,7 +107,7 @@ export default defineConfig([
           path: 'modelsConstEnum.ts',
           barrel: false,
         },
-        enumType: 'constEnum',
+        enum: { type: 'constEnum' },
       }),
     ],
   },
@@ -126,7 +124,7 @@ export default defineConfig([
           path: 'modelsLiteral.ts',
           barrel: false,
         },
-        enumType: 'literal',
+        enum: { type: 'literal' },
       }),
     ],
   },
@@ -156,7 +154,7 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'modelsInlineLiteral.ts', barrel: false },
-        enumType: 'inlineLiteral',
+        enum: { type: 'inlineLiteral' },
       }),
     ],
   },
@@ -168,7 +166,7 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'modelsOptionalUndefined.ts', barrel: false },
-        enumType: 'inlineLiteral',
+        enum: { type: 'inlineLiteral' },
         optionalType: 'undefined',
       }),
     ],
@@ -181,7 +179,7 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'modelsOptionalBoth.ts', barrel: false },
-        enumType: 'inlineLiteral',
+        enum: { type: 'inlineLiteral' },
         optionalType: 'questionTokenAndUndefined',
       }),
     ],
@@ -194,7 +192,7 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'models' },
-        enumType: 'inlineLiteral',
+        enum: { type: 'inlineLiteral' },
         paramsCasing: 'camelcase',
         group: { type: 'tag' },
       }),
@@ -208,8 +206,7 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'modelsPascalCaseKeys.ts', barrel: false },
-        enumType: 'asConst',
-        enumKeyCasing: 'pascalCase',
+        enum: { type: 'asConst', keyCasing: 'pascalCase' },
       }),
     ],
   },
@@ -224,8 +221,7 @@ export default defineConfig([
     plugins: [
       pluginTs({
         output: { path: 'modelsCamelCaseKeys.ts', barrel: false },
-        enumType: 'asConst',
-        enumKeyCasing: 'camelCase',
+        enum: { type: 'asConst', keyCasing: 'camelCase' },
       }),
     ],
   },

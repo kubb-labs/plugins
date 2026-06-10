@@ -22,9 +22,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginTs['resolvedOptions'] = {
-  enumType: 'asConst',
-  enumTypeSuffix: 'Key',
-  enumKeyCasing: 'none',
+  enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
   optionalType: 'questionToken',
   arrayType: 'array',
   syntaxType: 'type',
@@ -524,12 +522,12 @@ describe('typeGenerator — paramsCasing', () => {
 })
 
 describe('typeGenerator — enumType', () => {
-  const enumTypes = ['asConst', 'asPascalConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] as const satisfies Array<
-    NonNullable<PluginTs['resolvedOptions']['enumType']>
+  const enumTypes = ['asConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] as const satisfies Array<
+    NonNullable<PluginTs['resolvedOptions']['enum']['type']>
   >
 
   test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType', async ({ enumType }) => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enumType }
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `enumType ${enumType}` })
 
@@ -554,12 +552,12 @@ describe('typeGenerator — enumType — dotted name', () => {
     enumValues: ['available', 'pending', 'sold'],
   })
 
-  const dottedDefaultOptions: PluginTs['resolvedOptions'] = { ...defaultOptions, enumTypeSuffix: 'EnumKey' }
+  const dottedDefaultOptions: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, typeSuffix: 'EnumKey' } }
 
-  const enumTypes = ['asConst', 'asPascalConst', 'constEnum', 'enum', 'literal', 'inlineLiteral'] as const
+  const enumTypes = ['asConst', 'constEnum', 'enum', 'literal', 'inlineLiteral'] as const
 
   test.each(enumTypes.map((et) => ({ enumType: et })))('enumType=$enumType — top-level enum with dotted name', async ({ enumType }) => {
-    const options: PluginTs['resolvedOptions'] = { ...dottedDefaultOptions, enumType }
+    const options: PluginTs['resolvedOptions'] = { ...dottedDefaultOptions, enum: { ...dottedDefaultOptions.enum, type: enumType } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `enumNames.Type — ${enumType}` })
 
@@ -578,11 +576,11 @@ describe('typeGenerator — enumType — dotted name', () => {
 
 describe('typeGenerator — enumKeyCasing', () => {
   const casingVariants = ['screamingSnakeCase', 'snakeCase', 'pascalCase', 'camelCase', 'none'] as const satisfies Array<
-    NonNullable<PluginTs['resolvedOptions']['enumKeyCasing']>
+    NonNullable<PluginTs['resolvedOptions']['enum']['keyCasing']>
   >
 
   test.each(casingVariants.map((c) => ({ enumKeyCasing: c })))('enumKeyCasing $enumKeyCasing', async ({ enumKeyCasing }) => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enumType: 'asConst', enumKeyCasing }
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', keyCasing: enumKeyCasing } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: `enumKeyCasing ${enumKeyCasing}` })
 
@@ -601,7 +599,7 @@ describe('typeGenerator — enumKeyCasing', () => {
 
 describe('typeGenerator — enumTypeSuffix', () => {
   test('enumTypeSuffix Key (default)', async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enumType: 'asConst', enumTypeSuffix: 'Key' }
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', typeSuffix: 'Key' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumTypeSuffix Key' })
 
@@ -618,7 +616,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
   })
 
   test('enumTypeSuffix Value', async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enumType: 'asConst', enumTypeSuffix: 'Value' }
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', typeSuffix: 'Value' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumTypeSuffix Value' })
 
@@ -635,7 +633,7 @@ describe('typeGenerator — enumTypeSuffix', () => {
   })
 
   test('enumTypeSuffix empty string', async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enumType: 'asConst', enumTypeSuffix: '' }
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', typeSuffix: '' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'enumTypeSuffix empty' })
 
@@ -649,6 +647,45 @@ describe('typeGenerator — enumTypeSuffix', () => {
     })
 
     await matchFiles(driver.fileManager.files, 'enumTypeSuffix empty')
+  })
+})
+
+describe('typeGenerator — enumConstCasing', () => {
+  test('constCasing pascalCase keeps the Key-suffixed type', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: 'asConst', constCasing: 'pascalCase' } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumConstCasing pascalCase' })
+
+    await renderGeneratorSchema(typeGenerator, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumConstCasing pascalCase')
+  })
+
+  test('constCasing pascalCase with empty typeSuffix merges the const and type under one name', async () => {
+    const options: PluginTs['resolvedOptions'] = {
+      ...defaultOptions,
+      enum: { ...defaultOptions.enum, type: 'asConst', constCasing: 'pascalCase', typeSuffix: '' },
+    }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: 'enumConstCasing merged name' })
+
+    await renderGeneratorSchema(typeGenerator, enumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, 'enumConstCasing merged name')
   })
 })
 

@@ -17,7 +17,15 @@ export const typeGenerator = defineGenerator<PluginTs>({
   name: 'typescript',
   renderer: jsxRenderer,
   schema(node, ctx) {
-    const { enumType, enumTypeSuffix, enumKeyCasing, syntaxType, optionalType, arrayType, output, group, printer } = ctx.options
+    const {
+      enum: { type: enumType, constCasing: enumConstCasing, typeSuffix: enumTypeSuffix, keyCasing: enumKeyCasing },
+      syntaxType,
+      optionalType,
+      arrayType,
+      output,
+      group,
+      printer,
+    } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
     if (!node.name) {
@@ -76,6 +84,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
           name={meta.name}
           node={node}
           enumType={enumType}
+          enumConstCasing={enumConstCasing}
           enumTypeSuffix={enumTypeSuffix}
           enumKeyCasing={enumKeyCasing}
           resolver={resolver}
@@ -85,7 +94,16 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enumType, enumTypeSuffix, enumKeyCasing, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
+    const {
+      enum: { type: enumType, constCasing: enumConstCasing, typeSuffix: enumTypeSuffix, keyCasing: enumKeyCasing },
+      optionalType,
+      arrayType,
+      syntaxType,
+      paramsCasing,
+      group,
+      output,
+      printer,
+    } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
     const mode = ctx.getMode(output)
@@ -142,6 +160,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
             name={name}
             node={schema}
             enumType={enumType}
+            enumConstCasing={enumConstCasing}
             enumTypeSuffix={enumTypeSuffix}
             enumKeyCasing={enumKeyCasing}
             resolver={resolver}

@@ -53,12 +53,12 @@ export type PrinterTsOptions = {
   /**
    * Enum output format.
    * - `'inlineLiteral'` embeds literal unions inline
-   * - `'asPascalConst'` generates named const unions
+   * - `'literal'` generates named literal unions
    * - `'asConst'` generates as const declarations
    *
    * @default `'inlineLiteral'`
    */
-  enumType: PluginTs['resolvedOptions']['enumType']
+  enumType: PluginTs['resolvedOptions']['enum']['type']
   /**
    * Suffix appended to enum key reference names.
    *
@@ -67,7 +67,7 @@ export type PrinterTsOptions = {
    *
    * @default `'Key'`
    */
-  enumTypeSuffix?: PluginTs['resolvedOptions']['enumTypeSuffix']
+  enumTypeSuffix?: PluginTs['resolvedOptions']['enum']['typeSuffix']
   /**
    * Syntax for generated declarations.
    * - `'type'` generates type aliases

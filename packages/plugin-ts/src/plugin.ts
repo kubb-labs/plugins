@@ -27,7 +27,7 @@ export const pluginTsName = 'plugin-ts' satisfies PluginTs['name']
  *   plugins: [
  *     pluginTs({
  *       output: { path: './types' },
- *       enumType: 'asConst',
+ *       enum: { type: 'asConst' },
  *       optionalType: 'questionTokenAndUndefined',
  *     }),
  *   ],
@@ -41,9 +41,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     exclude = [],
     include,
     override = [],
-    enumType = 'asConst',
-    enumTypeSuffix = 'Key',
-    enumKeyCasing = 'none',
+    enum: enumOptions = {},
     optionalType = 'questionToken',
     arrayType = 'array',
     syntaxType = 'type',
@@ -55,6 +53,13 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
   } = options
 
   const groupConfig = createGroupConfig(group, { suffix: 'Controller' })
+
+  const resolvedEnum = {
+    type: enumOptions.type ?? 'asConst',
+    constCasing: enumOptions.constCasing ?? 'camelCase',
+    typeSuffix: enumOptions.typeSuffix ?? 'Key',
+    keyCasing: enumOptions.keyCasing ?? 'none',
+  }
 
   return {
     name: pluginTsName,
@@ -69,9 +74,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           optionalType,
           group: groupConfig,
           arrayType,
-          enumType,
-          enumTypeSuffix,
-          enumKeyCasing,
+          enum: resolvedEnum,
           syntaxType,
           paramsCasing,
           printer,

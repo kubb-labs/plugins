@@ -93,34 +93,53 @@ export type ResolverTs = Resolver &
 
 type EnumKeyCasing = 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'
 
+type EnumConstCasing = 'camelCase' | 'pascalCase'
+
 /**
- * Discriminated union that ties `enumTypeSuffix` and `enumKeyCasing` to the enum types that actually use them.
+ * Grouped enum settings. The discriminated union ties `constCasing`, `typeSuffix`, and `keyCasing`
+ * to the `type` values that actually use them.
  *
- * - `'asConst'` / `'asPascalConst'` — emit a `const` object; both `enumTypeSuffix` (type-alias suffix) and
- *    `enumKeyCasing` (key formatting) are meaningful.
- * - `'enum'` / `'constEnum'` — emit a TypeScript enum; `enumKeyCasing` applies to member names,
- *    but there is no separate type alias so `enumTypeSuffix` is not used.
- * - `'literal'` / `'inlineLiteral'` — emit only union literals; keys are discarded entirely,
- *    so neither `enumTypeSuffix` nor `enumKeyCasing` have any effect.
+ * - `'asConst'` — emit a `const` object plus a `typeof` type alias; `constCasing` (const name),
+ *    `typeSuffix` (type-alias suffix), and `keyCasing` (key formatting) are all meaningful.
+ * - `'enum'` / `'constEnum'` — emit a TypeScript enum; `keyCasing` applies to member names,
+ *    but there is no const object or separate type alias so `constCasing` and `typeSuffix` are unused.
+ * - `'literal'` / `'inlineLiteral'` — emit only union literals; keys are discarded entirely, so
+ *    none of `constCasing`, `typeSuffix`, or `keyCasing` have any effect.
+ *
+ * @example Share one name between the const and the type
+ * ```ts
+ * enum: { type: 'asConst', constCasing: 'pascalCase', typeSuffix: '' }
+ * // export const VehicleType = { … } as const
+ * // export type VehicleType = (typeof VehicleType)[keyof typeof VehicleType]
+ * ```
  */
-type EnumTypeOptions =
+type EnumOptions =
   | {
       /**
-       * Choose to use enum, asConst, asPascalConst, constEnum, literal, or inlineLiteral for enums.
-       * - 'asConst' generates const objects with camelCase names and as const assertion.
-       * - 'asPascalConst' generates const objects with PascalCase names and as const assertion.
+       * Emit a `const` object asserted with `as const`, paired with a `typeof` type alias.
+       * Tree-shakeable and free of enum runtime.
+       *
        * @default 'asConst'
        */
-      enumType?: 'asConst' | 'asPascalConst'
+      type?: 'asConst'
+      /**
+       * Casing of the generated const variable.
+       * - 'camelCase' names the const `vehicleType`.
+       * - 'pascalCase' names the const `VehicleType`, matching the schema name.
+       *
+       * @default 'camelCase'
+       */
+      constCasing?: EnumConstCasing
       /**
        * Suffix appended to the generated type alias name.
        *
-       * Only affects the type alias; the const object name is unchanged.
+       * Only affects the type alias; the const object name is unchanged. Set to `''` together with
+       * `constCasing: 'pascalCase'` to merge the const and type under the schema's exact name.
        *
        * @default 'Key'
-       * @example enumTypeSuffix: 'Value' → `export type PetStatusValue = …`
+       * @example typeSuffix: 'Value' → `export type PetStatusValue = …`
        */
-      enumTypeSuffix?: string
+      typeSuffix?: string
       /**
        * Choose the casing for enum key names.
        * - 'screamingSnakeCase' generates keys in SCREAMING_SNAKE_CASE format.
@@ -130,23 +149,25 @@ type EnumTypeOptions =
        * - 'none' uses the enum value as-is without transformation.
        * @default 'none'
        */
-      enumKeyCasing?: EnumKeyCasing
+      keyCasing?: EnumKeyCasing
     }
   | {
       /**
-       * Choose to use enum, asConst, asPascalConst, constEnum, literal, or inlineLiteral for enums.
-       * - 'enum' generates TypeScript enum declarations.
-       * - 'constEnum' generates TypeScript const enum declarations.
+       * Emit a TypeScript `enum` (`'enum'`) or `const enum` (`'constEnum'`) declaration.
+       *
        * @default 'asConst'
        */
-      enumType?: 'enum' | 'constEnum'
+      type?: 'enum' | 'constEnum'
       /**
-       * `enumTypeSuffix` has no effect for this `enumType`.
-       * It is only used when `enumType` is `'asConst'` or `'asPascalConst'`.
+       * `constCasing` has no effect for this `type`; only `'asConst'` emits a const object.
        */
-      enumTypeSuffix?: never
+      constCasing?: never
       /**
-       * Choose the casing for enum key names.
+       * `typeSuffix` has no effect for this `type`; only `'asConst'` emits a separate type alias.
+       */
+      typeSuffix?: never
+      /**
+       * Choose the casing for enum member names.
        * - 'screamingSnakeCase' generates keys in SCREAMING_SNAKE_CASE format.
        * - 'snakeCase' generates keys in snake_case format.
        * - 'pascalCase' generates keys in PascalCase format.
@@ -154,27 +175,30 @@ type EnumTypeOptions =
        * - 'none' uses the enum value as-is without transformation.
        * @default 'none'
        */
-      enumKeyCasing?: EnumKeyCasing
+      keyCasing?: EnumKeyCasing
     }
   | {
       /**
-       * Choose to use enum, asConst, asPascalConst, constEnum, literal, or inlineLiteral for enums.
-       * - 'literal' generates literal union types.
-       * - 'inlineLiteral' will inline enum values directly into the type (default in v5).
+       * Emit a union of literals as a named alias (`'literal'`) or inline the union at every usage
+       * site (`'inlineLiteral'`).
+       *
        * @default 'asConst'
        * @note In Kubb v5, 'inlineLiteral' becomes the default.
        */
-      enumType?: 'literal' | 'inlineLiteral'
+      type?: 'literal' | 'inlineLiteral'
       /**
-       * `enumTypeSuffix` has no effect for this `enumType`.
-       * It is only used when `enumType` is `'asConst'` or `'asPascalConst'`.
+       * `constCasing` has no effect for this `type`; literal modes emit no const object.
        */
-      enumTypeSuffix?: never
+      constCasing?: never
       /**
-       * `enumKeyCasing` has no effect for this `enumType`.
+       * `typeSuffix` has no effect for this `type`; literal modes emit no separate type alias.
+       */
+      typeSuffix?: never
+      /**
+       * `keyCasing` has no effect for this `type`.
        * Literal and inlineLiteral modes emit only values; keys are discarded entirely.
        */
-      enumKeyCasing?: never
+      keyCasing?: never
     }
 
 export type Options = {
@@ -286,7 +310,18 @@ export type Options = {
   printer?: {
     nodes?: PrinterTsNodes
   }
-} & EnumTypeOptions
+  /**
+   * How OpenAPI enums are represented in the generated TypeScript, and how their names are cased.
+   */
+  enum?: EnumOptions
+}
+
+type ResolvedEnumOptions = {
+  type: NonNullable<EnumOptions['type']>
+  constCasing: EnumConstCasing
+  typeSuffix: string
+  keyCasing: EnumKeyCasing
+}
 
 type ResolvedOptions = {
   output: Output
@@ -294,9 +329,7 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  enumType: NonNullable<Options['enumType']>
-  enumTypeSuffix: NonNullable<Options['enumTypeSuffix']>
-  enumKeyCasing: EnumKeyCasing
+  enum: ResolvedEnumOptions
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
