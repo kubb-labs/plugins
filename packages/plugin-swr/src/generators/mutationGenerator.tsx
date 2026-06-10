@@ -9,6 +9,11 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mutation, MutationKey } from '../components'
 import type { PluginSwr } from '../types'
 
+/**
+ * Built-in generator for `useSWRMutation` hooks. Emits one `useFooMutation` hook
+ * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
+ * the matching `fooMutationKey` helper.
+ */
 export const mutationGenerator = defineGenerator<PluginSwr>({
   name: 'swr-mutation',
   renderer: jsxRenderer,
@@ -104,6 +109,9 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
         {shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
         {!shouldUseClientPlugin && node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
           <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
+        )}
+        {!shouldUseClientPlugin && parser === 'zod' && zodResolver && node.requestBody?.content?.[0]?.schema && (
+          <File.Import name={['z']} path="zod" isTypeOnly />
         )}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />

@@ -7,6 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import type { z } from 'zod'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -21,7 +22,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
 
   const requestData = uploadFileDataSchema.parse(data)
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.output<typeof uploadFileDataSchema>>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return uploadFileResponseSchema.parse(res.data)
 }

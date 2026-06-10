@@ -2,6 +2,7 @@
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { CreatePetData, CreatePetResponse, CreatePetStatus201, CreatePetStatus405 } from './CreatePet'
+import type { z } from 'zod'
 import { client } from './.kubb/client'
 import { CreatePetResponse, CreatePetData } from './CreatePet'
 
@@ -19,7 +20,7 @@ export async function createPet(data?: CreatePetData, config: Partial<RequestCon
 
   const requestData = CreatePetData.parse(data)
 
-  const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, CreatePetData>({
+  const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, z.output<typeof CreatePetData>>({
     method: 'POST',
     url: getCreatePetUrl().url.toString(),
     data: requestData,

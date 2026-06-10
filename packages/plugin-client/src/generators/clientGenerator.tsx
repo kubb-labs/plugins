@@ -46,6 +46,8 @@ export const clientGenerator = defineGenerator<PluginClient>({
         ].filter((name): name is string => Boolean(name))
       : []
 
+    const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? (zodResolver.resolveDataName?.(node) ?? null) : null
+
     const meta = {
       name: resolver.resolveName(node.operationId),
       urlName: resolver.resolveUrlName(node),
@@ -93,6 +95,8 @@ export const clientGenerator = defineGenerator<PluginClient>({
         )}
 
         {hasFormData && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
+
+        {zodRequestName && <File.Import name={['z']} path="zod" isTypeOnly />}
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as Array<string>} root={meta.file.path} path={meta.fileZod.path} />}
 

@@ -7,6 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../types/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import type { z } from 'zod'
 import { updateUserResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -22,7 +23,7 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
 
   const requestData = updateUserDataSchema.parse(data)
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, z.output<typeof updateUserDataSchema>>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
 
   return updateUserResponseSchema.parse(res.data)
 }

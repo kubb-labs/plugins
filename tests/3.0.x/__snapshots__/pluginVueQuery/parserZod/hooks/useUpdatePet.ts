@@ -8,6 +8,7 @@ import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetSt
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import type { z } from 'zod'
 import { updatePetResponseSchema, updatePetDataSchema } from '../zod/updatePetSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
@@ -23,7 +24,7 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 
   const requestData = updatePetDataSchema.parse(data)
 
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, z.output<typeof updatePetDataSchema>>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return updatePetResponseSchema.parse(res.data)
 }

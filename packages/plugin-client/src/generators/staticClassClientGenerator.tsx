@@ -200,6 +200,10 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
               {hasFormData && <File.Import name={['buildFormData']} root={file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
+              {parser === 'zod' && zodResolver && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && (
+                <File.Import name={['z']} path="zod" isTypeOnly />
+              )}
+
               {Array.from(typeImportsByFile.entries()).map(([filePath, importSet]) => {
                 const typeFile = typeFilesByPath.get(filePath)
                 if (!typeFile) return null

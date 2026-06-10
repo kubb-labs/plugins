@@ -7,6 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import type { z } from 'zod'
 import { createUserResponseSchema, createUserDataSchema } from '../zod/createUserSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -22,7 +23,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 
   const requestData = createUserDataSchema.parse(data)
 
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, z.output<typeof createUserDataSchema>>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
 
   return createUserResponseSchema.parse(res.data)
 }

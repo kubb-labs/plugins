@@ -61,14 +61,21 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 }
 
 /**
- * Builds TypeScript generic parameters for a client method.
- * Includes response type, error type, and optional request type.
- * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented status types.
+ * Returns the generic type arguments — response, error, and request body — for a generated
+ * client call.
+ *
+ * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented
+ * status types. When `parser` is `'zod'` and a request body schema exists, the request type
+ * uses `z.output<typeof schema>` to reflect post-transform types (e.g. date coercion).
  */
 export function buildGenerics(
   node: ast.OperationNode,
   tsResolver: ResolverTs,
-  options: { dataReturnType?: PluginClient['resolvedOptions']['dataReturnType'] } = {},
+  options: {
+    dataReturnType?: PluginClient['resolvedOptions']['dataReturnType']
+    zodResolver?: ResolverZod | null
+    parser?: PluginClient['resolvedOptions']['parser']
+  } = {},
 ): Array<string> {
   const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const successNames = resolveSuccessNames(node, tsResolver)
@@ -83,7 +90,15 @@ export function buildGenerics(
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
-  return [responseName, TError, requestName || 'unknown'].filter(Boolean)
+
+  const zodRequestName =
+    options.parser === 'zod' && options.zodResolver && node.requestBody?.content?.[0]?.schema
+      ? (options.zodResolver.resolveDataName?.(node) ?? null)
+      : null
+
+  const requestGenericType = zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
+
+  return [responseName, TError, requestGenericType].filter(Boolean)
 }
 
 /**
