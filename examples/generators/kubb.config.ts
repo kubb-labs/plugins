@@ -47,7 +47,7 @@ export default defineConfig([
     },
     plugins: [
       pluginClient({
-        output: { path: './example3.tsx' },
+        output: { path: './example3.tsx', mode: 'file' },
         generators: [example3],
       }),
     ],
