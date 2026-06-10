@@ -17,7 +17,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildStatusUnionType } from '../utils.ts'
+import { buildStatusUnionType, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 import { buildUrlParamsNode } from './Url.tsx'
 
 type Props = {
@@ -118,8 +118,13 @@ export function Client({
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
 
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
+  const requestParser = resolveRequestParser(parser)
+  const responseParser = resolveResponseParser(parser)
+  const zodResponseName = zodResolver && responseParser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodRequestName = zodResolver && requestParser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
+  const queryParamsParser = resolveQueryParamsParser(parser)
+  const zodQueryParamsName =
+    zodResolver && queryParamsParser === 'zod' && originalQueryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, originalQueryParams[0]!) : null
 
   const errorNames = node.responses
     .filter((r) => {
@@ -174,7 +179,7 @@ export function Client({
                 value: `\`${baseURL}\``,
               }
             : null,
-        params: queryParamsName ? (queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
+        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
         data: requestName
           ? {
               value:
@@ -208,13 +213,13 @@ export function Client({
   ) : (
     <>
       {dataReturnType === 'full' &&
-        parser === 'zod' &&
+        responseParser === 'zod' &&
         zodResponseName &&
         statusUnionType &&
         `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
-      {dataReturnType === 'full' && parser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
-      {dataReturnType === 'data' && parser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
-      {dataReturnType === 'data' && parser !== 'zod' && 'return res.data'}
+      {dataReturnType === 'full' && responseParser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
+      {dataReturnType === 'data' && responseParser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
+      {dataReturnType === 'data' && responseParser !== 'zod' && 'return res.data'}
     </>
   )
 
@@ -259,7 +264,8 @@ export function Client({
               <br />
             </>
           )}
-          {parser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
+          {requestParser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
+          {zodQueryParamsName && `const requestParams = ${zodQueryParamsName}.parse(params)`}
           {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
           <br />
           {isConfigurable

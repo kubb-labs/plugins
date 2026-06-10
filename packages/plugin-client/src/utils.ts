@@ -6,6 +6,47 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { createFunctionParams } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
 
+type ParserOption = PluginClient['resolvedOptions']['parser']
+
+/**
+ * Returns `true` when any direction of the parser uses Zod (used for dependency checks).
+ */
+export function isParserEnabled(parser: ParserOption | undefined | false): boolean {
+  if (!parser) return false
+  if (parser === 'zod') return true
+  return !!(parser.request || parser.response)
+}
+
+/**
+ * Returns `'zod'` when request body parsing is enabled, `null` otherwise.
+ * The string shorthand `'zod'` also enables request body parsing (existing behavior).
+ */
+export function resolveRequestParser(parser: ParserOption | undefined | false): 'zod' | null {
+  if (!parser) return null
+  if (parser === 'zod') return 'zod'
+  return parser.request ?? null
+}
+
+/**
+ * Returns `'zod'` when query-parameters parsing is enabled, `null` otherwise.
+ * Only the object form `{ request: 'zod' }` enables query-params parsing.
+ * The string shorthand `'zod'` does not, preserving its existing behavior.
+ */
+export function resolveQueryParamsParser(parser: ParserOption | undefined | false): 'zod' | null {
+  if (!parser || parser === 'zod') return null
+  return parser.request ?? null
+}
+
+/**
+ * Returns `'zod'` when response-direction parsing is enabled, `null` otherwise.
+ * `parser: 'zod'` (string shorthand) maps to response parsing and returns `'zod'`.
+ */
+export function resolveResponseParser(parser: ParserOption | undefined | false): 'zod' | null {
+  if (!parser) return null
+  if (parser === 'zod') return 'zod'
+  return parser.response ?? null
+}
+
 /**
  * Builds the discriminated union type string for `dataReturnType: 'full'` return shapes.
  * Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`.
@@ -69,6 +110,7 @@ export function buildClassClientParams({
   isMultipleContentTypes,
   hasFormData,
   headers,
+  zodQueryParamsName,
 }: {
   node: ast.OperationNode
   path: URLPath
@@ -78,6 +120,7 @@ export function buildClassClientParams({
   isMultipleContentTypes: boolean
   hasFormData: boolean
   headers: Array<string>
+  zodQueryParamsName?: string | null
 }) {
   const { query: queryParams } = getOperationParameters(node)
   const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
@@ -102,7 +145,7 @@ export function buildClassClientParams({
               value: JSON.stringify(baseURL),
             }
           : null,
-        params: queryParamsName ? {} : null,
+        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : {}) : null,
         data: requestName
           ? {
               value:
@@ -127,7 +170,7 @@ export function buildClassClientParams({
 
 /**
  * Builds the request data parsing line for client methods.
- * Applies Zod validation if configured, otherwise uses data directly.
+ * Applies Zod validation when `parser.request === 'zod'`, otherwise assigns data directly.
  */
 export function buildRequestDataLine({
   parser,
@@ -138,14 +181,37 @@ export function buildRequestDataLine({
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
 }): string {
-  const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
-  if (parser === 'zod' && zodRequestName) {
+  const requestParser = resolveRequestParser(parser)
+  const zodRequestName = zodResolver && requestParser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
+  if (requestParser === 'zod' && zodRequestName) {
     return `const requestData = ${zodRequestName}.parse(data)`
   }
   if (node.requestBody?.content?.[0]?.schema) {
     return 'const requestData = data'
   }
   return ''
+}
+
+/**
+ * Builds the query parameters parsing line for client methods.
+ * Returns an empty string when no query params exist or query-params parsing is not enabled.
+ * Only the object form `parser: { request: 'zod' }` triggers this. `parser: 'zod'` does not.
+ */
+export function buildQueryParamsLine({
+  parser,
+  node,
+  zodResolver,
+}: {
+  parser: PluginClient['resolvedOptions']['parser'] | undefined
+  node: ast.OperationNode
+  zodResolver?: ResolverZod | null
+}): string {
+  if (resolveQueryParamsParser(parser) !== 'zod' || !zodResolver) return ''
+  const { query: queryParams } = getOperationParameters(node)
+  if (queryParams.length === 0) return ''
+  const zodQueryParamsName = zodResolver.resolveQueryParamsName?.(node, queryParams[0]!)
+  if (!zodQueryParamsName) return ''
+  return `const requestParams = ${zodQueryParamsName}.parse(params)`
 }
 
 /**
@@ -159,7 +225,7 @@ export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): str
 /**
  * Builds the return statement for a client method.
  * When `dataReturnType` is `'full'`, casts the response to the status-discriminated union type.
- * When `parser` is `'zod'`, pipes the response body through the Zod schema before returning.
+ * When `parser.response` is `'zod'`, pipes the response body through the Zod schema before returning.
  */
 export function buildReturnStatement({
   dataReturnType,
@@ -174,17 +240,18 @@ export function buildReturnStatement({
   zodResolver?: ResolverZod | null
   tsResolver?: ResolverTs | null
 }): string {
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const responseParser = resolveResponseParser(parser)
+  const zodResponseName = zodResolver && responseParser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
 
   if (dataReturnType === 'full' && tsResolver) {
     const unionType = buildStatusUnionType(node, tsResolver)
-    if (parser === 'zod' && zodResponseName) {
+    if (responseParser === 'zod' && zodResponseName) {
       return `return {...res, data: ${zodResponseName}.parse(res.data)} as ${unionType}`
     }
     return `return res as ${unionType}`
   }
 
-  if (dataReturnType === 'data' && parser === 'zod' && zodResponseName) {
+  if (dataReturnType === 'data' && responseParser === 'zod' && zodResponseName) {
     return `return ${zodResponseName}.parse(res.data)`
   }
   return 'return res.data'

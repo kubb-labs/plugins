@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 import { ast, definePlugin } from '@kubb/core'
-import { pluginClientName } from '@kubb/plugin-client'
+import { isParserEnabled, pluginClientName } from '@kubb/plugin-client'
 import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
 import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
 import { source as configSource } from '@kubb/plugin-client/templates/config.source'
@@ -95,7 +95,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
   return {
     name: pluginReactQueryName,
     options,
-    dependencies: [pluginTsName, parser === 'zod' ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
+    dependencies: [pluginTsName, isParserEnabled(parser) ? pluginZodName : undefined].filter((dependency): dependency is string => Boolean(dependency)),
     hooks: {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverReactQuery, ...userResolver } : resolverReactQuery

@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -9,6 +9,7 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { StaticClassClient } from '../components/StaticClassClient'
 import type { PluginClient } from '../types'
+import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 
 type OperationData = {
   node: ast.OperationNode
@@ -29,10 +30,12 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
   return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
 }
 
-function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
+function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {
+  const { query: queryParams } = getOperationParameters(node)
   const names: Array<string | null | undefined> = [
-    zodResolver.resolveResponseName?.(node),
-    node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
+    resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+    resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
+    resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
 }
@@ -56,7 +59,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
     const tsResolver = driver.getResolver(pluginTsName)
     const tsPluginOptions = pluginTs.options
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     function buildOperationData(node: ast.OperationNode): OperationData {
@@ -144,7 +147,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
 
       ops.forEach((op) => {
         if (!op.zodFile || !zodResolver) return
-        const names = resolveZodImportNames(op.node, zodResolver)
+        const names = resolveZodImportNames(op.node, zodResolver, parser)
         if (!zodImportsByFile.has(op.zodFile.path)) {
           zodImportsByFile.set(op.zodFile.path, new Set())
         }
@@ -162,8 +165,9 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
       <>
         {controllers.map(({ name, file, operations: ops }) => {
           const { typeImportsByFile, typeFilesByPath } = collectTypeImports(ops)
-          const { zodImportsByFile, zodFilesByPath } =
-            parser === 'zod' ? collectZodImports(ops) : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
+          const { zodImportsByFile, zodFilesByPath } = isParserEnabled(parser)
+            ? collectZodImports(ops)
+            : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
           const hasFormData = ops.some((op) => op.node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false)
 
           return (
@@ -204,7 +208,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
                 return <File.Import key={filePath} name={importNames} root={file.path} path={typeFile.path} isTypeOnly />
               })}
 
-              {parser === 'zod' &&
+              {isParserEnabled(parser) &&
                 Array.from(zodImportsByFile.entries()).map(([filePath, importSet]) => {
                   const zodFile = zodFilesByPath.get(filePath)
                   if (!zodFile) return null

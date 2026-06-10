@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -7,6 +7,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
 import type { PluginClient } from '../types'
+import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 
 /**
  * Built-in operation generator for `@kubb/plugin-client`. Emits one async
@@ -30,17 +31,20 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
 
-    const importedZodNames =
-      zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
-            (name): name is string => Boolean(name),
-          )
-        : []
+    const { query: queryParams } = getOperationParameters(node)
+
+    const importedZodNames = zodResolver
+      ? [
+          resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+          resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
+          resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
+        ].filter((name): name is string => Boolean(name))
+      : []
 
     const meta = {
       name: resolver.resolveName(node.operationId),

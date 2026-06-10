@@ -2,7 +2,7 @@ import path from 'node:path'
 import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { Client, pluginClientName } from '@kubb/plugin-client'
+import { Client, isParserEnabled, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -58,7 +58,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
       order: 'body-response-first',
     })
 
-    const pluginZod = parser === 'zod' ? driver.getPlugin(pluginZodName) : null
+    const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
     const fileZod = zodResolver
       ? zodResolver.resolveFile(operationFileEntry(node, node.operationId), {
@@ -67,7 +67,7 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           group: pluginZod?.options?.group ?? undefined,
         })
       : null
-    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver)
+    const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
 
     const clientPlugin = driver.getPlugin(pluginClientName)
     const hasClientPlugin = clientPlugin?.name === pluginClientName
