@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { CreateUserData, CreateUserResponse } from '../../../models/ts/user/CreateUser.ts'
+import type { CreateUserData, CreateUserStatusDefault } from '../../../models/ts/user/CreateUser.ts'
 import { createUserResponseSchema, createUserDataSchema } from '../../../zod/user/createUserSchema.ts'
 
 export function getCreateUserUrl() {
@@ -25,7 +25,7 @@ export async function createUser(
 
   const requestData = createUserDataSchema.parse(data)
 
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({
+  const res = await request<CreateUserStatusDefault, ResponseErrorConfig<Error>, CreateUserData>({
     method: 'POST',
     url: getCreateUserUrl().url.toString(),
     data: requestData,
@@ -33,5 +33,5 @@ export async function createUser(
     ...requestConfig,
   })
 
-  return { ...res, data: createUserResponseSchema.parse(res.data) }
+  return { ...res, data: createUserResponseSchema.parse(res.data) } as { status: number; data: CreateUserStatusDefault; statusText: string }
 }

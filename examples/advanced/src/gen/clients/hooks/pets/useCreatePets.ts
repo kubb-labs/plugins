@@ -1,4 +1,4 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
   CreatePetsData,
   CreatePetsPathUuid,
@@ -6,6 +6,7 @@ import type {
   CreatePetsQueryOffset,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsStatus201,
+  CreatePetsStatusDefault,
 } from '../../../models/ts/pets/CreatePets.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createPets } from '../../axios/petsService/createPets.ts'
@@ -16,7 +17,7 @@ export const createPetsMutationKey = () => [{ url: '/pets/:uuid' }] as const
 export function createPetsMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {}) {
   const mutationKey = createPetsMutationKey()
   return mutationOptions<
-    ResponseConfig<CreatePetsStatus201>,
+    { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid
@@ -40,7 +41,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Re
 export function useCreatePets<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<CreatePetsStatus201>,
+      { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
       ResponseErrorConfig<Error>,
       {
         uuid: CreatePetsPathUuid
@@ -58,7 +59,7 @@ export function useCreatePets<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? createPetsMutationKey()
 
   const baseOptions = createPetsMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<CreatePetsStatus201>,
+    { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid
@@ -70,7 +71,7 @@ export function useCreatePets<TContext>(
   >
 
   return useMutation<
-    ResponseConfig<CreatePetsStatus201>,
+    { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid
@@ -87,7 +88,7 @@ export function useCreatePets<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ResponseConfig<CreatePetsStatus201>,
+    { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
     {
       uuid: CreatePetsPathUuid

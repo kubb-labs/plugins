@@ -30,5 +30,5 @@ export async function uploadFile(
     headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })
 
-  return { ...res, data: uploadFileResponseSchema.parse(res.data) }
+  return { ...res, data: uploadFileResponseSchema.parse(res.data) } as { status: 200; data: UploadFileStatus200; statusText: string }
 }

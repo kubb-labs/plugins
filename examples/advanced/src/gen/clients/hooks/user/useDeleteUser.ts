@@ -1,5 +1,5 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { deleteUser } from '../../axios/userService/deleteUser.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -9,7 +9,7 @@ export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 export function deleteUserMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = deleteUserMutationKey()
   return mutationOptions<
-    ResponseConfig<DeleteUserResponse>,
+    { status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string },
     ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
     { username: DeleteUserPathUsername },
     TContext
@@ -29,7 +29,7 @@ export function deleteUserMutationOptions<TContext = unknown>(config: Partial<Re
 export function useDeleteUser<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<DeleteUserResponse>,
+      { status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string },
       ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
       { username: DeleteUserPathUsername },
       TContext
@@ -42,14 +42,14 @@ export function useDeleteUser<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? deleteUserMutationKey()
 
   const baseOptions = deleteUserMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<DeleteUserResponse>,
+    { status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string },
     ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
     { username: DeleteUserPathUsername },
     TContext
   >
 
   return useMutation<
-    ResponseConfig<DeleteUserResponse>,
+    { status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string },
     ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
     { username: DeleteUserPathUsername },
     TContext
@@ -61,7 +61,7 @@ export function useDeleteUser<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    ResponseConfig<DeleteUserResponse>,
+    { status: 400; data: DeleteUserStatus400; statusText: string } | { status: 404; data: DeleteUserStatus404; statusText: string },
     ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>,
     { username: DeleteUserPathUsername },
     TContext

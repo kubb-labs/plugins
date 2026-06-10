@@ -1,5 +1,9 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/user/CreateUsersWithListInput.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type {
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputStatus200,
+  CreateUsersWithListInputStatusDefault,
+} from '../../../models/ts/user/CreateUsersWithListInput.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createUsersWithListInput } from '../../axios/userService/createUsersWithListInput.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -10,7 +14,13 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const mutationKey = createUsersWithListInputMutationKey()
-  return mutationOptions<ResponseConfig<CreateUsersWithListInputStatus200>, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>({
+  return mutationOptions<
+    | { status: 200; data: CreateUsersWithListInputStatus200; statusText: string }
+    | { status: number; data: CreateUsersWithListInputStatusDefault; statusText: string },
+    ResponseErrorConfig<Error>,
+    { data?: CreateUsersWithListInputData },
+    TContext
+  >({
     mutationKey,
     mutationFn: async ({ data }) => {
       return createUsersWithListInput({ data }, config)
@@ -26,7 +36,8 @@ export function createUsersWithListInputMutationOptions<TContext = unknown>(
 export function useCreateUsersWithListInput<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      ResponseConfig<CreateUsersWithListInputStatus200>,
+      | { status: 200; data: CreateUsersWithListInputStatus200; statusText: string }
+      | { status: number; data: CreateUsersWithListInputStatusDefault; statusText: string },
       ResponseErrorConfig<Error>,
       { data?: CreateUsersWithListInputData },
       TContext
@@ -39,18 +50,31 @@ export function useCreateUsersWithListInput<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? createUsersWithListInputMutationKey()
 
   const baseOptions = createUsersWithListInputMutationOptions(config) as UseMutationOptions<
-    ResponseConfig<CreateUsersWithListInputStatus200>,
+    | { status: 200; data: CreateUsersWithListInputStatus200; statusText: string }
+    | { status: number; data: CreateUsersWithListInputStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
     { data?: CreateUsersWithListInputData },
     TContext
   >
 
-  return useMutation<ResponseConfig<CreateUsersWithListInputStatus200>, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>(
+  return useMutation<
+    | { status: 200; data: CreateUsersWithListInputStatus200; statusText: string }
+    | { status: number; data: CreateUsersWithListInputStatusDefault; statusText: string },
+    ResponseErrorConfig<Error>,
+    { data?: CreateUsersWithListInputData },
+    TContext
+  >(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<ResponseConfig<CreateUsersWithListInputStatus200>, ResponseErrorConfig<Error>, { data?: CreateUsersWithListInputData }, TContext>
+  ) as UseMutationResult<
+    | { status: 200; data: CreateUsersWithListInputStatus200; statusText: string }
+    | { status: number; data: CreateUsersWithListInputStatusDefault; statusText: string },
+    ResponseErrorConfig<Error>,
+    { data?: CreateUsersWithListInputData },
+    TContext
+  >
 }

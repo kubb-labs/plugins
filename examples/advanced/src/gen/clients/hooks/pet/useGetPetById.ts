@@ -1,4 +1,4 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
@@ -11,9 +11,13 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ petId })
   return queryOptions<
-    ResponseConfig<GetPetByIdStatus200>,
+    | { status: 200; data: GetPetByIdStatus200; statusText: string }
+    | { status: 400; data: GetPetByIdStatus400; statusText: string }
+    | { status: 404; data: GetPetByIdStatus404; statusText: string },
     ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>,
-    ResponseConfig<GetPetByIdStatus200>,
+    | { status: 200; data: GetPetByIdStatus200; statusText: string }
+    | { status: 400; data: GetPetByIdStatus400; statusText: string }
+    | { status: 404; data: GetPetByIdStatus404; statusText: string },
     typeof queryKey
   >({
     enabled: !!petId,
@@ -30,14 +34,28 @@ export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId 
  * {@link /pet/:petId:search}
  */
 export function useGetPetById<
-  TData = ResponseConfig<GetPetByIdStatus200>,
-  TQueryData = ResponseConfig<GetPetByIdStatus200>,
+  TData =
+    | { status: 200; data: GetPetByIdStatus200; statusText: string }
+    | { status: 400; data: GetPetByIdStatus400; statusText: string }
+    | { status: 404; data: GetPetByIdStatus404; statusText: string },
+  TQueryData =
+    | { status: 200; data: GetPetByIdStatus200; statusText: string }
+    | { status: 400; data: GetPetByIdStatus400; statusText: string }
+    | { status: 404; data: GetPetByIdStatus404; statusText: string },
   TQueryKey extends QueryKey = GetPetByIdQueryKey,
 >(
   { petId }: { petId?: GetPetByIdPathPetId } = {},
   options: {
     query?: Partial<
-      QueryObserverOptions<ResponseConfig<GetPetByIdStatus200>, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>
+      QueryObserverOptions<
+        | { status: 200; data: GetPetByIdStatus200; statusText: string }
+        | { status: 400; data: GetPetByIdStatus400; statusText: string }
+        | { status: 404; data: GetPetByIdStatus404; statusText: string },
+        ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>,
+        TData,
+        TQueryData,
+        TQueryKey
+      >
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

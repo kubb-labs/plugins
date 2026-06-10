@@ -7,6 +7,7 @@ import type {
   CreatePetsHeaderXEXAMPLE,
   CreatePetsData,
   CreatePetsStatus201,
+  CreatePetsStatusDefault,
 } from '../../../models/ts/pets/CreatePets.ts'
 import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/pets/createPetsSchema.ts'
 
@@ -42,7 +43,7 @@ export async function createPets(
 
   const requestData = createPetsDataSchema.parse(data)
 
-  const res = await request<CreatePetsStatus201, ResponseErrorConfig<Error>, CreatePetsData>({
+  const res = await request<CreatePetsStatus201 | CreatePetsStatusDefault, ResponseErrorConfig<Error>, CreatePetsData>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,
@@ -51,5 +52,7 @@ export async function createPets(
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
-  return { ...res, data: createPetsResponseSchema.parse(res.data) }
+  return { ...res, data: createPetsResponseSchema.parse(res.data) } as
+    | { status: 201; data: CreatePetsStatus201; statusText: string }
+    | { status: number; data: CreatePetsStatusDefault; statusText: string }
 }

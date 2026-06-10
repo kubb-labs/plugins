@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
+import type { AddPetData, AddPetStatus405, AddPetStatusDefault } from '../../../models/ts/pet/AddPet.ts'
 import { addPetResponseSchema, addPetDataSchema } from '../../../zod/pet/addPetSchema.ts'
 
 export function getAddPetUrl() {
@@ -25,7 +25,7 @@ export async function addPet(
 
   const requestData = addPetDataSchema.parse(data)
 
-  const res = await request<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
+  const res = await request<AddPetStatus405 | AddPetStatusDefault, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
     data: requestData,
@@ -33,5 +33,7 @@ export async function addPet(
     ...requestConfig,
   })
 
-  return { ...res, data: addPetResponseSchema.parse(res.data) }
+  return { ...res, data: addPetResponseSchema.parse(res.data) } as
+    | { status: 405; data: AddPetStatus405; statusText: string }
+    | { status: number; data: AddPetStatusDefault; statusText: string }
 }
