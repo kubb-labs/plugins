@@ -89,7 +89,6 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
           <>
             {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
-            {clientOptions.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={clientOptions.importPath} isTypeOnly />}
           </>
         ) : (
           <>
@@ -100,9 +99,6 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               path={path.resolve(root, '.kubb/client.ts')}
               isTypeOnly
             />
-            {clientOptions.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
-            )}
           </>
         )}
         {shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
