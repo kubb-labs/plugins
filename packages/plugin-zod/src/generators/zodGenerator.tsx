@@ -85,7 +85,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     }))
     const inputImportEntries = hasCodec
       ? [...codecRefNames].map((schemaName) => ({
-          name: resolver.resolveInputSchemaName(schemaName),
+          name: [resolver.resolveInputSchemaName(schemaName)],
           path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
         }))
       : []

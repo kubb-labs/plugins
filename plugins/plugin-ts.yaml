@@ -104,6 +104,18 @@ options:
         body: |
           > [!TIP]
           > `'inlineLiteral'` produces the cleanest output for small enums. The values appear directly where they are used instead of via a named alias.
+
+          Numeric enum values are not valid identifiers, so `'asConst'`, `'enum'`, and `'constEnum'` prefix them with the PascalCase enum name (`Priority_1`) instead of emitting bare digit keys. `keyCasing` still applies on top, so `'screamingSnakeCase'` produces `PRIORITY_1`.
+
+          ```typescript
+          export const priority = {
+            Priority_1: 1,
+            Priority_2: 2,
+            Priority_3: 3,
+          } as const
+
+          export type PriorityKey = (typeof priority)[keyof typeof priority]
+          ```
         examples:
           - name: "'enum'"
             files:
@@ -237,6 +249,8 @@ options:
           | `'pascalCase'` | `EnumValue` |
           | `'camelCase'` | `enumValue` |
           | `'none'` (default) | as-is |
+
+          For numeric values the casing is applied to the enum-name-prefixed key, so `'screamingSnakeCase'` turns a `1` value into `PRIORITY_1`.
 
   - name: dateType
     required: false
