@@ -97,7 +97,6 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
           <>
             {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
             <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
-            {clientOptions.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={clientOptions.importPath} isTypeOnly />}
           </>
         ) : (
           <>
@@ -108,9 +107,6 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
               path={path.resolve(root, '.kubb/client.ts')}
               isTypeOnly
             />
-            {clientOptions.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
-            )}
           </>
         )}
         <File.Import name={['toValue']} path="vue" />

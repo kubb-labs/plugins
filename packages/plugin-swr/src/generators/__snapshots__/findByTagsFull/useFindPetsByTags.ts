@@ -4,8 +4,8 @@
  */
 
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/client'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
@@ -25,7 +25,7 @@ export async function findPetsByTags(
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return res
+  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }
 
 export function findPetsByTagsQueryOptions(
@@ -45,7 +45,7 @@ export function findPetsByTagsQueryOptions(
 export function useFindPetsByTags(
   params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
   options: {
-    query?: SWRConfiguration<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>>
+    query?: SWRConfiguration<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }
     shouldFetch?: boolean
     immutable?: boolean
@@ -55,15 +55,18 @@ export function useFindPetsByTags(
 
   const queryKey = findPetsByTagsQueryKey(params)
 
-  return useSWR<ResponseConfig<FindPetsByTagsResponse>, ResponseErrorConfig<Error>, FindPetsByTagsQueryKey | null>(shouldFetch && !!params ? queryKey : null, {
-    ...findPetsByTagsQueryOptions(params, config),
-    ...(immutable
-      ? {
-          revalidateIfStale: false,
-          revalidateOnFocus: false,
-          revalidateOnReconnect: false,
-        }
-      : {}),
-    ...queryOptions,
-  })
+  return useSWR<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, FindPetsByTagsQueryKey | null>(
+    shouldFetch && !!params ? queryKey : null,
+    {
+      ...findPetsByTagsQueryOptions(params, config),
+      ...(immutable
+        ? {
+            revalidateIfStale: false,
+            revalidateOnFocus: false,
+            revalidateOnReconnect: false,
+          }
+        : {}),
+      ...queryOptions,
+    },
+  )
 }

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from './.kubb/client'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type {
   FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
@@ -35,7 +35,7 @@ export async function findPetsByTagsSuspense(
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return { ...res, data: FindPetsByTagsResponse.parse(res.data) }
+  return { ...res, data: FindPetsByTagsResponse.parse(res.data) } as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }
 
 export function findPetsByTagsSuspenseQueryOptions(
@@ -43,7 +43,12 @@ export function findPetsByTagsSuspenseQueryOptions(
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey(params)
-  return queryOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<Error>, ResponseConfig<FindPetsByTagsStatus200>, typeof queryKey>({
+  return queryOptions<
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
+    ResponseErrorConfig<Error>,
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
+    typeof queryKey
+  >({
     queryKey,
     queryFn: async ({ signal }) => {
       return findPetsByTagsSuspense(params, { ...config, signal: config.signal ?? signal })
@@ -54,10 +59,15 @@ export function findPetsByTagsSuspenseQueryOptions(
 /**
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTagsSuspense<TData = ResponseConfig<FindPetsByTagsStatus200>, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
+export function useFindPetsByTagsSuspense<
+  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
+  TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey,
+>(
   params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
-    query?: Partial<UseSuspenseQueryOptions<ResponseConfig<FindPetsByTagsStatus200>, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
+    query?: Partial<
+      UseSuspenseQueryOptions<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, TData, TQueryKey>
+    > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {

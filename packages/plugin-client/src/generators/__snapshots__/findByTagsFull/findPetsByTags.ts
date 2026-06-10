@@ -26,5 +26,5 @@ export async function findPetsByTags(
     ...requestConfig,
   })
 
-  return res
+  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }

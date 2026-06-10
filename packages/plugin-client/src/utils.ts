@@ -1,4 +1,4 @@
-import { getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
+import { buildStatusUnionType, getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
 import type { URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -47,6 +47,8 @@ export function resolveResponseParser(parser: ParserOption | undefined | false):
   return parser.response ?? null
 }
 
+export { buildStatusUnionType }
+
 /**
  * Builds HTTP headers array for a client request.
  * Includes Content-Type (if not default) and spreads header parameters if present.
@@ -62,27 +64,35 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  * Returns the generic type arguments — response, error, and request body — for a generated
  * client call.
  *
- * When `parser` is `'zod'` and a request body schema exists, the request type is
- * `z.output<typeof schema>` rather than the TypeScript input type. Zod schemas with
- * transforms (e.g. date coercion: `Date` → `string`) produce a different output type than
- * what TypeScript infers from the model, so the output type is needed to avoid a compile
- * error on the generated code.
+ * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented
+ * status types. When `parser` is `'zod'` and a request body schema exists, the request type
+ * uses `z.output<typeof schema>` to reflect post-transform types (e.g. date coercion).
  */
 export function buildGenerics(
   node: ast.OperationNode,
   tsResolver: ResolverTs,
-  zodOptions?: { zodResolver?: ResolverZod | null; parser?: PluginClient['resolvedOptions']['parser'] },
+  options: {
+    dataReturnType?: PluginClient['resolvedOptions']['dataReturnType']
+    zodResolver?: ResolverZod | null
+    parser?: PluginClient['resolvedOptions']['parser']
+  } = {},
 ): Array<string> {
+  const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const responseName =
+    options.dataReturnType === 'full'
+      ? allStatusNames.length > 0
+        ? allStatusNames.join(' | ')
+        : tsResolver.resolveResponseName(node)
+      : successNames.length > 0
+        ? successNames.join(' | ')
+        : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const zodRequestName =
-    zodOptions?.parser === 'zod' && zodOptions.zodResolver && node.requestBody?.content?.[0]?.schema
-      ? (zodOptions.zodResolver.resolveDataName?.(node) ?? null)
-      : null
+    options.parser === 'zod' && options.zodResolver && node.requestBody?.content?.[0]?.schema ? (options.zodResolver.resolveDataName?.(node) ?? null) : null
 
   const requestGenericType = zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
 
@@ -216,29 +226,35 @@ export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): str
 
 /**
  * Builds the return statement for a client method.
- * Applies Zod validation to response data when `parser.response === 'zod'`.
+ * When `dataReturnType` is `'full'`, casts the response to the status-discriminated union type.
+ * When `parser.response` is `'zod'`, pipes the response body through the Zod schema before returning.
  */
 export function buildReturnStatement({
   dataReturnType,
   parser,
   node,
   zodResolver,
+  tsResolver,
 }: {
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
+  tsResolver?: ResolverTs | null
 }): string {
   const responseParser = resolveResponseParser(parser)
   const zodResponseName = zodResolver && responseParser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
-  if (dataReturnType === 'full' && responseParser === 'zod' && zodResponseName) {
-    return `return {...res, data: ${zodResponseName}.parse(res.data)}`
+
+  if (dataReturnType === 'full' && tsResolver) {
+    const unionType = buildStatusUnionType(node, tsResolver)
+    if (responseParser === 'zod' && zodResponseName) {
+      return `return {...res, data: ${zodResponseName}.parse(res.data)} as ${unionType}`
+    }
+    return `return res as ${unionType}`
   }
+
   if (dataReturnType === 'data' && responseParser === 'zod' && zodResponseName) {
     return `return ${zodResponseName}.parse(res.data)`
-  }
-  if (dataReturnType === 'full') {
-    return 'return res'
   }
   return 'return res.data'
 }

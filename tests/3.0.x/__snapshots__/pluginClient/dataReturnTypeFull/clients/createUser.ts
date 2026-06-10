@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { CreateUserData, CreateUserStatusDefault } from '../types/CreateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getCreateUserUrl() {
@@ -23,7 +23,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 
   const requestData = data
 
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: getCreateUserUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<CreateUserStatusDefault, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: getCreateUserUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return res
+  return res as { status: number; data: CreateUserStatusDefault; statusText: string }
 }

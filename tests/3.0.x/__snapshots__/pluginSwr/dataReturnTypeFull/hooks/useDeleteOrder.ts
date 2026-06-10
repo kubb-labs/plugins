@@ -5,8 +5,8 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '@kubb/plugin-client/clients/axios'
+import type { DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
@@ -21,9 +21,9 @@ export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: `/store/order/${orderId}`, ...requestConfig })
+  const res = await request<DeleteOrderStatus400 | DeleteOrderStatus404, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: `/store/order/${orderId}`, ...requestConfig })
 
-  return res
+  return res as ({ status: 400; data: DeleteOrderStatus400; statusText: string } | { status: 404; data: DeleteOrderStatus404; statusText: string })
 }
 
 export type DeleteOrderMutationArg = { orderId: DeleteOrderPathOrderId }
@@ -34,14 +34,14 @@ export type DeleteOrderMutationArg = { orderId: DeleteOrderPathOrderId }
  * {@link /store/order/:orderId}
  */
 export function useDeleteOrder(options: {
-  mutation?: SWRMutationConfiguration<ResponseConfig<DeleteOrderResponse>, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderMutationKey | null, DeleteOrderMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<({ status: 400; data: DeleteOrderStatus400; statusText: string } | { status: 404; data: DeleteOrderStatus404; statusText: string }), ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderMutationKey | null, DeleteOrderMutationArg> & { throwOnError?: boolean },
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = deleteOrderMutationKey()
 
-  return useSWRMutation<ResponseConfig<DeleteOrderResponse>, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
+  return useSWRMutation<({ status: 400; data: DeleteOrderStatus400; statusText: string } | { status: 404; data: DeleteOrderStatus404; statusText: string }), ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderMutationKey | null, DeleteOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { orderId } }) => {
       return deleteOrder(orderId, config)

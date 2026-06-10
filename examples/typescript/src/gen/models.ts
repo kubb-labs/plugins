@@ -41,9 +41,9 @@ export const orderStatus = {
 export type OrderStatusKey = (typeof orderStatus)[keyof typeof orderStatus]
 
 export const orderHttpStatusEnum = {
-  '200': 200,
-  '400': 400,
-  '500': 500,
+  ORDER_HTTP_STATUS_ENUM_200: 200,
+  ORDER_HTTP_STATUS_ENUM_400: 400,
+  ORDER_HTTP_STATUS_ENUM_500: 500,
 } as const
 
 export type OrderHttpStatusEnumKey = (typeof orderHttpStatusEnum)[keyof typeof orderHttpStatusEnum]
@@ -304,6 +304,9 @@ export type Pet = (
    * @type string
    */
   name: string
+  /**
+   * @type object | undefined
+   */
   category?: Category
   /**
    * @type array

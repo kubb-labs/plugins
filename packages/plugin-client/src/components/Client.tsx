@@ -17,7 +17,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
+import { buildStatusUnionType, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 import { buildUrlParamsNode } from './Url.tsx'
 
 type Props = {
@@ -140,9 +140,11 @@ export function Client({
 
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
+  const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
+  const genericsResponseName = dataReturnType === 'full' ? (allStatusNames.length > 0 ? allStatusNames.join(' | ') : responseName) : responseName
   // z.output<> reflects the post-transform type (e.g. date coercion turns Date → string), avoiding a compile error on the generated call
   const requestGenericType = parser === 'zod' && zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
-  const generics = [responseName, TError, requestGenericType].filter(Boolean)
+  const generics = [genericsResponseName, TError, requestGenericType].filter(Boolean)
   const paramsNode = buildClientParamsNode({
     paramsType,
     paramsCasing,
@@ -206,13 +208,19 @@ export function Client({
     },
   })
 
+  const statusUnionType = dataReturnType === 'full' ? buildStatusUnionType(node, tsResolver) : null
+
   const childrenElement = children ? (
     children
   ) : (
     <>
-      {dataReturnType === 'full' && responseParser === 'zod' && zodResponseName && `return {...res, data: ${zodResponseName}.parse(res.data)}`}
+      {dataReturnType === 'full' &&
+        responseParser === 'zod' &&
+        zodResponseName &&
+        statusUnionType &&
+        `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
+      {dataReturnType === 'full' && responseParser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
       {dataReturnType === 'data' && responseParser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
-      {dataReturnType === 'full' && responseParser !== 'zod' && 'return res'}
       {dataReturnType === 'data' && responseParser !== 'zod' && 'return res.data'}
     </>
   )

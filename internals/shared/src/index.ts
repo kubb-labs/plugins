@@ -18,6 +18,7 @@ export {
   resolveErrorNames,
   resolveOperationTypeNames,
   resolveResponseTypes,
+  buildStatusUnionType,
   resolveStatusCodeNames,
   resolveSuccessNames,
   type BuildOperationCommentsOptions,

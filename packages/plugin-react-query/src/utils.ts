@@ -10,6 +10,7 @@ export {
 export {
   buildOperationComments as getComments,
   buildRequestConfigType,
+  buildStatusUnionType,
   getContentTypeInfo,
   resolveErrorNames,
   resolveStatusCodeNames,

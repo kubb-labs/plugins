@@ -8,8 +8,8 @@ default: "'data'"
 description: |
   Shape of the value returned from each generated client function.
 
-  - `'data'` returns only the response body (`response.data`). Concise and matches what most apps need.
-  - `'full'` returns the full response config — body, status code, headers, and the original request. Use this when callers need to inspect headers or status.
+  - `'data'` returns only the response body (`response.data`).
+  - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string }`. Narrowing on `res.status` also narrows `res.data` to the matching response type.
 examples:
   - name: "'data' (default)"
     files:
@@ -30,20 +30,21 @@ examples:
           //    ^? Pet
   - name: "'full'"
     files:
-      - name: getPetById.ts
+      - name: addPet.ts
         lang: typescript
         twoslash: false
         code: |
-          export async function getPetById<TData>(
-            petId: GetPetByIdPathParams,
-          ): Promise<ResponseConfig<TData>> {
-            // ...
+          export async function addPet(data: AddPetData, config = {}) {
+            const res = await request<AddPetStatus200 | AddPetStatus405, ...>(...)
+            return res as
+              | { status: 200; data: AddPetStatus200; statusText: string }
+              | { status: 405; data: AddPetStatus405; statusText: string }
           }
       - name: usage.ts
         lang: typescript
         twoslash: false
         code: |
-          const response = await getPetById(1)
-          //    ^? ResponseConfig<Pet>
-          console.log(response.status, response.headers)
-          const pet = response.data
+          const res = await addPet(petData)
+          if (res.status === 405) {
+            res.data // narrowed to AddPetStatus405
+          }

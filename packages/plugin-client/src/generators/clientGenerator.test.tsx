@@ -173,6 +173,18 @@ const underscoredPathParamsNode = ast.createOperation({
   responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
 })
 
+const multiStatusNode = ast.createOperation({
+  operationId: 'createPet',
+  method: 'POST',
+  path: '/pet',
+  tags: ['pet'],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Pet created' }),
+    ast.createResponse({ statusCode: '405', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
+  ],
+})
+
 const downloadFileNode = ast.createOperation({
   operationId: 'downloadFile',
   method: 'GET',
@@ -198,6 +210,8 @@ describe('clientGenerator operation', () => {
     { name: 'findByTagsWithZodBoth', node: findByTagsNode, options: { parser: { request: 'zod', response: 'zod' } as const } },
     { name: 'findByTagsFull', node: findByTagsNode, options: { dataReturnType: 'full' as const } },
     { name: 'findByTagsWithZodFull', node: findByTagsNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
+    { name: 'multiStatusFull', node: multiStatusNode, options: { dataReturnType: 'full' as const } },
+    { name: 'multiStatusWithZodFull', node: multiStatusNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
     { name: 'updatePetByIdWithZodRequest', node: updatePetByIdNode, options: { parser: { request: 'zod' } as const } },
     { name: 'importPath', node: findByTagsNode, options: { importPath: 'axios' as const } },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },

@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginSwr } from '../types.ts'
-import { buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
+import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -53,7 +53,7 @@ function buildMutationParamsNode(
   const responseName = resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   return ast.createFunctionParameters({
@@ -90,7 +90,7 @@ export function Mutation({
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const TData = dataReturnType === 'data' ? responseName : `ResponseConfig<${responseName}>`
+  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const mutationArgParamsNode = createMutationArgParams(node, { paramsCasing, resolver: tsResolver })
