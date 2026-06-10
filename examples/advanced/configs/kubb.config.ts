@@ -140,6 +140,13 @@ export default defineConfig({
             parser: false,
           },
         },
+        {
+          type: 'contentType',
+          pattern: 'application/octet-stream',
+          options: {
+            parser: false,
+          },
+        },
       ],
     }),
     pluginMcp({

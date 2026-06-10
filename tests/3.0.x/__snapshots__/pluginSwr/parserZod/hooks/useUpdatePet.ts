@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import type { z } from 'zod'
 import { updatePetResponseSchema, updatePetDataSchema } from '../zod/updatePetSchema.ts'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
@@ -24,7 +25,7 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 
   const requestData = updatePetDataSchema.parse(data)
 
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, z.output<typeof updatePetDataSchema>>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return updatePetResponseSchema.parse(res.data)
 }

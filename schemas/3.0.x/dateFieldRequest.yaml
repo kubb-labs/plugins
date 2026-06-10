@@ -1,0 +1,48 @@
+openapi: 3.0.3
+info:
+  title: Date Field Request
+  version: 1.0.0
+paths:
+  /events:
+    post:
+      operationId: createEvent
+      summary: Create an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Event:
+      type: object
+      required:
+        - name
+        - startDate
+      properties:
+        name:
+          type: string
+        startDate:
+          type: string
+          format: date
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string

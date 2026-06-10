@@ -59,16 +59,34 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 }
 
 /**
- * Builds TypeScript generic parameters for a client method.
- * Includes response type, error type, and optional request type.
+ * Returns the generic type arguments — response, error, and request body — for a generated
+ * client call.
+ *
+ * When `parser` is `'zod'` and a request body schema exists, the request type is
+ * `z.output<typeof schema>` rather than the TypeScript input type. Zod schemas with
+ * transforms (e.g. date coercion: `Date` → `string`) produce a different output type than
+ * what TypeScript infers from the model, so the output type is needed to avoid a compile
+ * error on the generated code.
  */
-export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
+export function buildGenerics(
+  node: ast.OperationNode,
+  tsResolver: ResolverTs,
+  zodOptions?: { zodResolver?: ResolverZod | null; parser?: PluginClient['resolvedOptions']['parser'] },
+): Array<string> {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
-  return [responseName, TError, requestName || 'unknown'].filter(Boolean)
+
+  const zodRequestName =
+    zodOptions?.parser === 'zod' && zodOptions.zodResolver && node.requestBody?.content?.[0]?.schema
+      ? (zodOptions.zodResolver.resolveDataName?.(node) ?? null)
+      : null
+
+  const requestGenericType = zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
+
+  return [responseName, TError, requestGenericType].filter(Boolean)
 }
 
 /**

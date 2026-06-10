@@ -8,6 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../types/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import type { z } from 'zod'
 import { updateUserResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
@@ -24,7 +25,7 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
 
   const requestData = updateUserDataSchema.parse(data)
 
-  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, z.output<typeof updateUserDataSchema>>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
 
   return updateUserResponseSchema.parse(res.data)
 }

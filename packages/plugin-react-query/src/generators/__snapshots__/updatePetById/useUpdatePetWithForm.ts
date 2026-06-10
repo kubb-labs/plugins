@@ -6,6 +6,7 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import type { z } from 'zod'
 import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -24,7 +25,7 @@ export async function updatePetWithForm(
 
   const requestData = UpdatePetWithFormData.parse(data)
 
-  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
+  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, z.output<typeof UpdatePetWithFormData>>({
     method: 'POST',
     url: `/pet/${petId}`,
     data: requestData,

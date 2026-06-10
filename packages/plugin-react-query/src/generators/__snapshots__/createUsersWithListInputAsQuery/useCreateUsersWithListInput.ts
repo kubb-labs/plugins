@@ -25,7 +25,7 @@ export async function createUsersWithListInput(
 
   const requestData = CreateUsersWithListInputData.parse(data)
 
-  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, z.output<typeof CreateUsersWithListInputData>>({
     method: 'POST',
     url: `/user/createWithList`,
     data: requestData,

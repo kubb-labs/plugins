@@ -8,6 +8,7 @@ import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddP
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import type { z } from 'zod'
 import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
@@ -23,7 +24,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const requestData = addPetDataSchema.parse(data)
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.output<typeof addPetDataSchema>>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return addPetResponseSchema.parse(res.data)
 }

@@ -140,7 +140,9 @@ export function Client({
 
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const generics = [responseName, TError, requestName || 'unknown'].filter(Boolean)
+  // z.output<> reflects the post-transform type (e.g. date coercion turns Date → string), avoiding a compile error on the generated call
+  const requestGenericType = parser === 'zod' && zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
+  const generics = [responseName, TError, requestGenericType].filter(Boolean)
   const paramsNode = buildClientParamsNode({
     paramsType,
     paramsCasing,
