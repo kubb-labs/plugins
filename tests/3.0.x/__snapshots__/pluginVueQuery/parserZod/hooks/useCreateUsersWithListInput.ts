@@ -8,6 +8,7 @@ import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import type { z } from 'zod'
 import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
@@ -23,7 +24,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 
   const requestData = createUsersWithListInputDataSchema.parse(data)
 
-  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: `/user/createWithList`, data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, z.output<typeof createUsersWithListInputDataSchema>>({ method: 'POST', url: `/user/createWithList`, data: requestData, ...requestConfig })
 
   return createUsersWithListInputResponseSchema.parse(res.data)
 }

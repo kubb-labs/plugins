@@ -7,6 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import type { z } from 'zod'
 import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
@@ -22,7 +23,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const requestData = placeOrderDataSchema.parse(data)
 
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.output<typeof placeOrderDataSchema>>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
   return placeOrderResponseSchema.parse(res.data)
 }

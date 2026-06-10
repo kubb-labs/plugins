@@ -109,6 +109,9 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
         {!shouldUseClientPlugin && node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
           <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
         )}
+        {!shouldUseClientPlugin && parser === 'zod' && zodResolver && node.requestBody?.content?.[0]?.schema && (
+          <File.Import name={['z']} path="zod" isTypeOnly />
+        )}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
