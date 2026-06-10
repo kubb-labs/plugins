@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.ts'
+import type { DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.ts'
 import { deleteUserResponseSchema } from '../../../zod/user/deleteUserSchema.ts'
 
 export function getDeleteUserUrl({ username }: { username: DeleteUserPathUsername }) {
@@ -17,11 +17,13 @@ export function getDeleteUserUrl({ username }: { username: DeleteUserPathUsernam
 export async function deleteUser({ username }: { username: DeleteUserPathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({
+  const res = await request<DeleteUserStatus400 | DeleteUserStatus404, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({
     method: 'DELETE',
     url: getDeleteUserUrl({ username }).url.toString(),
     ...requestConfig,
   })
 
-  return { ...res, data: deleteUserResponseSchema.parse(res.data) }
+  return { ...res, data: deleteUserResponseSchema.parse(res.data) } as
+    | { status: 400; data: DeleteUserStatus400; statusText: string }
+    | { status: 404; data: DeleteUserStatus404; statusText: string }
 }

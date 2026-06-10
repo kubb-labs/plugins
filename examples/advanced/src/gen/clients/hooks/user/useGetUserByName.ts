@@ -1,4 +1,4 @@
-import type { Client, RequestConfig, ResponseErrorConfig, ResponseConfig } from '../../../../axios-client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
 import type {
   GetUserByNamePathUsername,
@@ -20,9 +20,13 @@ export function getUserByNameQueryOptions(
 ) {
   const queryKey = getUserByNameQueryKey({ username })
   return queryOptions<
-    ResponseConfig<GetUserByNameStatus200>,
+    | { status: 200; data: GetUserByNameStatus200; statusText: string }
+    | { status: 400; data: GetUserByNameStatus400; statusText: string }
+    | { status: 404; data: GetUserByNameStatus404; statusText: string },
     ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
-    ResponseConfig<GetUserByNameStatus200>,
+    | { status: 200; data: GetUserByNameStatus200; statusText: string }
+    | { status: 400; data: GetUserByNameStatus400; statusText: string }
+    | { status: 404; data: GetUserByNameStatus404; statusText: string },
     typeof queryKey
   >({
     enabled: !!username,
@@ -38,15 +42,23 @@ export function getUserByNameQueryOptions(
  * {@link /user/:username}
  */
 export function useGetUserByName<
-  TData = ResponseConfig<GetUserByNameStatus200>,
-  TQueryData = ResponseConfig<GetUserByNameStatus200>,
+  TData =
+    | { status: 200; data: GetUserByNameStatus200; statusText: string }
+    | { status: 400; data: GetUserByNameStatus400; statusText: string }
+    | { status: 404; data: GetUserByNameStatus404; statusText: string },
+  TQueryData =
+    | { status: 200; data: GetUserByNameStatus200; statusText: string }
+    | { status: 400; data: GetUserByNameStatus400; statusText: string }
+    | { status: 404; data: GetUserByNameStatus404; statusText: string },
   TQueryKey extends QueryKey = GetUserByNameQueryKey,
 >(
   { username }: { username?: GetUserByNamePathUsername } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<
-        ResponseConfig<GetUserByNameStatus200>,
+        | { status: 200; data: GetUserByNameStatus200; statusText: string }
+        | { status: 400; data: GetUserByNameStatus400; statusText: string }
+        | { status: 404; data: GetUserByNameStatus404; statusText: string },
         ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
         TData,
         TQueryData,
