@@ -42,8 +42,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           )
         : []
 
-    const zodRequestName =
-      zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? (zodResolver.resolveDataName?.(node) ?? null) : null
+    const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? (zodResolver.resolveDataName?.(node) ?? null) : null
 
     const meta = {
       name: resolver.resolveName(node.operationId),
