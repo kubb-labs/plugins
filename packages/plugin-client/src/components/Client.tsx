@@ -136,7 +136,7 @@ export function Client({
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
-  const genericsResponseName = dataReturnType === 'fullByStatus' ? (allStatusNames.length > 0 ? allStatusNames.join(' | ') : responseName) : responseName
+  const genericsResponseName = dataReturnType === 'full' ? (allStatusNames.length > 0 ? allStatusNames.join(' | ') : responseName) : responseName
   const generics = [genericsResponseName, TError, requestName || 'unknown'].filter(Boolean)
   const paramsNode = buildClientParamsNode({
     paramsType,
@@ -201,21 +201,15 @@ export function Client({
     },
   })
 
-  const statusUnionType = dataReturnType === 'fullByStatus' ? buildStatusUnionType(node, tsResolver) : null
+  const statusUnionType = dataReturnType === 'full' ? buildStatusUnionType(node, tsResolver) : null
 
   const childrenElement = children ? (
     children
   ) : (
     <>
-      {dataReturnType === 'fullByStatus' &&
-        parser === 'zod' &&
-        zodResponseName &&
-        statusUnionType &&
-        `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
-      {dataReturnType === 'fullByStatus' && parser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
-      {dataReturnType === 'full' && parser === 'zod' && zodResponseName && `return {...res, data: ${zodResponseName}.parse(res.data)}`}
+      {dataReturnType === 'full' && parser === 'zod' && zodResponseName && statusUnionType && `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
+      {dataReturnType === 'full' && parser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
       {dataReturnType === 'data' && parser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
-      {dataReturnType === 'full' && parser !== 'zod' && 'return res'}
       {dataReturnType === 'data' && parser !== 'zod' && 'return res.data'}
     </>
   )

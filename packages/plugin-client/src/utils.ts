@@ -43,7 +43,7 @@ export function buildGenerics(
   const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName =
-    options.dataReturnType === 'fullByStatus'
+    options.dataReturnType === 'full'
       ? allStatusNames.length > 0
         ? allStatusNames.join(' | ')
         : tsResolver.resolveResponseName(node)
@@ -176,7 +176,7 @@ export function buildReturnStatement({
 }): string {
   const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
 
-  if (dataReturnType === 'fullByStatus' && tsResolver) {
+  if (dataReturnType === 'full' && tsResolver) {
     const unionType = buildStatusUnionType(node, tsResolver)
     if (parser === 'zod' && zodResponseName) {
       return `return {...res, data: ${zodResponseName}.parse(res.data)} as ${unionType}`
@@ -184,14 +184,8 @@ export function buildReturnStatement({
     return `return res as ${unionType}`
   }
 
-  if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {
-    return `return {...res, data: ${zodResponseName}.parse(res.data)}`
-  }
   if (dataReturnType === 'data' && parser === 'zod' && zodResponseName) {
     return `return ${zodResponseName}.parse(res.data)`
-  }
-  if (dataReturnType === 'full' && parser !== 'zod') {
-    return 'return res'
   }
   return 'return res.data'
 }

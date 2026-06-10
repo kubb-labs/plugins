@@ -483,15 +483,14 @@ options:
     description: |
       Emits an `operations.ts` file that re-exports every generated function grouped by HTTP method. Useful for building meta-tooling (route registries, API explorers) on top of the generated code.
   - name: dataReturnType
-    type: "'data' | 'full' | 'fullByStatus'"
+    type: "'data' | 'full'"
     required: false
     default: "'data'"
     description: |
       Shape of the value returned from each generated client function.
 
       - `'data'` returns only the response body (`response.data`). Concise and matches what most apps need.
-      - `'full'` returns the full response config — body, status code, headers, and the original request. Use this when callers need to inspect headers or status.
-      - `'fullByStatus'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`, so narrowing on `res.status` also narrows `res.data` to the matching response type. Ideal for typed error handling without exceptions.
+      - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`, so narrowing on `res.status` also narrows `res.data` to the matching response type.
     examples:
       - name: "'data' (default)"
         files:
@@ -511,25 +510,6 @@ options:
               const pet = await getPetById(1)
               //    ^? Pet
       - name: "'full'"
-        files:
-          - name: getPetById.ts
-            lang: typescript
-            twoslash: false
-            code: |
-              export async function getPetById<TData>(
-                petId: GetPetByIdPathParams,
-              ): Promise<ResponseConfig<TData>> {
-                // ...
-              }
-          - name: usage.ts
-            lang: typescript
-            twoslash: false
-            code: |
-              const response = await getPetById(1)
-              //    ^? ResponseConfig<Pet>
-              console.log(response.status, response.headers)
-              const pet = response.data
-      - name: "'fullByStatus'"
         files:
           - name: addPet.ts
             lang: typescript

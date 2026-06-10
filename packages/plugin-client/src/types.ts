@@ -162,14 +162,13 @@ export type Options = {
   /**
    * Shape of the value returned by each generated client function.
    * - `'data'` — only the response body.
-   * - `'full'` — the full response config (body, status, headers, request).
-   * - `'fullByStatus'` — the full response as a discriminated union keyed by HTTP status code.
+   * - `'full'` — the full response as a discriminated union keyed by HTTP status code.
    *   Each member is `{ status: N; data: StatusNType; statusText: string; headers: Headers }`,
    *   so narrowing on `res.status` also narrows `res.data` to the matching response type.
    *
    * @default 'data'
    */
-  dataReturnType?: 'data' | 'full' | 'fullByStatus'
+  dataReturnType?: 'data' | 'full'
   /**
    * Rename parameter properties in the generated client (path, query, headers).
    * The HTTP request still uses the original spec names; Kubb writes the mapping for you.
