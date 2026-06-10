@@ -207,7 +207,11 @@ export function Client({
     children
   ) : (
     <>
-      {dataReturnType === 'full' && parser === 'zod' && zodResponseName && statusUnionType && `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
+      {dataReturnType === 'full' &&
+        parser === 'zod' &&
+        zodResponseName &&
+        statusUnionType &&
+        `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
       {dataReturnType === 'full' && parser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
       {dataReturnType === 'data' && parser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
       {dataReturnType === 'data' && parser !== 'zod' && 'return res.data'}
