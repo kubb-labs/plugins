@@ -92,9 +92,7 @@ export function buildGenerics(
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const zodRequestName =
-    options.parser === 'zod' && options.zodResolver && node.requestBody?.content?.[0]?.schema
-      ? (options.zodResolver.resolveDataName?.(node) ?? null)
-      : null
+    options.parser === 'zod' && options.zodResolver && node.requestBody?.content?.[0]?.schema ? (options.zodResolver.resolveDataName?.(node) ?? null) : null
 
   const requestGenericType = zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
 
