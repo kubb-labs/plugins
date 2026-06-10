@@ -175,7 +175,7 @@ type ResolvedOptions = {
   include: Options['include']
   override: NonNullable<Options['override']>
   client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'bundle' | 'paramsCasing'>
-  parser: Required<NonNullable<Options['parser']>>
+  parser: NonNullable<Options['parser']>
   pathParamsType: NonNullable<Options['pathParamsType']>
   paramsCasing: Options['paramsCasing']
   paramsType: NonNullable<Options['paramsType']>
