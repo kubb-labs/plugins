@@ -11,7 +11,7 @@ const input = { path: './petStore.yaml' } as const
 const tsPlugin = pluginTs({
   output: { path: 'models/ts' },
   group: { type: 'tag' },
-  enumType: 'asConst',
+  enum: { type: 'asConst' },
 })
 
 export default defineConfig([

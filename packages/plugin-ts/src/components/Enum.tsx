@@ -8,11 +8,11 @@ import { ENUM_TYPES_WITH_KEY_SUFFIX, ENUM_TYPES_WITH_RUNTIME_VALUE, ENUM_TYPES_W
 import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 
+type EnumOptions = PluginTs['resolvedOptions']['enum']
+
 type Props = {
   node: ast.EnumSchemaNode
-  enumType: PluginTs['resolvedOptions']['enumType']
-  enumTypeSuffix: PluginTs['resolvedOptions']['enumTypeSuffix']
-  enumKeyCasing: PluginTs['resolvedOptions']['enumKeyCasing']
+  enum: EnumOptions
   resolver: ResolverTs
   key?: string | number | null
 }
@@ -21,26 +21,19 @@ type Props = {
  * Resolves the runtime identifier name and the TypeScript type name for an enum schema node.
  *
  * The raw `node.name` may be a YAML key such as `"enumNames.Type"` which is not a
- * valid TypeScript identifier. The resolver normalizes it; for inline enum
- * properties the adapter already emits a PascalCase+suffix name so resolution is typically a no-op.
+ * valid TypeScript identifier. The resolver normalizes it. For inline enum properties the adapter
+ * already emits a PascalCase+suffix name, so resolution is typically a no-op.
+ *
+ * When `constCasing` is `'pascalCase'` and `typeSuffix` is empty, the const and the type
+ * resolve to the same name, which TypeScript merges into a single value+type declaration.
  */
-export function getEnumNames({
-  node,
-  enumType,
-  enumTypeSuffix,
-  resolver,
-}: {
-  node: ast.EnumSchemaNode
-  enumType: PluginTs['resolvedOptions']['enumType']
-  enumTypeSuffix: PluginTs['resolvedOptions']['enumTypeSuffix']
-  resolver: ResolverTs
-}): {
+export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.EnumSchemaNode; enum: EnumOptions; resolver: ResolverTs }): {
   enumName: string
   typeName: string
 } {
   const resolved = resolver.default(node.name!, 'type')
-  const enumName = enumType === 'asPascalConst' ? resolved : camelCase(node.name!)
-  const typeName = ENUM_TYPES_WITH_KEY_SUFFIX.has(enumType) ? resolver.resolveEnumKeyName(node, enumTypeSuffix) : resolved
+  const enumName = enumOptions.constCasing === 'pascalCase' ? resolved : camelCase(node.name!)
+  const typeName = ENUM_TYPES_WITH_KEY_SUFFIX.has(enumOptions.type) ? resolver.resolveEnumKeyName(node, enumOptions.typeSuffix) : resolved
 
   return { enumName, typeName }
 }
@@ -48,16 +41,16 @@ export function getEnumNames({
 /**
  * Renders the enum declaration(s) for a single named `EnumSchemaNode`.
  *
- * Depending on `enumType` this may emit:
- * - A runtime object (`asConst` / `asPascalConst`) plus a `typeof` type alias
+ * Depending on `enum.type` this may emit:
+ * - A runtime object (`asConst`) plus a `typeof` type alias
  * - A `const enum` or plain `enum` declaration (`constEnum` / `enum`)
  * - A union literal type alias (`literal`)
  *
  * The emitted `File.Source` nodes carry the resolved names so that the barrel
  * index picks up the correct export identifiers.
  */
-export function Enum({ node, enumType, enumTypeSuffix, enumKeyCasing, resolver }: Props): KubbReactNode {
-  const { enumName, typeName } = getEnumNames({ node, enumType, enumTypeSuffix, resolver })
+export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNode {
+  const { enumName, typeName } = getEnumNames({ node, enum: enumOptions, resolver })
 
   const [nameNode, typeNode] = factory.createEnumDeclaration({
     name: enumName,
@@ -65,9 +58,14 @@ export function Enum({ node, enumType, enumTypeSuffix, enumKeyCasing, resolver }
     enums: (node.namedEnumValues?.map((v) => [trimQuotes(v.name.toString()), v.value]) ??
       node.enumValues?.filter((v): v is NonNullable<typeof v> => v !== null && v !== undefined).map((v) => [trimQuotes(v.toString()), v]) ??
       []) as Array<[string | number, string | number | boolean]>,
-    type: enumType,
-    enumKeyCasing,
+    type: enumOptions.type,
+    enumKeyCasing: enumOptions.keyCasing,
   })
+
+  // When the const and the type share a name (pascalCase const + empty typeSuffix) they merge into
+  // one declaration. The const carries the barrel export, so keep the type alias in the file but out
+  // of the barrel to avoid re-exporting the name a second time as `export type { … }`.
+  const namesMerge = !!nameNode && enumName === typeName
 
   return (
     <>
@@ -76,7 +74,12 @@ export function Enum({ node, enumType, enumTypeSuffix, enumKeyCasing, resolver }
           {parserTs.print(nameNode)}
         </File.Source>
       )}
-      <File.Source name={typeName} isIndexable isExportable={ENUM_TYPES_WITH_RUNTIME_VALUE.has(enumType)} isTypeOnly={ENUM_TYPES_WITH_TYPE_ONLY.has(enumType)}>
+      <File.Source
+        name={typeName}
+        isIndexable={!namesMerge}
+        isExportable={!namesMerge && ENUM_TYPES_WITH_RUNTIME_VALUE.has(enumOptions.type)}
+        isTypeOnly={ENUM_TYPES_WITH_TYPE_ONLY.has(enumOptions.type)}
+      >
         {parserTs.print(typeNode)}
       </File.Source>
     </>

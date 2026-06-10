@@ -528,15 +528,14 @@ export function createEnumDeclaration({
   enumKeyCasing = 'none',
 }: {
   /**
-   * Choose to use `enum`, `asConst`, `asPascalConst`, `constEnum`, or `literal` for enums.
+   * Choose to use `enum`, `asConst`, `constEnum`, or `literal` for enums.
    * - `enum`: TypeScript enum
-   * - `asConst`: const with camelCase name (e.g., `petType`)
-   * - `asPascalConst`: const with PascalCase name (e.g., `PetType`)
+   * - `asConst`: const object asserted with `as const` (the caller decides the const name casing)
    * - `constEnum`: const enum
    * - `literal`: literal union type
    * @default `'enum'`
    */
-  type?: 'enum' | 'asConst' | 'asPascalConst' | 'constEnum' | 'literal' | 'inlineLiteral'
+  type?: 'enum' | 'asConst' | 'constEnum' | 'literal' | 'inlineLiteral'
   /**
    * Enum name in camelCase.
    */
@@ -629,8 +628,8 @@ export function createEnumDeclaration({
   }
 
   // used when using `as const` instead of an TypeScript enum.
-  // name is already PascalCase for asPascalConst and camelCase for asConst (set in Type.tsx)
-  // typeName has the Key suffix for type alias, so we use name for the const identifier
+  // name is already cased by the caller (camelCase or pascalCase, driven by enum.constCasing).
+  // typeName carries the typeSuffix for the type alias, so we use name for the const identifier.
   const identifierName = name
 
   // When there are no enum items (empty or all-null enum), don't generate a runtime const.

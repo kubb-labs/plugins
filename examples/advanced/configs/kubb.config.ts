@@ -43,14 +43,14 @@ export default defineConfig({
         type: 'tag',
       },
       arrayType: 'generic',
-      enumType: 'asConst',
+      enum: { type: 'asConst' },
       paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
       override: [
         {
           type: 'operationId',
           pattern: 'findPetsByStatus',
           options: {
-            enumType: 'enum',
+            enum: { type: 'enum', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
           },
         },
       ],

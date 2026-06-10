@@ -378,141 +378,173 @@ options:
           Function that turns a group key (the operation's first tag) into a folder/identifier name.
 
           The result is used as both the subdirectory name under `output.path` and as a suffix when naming aggregate files.
-  - name: enumType
-    type: "'enum' | 'asConst' | 'asPascalConst' | 'constEnum' | 'literal' | 'inlineLiteral'"
+  - name: enum
+    type: EnumOptions
     required: false
-    default: "'asConst'"
+    default: "{ type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' }"
     description: |
-      How OpenAPI enums are represented in the generated TypeScript.
-
-      - `'asConst'` (default) — `as const` object plus a key/value type. Tree-shakeable, no enum runtime.
-      - `'asPascalConst'` — same as `asConst`, but the const is named in PascalCase.
-      - `'enum'` — a regular TypeScript `enum`. Produces JavaScript runtime code.
-      - `'constEnum'` — a `const enum`. Inlines at compile time; not compatible with `--isolatedModules`.
-      - `'literal'` — a plain union type (`'dog' | 'cat'`). No runtime value.
-      - `'inlineLiteral'` — the union is inlined at every usage site instead of giving it a name.
-    tip: |
-      `'asConst'` vs `'asPascalConst'` differs only in the casing of the const variable: `petType` vs `PetType`. The type alias is always PascalCase.
-    examples:
-      - name: "'enum'"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              enum PetType {
-                Dog = 'dog',
-                Cat = 'cat',
-              }
-      - name: "'asConst' (default)"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              export const petType = {
-                Dog: 'dog',
-                Cat: 'cat',
-              } as const
-
-              export type PetTypeKey = (typeof petType)[keyof typeof petType]
-      - name: "'asPascalConst'"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              export const PetType = {
-                Dog: 'dog',
-                Cat: 'cat',
-              } as const
-
-              export type PetTypeKey = (typeof PetType)[keyof typeof PetType]
-      - name: "'constEnum'"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              const enum PetType {
-                Dog = 'dog',
-                Cat = 'cat',
-              }
-      - name: "'literal'"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              export type PetType = 'dog' | 'cat'
-      - name: "'inlineLiteral'"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              // No separate enum type — values are inlined wherever PetType would have been used
-              export interface Pet {
-                status?: 'available' | 'pending' | 'sold'
-              }
+      How OpenAPI enums are represented in the generated TypeScript, and how their names are cased.
     body: |
       > [!TIP]
-      > `'inlineLiteral'` produces the cleanest output for small enums — the values appear directly where they are used instead of via a named alias.
-  - name: enumSuffix
-    required: false
-    description: ''
-    warning: |
-      Moved to [`adapterOas`](/adapters/adapter-oas#enumSuffix). Use `adapterOas({ enumSuffix })` instead.
-  - name: enumTypeSuffix
-    type: string
-    required: false
-    default: "'Key'"
-    description: |
-      Suffix appended to the type alias generated for enums when `enumType` is `'asConst'` or `'asPascalConst'`.
+      > Set `constCasing: 'pascalCase'` together with `typeSuffix: ''` to emit a const and a type that share the schema's exact name. This is the convention most hand-written codebases use, so migrating an existing project keeps every annotation and value reference intact.
+      >
+      > ```typescript
+      > export const VehicleType = {
+      >   Sedan: 'Sedan',
+      >   SUV: 'SUV',
+      > } as const
+      >
+      > export type VehicleType = (typeof VehicleType)[keyof typeof VehicleType]
+      > ```
+    properties:
+      - name: type
+        type: "'asConst' | 'enum' | 'constEnum' | 'literal' | 'inlineLiteral'"
+        required: false
+        default: "'asConst'"
+        description: |
+          How OpenAPI enums are represented in the generated TypeScript.
 
-      The const object name (e.g. `petType`) is unaffected — only the companion type alias is renamed.
-    examples:
-      - name: "'Key' (default)"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              export const petType = {
-                Dog: 'dog',
-                Cat: 'cat',
-              } as const
+          - `'asConst'` (default) generates an `as const` object plus a key/value type. It is tree-shakeable and adds no enum runtime.
+          - `'enum'` generates a regular TypeScript `enum`, which produces JavaScript runtime code.
+          - `'constEnum'` generates a `const enum`. It inlines at compile time and is not compatible with `--isolatedModules`.
+          - `'literal'` generates a plain union type (`'dog' | 'cat'`) with no runtime value.
+          - `'inlineLiteral'` inlines the union at every usage site instead of giving it a name.
+        body: |
+          > [!TIP]
+          > `'inlineLiteral'` produces the cleanest output for small enums. The values appear directly where they are used instead of via a named alias.
+        examples:
+          - name: "'enum'"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  enum PetType {
+                    Dog = 'dog',
+                    Cat = 'cat',
+                  }
+          - name: "'asConst' (default)"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export const petType = {
+                    Dog: 'dog',
+                    Cat: 'cat',
+                  } as const
 
-              export type PetTypeKey = (typeof petType)[keyof typeof petType]
-      - name: "'Value'"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              export const petType = {
-                Dog: 'dog',
-                Cat: 'cat',
-              } as const
+                  export type PetTypeKey = (typeof petType)[keyof typeof petType]
+          - name: "'constEnum'"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  const enum PetType {
+                    Dog = 'dog',
+                    Cat = 'cat',
+                  }
+          - name: "'literal'"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export type PetType = 'dog' | 'cat'
+          - name: "'inlineLiteral'"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  // No separate enum type. Values are inlined wherever PetType would have been used
+                  export interface Pet {
+                    status?: 'available' | 'pending' | 'sold'
+                  }
+      - name: constCasing
+        type: "'camelCase' | 'pascalCase'"
+        required: false
+        default: "'camelCase'"
+        description: |
+          Casing of the generated const variable when `type` is `'asConst'`.
 
-              export type PetTypeValue = (typeof petType)[keyof typeof petType]
-      - name: "'' (no suffix)"
-        files:
-          - lang: typescript
-            twoslash: false
-            code: |
-              export const petType = {
-                Dog: 'dog',
-                Cat: 'cat',
-              } as const
+          - `'camelCase'` names the const `petType`.
+          - `'pascalCase'` names the const `PetType`, matching the schema name.
+        examples:
+          - name: "'camelCase' (default)"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export const petType = {
+                    Dog: 'dog',
+                    Cat: 'cat',
+                  } as const
 
-              export type PetType = (typeof petType)[keyof typeof petType]
-  - name: enumKeyCasing
-    type: "'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'"
-    required: false
-    default: "'none'"
-    description: |
-      Casing applied to enum key names. By default the key is the raw value from the spec; switch to a project convention when needed.
-    body: |
-      | Value | Example key |
-      | --- | --- |
-      | `'screamingSnakeCase'` | `ENUM_VALUE` |
-      | `'snakeCase'` | `enum_value` |
-      | `'pascalCase'` | `EnumValue` |
-      | `'camelCase'` | `enumValue` |
-      | `'none'` (default) | as-is |
+                  export type PetTypeKey = (typeof petType)[keyof typeof petType]
+          - name: "'pascalCase'"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export const PetType = {
+                    Dog: 'dog',
+                    Cat: 'cat',
+                  } as const
+
+                  export type PetTypeKey = (typeof PetType)[keyof typeof PetType]
+      - name: typeSuffix
+        type: string
+        required: false
+        default: "'Key'"
+        description: |
+          Suffix appended to the type alias generated for enums when `type` is `'asConst'`.
+
+          The const object name (e.g. `petType`) is unaffected, so only the companion type alias is renamed. Set it to `''` to drop the suffix, which (with `constCasing: 'pascalCase'`) merges the const and type under one name.
+        examples:
+          - name: "'Key' (default)"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export const petType = {
+                    Dog: 'dog',
+                    Cat: 'cat',
+                  } as const
+
+                  export type PetTypeKey = (typeof petType)[keyof typeof petType]
+          - name: "'Value'"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export const petType = {
+                    Dog: 'dog',
+                    Cat: 'cat',
+                  } as const
+
+                  export type PetTypeValue = (typeof petType)[keyof typeof petType]
+          - name: "'' (no suffix)"
+            files:
+              - lang: typescript
+                twoslash: false
+                code: |
+                  export const petType = {
+                    Dog: 'dog',
+                    Cat: 'cat',
+                  } as const
+
+                  export type PetType = (typeof petType)[keyof typeof petType]
+      - name: keyCasing
+        type: "'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelCase' | 'none'"
+        required: false
+        default: "'none'"
+        description: |
+          Casing applied to enum key names. By default the key is the raw value from the spec, so switch to a project convention when needed.
+        body: |
+          | Value | Example key |
+          | --- | --- |
+          | `'screamingSnakeCase'` | `ENUM_VALUE` |
+          | `'snakeCase'` | `enum_value` |
+          | `'pascalCase'` | `EnumValue` |
+          | `'camelCase'` | `enumValue` |
+          | `'none'` (default) | as-is |
   - name: dateType
     required: false
     description: ''

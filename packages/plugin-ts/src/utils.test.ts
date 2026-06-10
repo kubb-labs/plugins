@@ -5,7 +5,12 @@ import { printerTs } from './printers/printerTs.ts'
 import { resolverTs } from './resolvers/resolverTs.ts'
 import { buildData, buildParams, buildPropertyJSDocComments, buildResponses, buildResponseUnion } from './utils.ts'
 
-const printer = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enumType: 'inlineLiteral' })
+const printer = printerTs({
+  resolver: resolverTs,
+  optionalType: 'questionToken',
+  arrayType: 'array',
+  enum: { type: 'inlineLiteral', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' },
+})
 const tsPrinter = ts.createPrinter()
 const sourceFile = ts.createSourceFile('', '', ts.ScriptTarget.Latest)
 
