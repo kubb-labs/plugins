@@ -20,9 +20,9 @@ export const orderStatusEnum = {
 export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum]
 
 export const orderHttpStatusEnum = {
-  '200': 200,
-  '400': 400,
-  '500': 500,
+  OrderHttpStatusEnum_200: 200,
+  OrderHttpStatusEnum_400: 400,
+  OrderHttpStatusEnum_500: 500,
 } as const
 
 export type OrderHttpStatusEnumKey = (typeof orderHttpStatusEnum)[keyof typeof orderHttpStatusEnum]
