@@ -15,7 +15,7 @@ pluginTs({ enumType: 'asConst', enumTypeSuffix: 'Key', enumKeyCasing: 'none' })
 pluginTs({ enum: { type: 'asConst', constCasing: 'camelCase', typeSuffix: 'Key', keyCasing: 'none' } })
 ```
 
-The new `enum.constCasing` (`'camelCase'` default, or `'pascalCase'`) controls the casing of the generated const variable, which makes the old `enumType: 'asPascalConst'` redundant. `asPascalConst` is removed; use `enum: { type: 'asConst', constCasing: 'pascalCase' }` instead.
+The new `enum.constCasing` (`'camelCase'` default, or `'pascalCase'`) controls the casing of the generated const variable, which makes the old `enumType: 'asPascalConst'` redundant. `asPascalConst` is removed, so use `enum: { type: 'asConst', constCasing: 'pascalCase' }` instead.
 
 Pairing `constCasing: 'pascalCase'` with `typeSuffix: ''` now emits a const and a type that share the schema's exact name (`export const VehicleType` + `export type VehicleType`), and the barrel exports that name once instead of producing a duplicate `export type`. This matches the convention most hand-written codebases use, so migrating an existing project keeps every annotation and value reference intact.
 

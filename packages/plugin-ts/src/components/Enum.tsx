@@ -21,10 +21,10 @@ type Props = {
  * Resolves the runtime identifier name and the TypeScript type name for an enum schema node.
  *
  * The raw `node.name` may be a YAML key such as `"enumNames.Type"` which is not a
- * valid TypeScript identifier. The resolver normalizes it; for inline enum
- * properties the adapter already emits a PascalCase+suffix name so resolution is typically a no-op.
+ * valid TypeScript identifier. The resolver normalizes it. For inline enum properties the adapter
+ * already emits a PascalCase+suffix name, so resolution is typically a no-op.
  *
- * When `constCasing` is `'pascalCase'` and `typeSuffix` is empty the const and the type
+ * When `constCasing` is `'pascalCase'` and `typeSuffix` is empty, the const and the type
  * resolve to the same name, which TypeScript merges into a single value+type declaration.
  */
 export function getEnumNames({ node, enum: enumOptions, resolver }: { node: ast.EnumSchemaNode; enum: EnumOptions; resolver: ResolverTs }): {
@@ -63,8 +63,8 @@ export function Enum({ node, enum: enumOptions, resolver }: Props): KubbReactNod
   })
 
   // When the const and the type share a name (pascalCase const + empty typeSuffix) they merge into
-  // one declaration. The const carries the barrel export; keep the type alias in the file but out of
-  // the barrel so it is not re-exported a second time as `export type { … }`.
+  // one declaration. The const carries the barrel export, so keep the type alias in the file but out
+  // of the barrel to avoid re-exporting the name a second time as `export type { … }`.
   const namesMerge = !!nameNode && enumName === typeName
 
   return (

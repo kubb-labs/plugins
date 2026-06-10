@@ -51,9 +51,9 @@ export type PrinterTsOptions = {
    */
   arrayType: PluginTs['resolvedOptions']['arrayType']
   /**
-   * Grouped enum settings. Only `type` (output format) and `typeSuffix` (enum key reference suffix)
-   * affect how references to enums are printed; `constCasing` and `keyCasing` are ignored here since
-   * the printer emits references, not the enum declarations themselves.
+   * Grouped enum settings. The printer emits references to enums, not the enum declarations, so only
+   * `type` (the output format) and `typeSuffix` (the enum key reference suffix) matter here.
+   * `constCasing` and `keyCasing` are ignored.
    */
   enum: PluginTs['resolvedOptions']['enum']
   /**

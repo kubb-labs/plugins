@@ -97,14 +97,14 @@ options:
         description: |
           How OpenAPI enums are represented in the generated TypeScript.
 
-          - `'asConst'` (default) — `as const` object plus a key/value type. Tree-shakeable, no enum runtime.
-          - `'enum'` — a regular TypeScript `enum`. Produces JavaScript runtime code.
-          - `'constEnum'` — a `const enum`. Inlines at compile time; not compatible with `--isolatedModules`.
-          - `'literal'` — a plain union type (`'dog' | 'cat'`). No runtime value.
-          - `'inlineLiteral'` — the union is inlined at every usage site instead of giving it a name.
+          - `'asConst'` (default) generates an `as const` object plus a key/value type. It is tree-shakeable and adds no enum runtime.
+          - `'enum'` generates a regular TypeScript `enum`, which produces JavaScript runtime code.
+          - `'constEnum'` generates a `const enum`. It inlines at compile time and is not compatible with `--isolatedModules`.
+          - `'literal'` generates a plain union type (`'dog' | 'cat'`) with no runtime value.
+          - `'inlineLiteral'` inlines the union at every usage site instead of giving it a name.
         body: |
           > [!TIP]
-          > `'inlineLiteral'` produces the cleanest output for small enums — the values appear directly where they are used instead of via a named alias.
+          > `'inlineLiteral'` produces the cleanest output for small enums. The values appear directly where they are used instead of via a named alias.
         examples:
           - name: "'enum'"
             files:
@@ -146,7 +146,7 @@ options:
               - lang: typescript
                 twoslash: false
                 code: |
-                  // No separate enum type — values are inlined wherever PetType would have been used
+                  // No separate enum type. Values are inlined wherever PetType would have been used
                   export interface Pet {
                     status?: 'available' | 'pending' | 'sold'
                   }
@@ -189,7 +189,7 @@ options:
         description: |
           Suffix appended to the type alias generated for enums when `type` is `'asConst'`.
 
-          The const object name (e.g. `petType`) is unaffected — only the companion type alias is renamed. Set to `''` to drop the suffix, which (with `constCasing: 'pascalCase'`) merges the const and type under one name.
+          The const object name (e.g. `petType`) is unaffected, so only the companion type alias is renamed. Set it to `''` to drop the suffix, which (with `constCasing: 'pascalCase'`) merges the const and type under one name.
         examples:
           - name: "'Key' (default)"
             files:
@@ -229,7 +229,7 @@ options:
         required: false
         default: "'none'"
         description: |
-          Casing applied to enum key names. By default the key is the raw value from the spec; switch to a project convention when needed.
+          Casing applied to enum key names. By default the key is the raw value from the spec, so switch to a project convention when needed.
         body: |
           | Value | Example key |
           | --- | --- |

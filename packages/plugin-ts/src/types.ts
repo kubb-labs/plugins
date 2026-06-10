@@ -96,15 +96,11 @@ type EnumKeyCasing = 'screamingSnakeCase' | 'snakeCase' | 'pascalCase' | 'camelC
 type EnumConstCasing = 'camelCase' | 'pascalCase'
 
 /**
- * Grouped enum settings. The discriminated union ties `constCasing`, `typeSuffix`, and `keyCasing`
- * to the `type` values that actually use them.
+ * Grouped enum settings. Each `type` uses only some of the other fields.
  *
- * - `'asConst'` — emit a `const` object plus a `typeof` type alias; `constCasing` (const name),
- *    `typeSuffix` (type-alias suffix), and `keyCasing` (key formatting) are all meaningful.
- * - `'enum'` / `'constEnum'` — emit a TypeScript enum; `keyCasing` applies to member names,
- *    but there is no const object or separate type alias so `constCasing` and `typeSuffix` are unused.
- * - `'literal'` / `'inlineLiteral'` — emit only union literals; keys are discarded entirely, so
- *    none of `constCasing`, `typeSuffix`, or `keyCasing` have any effect.
+ * - `'asConst'` emits a `const` object plus a `typeof` type alias, so `constCasing`, `typeSuffix`, and `keyCasing` all apply.
+ * - `'enum'` and `'constEnum'` emit a TypeScript enum, so only `keyCasing` (the member names) applies.
+ * - `'literal'` and `'inlineLiteral'` emit union literals and drop the keys, so none of the other fields apply.
  *
  * @example Share one name between the const and the type
  * ```ts
@@ -117,7 +113,7 @@ type EnumOptions =
   | {
       /**
        * Emit a `const` object asserted with `as const`, paired with a `typeof` type alias.
-       * Tree-shakeable and free of enum runtime.
+       * This is tree-shakeable and adds no enum runtime.
        *
        * @default 'asConst'
        */
@@ -131,13 +127,13 @@ type EnumOptions =
        */
       constCasing?: EnumConstCasing
       /**
-       * Suffix appended to the generated type alias name.
-       *
-       * Only affects the type alias; the const object name is unchanged. Set to `''` together with
-       * `constCasing: 'pascalCase'` to merge the const and type under the schema's exact name.
+       * Suffix appended to the generated type alias name. Only the type alias is renamed. The const
+       * object name stays the same. Set it to `''` together with `constCasing: 'pascalCase'` to merge
+       * the const and type under the schema's exact name.
        *
        * @default 'Key'
-       * @example typeSuffix: 'Value' → `export type PetStatusValue = …`
+       * @example A custom suffix
+       * `typeSuffix: 'Value'` renames the alias to `PetStatusValue`
        */
       typeSuffix?: string
       /**
@@ -159,11 +155,11 @@ type EnumOptions =
        */
       type?: 'enum' | 'constEnum'
       /**
-       * `constCasing` has no effect for this `type`; only `'asConst'` emits a const object.
+       * `constCasing` has no effect for this `type`. Only `'asConst'` emits a const object.
        */
       constCasing?: never
       /**
-       * `typeSuffix` has no effect for this `type`; only `'asConst'` emits a separate type alias.
+       * `typeSuffix` has no effect for this `type`. Only `'asConst'` emits a separate type alias.
        */
       typeSuffix?: never
       /**
@@ -195,8 +191,8 @@ type EnumOptions =
        */
       typeSuffix?: never
       /**
-       * `keyCasing` has no effect for this `type`.
-       * Literal and inlineLiteral modes emit only values; keys are discarded entirely.
+       * `keyCasing` has no effect for this `type`. Literal and inlineLiteral modes emit only values,
+       * so the keys are discarded.
        */
       keyCasing?: never
     }
