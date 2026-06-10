@@ -175,11 +175,11 @@ export type Options = {
    */
   paramsCasing?: 'camelcase'
   /**
-   * Validator applied to request and/or response bodies using schemas from `@kubb/plugin-zod`.
-   * - `false` (default) — no validation; the response is returned as-is.
-   * - `'zod'` — validates response bodies only (backward-compatible shorthand).
-   * - `{ request?: 'zod'; response?: 'zod' }` — opt in per direction. `request` validates the
-   *   request body and query parameters before the call; `response` validates the response body.
+   * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
+   * - `false` (default): no validation. The response is returned as-is.
+   * - `'zod'`: validates response bodies only (backward-compatible shorthand).
+   * - `{ request?: 'zod'; response?: 'zod' }`: opt in per direction. `request` validates the
+   *   request body and query parameters before the call. `response` validates the response body.
    *
    * @default false
    * @example Response only (shorthand)

@@ -688,15 +688,15 @@ options:
     required: false
     default: 'false'
     description: |
-      Runtime validator applied to request and/or response data using schemas from `@kubb/plugin-zod`.
+      Runtime validator applied to request and response data using schemas from `@kubb/plugin-zod`.
 
-      - `false` (default) — no validation. The client has no runtime parser; the response is cast to the generated TypeScript type and returned as-is.
-      - `'zod'` — validates response bodies only (backward-compatible shorthand).
-      - `{ request?: 'zod', response?: 'zod' }` — opt in per direction. `request` validates the request body and query parameters before the call; `response` validates the response body after.
+      - `false` (default): no validation. The client returns the response cast to the generated TypeScript type without parsing.
+      - `'zod'`: validates response bodies only (backward-compatible shorthand).
+      - `{ request?: 'zod', response?: 'zod' }`: opt in per direction. `request` validates the request body and query parameters before the call. `response` validates the response body after.
 
       Requires `@kubb/plugin-zod` in the plugins list when either direction is set to `'zod'`.
 
-      With `coercion` enabled in `@kubb/plugin-zod`, request-side parsing also normalises types (e.g. `z.coerce.number()` converts a stringified number from a form field).
+      With `coercion` enabled in `@kubb/plugin-zod`, request-side parsing also normalizes types (`z.coerce.number()` converts a stringified number from a form field).
     examples:
       - name: Validate responses with Zod
         files:

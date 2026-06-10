@@ -9,7 +9,7 @@ import type { PluginClient } from './types.ts'
 type ParserOption = PluginClient['resolvedOptions']['parser']
 
 /**
- * Returns `true` when any direction of the parser uses Zod — used for dependency checks.
+ * Returns `true` when any direction of the parser uses Zod (used for dependency checks).
  */
 export function isParserEnabled(parser: ParserOption | undefined | false): boolean {
   if (!parser) return false
@@ -29,8 +29,8 @@ export function resolveRequestParser(parser: ParserOption | undefined | false): 
 
 /**
  * Returns `'zod'` when query-parameters parsing is enabled, `null` otherwise.
- * Only the object form `{ request: 'zod' }` enables query-params parsing —
- * the string shorthand `'zod'` does not, preserving its existing behavior.
+ * Only the object form `{ request: 'zod' }` enables query-params parsing.
+ * The string shorthand `'zod'` does not, preserving its existing behavior.
  */
 export function resolveQueryParamsParser(parser: ParserOption | undefined | false): 'zod' | null {
   if (!parser || parser === 'zod') return null
@@ -169,7 +169,7 @@ export function buildRequestDataLine({
 /**
  * Builds the query parameters parsing line for client methods.
  * Returns an empty string when no query params exist or query-params parsing is not enabled.
- * Only the object form `parser: { request: 'zod' }` triggers this — `parser: 'zod'` does not.
+ * Only the object form `parser: { request: 'zod' }` triggers this. `parser: 'zod'` does not.
  */
 export function buildQueryParamsLine({
   parser,

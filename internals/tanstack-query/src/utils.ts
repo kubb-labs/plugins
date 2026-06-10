@@ -99,7 +99,7 @@ export function resolveRequestParser(parser: ParserOption): 'zod' | null {
 
 /**
  * Returns `'zod'` when query-params parsing is enabled.
- * Only the object form `{ request: 'zod' }` enables this; `parser: 'zod'` does not.
+ * Only the object form `{ request: 'zod' }` enables this. `parser: 'zod'` does not.
  */
 export function resolveQueryParamsParser(parser: ParserOption): 'zod' | null {
   if (!parser || parser === 'zod') return null
@@ -109,10 +109,10 @@ export function resolveQueryParamsParser(parser: ParserOption): 'zod' | null {
 /**
  * Collects the Zod schema import names for an operation based on the active parser directions.
  *
- * - `parser: 'zod'` — response + request body names (backward-compatible behavior).
- * - `parser: { request: 'zod' }` — request body + query params names.
- * - `parser: { response: 'zod' }` — response name only.
- * - `parser: { request: 'zod', response: 'zod' }` — all three.
+ * - `parser: 'zod'`: response and request body names (backward-compatible behavior).
+ * - `parser: { request: 'zod' }`: request body and query params names.
+ * - `parser: { response: 'zod' }`: response name only.
+ * - `parser: { request: 'zod', response: 'zod' }`: all three.
  *
  * Returns an empty array when no resolver is provided or `parser` is falsy.
  */
