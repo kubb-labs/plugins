@@ -12,4 +12,4 @@ export const addressSchema = z.object({
   zip: z.string().optional(),
 })
 
-export type AddressSchema = z.infer<typeof addressSchema>
+export type AddressSchemaType = z.infer<typeof addressSchema>

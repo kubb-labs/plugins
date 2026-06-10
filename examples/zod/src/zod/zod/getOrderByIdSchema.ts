@@ -8,28 +8,28 @@ import { orderSchema } from './orderSchema.ts'
 
 export const getOrderByIdPathOrderIdSchema = z.bigint().describe('ID of order that needs to be fetched')
 
-export type GetOrderByIdPathOrderIdSchema = z.infer<typeof getOrderByIdPathOrderIdSchema>
+export type GetOrderByIdPathOrderIdSchemaType = z.infer<typeof getOrderByIdPathOrderIdSchema>
 
 export const getOrderByIdStatus200SchemaJson = orderSchema
 
-export type GetOrderByIdStatus200SchemaJson = z.infer<typeof getOrderByIdStatus200SchemaJson>
+export type GetOrderByIdStatus200SchemaJsonType = z.infer<typeof getOrderByIdStatus200SchemaJson>
 
 export const getOrderByIdStatus200SchemaXml = orderSchema
 
-export type GetOrderByIdStatus200SchemaXml = z.infer<typeof getOrderByIdStatus200SchemaXml>
+export type GetOrderByIdStatus200SchemaXmlType = z.infer<typeof getOrderByIdStatus200SchemaXml>
 
 export const getOrderByIdStatus200Schema = z.union([getOrderByIdStatus200SchemaJson, getOrderByIdStatus200SchemaXml])
 
-export type GetOrderByIdStatus200Schema = z.infer<typeof getOrderByIdStatus200Schema>
+export type GetOrderByIdStatus200SchemaType = z.infer<typeof getOrderByIdStatus200Schema>
 
 export const getOrderByIdStatus400Schema = z.any()
 
-export type GetOrderByIdStatus400Schema = z.infer<typeof getOrderByIdStatus400Schema>
+export type GetOrderByIdStatus400SchemaType = z.infer<typeof getOrderByIdStatus400Schema>
 
 export const getOrderByIdStatus404Schema = z.any()
 
-export type GetOrderByIdStatus404Schema = z.infer<typeof getOrderByIdStatus404Schema>
+export type GetOrderByIdStatus404SchemaType = z.infer<typeof getOrderByIdStatus404Schema>
 
 export const getOrderByIdResponseSchema = z.union([getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
 
-export type GetOrderByIdResponseSchema = z.infer<typeof getOrderByIdResponseSchema>
+export type GetOrderByIdResponseSchemaType = z.infer<typeof getOrderByIdResponseSchema>

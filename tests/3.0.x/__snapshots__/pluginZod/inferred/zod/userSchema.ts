@@ -16,4 +16,4 @@ export const userSchema = z.object({
   userStatus: z.int().optional().describe('User Status'),
 })
 
-export type UserSchema = z.infer<typeof userSchema>
+export type UserSchemaType = z.infer<typeof userSchema>

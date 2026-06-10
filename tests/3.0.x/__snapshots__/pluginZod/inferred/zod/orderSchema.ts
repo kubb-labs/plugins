@@ -14,4 +14,4 @@ export const orderSchema = z.object({
   complete: z.boolean().optional(),
 })
 
-export type OrderSchema = z.infer<typeof orderSchema>
+export type OrderSchemaType = z.infer<typeof orderSchema>

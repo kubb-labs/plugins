@@ -9,4 +9,4 @@ export const dogSchema = z
   })
   .strict()
 
-export type DogSchema = z.infer<typeof dogSchema>
+export type DogSchemaType = z.infer<typeof dogSchema>

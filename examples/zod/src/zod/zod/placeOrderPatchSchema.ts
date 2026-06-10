@@ -8,28 +8,28 @@ import { orderSchema } from './orderSchema.ts'
 
 export const placeOrderPatchStatus200Schema = orderSchema
 
-export type PlaceOrderPatchStatus200Schema = z.infer<typeof placeOrderPatchStatus200Schema>
+export type PlaceOrderPatchStatus200SchemaType = z.infer<typeof placeOrderPatchStatus200Schema>
 
 export const placeOrderPatchStatus405Schema = z.any()
 
-export type PlaceOrderPatchStatus405Schema = z.infer<typeof placeOrderPatchStatus405Schema>
+export type PlaceOrderPatchStatus405SchemaType = z.infer<typeof placeOrderPatchStatus405Schema>
 
 export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
-export type PlaceOrderPatchResponseSchema = z.infer<typeof placeOrderPatchResponseSchema>
+export type PlaceOrderPatchResponseSchemaType = z.infer<typeof placeOrderPatchResponseSchema>
 
 export const placeOrderPatchDataSchemaJson = orderSchema.optional()
 
-export type PlaceOrderPatchDataSchemaJson = z.infer<typeof placeOrderPatchDataSchemaJson>
+export type PlaceOrderPatchDataSchemaJsonType = z.infer<typeof placeOrderPatchDataSchemaJson>
 
 export const placeOrderPatchDataSchemaXml = orderSchema.optional()
 
-export type PlaceOrderPatchDataSchemaXml = z.infer<typeof placeOrderPatchDataSchemaXml>
+export type PlaceOrderPatchDataSchemaXmlType = z.infer<typeof placeOrderPatchDataSchemaXml>
 
 export const placeOrderPatchDataSchemaFormUrlEncoded = orderSchema.optional()
 
-export type PlaceOrderPatchDataSchemaFormUrlEncoded = z.infer<typeof placeOrderPatchDataSchemaFormUrlEncoded>
+export type PlaceOrderPatchDataSchemaFormUrlEncodedType = z.infer<typeof placeOrderPatchDataSchemaFormUrlEncoded>
 
 export const placeOrderPatchDataSchema = z.union([placeOrderPatchDataSchemaJson, placeOrderPatchDataSchemaXml, placeOrderPatchDataSchemaFormUrlEncoded])
 
-export type PlaceOrderPatchDataSchema = z.infer<typeof placeOrderPatchDataSchema>
+export type PlaceOrderPatchDataSchemaType = z.infer<typeof placeOrderPatchDataSchema>

@@ -7,8 +7,8 @@ import * as z from 'zod'
 
 export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
 
-export type GetInventoryStatus200Schema = z.infer<typeof getInventoryStatus200Schema>
+export type GetInventoryStatus200SchemaType = z.infer<typeof getInventoryStatus200Schema>
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema
 
-export type GetInventoryResponseSchema = z.infer<typeof getInventoryResponseSchema>
+export type GetInventoryResponseSchemaType = z.infer<typeof getInventoryResponseSchema>

@@ -9,24 +9,24 @@ import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 
 export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema.optional().default('available').describe('Status values that need to be considered for filter')
 
-export type FindPetsByStatusQueryStatusSchema = z.infer<typeof findPetsByStatusQueryStatusSchema>
+export type FindPetsByStatusQueryStatusSchemaType = z.infer<typeof findPetsByStatusQueryStatusSchema>
 
 export const findPetsByStatusStatus200SchemaJson = z.array(petSchema)
 
-export type FindPetsByStatusStatus200SchemaJson = z.infer<typeof findPetsByStatusStatus200SchemaJson>
+export type FindPetsByStatusStatus200SchemaJsonType = z.infer<typeof findPetsByStatusStatus200SchemaJson>
 
 export const findPetsByStatusStatus200SchemaXml = z.array(petSchema)
 
-export type FindPetsByStatusStatus200SchemaXml = z.infer<typeof findPetsByStatusStatus200SchemaXml>
+export type FindPetsByStatusStatus200SchemaXmlType = z.infer<typeof findPetsByStatusStatus200SchemaXml>
 
 export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus200SchemaJson, findPetsByStatusStatus200SchemaXml])
 
-export type FindPetsByStatusStatus200Schema = z.infer<typeof findPetsByStatusStatus200Schema>
+export type FindPetsByStatusStatus200SchemaType = z.infer<typeof findPetsByStatusStatus200Schema>
 
 export const findPetsByStatusStatus400Schema = z.any()
 
-export type FindPetsByStatusStatus400Schema = z.infer<typeof findPetsByStatusStatus400Schema>
+export type FindPetsByStatusStatus400SchemaType = z.infer<typeof findPetsByStatusStatus400Schema>
 
 export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])
 
-export type FindPetsByStatusResponseSchema = z.infer<typeof findPetsByStatusResponseSchema>
+export type FindPetsByStatusResponseSchemaType = z.infer<typeof findPetsByStatusResponseSchema>

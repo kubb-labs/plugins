@@ -235,168 +235,168 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './models/ts/userController/UpdateUser.ts'
-export type { AddPetRequestSchema } from './zod/addPetRequestSchema.ts'
-export type { AddressSchema } from './zod/addressSchema.ts'
-export type { AnimalSchema } from './zod/animalSchema.ts'
-export type { ApiResponseSchema } from './zod/apiResponseSchema.ts'
-export type { CatSchema } from './zod/catSchema.ts'
-export type { CategorySchema } from './zod/categorySchema.ts'
-export type { CreatePetsXEXAMPLESchema } from './zod/createPetsXEXAMPLESchema.ts'
-export type { CustomerSchema } from './zod/customerSchema.ts'
-export type { DogSchema } from './zod/dogSchema.ts'
-export type { ImageSchema } from './zod/imageSchema.ts'
-export type { OrderParamsSchema } from './zod/orderParamsSchema.ts'
-export type { OrderParamsStatusEnumSchema } from './zod/orderParamsStatusEnumSchema.ts'
-export type { OrderSchema } from './zod/orderSchema.ts'
+export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema.ts'
+export type { AddressSchemaType } from './zod/addressSchema.ts'
+export type { AnimalSchemaType } from './zod/animalSchema.ts'
+export type { ApiResponseSchemaType } from './zod/apiResponseSchema.ts'
+export type { CatSchemaType } from './zod/catSchema.ts'
+export type { CategorySchemaType } from './zod/categorySchema.ts'
+export type { CreatePetsXEXAMPLESchemaType } from './zod/createPetsXEXAMPLESchema.ts'
+export type { CustomerSchemaType } from './zod/customerSchema.ts'
+export type { DogSchemaType } from './zod/dogSchema.ts'
+export type { ImageSchemaType } from './zod/imageSchema.ts'
+export type { OrderParamsSchemaType } from './zod/orderParamsSchema.ts'
+export type { OrderParamsStatusEnumSchemaType } from './zod/orderParamsStatusEnumSchema.ts'
+export type { OrderSchemaType } from './zod/orderSchema.ts'
 export type {
-  AddFilesDataSchema,
-  AddFilesDataSchemaFormData,
-  AddFilesDataSchemaJson,
-  AddFilesResponseSchema,
-  AddFilesStatus200Schema,
-  AddFilesStatus405Schema,
+  AddFilesDataSchemaFormDataType,
+  AddFilesDataSchemaJsonType,
+  AddFilesDataSchemaType,
+  AddFilesResponseSchemaType,
+  AddFilesStatus200SchemaType,
+  AddFilesStatus405SchemaType,
 } from './zod/petController/addFilesSchema.ts'
 export type {
-  AddPetDataSchema,
-  AddPetDataSchemaFormUrlEncoded,
-  AddPetDataSchemaJson,
-  AddPetDataSchemaXml,
-  AddPetResponseSchema,
-  AddPetStatus405Schema,
-  AddPetStatusDefaultSchema,
-  AddPetStatusDefaultSchemaJson,
-  AddPetStatusDefaultSchemaXml,
+  AddPetDataSchemaFormUrlEncodedType,
+  AddPetDataSchemaJsonType,
+  AddPetDataSchemaType,
+  AddPetDataSchemaXmlType,
+  AddPetResponseSchemaType,
+  AddPetStatus405SchemaType,
+  AddPetStatusDefaultSchemaJsonType,
+  AddPetStatusDefaultSchemaType,
+  AddPetStatusDefaultSchemaXmlType,
 } from './zod/petController/addPetSchema.ts'
 export type {
-  DeletePetHeaderApiKeySchema,
-  DeletePetPathPetIdSchema,
-  DeletePetResponseSchema,
-  DeletePetStatus400Schema,
+  DeletePetHeaderApiKeySchemaType,
+  DeletePetPathPetIdSchemaType,
+  DeletePetResponseSchemaType,
+  DeletePetStatus400SchemaType,
 } from './zod/petController/deletePetSchema.ts'
 export type {
-  FindPetsByStatusPathStepIdSchema,
-  FindPetsByStatusResponseSchema,
-  FindPetsByStatusStatus200Schema,
-  FindPetsByStatusStatus200SchemaJson,
-  FindPetsByStatusStatus200SchemaXml,
-  FindPetsByStatusStatus400Schema,
+  FindPetsByStatusPathStepIdSchemaType,
+  FindPetsByStatusResponseSchemaType,
+  FindPetsByStatusStatus200SchemaJsonType,
+  FindPetsByStatusStatus200SchemaType,
+  FindPetsByStatusStatus200SchemaXmlType,
+  FindPetsByStatusStatus400SchemaType,
 } from './zod/petController/findPetsByStatusSchema.ts'
 export type {
-  FindPetsByTagsHeaderXEXAMPLESchema,
-  FindPetsByTagsQueryPageSchema,
-  FindPetsByTagsQueryPageSizeSchema,
-  FindPetsByTagsQueryTagsSchema,
-  FindPetsByTagsResponseSchema,
-  FindPetsByTagsStatus200Schema,
-  FindPetsByTagsStatus200SchemaJson,
-  FindPetsByTagsStatus200SchemaXml,
-  FindPetsByTagsStatus400Schema,
+  FindPetsByTagsHeaderXEXAMPLESchemaType,
+  FindPetsByTagsQueryPageSchemaType,
+  FindPetsByTagsQueryPageSizeSchemaType,
+  FindPetsByTagsQueryTagsSchemaType,
+  FindPetsByTagsResponseSchemaType,
+  FindPetsByTagsStatus200SchemaJsonType,
+  FindPetsByTagsStatus200SchemaType,
+  FindPetsByTagsStatus200SchemaXmlType,
+  FindPetsByTagsStatus400SchemaType,
 } from './zod/petController/findPetsByTagsSchema.ts'
 export type {
-  GetPetByIdPathPetIdSchema,
-  GetPetByIdResponseSchema,
-  GetPetByIdStatus200Schema,
-  GetPetByIdStatus200SchemaJson,
-  GetPetByIdStatus200SchemaXml,
-  GetPetByIdStatus400Schema,
-  GetPetByIdStatus404Schema,
+  GetPetByIdPathPetIdSchemaType,
+  GetPetByIdResponseSchemaType,
+  GetPetByIdStatus200SchemaJsonType,
+  GetPetByIdStatus200SchemaType,
+  GetPetByIdStatus200SchemaXmlType,
+  GetPetByIdStatus400SchemaType,
+  GetPetByIdStatus404SchemaType,
 } from './zod/petController/getPetByIdSchema.ts'
 export type {
-  UpdatePetDataSchema,
-  UpdatePetDataSchemaFormUrlEncoded,
-  UpdatePetDataSchemaJson,
-  UpdatePetDataSchemaXml,
-  UpdatePetResponseSchema,
-  UpdatePetStatus200Schema,
-  UpdatePetStatus200SchemaJson,
-  UpdatePetStatus200SchemaXml,
-  UpdatePetStatus202Schema,
-  UpdatePetStatus400Schema,
-  UpdatePetStatus404Schema,
-  UpdatePetStatus405Schema,
+  UpdatePetDataSchemaFormUrlEncodedType,
+  UpdatePetDataSchemaJsonType,
+  UpdatePetDataSchemaType,
+  UpdatePetDataSchemaXmlType,
+  UpdatePetResponseSchemaType,
+  UpdatePetStatus200SchemaJsonType,
+  UpdatePetStatus200SchemaType,
+  UpdatePetStatus200SchemaXmlType,
+  UpdatePetStatus202SchemaType,
+  UpdatePetStatus400SchemaType,
+  UpdatePetStatus404SchemaType,
+  UpdatePetStatus405SchemaType,
 } from './zod/petController/updatePetSchema.ts'
 export type {
-  UpdatePetWithFormPathPetIdSchema,
-  UpdatePetWithFormQueryNameSchema,
-  UpdatePetWithFormQueryStatusSchema,
-  UpdatePetWithFormResponseSchema,
-  UpdatePetWithFormStatus405Schema,
+  UpdatePetWithFormPathPetIdSchemaType,
+  UpdatePetWithFormQueryNameSchemaType,
+  UpdatePetWithFormQueryStatusSchemaType,
+  UpdatePetWithFormResponseSchemaType,
+  UpdatePetWithFormStatus405SchemaType,
 } from './zod/petController/updatePetWithFormSchema.ts'
 export type {
-  UploadFileDataSchema,
-  UploadFilePathPetIdSchema,
-  UploadFileQueryAdditionalMetadataSchema,
-  UploadFileResponseSchema,
-  UploadFileStatus200Schema,
+  UploadFileDataSchemaType,
+  UploadFilePathPetIdSchemaType,
+  UploadFileQueryAdditionalMetadataSchemaType,
+  UploadFileResponseSchemaType,
+  UploadFileStatus200SchemaType,
 } from './zod/petController/uploadFileSchema.ts'
-export type { PetNotFoundSchema } from './zod/petNotFoundSchema.ts'
-export type { PetSchema } from './zod/petSchema.ts'
-export type { PetStatusEnumSchema } from './zod/petStatusEnumSchema.ts'
+export type { PetNotFoundSchemaType } from './zod/petNotFoundSchema.ts'
+export type { PetSchemaType } from './zod/petSchema.ts'
+export type { PetStatusEnumSchemaType } from './zod/petStatusEnumSchema.ts'
 export type {
-  CreatePetsDataSchema,
-  CreatePetsHeaderXEXAMPLESchema,
-  CreatePetsPathUuidSchema,
-  CreatePetsQueryBoolParamSchema,
-  CreatePetsQueryOffsetSchema,
-  CreatePetsResponseSchema,
-  CreatePetsStatus201Schema,
-  CreatePetsStatusDefaultSchema,
+  CreatePetsDataSchemaType,
+  CreatePetsHeaderXEXAMPLESchemaType,
+  CreatePetsPathUuidSchemaType,
+  CreatePetsQueryBoolParamSchemaType,
+  CreatePetsQueryOffsetSchemaType,
+  CreatePetsResponseSchemaType,
+  CreatePetsStatus201SchemaType,
+  CreatePetsStatusDefaultSchemaType,
 } from './zod/petsController/createPetsSchema.ts'
-export type { TagTagSchema } from './zod/tag/tagSchema.ts'
-export type { UserArraySchema } from './zod/userArraySchema.ts'
+export type { TagTagSchemaType } from './zod/tag/tagSchema.ts'
+export type { UserArraySchemaType } from './zod/userArraySchema.ts'
 export type {
-  CreateUserDataSchema,
-  CreateUserDataSchemaFormUrlEncoded,
-  CreateUserDataSchemaJson,
-  CreateUserDataSchemaXml,
-  CreateUserResponseSchema,
-  CreateUserStatusDefaultSchema,
-  CreateUserStatusDefaultSchemaJson,
-  CreateUserStatusDefaultSchemaXml,
+  CreateUserDataSchemaFormUrlEncodedType,
+  CreateUserDataSchemaJsonType,
+  CreateUserDataSchemaType,
+  CreateUserDataSchemaXmlType,
+  CreateUserResponseSchemaType,
+  CreateUserStatusDefaultSchemaJsonType,
+  CreateUserStatusDefaultSchemaType,
+  CreateUserStatusDefaultSchemaXmlType,
 } from './zod/userController/createUserSchema.ts'
 export type {
-  CreateUsersWithListInputDataSchema,
-  CreateUsersWithListInputResponseSchema,
-  CreateUsersWithListInputStatus200Schema,
-  CreateUsersWithListInputStatus200SchemaJson,
-  CreateUsersWithListInputStatus200SchemaXml,
-  CreateUsersWithListInputStatusDefaultSchema,
+  CreateUsersWithListInputDataSchemaType,
+  CreateUsersWithListInputResponseSchemaType,
+  CreateUsersWithListInputStatus200SchemaJsonType,
+  CreateUsersWithListInputStatus200SchemaType,
+  CreateUsersWithListInputStatus200SchemaXmlType,
+  CreateUsersWithListInputStatusDefaultSchemaType,
 } from './zod/userController/createUsersWithListInputSchema.ts'
 export type {
-  DeleteUserPathUsernameSchema,
-  DeleteUserResponseSchema,
-  DeleteUserStatus400Schema,
-  DeleteUserStatus404Schema,
+  DeleteUserPathUsernameSchemaType,
+  DeleteUserResponseSchemaType,
+  DeleteUserStatus400SchemaType,
+  DeleteUserStatus404SchemaType,
 } from './zod/userController/deleteUserSchema.ts'
 export type {
-  GetUserByNamePathUsernameSchema,
-  GetUserByNameResponseSchema,
-  GetUserByNameStatus200Schema,
-  GetUserByNameStatus200SchemaJson,
-  GetUserByNameStatus200SchemaXml,
-  GetUserByNameStatus400Schema,
-  GetUserByNameStatus404Schema,
+  GetUserByNamePathUsernameSchemaType,
+  GetUserByNameResponseSchemaType,
+  GetUserByNameStatus200SchemaJsonType,
+  GetUserByNameStatus200SchemaType,
+  GetUserByNameStatus200SchemaXmlType,
+  GetUserByNameStatus400SchemaType,
+  GetUserByNameStatus404SchemaType,
 } from './zod/userController/getUserByNameSchema.ts'
 export type {
-  LoginUserQueryPasswordSchema,
-  LoginUserQueryUsernameSchema,
-  LoginUserResponseSchema,
-  LoginUserStatus200Schema,
-  LoginUserStatus200SchemaJson,
-  LoginUserStatus200SchemaXml,
-  LoginUserStatus400Schema,
+  LoginUserQueryPasswordSchemaType,
+  LoginUserQueryUsernameSchemaType,
+  LoginUserResponseSchemaType,
+  LoginUserStatus200SchemaJsonType,
+  LoginUserStatus200SchemaType,
+  LoginUserStatus200SchemaXmlType,
+  LoginUserStatus400SchemaType,
 } from './zod/userController/loginUserSchema.ts'
-export type { LogoutUserResponseSchema, LogoutUserStatusDefaultSchema } from './zod/userController/logoutUserSchema.ts'
+export type { LogoutUserResponseSchemaType, LogoutUserStatusDefaultSchemaType } from './zod/userController/logoutUserSchema.ts'
 export type {
-  UpdateUserDataSchema,
-  UpdateUserDataSchemaFormUrlEncoded,
-  UpdateUserDataSchemaJson,
-  UpdateUserDataSchemaXml,
-  UpdateUserPathUsernameSchema,
-  UpdateUserResponseSchema,
-  UpdateUserStatusDefaultSchema,
+  UpdateUserDataSchemaFormUrlEncodedType,
+  UpdateUserDataSchemaJsonType,
+  UpdateUserDataSchemaType,
+  UpdateUserDataSchemaXmlType,
+  UpdateUserPathUsernameSchemaType,
+  UpdateUserResponseSchemaType,
+  UpdateUserStatusDefaultSchemaType,
 } from './zod/userController/updateUserSchema.ts'
-export type { UserSchema } from './zod/userSchema.ts'
+export type { UserSchemaType } from './zod/userSchema.ts'
 export { operations } from './clients/axios/operations.ts'
 export { addFiles, getAddFilesUrl } from './clients/axios/petService/addFiles.ts'
 export { addPet, getAddPetUrl } from './clients/axios/petService/addPet.ts'

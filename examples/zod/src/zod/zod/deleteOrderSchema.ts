@@ -7,16 +7,16 @@ import { z } from '../../zod.ts'
 
 export const deleteOrderPathOrderIdSchema = z.bigint().describe('ID of the order that needs to be deleted')
 
-export type DeleteOrderPathOrderIdSchema = z.infer<typeof deleteOrderPathOrderIdSchema>
+export type DeleteOrderPathOrderIdSchemaType = z.infer<typeof deleteOrderPathOrderIdSchema>
 
 export const deleteOrderStatus400Schema = z.any()
 
-export type DeleteOrderStatus400Schema = z.infer<typeof deleteOrderStatus400Schema>
+export type DeleteOrderStatus400SchemaType = z.infer<typeof deleteOrderStatus400Schema>
 
 export const deleteOrderStatus404Schema = z.any()
 
-export type DeleteOrderStatus404Schema = z.infer<typeof deleteOrderStatus404Schema>
+export type DeleteOrderStatus404SchemaType = z.infer<typeof deleteOrderStatus404Schema>
 
 export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
 
-export type DeleteOrderResponseSchema = z.infer<typeof deleteOrderResponseSchema>
+export type DeleteOrderResponseSchemaType = z.infer<typeof deleteOrderResponseSchema>
