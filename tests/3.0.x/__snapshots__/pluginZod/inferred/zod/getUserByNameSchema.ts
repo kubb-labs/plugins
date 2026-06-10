@@ -33,3 +33,7 @@ export type GetUserByNameStatus404SchemaType = z.infer<typeof getUserByNameStatu
 export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])
 
 export type GetUserByNameResponseSchemaType = z.infer<typeof getUserByNameResponseSchema>
+
+export const getUserByNameSuccessResponseSchema = getUserByNameStatus200Schema
+
+export type GetUserByNameSuccessResponseSchemaType = z.infer<typeof getUserByNameSuccessResponseSchema>

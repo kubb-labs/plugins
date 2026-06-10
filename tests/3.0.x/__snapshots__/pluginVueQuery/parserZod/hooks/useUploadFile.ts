@@ -8,7 +8,7 @@ import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMeta
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
+import { uploadFileSuccessResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
@@ -24,7 +24,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
-  return uploadFileResponseSchema.parse(res.data)
+  return uploadFileSuccessResponseSchema.parse(res.data)
 }
 
 /**

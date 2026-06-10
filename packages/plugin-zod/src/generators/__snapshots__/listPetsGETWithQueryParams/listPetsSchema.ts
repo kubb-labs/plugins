@@ -12,3 +12,5 @@ export const listPetsStatus200Schema = z.object({})
 export const listPetsStatusDefaultSchema = z.object({})
 
 export const listPetsResponseSchema = z.union([listPetsStatus200Schema, listPetsStatusDefaultSchema])
+
+export const listPetsSuccessResponseSchema = listPetsStatus200Schema

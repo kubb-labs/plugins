@@ -1,9 +1,9 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import { client } from './.kubb/client'
-import { FindPetsByTagsResponse } from './FindPetsByTags'
+import { findPetsByTagsSuccessResponseSchema } from './findPetsByTagsSchema'
 
 export function getFindPetsByTagsUrl() {
   const res = { method: 'GET', url: `/pet/findByTags` as const }
@@ -27,5 +27,5 @@ export async function findPetsByTags(
     ...requestConfig,
   })
 
-  return FindPetsByTagsResponse.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }

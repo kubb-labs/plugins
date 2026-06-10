@@ -16,3 +16,7 @@ export type ListPetsInferredStatus200SchemaType = z.infer<typeof listPetsInferre
 export const listPetsInferredResponseSchema = listPetsInferredStatus200Schema
 
 export type ListPetsInferredResponseSchemaType = z.infer<typeof listPetsInferredResponseSchema>
+
+export const listPetsInferredSuccessResponseSchema = listPetsInferredStatus200Schema
+
+export type ListPetsInferredSuccessResponseSchemaType = z.infer<typeof listPetsInferredSuccessResponseSchema>

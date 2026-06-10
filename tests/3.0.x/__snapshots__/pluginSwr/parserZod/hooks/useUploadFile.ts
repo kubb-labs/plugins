@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
+import { uploadFileSuccessResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -25,7 +25,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
-  return uploadFileResponseSchema.parse(res.data)
+  return uploadFileSuccessResponseSchema.parse(res.data)
 }
 
 export type UploadFileMutationArg = { petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }

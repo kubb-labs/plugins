@@ -8,7 +8,7 @@ import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsSt
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { findPetsByTagsResponseSchema } from '../zod/findPetsByTagsSchema.ts'
+import { findPetsByTagsSuccessResponseSchema } from '../zod/findPetsByTagsSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -26,7 +26,7 @@ export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return findPetsByTagsResponseSchema.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByTagsQueryOptions(params?: MaybeRefOrGetter<{ tags?: FindPetsByTagsQueryTags }>, config: Partial<RequestConfig> & { client?: Client } = {}) {

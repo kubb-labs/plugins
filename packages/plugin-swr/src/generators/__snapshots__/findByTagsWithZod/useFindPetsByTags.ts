@@ -8,7 +8,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
-import { FindPetsByTagsResponse } from './FindPetsByTags'
+import { findPetsByTagsSuccessResponseSchema } from './findPetsByTagsSchema'
 
 export const findPetsByTagsQueryKey = (params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }) =>
   [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
@@ -26,7 +26,7 @@ export async function findPetsByTags(
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return FindPetsByTagsResponse.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByTagsQueryOptions(

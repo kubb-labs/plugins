@@ -8,7 +8,7 @@ import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, Dele
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { deletePetResponseSchema } from '../zod/deletePetSchema.ts'
+import { deletePetSuccessResponseSchema } from '../zod/deletePetSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -23,7 +23,7 @@ export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?:
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
-  return deletePetResponseSchema.parse(res.data)
+  return deletePetSuccessResponseSchema.parse(res.data)
 }
 
 /**

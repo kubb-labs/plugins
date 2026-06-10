@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { loginUserResponseSchema } from '../zod/loginUserSchema.ts'
+import { loginUserSuccessResponseSchema } from '../zod/loginUserSchema.ts'
 
 function getLoginUserUrl() {
   const res = { method: 'GET', url: `/user/login` as const }
@@ -23,5 +23,5 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
 
   const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: getLoginUserUrl().url.toString(), params, ...requestConfig })
 
-  return loginUserResponseSchema.parse(res.data)
+  return loginUserSuccessResponseSchema.parse(res.data)
 }

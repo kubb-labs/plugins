@@ -117,7 +117,7 @@ export function Client({
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
 
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveSuccessResponseName?.(node) : null
   const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
 
   const errorNames = node.responses

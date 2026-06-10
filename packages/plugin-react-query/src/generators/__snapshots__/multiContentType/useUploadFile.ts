@@ -4,11 +4,11 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileStatus200 } from './UploadFile'
+import type { UploadFileData, UploadFilePathPetId, UploadFileStatus200 } from './UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { client } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
-import { UploadFileResponse, UploadFileData } from './UploadFile'
+import { uploadFileSuccessResponseSchema, uploadFileDataSchema } from './uploadFileSchema'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
@@ -23,7 +23,7 @@ export async function uploadFile(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = UploadFileData.parse(data)
+  const requestData = uploadFileDataSchema.parse(data)
   const formData = buildFormData(requestData)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
@@ -34,7 +34,7 @@ export async function uploadFile(
     ...requestConfig,
   })
 
-  return UploadFileResponse.parse(res.data)
+  return uploadFileSuccessResponseSchema.parse(res.data)
 }
 
 export function uploadFileMutationOptions<TContext = unknown>(

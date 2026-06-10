@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
+import { addPetSuccessResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -26,7 +26,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
-  return addPetResponseSchema.parse(res.data)
+  return addPetSuccessResponseSchema.parse(res.data)
 }
 
 export type AddPetMutationArg = { data: AddPetData }

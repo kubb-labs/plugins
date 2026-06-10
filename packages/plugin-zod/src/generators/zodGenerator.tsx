@@ -1,4 +1,4 @@
-import { resolveContentTypeVariants } from '@internals/shared'
+import { isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { extractRefName } from '@kubb/ast/utils'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
@@ -278,6 +278,45 @@ export const zodGenerator = defineGenerator<PluginZod>({
           })()
         : null
 
+    const successResponsesWithSchema = node.responses.filter(
+      (res) => isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema),
+    )
+    const successResponseUnionSchema =
+      successResponsesWithSchema.length > 0
+        ? (() => {
+            const successResponseUnionName = resolver.resolveSuccessResponseName(node)
+
+            const importedSuccessNames = new Set(
+              successResponsesWithSchema.flatMap((res) =>
+                (res.content ?? []).flatMap((entry) =>
+                  entry.schema
+                    ? adapter
+                        .getImports(entry.schema, (schemaName) => ({
+                          name: resolver.resolveSchemaName(schemaName),
+                          path: '',
+                        }))
+                        .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+                    : [],
+                ),
+              ),
+            )
+
+            if (importedSuccessNames.has(successResponseUnionName)) {
+              return null
+            }
+
+            const members = successResponsesWithSchema.map((res) =>
+              ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+            )
+            const unionNode = members.length === 1 ? members[0]! : ast.createSchema({ type: 'union', members })
+
+            return renderSchemaEntry({
+              schema: unionNode,
+              name: successResponseUnionName,
+            })
+          })()
+        : null
+
     const requestBodyContent = node.requestBody?.content ?? []
     const requestSchema = (() => {
       if (requestBodyContent.length === 0) return null
@@ -314,6 +353,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         {paramSchemas}
         {responseSchemas}
         {responseUnionSchema}
+        {successResponseUnionSchema}
         {requestSchema}
       </File>
     )

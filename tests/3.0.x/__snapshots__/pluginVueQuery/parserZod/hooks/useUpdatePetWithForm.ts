@@ -8,7 +8,7 @@ import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWi
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { updatePetWithFormResponseSchema } from '../zod/updatePetWithFormSchema.ts'
+import { updatePetWithFormSuccessResponseSchema } from '../zod/updatePetWithFormSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -22,7 +22,7 @@ export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, param
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: 'POST', url: `/pet/${petId}`, params, ...requestConfig })
 
-  return updatePetWithFormResponseSchema.parse(res.data)
+  return updatePetWithFormSuccessResponseSchema.parse(res.data)
 }
 
 /**

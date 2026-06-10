@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
+import { createUsersWithListInputSuccessResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
@@ -26,7 +26,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 
   const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: `/user/createWithList`, data: requestData, ...requestConfig })
 
-  return createUsersWithListInputResponseSchema.parse(res.data)
+  return createUsersWithListInputSuccessResponseSchema.parse(res.data)
 }
 
 export type CreateUsersWithListInputMutationArg = { data?: CreateUsersWithListInputData }

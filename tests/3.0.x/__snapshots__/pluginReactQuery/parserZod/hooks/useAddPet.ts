@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
+import { addPetSuccessResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
@@ -24,7 +24,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
-  return addPetResponseSchema.parse(res.data)
+  return addPetSuccessResponseSchema.parse(res.data)
 }
 
 export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {

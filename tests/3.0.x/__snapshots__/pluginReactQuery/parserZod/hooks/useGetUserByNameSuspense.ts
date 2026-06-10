@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../types/GetUserByName.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { getUserByNameResponseSchema } from '../zod/getUserByNameSchema.ts'
+import { getUserByNameSuccessResponseSchema } from '../zod/getUserByNameSchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getUserByNameSuspenseQueryKey = (username?: GetUserByNamePathUsername) => [{ url: '/user/:username', params: {username:username} }] as const
@@ -23,7 +23,7 @@ export async function getUserByNameSuspense(username: GetUserByNamePathUsername,
 
   const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: 'GET', url: `/user/${username}`, ...requestConfig })
 
-  return getUserByNameResponseSchema.parse(res.data)
+  return getUserByNameSuccessResponseSchema.parse(res.data)
 }
 
 export function getUserByNameSuspenseQueryOptions(username: GetUserByNamePathUsername, config: Partial<RequestConfig> & { client?: Client } = {}) {

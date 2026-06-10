@@ -8,7 +8,7 @@ import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { loginUserResponseSchema } from '../zod/loginUserSchema.ts'
+import { loginUserSuccessResponseSchema } from '../zod/loginUserSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -25,7 +25,7 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
 
   const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: `/user/login`, params, ...requestConfig })
 
-  return loginUserResponseSchema.parse(res.data)
+  return loginUserSuccessResponseSchema.parse(res.data)
 }
 
 export function loginUserQueryOptions(params?: MaybeRefOrGetter<{ username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }>, config: Partial<RequestConfig> & { client?: Client } = {}) {

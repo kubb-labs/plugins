@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
+import { getInventorySuccessResponseSchema } from '../zod/getInventorySchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
@@ -24,7 +24,7 @@ export async function getInventorySuspense(config: Partial<RequestConfig> & { cl
 
   const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
-  return getInventoryResponseSchema.parse(res.data)
+  return getInventorySuccessResponseSchema.parse(res.data)
 }
 
 export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {

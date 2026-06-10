@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { loginUserResponseSchema } from '../zod/loginUserSchema.ts'
+import { loginUserSuccessResponseSchema } from '../zod/loginUserSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const loginUserQueryKey = (params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }) => [{ url: '/user/login' }, ...(params ? [params] : [])] as const
@@ -23,7 +23,7 @@ export async function loginUser(params?: { username?: LoginUserQueryUsername; pa
 
   const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: `/user/login`, params, ...requestConfig })
 
-  return loginUserResponseSchema.parse(res.data)
+  return loginUserSuccessResponseSchema.parse(res.data)
 }
 
 export function loginUserQueryOptions(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {

@@ -5,6 +5,8 @@ import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
+import type { PluginZod } from '@kubb/plugin-zod'
+import { pluginZodName, resolverZod } from '@kubb/plugin-zod'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { resolverClient } from '../resolvers/resolverClient.ts'
@@ -51,6 +53,27 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+const mockedZodPlugin = createMockedPlugin<PluginZod>({
+  name: 'plugin-zod',
+  options: { output: { path: '.' } } as PluginZod['resolvedOptions'],
+  resolver: resolverZod,
+})
+
+function createZodAwareDriver(name: string) {
+  const base = createMockedPluginDriver({ name, plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'] })
+  return {
+    ...base,
+    getPlugin(pluginName: string) {
+      return pluginName === pluginZodName
+        ? (mockedZodPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'])
+        : (mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'])
+    },
+    getResolver(pluginName: string) {
+      return pluginName === pluginZodName ? resolverZod : resolverTs
+    },
+  }
+}
 
 // Shared operation nodes
 const findByTagsNode = ast.createOperation({
@@ -189,6 +212,17 @@ const downloadFileNode = ast.createOperation({
   ],
 })
 
+const getStatusNode = ast.createOperation({
+  operationId: 'getStatus',
+  method: 'GET',
+  path: '/status',
+  tags: ['status'],
+  responses: [
+    ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'status', required: true, schema: ast.createSchema({ type: 'string' }) })] }), description: 'Ok' }),
+    ast.createResponse({ statusCode: '422', schema: ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'detail', required: true, schema: ast.createSchema({ type: 'string' }) })] }), description: 'Err' }),
+  ],
+})
+
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
@@ -196,6 +230,8 @@ describe('clientGenerator operation', () => {
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
     { name: 'findByTagsFull', node: findByTagsNode, options: { dataReturnType: 'full' as const } },
     { name: 'findByTagsWithZodFull', node: findByTagsNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
+    { name: 'getStatusWithZod', node: getStatusNode, options: { parser: 'zod' as const } },
+    { name: 'getStatusWithZodFull', node: getStatusNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
     { name: 'importPath', node: findByTagsNode, options: { importPath: 'axios' as const } },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
@@ -226,10 +262,13 @@ describe('clientGenerator operation', () => {
       ...('baseURL' in props ? { baseURL: props.baseURL } : {}),
     }
     const plugin = createMockedPlugin<PluginClient>({ name: 'plugin-client', options, resolver: resolverClient })
-    const driver = createMockedPluginDriver({
-      name: props.name,
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
+    const driver =
+      options.parser === 'zod'
+        ? createZodAwareDriver(props.name)
+        : createMockedPluginDriver({
+            name: props.name,
+            plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+          })
 
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,

@@ -12,3 +12,7 @@ export type GetInventoryStatus200SchemaType = z.infer<typeof getInventoryStatus2
 export const getInventoryResponseSchema = getInventoryStatus200Schema
 
 export type GetInventoryResponseSchemaType = z.infer<typeof getInventoryResponseSchema>
+
+export const getInventorySuccessResponseSchema = getInventoryStatus200Schema
+
+export type GetInventorySuccessResponseSchemaType = z.infer<typeof getInventorySuccessResponseSchema>

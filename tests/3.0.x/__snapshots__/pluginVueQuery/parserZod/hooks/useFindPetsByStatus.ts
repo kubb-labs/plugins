@@ -8,7 +8,7 @@ import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsBy
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
+import { findPetsByStatusSuccessResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -26,7 +26,7 @@ export async function findPetsByStatus(params?: { status?: FindPetsByStatusQuery
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, params, ...requestConfig })
 
-  return findPetsByStatusResponseSchema.parse(res.data)
+  return findPetsByStatusSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, config: Partial<RequestConfig> & { client?: Client } = {}) {

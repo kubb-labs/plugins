@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { createUserResponseSchema, createUserDataSchema } from '../zod/createUserSchema.ts'
+import { createUserSuccessResponseSchema, createUserDataSchema } from '../zod/createUserSchema.ts'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -26,7 +26,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 
   const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserData>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
 
-  return createUserResponseSchema.parse(res.data)
+  return createUserSuccessResponseSchema.parse(res.data)
 }
 
 export type CreateUserMutationArg = { data?: CreateUserData }

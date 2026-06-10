@@ -4,10 +4,10 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { client } from './.kubb/client'
-import { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from './CreateUsersWithListInput'
+import { createUsersWithListInputSuccessResponseSchema, createUsersWithListInputDataSchema } from './createUsersWithListInputSchema'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const createUsersWithListInputQueryKey = (data?: CreateUsersWithListInputData) => [{ url: '/user/createWithList' }, ...(data ? [data] : [])] as const
@@ -23,7 +23,7 @@ export async function createUsersWithListInput(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = CreateUsersWithListInputData.parse(data)
+  const requestData = createUsersWithListInputDataSchema.parse(data)
 
   const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({
     method: 'POST',
@@ -32,7 +32,7 @@ export async function createUsersWithListInput(
     ...requestConfig,
   })
 
-  return CreateUsersWithListInputResponse.parse(res.data)
+  return createUsersWithListInputSuccessResponseSchema.parse(res.data)
 }
 
 export function createUsersWithListInputQueryOptions(

@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
-import { logoutUserResponseSchema } from '../zod/logoutUserSchema.ts'
+import { logoutUserSuccessResponseSchema } from '../zod/logoutUserSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -24,7 +24,7 @@ export async function logoutUser(config: Partial<RequestConfig> & { client?: Cli
 
   const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
-  return logoutUserResponseSchema.parse(res.data)
+  return logoutUserSuccessResponseSchema.parse(res.data)
 }
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {

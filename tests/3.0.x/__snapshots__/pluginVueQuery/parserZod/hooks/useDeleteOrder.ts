@@ -8,7 +8,7 @@ import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400,
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { deleteOrderResponseSchema } from '../zod/deleteOrderSchema.ts'
+import { deleteOrderSuccessResponseSchema } from '../zod/deleteOrderSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
@@ -23,7 +23,7 @@ export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Parti
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: `/store/order/${orderId}`, ...requestConfig })
 
-  return deleteOrderResponseSchema.parse(res.data)
+  return deleteOrderSuccessResponseSchema.parse(res.data)
 }
 
 /**

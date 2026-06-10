@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { getOrderByIdResponseSchema } from '../zod/getOrderByIdSchema.ts'
+import { getOrderByIdSuccessResponseSchema } from '../zod/getOrderByIdSchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getOrderByIdSuspenseQueryKey = (orderId?: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
@@ -24,7 +24,7 @@ export async function getOrderByIdSuspense(orderId: GetOrderByIdPathOrderId, con
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: 'GET', url: `/store/order/${orderId}`, ...requestConfig })
 
-  return getOrderByIdResponseSchema.parse(res.data)
+  return getOrderByIdSuccessResponseSchema.parse(res.data)
 }
 
 export function getOrderByIdSuspenseQueryOptions(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {

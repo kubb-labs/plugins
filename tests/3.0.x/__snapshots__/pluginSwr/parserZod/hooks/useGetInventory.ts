@@ -8,7 +8,7 @@ import useSWR from 'swr'
 import type { GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
+import { getInventorySuccessResponseSchema } from '../zod/getInventorySchema.ts'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -24,7 +24,7 @@ export async function getInventory(config: Partial<RequestConfig> & { client?: C
 
   const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
 
-  return getInventoryResponseSchema.parse(res.data)
+  return getInventorySuccessResponseSchema.parse(res.data)
 }
 
 export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {

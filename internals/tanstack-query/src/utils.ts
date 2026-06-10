@@ -69,18 +69,21 @@ export function resolveOperationOverrides<TOptions>(node: ast.OperationNode, ove
 }
 
 type ZodSchemaNameResolverLike = {
+  resolveSuccessResponseName?: (node: ast.OperationNode) => string | undefined
   resolveResponseName?: (node: ast.OperationNode) => string | undefined
   resolveDataName?: (node: ast.OperationNode) => string | undefined
 }
 
 /**
  * Collects the Zod schema import names for an operation (response + request body).
+ * Uses the success-only response schema when available, falling back to the full response union.
  *
  * Returns an empty array when no resolver is provided or the operation has no request body schema.
  */
 export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined): string[] {
   if (!zodResolver) return []
-  return [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
+  const responseName = zodResolver.resolveSuccessResponseName?.(node) ?? zodResolver.resolveResponseName?.(node)
+  return [responseName, node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
     (n): n is string => Boolean(n),
   )
 }

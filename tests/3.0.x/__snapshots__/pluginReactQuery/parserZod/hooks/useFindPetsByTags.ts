@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { findPetsByTagsResponseSchema } from '../zod/findPetsByTagsSchema.ts'
+import { findPetsByTagsSuccessResponseSchema } from '../zod/findPetsByTagsSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
@@ -24,7 +24,7 @@ export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return findPetsByTagsResponseSchema.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByTagsQueryOptions(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {

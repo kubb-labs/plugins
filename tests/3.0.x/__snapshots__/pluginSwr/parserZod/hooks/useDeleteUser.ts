@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { deleteUserResponseSchema } from '../zod/deleteUserSchema.ts'
+import { deleteUserSuccessResponseSchema } from '../zod/deleteUserSchema.ts'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -24,7 +24,7 @@ export async function deleteUser(username: DeleteUserPathUsername, config: Parti
 
   const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: `/user/${username}`, ...requestConfig })
 
-  return deleteUserResponseSchema.parse(res.data)
+  return deleteUserSuccessResponseSchema.parse(res.data)
 }
 
 export type DeleteUserMutationArg = { username: DeleteUserPathUsername }

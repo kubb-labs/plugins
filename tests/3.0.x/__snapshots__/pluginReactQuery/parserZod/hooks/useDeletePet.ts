@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { deletePetResponseSchema } from '../zod/deletePetSchema.ts'
+import { deletePetSuccessResponseSchema } from '../zod/deletePetSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -22,7 +22,7 @@ export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?:
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
-  return deletePetResponseSchema.parse(res.data)
+  return deletePetSuccessResponseSchema.parse(res.data)
 }
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {

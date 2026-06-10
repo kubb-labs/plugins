@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
+import { placeOrderSuccessResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
 
 function getPlaceOrderUrl() {
   const res = { method: 'POST', url: `/store/order` as const }
@@ -26,5 +26,5 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return placeOrderResponseSchema.parse(res.data)
+  return placeOrderSuccessResponseSchema.parse(res.data)
 }

@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { logoutUserResponseSchema } from '../zod/logoutUserSchema.ts'
+import { logoutUserSuccessResponseSchema } from '../zod/logoutUserSchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const logoutUserSuspenseQueryKey = () => [{ url: '/user/logout' }] as const
@@ -23,7 +23,7 @@ export async function logoutUserSuspense(config: Partial<RequestConfig> & { clie
 
   const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
-  return logoutUserResponseSchema.parse(res.data)
+  return logoutUserSuccessResponseSchema.parse(res.data)
 }
 
 export function logoutUserSuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {

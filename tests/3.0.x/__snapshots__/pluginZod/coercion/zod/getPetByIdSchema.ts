@@ -19,3 +19,5 @@ export const getPetByIdStatus400Schema = z.any()
 export const getPetByIdStatus404Schema = z.any()
 
 export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
+
+export const getPetByIdSuccessResponseSchema = getPetByIdStatus200Schema

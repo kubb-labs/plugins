@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { findPetsByTagsResponseSchema } from '../zod/findPetsByTagsSchema.ts'
+import { findPetsByTagsSuccessResponseSchema } from '../zod/findPetsByTagsSchema.ts'
 
 function getFindPetsByTagsUrl() {
   const res = { method: 'GET', url: `/pet/findByTags` as const }
@@ -24,5 +24,5 @@ export async function findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ method: 'GET', url: getFindPetsByTagsUrl().url.toString(), params, ...requestConfig })
 
-  return findPetsByTagsResponseSchema.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }

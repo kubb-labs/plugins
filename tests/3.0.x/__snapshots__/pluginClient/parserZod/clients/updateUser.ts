@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { updateUserResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
+import { updateUserSuccessResponseSchema, updateUserDataSchema } from '../zod/updateUserSchema.ts'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
   const res = { method: 'PUT', url: `/user/${username}` as const }
@@ -26,5 +26,5 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
 
   const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: getUpdateUserUrl(username).url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return updateUserResponseSchema.parse(res.data)
+  return updateUserSuccessResponseSchema.parse(res.data)
 }

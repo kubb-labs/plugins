@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
+import { findPetsByStatusSuccessResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const findPetsByStatusSuspenseQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) => [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
@@ -24,7 +24,7 @@ export async function findPetsByStatusSuspense(params?: { status?: FindPetsBySta
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, params, ...requestConfig })
 
-  return findPetsByStatusResponseSchema.parse(res.data)
+  return findPetsByStatusSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByStatusSuspenseQueryOptions(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {

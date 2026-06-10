@@ -31,7 +31,7 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod): Array<string> {
   const names: Array<string | null | undefined> = [
-    zodResolver.resolveResponseName?.(node),
+    zodResolver.resolveSuccessResponseName?.(node),
     node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
   ]
   return names.filter((n): n is string => Boolean(n))

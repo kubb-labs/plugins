@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
+import { placeOrderSuccessResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
@@ -24,7 +24,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
-  return placeOrderResponseSchema.parse(res.data)
+  return placeOrderSuccessResponseSchema.parse(res.data)
 }
 
 export function placeOrderMutationOptions<TContext = unknown>(config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {

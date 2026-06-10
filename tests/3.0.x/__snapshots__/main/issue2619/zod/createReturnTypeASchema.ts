@@ -10,4 +10,6 @@ export const createReturnTypeAStatus200Schema = resultSchema
 
 export const createReturnTypeAResponseSchema = createReturnTypeAStatus200Schema
 
+export const createReturnTypeASuccessResponseSchema = createReturnTypeAStatus200Schema
+
 export const createReturnTypeADataSchema = typeARequestSchema

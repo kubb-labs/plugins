@@ -33,3 +33,7 @@ export type GetPetByIdStatus404SchemaType = z.infer<typeof getPetByIdStatus404Sc
 export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
 
 export type GetPetByIdResponseSchemaType = z.infer<typeof getPetByIdResponseSchema>
+
+export const getPetByIdSuccessResponseSchema = getPetByIdStatus200Schema
+
+export type GetPetByIdSuccessResponseSchemaType = z.infer<typeof getPetByIdSuccessResponseSchema>

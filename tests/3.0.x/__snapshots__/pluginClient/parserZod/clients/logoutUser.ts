@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { logoutUserResponseSchema } from '../zod/logoutUserSchema.ts'
+import { logoutUserSuccessResponseSchema } from '../zod/logoutUserSchema.ts'
 
 function getLogoutUserUrl() {
   const res = { method: 'GET', url: `/user/logout` as const }
@@ -23,5 +23,5 @@ export async function logoutUser(config: Partial<RequestConfig> & { client?: Cli
 
   const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getLogoutUserUrl().url.toString(), ...requestConfig })
 
-  return logoutUserResponseSchema.parse(res.data)
+  return logoutUserSuccessResponseSchema.parse(res.data)
 }

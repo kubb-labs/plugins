@@ -8,7 +8,7 @@ import useSWR from 'swr'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { logoutUserResponseSchema } from '../zod/logoutUserSchema.ts'
+import { logoutUserSuccessResponseSchema } from '../zod/logoutUserSchema.ts'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 
@@ -23,7 +23,7 @@ export async function logoutUser(config: Partial<RequestConfig> & { client?: Cli
 
   const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/user/logout`, ...requestConfig })
 
-  return logoutUserResponseSchema.parse(res.data)
+  return logoutUserSuccessResponseSchema.parse(res.data)
 }
 
 export function logoutUserQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {

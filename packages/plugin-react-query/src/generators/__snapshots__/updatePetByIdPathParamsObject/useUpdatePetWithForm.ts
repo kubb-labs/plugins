@@ -4,10 +4,10 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { UpdatePetWithFormData, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { client } from './.kubb/client'
-import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
+import { updatePetWithFormSuccessResponseSchema, updatePetWithFormDataSchema } from './updatePetWithFormSchema'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -22,7 +22,7 @@ export async function updatePetWithForm(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = UpdatePetWithFormData.parse(data)
+  const requestData = updatePetWithFormDataSchema.parse(data)
 
   const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
@@ -31,7 +31,7 @@ export async function updatePetWithForm(
     ...requestConfig,
   })
 
-  return UpdatePetWithFormResponse.parse(res.data)
+  return updatePetWithFormSuccessResponseSchema.parse(res.data)
 }
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {}) {

@@ -22,6 +22,10 @@ export const uploadFileResponseSchema = uploadFileStatus200Schema
 
 export type UploadFileResponseSchemaType = z.infer<typeof uploadFileResponseSchema>
 
+export const uploadFileSuccessResponseSchema = uploadFileStatus200Schema
+
+export type UploadFileSuccessResponseSchemaType = z.infer<typeof uploadFileSuccessResponseSchema>
+
 export const uploadFileDataSchema = z.instanceof(File).optional()
 
 export type UploadFileDataSchemaType = z.infer<typeof uploadFileDataSchema>

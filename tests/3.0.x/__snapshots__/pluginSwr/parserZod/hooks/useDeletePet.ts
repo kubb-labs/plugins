@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { deletePetResponseSchema } from '../zod/deletePetSchema.ts'
+import { deletePetSuccessResponseSchema } from '../zod/deletePetSchema.ts'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -24,7 +24,7 @@ export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?:
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
-  return deletePetResponseSchema.parse(res.data)
+  return deletePetSuccessResponseSchema.parse(res.data)
 }
 
 export type DeletePetMutationArg = { petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey } }

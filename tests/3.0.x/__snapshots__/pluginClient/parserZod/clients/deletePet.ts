@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { deletePetResponseSchema } from '../zod/deletePetSchema.ts'
+import { deletePetSuccessResponseSchema } from '../zod/deletePetSchema.ts'
 
 function getDeletePetUrl(petId: DeletePetPathPetId) {
   const res = { method: 'DELETE', url: `/pet/${petId}` as const }
@@ -24,5 +24,5 @@ export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?:
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: getDeletePetUrl(petId).url.toString(), ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
 
-  return deletePetResponseSchema.parse(res.data)
+  return deletePetSuccessResponseSchema.parse(res.data)
 }

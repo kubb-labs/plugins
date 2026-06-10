@@ -8,7 +8,7 @@ import useSWR from 'swr'
 import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { getPetByIdResponseSchema } from '../zod/getPetByIdSchema.ts'
+import { getPetByIdSuccessResponseSchema } from '../zod/getPetByIdSchema.ts'
 
 export const getPetByIdQueryKey = (petId?: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
@@ -24,7 +24,7 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
 
-  return getPetByIdResponseSchema.parse(res.data)
+  return getPetByIdSuccessResponseSchema.parse(res.data)
 }
 
 export function getPetByIdQueryOptions(petId?: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {

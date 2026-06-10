@@ -8,7 +8,7 @@ import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, Get
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { getPetByIdResponseSchema } from '../zod/getPetByIdSchema.ts'
+import { getPetByIdSuccessResponseSchema } from '../zod/getPetByIdSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -26,7 +26,7 @@ export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<Req
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
 
-  return getPetByIdResponseSchema.parse(res.data)
+  return getPetByIdSuccessResponseSchema.parse(res.data)
 }
 
 export function getPetByIdQueryOptions(petId?: MaybeRefOrGetter<GetPetByIdPathPetId>, config: Partial<RequestConfig> & { client?: Client } = {}) {

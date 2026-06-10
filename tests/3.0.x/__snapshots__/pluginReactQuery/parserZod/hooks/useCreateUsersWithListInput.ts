@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
+import { createUsersWithListInputSuccessResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
@@ -24,7 +24,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 
   const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: `/user/createWithList`, data: requestData, ...requestConfig })
 
-  return createUsersWithListInputResponseSchema.parse(res.data)
+  return createUsersWithListInputSuccessResponseSchema.parse(res.data)
 }
 
 export function createUsersWithListInputMutationOptions<TContext = unknown>(config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {}) {

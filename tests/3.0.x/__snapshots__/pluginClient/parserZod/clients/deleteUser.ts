@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { deleteUserResponseSchema } from '../zod/deleteUserSchema.ts'
+import { deleteUserSuccessResponseSchema } from '../zod/deleteUserSchema.ts'
 
 function getDeleteUserUrl(username: DeleteUserPathUsername) {
   const res = { method: 'DELETE', url: `/user/${username}` as const }
@@ -24,5 +24,5 @@ export async function deleteUser(username: DeleteUserPathUsername, config: Parti
 
   const res = await request<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, unknown>({ method: 'DELETE', url: getDeleteUserUrl(username).url.toString(), ...requestConfig })
 
-  return deleteUserResponseSchema.parse(res.data)
+  return deleteUserSuccessResponseSchema.parse(res.data)
 }

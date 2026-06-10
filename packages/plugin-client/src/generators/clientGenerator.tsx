@@ -37,7 +37,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const importedZodNames =
       zodResolver && parser === 'zod'
-        ? [zodResolver.resolveResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
+        ? [zodResolver.resolveSuccessResponseName?.(node), node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null].filter(
             (name): name is string => Boolean(name),
           )
         : []

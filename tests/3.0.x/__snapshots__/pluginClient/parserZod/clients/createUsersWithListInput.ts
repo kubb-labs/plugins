@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
+import { createUsersWithListInputSuccessResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
 
 function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: `/user/createWithList` as const }
@@ -26,5 +26,5 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 
   const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
 
-  return createUsersWithListInputResponseSchema.parse(res.data)
+  return createUsersWithListInputSuccessResponseSchema.parse(res.data)
 }

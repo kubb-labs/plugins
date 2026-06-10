@@ -4,11 +4,11 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { UpdatePetWithFormData, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { client } from './.kubb/client'
-import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
+import { UpdatePetWithFormData } from './UpdatePetWithForm'
 import { useMutation } from '@tanstack/vue-query'
 
 export const updatePetWithFormMutationKey = () => ['updatePetWithForm', { url: '/pet/:petId' }] as const
@@ -31,8 +31,6 @@ export async function updatePetWithForm(
     data: requestData,
     ...requestConfig,
   })
-
-  return UpdatePetWithFormResponse.parse(res.data)
 }
 
 /**

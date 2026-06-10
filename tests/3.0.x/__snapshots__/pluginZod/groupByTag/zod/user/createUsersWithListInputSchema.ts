@@ -16,4 +16,6 @@ export const createUsersWithListInputStatusDefaultSchema = z.any()
 
 export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
 
+export const createUsersWithListInputSuccessResponseSchema = createUsersWithListInputStatus200Schema
+
 export const createUsersWithListInputDataSchema = z.array(userSchema).optional()

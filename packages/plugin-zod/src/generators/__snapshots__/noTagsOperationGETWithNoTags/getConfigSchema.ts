@@ -8,3 +8,5 @@ import * as z from 'zod'
 export const getConfigStatus200Schema = z.object({})
 
 export const getConfigResponseSchema = getConfigStatus200Schema
+
+export const getConfigSuccessResponseSchema = getConfigStatus200Schema

@@ -26,6 +26,10 @@ export const createUsersWithListInputResponseSchema = z.union([createUsersWithLi
 
 export type CreateUsersWithListInputResponseSchemaType = z.infer<typeof createUsersWithListInputResponseSchema>
 
+export const createUsersWithListInputSuccessResponseSchema = createUsersWithListInputStatus200Schema
+
+export type CreateUsersWithListInputSuccessResponseSchemaType = z.infer<typeof createUsersWithListInputSuccessResponseSchema>
+
 export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
 
 export type CreateUsersWithListInputDataSchemaType = z.infer<typeof createUsersWithListInputDataSchema>

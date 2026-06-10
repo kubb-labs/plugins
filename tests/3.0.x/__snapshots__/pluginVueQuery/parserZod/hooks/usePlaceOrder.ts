@@ -8,7 +8,7 @@ import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '.
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
+import { placeOrderSuccessResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
@@ -25,7 +25,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
-  return placeOrderResponseSchema.parse(res.data)
+  return placeOrderSuccessResponseSchema.parse(res.data)
 }
 
 /**

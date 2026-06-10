@@ -145,7 +145,7 @@ export function buildReturnStatement({
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
 }): string {
-  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodResponseName = zodResolver && parser === 'zod' ? zodResolver.resolveSuccessResponseName?.(node) : null
   if (dataReturnType === 'full' && parser === 'zod' && zodResponseName) {
     return `return {...res, data: ${zodResponseName}.parse(res.data)}`
   }

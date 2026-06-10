@@ -34,6 +34,10 @@ export const updatePetResponseSchema = z.union([updatePetStatus200Schema, update
 
 export type UpdatePetResponseSchemaType = z.infer<typeof updatePetResponseSchema>
 
+export const updatePetSuccessResponseSchema = updatePetStatus200Schema
+
+export type UpdatePetSuccessResponseSchemaType = z.infer<typeof updatePetSuccessResponseSchema>
+
 export const updatePetDataSchemaJson = petSchema.describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchemaJsonType = z.infer<typeof updatePetDataSchemaJson>

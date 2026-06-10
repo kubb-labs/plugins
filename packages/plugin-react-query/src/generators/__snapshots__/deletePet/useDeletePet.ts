@@ -4,10 +4,10 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
+import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { client } from './.kubb/client'
-import { DeletePetResponse } from './DeletePet'
+import { deletePetSuccessResponseSchema } from './deletePetSchema'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -29,7 +29,7 @@ export async function deletePet(
     headers: { ...headers, ...requestConfig.headers },
   })
 
-  return DeletePetResponse.parse(res.data)
+  return deletePetSuccessResponseSchema.parse(res.data)
 }
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {

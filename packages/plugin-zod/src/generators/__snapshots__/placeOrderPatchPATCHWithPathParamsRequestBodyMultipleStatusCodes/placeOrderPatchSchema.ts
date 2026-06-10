@@ -13,4 +13,6 @@ export const placeOrderPatchStatus405Schema = z.object({})
 
 export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
 
+export const placeOrderPatchSuccessResponseSchema = placeOrderPatchStatus200Schema
+
 export const placeOrderPatchDataSchema = z.object({}).describe('Order payload')

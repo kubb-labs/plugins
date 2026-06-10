@@ -8,7 +8,7 @@ import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { getOrderByIdResponseSchema } from '../zod/getOrderByIdSchema.ts'
+import { getOrderByIdSuccessResponseSchema } from '../zod/getOrderByIdSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -26,7 +26,7 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: 'GET', url: `/store/order/${orderId}`, ...requestConfig })
 
-  return getOrderByIdResponseSchema.parse(res.data)
+  return getOrderByIdSuccessResponseSchema.parse(res.data)
 }
 
 export function getOrderByIdQueryOptions(orderId?: MaybeRefOrGetter<GetOrderByIdPathOrderId>, config: Partial<RequestConfig> & { client?: Client } = {}) {

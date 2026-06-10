@@ -8,7 +8,7 @@ import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameSt
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { getUserByNameResponseSchema } from '../zod/getUserByNameSchema.ts'
+import { getUserByNameSuccessResponseSchema } from '../zod/getUserByNameSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -25,7 +25,7 @@ export async function getUserByName(username: GetUserByNamePathUsername, config:
 
   const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({ method: 'GET', url: `/user/${username}`, ...requestConfig })
 
-  return getUserByNameResponseSchema.parse(res.data)
+  return getUserByNameSuccessResponseSchema.parse(res.data)
 }
 
 export function getUserByNameQueryOptions(username?: MaybeRefOrGetter<GetUserByNamePathUsername>, config: Partial<RequestConfig> & { client?: Client } = {}) {

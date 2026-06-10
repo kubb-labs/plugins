@@ -66,6 +66,15 @@ export type ResolverZod = Resolver &
      */
     resolveResponseName(this: ResolverZod, node: ast.OperationNode): string
     /**
+     * Resolves the name for the union of only 2xx (success) operation responses.
+     * Used by `@kubb/plugin-client` when `parser: 'zod'` to ensure only success
+     * response shapes are parsed and returned from client calls.
+     *
+     * @example Success response union names
+     * `resolver.resolveSuccessResponseName(node) // → 'listPetsSuccessResponseSchema'`
+     */
+    resolveSuccessResponseName(this: ResolverZod, node: ast.OperationNode): string
+    /**
      * Resolves the name for an operation's grouped path parameters type.
      *
      * @example Path parameters names

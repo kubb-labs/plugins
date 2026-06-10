@@ -4,10 +4,10 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus200 } from './FindPetsByStatus'
+import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { client } from './.kubb/client'
-import { FindPetsByStatusResponse } from './FindPetsByStatus'
+import { findPetsByStatusSuccessResponseSchema } from './findPetsByStatusSchema'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
@@ -31,7 +31,7 @@ export async function findPetsByStatus(
     ...requestConfig,
   })
 
-  return FindPetsByStatusResponse.parse(res.data)
+  return findPetsByStatusSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByStatusQueryOptions(

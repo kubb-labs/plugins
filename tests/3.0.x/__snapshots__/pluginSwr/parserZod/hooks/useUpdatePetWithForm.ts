@@ -8,7 +8,7 @@ import useSWRMutation from 'swr/mutation'
 import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from '../types/UpdatePetWithForm.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { updatePetWithFormResponseSchema } from '../zod/updatePetWithFormSchema.ts'
+import { updatePetWithFormSuccessResponseSchema } from '../zod/updatePetWithFormSchema.ts'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -23,7 +23,7 @@ export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, param
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: 'POST', url: `/pet/${petId}`, params, ...requestConfig })
 
-  return updatePetWithFormResponseSchema.parse(res.data)
+  return updatePetWithFormSuccessResponseSchema.parse(res.data)
 }
 
 export type UpdatePetWithFormMutationArg = { petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } }

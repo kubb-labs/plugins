@@ -6,7 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
+import { addPetSuccessResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 
 function getAddPetUrl() {
   const res = { method: 'POST', url: `/pet` as const }
@@ -26,5 +26,5 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: getAddPetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return addPetResponseSchema.parse(res.data)
+  return addPetSuccessResponseSchema.parse(res.data)
 }

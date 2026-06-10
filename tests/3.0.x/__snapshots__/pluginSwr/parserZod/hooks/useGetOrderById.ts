@@ -8,7 +8,7 @@ import useSWR from 'swr'
 import type { GetOrderByIdResponse, GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { getOrderByIdResponseSchema } from '../zod/getOrderByIdSchema.ts'
+import { getOrderByIdSuccessResponseSchema } from '../zod/getOrderByIdSchema.ts'
 
 export const getOrderByIdQueryKey = (orderId?: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const
 
@@ -24,7 +24,7 @@ export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Par
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ method: 'GET', url: `/store/order/${orderId}`, ...requestConfig })
 
-  return getOrderByIdResponseSchema.parse(res.data)
+  return getOrderByIdSuccessResponseSchema.parse(res.data)
 }
 
 export function getOrderByIdQueryOptions(orderId?: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {

@@ -4,11 +4,11 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryPageSize, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryPageSize, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, UseInfiniteQueryOptions, UseInfiniteQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { client } from './.kubb/client'
-import { FindPetsByTagsResponse } from './FindPetsByTags'
+import { findPetsByTagsSuccessResponseSchema } from './findPetsByTagsSchema'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
@@ -28,7 +28,7 @@ export async function findPetsByTagsInfinite(
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return FindPetsByTagsResponse.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByTagsInfiniteQueryOptions(

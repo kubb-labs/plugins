@@ -4,17 +4,11 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type {
-  UpdatePetWithFormData,
-  UpdatePetWithFormResponse,
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormStatus200,
-} from './UpdatePetWithForm'
+import type { UpdatePetWithFormData, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { client } from './.kubb/client'
-import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
+import { updatePetWithFormSuccessResponseSchema, updatePetWithFormDataSchema } from './updatePetWithFormSchema'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
@@ -37,7 +31,7 @@ export async function updatePetWithForm(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = UpdatePetWithFormData.parse(data)
+  const requestData = updatePetWithFormDataSchema.parse(data)
 
   const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
@@ -47,7 +41,7 @@ export async function updatePetWithForm(
     ...requestConfig,
   })
 
-  return UpdatePetWithFormResponse.parse(res.data)
+  return updatePetWithFormSuccessResponseSchema.parse(res.data)
 }
 
 export function updatePetWithFormQueryOptions(

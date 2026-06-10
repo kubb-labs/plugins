@@ -4,16 +4,10 @@
  */
 
 import client from 'axios'
-import type {
-  FindPetsByTagsResponse,
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsQueryStatus,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsStatus200,
-} from './FindPetsByTags'
+import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsQueryPageSize, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
-import { FindPetsByTagsResponse } from './FindPetsByTags'
+import { findPetsByTagsSuccessResponseSchema } from './findPetsByTagsSchema'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsSuspenseQueryKey = (params?: {
@@ -35,7 +29,7 @@ export async function findPetsByTagsSuspense(
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
 
-  return FindPetsByTagsResponse.parse(res.data)
+  return findPetsByTagsSuccessResponseSchema.parse(res.data)
 }
 
 export function findPetsByTagsSuspenseQueryOptions(

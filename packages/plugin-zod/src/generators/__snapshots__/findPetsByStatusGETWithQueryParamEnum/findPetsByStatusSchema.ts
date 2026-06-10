@@ -10,3 +10,5 @@ export const findPetsByStatusQueryStatusSchema = z.enum(['available', 'pending',
 export const findPetsByStatusStatus200Schema = z.object({})
 
 export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
+
+export const findPetsByStatusSuccessResponseSchema = findPetsByStatusStatus200Schema

@@ -12,3 +12,5 @@ export const showPetByIdStatus200Schema = z.object({})
 export const showPetByIdStatusDefaultSchema = z.object({})
 
 export const showPetByIdResponseSchema = z.union([showPetByIdStatus200Schema, showPetByIdStatusDefaultSchema])
+
+export const showPetByIdSuccessResponseSchema = showPetByIdStatus200Schema

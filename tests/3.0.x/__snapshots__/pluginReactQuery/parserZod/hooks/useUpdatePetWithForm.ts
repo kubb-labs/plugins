@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from '../types/UpdatePetWithForm.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { updatePetWithFormResponseSchema } from '../zod/updatePetWithFormSchema.ts'
+import { updatePetWithFormSuccessResponseSchema } from '../zod/updatePetWithFormSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -21,7 +21,7 @@ export async function updatePetWithForm(petId: UpdatePetWithFormPathPetId, param
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ method: 'POST', url: `/pet/${petId}`, params, ...requestConfig })
 
-  return updatePetWithFormResponseSchema.parse(res.data)
+  return updatePetWithFormSuccessResponseSchema.parse(res.data)
 }
 
 export function updatePetWithFormMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {

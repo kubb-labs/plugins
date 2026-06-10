@@ -19,3 +19,5 @@ export const getUserByNameStatus400Schema = z.any()
 export const getUserByNameStatus404Schema = z.any()
 
 export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])
+
+export const getUserByNameSuccessResponseSchema = getUserByNameStatus200Schema

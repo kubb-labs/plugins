@@ -5,6 +5,8 @@ import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
+import type { PluginZod } from '@kubb/plugin-zod'
+import { pluginZodName, resolverZod } from '@kubb/plugin-zod'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
@@ -57,6 +59,27 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+const mockedZodPlugin = createMockedPlugin<PluginZod>({
+  name: 'plugin-zod',
+  options: { output: { path: '.' } } as PluginZod['resolvedOptions'],
+  resolver: resolverZod,
+})
+
+function createZodAwareDriver(name: string) {
+  const base = createMockedPluginDriver({ name, plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'] })
+  return {
+    ...base,
+    getPlugin(pluginName: string) {
+      return pluginName === pluginZodName
+        ? (mockedZodPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'])
+        : (mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'])
+    },
+    getResolver(pluginName: string) {
+      return pluginName === pluginZodName ? resolverZod : resolverTs
+    },
+  }
+}
 
 const findByTagsNode = ast.createOperation({
   operationId: 'findPetsByTags',
@@ -115,10 +138,13 @@ describe('queryGenerator operation', () => {
       ...props.options,
     }
     const plugin = createMockedPlugin<PluginSwr>({ name: 'plugin-swr', options, resolver: resolverSwr })
-    const driver = createMockedPluginDriver({
-      name: props.name,
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
+    const driver =
+      options.parser === 'zod'
+        ? createZodAwareDriver(props.name)
+        : createMockedPluginDriver({
+            name: props.name,
+            plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+          })
 
     await renderGeneratorOperation(queryGenerator, props.node, {
       config: testConfig,
