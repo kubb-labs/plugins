@@ -8,6 +8,7 @@ import type {
   UpdatePetStatus404,
   UpdatePetStatus405,
 } from '../../../models/ts/pet/UpdatePet.ts'
+import type { z } from 'zod'
 import { updatePetResponseSchema, updatePetDataSchema } from '../../../zod/pet/updatePetSchema.ts'
 
 export function getUpdatePetUrl() {
@@ -35,7 +36,7 @@ export async function updatePet(
   const res = await request<
     UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    UpdatePetData
+    z.output<typeof updatePetDataSchema>
   >({ method: 'PUT', url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return { ...res, data: updatePetResponseSchema.parse(res.data) }
