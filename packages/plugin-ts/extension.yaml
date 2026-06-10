@@ -318,11 +318,6 @@ options:
                       }),
                     ],
                   })
-  - name: contentType
-    required: false
-    description: ''
-    warning: |
-      Moved to [`adapterOas`](/adapters/adapter-oas#contentType). Use `adapterOas({ contentType })` instead.
   - name: group
     type: Group
     required: false
