@@ -18,10 +18,14 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 }
 
 /**
- * Builds TypeScript generic parameters for a client method.
- * Includes response type, error type, and optional request type.
- * When a Zod request schema is provided, the request generic uses `z.output<typeof schema>`
- * to correctly reflect any transforms (e.g. date coercion) applied by the schema.
+ * Returns the generic type arguments — response, error, and request body — for a generated
+ * client call.
+ *
+ * When `parser` is `'zod'` and a request body schema exists, the request type is
+ * `z.output<typeof schema>` rather than the TypeScript input type. Zod schemas with
+ * transforms (e.g. date coercion: `Date` → `string`) produce a different output type than
+ * what TypeScript infers from the model, so the output type is needed to avoid a compile
+ * error on the generated code.
  */
 export function buildGenerics(
   node: ast.OperationNode,

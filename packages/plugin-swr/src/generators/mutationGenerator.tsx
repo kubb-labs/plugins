@@ -9,6 +9,11 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Mutation, MutationKey } from '../components'
 import type { PluginSwr } from '../types'
 
+/**
+ * Built-in generator for `useSWRMutation` hooks. Emits one `useFooMutation` hook
+ * per POST/PUT/DELETE operation (configurable via `mutation.methods`) plus
+ * the matching `fooMutationKey` helper.
+ */
 export const mutationGenerator = defineGenerator<PluginSwr>({
   name: 'swr-mutation',
   renderer: jsxRenderer,
