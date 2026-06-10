@@ -20,14 +20,28 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
 /**
  * Builds TypeScript generic parameters for a client method.
  * Includes response type, error type, and optional request type.
+ * When a Zod request schema is provided, the request generic uses `z.output<typeof schema>`
+ * to correctly reflect any transforms (e.g. date coercion) applied by the schema.
  */
-export function buildGenerics(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
+export function buildGenerics(
+  node: ast.OperationNode,
+  tsResolver: ResolverTs,
+  zodOptions?: { zodResolver?: ResolverZod | null; parser?: PluginClient['resolvedOptions']['parser'] },
+): Array<string> {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
-  return [responseName, TError, requestName || 'unknown'].filter(Boolean)
+
+  const zodRequestName =
+    zodOptions?.parser === 'zod' && zodOptions.zodResolver && node.requestBody?.content?.[0]?.schema
+      ? (zodOptions.zodResolver.resolveDataName?.(node) ?? null)
+      : null
+
+  const requestGenericType = zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
+
+  return [responseName, TError, requestGenericType].filter(Boolean)
 }
 
 /**

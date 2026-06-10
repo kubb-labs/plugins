@@ -134,7 +134,8 @@ export function Client({
 
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const generics = [responseName, TError, requestName || 'unknown'].filter(Boolean)
+  const requestGenericType = parser === 'zod' && zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
+  const generics = [responseName, TError, requestGenericType].filter(Boolean)
   const paramsNode = buildClientParamsNode({
     paramsType,
     paramsCasing,

@@ -134,6 +134,26 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── parser zod with date coercion (regression for #3511) ───────────────
+  {
+    name: 'parserZodDateCoercion',
+    config: {
+      root: __dirname,
+      input: { path: '../../schemas/3.0.x/dateFieldRequest.yaml' },
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, dateType: 'date' }),
+      parsers: [parserTs],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false }, coercion: { dates: true } }),
+        pluginClient({
+          output: { path: './clients', barrel: false },
+          parser: 'zod',
+        }),
+      ],
+    },
+  },
+
   // ─── clientType ─────────────────────────────────────────────────────────
   {
     name: 'clientTypeClass',
