@@ -81,7 +81,7 @@ function createZodAwareDriver(name: string) {
     getResolver(pluginName: string) {
       return pluginName === pluginZodName ? resolverZod : resolverTs
     },
-  }
+  } as unknown as typeof base
 }
 
 // Shared operation nodes
