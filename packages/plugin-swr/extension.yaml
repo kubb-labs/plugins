@@ -81,17 +81,16 @@ options:
                           └── Store.ts
         default: "'hooks'"
       - name: mode
-        type: "'directory' | 'group' | 'file'"
+        type: "'directory' | 'file'"
         required: false
         default: "'directory'"
         description: |
           How the plugin consolidates its generated code into files.
 
           - `'directory'` writes one file per operation or schema under `output.path`. This is the default.
-          - `'group'` writes one file per resolved group and needs the `group` option set.
           - `'file'` writes everything into a single file. The `output.path` must include the file extension (e.g. `'types.ts'`, `'models.py'`).
         tip: |
-          `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error. `mode: 'file'` forbids `group` — a single-file output has nothing to group.
+          Pair `'directory'` with the `group` option to organize output into per-tag or per-path subdirectories. `mode: 'file'` forbids `group` — a single-file output has nothing to group, and combining them stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
         examples:
           - name: kubb.config.ts
             files:
@@ -110,7 +109,7 @@ options:
                         output: { path: 'types.ts', mode: 'file' },
                       }),
                       pluginClient({
-                        output: { path: 'clients', mode: 'group' },
+                        output: { path: 'clients', mode: 'directory' },
                         group: { type: 'tag' },
                       }),
                     ],
@@ -124,8 +123,10 @@ options:
                   └── gen/
                       ├── types.ts
                       └── clients/
-                          ├── pet.ts
-                          └── store.ts
+                          ├── pet/
+                          │   └── getPetById.ts
+                          └── store/
+                              └── getInventory.ts
       - name: barrel
         type: "{ type: 'named' | 'all', nested?: boolean } | false"
         required: false

@@ -11,7 +11,7 @@ description: |
 tip: |
   Use `group` to mirror your API's domain structure (pet, store, user) in the generated code. Combine it with `output.barrel: { type: 'named', nested: true }` to get per-tag barrel files.
 
-  By default each group becomes a folder. Set `output.mode: 'group'` to collapse each group into a single file (`{output.path}/{groupName}.ts`) instead. `group` is not valid with `output.mode: 'file'` — a single-file output has no grouping concept.
+  `group` only applies to `output.mode: 'directory'` (the default), where each group becomes a folder. It is not valid with `output.mode: 'file'` — a single-file output has no grouping concept.
 examples:
   - name: kubb.config.ts
     files:

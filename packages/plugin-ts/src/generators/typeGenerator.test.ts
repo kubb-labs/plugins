@@ -514,8 +514,8 @@ describe('typeGenerator — Operation — output.mode', () => {
     expect(file!.baseName).toBe('types.ts')
   })
 
-  test("mode 'group' consolidates a tag into one file per group", async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types', mode: 'group' }, group: { type: 'tag' } }
+  test("mode 'directory' with group places a tagged operation in a per-tag subdirectory", async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, output: { path: 'types', mode: 'directory' }, group: { type: 'tag' } }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'listPets', config: testConfig })
 
@@ -528,9 +528,9 @@ describe('typeGenerator — Operation — output.mode', () => {
       resolver: resolverTs,
     })
 
-    const file = driver.fileManager.files.find((f: ast.FileNode) => f.baseName === 'pets.ts')
+    const root = path.resolve(testConfig.root, testConfig.output.path, options.output.path)
+    const file = driver.fileManager.files.find((f: ast.FileNode) => path.dirname(f.path) === path.resolve(root, 'pets'))
     expect(file).toBeDefined()
-    expect(file!.path).toBe(path.resolve(testConfig.root, testConfig.output.path, 'types', 'pets.ts'))
   })
 })
 

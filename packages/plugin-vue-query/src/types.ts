@@ -151,7 +151,7 @@ export type Infinite = {
 
 /**
  * Where the generated composables are written and how they are exported, plus the optional
- * `group` strategy. With `output.mode: 'group'` the `group` option is required.
+ * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
  *
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
