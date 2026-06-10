@@ -7,7 +7,7 @@ required: true
 description: |
   Folder where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
 
-  Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). To put everything in one file, set `output.mode: 'file'` and point `path` at that file (or a name with no extension, which gets `.ts` appended).
+  Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). To put everything in one file, set `output.mode: 'file'` and point `path` at the target file including its extension (e.g. `'types.ts'`).
 tip: |
   `output.path` sets where files go, `output.mode` sets how many. See `output.mode` for the single-file and one-file-per-group layouts.
 examples:

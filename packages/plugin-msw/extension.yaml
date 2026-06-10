@@ -53,7 +53,7 @@ options:
         description: |
           Folder where the plugin writes its generated code. The path is resolved against the global `output.path` set on `defineConfig`.
 
-          Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). To put everything in one file, set `output.mode: 'file'` and point `path` at that file (or a name with no extension, which gets `.ts` appended).
+          Use a folder to keep each generator's output isolated (`'types'`, `'clients'`, `'hooks'`). To put everything in one file, set `output.mode: 'file'` and point `path` at the target file including its extension (e.g. `'types.ts'`).
         tip: |
           `output.path` sets where files go, `output.mode` sets how many. See `output.mode` for the single-file and one-file-per-group layouts.
         examples:
@@ -94,7 +94,7 @@ options:
 
           - `'directory'` writes one file per operation or schema under `output.path`. This is the default.
           - `'group'` writes one file per resolved group and needs the `group` option set.
-          - `'file'` writes everything into a single file. When `output.path` has no extension the default `.ts` is appended, so `'types'` becomes `'types.ts'`.
+          - `'file'` writes everything into a single file. The `output.path` must include the file extension (e.g. `'types.ts'`, `'models.py'`).
         tip: |
           `mode: 'group'` requires the sibling `group` option. Setting it without `group` stops the build with a `KUBB_INVALID_PLUGIN_OPTIONS` error.
         examples:
@@ -112,7 +112,7 @@ options:
                     output: { path: './src/gen' },
                     plugins: [
                       pluginTs({
-                        output: { path: 'types', mode: 'file' },
+                        output: { path: 'types.ts', mode: 'file' },
                       }),
                       pluginClient({
                         output: { path: 'clients', mode: 'group' },
