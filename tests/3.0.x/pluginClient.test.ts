@@ -153,28 +153,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── clientType + barrel (regression: tag class must not collide with schema model) ─
-  // The petstore tag `pet` and schema `Pet` share a name. With the barrel middleware
-  // active, the root `index.ts` re-exports both; the tag class must be `PetClient` so the
-  // barrel typechecks without a TS2300 duplicate-identifier error. See issue #331.
-  {
-    name: 'clientTypeClassBarrel',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: { type: 'named' } },
-      adapter: adapterOas({ validate: false }),
-      parsers: [parserTs],
-      middleware: [middlewareBarrel()],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: { type: 'named' } } }),
-        pluginClient({
-          output: { path: './clients', barrel: { type: 'named' } },
-          clientType: 'class',
-        }),
-      ],
-    },
-  },
 
   // ─── paramsCasing ───────────────────────────────────────────────────────
   {
@@ -302,6 +280,45 @@ describe(`plugin-client options ${version}`, () => {
         if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e
       }
     }
+
+    await fs.rm(tmpDir, { recursive: true, force: true })
+  })
+
+  // Regression for https://github.com/kubb-labs/plugins/issues/331: the petstore tag
+  // `pet` and schema `Pet` share a name. With the barrel middleware active, the root
+  // `index.ts` re-exports both, so the tag class must be `PetClient` to avoid a TS2300
+  // duplicate-identifier error. Asserted on the barrel string rather than snapshotted, so
+  // it stays robust across environments.
+  test('class clients keep a distinct name from schema models in the barrel', async () => {
+    const tmpDir = path.join(os.tmpdir(), `kubb-test-barrel-${Date.now()}`)
+    const output = path.join(tmpDir, 'gen')
+    const { files, diagnostics } = await createKubb(
+      {
+        root: __dirname,
+        input: { path: '../../schemas/3.0.x/petStore.yaml' },
+        output: { path: output, barrel: { type: 'named' } },
+        adapter: adapterOas({ validate: false }),
+        parsers: [parserTs],
+        reporters: [],
+        middleware: [middlewareBarrel()],
+        storage: fsStorage(),
+        plugins: [
+          pluginTs({ output: { path: './types', barrel: { type: 'named' } } }),
+          pluginClient({ output: { path: './clients', barrel: { type: 'named' } }, clientType: 'class' }),
+        ],
+      } as Config,
+      { hooks: new AsyncEventEmitter<KubbHooks>() },
+    ).safeBuild()
+
+    expect(Diagnostics.hasError(diagnostics)).toBe(false)
+
+    const rootBarrel = files.find((file) => file.path === path.join(output, 'index.ts'))
+    expect(rootBarrel).toBeDefined()
+    const source = await fs.readFile(rootBarrel!.path, 'utf-8')
+
+    expect(source).toContain("export { PetClient } from './clients/petClient.ts'")
+    expect(source).toContain("export type { Pet } from './types/Pet.ts'")
+    expect(source).not.toMatch(/export \{ Pet \}/)
 
     await fs.rm(tmpDir, { recursive: true, force: true })
   })
