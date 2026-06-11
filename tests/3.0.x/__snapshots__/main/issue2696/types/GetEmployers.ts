@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { Items } from './Items.ts'
+import type { Employer } from './Employer.ts'
 
 /**
  * @type array
 */
-export type GetEmployersStatus200 = Items[];
+export type GetEmployersStatus200 = Employer[];
 
 /**
  * @type object

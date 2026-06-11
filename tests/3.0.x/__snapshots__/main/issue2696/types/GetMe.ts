@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { CurrentUser } from './CurrentUser.ts'
+import type { User } from './User.ts'
 
 /**
  * @type object
 */
-export type GetMeStatus200 = CurrentUser;
+export type GetMeStatus200 = User;
 
 /**
  * @type object
