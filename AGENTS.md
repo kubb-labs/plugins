@@ -8,7 +8,6 @@ This repository contains the plugin ecosystem for Kubb, organized around:
 
 - Plugin system: modular code generators (TypeScript, Client, React-Query, Vue-Query, Zod, Faker, MSW, Cypress, ReDoc, MCP)
 - Shared utilities and helpers used across plugins
-- YAML based plugin configuration
 - Test suites and working examples
 
 ## Project structure and commands
@@ -49,18 +48,14 @@ The `internals/` directory provides shared utilities:
 - `tanstack-query` holds shared TanStack Query utilities
 - `utils` holds general utility functions
 
-### Plugin configurations
+### Plugin docs and metadata
 
-The `plugins/` directory contains YAML configuration files for each plugin, with shared templates in `_shared/`. These files document every plugin option (name, type, default, description, examples) and feed the plugin reference pages on [kubb.dev](https://kubb.dev).
+Plugin docs live in the platform repo ([kubb-labs/platform](https://github.com/kubb-labs/platform)). Each plugin has a hand-written page at `apps/kubb.dev/plugins/<name>.md` and a small metadata file at `extensions/plugins/<name>.yaml`, published on [kubb.dev](https://kubb.dev).
 
 > [!IMPORTANT]
-> **Editing plugin docs or options metadata? Edit the source, not the generated file.**
+> **Changing a plugin's options? Update its kubb.dev page in the platform repo.**
 >
-> - **Source of truth:** `plugins/<name>.yaml` plus the shared option fragments in `plugins/_shared/**`. A source file may pull in shared fragments with `extends: ./_shared/...`.
-> - **Generated output:** `packages/<name>/extension.yaml` is produced by `scripts/build-extension-yaml.ts`, which resolves every `extends:` into a self-contained file. **Never edit `packages/*/extension.yaml` by hand.** Your changes are overwritten on the next build.
-> - **Regenerate** after editing any source: `pnpm build:extension-yaml`. Commit both the source and the regenerated `packages/*/extension.yaml`.
-> - **Shared fragments are global:** changing a file under `plugins/_shared/` updates every plugin that `extends` it. Override per-plugin by adding fields next to the `extends:` (they are deep-merged on top of the shared fragment).
-> - **Keep docs in sync with code:** an option only belongs in the YAML if it exists in that plugin's `src/types.ts` `Options` type and is honored in `src/plugin.ts`. Match documented `default:` values to the destructuring defaults in `plugin.ts`.
+> A documented option must exist in the plugin's `src/types.ts` `Options` type and be honored in `src/plugin.ts`. Keep the documented defaults matching the destructuring defaults in `plugin.ts`.
 
 ### Examples and tests
 
