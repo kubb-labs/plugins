@@ -16,7 +16,7 @@ export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetS
 
 export const addPetStatus405Schema = petNotFoundSchema
 
-export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetDataSchemaJson = addPetRequestSchema
 

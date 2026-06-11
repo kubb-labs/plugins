@@ -31,9 +31,9 @@ export function findPetsByTagsInfiniteQueryOptions(
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey(params)
   return infiniteQueryOptions<
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    InfiniteData<{ status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }>,
+    InfiniteData<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }>,
     typeof queryKey,
     number
   >({
@@ -53,7 +53,7 @@ export function findPetsByTagsInfiniteQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsInfinite<
-  TQueryFnData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+  TQueryFnData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TError = ResponseErrorConfig<FindPetsByTagsStatus400>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,

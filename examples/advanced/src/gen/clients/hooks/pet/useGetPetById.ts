@@ -11,13 +11,9 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ petId })
   return queryOptions<
-    | { status: 200; data: GetPetByIdStatus200; statusText: string }
-    | { status: 400; data: GetPetByIdStatus400; statusText: string }
-    | { status: 404; data: GetPetByIdStatus404; statusText: string },
+    { status: 200; data: GetPetByIdStatus200; statusText: string },
     ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>,
-    | { status: 200; data: GetPetByIdStatus200; statusText: string }
-    | { status: 400; data: GetPetByIdStatus400; statusText: string }
-    | { status: 404; data: GetPetByIdStatus404; statusText: string },
+    { status: 200; data: GetPetByIdStatus200; statusText: string },
     typeof queryKey
   >({
     enabled: !!petId,
@@ -34,23 +30,15 @@ export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId 
  * {@link /pet/:petId:search}
  */
 export function useGetPetById<
-  TData =
-    | { status: 200; data: GetPetByIdStatus200; statusText: string }
-    | { status: 400; data: GetPetByIdStatus400; statusText: string }
-    | { status: 404; data: GetPetByIdStatus404; statusText: string },
-  TQueryData =
-    | { status: 200; data: GetPetByIdStatus200; statusText: string }
-    | { status: 400; data: GetPetByIdStatus400; statusText: string }
-    | { status: 404; data: GetPetByIdStatus404; statusText: string },
+  TData = { status: 200; data: GetPetByIdStatus200; statusText: string },
+  TQueryData = { status: 200; data: GetPetByIdStatus200; statusText: string },
   TQueryKey extends QueryKey = GetPetByIdQueryKey,
 >(
   { petId }: { petId?: GetPetByIdPathPetId } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<
-        | { status: 200; data: GetPetByIdStatus200; statusText: string }
-        | { status: 400; data: GetPetByIdStatus400; statusText: string }
-        | { status: 404; data: GetPetByIdStatus404; statusText: string },
+        { status: 200; data: GetPetByIdStatus200; statusText: string },
         ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>,
         TData,
         TQueryData,

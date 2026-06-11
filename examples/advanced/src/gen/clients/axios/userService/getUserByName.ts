@@ -21,14 +21,11 @@ export function getGetUserByNameUrl({ username }: { username: GetUserByNamePathU
 export async function getUserByName({ username }: { username: GetUserByNamePathUsername }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<
-    GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404,
-    ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>,
-    unknown
-  >({ method: 'GET', url: getGetUserByNameUrl({ username }).url.toString(), ...requestConfig })
+  const res = await request<GetUserByNameStatus200, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, unknown>({
+    method: 'GET',
+    url: getGetUserByNameUrl({ username }).url.toString(),
+    ...requestConfig,
+  })
 
-  return { ...res, data: getUserByNameResponseSchema.parse(res.data) } as
-    | { status: 200; data: GetUserByNameStatus200; statusText: string }
-    | { status: 400; data: GetUserByNameStatus400; statusText: string }
-    | { status: 404; data: GetUserByNameStatus404; statusText: string }
+  return { ...res, data: getUserByNameResponseSchema.parse(res.data) } as { status: 200; data: GetUserByNameStatus200; statusText: string }
 }

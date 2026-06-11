@@ -15,9 +15,9 @@ export function findPetsByStatusQueryOptions(
 ) {
   const queryKey = findPetsByStatusQueryKey({ stepId })
   return queryOptions<
-    { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
+    { status: 200; data: FindPetsByStatusStatus200; statusText: string },
     ResponseErrorConfig<FindPetsByStatusStatus400>,
-    { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
+    { status: 200; data: FindPetsByStatusStatus200; statusText: string },
     typeof queryKey
   >({
     enabled: !!stepId,
@@ -34,15 +34,15 @@ export function findPetsByStatusQueryOptions(
  * {@link /pet/findByStatus/:step_id}
  */
 export function useFindPetsByStatus<
-  TData = { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
-  TQueryData = { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
+  TData = { status: 200; data: FindPetsByStatusStatus200; statusText: string },
+  TQueryData = { status: 200; data: FindPetsByStatusStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
   { stepId }: { stepId?: FindPetsByStatusPathStepId } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<
-        { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
+        { status: 200; data: FindPetsByStatusStatus200; statusText: string },
         ResponseErrorConfig<FindPetsByStatusStatus400>,
         TData,
         TQueryData,

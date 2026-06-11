@@ -15,9 +15,9 @@ export function loginUserQueryOptions(
 ) {
   const queryKey = loginUserQueryKey(params)
   return queryOptions<
-    { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+    { status: 200; data: LoginUserStatus200; statusText: string },
     ResponseErrorConfig<LoginUserStatus400>,
-    { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+    { status: 200; data: LoginUserStatus200; statusText: string },
     typeof queryKey
   >({
     queryKey,
@@ -32,20 +32,14 @@ export function loginUserQueryOptions(
  * {@link /user/login}
  */
 export function useLoginUser<
-  TData = { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
-  TQueryData = { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
+  TData = { status: 200; data: LoginUserStatus200; statusText: string },
+  TQueryData = { status: 200; data: LoginUserStatus200; statusText: string },
   TQueryKey extends QueryKey = LoginUserQueryKey,
 >(
   { params }: { params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword } } = {},
   options: {
     query?: Partial<
-      QueryObserverOptions<
-        { status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string },
-        ResponseErrorConfig<LoginUserStatus400>,
-        TData,
-        TQueryData,
-        TQueryKey
-      >
+      QueryObserverOptions<{ status: 200; data: LoginUserStatus200; statusText: string }, ResponseErrorConfig<LoginUserStatus400>, TData, TQueryData, TQueryKey>
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},

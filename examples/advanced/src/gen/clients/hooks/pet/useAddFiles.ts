@@ -11,7 +11,7 @@ export function addFilesMutationOptions<TContext = unknown>(
 ) {
   const mutationKey = addFilesMutationKey()
   return mutationOptions<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
+    { status: 200; data: AddFilesStatus200; statusText: string },
     ResponseErrorConfig<AddFilesStatus405>,
     { data: AddFilesData },
     TContext
@@ -31,7 +31,7 @@ export function addFilesMutationOptions<TContext = unknown>(
 export function useAddFiles<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
+      { status: 200; data: AddFilesStatus200; statusText: string },
       ResponseErrorConfig<AddFilesStatus405>,
       { data: AddFilesData },
       TContext
@@ -44,28 +44,18 @@ export function useAddFiles<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addFilesMutationKey()
 
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
+    { status: 200; data: AddFilesStatus200; statusText: string },
     ResponseErrorConfig<AddFilesStatus405>,
     { data: AddFilesData },
     TContext
   >
 
-  return useMutation<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
-    ResponseErrorConfig<AddFilesStatus405>,
-    { data: AddFilesData },
-    TContext
-  >(
+  return useMutation<{ status: 200; data: AddFilesStatus200; statusText: string }, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
-    ResponseErrorConfig<AddFilesStatus405>,
-    { data: AddFilesData },
-    TContext
-  >
+  ) as UseMutationResult<{ status: 200; data: AddFilesStatus200; statusText: string }, ResponseErrorConfig<AddFilesStatus405>, { data: AddFilesData }, TContext>
 }

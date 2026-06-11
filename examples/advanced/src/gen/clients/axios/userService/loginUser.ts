@@ -19,14 +19,12 @@ export async function loginUser(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LoginUserStatus200 | LoginUserStatus400, ResponseErrorConfig<LoginUserStatus400>, unknown>({
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({
     method: 'GET',
     url: getLoginUserUrl().url.toString(),
     params,
     ...requestConfig,
   })
 
-  return { ...res, data: loginUserResponseSchema.parse(res.data) } as
-    | { status: 200; data: LoginUserStatus200; statusText: string }
-    | { status: 400; data: LoginUserStatus400; statusText: string }
+  return { ...res, data: loginUserResponseSchema.parse(res.data) } as { status: 200; data: LoginUserStatus200; statusText: string }
 }

@@ -35,14 +35,14 @@ export async function findPetsByTagsSuspenseHook(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: `/pet/findByTags`,
     params,
     ...requestConfig,
   })
 
-  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }
+  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }
 
 export function findPetsByTagsSuspenseQueryOptionsHook(
@@ -51,9 +51,9 @@ export function findPetsByTagsSuspenseQueryOptionsHook(
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey(params)
   return queryOptions<
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
     typeof queryKey
   >({
     queryKey,
@@ -69,14 +69,14 @@ export function findPetsByTagsSuspenseQueryOptionsHook(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspenseHook<
-  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey,
 >(
   params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
   options: {
     query?: Partial<
       UseSuspenseQueryOptions<
-        { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+        { status: 200; data: FindPetsByTagsStatus200; statusText: string },
         ResponseErrorConfig<FindPetsByTagsStatus400>,
         TData,
         TQueryKey

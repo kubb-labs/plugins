@@ -17,4 +17,4 @@ export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, lo
 
 export const loginUserStatus400Schema = z.any()
 
-export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])
+export const loginUserResponseSchema = loginUserStatus200Schema

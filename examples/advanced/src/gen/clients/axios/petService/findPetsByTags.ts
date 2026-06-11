@@ -35,7 +35,7 @@ export async function findPetsByTags(
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByTagsUrl().url.toString(),
     params,
@@ -43,7 +43,5 @@ export async function findPetsByTags(
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
-  return { ...res, data: findPetsByTagsResponseSchema.parse(res.data) } as
-    | { status: 200; data: FindPetsByTagsStatus200; statusText: string }
-    | { status: 400; data: FindPetsByTagsStatus400; statusText: string }
+  return { ...res, data: findPetsByTagsResponseSchema.parse(res.data) } as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }

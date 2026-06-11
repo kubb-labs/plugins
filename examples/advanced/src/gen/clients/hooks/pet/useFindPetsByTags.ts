@@ -28,9 +28,9 @@ export function findPetsByTagsQueryOptions(
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
   return queryOptions<
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+    { status: 200; data: FindPetsByTagsStatus200; statusText: string },
     typeof queryKey
   >({
     queryKey,
@@ -46,8 +46,8 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags<
-  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
-  TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
+  TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
   {
@@ -60,7 +60,7 @@ export function useFindPetsByTags<
   options: {
     query?: Partial<
       QueryObserverOptions<
-        { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+        { status: 200; data: FindPetsByTagsStatus200; statusText: string },
         ResponseErrorConfig<FindPetsByTagsStatus400>,
         TData,
         TQueryData,

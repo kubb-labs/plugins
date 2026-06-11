@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../../models/ts/pet/DeletePet.ts'
+import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, DeletePetStatus400 } from '../../../models/ts/pet/DeletePet.ts'
 import { deletePetResponseSchema } from '../../../zod/pet/deletePetSchema.ts'
 
 export function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
@@ -22,7 +22,7 @@ export async function deletePet(
 
   const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
-  const res = await request<DeletePetStatus400, ResponseErrorConfig<DeletePetStatus400>, unknown>({
+  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
     url: getDeletePetUrl({ petId }).url.toString(),
     ...requestConfig,
