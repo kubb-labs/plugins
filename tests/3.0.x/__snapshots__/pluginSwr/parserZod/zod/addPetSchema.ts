@@ -15,7 +15,7 @@ export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetS
 
 export const addPetStatus405Schema = z.any()
 
-export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 

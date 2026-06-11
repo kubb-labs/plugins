@@ -1,4 +1,4 @@
-import { resolveContentTypeVariants } from '@internals/shared'
+import { isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import { extractRefName } from '@kubb/ast/utils'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
@@ -241,8 +241,13 @@ export const zodGenerator = defineGenerator<PluginZod>({
     })
 
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+    // The response schema validates resolved (non-throwing) response data, so only success
+    // (2xx) responses belong in the union. Fall back to every response when the spec declares
+    // no 2xx schema (for example only `default`), so the schema keeps existing for consumers.
+    const successResponsesWithSchema = responsesWithSchema.filter((res) => isSuccessStatusCode(res.statusCode))
+    const unionResponses = successResponsesWithSchema.length > 0 ? successResponsesWithSchema : responsesWithSchema
     const responseUnionSchema =
-      responsesWithSchema.length > 0
+      unionResponses.length > 0
         ? (() => {
             const responseUnionName = resolver.resolveResponseName(node)
 
@@ -250,7 +255,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
             // When a response is a $ref to a component schema whose resolved name matches
             // the response union name, skip generation to avoid redeclaration errors.
             const importedNames = new Set(
-              responsesWithSchema.flatMap((res) =>
+              unionResponses.flatMap((res) =>
                 (res.content ?? []).flatMap((entry) =>
                   entry.schema
                     ? adapter
@@ -268,7 +273,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
               return null
             }
 
-            const members = responsesWithSchema.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }))
+            const members = unionResponses.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }))
             const unionNode = members.length === 1 ? members[0]! : ast.createSchema({ type: 'union', members })
 
             return renderSchemaEntry({

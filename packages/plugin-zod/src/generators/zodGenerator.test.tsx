@@ -574,6 +574,22 @@ describe('zodGenerator — Operation', () => {
       }),
       options: { coercion: true },
     },
+    {
+      name: 'getHealth — GET with only a default response keeps the response schema',
+      node: ast.createOperation({
+        operationId: 'getHealth',
+        method: 'GET',
+        path: '/health',
+        tags: ['health'],
+        responses: [
+          ast.createResponse({
+            statusCode: 'default',
+            schema: ast.createSchema({ type: 'object', primitive: 'object', properties: [] }),
+            description: 'Health status',
+          }),
+        ],
+      }),
+    },
   ]
 
   test.each(operations)('$name', async (props) => {
