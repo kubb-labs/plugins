@@ -145,11 +145,26 @@ async function parseResponse<TData>(response: Response, responseType?: RequestCo
   }
 }
 
-export type ResponseErrorConfig<TError = unknown> = TError
+/**
+ * Thrown for responses outside the 2xx range, so a resolved call always means success —
+ * the same contract the axios client enforces through its default `validateStatus`.
+ * The parsed error body and response metadata are available on `response`.
+ */
+export class ResponseError<TError = unknown> extends Error {
+  response: ResponseConfig<TError>
+
+  constructor(response: ResponseConfig<TError>) {
+    super(`Request failed with status ${response.status}${response.statusText ? ` ${response.statusText}` : ''}`)
+    this.name = 'ResponseError'
+    this.response = response
+  }
+}
+
+export type ResponseErrorConfig<TError = unknown> = ResponseError<TError>
 
 export type Client = <TData, _TError = unknown, TVariables = unknown>(config: RequestConfig<TVariables>, request?: unknown) => Promise<ResponseConfig<TData>>
 
-export const client = async <TData, _TError = unknown, TVariables = unknown>(
+export const client = async <TData, TError = unknown, TVariables = unknown>(
   paramsConfig: RequestConfig<TVariables>,
   _request?: unknown,
 ): Promise<ResponseConfig<TData>> => {
@@ -181,6 +196,16 @@ export const client = async <TData, _TError = unknown, TVariables = unknown>(
     signal: config.signal,
     headers,
   })
+
+  if (!response.ok) {
+    const data = await parseResponse<TError>(response, config.responseType)
+    throw new ResponseError<TError>({
+      data,
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers as Headers,
+    })
+  }
 
   const data = await parseResponse<TData>(response, config.responseType)
 
