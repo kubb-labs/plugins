@@ -362,18 +362,6 @@ export function createTypeDeclaration({
 }
 
 /**
- * Creates a TypeScript namespace declaration (exported module).
- */
-export function createNamespaceDeclaration({ statements, name }: { name: string; statements: Array<ts.Statement> }) {
-  return factory.createModuleDeclaration(
-    [factory.createToken(ts.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier(name),
-    factory.createModuleBlock(statements),
-    ts.NodeFlags.Namespace,
-  )
-}
-
-/**
  * Creates an import declaration with support for default imports, named imports, namespace imports, and type-only imports.
  * Optionally rename imported members with `propertyName` and `name` pairs.
  *
@@ -816,19 +804,9 @@ export const createStringLiteral = factory.createStringLiteral
 export const createArrayTypeNode = factory.createArrayTypeNode
 
 /**
- * Creates a parenthesized type node to control operator precedence.
- */
-export const createParenthesizedType = factory.createParenthesizedType
-
-/**
  * Creates a literal type node (e.g., `'hello'`, `42`, `true`).
  */
 export const createLiteralTypeNode = factory.createLiteralTypeNode
-
-/**
- * Creates a null literal type node.
- */
-export const createNull = factory.createNull
 
 /**
  * Creates an identifier node.
@@ -859,16 +837,6 @@ export const createTrue = factory.createTrue
  * Creates a boolean false literal type node.
  */
 export const createFalse = factory.createFalse
-
-/**
- * Creates an indexed access type node (e.g., `T[K]`).
- */
-export const createIndexedAccessTypeNode = factory.createIndexedAccessTypeNode
-
-/**
- * Creates a type operator node (e.g., `keyof T`, `readonly T[]`).
- */
-export const createTypeOperatorNode = factory.createTypeOperatorNode
 
 /**
  * Creates a prefix unary expression (e.g., negative numbers, logical not).
