@@ -14,4 +14,4 @@ export const getThingsStatus201Schema = z.any()
 
 export const getThingsStatusDefaultSchema = petNotFoundSchema
 
-export const getThingsResponseSchema = z.union([getThingsStatus201Schema, getThingsStatusDefaultSchema])
+export const getThingsResponseSchema = getThingsStatus201Schema

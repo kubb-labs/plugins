@@ -9,7 +9,7 @@ export const addFilesStatus405Schema = z.any()
 
 export type AddFilesStatus405SchemaType = z.infer<typeof addFilesStatus405Schema>
 
-export const addFilesResponseSchema = z.union([addFilesStatus200Schema, addFilesStatus405Schema])
+export const addFilesResponseSchema = addFilesStatus200Schema
 
 export type AddFilesResponseSchemaType = z.infer<typeof addFilesResponseSchema>
 

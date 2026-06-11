@@ -35,14 +35,14 @@ export async function findPetsByTagsSuspenseInfiniteHook(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: `/pet/findByTags`,
     params,
     ...requestConfig,
   })
 
-  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }
+  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string }
 }
 
 export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(

@@ -54,7 +54,7 @@ export async function placeOrder(
 
   const requestData = data
 
-  const res = await request<PlaceOrderStatus200 | PlaceOrderStatus405, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: `/store/order`,
     data: requestData,
@@ -62,7 +62,7 @@ export async function placeOrder(
     ...requestConfig,
   })
 
-  return res as { status: 200; data: PlaceOrderStatus200; statusText: string } | { status: 405; data: PlaceOrderStatus405; statusText: string }
+  return res as { status: 200; data: PlaceOrderStatus200; statusText: string }
 }
 
 placeOrder.method = 'POST' as const
@@ -89,7 +89,7 @@ export async function placeOrderPatch(
 
   const requestData = data
 
-  const res = await request<PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
+  const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
     data: requestData,
@@ -97,7 +97,7 @@ export async function placeOrderPatch(
     ...requestConfig,
   })
 
-  return res as { status: 200; data: PlaceOrderPatchStatus200; statusText: string } | { status: 405; data: PlaceOrderPatchStatus405; statusText: string }
+  return res as { status: 200; data: PlaceOrderPatchStatus200; statusText: string }
 }
 
 placeOrderPatch.method = 'PATCH' as const
@@ -116,16 +116,13 @@ placeOrderPatch.queryParams = {} as never
 export async function getOrderById({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<
-    GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404,
-    ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>,
-    unknown
-  >({ method: 'GET', url: `/store/order/${orderId}`, ...requestConfig })
+  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
+    method: 'GET',
+    url: `/store/order/${orderId}`,
+    ...requestConfig,
+  })
 
-  return res as
-    | { status: 200; data: GetOrderByIdStatus200; statusText: string }
-    | { status: 400; data: GetOrderByIdStatus400; statusText: string }
-    | { status: 404; data: GetOrderByIdStatus404; statusText: string }
+  return res as { status: 200; data: GetOrderByIdStatus200; statusText: string }
 }
 
 getOrderById.method = 'GET' as const
@@ -144,7 +141,7 @@ getOrderById.queryParams = {} as never
 export async function deleteOrder({ orderId }: { orderId: DeleteOrderPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeleteOrderStatus400 | DeleteOrderStatus404, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
+  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',
     url: `/store/order/${orderId}`,
     ...requestConfig,

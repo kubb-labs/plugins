@@ -22,6 +22,6 @@ export const getThingsStatusDefaultSchema = petNotFoundSchema.describe('Pet not 
 
 export type GetThingsStatusDefaultSchemaType = z.infer<typeof getThingsStatusDefaultSchema>
 
-export const getThingsResponseSchema = z.union([getThingsStatus201Schema, getThingsStatusDefaultSchema])
+export const getThingsResponseSchema = getThingsStatus201Schema
 
 export type GetThingsResponseSchemaType = z.infer<typeof getThingsResponseSchema>

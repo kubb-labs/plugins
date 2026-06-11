@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { LogoutUserStatusDefault } from '../../../models/ts/user/LogoutUser.ts'
+import type { LogoutUserResponse, LogoutUserStatusDefault } from '../../../models/ts/user/LogoutUser.ts'
 import { logoutUserResponseSchema } from '../../../zod/user/logoutUserSchema.ts'
 
 export function getLogoutUserUrl() {
@@ -16,7 +16,7 @@ export function getLogoutUserUrl() {
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LogoutUserStatusDefault, ResponseErrorConfig<Error>, unknown>({
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getLogoutUserUrl().url.toString(),
     ...requestConfig,

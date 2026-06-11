@@ -19,13 +19,11 @@ export function getFindPetsByStatusUrl({ stepId }: { stepId: FindPetsByStatusPat
 export async function findPetsByStatus({ stepId }: { stepId: FindPetsByStatusPathStepId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByStatusStatus200 | FindPetsByStatusStatus400, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
+  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByStatusUrl({ stepId }).url.toString(),
     ...requestConfig,
   })
 
-  return { ...res, data: findPetsByStatusResponseSchema.parse(res.data) } as
-    | { status: 200; data: FindPetsByStatusStatus200; statusText: string }
-    | { status: 400; data: FindPetsByStatusStatus400; statusText: string }
+  return { ...res, data: findPetsByStatusResponseSchema.parse(res.data) } as { status: 200; data: FindPetsByStatusStatus200; statusText: string }
 }
