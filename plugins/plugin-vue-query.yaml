@@ -67,7 +67,7 @@ options:
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: client
-    type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }'
+    type: 'ClientImportPath & { clientType?, dataReturnType?, throwOnError?, baseURL?, bundle?, paramsCasing? }'
     required: false
     description: |
       HTTP client used inside every generated composable. Each composable calls into this client to perform the request.

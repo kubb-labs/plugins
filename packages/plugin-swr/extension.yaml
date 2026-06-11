@@ -364,7 +364,7 @@ options:
     required: false
     description: Grouping combines files in a folder based on a specific `type`.
   - name: client
-    type: ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle?, paramsCasing? }
+    type: ClientImportPath & { clientType?, dataReturnType?, throwOnError?, baseURL?, bundle?, paramsCasing? }
     required: false
     description: Client configuration for HTTP request generation.
   - name: paramsType

@@ -34,6 +34,7 @@ type Props = {
   operations: Array<OperationData>
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
+  throwOnError?: PluginClient['resolvedOptions']['throwOnError']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
@@ -48,6 +49,7 @@ type GenerateMethodProps = {
   zodResolver?: ResolverZod | null
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
+  throwOnError?: PluginClient['resolvedOptions']['throwOnError']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   paramsType: PluginClient['resolvedOptions']['paramsType']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
@@ -63,6 +65,7 @@ function generateMethod({
   zodResolver,
   baseURL,
   dataReturnType,
+  throwOnError = true,
   parser,
   paramsType,
   paramsCasing,
@@ -75,19 +78,30 @@ function generateMethod({
   const { header: headerParams } = getOperationParameters(node)
   const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
-  const generics = buildGenerics(node, tsResolver, { zodResolver, parser })
+  const generics = buildGenerics(node, tsResolver, { throwOnError, zodResolver, parser })
   const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const { query: queryParams } = getOperationParameters(node)
   const zodQueryParamsName =
     zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
-  const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers, zodQueryParamsName })
+  const clientParams = buildClassClientParams({
+    node,
+    path,
+    baseURL,
+    tsResolver,
+    isFormData,
+    isMultipleContentTypes,
+    hasFormData,
+    headers,
+    zodQueryParamsName,
+    throwOnError,
+  })
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
   const queryParamsLine = buildQueryParamsLine({ parser, node, zodResolver })
   const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
-  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver, tsResolver })
+  const returnStatement = buildReturnStatement({ dataReturnType, throwOnError, parser, node, zodResolver, tsResolver })
 
   const methodBody = [
     `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
@@ -112,6 +126,7 @@ export function ClassClient({
   operations,
   baseURL,
   dataReturnType,
+  throwOnError = true,
   parser,
   paramsType,
   paramsCasing,
@@ -126,6 +141,7 @@ export function ClassClient({
       zodResolver,
       baseURL,
       dataReturnType,
+      throwOnError,
       parser,
       paramsType,
       paramsCasing,

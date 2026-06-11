@@ -166,6 +166,17 @@ export type Options = OutputOptions & {
    */
   dataReturnType?: 'data' | 'full'
   /**
+   * Whether the runtime client throws for responses outside the 2xx range.
+   * - `true` (default): a resolved call always means success. Generated types and zod
+   *   parsing only cover success (2xx) responses; error shapes surface through
+   *   `ResponseErrorConfig` on the thrown error.
+   * - `false`: every response resolves. Generated types and zod parsing cover every
+   *   documented status, so narrowing on `status` is up to the caller.
+   *
+   * @default true
+   */
+  throwOnError?: boolean
+  /**
    * Rename parameter properties in the generated client (path, query, headers).
    * The HTTP request still uses the original spec names; Kubb writes the mapping for you.
    *
@@ -258,6 +269,7 @@ type ResolvedOptions = {
   importPath: Options['importPath']
   baseURL: Options['baseURL']
   dataReturnType: NonNullable<Options['dataReturnType']>
+  throwOnError: NonNullable<Options['throwOnError']>
   pathParamsType: NonNullable<NonNullable<Options['pathParamsType']>>
   paramsType: NonNullable<Options['paramsType']>
   paramsCasing: Options['paramsCasing']

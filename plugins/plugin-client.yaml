@@ -75,6 +75,24 @@ options:
 
   - extends: ./_shared/client/data-return-type.yaml
 
+  - name: throwOnError
+    type: boolean
+    required: false
+    default: 'true'
+    description: |
+      Whether the runtime client throws for responses outside the 2xx range.
+
+      - `true` (default) — a resolved call always means success. Generated types and zod parsing only cover success (2xx) responses; error shapes surface through `ResponseErrorConfig` on the thrown error (`AxiosError` for axios, `ResponseError` for fetch).
+      - `false` — every response resolves. Generated types and zod parsing cover every documented status, so pair it with `dataReturnType: 'full'` and narrow on `res.status`.
+    codeBlock:
+      lang: typescript
+      title: 'throwOnError: false with dataReturnType: full'
+      code: |
+        const res = await addPet(petData)
+        if (res.status === 405) {
+          res.data // narrowed to AddPetStatus405, no try/catch needed
+        }
+
   - name: urlType
     type: "'export' | false"
     required: false

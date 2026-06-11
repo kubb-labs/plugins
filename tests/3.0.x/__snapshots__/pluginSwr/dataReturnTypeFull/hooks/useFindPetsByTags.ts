@@ -40,7 +40,7 @@ export function findPetsByTagsQueryOptions(params?: { tags?: FindPetsByTagsQuery
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, options: {
-  query?: SWRConfiguration<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<FindPetsByTagsStatus400>>,
+  query?: SWRConfiguration<({ status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }), ResponseErrorConfig<FindPetsByTagsStatus400>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
   immutable?: boolean
@@ -49,7 +49,7 @@ export function useFindPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, o
 
   const queryKey = findPetsByTagsQueryKey(params)
 
-  return useSWR<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(
+  return useSWR<({ status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }), ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...findPetsByTagsQueryOptions(params, config),

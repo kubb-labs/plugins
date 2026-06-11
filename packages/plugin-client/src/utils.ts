@@ -50,6 +50,64 @@ export function resolveResponseParser(parser: ParserOption | undefined | false):
 export { buildStatusUnionType }
 
 /**
+ * The zod validation a generated client applies to response data, resolved by
+ * {@link buildZodResponseParse}.
+ */
+export type ZodResponseParse = {
+  /**
+   * Expression the generated code calls `.parse(res.data)` on — a schema name or an
+   * inline `z.union([...])`.
+   */
+  expression: string
+  /**
+   * Schema names the generated file imports from the zod plugin output.
+   */
+  importNames: Array<string>
+  /**
+   * Whether the expression references `z` directly, requiring a `z` value import.
+   */
+  needsZodImport: boolean
+}
+
+/**
+ * Resolves the zod expression a generated client validates response data with.
+ *
+ * With `throwOnError`, only success bodies reach the parse, so the success-only
+ * `<operation>ResponseSchema` is used. Without it, every documented response resolves, so the
+ * per-status schemas join into an inline `z.union` (which needs a `z` value import).
+ */
+export function buildZodResponseParse(node: ast.OperationNode, zodResolver: ResolverZod, options: { throwOnError: boolean }): ZodResponseParse | null {
+  if (options.throwOnError) {
+    const name = zodResolver.resolveResponseName?.(node)
+    return name ? { expression: name, importNames: [name], needsZodImport: false } : null
+  }
+
+  const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+  const statusNames = responsesWithSchema
+    .map((res) => zodResolver.resolveResponseStatusName?.(node, res.statusCode))
+    .filter((name): name is string => Boolean(name))
+
+  if (statusNames.length === 0) {
+    const name = zodResolver.resolveResponseName?.(node)
+    return name ? { expression: name, importNames: [name], needsZodImport: false } : null
+  }
+  if (statusNames.length === 1) {
+    return { expression: statusNames[0]!, importNames: statusNames, needsZodImport: false }
+  }
+  return { expression: `z.union([${statusNames.join(', ')}])`, importNames: statusNames, needsZodImport: true }
+}
+
+/**
+ * Returns `true` when a generated class file needs a `z` value import — without
+ * `throwOnError`, operations with more than one documented response validate with an
+ * inline `z.union`.
+ */
+export function needsZodValueImport(ops: Array<{ node: ast.OperationNode }>, throwOnError: PluginClient['resolvedOptions']['throwOnError']): boolean {
+  if (throwOnError !== false) return false
+  return ops.some((op) => op.node.responses.filter((res) => res.content?.some((entry) => entry.schema)).length > 1)
+}
+
+/**
  * Builds HTTP headers array for a client request.
  * Includes Content-Type (if not default) and spreads header parameters if present.
  */
@@ -64,21 +122,23 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  * Returns the generic type arguments — response, error, and request body — for a generated
  * client call.
  *
- * The response generic only covers success (2xx) status types, since the bundled clients
- * throw for other statuses. When `parser` is `'zod'` and a request body schema exists, the
- * request type uses `z.output<typeof schema>` to reflect post-transform types (e.g. date
- * coercion).
+ * With `throwOnError` (the default), the response generic only covers success (2xx) status
+ * types; without it every documented status can resolve, so the generic widens to all of
+ * them. When `parser` is `'zod'` and a request body schema exists, the request type uses
+ * `z.output<typeof schema>` to reflect post-transform types (e.g. date coercion).
  */
 export function buildGenerics(
   node: ast.OperationNode,
   tsResolver: ResolverTs,
   options: {
+    throwOnError?: PluginClient['resolvedOptions']['throwOnError']
     zodResolver?: ResolverZod | null
     parser?: PluginClient['resolvedOptions']['parser']
   } = {},
 ): Array<string> {
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const statusNames =
+    options.throwOnError === false ? node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode)) : resolveSuccessNames(node, tsResolver)
+  const responseName = statusNames.length > 0 ? statusNames.join(' | ') : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
@@ -105,6 +165,7 @@ export function buildClassClientParams({
   hasFormData,
   headers,
   zodQueryParamsName,
+  throwOnError = true,
 }: {
   node: ast.OperationNode
   path: URLPath
@@ -115,6 +176,7 @@ export function buildClassClientParams({
   hasFormData: boolean
   headers: Array<string>
   zodQueryParamsName?: string | null
+  throwOnError?: PluginClient['resolvedOptions']['throwOnError']
 }) {
   const { query: queryParams } = getOperationParameters(node)
   const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
@@ -152,6 +214,7 @@ export function buildClassClientParams({
           : null,
         contentType: isMultipleContentTypes ? {} : null,
         responseType: responseType ? { value: JSON.stringify(responseType) } : null,
+        throwOnError: throwOnError === false ? { value: 'false' } : null,
         headers: headers.length
           ? {
               value: `{ ${headers.join(', ')}, ...requestConfig.headers }`,
@@ -223,30 +286,32 @@ export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): str
  */
 export function buildReturnStatement({
   dataReturnType,
+  throwOnError = true,
   parser,
   node,
   zodResolver,
   tsResolver,
 }: {
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
+  throwOnError?: PluginClient['resolvedOptions']['throwOnError']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   zodResolver?: ResolverZod | null
   tsResolver?: ResolverTs | null
 }): string {
   const responseParser = resolveResponseParser(parser)
-  const zodResponseName = zodResolver && responseParser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodParse = zodResolver && responseParser === 'zod' ? buildZodResponseParse(node, zodResolver, { throwOnError }) : null
 
   if (dataReturnType === 'full' && tsResolver) {
-    const unionType = buildStatusUnionType(node, tsResolver)
-    if (responseParser === 'zod' && zodResponseName) {
-      return `return {...res, data: ${zodResponseName}.parse(res.data)} as ${unionType}`
+    const unionType = buildStatusUnionType(node, tsResolver, { successOnly: throwOnError })
+    if (zodParse) {
+      return `return {...res, data: ${zodParse.expression}.parse(res.data)} as ${unionType}`
     }
     return `return res as ${unionType}`
   }
 
-  if (dataReturnType === 'data' && responseParser === 'zod' && zodResponseName) {
-    return `return ${zodResponseName}.parse(res.data)`
+  if (dataReturnType === 'data' && zodParse) {
+    return `return ${zodParse.expression}.parse(res.data)`
   }
   return 'return res.data'
 }

@@ -25,6 +25,14 @@ export type RequestConfig<TData = unknown> = {
   validateStatus?: (status: number) => boolean
   headers?: HeadersInit
   contentType?: string
+  /**
+   * Throws for responses outside the 2xx range (axios's default `validateStatus`).
+   * Set to `false` to resolve every response instead — the response keeps its success
+   * typing, so narrowing on `status` is up to the caller. Ignored when a custom
+   * `validateStatus` is provided.
+   * @default true
+   */
+  throwOnError?: boolean
 }
 
 /**
@@ -89,10 +97,11 @@ export const client = async <TData, TError = unknown, TVariables = unknown>(
   _request?: unknown,
 ): Promise<ResponseConfig<TData>> => {
   const requestConfig = mergeConfig(getConfig(), config)
-  const { contentType, headers, ...axiosConfig } = requestConfig
+  const { contentType, headers, throwOnError, ...axiosConfig } = requestConfig
   return axiosInstance
     .request<TData, ResponseConfig<TData>>({
       ...axiosConfig,
+      ...(throwOnError === false && !axiosConfig.validateStatus ? { validateStatus: () => true } : {}),
       headers: {
         ...(contentType && contentType !== 'multipart/form-data' ? { 'Content-Type': contentType } : {}),
         ...serializeHeaders(headers),

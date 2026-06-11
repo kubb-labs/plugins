@@ -17,7 +17,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildStatusUnionType, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
+import { buildStatusUnionType, buildZodResponseParse, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 import { buildUrlParamsNode } from './Url.tsx'
 
 type Props = {
@@ -30,6 +30,7 @@ type Props = {
 
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
+  throwOnError?: PluginClient['resolvedOptions']['throwOnError']
   paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
   paramsType: PluginClient['resolvedOptions']['pathParamsType']
   pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
@@ -88,6 +89,7 @@ export function Client({
   returnType,
   baseURL,
   dataReturnType,
+  throwOnError = true,
   parser,
   paramsType,
   paramsCasing,
@@ -113,14 +115,15 @@ export function Client({
   const headerParamsMapping = paramsCasing ? buildParamsMapping(originalHeaderParams, casedHeaderParams) : null
 
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
+  const statusTypeNames =
+    throwOnError === false ? node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode)) : resolveSuccessNames(node, tsResolver)
+  const responseName = statusTypeNames.length > 0 ? statusTypeNames.join(' | ') : tsResolver.resolveResponseName(node)
   const queryParamsName = originalQueryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, originalQueryParams[0]!) : null
   const headerParamsName = originalHeaderParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, originalHeaderParams[0]!) : null
 
   const requestParser = resolveRequestParser(parser)
   const responseParser = resolveResponseParser(parser)
-  const zodResponseName = zodResolver && responseParser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
+  const zodResponseParse = zodResolver && responseParser === 'zod' ? buildZodResponseParse(node, zodResolver, { throwOnError }) : null
   const zodRequestName = zodResolver && requestParser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
   const queryParamsParser = resolveQueryParamsParser(parser)
   const zodQueryParamsName =
@@ -192,6 +195,7 @@ export function Client({
           : null,
         contentType: isConfigurable && isMultipleContentTypes ? {} : null,
         responseType: responseType ? { value: stringify(responseType) } : null,
+        throwOnError: throwOnError === false ? { value: 'false' } : null,
         requestConfig: isConfigurable
           ? {
               mode: 'inlineSpread',
@@ -206,20 +210,19 @@ export function Client({
     },
   })
 
-  const statusUnionType = dataReturnType === 'full' ? buildStatusUnionType(node, tsResolver) : null
+  const statusUnionType = dataReturnType === 'full' ? buildStatusUnionType(node, tsResolver, { successOnly: throwOnError }) : null
 
   const childrenElement = children ? (
     children
   ) : (
     <>
       {dataReturnType === 'full' &&
-        responseParser === 'zod' &&
-        zodResponseName &&
+        zodResponseParse &&
         statusUnionType &&
-        `return {...res, data: ${zodResponseName}.parse(res.data)} as ${statusUnionType}`}
-      {dataReturnType === 'full' && responseParser !== 'zod' && statusUnionType && `return res as ${statusUnionType}`}
-      {dataReturnType === 'data' && responseParser === 'zod' && zodResponseName && `return ${zodResponseName}.parse(res.data)`}
-      {dataReturnType === 'data' && responseParser !== 'zod' && 'return res.data'}
+        `return {...res, data: ${zodResponseParse.expression}.parse(res.data)} as ${statusUnionType}`}
+      {dataReturnType === 'full' && !zodResponseParse && statusUnionType && `return res as ${statusUnionType}`}
+      {dataReturnType === 'data' && zodResponseParse && `return ${zodResponseParse.expression}.parse(res.data)`}
+      {dataReturnType === 'data' && !zodResponseParse && 'return res.data'}
     </>
   )
 

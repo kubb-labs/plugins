@@ -16,4 +16,4 @@ try {
 }
 ```
 
-Set `throwOnError: false` (per request or through `client.setConfig`) to keep the previous behavior of resolving every response regardless of status.
+Set `throwOnError: false` to keep the previous behavior of resolving every response regardless of status — as a plugin option (so generated types and zod validation widen to match), per request, or through `client.setConfig`. The axios client maps `throwOnError: false` to a permissive `validateStatus` unless a custom one is provided.

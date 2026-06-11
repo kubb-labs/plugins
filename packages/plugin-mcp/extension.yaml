@@ -643,6 +643,8 @@ options:
 
           - `'data'` returns only the response body (`response.data`).
           - `'full'` returns a discriminated union keyed by HTTP status code. Each member is `{ status: N; data: StatusNType; statusText: string }`. Narrowing on `res.status` also narrows `res.data` to the matching response type.
+
+          With the default `throwOnError: true` the union only contains success (2xx) members, since error responses throw. Set `throwOnError: false` on `@kubb/plugin-client` to resolve and narrow every documented status.
         examples:
           - name: "'data' (default)"
             files:
@@ -661,7 +663,7 @@ options:
                 code: |
                   const pet = await getPetById(1)
                   //    ^? Pet
-          - name: "'full'"
+          - name: "'full' with throwOnError: false"
             files:
               - name: addPet.ts
                 lang: typescript

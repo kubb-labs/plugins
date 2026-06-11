@@ -38,7 +38,7 @@ export function getUserByNameQueryOptions(username?: GetUserByNamePathUsername, 
  * {@link /user/:username}
  */
 export function useGetUserByName(username?: GetUserByNamePathUsername, options: {
-  query?: SWRConfiguration<{ status: 200; data: GetUserByNameStatus200; statusText: string }, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>>,
+  query?: SWRConfiguration<({ status: 200; data: GetUserByNameStatus200; statusText: string } | { status: 400; data: GetUserByNameStatus400; statusText: string } | { status: 404; data: GetUserByNameStatus404; statusText: string }), ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
   immutable?: boolean
@@ -47,7 +47,7 @@ export function useGetUserByName(username?: GetUserByNamePathUsername, options: 
 
   const queryKey = getUserByNameQueryKey(username)
 
-  return useSWR<{ status: 200; data: GetUserByNameStatus200; statusText: string }, ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameQueryKey | null>(
+  return useSWR<({ status: 200; data: GetUserByNameStatus200; statusText: string } | { status: 400; data: GetUserByNameStatus400; statusText: string } | { status: 404; data: GetUserByNameStatus404; statusText: string }), ResponseErrorConfig<GetUserByNameStatus400 | GetUserByNameStatus404>, GetUserByNameQueryKey | null>(
    shouldFetch && !!(username) ? queryKey : null,
    {
      ...getUserByNameQueryOptions(username, config),

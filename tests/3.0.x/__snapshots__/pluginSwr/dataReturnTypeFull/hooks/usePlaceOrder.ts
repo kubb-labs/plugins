@@ -36,14 +36,14 @@ export type PlaceOrderMutationArg = { data?: PlaceOrderData }
  * {@link /store/order}
  */
 export function usePlaceOrder(options: {
-  mutation?: SWRMutationConfiguration<{ status: 200; data: PlaceOrderStatus200; statusText: string }, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<({ status: 200; data: PlaceOrderStatus200; statusText: string } | { status: 405; data: PlaceOrderStatus405; statusText: string }), ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
   client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = placeOrderMutationKey()
 
-  return useSWRMutation<{ status: 200; data: PlaceOrderStatus200; statusText: string }, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
+  return useSWRMutation<({ status: 200; data: PlaceOrderStatus200; statusText: string } | { status: 405; data: PlaceOrderStatus405; statusText: string }), ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { data } }) => {
       return placeOrder(data, config)

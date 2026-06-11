@@ -7,7 +7,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
 import type { PluginClient } from '../types'
-import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
+import { buildZodResponseParse, isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 
 /**
  * Built-in operation generator for `@kubb/plugin-client`. Emits one async
@@ -20,7 +20,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
+    const { output, urlType, dataReturnType, throwOnError, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -38,9 +38,10 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
     const { query: queryParams } = getOperationParameters(node)
 
+    const zodResponseParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodResponseParse(node, zodResolver, { throwOnError }) : null
     const importedZodNames = zodResolver
       ? [
-          resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+          ...(zodResponseParse?.importNames ?? []),
           resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
           resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
         ].filter((name): name is string => Boolean(name))
@@ -96,7 +97,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
 
         {hasFormData && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
-        {zodRequestName && <File.Import name={['z']} path="zod" isTypeOnly />}
+        {(zodRequestName || zodResponseParse?.needsZodImport) && <File.Import name={['z']} path="zod" isTypeOnly={!zodResponseParse?.needsZodImport} />}
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as Array<string>} root={meta.file.path} path={meta.fileZod.path} />}
 
@@ -121,6 +122,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
           urlName={meta.urlName}
           baseURL={baseURL}
           dataReturnType={dataReturnType}
+          throwOnError={throwOnError}
           pathParamsType={pathParamsType}
           paramsCasing={paramsCasing}
           paramsType={paramsType}

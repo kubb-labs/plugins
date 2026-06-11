@@ -24,6 +24,7 @@ const testConfig: Config = {
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
+  throwOnError: true,
   paramsCasing: undefined,
   paramsType: 'inline',
   pathParamsType: 'inline',
@@ -212,6 +213,12 @@ describe('clientGenerator operation', () => {
     { name: 'findByTagsWithZodFull', node: findByTagsNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
     { name: 'multiStatusFull', node: multiStatusNode, options: { dataReturnType: 'full' as const } },
     { name: 'multiStatusWithZodFull', node: multiStatusNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
+    {
+      name: 'multiStatusWithZodFullNoThrow',
+      node: multiStatusNode,
+      options: { parser: 'zod' as const, dataReturnType: 'full' as const, throwOnError: false },
+    },
+    { name: 'multiStatusWithZodNoThrow', node: multiStatusNode, options: { parser: 'zod' as const, throwOnError: false } },
     { name: 'updatePetByIdWithZodRequest', node: updatePetByIdNode, options: { parser: { request: 'zod' } as const } },
     { name: 'importPath', node: findByTagsNode, options: { importPath: 'axios' as const } },
     { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },

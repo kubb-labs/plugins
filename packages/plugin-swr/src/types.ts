@@ -108,7 +108,7 @@ type Mutation = {
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
 export type Options = OutputOptions & {
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'bundle' | 'paramsCasing'>
+  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'throwOnError' | 'baseURL' | 'bundle' | 'paramsCasing'>
   /**
    * Tags, operations, or paths to exclude from generation.
    */
@@ -171,7 +171,7 @@ type ResolvedOptions = {
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'bundle' | 'paramsCasing'>
+  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'throwOnError' | 'importPath' | 'baseURL' | 'bundle' | 'paramsCasing'>
   parser: NonNullable<Options['parser']>
   pathParamsType: NonNullable<Options['pathParamsType']>
   paramsCasing: Options['paramsCasing']

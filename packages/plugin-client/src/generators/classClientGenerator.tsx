@@ -10,7 +10,7 @@ import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { ClassClient } from '../components/ClassClient'
 import { WrapperClient } from '../components/WrapperClient'
 import type { PluginClient } from '../types'
-import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
+import { buildZodResponseParse, isParserEnabled, needsZodValueImport, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
 
 type OperationData = {
   node: ast.OperationNode
@@ -32,10 +32,15 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
   return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
 }
 
-function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {
+function resolveZodImportNames(
+  node: ast.OperationNode,
+  zodResolver: ResolverZod,
+  parser: PluginClient['resolvedOptions']['parser'],
+  throwOnError: PluginClient['resolvedOptions']['throwOnError'],
+): Array<string> {
   const { query: queryParams } = getOperationParameters(node)
   const names: Array<string | null | undefined> = [
-    resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+    ...(resolveResponseParser(parser) === 'zod' ? (buildZodResponseParse(node, zodResolver, { throwOnError })?.importNames ?? []) : []),
     resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
     resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
   ]
@@ -52,7 +57,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
+    const { output, group, dataReturnType, throwOnError, paramsCasing, paramsType, pathParamsType, parser, importPath, sdk } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -148,7 +153,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
       ops.forEach((op) => {
         if (!op.zodFile || !zodResolver) return
-        const names = resolveZodImportNames(op.node, zodResolver, parser)
+        const names = resolveZodImportNames(op.node, zodResolver, parser, throwOnError)
         if (!zodImportsByFile.has(op.zodFile.path)) {
           zodImportsByFile.set(op.zodFile.path, new Set())
         }
@@ -194,9 +199,11 @@ export const classClientGenerator = defineGenerator<PluginClient>({
 
           {hasFormData && <File.Import name={['buildFormData']} root={file.path} path={path.resolve(root, '.kubb/config.ts')} />}
 
-          {parser === 'zod' && zodResolver && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && (
-            <File.Import name={['z']} path="zod" isTypeOnly />
-          )}
+          {parser === 'zod' &&
+            zodResolver &&
+            (ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) || needsZodValueImport(ops, throwOnError)) && (
+              <File.Import name={['z']} path="zod" isTypeOnly={!needsZodValueImport(ops, throwOnError)} />
+            )}
 
           {Array.from(typeImportsByFile.entries()).map(([filePath, importSet]) => {
             const typeFile = typeFilesByPath.get(filePath)
@@ -220,6 +227,7 @@ export const classClientGenerator = defineGenerator<PluginClient>({
             operations={ops}
             baseURL={baseURL}
             dataReturnType={dataReturnType}
+            throwOnError={throwOnError}
             pathParamsType={pathParamsType}
             paramsCasing={paramsCasing}
             paramsType={paramsType}

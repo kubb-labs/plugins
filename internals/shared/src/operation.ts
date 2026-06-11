@@ -259,12 +259,12 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
  * Builds the discriminated union type string for `dataReturnType: 'full'` return shapes.
  * Each member is `{ status: N; data: StatusNType; statusText: string }`.
  *
- * Only success (2xx) responses become members — both bundled clients throw for other
- * statuses, so a resolved call never carries an error shape. When the spec declares no 2xx
- * response, every response is included as a fallback.
+ * With `successOnly`, only success (2xx) responses become members — for clients that throw
+ * on other statuses, a resolved call never carries an error shape. When the spec declares no
+ * 2xx response, every response is included as a fallback.
  */
-export function buildStatusUnionType(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string {
-  const successResponses = node.responses.filter((response) => isSuccessStatusCode(response.statusCode))
+export function buildStatusUnionType(node: ast.OperationNode, resolver: ResponseStatusNameResolver, options: { successOnly?: boolean } = {}): string {
+  const successResponses = options.successOnly ? node.responses.filter((response) => isSuccessStatusCode(response.statusCode)) : []
   const unionResponses = successResponses.length > 0 ? successResponses : node.responses
   const members = unionResponses.map((r) => {
     const typeName = resolver.resolveResponseStatusName(node, r.statusCode)

@@ -67,7 +67,7 @@ options:
         description: Function that builds the folder/identifier name from a group key (the operation's first tag).
 
   - name: client
-    type: 'ClientImportPath & { clientType?, dataReturnType?, baseURL?, bundle? }'
+    type: 'ClientImportPath & { clientType?, dataReturnType?, throwOnError?, baseURL?, bundle? }'
     required: false
     description: |
       HTTP client used inside every generated hook. Each generated hook calls into this client to perform the actual request.

@@ -36,14 +36,14 @@ export type AddPetMutationArg = { data: AddPetData }
  * {@link /pet}
  */
 export function useAddPet(options: {
-  mutation?: SWRMutationConfiguration<{ status: 200; data: AddPetStatus200; statusText: string }, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<({ status: 200; data: AddPetStatus200; statusText: string } | { status: 405; data: AddPetStatus405; statusText: string }), ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg> & { throwOnError?: boolean },
   client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = addPetMutationKey()
 
-  return useSWRMutation<{ status: 200; data: AddPetStatus200; statusText: string }, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
+  return useSWRMutation<({ status: 200; data: AddPetStatus200; statusText: string } | { status: 405; data: AddPetStatus405; statusText: string }), ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { data } }) => {
       return addPet(data, config)

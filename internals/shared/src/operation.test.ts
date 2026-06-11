@@ -185,11 +185,17 @@ describe('response status helpers', () => {
     expect(resolveStatusCodeNames(node, resolver)).toStrictEqual(['Status201', 'Status400', 'Statusdefault'])
   })
 
-  test('builds the status union from success responses only', () => {
-    expect(buildStatusUnionType(node, resolver)).toBe('{ status: 201; data: Status201; statusText: string }')
+  test('builds the status union from every response by default', () => {
+    expect(buildStatusUnionType(node, resolver)).toBe(
+      '({ status: 201; data: Status201; statusText: string } | { status: 400; data: Status400; statusText: string } | { status: number; data: Statusdefault; statusText: string })',
+    )
   })
 
-  test('builds the status union from every response when no success response exists', () => {
+  test('builds the status union from success responses only when successOnly is set', () => {
+    expect(buildStatusUnionType(node, resolver, { successOnly: true })).toBe('{ status: 201; data: Status201; statusText: string }')
+  })
+
+  test('builds the status union from every response when successOnly finds no success response', () => {
     const errorOnlyNode = ast.createOperation({
       operationId: 'getHealth',
       method: 'GET',
@@ -200,7 +206,7 @@ describe('response status helpers', () => {
       ],
     })
 
-    expect(buildStatusUnionType(errorOnlyNode, resolver)).toBe(
+    expect(buildStatusUnionType(errorOnlyNode, resolver, { successOnly: true })).toBe(
       '({ status: 400; data: Status400; statusText: string } | { status: number; data: Statusdefault; statusText: string })',
     )
   })

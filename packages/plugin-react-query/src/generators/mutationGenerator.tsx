@@ -124,6 +124,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
             dataReturnType={clientOptions.dataReturnType || 'data'}
+            throwOnError={clientOptions.throwOnError}
             paramsCasing={clientOptions.paramsCasing || paramsCasing}
             paramsType={paramsType}
             pathParamsType={pathParamsType}

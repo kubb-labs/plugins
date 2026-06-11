@@ -40,7 +40,7 @@ export function getPetByIdQueryOptions(petId?: GetPetByIdPathPetId, config: Part
  * {@link /pet/:petId}
  */
 export function useGetPetById(petId?: GetPetByIdPathPetId, options: {
-  query?: SWRConfiguration<{ status: 200; data: GetPetByIdStatus200; statusText: string }, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
+  query?: SWRConfiguration<({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string }), ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
   immutable?: boolean
@@ -49,7 +49,7 @@ export function useGetPetById(petId?: GetPetByIdPathPetId, options: {
 
   const queryKey = getPetByIdQueryKey(petId)
 
-  return useSWR<{ status: 200; data: GetPetByIdStatus200; statusText: string }, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(
+  return useSWR<({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string }), ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(
    shouldFetch && !!(petId) ? queryKey : null,
    {
      ...getPetByIdQueryOptions(petId, config),
