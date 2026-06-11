@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatusDefault } from '../types/CreateUsersWithListInput.ts'
+import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getCreateUsersWithListInputUrl() {
@@ -23,7 +23,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 
   const requestData = data
 
-  const res = await request<CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputData>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
 
-  return res as ({ status: 200; data: CreateUsersWithListInputStatus200; statusText: string } | { status: number; data: CreateUsersWithListInputStatusDefault; statusText: string })
+  return res as { status: 200; data: CreateUsersWithListInputStatus200; statusText: string }
 }

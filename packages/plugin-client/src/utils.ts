@@ -64,29 +64,21 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  * Returns the generic type arguments — response, error, and request body — for a generated
  * client call.
  *
- * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented
- * status types. When `parser` is `'zod'` and a request body schema exists, the request type
- * uses `z.output<typeof schema>` to reflect post-transform types (e.g. date coercion).
+ * The response generic only covers success (2xx) status types, since the bundled clients
+ * throw for other statuses. When `parser` is `'zod'` and a request body schema exists, the
+ * request type uses `z.output<typeof schema>` to reflect post-transform types (e.g. date
+ * coercion).
  */
 export function buildGenerics(
   node: ast.OperationNode,
   tsResolver: ResolverTs,
   options: {
-    dataReturnType?: PluginClient['resolvedOptions']['dataReturnType']
     zodResolver?: ResolverZod | null
     parser?: PluginClient['resolvedOptions']['parser']
   } = {},
 ): Array<string> {
-  const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName =
-    options.dataReturnType === 'full'
-      ? allStatusNames.length > 0
-        ? allStatusNames.join(' | ')
-        : tsResolver.resolveResponseName(node)
-      : successNames.length > 0
-        ? successNames.join(' | ')
-        : tsResolver.resolveResponseName(node)
+  const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`

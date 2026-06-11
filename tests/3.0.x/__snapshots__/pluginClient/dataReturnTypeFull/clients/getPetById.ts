@@ -21,7 +21,7 @@ function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
 export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl(petId).url.toString(), ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl(petId).url.toString(), ...requestConfig })
 
-  return res as ({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string })
+  return res as { status: 200; data: GetPetByIdStatus200; statusText: string }
 }

@@ -24,6 +24,13 @@ export type RequestConfig<TData = unknown> = {
   headers?: HeadersInit
   credentials?: RequestCredentials
   contentType?: string
+  /**
+   * Throws a `ResponseError` when the response status falls outside the 2xx range.
+   * Set to `false` to resolve every response instead — the response keeps its success
+   * typing, so narrowing on `status` is up to the caller.
+   * @default true
+   */
+  throwOnError?: boolean
 }
 
 /**
@@ -197,7 +204,7 @@ export const client = async <TData, TError = unknown, TVariables = unknown>(
     headers,
   })
 
-  if (!response.ok) {
+  if (!response.ok && config.throwOnError !== false) {
     const data = await parseResponse<TError>(response, config.responseType)
     throw new ResponseError<TError>({
       data,

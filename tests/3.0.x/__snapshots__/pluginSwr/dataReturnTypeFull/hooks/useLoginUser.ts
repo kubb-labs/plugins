@@ -20,9 +20,9 @@ type LoginUserQueryKey = ReturnType<typeof loginUserQueryKey>
 export async function loginUser(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LoginUserStatus200 | LoginUserStatus400, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: `/user/login`, params, ...requestConfig })
+  const res = await request<LoginUserStatus200, ResponseErrorConfig<LoginUserStatus400>, unknown>({ method: 'GET', url: `/user/login`, params, ...requestConfig })
 
-  return res as ({ status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string })
+  return res as { status: 200; data: LoginUserStatus200; statusText: string }
 }
 
 export function loginUserQueryOptions(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, config: Partial<RequestConfig> & { client?: Client } = {}) {
@@ -38,7 +38,7 @@ export function loginUserQueryOptions(params?: { username?: LoginUserQueryUserna
  * {@link /user/login}
  */
 export function useLoginUser(params?: { username?: LoginUserQueryUsername; password?: LoginUserQueryPassword }, options: {
-  query?: SWRConfiguration<({ status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string }), ResponseErrorConfig<LoginUserStatus400>>,
+  query?: SWRConfiguration<{ status: 200; data: LoginUserStatus200; statusText: string }, ResponseErrorConfig<LoginUserStatus400>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
   immutable?: boolean
@@ -47,7 +47,7 @@ export function useLoginUser(params?: { username?: LoginUserQueryUsername; passw
 
   const queryKey = loginUserQueryKey(params)
 
-  return useSWR<({ status: 200; data: LoginUserStatus200; statusText: string } | { status: 400; data: LoginUserStatus400; statusText: string }), ResponseErrorConfig<LoginUserStatus400>, LoginUserQueryKey | null>(
+  return useSWR<{ status: 200; data: LoginUserStatus200; statusText: string }, ResponseErrorConfig<LoginUserStatus400>, LoginUserQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...loginUserQueryOptions(params, config),

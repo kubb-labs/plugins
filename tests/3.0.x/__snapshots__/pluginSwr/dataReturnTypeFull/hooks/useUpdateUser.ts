@@ -5,7 +5,7 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { UpdateUserData, UpdateUserPathUsername, UpdateUserStatusDefault } from '../types/UpdateUser.ts'
+import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername, UpdateUserStatusDefault } from '../types/UpdateUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -23,7 +23,7 @@ export async function updateUser(username: UpdateUserPathUsername, data?: Update
 
   const requestData = data
 
-  const res = await request<UpdateUserStatusDefault, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserData>({ method: 'PUT', url: `/user/${username}`, data: requestData, contentType, ...requestConfig })
 
   return res as { status: number; data: UpdateUserStatusDefault; statusText: string }
 }

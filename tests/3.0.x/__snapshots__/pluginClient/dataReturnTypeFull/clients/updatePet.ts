@@ -23,7 +23,7 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 
   const requestData = data
 
-  const res = await request<UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return res as ({ status: 200; data: UpdatePetStatus200; statusText: string } | { status: 400; data: UpdatePetStatus400; statusText: string } | { status: 404; data: UpdatePetStatus404; statusText: string } | { status: 405; data: UpdatePetStatus405; statusText: string })
+  return res as { status: 200; data: UpdatePetStatus200; statusText: string }
 }

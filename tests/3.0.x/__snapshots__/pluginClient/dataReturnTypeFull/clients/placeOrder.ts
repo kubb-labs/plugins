@@ -23,7 +23,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const requestData = data
 
-  const res = await request<PlaceOrderStatus200 | PlaceOrderStatus405, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: getPlaceOrderUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
-  return res as ({ status: 200; data: PlaceOrderStatus200; statusText: string } | { status: 405; data: PlaceOrderStatus405; statusText: string })
+  return res as { status: 200; data: PlaceOrderStatus200; statusText: string }
 }

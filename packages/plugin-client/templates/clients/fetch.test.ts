@@ -44,6 +44,15 @@ describe('client', () => {
     })
   })
 
+  it('resolves a non-2xx response when throwOnError is false', async () => {
+    using _ = mockFetch(jsonResponse({ detail: 'invalid' }, { status: 422, statusText: 'Unprocessable Entity' }))
+
+    const res = await client({ method: 'GET', url: 'https://example.com/status', throwOnError: false })
+
+    expect(res.status).toBe(422)
+    expect(res.data).toStrictEqual({ detail: 'invalid' })
+  })
+
   it('resolves with an empty object body on a 204 response', async () => {
     using _ = mockFetch(new Response(null, { status: 204 }))
 

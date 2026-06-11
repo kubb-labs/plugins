@@ -23,9 +23,9 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 
   const requestData = data
 
-  const res = await request<UpdatePetStatus200 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
-  return res as ({ status: 200; data: UpdatePetStatus200; statusText: string } | { status: 400; data: UpdatePetStatus400; statusText: string } | { status: 404; data: UpdatePetStatus404; statusText: string } | { status: 405; data: UpdatePetStatus405; statusText: string })
+  return res as { status: 200; data: UpdatePetStatus200; statusText: string }
 }
 
 export type UpdatePetMutationArg = { data: UpdatePetData }
@@ -36,14 +36,14 @@ export type UpdatePetMutationArg = { data: UpdatePetData }
  * {@link /pet}
  */
 export function useUpdatePet(options: {
-  mutation?: SWRMutationConfiguration<({ status: 200; data: UpdatePetStatus200; statusText: string } | { status: 400; data: UpdatePetStatus400; statusText: string } | { status: 404; data: UpdatePetStatus404; statusText: string } | { status: 405; data: UpdatePetStatus405; statusText: string }), ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetMutationKey | null, UpdatePetMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<{ status: 200; data: UpdatePetStatus200; statusText: string }, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetMutationKey | null, UpdatePetMutationArg> & { throwOnError?: boolean },
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = updatePetMutationKey()
 
-  return useSWRMutation<({ status: 200; data: UpdatePetStatus200; statusText: string } | { status: 400; data: UpdatePetStatus400; statusText: string } | { status: 404; data: UpdatePetStatus404; statusText: string } | { status: 405; data: UpdatePetStatus405; statusText: string }), ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
+  return useSWRMutation<{ status: 200; data: UpdatePetStatus200; statusText: string }, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetMutationKey | null, UpdatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { data } }) => {
       return updatePet(data, config)

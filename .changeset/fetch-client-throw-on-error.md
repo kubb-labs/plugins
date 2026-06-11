@@ -15,3 +15,5 @@ try {
   }
 }
 ```
+
+Set `throwOnError: false` (per request or through `client.setConfig`) to keep the previous behavior of resolving every response regardless of status.

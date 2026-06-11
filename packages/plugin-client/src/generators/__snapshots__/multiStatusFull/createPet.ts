@@ -18,12 +18,12 @@ export async function createPet(data?: CreatePetData, config: Partial<RequestCon
 
   const requestData = data
 
-  const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, CreatePetData>({
+  const res = await request<CreatePetStatus201, ResponseErrorConfig<CreatePetStatus405>, CreatePetData>({
     method: 'POST',
     url: getCreatePetUrl().url.toString(),
     data: requestData,
     ...requestConfig,
   })
 
-  return res as { status: 201; data: CreatePetStatus201; statusText: string } | { status: 405; data: CreatePetStatus405; statusText: string }
+  return res as { status: 201; data: CreatePetStatus201; statusText: string }
 }

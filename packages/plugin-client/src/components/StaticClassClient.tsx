@@ -75,7 +75,7 @@ function generateMethod({
   const { header: headerParams } = getOperationParameters(node)
   const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
   const headers = isMultipleContentTypes ? (headerParamsName ? ['...headers'] : []) : buildHeaders(contentType, !!headerParamsName)
-  const generics = buildGenerics(node, tsResolver, { dataReturnType, zodResolver, parser })
+  const generics = buildGenerics(node, tsResolver, { zodResolver, parser })
   const paramsNode = buildClientParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver, isConfigurable: true })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const { query: queryParams } = getOperationParameters(node)

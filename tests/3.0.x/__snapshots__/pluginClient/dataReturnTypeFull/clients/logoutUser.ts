@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { LogoutUserStatusDefault } from '../types/LogoutUser.ts'
+import type { LogoutUserResponse, LogoutUserStatusDefault } from '../types/LogoutUser.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getLogoutUserUrl() {
@@ -20,7 +20,7 @@ function getLogoutUserUrl() {
 export async function logoutUser(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<LogoutUserStatusDefault, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getLogoutUserUrl().url.toString(), ...requestConfig })
+  const res = await request<LogoutUserResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getLogoutUserUrl().url.toString(), ...requestConfig })
 
   return res as { status: number; data: LogoutUserStatusDefault; statusText: string }
 }

@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
+import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
@@ -21,7 +21,7 @@ function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
 export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeleteOrderStatus400 | DeleteOrderStatus404, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: getDeleteOrderUrl(orderId).url.toString(), ...requestConfig })
+  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ method: 'DELETE', url: getDeleteOrderUrl(orderId).url.toString(), ...requestConfig })
 
   return res as ({ status: 400; data: DeleteOrderStatus400; statusText: string } | { status: 404; data: DeleteOrderStatus404; statusText: string })
 }
