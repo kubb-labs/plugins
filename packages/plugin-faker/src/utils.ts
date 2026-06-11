@@ -188,7 +188,7 @@ export function resolveTypeReference({
  * Maps a schema node type to its corresponding scalar type representation.
  * Returns the type name for enums or the base type (string, number, etc.) for primitives.
  */
-export function getScalarType(node: ast.SchemaNode, typeName: string): string {
+function getScalarType(node: ast.SchemaNode, typeName: string): string {
   switch (node.type) {
     case 'string':
     case 'email':
