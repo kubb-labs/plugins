@@ -21,7 +21,6 @@
   "scripts": {
     "build": "turbo run build --filter=./packages/*",
     "build:examples": "turbo run build --filter=./examples/*",
-    "build:extension-yaml": "tsx scripts/build-extension-yaml.ts",
     "changeset": "changeset",
     "clean": "turbo run clean",
     "format": "oxfmt -c oxfmt.config.ts packages internals configs examples",
@@ -59,11 +58,9 @@
     "prettier": "catalog:",
     "taze": "^19.14.1",
     "tsdown": "catalog:",
-    "tsx": "^4.22.4",
     "turbo": "^2.9.16",
     "typescript": "catalog:",
-    "vitest": "catalog:",
-    "yaml": "^2.9.0"
+    "vitest": "catalog:"
   },
   "engines": {
     "node": ">=22",
