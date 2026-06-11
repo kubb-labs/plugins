@@ -78,12 +78,6 @@ export default defineConfig([
         output: { path: './tagObject.ts', mode: 'file' },
         generators: [clientStaticGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
-        group: {
-          type: 'tag',
-          name({ group }) {
-            return `${group}Controller`
-          },
-        },
         dataReturnType: 'full',
         pathParamsType: 'object',
       }),
@@ -130,12 +124,6 @@ export default defineConfig([
         output: { path: './tag.ts', mode: 'file' },
         parser: false,
         include: [{ type: 'tag', pattern: 'store' }],
-        group: {
-          type: 'tag',
-          name({ group }) {
-            return `${group}Controller`
-          },
-        },
       }),
     ],
   },

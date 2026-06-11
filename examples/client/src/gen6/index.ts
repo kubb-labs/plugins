@@ -208,4 +208,4 @@ export type {
 export { client } from './.kubb/client.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.ts'
 export { petStatusEnum } from './models/ts/PetStatusEnum.ts'
-export { deleteOrder, getInventory, getOrderById, placeOrder, placeOrderPatch, storeController } from './tag.ts'
+export { deleteOrder, getInventory, getOrderById, placeOrder, placeOrderPatch } from './tag.ts'

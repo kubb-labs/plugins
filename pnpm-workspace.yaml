@@ -12,23 +12,23 @@ allowBuilds:
   vue-demi: true
 
 catalog:
-  '@kubb/adapter-oas': 5.0.0-beta.46
-  '@kubb/ast': 5.0.0-beta.46
-  '@kubb/core': 5.0.0-beta.46
-  '@kubb/middleware-barrel': 5.0.0-beta.46
-  '@kubb/parser-ts': 5.0.0-beta.46
-  '@kubb/renderer-jsx': 5.0.0-beta.46
-  '@types/node': ^22.19.20
+  '@kubb/adapter-oas': 5.0.0-beta.52
+  '@kubb/ast': 5.0.0-beta.52
+  '@kubb/core': 5.0.0-beta.52
+  '@kubb/plugin-barrel': 5.0.0-beta.52
+  '@kubb/parser-ts': 5.0.0-beta.52
+  '@kubb/renderer-jsx': 5.0.0-beta.52
+  '@types/node': ^22.19.21
   '@types/react': ^19.2.17
   '@vitest/coverage-v8': ^4.1.8
   '@vitest/ui': ^4.1.8
-  kubb: 5.0.0-beta.46
+  kubb: 5.0.0-beta.52
   oxfmt: ^0.47.0
-  oxlint: ^1.68.0
+  oxlint: ^1.69.0
   prettier: ^3.8.3
   tsdown: ^0.22.2
   typescript: ^6.0.3
-  unplugin-kubb: 5.0.0-beta.46
+  unplugin-kubb: 5.0.0-beta.52
   vitest: ^4.1.8
 #
 #overrides:
@@ -37,7 +37,7 @@ catalog:
 #  '@kubb/cli': link:../kubb/packages/cli
 #  '@kubb/core': link:../kubb/packages/core
 #  '@kubb/mcp': link:../kubb/packages/mcp
-#  '@kubb/middleware-barrel': link:../kubb/packages/middleware-barrel
+#  '@kubb/plugin-barrel': link:../kubb/packages/plugin-barrel
 #  '@kubb/parser-md': link:../kubb/packages/parser-md
 #  '@kubb/parser-ts': link:../kubb/packages/parser-ts
 #  '@kubb/renderer-jsx': link:../kubb/packages/renderer-jsx

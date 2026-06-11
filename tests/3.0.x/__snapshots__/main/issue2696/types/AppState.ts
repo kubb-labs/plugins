@@ -3,9 +3,6 @@
 * Do not edit manually.
 */
 
-import type { Employer } from './Employer.ts'
-import type { User } from './User.ts'
-
 /**
  * @type object
 */
@@ -13,9 +10,35 @@ export type AppState = {
     /**
      * @type object | undefined
     */
-    currentUser?: User;
+    currentUser?: {
+        /**
+         * @type string
+        */
+        id: string;
+        /**
+         * @type string
+        */
+        email: string;
+        /**
+         * @type string | undefined
+        */
+        name?: string;
+    };
     /**
      * @type array | undefined
     */
-    employers?: Employer[];
+    employers?: {
+        /**
+         * @type string
+        */
+        id: string;
+        /**
+         * @type string
+        */
+        name: string;
+        /**
+         * @type string | undefined
+        */
+        industry?: string;
+    }[];
 };
