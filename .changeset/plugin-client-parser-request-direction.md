@@ -3,7 +3,6 @@
 '@kubb/plugin-react-query': patch
 '@kubb/plugin-swr': patch
 '@kubb/plugin-vue-query': patch
-'@internals/tanstack-query': patch
 ---
 
 **plugin-client**: extend `parser` option to support per-direction Zod validation.
