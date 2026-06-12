@@ -4,7 +4,7 @@
  */
 
 import type { Cat } from './Cat.ts'
-import type { Category } from './Category.ts'
+import type { Category1 } from './Category1.ts'
 import type { Dog } from './Dog.ts'
 import type { PetStatusEnumKey } from './PetStatusEnum.ts'
 import type { Tag } from './Tag.ts'
@@ -46,7 +46,10 @@ export type Pet = (
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */

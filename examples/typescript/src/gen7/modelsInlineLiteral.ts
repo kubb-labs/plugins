@@ -250,6 +250,8 @@ export type Cat = {
   name?: string
 }
 
+export type Category1 = Category
+
 export type Pet = (
   | (Dog & {
       /**
@@ -280,7 +282,10 @@ export type Pet = (
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
