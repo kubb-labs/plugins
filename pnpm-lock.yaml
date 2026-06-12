@@ -711,6 +711,19 @@ importers:
         specifier: 'catalog:'
         version: 22.19.21
 
+  packages/plugin-barrel:
+    dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.54
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.54(@kubb/renderer-jsx@5.0.0-beta.54)
+    devDependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+
   packages/plugin-client:
     dependencies:
       '@kubb/ast':
