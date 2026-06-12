@@ -267,6 +267,8 @@ export interface Cat {
   name?: string
 }
 
+export type Category1 = Category
+
 export const petTypeEnum = {
   DOG: 'dog',
   CAT: 'cat',
@@ -304,7 +306,10 @@ export type Pet = (
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
