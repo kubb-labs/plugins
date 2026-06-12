@@ -105,7 +105,6 @@ export type {
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './pets/createPetsSchema.ts'
-export type { TagTagSchemaType } from './tag/tagSchema.ts'
 export type {
   CreateUserDataSchemaFormUrlEncodedType,
   CreateUserDataSchemaJsonType,
@@ -262,7 +261,6 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './pets/createPetsSchema.ts'
-export { tagTagSchema } from './tag/tagSchema.ts'
 export {
   createUserDataSchema,
   createUserDataSchemaFormUrlEncoded,

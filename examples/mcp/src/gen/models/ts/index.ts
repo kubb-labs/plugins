@@ -21,7 +21,6 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.js'
-export type { AddPetRequest } from './AddPetRequest.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
@@ -217,7 +216,6 @@ export type {
 } from './UpdateUser.js'
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
-export type { TagTag } from './tag/Tag.js'
 export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.js'
 export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
 export { petStatusEnum } from './PetStatusEnum.js'

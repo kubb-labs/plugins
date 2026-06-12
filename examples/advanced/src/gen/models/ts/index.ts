@@ -170,7 +170,6 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.ts'
-export type { TagTag } from './tag/Tag.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,

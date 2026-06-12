@@ -1,4 +1,3 @@
-export type { AddPetRequest } from './AddPetRequest.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
@@ -7,7 +6,6 @@ export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './Order.
 export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type { PetStatusEnumKey } from './PetStatusEnum.js'
-export type { Tag } from './Tag.js'
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
 export type {

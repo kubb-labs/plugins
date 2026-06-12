@@ -6,13 +6,12 @@
 import * as z from 'zod'
 import { categorySchema } from './categorySchema.js'
 import { petStatusEnumSchema } from './petStatusEnumSchema.js'
-import { tagTagSchema } from './tag/tagSchema.js'
 
 export const petSchema = z.object({
   id: z.int().optional(),
   name: z.string(),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
-  tags: z.array(tagTagSchema).optional(),
+  tags: z.array(categorySchema).optional(),
   status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })
