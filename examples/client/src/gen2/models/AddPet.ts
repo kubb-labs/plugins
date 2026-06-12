@@ -3,7 +3,6 @@
  * Do not edit manually.
  */
 
-import type { AddPetRequest } from './AddPetRequest.ts'
 import type { Pet } from './Pet.ts'
 import type { PetNotFound } from './PetNotFound.ts'
 
@@ -25,7 +24,7 @@ export type AddPetStatus405 = PetNotFound
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = AddPetRequest
+export type AddPetJsonData = Pet
 
 /**
  * @description Create a new pet in the store

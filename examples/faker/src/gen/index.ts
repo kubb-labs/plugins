@@ -142,7 +142,6 @@ export type {
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
-export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -192,7 +191,6 @@ export type { UserArray } from './models/UserArray.ts'
 export { createCategory } from './faker/createCategory.ts'
 export { createPet } from './faker/createPet.ts'
 export { createPetStatusEnum } from './faker/createPetStatusEnum.ts'
-export { createTag } from './faker/createTag.ts'
 export {
   createUpdatePetData,
   createUpdatePetFormUrlEncodedData,

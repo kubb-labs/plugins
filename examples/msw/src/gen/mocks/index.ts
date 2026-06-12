@@ -1,4 +1,3 @@
-export { createAddPetRequest } from './createAddPetRequest.ts'
 export { createAddress } from './createAddress.ts'
 export { createApiResponse } from './createApiResponse.ts'
 export { createCategory } from './createCategory.ts'
@@ -7,7 +6,6 @@ export { createOrder } from './createOrder.ts'
 export { createPet } from './createPet.ts'
 export { createPetNotFound } from './createPetNotFound.ts'
 export { createPetStatusEnum } from './createPetStatusEnum.ts'
-export { createTag } from './createTag.ts'
 export { createUser } from './createUser.ts'
 export { createUserArray } from './createUserArray.ts'
 export {

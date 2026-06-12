@@ -55,18 +55,14 @@ export const userSchema = personSchema.and(
   }),
 )
 
-export const tagSchema = categorySchema
-
 export const petSchema = z.object({
   id: z.bigint().optional(),
   name: z.string(),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
-  tags: z.array(tagSchema).optional(),
+  tags: z.array(categorySchema).optional(),
   status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })
-
-export const addPetRequestSchema = petSchema
 
 export const apiResponseSchema = z.object({
   code: z.int().optional(),
@@ -113,7 +109,7 @@ export const addPetStatus405Schema = petNotFoundSchema
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetDataSchemaJson = petSchema.describe('Create a new pet in the store')
 
 export const addPetDataSchemaXml = petSchema.describe('Create a new pet in the store')
 

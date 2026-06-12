@@ -6,7 +6,6 @@
 import type { Pet } from '../models/Pet.ts'
 import { createCategory } from './createCategory.ts'
 import { createPetStatusEnum } from './createPetStatusEnum.ts'
-import { createTag } from './createTag.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
@@ -16,7 +15,7 @@ export function createPet<TData extends Partial<Pet> = object>(data?: TData) {
     name: faker.string.alpha(),
     category: createCategory(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTag()),
+    tags: faker.helpers.multiple(() => createCategory()),
     status: createPetStatusEnum(),
   }
   return {

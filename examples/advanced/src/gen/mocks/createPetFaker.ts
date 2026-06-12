@@ -1,6 +1,5 @@
 import type { Pet } from '../models/ts/Pet.ts'
 import { createCategoryFaker } from './createCategoryFaker.ts'
-import { createTagTagFaker } from './tag/createTagFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createPetFaker<TData extends Partial<Pet> = object>(data?: TData) {
@@ -12,7 +11,7 @@ export function createPetFaker<TData extends Partial<Pet> = object>(data?: TData
     url: faker.internet.url(),
     category: createCategoryFaker(),
     photoUrls: faker.helpers.multiple(() => faker.string.alpha()),
-    tags: faker.helpers.multiple(() => createTagTagFaker()),
+    tags: faker.helpers.multiple(() => createCategoryFaker()),
     status: faker.helpers.arrayElement<any>(['working', 'idle']),
   }
   return {

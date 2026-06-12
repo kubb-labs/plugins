@@ -107,7 +107,6 @@ export {
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './pets/createCreatePetsFaker.ts'
-export { createTagTagFaker } from './tag/createTagFaker.ts'
 export {
   createCreateUserDataFaker,
   createCreateUserDataFakerFormUrlEncoded,

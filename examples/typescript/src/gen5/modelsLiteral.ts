@@ -213,8 +213,6 @@ export type User = {
   userStatus?: number
 }
 
-export type Tag = Category
-
 /**
  * @type object
  */
@@ -244,8 +242,6 @@ export type Cat = {
    */
   name?: string
 }
-
-export type Category1 = Category
 
 export type PetTypeEnum = 'dog' | 'cat'
 
@@ -282,7 +278,7 @@ export type Pet = (
   /**
    * @type object | undefined
    */
-  category?: Category1
+  category?: Category
   /**
    * @type array
    */
@@ -290,7 +286,7 @@ export type Pet = (
   /**
    * @type array | undefined
    */
-  readonly tags?: Array<Tag>
+  readonly tags?: Array<Category>
   /**
    * @description pet status in the store
    */
@@ -338,7 +334,7 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags?: Array<Tag>
+  tags?: Array<Category>
   /**
    * @description pet status in the store
    * @type string | undefined

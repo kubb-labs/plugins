@@ -218,8 +218,6 @@ export type User = {
   userStatus: number | undefined
 }
 
-export type Tag = Category
-
 /**
  * @type object
  */
@@ -249,8 +247,6 @@ export type Cat = {
    */
   name: string | undefined
 }
-
-export type Category1 = Category
 
 export type Pet = (
   | (Dog & {
@@ -285,7 +281,7 @@ export type Pet = (
   /**
    * @type object | undefined
    */
-  category: Category1 | undefined
+  category: Category | undefined
   /**
    * @type array
    */
@@ -293,7 +289,7 @@ export type Pet = (
   /**
    * @type array | undefined
    */
-  readonly tags: Array<Tag> | undefined
+  readonly tags: Array<Category> | undefined
   /**
    * @description pet status in the store
    */
@@ -339,7 +335,7 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags: Array<Tag> | undefined
+  tags: Array<Category> | undefined
   /**
    * @description pet status in the store
    * @type string | undefined

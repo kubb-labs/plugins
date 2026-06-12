@@ -11,7 +11,6 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.ts'
-export type { AddPetRequest } from './AddPetRequest.ts'
 export type { Address } from './Address.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Category } from './Category.ts'
@@ -162,7 +161,6 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.ts'
-export type { Tag } from './Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,

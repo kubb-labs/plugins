@@ -1,5 +1,5 @@
 import type { User } from '../models/ts/User.ts'
-import { createTagTagFaker } from './tag/createTagFaker.ts'
+import { createCategoryFaker } from './createCategoryFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createUserFaker<TData extends Partial<User> = object>(data?: TData) {
@@ -7,7 +7,7 @@ export function createUserFaker<TData extends Partial<User> = object>(data?: TDa
     id: faker.number.int(),
     username: faker.string.alpha(),
     uuid: faker.string.uuid(),
-    tag: createTagTagFaker(),
+    tag: createCategoryFaker(),
     firstName: faker.string.alpha(),
     lastName: faker.string.alpha(),
     email: faker.internet.email(),

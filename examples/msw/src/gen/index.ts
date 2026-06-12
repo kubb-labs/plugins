@@ -11,7 +11,6 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './models/AddPet.ts'
-export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
@@ -162,7 +161,6 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/PlaceOrderPatch.ts'
-export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -209,7 +207,6 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
-export { createAddPetRequest } from './mocks/createAddPetRequest.ts'
 export { createAddress } from './mocks/createAddress.ts'
 export { createApiResponse } from './mocks/createApiResponse.ts'
 export { createCategory } from './mocks/createCategory.ts'
@@ -218,7 +215,6 @@ export { createOrder } from './mocks/createOrder.ts'
 export { createPet } from './mocks/createPet.ts'
 export { createPetNotFound } from './mocks/createPetNotFound.ts'
 export { createPetStatusEnum } from './mocks/createPetStatusEnum.ts'
-export { createTag } from './mocks/createTag.ts'
 export { createUser } from './mocks/createUser.ts'
 export { createUserArray } from './mocks/createUserArray.ts'
 export {

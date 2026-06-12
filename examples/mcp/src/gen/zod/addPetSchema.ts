@@ -4,7 +4,6 @@
  */
 
 import * as z from 'zod'
-import { addPetRequestSchema } from './addPetRequestSchema.js'
 import { petNotFoundSchema } from './petNotFoundSchema.js'
 import { petSchema } from './petSchema.js'
 
@@ -18,7 +17,7 @@ export const addPetStatus405Schema = petNotFoundSchema
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
+export const addPetDataSchemaJson = petSchema.describe('Create a new pet in the store')
 
 export const addPetDataSchemaXml = petSchema.omit({ id: true }).describe('Create a new pet in the store')
 

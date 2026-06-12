@@ -142,7 +142,6 @@ export type {
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './PlaceOrder.ts'
-export type { Tag } from './Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
