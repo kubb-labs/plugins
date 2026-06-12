@@ -1,7 +1,6 @@
 export { createCategory } from './createCategory.ts'
 export { createPet } from './createPet.ts'
 export { createPetStatusEnum } from './createPetStatusEnum.ts'
-export { createTag } from './createTag.ts'
 export {
   createUpdatePetData,
   createUpdatePetFormUrlEncodedData,

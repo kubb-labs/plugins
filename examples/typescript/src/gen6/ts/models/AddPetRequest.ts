@@ -4,7 +4,6 @@
  */
 
 import type { Category } from './Category.ts'
-import type { Tag } from './Tag.ts'
 
 export const addPetRequestStatusEnum = {
   available: 'available',
@@ -42,7 +41,7 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags?: Array<Tag>
+  tags?: Array<Category>
   /**
    * @description pet status in the store
    * @type string | undefined

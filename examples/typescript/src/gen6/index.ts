@@ -164,7 +164,6 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './ts/models/PlaceOrderPatch.ts'
-export type { Tag } from './ts/models/Tag.ts'
 export type { UnhappyCustomer } from './ts/models/UnhappyCustomer.ts'
 export type {
   UpdatePetData,

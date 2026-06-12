@@ -1,4 +1,3 @@
-export type { AddPetRequest } from './models/ts/AddPetRequest.ts'
 export type { Address } from './models/ts/Address.ts'
 export type { ApiResponse } from './models/ts/ApiResponse.ts'
 export type { Category } from './models/ts/Category.ts'
@@ -7,7 +6,6 @@ export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models
 export type { Pet } from './models/ts/Pet.ts'
 export type { PetNotFound } from './models/ts/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/ts/PetStatusEnum.ts'
-export type { Tag } from './models/ts/Tag.ts'
 export type { User } from './models/ts/User.ts'
 export type { UserArray } from './models/ts/UserArray.ts'
 export type {

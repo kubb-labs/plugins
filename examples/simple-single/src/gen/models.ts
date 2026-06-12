@@ -200,8 +200,6 @@ export type User = Person & {
   userStatus?: number
 }
 
-export type Tag = Category
-
 /**
  * @type object
  */
@@ -229,14 +227,12 @@ export type Pet = {
   /**
    * @type array | undefined
    */
-  tags?: Tag[]
+  tags?: Category[]
   /**
    * @description pet status in the store
    */
   status?: PetStatusEnumKey
 }
-
-export type AddPetRequest = Pet
 
 /**
  * @type object
@@ -373,7 +369,7 @@ export type AddPetStatus405 = PetNotFound
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = AddPetRequest
+export type AddPetJsonData = Pet
 
 /**
  * @description Create a new pet in the store

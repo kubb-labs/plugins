@@ -5,7 +5,6 @@
 
 import type { AddPetRequest } from '../types/AddPetRequest.ts'
 import { createCategory } from './createCategory.ts'
-import { createTag } from './createTag.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createAddPetRequest<TData extends Partial<AddPetRequest> = object>(data?: TData)
@@ -16,7 +15,7 @@ export function createAddPetRequest<TData extends Partial<AddPetRequest> = objec
   name: faker.string.alpha(),
   category: createCategory(),
   photoUrls: faker.helpers.multiple(() => (faker.string.alpha())),
-  tags: faker.helpers.multiple(() => (createTag())),
+  tags: faker.helpers.multiple(() => (createCategory())),
   status: 'active',
 }
   return {

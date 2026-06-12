@@ -14,7 +14,6 @@ import type {
   AddPetStatus405,
   AddPetXmlData,
 } from '../../models/AddPet.ts'
-import { createAddPetRequest } from '../createAddPetRequest.ts'
 import { createPet } from '../createPet.ts'
 import { createPetNotFound } from '../createPetNotFound.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -61,7 +60,7 @@ export function createAddPetStatus405(data?: Partial<AddPetStatus405>): AddPetSt
 export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJsonData {
   faker.seed([220])
 
-  return createAddPetRequest(data) as AddPetJsonData
+  return createPet(data) as AddPetJsonData
 }
 
 /**

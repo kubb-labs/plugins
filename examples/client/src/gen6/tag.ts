@@ -145,7 +145,3 @@ export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Parti
 
   return res.data
 }
-
-export function storeController() {
-  return { getInventory, placeOrder, placeOrderPatch, getOrderById, deleteOrder }
-}

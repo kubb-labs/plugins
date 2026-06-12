@@ -170,7 +170,6 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/ts/store/PlaceOrderPatch.ts'
-export type { TagTag } from './models/ts/tag/Tag.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -342,7 +341,6 @@ export type {
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './zod/pets/createPetsSchema.ts'
-export type { TagTagSchemaType } from './zod/tag/tagSchema.ts'
 export type {
   CreateUserDataSchemaFormUrlEncodedType,
   CreateUserDataSchemaJsonType,
@@ -549,7 +547,6 @@ export {
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './mocks/pets/createCreatePetsFaker.ts'
-export { createTagTagFaker } from './mocks/tag/createTagFaker.ts'
 export {
   createCreateUserDataFaker,
   createCreateUserDataFakerFormUrlEncoded,
@@ -740,7 +737,6 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './zod/pets/createPetsSchema.ts'
-export { tagTagSchema } from './zod/tag/tagSchema.ts'
 export {
   createUserDataSchema,
   createUserDataSchemaFormUrlEncoded,

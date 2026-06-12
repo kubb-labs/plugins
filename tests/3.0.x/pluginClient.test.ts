@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, type Config, createKubb, Diagnostics, fsStorage, type KubbHooks } from '@kubb/core'
-import { middlewareBarrel } from '@kubb/middleware-barrel'
+import { pluginBarrel } from '@kubb/plugin-barrel'
 import { parserTs } from '@kubb/parser-ts'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -173,7 +173,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-
   // ─── paramsCasing ───────────────────────────────────────────────────────
   {
     name: 'paramsCasing',
@@ -320,9 +319,9 @@ describe(`plugin-client options ${version}`, () => {
         adapter: adapterOas({ validate: false }),
         parsers: [parserTs],
         reporters: [],
-        middleware: [middlewareBarrel()],
         storage: fsStorage(),
         plugins: [
+          pluginBarrel(),
           pluginTs({ output: { path: './types', barrel: { type: 'named' } } }),
           pluginClient({ output: { path: './clients', barrel: { type: 'named' } }, clientType: 'class' }),
         ],
