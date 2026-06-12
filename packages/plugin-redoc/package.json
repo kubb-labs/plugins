@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-redoc",
-  "version": "5.0.0-beta.51",
+  "version": "5.0.0-beta.52",
   "description": "Generate a beautiful, interactive ReDoc API reference page from your OpenAPI specification. Produces a standalone HTML file with a responsive, developer-friendly UI.",
   "keywords": [
     "api-docs",
