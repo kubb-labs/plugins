@@ -69,6 +69,12 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 | [`@kubb/plugin-redoc`](./packages/plugin-redoc) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-redoc.svg)](https://npmx.dev/package/@kubb/plugin-redoc) | [ReDoc](https://github.com/Redocly/redoc) API documentation generation |
 | [`@kubb/plugin-mcp`](./packages/plugin-mcp) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-mcp.svg)](https://npmx.dev/package/@kubb/plugin-mcp) | Model Context Protocol tools for AI assistants |
 
+### Output
+
+| Package | Version | Description |
+|---------|---------|-------------|
+| [`@kubb/plugin-barrel`](./packages/plugin-barrel) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-barrel.svg)](https://npmx.dev/package/@kubb/plugin-barrel) | Barrel file generation — auto-creates `index.ts` re-export files per plugin output |
+
 ## Community plugins
 
 Plugins built and maintained by the community. Want to add yours? See [CONTRIBUTING.md](./CONTRIBUTING.md).
