@@ -51,17 +51,15 @@ export default defineConfig({
   output: {
     path: './src/gen',
   },
-  plugins: [
-    pluginBarrel(),
-  ],
+  plugins: [pluginBarrel()],
 })
 ```
 
 ## Options
 
-| Option | Type                  | Default   | Description                                 |
-| ------ | --------------------- | --------- | ------------------------------------------- |
-| `type` | `'all' \| 'named'`    | `'named'` | Export style for the generated barrel files |
+| Option | Type               | Default   | Description                                 |
+| ------ | ------------------ | --------- | ------------------------------------------- |
+| `type` | `'all' \| 'named'` | `'named'` | Export style for the generated barrel files |
 
 ### Export types
 
