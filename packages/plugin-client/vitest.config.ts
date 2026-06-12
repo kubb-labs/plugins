@@ -4,4 +4,7 @@ export default defineConfig({
   test: {
     include: ['./src/**/*.test.{ts,tsx}', './templates/**/*.test.{ts,tsx}'],
   },
+  resolve: {
+    tsconfigPaths: true,
+  },
 })
