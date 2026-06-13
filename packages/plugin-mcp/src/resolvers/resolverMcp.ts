@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginMcp } from '../types.ts'
 
@@ -19,7 +19,7 @@ export const resolverMcp = defineResolver<PluginMcp>(() => ({
   pluginName: 'plugin-mcp',
   default(name, type) {
     if (type === 'file') {
-      return camelCase(name, { isFile: true })
+      return toFilePath(name)
     }
     return camelCase(name, { suffix: 'handler' })
   },

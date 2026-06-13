@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginVueQuery } from '../types.ts'
 
@@ -26,7 +26,7 @@ export const resolverVueQuery = defineResolver<PluginVueQuery>(() => ({
   name: 'default',
   pluginName: 'plugin-vue-query',
   default(name, type) {
-    return camelCase(name, { isFile: type === 'file' })
+    return type === 'file' ? toFilePath(name) : camelCase(name)
   },
   resolveName(name) {
     return this.default(name, 'function')

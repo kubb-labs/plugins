@@ -1,4 +1,4 @@
-import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
+import { camelCase, ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginClient } from '../types.ts'
 
@@ -21,8 +21,8 @@ export const resolverClient = defineResolver<PluginClient>(() => ({
   name: 'default',
   pluginName: 'plugin-client',
   default(name, type) {
-    const resolved = camelCase(name, { isFile: type === 'file' })
-    return type === 'file' ? resolved : ensureValidVarName(resolved)
+    if (type === 'file') return toFilePath(name)
+    return ensureValidVarName(camelCase(name))
   },
   resolveName(name) {
     return this.default(name, 'function')

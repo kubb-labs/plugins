@@ -1,4 +1,5 @@
 export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.ts'
+export { toFilePath } from './filePath.ts'
 export { getRelativePath } from './fs.ts'
 export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'
 export { getUniqueName } from './names.ts'

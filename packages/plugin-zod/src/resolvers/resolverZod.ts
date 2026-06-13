@@ -1,4 +1,4 @@
-import { camelCase, ensureValidVarName, pascalCase } from '@internals/utils'
+import { camelCase, ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginZod } from '../types.ts'
 
@@ -22,8 +22,8 @@ export const resolverZod = defineResolver<PluginZod>(() => {
     name: 'default',
     pluginName: 'plugin-zod',
     default(name, type) {
-      const resolved = camelCase(name, { isFile: type === 'file', suffix: type ? 'schema' : undefined })
-      return type === 'file' ? resolved : ensureValidVarName(resolved)
+      if (type === 'file') return toFilePath(name, (part) => camelCase(part, { suffix: 'schema' }))
+      return ensureValidVarName(camelCase(name, { suffix: type ? 'schema' : undefined }))
     },
     resolveSchemaName(name) {
       return ensureValidVarName(camelCase(name, { suffix: 'schema' }))

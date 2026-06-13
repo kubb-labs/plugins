@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginSwr } from '../types.ts'
 
@@ -18,7 +18,7 @@ export const resolverSwr = defineResolver<PluginSwr>(() => ({
   name: 'default',
   pluginName: 'plugin-swr',
   default(name, type) {
-    return camelCase(name, { isFile: type === 'file' })
+    return type === 'file' ? toFilePath(name) : camelCase(name)
   },
   resolveName(name) {
     return this.default(name, 'function')

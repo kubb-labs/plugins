@@ -1,4 +1,4 @@
-import { ensureValidVarName, pascalCase } from '@internals/utils'
+import { ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginTs } from '../types.ts'
 
@@ -9,7 +9,7 @@ import type { PluginTs } from '../types.ts'
  * casing/file-layout rules.
  *
  * The `default` method is supplied by `defineResolver`. It uses PascalCase for
- * type names and PascalCase-with-isFile for files.
+ * type names and PascalCase file paths (dotted names become `/`-joined) for files.
  *
  * @example Resolve a type and file name
  * ```ts
@@ -25,15 +25,15 @@ export const resolverTs = defineResolver<PluginTs>(() => {
     name: 'default',
     pluginName: 'plugin-ts',
     default(name, type) {
-      const resolved = pascalCase(name, { isFile: type === 'file' })
-      return type === 'file' ? resolved : ensureValidVarName(resolved)
+      if (type === 'file') return toFilePath(name, pascalCase)
+      return ensureValidVarName(pascalCase(name))
     },
     resolveTypeName(name) {
       return ensureValidVarName(pascalCase(name))
     },
     resolvePathName(name, type) {
-      const resolved = pascalCase(name, { isFile: type === 'file' })
-      return type === 'file' ? resolved : ensureValidVarName(resolved)
+      if (type === 'file') return toFilePath(name, pascalCase)
+      return ensureValidVarName(pascalCase(name))
     },
     resolveParamName(node, param) {
       return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)

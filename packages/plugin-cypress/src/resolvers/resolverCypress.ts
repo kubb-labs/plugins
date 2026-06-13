@@ -1,4 +1,4 @@
-import { camelCase } from '@internals/utils'
+import { camelCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginCypress } from '../types.ts'
 
@@ -18,7 +18,7 @@ export const resolverCypress = defineResolver<PluginCypress>(() => ({
   name: 'default',
   pluginName: 'plugin-cypress',
   default(name, type) {
-    return camelCase(name, { isFile: type === 'file' })
+    return type === 'file' ? toFilePath(name) : camelCase(name)
   },
   resolveName(name) {
     return this.default(name, 'function')

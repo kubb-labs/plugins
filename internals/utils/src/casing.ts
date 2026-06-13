@@ -1,9 +1,5 @@
 type Options = {
   /**
-   * When `true`, dot-separated segments are split on `.` and joined with `/` after casing.
-   */
-  isFile?: boolean
-  /**
    * Text prepended before casing is applied.
    */
   prefix?: string
@@ -21,78 +17,58 @@ type Options = {
  * When `pascal` is `true` the first word is also capitalized (PascalCase), otherwise only subsequent words are.
  */
 function toCamelOrPascal(text: string, pascal: boolean): string {
-  const normalized = text
+  return text
     .trim()
     .replace(/([a-z\d])([A-Z])/g, '$1 $2')
     .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2')
     .replace(/(\d)([a-z])/g, '$1 $2')
-
-  const words = normalized.split(/[\s\-_./\\:]+/).filter(Boolean)
-
-  return words
+    .split(/[\s\-_./\\:]+/)
+    .filter(Boolean)
     .map((word, i) => {
-      const allUpper = word.length > 1 && word === word.toUpperCase()
-      if (allUpper) return word
-      if (i === 0 && !pascal) return word.charAt(0).toLowerCase() + word.slice(1)
-      return word.charAt(0).toUpperCase() + word.slice(1)
+      if (word.length > 1 && word === word.toUpperCase()) return word
+      const head = i === 0 && !pascal ? word.charAt(0).toLowerCase() : word.charAt(0).toUpperCase()
+      return head + word.slice(1)
     })
     .join('')
     .replace(/[^a-zA-Z0-9]/g, '')
 }
 
 /**
- * Splits `text` on `.` and applies `transformPart` to each segment.
- * The last segment receives `isLast = true`, all earlier segments receive `false`.
- * Segments are joined with `/` to form a file path.
- *
- * Only splits on dots followed by a letter so that version numbers
- * embedded in operationIds (e.g. `v2025.0`) are kept intact.
- */
-function applyToFileParts(text: string, transformPart: (part: string, isLast: boolean) => string): string {
-  const parts = text.split(/\.(?=[a-zA-Z])/)
-  return parts.map((part, i) => transformPart(part, i === parts.length - 1)).join('/')
-}
-
-/**
  * Converts `text` to camelCase.
- * When `isFile` is `true`, dot-separated segments are each cased independently and joined with `/`.
  *
- * @example
- * camelCase('hello-world')                   // 'helloWorld'
- * camelCase('pet.petId', { isFile: true })   // 'pet/petId'
+ * @example Word boundaries
+ * `camelCase('hello-world') // 'helloWorld'`
+ *
+ * @example With a prefix
+ * `camelCase('tag', { prefix: 'create' }) // 'createTag'`
  */
-export function camelCase(text: string, { isFile, prefix = '', suffix = '' }: Options = {}): string {
-  if (isFile) {
-    return applyToFileParts(text, (part, isLast) => camelCase(part, isLast ? { prefix, suffix } : {}))
-  }
-
+export function camelCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
   return toCamelOrPascal(`${prefix} ${text} ${suffix}`, false)
 }
 
 /**
  * Converts `text` to PascalCase.
- * When `isFile` is `true`, the last dot-separated segment is PascalCased and earlier segments are camelCased.
  *
- * @example
- * pascalCase('hello-world')                  // 'HelloWorld'
- * pascalCase('pet.petId', { isFile: true })  // 'pet/PetId'
+ * @example Word boundaries
+ * `pascalCase('hello-world') // 'HelloWorld'`
+ *
+ * @example With a suffix
+ * `pascalCase('tag', { suffix: 'schema' }) // 'TagSchema'`
  */
-export function pascalCase(text: string, { isFile, prefix = '', suffix = '' }: Options = {}): string {
-  if (isFile) {
-    return applyToFileParts(text, (part, isLast) => (isLast ? pascalCase(part, { prefix, suffix }) : camelCase(part)))
-  }
-
+export function pascalCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
   return toCamelOrPascal(`${prefix} ${text} ${suffix}`, true)
 }
 
 /**
  * Converts `text` to snake_case.
  *
- * @example
- * snakeCase('helloWorld')  // 'hello_world'
- * snakeCase('Hello-World') // 'hello_world'
+ * @example From camelCase
+ * `snakeCase('helloWorld') // 'hello_world'`
+ *
+ * @example From mixed separators
+ * `snakeCase('Hello-World') // 'hello_world'`
  */
-export function snakeCase(text: string, { prefix = '', suffix = '' }: Omit<Options, 'isFile'> = {}): string {
+export function snakeCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
   const processed = `${prefix} ${text} ${suffix}`.trim()
   return processed
     .replace(/([a-z])([A-Z])/g, '$1_$2')
@@ -107,9 +83,9 @@ export function snakeCase(text: string, { prefix = '', suffix = '' }: Omit<Optio
 /**
  * Converts `text` to SCREAMING_SNAKE_CASE.
  *
- * @example
- * screamingSnakeCase('helloWorld') // 'HELLO_WORLD'
+ * @example From camelCase
+ * `screamingSnakeCase('helloWorld') // 'HELLO_WORLD'`
  */
-export function screamingSnakeCase(text: string, { prefix = '', suffix = '' }: Omit<Options, 'isFile'> = {}): string {
+export function screamingSnakeCase(text: string, { prefix = '', suffix = '' }: Options = {}): string {
   return snakeCase(text, { prefix, suffix }).toUpperCase()
 }
