@@ -1,5 +1,5 @@
 import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
-import { URLPath } from '@internals/utils'
+import { toTemplateString } from '@internals/utils'
 import { buildJSDoc, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -69,7 +69,6 @@ function generateMethod({
   pathParamsType,
 }: GenerateMethodProps): string {
   if (!ast.isHttpOperationNode(node)) return ''
-  const path = new URLPath(node.path, { casing: paramsCasing })
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const { header: headerParams } = getOperationParameters(node)
@@ -81,7 +80,17 @@ function generateMethod({
   const { query: queryParams } = getOperationParameters(node)
   const zodQueryParamsName =
     zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
-  const clientParams = buildClassClientParams({ node, path, baseURL, tsResolver, isFormData, isMultipleContentTypes, hasFormData, headers, zodQueryParamsName })
+  const clientParams = buildClassClientParams({
+    node,
+    url: toTemplateString(node.path, { casing: paramsCasing }),
+    baseURL,
+    tsResolver,
+    isFormData,
+    isMultipleContentTypes,
+    hasFormData,
+    headers,
+    zodQueryParamsName,
+  })
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
   const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })

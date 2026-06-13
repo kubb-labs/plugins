@@ -1,5 +1,5 @@
 import { buildParamsMapping, getOperationParameters } from '@internals/shared'
-import { isValidVarName, URLPath } from '@internals/utils'
+import { isValidVarName, toTemplateString } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -58,7 +58,6 @@ export function Url({
   tsResolver,
 }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
-  const path = new URLPath(node.path)
 
   const paramsNode = buildUrlParamsNode({
     paramsType,
@@ -82,7 +81,7 @@ export function Url({
             .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
             .join('\n')}
         {pathParamsMapping && Object.keys(pathParamsMapping).length > 0 && <br />}
-        <Const name={'res'}>{`{ method: '${node.method.toUpperCase()}', url: ${path.toTemplateString({ prefix: baseURL })} as const }`}</Const>
+        <Const name={'res'}>{`{ method: '${node.method.toUpperCase()}', url: ${toTemplateString(node.path, { prefix: baseURL })} as const }`}</Const>
         <br />
         return res
       </Function>

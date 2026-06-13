@@ -1,5 +1,4 @@
 import { buildStatusUnionType, getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
-import type { URLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -105,7 +104,7 @@ export function buildGenerics(
  */
 export function buildClassClientParams({
   node,
-  path,
+  url,
   baseURL,
   tsResolver,
   isFormData,
@@ -115,7 +114,7 @@ export function buildClassClientParams({
   zodQueryParamsName,
 }: {
   node: ast.OperationNode
-  path: URLPath
+  url: string
   baseURL: string | null | undefined
   tsResolver: ResolverTs
   isFormData: boolean
@@ -140,7 +139,7 @@ export function buildClassClientParams({
           value: JSON.stringify(ast.isHttpOperationNode(node) ? node.method.toUpperCase() : ''),
         },
         url: {
-          value: path.template,
+          value: url,
         },
         baseURL: baseURL
           ? {

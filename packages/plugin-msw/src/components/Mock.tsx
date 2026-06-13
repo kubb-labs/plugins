@@ -1,5 +1,5 @@
 import { getPrimarySuccessResponse } from '@internals/shared'
-import { URLPath } from '@internals/utils'
+import { toURLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -21,7 +21,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
   const contentType = getContentType(successResponse)
-  const url = new URLPath(getMswUrl(node)).toURLPath()
+  const url = toURLPath(getMswUrl(node))
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
   const responseHasSchema = hasResponseSchema(successResponse)

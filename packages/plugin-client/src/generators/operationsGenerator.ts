@@ -1,4 +1,4 @@
-import { URLPath } from '@internals/utils'
+import { toURLPath } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import type { PluginClient } from '../types'
 
@@ -21,7 +21,7 @@ export const operationsGenerator = defineGenerator<PluginClient>({
     for (const node of nodes) {
       if (!ast.isHttpOperationNode(node)) continue
       operationsObject[node.operationId] = {
-        path: new URLPath(node.path).URL,
+        path: toURLPath(node.path),
         method: node.method.toLowerCase(),
       }
     }

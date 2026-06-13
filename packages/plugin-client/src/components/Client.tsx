@@ -7,7 +7,7 @@ import {
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
-import { isValidVarName, URLPath } from '@internals/utils'
+import { isValidVarName, toTemplateString } from '@internals/utils'
 import { stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -100,7 +100,6 @@ export function Client({
   isConfigurable = true,
 }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
-  const path = new URLPath(node.path)
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const responseType = getResponseType(node)
@@ -173,7 +172,7 @@ export function Client({
           value: stringify(node.method.toUpperCase()),
         },
         url: {
-          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : path.template,
+          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : toTemplateString(node.path),
         },
         baseURL:
           baseURL && !urlName

@@ -1,4 +1,4 @@
-import { URLPath } from '@internals/utils'
+import { toURLPath } from '@internals/utils'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -15,10 +15,9 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export const mutationKeyTransformer: Transformer = ({ node, casing }) => {
+export const mutationKeyTransformer: Transformer = ({ node }) => {
   if (!node.path) return []
-  const path = new URLPath(node.path, { casing })
-  return [`{ url: '${path.toURLPath()}' }`]
+  return [`{ url: '${toURLPath(node.path)}' }`]
 }
 
 export function MutationKey({ name, paramsCasing, node, transformer }: Props): KubbReactNode {
