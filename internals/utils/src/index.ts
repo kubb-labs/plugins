@@ -2,7 +2,5 @@ export { camelCase, pascalCase, screamingSnakeCase, snakeCase } from './casing.t
 export { toFilePath } from './filePath.ts'
 export { getRelativePath } from './fs.ts'
 export { aliasConflictingImports, filterUsedImports, rewriteAliasedImports, type ImportEntry, type ImportName } from './imports.ts'
-export { getUniqueName } from './names.ts'
 export { ensureValidVarName, isValidVarName } from './reserved.ts'
-export { trimExtName } from './string.ts'
 export { URLPath } from './urlPath.ts'

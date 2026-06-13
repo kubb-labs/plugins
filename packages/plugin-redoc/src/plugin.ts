@@ -1,5 +1,4 @@
 import path from 'node:path'
-import { trimExtName } from '@internals/utils'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { adapterOasName } from '@kubb/adapter-oas'
 
@@ -35,6 +34,8 @@ export const pluginRedocName = 'plugin-redoc' satisfies PluginRedoc['name']
  */
 export const pluginRedoc = definePlugin<PluginRedoc>((options) => {
   const { output = { path: 'docs.html' } } = options
+  const extname = path.extname(output.path)
+  const name = extname ? output.path.slice(0, -extname.length) : output.path
 
   return {
     name: pluginRedocName,
@@ -44,7 +45,7 @@ export const pluginRedoc = definePlugin<PluginRedoc>((options) => {
       async 'kubb:plugin:setup'(ctx) {
         ctx.setOptions({
           output,
-          name: trimExtName(output.path),
+          name,
           exclude: [],
           override: [],
         })
