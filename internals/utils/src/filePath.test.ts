@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { camelCase, pascalCase } from './casing.ts'
-import { toFilePath } from './filePath.ts'
+import { toFilePath } from './fs.ts'
 
 describe('toFilePath', () => {
   test.each([
