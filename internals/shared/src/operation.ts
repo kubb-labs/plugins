@@ -1,4 +1,4 @@
-import { toURLPath } from '@internals/utils'
+import { Url } from '@internals/utils'
 import { ast, type ResolverFileParams } from '@kubb/core'
 
 /**
@@ -79,7 +79,7 @@ function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): 
   }
 
   if (link === 'urlPath') {
-    return node.path ? `{@link ${toURLPath(node.path)}}` : null
+    return node.path ? `{@link ${Url.toPath(node.path)}}` : null
   }
 
   return node.path ? `{@link ${node.path.replaceAll('{', ':').replaceAll('}', '')}}` : null

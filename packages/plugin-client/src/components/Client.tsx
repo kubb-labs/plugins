@@ -7,7 +7,7 @@ import {
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
-import { isValidVarName, toTemplateString } from '@internals/utils'
+import { isValidVarName, Url } from '@internals/utils'
 import { stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -172,7 +172,7 @@ export function Client({
           value: stringify(node.method.toUpperCase()),
         },
         url: {
-          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : toTemplateString(node.path),
+          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toTemplateString(node.path),
         },
         baseURL:
           baseURL && !urlName

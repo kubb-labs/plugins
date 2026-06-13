@@ -1,5 +1,5 @@
 import { buildOperationComments, buildTransformedParamsMapping, getOperationParameters } from '@internals/shared'
-import { camelCase, isValidVarName, toTemplateString } from '@internals/utils'
+import { camelCase, isValidVarName, Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -87,7 +87,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
 
   const fetchConfig: Array<string> = []
   fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
-  fetchConfig.push(`url: ${toTemplateString(node.path)}`)
+  fetchConfig.push(`url: ${Url.toTemplateString(node.path)}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
   if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'params: mappedParams' : 'params')
   if (requestName) fetchConfig.push(`data: ${isFormData ? 'formData as FormData' : 'requestData'}`)

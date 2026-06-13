@@ -1,5 +1,5 @@
 import { buildOperationComments, getContentTypeInfo, getOperationParameters } from '@internals/shared'
-import { toTemplateString } from '@internals/utils'
+import { Url } from '@internals/utils'
 import { buildJSDoc, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -82,7 +82,7 @@ function generateMethod({
     zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
   const clientParams = buildClassClientParams({
     node,
-    url: toTemplateString(node.path, { casing: paramsCasing }),
+    url: Url.toTemplateString(node.path, { casing: paramsCasing }),
     baseURL,
     tsResolver,
     isFormData,

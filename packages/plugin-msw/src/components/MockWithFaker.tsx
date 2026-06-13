@@ -1,5 +1,5 @@
 import { getPrimarySuccessResponse } from '@internals/shared'
-import { toURLPath } from '@internals/utils'
+import { Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -22,7 +22,7 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
   const successResponse = getPrimarySuccessResponse(node)
   const statusCode = successResponse ? Number(successResponse.statusCode) : 200
   const contentType = getContentType(successResponse)
-  const url = toURLPath(getMswUrl(node))
+  const url = Url.toPath(getMswUrl(node))
 
   const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
 

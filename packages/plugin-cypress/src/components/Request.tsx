@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { camelCase, toTemplateString } from '@internals/utils'
+import { camelCase, Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -55,7 +55,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
   // even when the OpenAPI spec has inconsistent casing between the two.
   const pathParamNameMap = new Map(casedPathParams.map((p) => [camelCase(p.name), p.name]))
 
-  const urlTemplate = toTemplateString(node.path, {
+  const urlTemplate = Url.toTemplateString(node.path, {
     prefix: baseURL,
     replacer: (param) => pathParamNameMap.get(camelCase(param)) ?? param,
     casing: paramsCasing,

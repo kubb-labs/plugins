@@ -73,64 +73,80 @@ function toParamsObject(
 }
 
 /**
- * Converts an OpenAPI/Swagger path to Express-style colon syntax.
- *
- * @example
- * toURLPath('/pet/{petId}') // '/pet/:petId'
+ * Helpers for OpenAPI/Swagger paths, plus a thin wrapper over the native `URL`.
  */
-export function toURLPath(path: string): string {
-  return path.replace(/\{([^}]+)\}/g, ':$1')
-}
-
-/**
- * Converts an OpenAPI/Swagger path to a TypeScript template literal string.
- * `prefix` is prepended inside the literal, `replacer` transforms each parameter name,
- * and `casing` controls parameter identifier casing.
- *
- * @example
- * toTemplateString('/pet/{petId}') // '`/pet/${petId}`'
- *
- * @example
- * toTemplateString('/pet/{petId}', { prefix: 'https://api' }) // '`https://api/pet/${petId}`'
- */
-export function toTemplateString(path: string, { prefix, replacer, casing }: TemplateOptions = {}): string {
-  const parts = path.split(/\{([^}]+)\}/)
-  const result = parts
-    .map((part, i) => {
-      if (i % 2 === 0) return part
-      const param = transformParam(part, casing)
-      return `\${${replacer ? replacer(param) : param}}`
-    })
-    .join('')
-
-  return `\`${prefix ?? ''}${result}\``
-}
-
-/**
- * Returns the path and its extracted params as a structured `URLObject`, or as a stringified
- * expression when `stringify` is set.
- *
- * @example
- * toURLObject('/pet/{petId}')
- * // { url: '/pet/:petId', params: { petId: 'petId' } }
- */
-export function toURLObject(path: string, { type = 'path', replacer, stringify, casing }: ObjectOptions = {}): URLObject | string {
-  const object: URLObject = {
-    url: type === 'path' ? toURLPath(path) : toTemplateString(path, { replacer, casing }),
-    params: toParamsObject(path, { replacer, casing }),
+export class Url {
+  /**
+   * Reports whether `url` is a parseable absolute URL. Delegates to the native `URL.canParse`.
+   *
+   * @example
+   * Url.canParse('https://petstore.swagger.io/v2') // true
+   * Url.canParse('/pet/{petId}')                   // false
+   */
+  static canParse(url: string, base?: string | URL): boolean {
+    return URL.canParse(url, base)
   }
 
-  if (stringify) {
-    if (type === 'template') {
-      return JSON.stringify(object).replaceAll("'", '').replaceAll(`"`, '')
-    }
-
-    if (object.params) {
-      return `{ url: '${object.url}', params: ${JSON.stringify(object.params).replaceAll("'", '').replaceAll(`"`, '')} }`
-    }
-
-    return `{ url: '${object.url}' }`
+  /**
+   * Converts an OpenAPI/Swagger path to Express-style colon syntax.
+   *
+   * @example
+   * Url.toPath('/pet/{petId}') // '/pet/:petId'
+   */
+  static toPath(path: string): string {
+    return path.replace(/\{([^}]+)\}/g, ':$1')
   }
 
-  return object
+  /**
+   * Converts an OpenAPI/Swagger path to a TypeScript template literal string.
+   * `prefix` is prepended inside the literal, `replacer` transforms each parameter name,
+   * and `casing` controls parameter identifier casing.
+   *
+   * @example
+   * Url.toTemplateString('/pet/{petId}') // '`/pet/${petId}`'
+   *
+   * @example
+   * Url.toTemplateString('/pet/{petId}', { prefix: 'https://api' }) // '`https://api/pet/${petId}`'
+   */
+  static toTemplateString(path: string, { prefix, replacer, casing }: TemplateOptions = {}): string {
+    const parts = path.split(/\{([^}]+)\}/)
+    const result = parts
+      .map((part, i) => {
+        if (i % 2 === 0) return part
+        const param = transformParam(part, casing)
+        return `\${${replacer ? replacer(param) : param}}`
+      })
+      .join('')
+
+    return `\`${prefix ?? ''}${result}\``
+  }
+
+  /**
+   * Returns the path and its extracted params as a structured `URLObject`, or as a stringified
+   * expression when `stringify` is set.
+   *
+   * @example
+   * Url.toObject('/pet/{petId}')
+   * // { url: '/pet/:petId', params: { petId: 'petId' } }
+   */
+  static toObject(path: string, { type = 'path', replacer, stringify, casing }: ObjectOptions = {}): URLObject | string {
+    const object: URLObject = {
+      url: type === 'path' ? Url.toPath(path) : Url.toTemplateString(path, { replacer, casing }),
+      params: toParamsObject(path, { replacer, casing }),
+    }
+
+    if (stringify) {
+      if (type === 'template') {
+        return JSON.stringify(object).replaceAll("'", '').replaceAll(`"`, '')
+      }
+
+      if (object.params) {
+        return `{ url: '${object.url}', params: ${JSON.stringify(object.params).replaceAll("'", '').replaceAll(`"`, '')} }`
+      }
+
+      return `{ url: '${object.url}' }`
+    }
+
+    return object
+  }
 }

@@ -1,5 +1,5 @@
 import { getOperationParameters } from '@internals/shared'
-import { toURLObject } from '@internals/utils'
+import { Url } from '@internals/utils'
 import type { ast } from '@kubb/core'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -26,7 +26,7 @@ export const queryKeyTransformer: Transformer = ({ node, casing }) => {
   const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
 
   return [
-    toURLObject(node.path, { type: 'path', stringify: true, casing }),
+    Url.toObject(node.path, { type: 'path', stringify: true, casing }),
     hasQueryParams ? '...(params ? [params] : [])' : null,
     hasRequestBody ? '...(data ? [data] : [])' : null,
   ].filter(Boolean) as string[]
