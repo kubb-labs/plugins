@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-react-query",
-  "version": "5.0.0-beta.53",
+  "version": "5.0.0-beta.55",
   "description": "Generate type-safe TanStack Query (React Query) hooks from your OpenAPI specification. Covers useQuery, useMutation, useInfiniteQuery, and queryOptions with full TypeScript support.",
   "keywords": [
     "code-generation",

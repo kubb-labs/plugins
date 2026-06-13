@@ -29,7 +29,7 @@ export const queryKeyTransformer: Transformer = ({ node, casing }) => {
     Url.toObject(node.path, { type: 'path', stringify: true, casing }),
     hasQueryParams ? '...(params ? [params] : [])' : null,
     hasRequestBody ? '...(data ? [data] : [])' : null,
-  ].filter(Boolean) as string[]
+  ].filter(Boolean) as Array<string>
 }
 
 export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer }: Props): KubbReactNode {

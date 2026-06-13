@@ -1,8 +1,8 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { URLPath } from '@kubb/core'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
+import { Url } from '@internals/utils'
 
 function capitalize(name: string): string {
   return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
@@ -96,13 +96,12 @@ export const config = {
         type: 'path',
       },
       queryKey({ node, casing }) {
-        const path = new URLPath(node.path, { casing })
         const hasQueryParams = node.parameters?.some((p) => p.in === 'query') ?? false
         const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
 
         return [
           '"v5"',
-          path.toObject({ type: 'path', stringify: true }),
+          Url.toObject(node.path, { type: 'path', stringify: true, casing }),
           hasQueryParams ? '...(params ? [params] : [])' : undefined,
           hasRequestBody ? '...(data ? [data] : [])' : undefined,
         ].filter(Boolean) as [string, ...Array<string>]
