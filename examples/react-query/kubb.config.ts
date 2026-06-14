@@ -1,8 +1,8 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { Url } from '@kubb/core'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
-import { Url } from '@internals/utils'
 
 function capitalize(name: string): string {
   return `${name.charAt(0).toUpperCase()}${name.slice(1)}`
