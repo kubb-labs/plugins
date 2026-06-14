@@ -1,6 +1,7 @@
 import { aliasConflictingImports, rewriteAliasedImports } from '@internals/utils'
 import type { Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
+import { findCircularSchemas } from '@kubb/ast/utils'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs } from '@kubb/plugin-ts'
@@ -184,7 +185,7 @@ describe('fakerGenerator — schema', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema])],
+        circularNames: [...findCircularSchemas([categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema])],
         enumNames: [],
       },
       driver,
@@ -292,7 +293,7 @@ describe('fakerGenerator — operation', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, errorSchema, petSchema, treeNodeSchema])],
+        circularNames: [...findCircularSchemas([categorySchema, errorSchema, petSchema, treeNodeSchema])],
         enumNames: [],
       },
       driver,

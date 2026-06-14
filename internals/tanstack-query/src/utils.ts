@@ -1,5 +1,6 @@
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
+import { caseParams, resolveGroupType, resolveParamType } from '@kubb/ast/utils'
 import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import type { ParamsCasing, ParamsType, PathParamsType } from './types.ts'
 
@@ -145,11 +146,11 @@ export function buildQueryKeyParams(
 ): ast.FunctionParametersNode {
   const { pathParamsType, paramsCasing, resolver } = options
 
-  const casedParams = ast.caseParams(node.parameters, paramsCasing)
+  const casedParams = caseParams(node.parameters, paramsCasing)
   const pathParams = casedParams.filter((p) => p.in === 'path')
   const queryParams = casedParams.filter((p) => p.in === 'query')
 
-  const queryGroupType = ast.resolveGroupType({ node, params: queryParams, group: 'query', resolver })
+  const queryGroupType = resolveGroupType({ node, params: queryParams, group: 'query', resolver })
 
   const bodyType = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const bodyRequired = node.requestBody?.required ?? false
@@ -158,7 +159,7 @@ export function buildQueryKeyParams(
 
   // Path params
   if (pathParams.length) {
-    const pathChildren = pathParams.map((p) => ({ name: p.name, type: ast.resolveParamType({ node, param: p, resolver }), optional: !p.required }))
+    const pathChildren = pathParams.map((p) => ({ name: p.name, type: resolveParamType({ node, param: p, resolver }), optional: !p.required }))
     if (pathParamsType === 'object') {
       params.push(ast.factory.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
     } else {
@@ -172,7 +173,7 @@ export function buildQueryKeyParams(
   }
 
   // Query params
-  params.push(...ast.buildGroupParam({ name: 'params', node, params: queryParams, groupType: queryGroupType, resolver, wrapType: (type) => type }))
+  params.push(...buildGroupParam({ name: 'params', node, params: queryParams, groupType: queryGroupType, resolver, wrapType: (type) => type }))
 
   return ast.factory.createFunctionParameters({ params })
 }

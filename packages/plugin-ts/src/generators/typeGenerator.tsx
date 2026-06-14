@@ -1,5 +1,6 @@
 import { resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
+import { caseParams } from '@kubb/ast/utils'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
@@ -80,7 +81,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const { enum: enumOptions, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
-    const params = ast.caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, paramsCasing)
 
     const meta = {
       file: resolver.resolveFile(

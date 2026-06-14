@@ -1,5 +1,6 @@
 import { Url } from '@internals/utils'
 import { ast, type ResolverFileParams } from '@kubb/core'
+import { caseParams } from '@kubb/ast/utils'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to
@@ -199,7 +200,7 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
 }
 
 export function getOperationParameters(node: ast.OperationNode, options: { paramsCasing?: 'camelcase' } = {}): OperationParameterGroups {
-  const params = ast.caseParams(node.parameters, options.paramsCasing)
+  const params = caseParams(node.parameters, options.paramsCasing)
 
   return {
     path: params.filter((param) => param.in === 'path'),

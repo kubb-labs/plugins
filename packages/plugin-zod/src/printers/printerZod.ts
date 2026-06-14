@@ -1,6 +1,7 @@
 import { buildList, buildObject, extractRefName, objectKey, stringify } from '@kubb/ast/utils'
 
 import { ast } from '@kubb/core'
+import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
@@ -89,7 +90,7 @@ function strictOneOfMember(member: string, node: ast.SchemaNode): string {
       return member
     }
 
-    const schema = ast.syncSchemaRef(node)
+    const schema = syncSchemaRef(node)
 
     if (schema.type === 'object' && (schema.additionalProperties === undefined || schema.additionalProperties === false)) {
       return `${member}.strict()`
@@ -224,13 +225,13 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         const entries = node.properties.map((prop) => {
           const { name: propName, schema } = prop
 
-          const meta = ast.syncSchemaRef(schema)
+          const meta = syncSchemaRef(schema)
 
           const isNullable = meta.nullable
           const isOptional = schema.optional
           const isNullish = schema.nullish
 
-          const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
+          const hasSelfRef = this.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
           // Inside a getter the getter itself defers evaluation, so suppress
           // z.lazy() wrapping on nested refs by temporarily clearing cyclicSchemas.
           // Save before clearing: this.options === options (same reference via definePrinter),
@@ -333,7 +334,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const meta = ast.syncSchemaRef(node)
+      const meta = syncSchemaRef(node)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed

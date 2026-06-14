@@ -1,6 +1,7 @@
 import { resolveContentTypeVariants } from '@internals/shared'
 import { extractRefName } from '@kubb/ast/utils'
 import type { Adapter } from '@kubb/core'
+import { caseParams } from '@kubb/ast/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -140,7 +141,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
 
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
 
-    const params = ast.caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, paramsCasing)
 
     const meta = {
       file: resolver.resolveFile(
@@ -334,7 +335,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const transformedOperations = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const params = ast.caseParams(node.parameters, paramsCasing)
+      const params = caseParams(node.parameters, paramsCasing)
 
       return {
         node,

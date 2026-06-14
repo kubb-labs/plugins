@@ -1,6 +1,7 @@
 import { jsStringEscape, stringify } from '@kubb/ast/utils'
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
+import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
 
 /**
@@ -11,7 +12,7 @@ import type { ResolverTs } from './types.ts'
 
  */
 export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string | undefined> {
-  const meta = ast.syncSchemaRef(schema)
+  const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
 
