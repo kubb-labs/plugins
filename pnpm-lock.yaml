@@ -750,6 +750,9 @@ importers:
 
   packages/plugin-cypress:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.58
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.58(@kubb/renderer-jsx@5.0.0-beta.58)
@@ -791,6 +794,9 @@ importers:
 
   packages/plugin-mcp:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.58
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.58(@kubb/renderer-jsx@5.0.0-beta.58)
@@ -816,6 +822,9 @@ importers:
 
   packages/plugin-msw:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.58
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.58(@kubb/renderer-jsx@5.0.0-beta.58)
@@ -882,6 +891,9 @@ importers:
 
   packages/plugin-swr:
     dependencies:
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.58
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.58(@kubb/renderer-jsx@5.0.0-beta.58)
