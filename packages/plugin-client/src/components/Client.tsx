@@ -8,7 +8,7 @@ import {
   resolveSuccessNames,
 } from '@internals/shared'
 import { isValidVarName, Url } from '@internals/utils'
-import { stringify } from '@kubb/ast/utils'
+import { createOperationParams, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -59,7 +59,7 @@ export function buildClientParamsNode({
   tsResolver,
   isConfigurable,
 }: GetParamsProps): ast.FunctionParametersNode {
-  return ast.factory.createOperationParams(node, {
+  return createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
