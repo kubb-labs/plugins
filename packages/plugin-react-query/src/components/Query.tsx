@@ -46,13 +46,10 @@ function buildQueryParamsNode(
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
-    type: ast.createParamsType({
-      variant: 'reference',
-      name: `{
+    type: `{
   query?: Partial<QueryObserverOptions<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
   client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
 }`,
-    }),
     default: '{}',
   })
 

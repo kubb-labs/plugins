@@ -23,7 +23,7 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
       params: [
         ast.createFunctionParameter({
           name: 'data',
-          type: ast.createParamsType({ variant: 'reference', name: typeName }),
+          type: typeName,
           optional: !hasResponseSchema(response),
         }),
       ],

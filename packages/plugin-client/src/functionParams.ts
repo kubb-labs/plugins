@@ -24,68 +24,67 @@ function isGroup(spec: ParamSpec): spec is ParamGroup {
   return 'children' in spec
 }
 
-function createType(type?: string) {
-  return type ? ast.createParamsType({ variant: 'reference', name: type }) : null
+function groupEntries(group: ParamGroup): Array<[string, ParamLeaf]> {
+  return Object.entries(group.children).filter(([, child]) => child != null) as Array<[string, ParamLeaf]>
+}
+
+/**
+ * Assembles a destructured group parameter from a binding pattern and an optional
+ * type literal. Built directly because `createFunctionParameter({ properties })`
+ * requires every member to carry a type, while these groups also hold untyped,
+ * value-only call entries.
+ */
+function createGroupParam(
+  elements: Array<{ name: string }>,
+  members: Array<{ name: string; type: string; optional?: boolean }>,
+  default_?: string,
+): ast.FunctionParameterNode {
+  return {
+    kind: 'FunctionParameter',
+    name: ast.createObjectBindingPattern({ elements }),
+    type: members.length ? ast.createTypeLiteral({ members }) : undefined,
+    default: default_,
+    optional: false,
+  }
 }
 
 function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParameterNode {
   if (spec.default !== undefined) {
-    return ast.createFunctionParameter({
-      name,
-      type: createType(spec.type) ?? undefined,
-      default: spec.default,
-      rest: spec.mode === 'inlineSpread',
-    })
+    return ast.createFunctionParameter({ name, type: spec.type, default: spec.default, rest: spec.mode === 'inlineSpread' })
   }
 
-  return ast.createFunctionParameter({
-    name,
-    type: createType(spec.type) ?? undefined,
-    optional: !!spec.optional,
-    rest: spec.mode === 'inlineSpread',
-  })
+  return ast.createFunctionParameter({ name, type: spec.type, optional: !!spec.optional, rest: spec.mode === 'inlineSpread' })
 }
 
-function createDeclarationParam(name: string, spec: ParamSpec): ast.FunctionParameterNode | ast.ParameterGroupNode {
+function createDeclarationParam(name: string, spec: ParamSpec): ast.FunctionParameterNode {
   if (isGroup(spec)) {
-    return ast.createParameterGroup({
-      inline: spec.mode === 'inlineSpread',
-      default: spec.default,
-      properties: Object.entries(spec.children)
-        .filter(([, child]) => child != null)
-        .map(([childName, child]) => createDeclarationLeaf(childName, child!)),
-    })
+    const entries = groupEntries(spec)
+    const elements = entries.map(([childName]) => ({ name: childName }))
+    const members = entries
+      .filter(([, child]) => child.type)
+      .map(([childName, child]) => ({ name: childName, type: child.type!, optional: !!child.optional || child.default !== undefined }))
+    return createGroupParam(elements, members, spec.default)
   }
 
   return createDeclarationLeaf(name, spec)
 }
 
-function createCallParam(name: string, spec: ParamSpec): ast.FunctionParameterNode | ast.ParameterGroupNode {
+function createCallParam(name: string, spec: ParamSpec): ast.FunctionParameterNode {
   if (isGroup(spec)) {
-    return ast.createParameterGroup({
-      inline: spec.mode === 'inlineSpread',
-      properties: Object.entries(spec.children)
-        .filter(([, child]) => child != null)
-        .map(([childName, child]) =>
-          ast.createFunctionParameter({
-            name:
-              child?.mode === 'inlineSpread'
-                ? spec.mode === 'inlineSpread'
-                  ? (child.value ?? childName)
-                  : `...${child.value ?? childName}`
-                : child?.value
-                  ? `${childName}: ${child.value}`
-                  : childName,
-            rest: spec.mode === 'inlineSpread' && child?.mode === 'inlineSpread',
-          }),
-        ),
-    })
+    const elements = groupEntries(spec).map(([childName, child]) => ({
+      name:
+        child.mode === 'inlineSpread'
+          ? spec.mode === 'inlineSpread'
+            ? (child.value ?? childName)
+            : `...${child.value ?? childName}`
+          : child.value
+            ? `${childName}: ${child.value}`
+            : childName,
+    }))
+    return createGroupParam(elements, [])
   }
 
-  return ast.createFunctionParameter({
-    name: spec.value ?? name,
-    rest: spec.mode === 'inlineSpread',
-  })
+  return ast.createFunctionParameter({ name: spec.value ?? name, rest: spec.mode === 'inlineSpread' })
 }
 
 /**

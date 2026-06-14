@@ -61,7 +61,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
       params: [
         ast.createFunctionParameter({
           name: dataParamName,
-          type: ast.createParamsType({ variant: 'reference', name: dataType }),
+          type: dataType,
           optional: true,
         }),
       ],

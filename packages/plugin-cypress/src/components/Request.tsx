@@ -39,7 +39,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
     extraParams: [
       ast.createFunctionParameter({
         name: 'options',
-        type: ast.createParamsType({ variant: 'reference', name: 'Partial<Cypress.RequestOptions>' }),
+        type: 'Partial<Cypress.RequestOptions>',
         default: '{}',
       }),
     ],

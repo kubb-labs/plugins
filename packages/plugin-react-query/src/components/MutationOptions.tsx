@@ -20,17 +20,14 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
-const keysPrinter = functionPrinter({ mode: 'keys' })
+const keysPrinter = functionPrinter({ mode: 'call' })
 
 export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
   return ast.createFunctionParameters({
     params: [
       ast.createFunctionParameter({
         name: 'config',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: buildRequestConfigType(node, resolver),
-        }),
+        type: buildRequestConfigType(node, resolver),
         default: '{}',
       }),
     ],
@@ -76,10 +73,7 @@ export function MutationOptions({
     extraParams: [
       ast.createFunctionParameter({
         name: 'config',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: buildRequestConfigType(node, tsResolver),
-        }),
+        type: buildRequestConfigType(node, tsResolver),
         default: '{}',
       }),
     ],
