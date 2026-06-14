@@ -22,7 +22,10 @@ export function wrapWithMaybeRefOrGetter(paramsNode: ast.FunctionParametersNode,
     if (typeof param.name !== 'string') {
       const type = param.type
       if (type && typeof type !== 'string' && type.kind === 'TypeLiteral') {
-        return { ...param, type: ast.createTypeLiteral({ members: type.members.map((member) => ({ ...member, type: `MaybeRefOrGetter<${renderType(member.type)}>` })) }) }
+        return {
+          ...param,
+          type: ast.createTypeLiteral({ members: type.members.map((member) => ({ ...member, type: `MaybeRefOrGetter<${renderType(member.type)}>` })) }),
+        }
       }
       return param
     }

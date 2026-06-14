@@ -84,7 +84,10 @@ function sortParams(params: ReadonlyArray<ast.FunctionParameterNode>): Array<ast
  * Orders a destructured group's binding elements and type members together,
  * required fields first, matching how grouped children were sorted before.
  */
-function sortedGroupMembers(name: ast.ObjectBindingPatternNode, type: ast.TypeExpression | undefined): Array<{ name: string; type?: ast.TypeExpression; optional?: boolean }> {
+function sortedGroupMembers(
+  name: ast.ObjectBindingPatternNode,
+  type: ast.TypeExpression | undefined,
+): Array<{ name: string; type?: ast.TypeExpression; optional?: boolean }> {
   const members = type && typeof type !== 'string' && type.kind === 'TypeLiteral' ? type.members : []
   const memberRank = (optional?: boolean) => (optional ? PARAM_RANK.optional : PARAM_RANK.required)
   return name.elements

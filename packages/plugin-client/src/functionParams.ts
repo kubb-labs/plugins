@@ -34,7 +34,11 @@ function groupEntries(group: ParamGroup): Array<[string, ParamLeaf]> {
  * requires every member to carry a type, while these groups also hold untyped,
  * value-only call entries.
  */
-function createGroupParam(elements: Array<{ name: string }>, members: Array<{ name: string; type: string; optional?: boolean }>, default_?: string): ast.FunctionParameterNode {
+function createGroupParam(
+  elements: Array<{ name: string }>,
+  members: Array<{ name: string; type: string; optional?: boolean }>,
+  default_?: string,
+): ast.FunctionParameterNode {
   return {
     kind: 'FunctionParameter',
     name: ast.createObjectBindingPattern({ elements }),

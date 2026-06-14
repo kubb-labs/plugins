@@ -71,7 +71,10 @@ describe('functionPrinter in declaration mode', () => {
 
   it('always places rest parameters last', () => {
     const sig = ast.createFunctionParameters({
-      params: [ast.createFunctionParameter({ name: 'args', type: 'string[]', rest: true }), ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false })],
+      params: [
+        ast.createFunctionParameter({ name: 'args', type: 'string[]', rest: true }),
+        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+      ],
     })
     expect(printer.print(sig)).toBe('petId: string, ...args: string[]')
   })
@@ -151,7 +154,10 @@ describe('functionPrinter in call mode', () => {
 
   it('prints simple parameter names only', () => {
     const sig = ast.createFunctionParameters({
-      params: [ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }), ast.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' })],
+      params: [
+        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+        ast.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' }),
+      ],
     })
     expect(printer.print(sig)).toBe('petId, config')
   })
@@ -209,7 +215,10 @@ describe('defineFunctionPrinter', () => {
     }))
 
     const sig = ast.createFunctionParameters({
-      params: [ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }), ast.createFunctionParameter({ name: 'config', type: 'Config', optional: false })],
+      params: [
+        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+        ast.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
+      ],
     })
 
     const printer = upperPrinter({ mode: 'declaration' })
