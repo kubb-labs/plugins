@@ -42,7 +42,7 @@ function buildInfiniteQueryParamsNode(
   const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
-  const optionsParam = ast.createFunctionParameter({
+  const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
@@ -51,7 +51,7 @@ function buildInfiniteQueryParamsNode(
     default: '{}',
   })
 
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

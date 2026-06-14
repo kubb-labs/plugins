@@ -51,13 +51,19 @@ const mockedZodPlugin = createMockedPlugin<PluginZod>({
 
 describe('serverGenerator — Operations', () => {
   const nodes: Array<ast.OperationNode> = [
-    ast.createOperation({
+    ast.factory.createOperation({
       operationId: 'showPetById',
       method: 'GET',
       path: '/pets/{petId}',
       tags: ['pets'],
-      parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-      responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Expected response' })],
+      parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+      responses: [
+        ast.factory.createResponse({
+          statusCode: '200',
+          schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+          description: 'Expected response',
+        }),
+      ],
     }),
   ]
 

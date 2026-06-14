@@ -8,7 +8,7 @@ import { defineFunctionPrinter, functionPrinter, renderType } from './functionPr
  * express (a reference type, or an untyped binding).
  */
 function group(elements: Array<{ name: string }>, type?: ast.TypeExpression, default_?: string): ast.FunctionParameterNode {
-  return { kind: 'FunctionParameter', name: ast.createObjectBindingPattern({ elements }), type, default: default_, optional: false }
+  return { kind: 'FunctionParameter', name: ast.factory.createObjectBindingPattern({ elements }), type, default: default_, optional: false }
 }
 
 describe('renderType', () => {
@@ -17,11 +17,11 @@ describe('renderType', () => {
   })
 
   it('renders an indexed access type', () => {
-    expect(renderType(ast.createIndexedAccessType({ objectType: 'GetPetPathParams', indexType: 'petId' }))).toBe("GetPetPathParams['petId']")
+    expect(renderType(ast.factory.createIndexedAccessType({ objectType: 'GetPetPathParams', indexType: 'petId' }))).toBe("GetPetPathParams['petId']")
   })
 
   it('renders a type literal with optional members', () => {
-    const type = ast.createTypeLiteral({
+    const type = ast.factory.createTypeLiteral({
       members: [
         { name: 'petId', type: 'string', optional: false },
         { name: 'name', type: 'string', optional: true },
@@ -39,50 +39,52 @@ describe('functionPrinter in declaration mode', () => {
   const printer = functionPrinter({ mode: 'declaration' })
 
   it('prints required typed parameters as `name: type`', () => {
-    const sig = ast.createFunctionParameters({ params: [ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false })] })
+    const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false })] })
     expect(printer.print(sig)).toBe('petId: string')
   })
 
   it('prints optional typed parameters as `name?: type`', () => {
-    const sig = ast.createFunctionParameters({ params: [ast.createFunctionParameter({ name: 'params', type: 'QueryParams', optional: true })] })
+    const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'params', type: 'QueryParams', optional: true })] })
     expect(printer.print(sig)).toBe('params?: QueryParams')
   })
 
   it('prints defaulted typed parameters as `name: type = default`', () => {
-    const sig = ast.createFunctionParameters({ params: [ast.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' })] })
+    const sig = ast.factory.createFunctionParameters({
+      params: [ast.factory.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' })],
+    })
     expect(printer.print(sig)).toBe('config: RequestConfig = {}')
   })
 
   it('prints rest parameters with spread syntax', () => {
-    const sig = ast.createFunctionParameters({ params: [ast.createFunctionParameter({ name: 'args', type: 'string[]', rest: true })] })
+    const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'args', type: 'string[]', rest: true })] })
     expect(printer.print(sig)).toBe('...args: string[]')
   })
 
   it('orders parameters as required, optional, then defaulted', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({ name: 'config', type: 'Config', default: '{}' }),
-        ast.createFunctionParameter({ name: 'params', type: 'Params', optional: true }),
-        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+        ast.factory.createFunctionParameter({ name: 'config', type: 'Config', default: '{}' }),
+        ast.factory.createFunctionParameter({ name: 'params', type: 'Params', optional: true }),
+        ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
       ],
     })
     expect(printer.print(sig)).toBe('petId: string, params?: Params, config: Config = {}')
   })
 
   it('always places rest parameters last', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({ name: 'args', type: 'string[]', rest: true }),
-        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+        ast.factory.createFunctionParameter({ name: 'args', type: 'string[]', rest: true }),
+        ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
       ],
     })
     expect(printer.print(sig)).toBe('petId: string, ...args: string[]')
   })
 
   it('prints a destructured group with an inferred inline object type', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           properties: [
             { name: 'id', type: 'string', optional: false },
             { name: 'name', type: 'string', optional: true },
@@ -95,9 +97,9 @@ describe('functionPrinter in declaration mode', () => {
   })
 
   it('orders required group members before optional ones', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           properties: [
             { name: 'name', type: 'string', optional: true },
             { name: 'id', type: 'string', optional: false },
@@ -109,9 +111,9 @@ describe('functionPrinter in declaration mode', () => {
   })
 
   it('appends `= {}` when every group member is optional', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           properties: [
             { name: 'a', type: 'string', optional: true },
             { name: 'b', type: 'string', optional: true },
@@ -123,28 +125,28 @@ describe('functionPrinter in declaration mode', () => {
   })
 
   it('prints a group with an explicit reference type', () => {
-    const sig = ast.createFunctionParameters({ params: [group([{ name: 'data' }], 'PetData', '{}')] })
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'data' }], 'PetData', '{}')] })
     expect(printer.print(sig)).toBe('{ data }: PetData = {}')
   })
 
   it('prints mixed group and simple parameters in a stable order', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           properties: [
             { name: 'id', type: 'string', optional: false },
             { name: 'name', type: 'string', optional: true },
           ],
           default: '{}',
         }),
-        ast.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' }),
+        ast.factory.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' }),
       ],
     })
     expect(printer.print(sig)).toBe('{ id, name }: { id: string; name?: string } = {}, config: RequestConfig = {}')
   })
 
   it('prints default-only parameters without a type annotation', () => {
-    const sig = ast.createFunctionParameters({ params: [ast.createFunctionParameter({ name: 'config', default: '{}' })] })
+    const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'config', default: '{}' })] })
     expect(printer.print(sig)).toBe('config = {}')
   })
 })
@@ -153,22 +155,22 @@ describe('functionPrinter in call mode', () => {
   const printer = functionPrinter({ mode: 'call' })
 
   it('prints simple parameter names only', () => {
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
-        ast.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' }),
+        ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+        ast.factory.createFunctionParameter({ name: 'config', type: 'RequestConfig', default: '{}' }),
       ],
     })
     expect(printer.print(sig)).toBe('petId, config')
   })
 
   it('prints a destructured group as `{ key1, key2 }`', () => {
-    const sig = ast.createFunctionParameters({ params: [group([{ name: 'method' }, { name: 'url' }])] })
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'method' }, { name: 'url' }])] })
     expect(printer.print(sig)).toBe('{ method, url }')
   })
 
   it('keeps spread syntax for rest parameters', () => {
-    const sig = ast.createFunctionParameters({ params: [ast.createFunctionParameter({ name: 'args', rest: true })] })
+    const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'args', rest: true })] })
     expect(printer.print(sig)).toBe('...args')
   })
 })
@@ -178,18 +180,18 @@ describe('functionPrinter transform options', () => {
     {
       label: 'transformName',
       options: { mode: 'declaration' as const, transformName: (n: string) => n.toUpperCase() },
-      param: ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+      param: ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
       expected: 'PETID: string',
     },
     {
       label: 'transformType',
       options: { mode: 'declaration' as const, transformType: (t: string) => `Partial<${t}>` },
-      param: ast.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
+      param: ast.factory.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
       expected: 'config: Partial<Config>',
     },
   ])('applies $label in declaration mode', ({ options, param, expected }) => {
     const printer = functionPrinter(options)
-    const sig = ast.createFunctionParameters({ params: [param] })
+    const sig = ast.factory.createFunctionParameters({ params: [param] })
     expect(printer.print(sig)).toBe(expected)
   })
 })
@@ -214,10 +216,10 @@ describe('defineFunctionPrinter', () => {
       },
     }))
 
-    const sig = ast.createFunctionParameters({
+    const sig = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
-        ast.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
+        ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
+        ast.factory.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
       ],
     })
 

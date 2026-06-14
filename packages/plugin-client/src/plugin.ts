@@ -130,14 +130,14 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
             sources: [
-              ast.createSource({
+              ast.factory.createSource({
                 name: 'client',
-                nodes: isInlineSource ? [ast.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
+                nodes: isInlineSource ? [ast.factory.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
                 isExportable: true,
                 isIndexable: true,
               }),
             ],
-            exports: !isInlineSource && resolvedImportPath ? [ast.createExport({ path: resolvedImportPath })] : [],
+            exports: !isInlineSource && resolvedImportPath ? [ast.factory.createExport({ path: resolvedImportPath })] : [],
           })
         }
 
@@ -145,9 +145,9 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           baseName: 'config.ts',
           path: path.resolve(root, '.kubb/config.ts'),
           sources: [
-            ast.createSource({
+            ast.factory.createSource({
               name: 'config',
-              nodes: [ast.createText(configSource)],
+              nodes: [ast.factory.createText(configSource)],
               isExportable: false,
               isIndexable: false,
             }),

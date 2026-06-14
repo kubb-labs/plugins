@@ -41,8 +41,8 @@ function createGroupParam(
 ): ast.FunctionParameterNode {
   return {
     kind: 'FunctionParameter',
-    name: ast.createObjectBindingPattern({ elements }),
-    type: members.length ? ast.createTypeLiteral({ members }) : undefined,
+    name: ast.factory.createObjectBindingPattern({ elements }),
+    type: members.length ? ast.factory.createTypeLiteral({ members }) : undefined,
     default: default_,
     optional: false,
   }
@@ -50,10 +50,10 @@ function createGroupParam(
 
 function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParameterNode {
   if (spec.default !== undefined) {
-    return ast.createFunctionParameter({ name, type: spec.type, default: spec.default, rest: spec.mode === 'inlineSpread' })
+    return ast.factory.createFunctionParameter({ name, type: spec.type, default: spec.default, rest: spec.mode === 'inlineSpread' })
   }
 
-  return ast.createFunctionParameter({ name, type: spec.type, optional: !!spec.optional, rest: spec.mode === 'inlineSpread' })
+  return ast.factory.createFunctionParameter({ name, type: spec.type, optional: !!spec.optional, rest: spec.mode === 'inlineSpread' })
 }
 
 function createDeclarationParam(name: string, spec: ParamSpec): ast.FunctionParameterNode {
@@ -84,7 +84,7 @@ function createCallParam(name: string, spec: ParamSpec): ast.FunctionParameterNo
     return createGroupParam(elements, [])
   }
 
-  return ast.createFunctionParameter({ name: spec.value ?? name, rest: spec.mode === 'inlineSpread' })
+  return ast.factory.createFunctionParameter({ name: spec.value ?? name, rest: spec.mode === 'inlineSpread' })
 }
 
 /**
@@ -98,7 +98,7 @@ export function createFunctionParams(params: Record<string, ParamSpec | null | u
     toConstructor() {
       return (
         declarationPrinter.print(
-          ast.createFunctionParameters({
+          ast.factory.createFunctionParameters({
             params: entries.map(([name, spec]) => createDeclarationParam(name, spec)),
           }),
         ) ?? ''
@@ -107,7 +107,7 @@ export function createFunctionParams(params: Record<string, ParamSpec | null | u
     toCall() {
       return (
         callPrinter.print(
-          ast.createFunctionParameters({
+          ast.factory.createFunctionParameters({
             params: entries.map(([name, spec]) => createCallParam(name, spec)),
           }),
         ) ?? ''

@@ -57,9 +57,9 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   if (!useGenericOverride) {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
-    const params = ast.createFunctionParameters({
+    const params = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           name: dataParamName,
           type: dataType,
           optional: true,

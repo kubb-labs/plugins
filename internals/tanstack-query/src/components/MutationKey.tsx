@@ -21,7 +21,7 @@ export const mutationKeyTransformer: Transformer = ({ node }) => {
 }
 
 export function MutationKey({ name, paramsCasing, node, transformer }: Props): KubbReactNode {
-  const paramsNode = ast.createFunctionParameters({ params: [] })
+  const paramsNode = ast.factory.createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? mutationKeyTransformer)({ node, casing: paramsCasing })
 

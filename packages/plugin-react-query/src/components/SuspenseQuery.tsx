@@ -43,7 +43,7 @@ function buildSuspenseQueryParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const optionsParam = ast.createFunctionParameter({
+  const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<UseSuspenseQueryOptions<${[TData, TError, 'TData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
@@ -52,7 +52,7 @@ function buildSuspenseQueryParamsNode(
     default: '{}',
   })
 
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

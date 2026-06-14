@@ -56,52 +56,70 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   resolver: resolverTs,
 })
 
-const findByTagsNode = ast.createOperation({
+const findByTagsNode = ast.factory.createOperation({
   operationId: 'findPetsByTags',
   method: 'GET',
   path: '/pet/findByTags',
   tags: ['pet'],
   parameters: [
-    ast.createParameter({
+    ast.factory.createParameter({
       name: 'tags',
       in: 'query',
-      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
       required: true,
     }),
-    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
   ],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const updatePetWithFormNode = ast.createOperation({
+const updatePetWithFormNode = ast.factory.createOperation({
   operationId: 'updatePetWithForm',
   method: 'POST',
   path: '/pet/{petId}',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const deletePetNode = ast.createOperation({
+const deletePetNode = ast.factory.createOperation({
   operationId: 'deletePet',
   method: 'DELETE',
   path: '/pet/{petId}',
   tags: ['pet'],
   parameters: [
-    ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
-    ast.createParameter({ name: 'api_key', in: 'header', schema: ast.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'api_key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
   ],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'void' }), description: 'successful operation' })],
+  responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'void' }), description: 'successful operation' })],
 })
 
-const createPetNode = ast.createOperation({
+const createPetNode = ast.factory.createOperation({
   operationId: 'createPet',
   method: 'POST',
   path: '/pet',
   tags: ['pet'],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
 describe('mutationGenerator operation', () => {

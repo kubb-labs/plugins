@@ -237,7 +237,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
           // so reading options.cyclicSchemas after mutation would return undefined.
           const savedCyclicSchemas = this.options.cyclicSchemas
           if (hasSelfRef) this.options.cyclicSchemas = undefined
-          const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
+          const baseOutput = this.transform(schema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
           if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
 
           const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
@@ -270,7 +270,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
             const catchallType = this.transform(node.additionalProperties)
             return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
           }
-          if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.createSchema({ type: 'unknown' }))})`
+          if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
           if (node.additionalProperties === false) return `${objectBase}.strict()`
           return objectBase
         })()
@@ -279,7 +279,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
       },
       array(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
-        const inner = items.join(', ') || this.transform(ast.createSchema({ type: 'unknown' }))!
+        const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
         const base = `z.array(${inner})${lengthConstraints(node)}`
 
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base

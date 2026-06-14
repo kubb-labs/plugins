@@ -42,7 +42,7 @@ function buildQueryParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const optionsParam = ast.createFunctionParameter({
+  const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: SWRConfiguration<${[TData, TError].join(', ')}>,
@@ -53,7 +53,7 @@ function buildQueryParamsNode(
     default: '{}',
   })
 
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

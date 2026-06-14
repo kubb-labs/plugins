@@ -73,9 +73,9 @@ export const pluginRedoc = definePlugin<PluginRedoc>((options) => {
           baseName: 'docs.html',
           path: path.resolve(root, output.path || './docs.html'),
           sources: [
-            ast.createSource({
+            ast.factory.createSource({
               name: 'docs.html',
-              nodes: [ast.createText(pageHTML)],
+              nodes: [ast.factory.createText(pageHTML)],
             }),
           ],
         })

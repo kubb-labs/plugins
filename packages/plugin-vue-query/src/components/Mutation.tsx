@@ -30,7 +30,7 @@ function createMutationArgParams(
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
     paramsCasing: options.paramsCasing,
@@ -59,9 +59,9 @@ function buildMutationParamsNode(
   const wrappedParamsNode = wrapWithMaybeRefOrGetter(mutationArgParamsNode)
   const TRequestWrapped = wrappedParamsNode.params.length > 0 ? (declarationPrinter.print(wrappedParamsNode) ?? '') : ''
 
-  return ast.createFunctionParameters({
+  return ast.factory.createFunctionParameters({
     params: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'options',
         type: `{
   mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'undefined', 'TContext'].join(', ')}> & { client?: QueryClient },
@@ -101,16 +101,16 @@ export function Mutation({
 
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'undefined', 'TContext'].join(', ')
 
-  const mutationKeyParamsNode = ast.createFunctionParameters({ params: [] })
+  const mutationKeyParamsNode = ast.factory.createFunctionParameters({ params: [] })
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
 
-  const clientCallParamsNode = ast.createOperationParams(node, {
+  const clientCallParamsNode = ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'config',
         type: buildRequestConfigType(node, tsResolver),
         default: '{}',

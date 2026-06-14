@@ -12,14 +12,14 @@ export const clientOperationGenerator = defineGenerator<PluginClient>({
     const file = resolver.resolveFile({ name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path }, { root, output })
 
     return [
-      ast.createFile({
+      ast.factory.createFile({
         baseName: file.baseName,
         path: file.path,
         meta: file.meta,
         sources: [
-          ast.createSource({
+          ast.factory.createSource({
             nodes: [
-              ast.createText(`export const ${node.operationId} = {
+              ast.factory.createText(`export const ${node.operationId} = {
   method: '${node.method}',
   url: '${toURL(node.path)}'
 }`),

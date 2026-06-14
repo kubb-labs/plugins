@@ -5,6 +5,7 @@ This directory contains performance benchmarks for Kubb plugin generation.
 ## Overview
 
 The benchmarks test the performance of generating code from OpenAPI specifications using different plugin configurations. These help:
+
 - Track performance regressions over time
 - Identify optimization opportunities
 - Compare performance of different plugin combinations
@@ -24,24 +25,30 @@ pnpm vitest bench --config ./configs/vitest.bench.config.ts tests/performance/ma
 ## Benchmark Scenarios
 
 ### Single Plugin Generation (plugin-ts)
+
 Tests performance of TypeScript type generation from an OpenAPI specification.
 
 **Plugins used:**
+
 - `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 
 ### Multiple Plugins Generation (plugin-ts + plugin-client)
+
 Tests performance with multiple code generators running simultaneously.
 
 **Plugins used:**
+
 - `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 - `plugin-client` - API client generator
 
 ### Comprehensive Plugin Suite
+
 Tests performance with a full suite of generators including validation and mocking.
 
 **Plugins used:**
+
 - `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 - `plugin-client` - API client generator
@@ -51,6 +58,7 @@ Tests performance with a full suite of generators including validation and mocki
 ## Understanding Results
 
 Benchmark results show:
+
 - **hz**: Operations per second (higher is better)
 - **min/max/mean**: Execution time in milliseconds (lower is better)
 - **p75/p99/p995/p999**: Percentile timings
@@ -58,6 +66,7 @@ Benchmark results show:
 - **samples**: Number of benchmark iterations
 
 Example output:
+
 ```
 ✓ test/performance/main.bench.ts
     name                                                          hz      min     max     mean      p75     p99
@@ -80,12 +89,16 @@ import { build } from '@kubb/core'
 // ... other imports
 
 describe('My Benchmark Suite', () => {
-  bench('my benchmark', async () => {
-    // Your code to benchmark
-    await build({ config, events })
-  }, {
-    time: 10000, // Run for 10 seconds
-  })
+  bench(
+    'my benchmark',
+    async () => {
+      // Your code to benchmark
+      await build({ config, events })
+    },
+    {
+      time: 10000, // Run for 10 seconds
+    },
+  )
 })
 ```
 

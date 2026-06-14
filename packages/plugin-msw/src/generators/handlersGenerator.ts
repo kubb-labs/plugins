@@ -22,13 +22,13 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         { name: resolver.resolveName(node.operationId), extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
         { root, output, group: group ?? undefined },
       )
-      return ast.createImport({ name: [operationName], root: file.path, path: operationFile.path })
+      return ast.factory.createImport({ name: [operationName], root: file.path, path: operationFile.path })
     })
 
     const handlers = nodes.map((node) => `${resolver.resolveHandlerName(node)}()`)
 
     return [
-      ast.createFile({
+      ast.factory.createFile({
         baseName: file.baseName,
         path: file.path,
         meta: file.meta,
@@ -36,11 +36,11 @@ export const handlersGenerator = defineGenerator<PluginMsw>({
         footer: resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
         imports,
         sources: [
-          ast.createSource({
+          ast.factory.createSource({
             name: handlersName,
             isIndexable: true,
             isExportable: true,
-            nodes: [ast.createText(`export const ${handlersName} = ${JSON.stringify(handlers).replaceAll('"', '')} as const`)],
+            nodes: [ast.factory.createText(`export const ${handlersName} = ${JSON.stringify(handlers).replaceAll('"', '')} as const`)],
           }),
         ],
       }),

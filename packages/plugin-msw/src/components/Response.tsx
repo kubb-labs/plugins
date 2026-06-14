@@ -19,9 +19,9 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
   const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
 
   const params = declarationPrinter.print(
-    ast.createFunctionParameters({
+    ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           name: 'data',
           type: typeName,
           optional: !hasResponseSchema(response),

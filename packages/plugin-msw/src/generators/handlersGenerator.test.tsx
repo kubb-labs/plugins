@@ -31,34 +31,34 @@ const defaultOptions: PluginMsw['resolvedOptions'] = {
 }
 
 const operationNodes: Array<ast.OperationNode> = [
-  ast.createOperation({
+  ast.factory.createOperation({
     operationId: 'listPets',
     method: 'GET',
     path: '/pets',
     tags: ['pets'],
     responses: [
-      ast.createResponse({
+      ast.factory.createResponse({
         statusCode: '200',
         description: 'ok',
-        schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'object', properties: [] })] }),
+        schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'object', properties: [] })] }),
       }),
     ],
   }),
-  ast.createOperation({
+  ast.factory.createOperation({
     operationId: 'createPets',
     method: 'POST',
     path: '/pets',
     tags: ['pets'],
-    requestBody: { required: true, content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-    responses: [ast.createResponse({ statusCode: '201', description: 'created', schema: ast.createSchema({ type: 'void' }) })],
+    requestBody: { required: true, content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+    responses: [ast.factory.createResponse({ statusCode: '201', description: 'created', schema: ast.factory.createSchema({ type: 'void' }) })],
   }),
-  ast.createOperation({
+  ast.factory.createOperation({
     operationId: 'showPetById',
     method: 'GET',
     path: '/pets/{petId}',
     tags: ['pets'],
-    parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-    responses: [ast.createResponse({ statusCode: '200', description: 'ok', schema: ast.createSchema({ type: 'object', properties: [] }) })],
+    parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+    responses: [ast.factory.createResponse({ statusCode: '200', description: 'ok', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
   }),
 ]
 

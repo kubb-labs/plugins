@@ -141,9 +141,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
-      const unionSchema = ast.createSchema({
+      const unionSchema = ast.factory.createSchema({
         type: 'union',
-        members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })),
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
       })
       return (
         <>

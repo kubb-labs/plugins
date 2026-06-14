@@ -171,9 +171,9 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
             sources: [
-              ast.createSource({
+              ast.factory.createSource({
                 name: 'client',
-                nodes: [ast.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
+                nodes: [ast.factory.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
                 isExportable: true,
                 isIndexable: true,
               }),
@@ -186,9 +186,9 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
             baseName: 'config.ts',
             path: path.resolve(root, '.kubb/config.ts'),
             sources: [
-              ast.createSource({
+              ast.factory.createSource({
                 name: 'config',
-                nodes: [ast.createText(configSource)],
+                nodes: [ast.factory.createText(configSource)],
                 isExportable: false,
                 isIndexable: false,
               }),

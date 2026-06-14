@@ -12,7 +12,7 @@ export type FunctionNodeByType = {
 const kindToHandlerKey = {
   FunctionParameter: 'functionParameter',
   FunctionParameters: 'functionParameters',
-} satisfies Partial<Record<string, ast.FunctionNodeType>>
+} satisfies Partial<Record<string, ast.FunctionParamKind>>
 
 /**
  * Renders a {@link ast.TypeExpression} to its TypeScript source.
@@ -124,7 +124,7 @@ function renderGroupType(
  * Uses `createPrinterFactory` and dispatches handlers by `node.kind`
  * (for function nodes) rather than by `node.type` (for schema nodes).
  */
-export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionNodeType, FunctionNodeByType>(
+export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionParamKind, FunctionNodeByType>(
   (node) => kindToHandlerKey[node.kind as keyof typeof kindToHandlerKey],
 )
 

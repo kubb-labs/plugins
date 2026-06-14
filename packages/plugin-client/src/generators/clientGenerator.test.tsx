@@ -53,65 +53,89 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
 })
 
 // Shared operation nodes
-const findByTagsNode = ast.createOperation({
+const findByTagsNode = ast.factory.createOperation({
   operationId: 'findPetsByTags',
   method: 'GET',
   path: '/pet/findByTags',
   tags: ['pet'],
   parameters: [
-    ast.createParameter({
+    ast.factory.createParameter({
       name: 'tags',
       in: 'query',
-      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
       required: true,
     }),
-    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
   ],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const updatePetByIdNode = ast.createOperation({
+const updatePetByIdNode = ast.factory.createOperation({
   operationId: 'updatePetWithForm',
   method: 'POST',
   path: '/pet/{petId}',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const deletePetNode = ast.createOperation({
+const deletePetNode = ast.factory.createOperation({
   operationId: 'deletePet',
   method: 'DELETE',
   path: '/pet/{petId}',
   tags: ['pet'],
   parameters: [
-    ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
-    ast.createParameter({ name: 'api_key', in: 'header', schema: ast.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'api_key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
   ],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'void' }), description: 'successful operation' })],
+  responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'void' }), description: 'successful operation' })],
 })
 
-const uploadFileNode = ast.createOperation({
+const uploadFileNode = ast.factory.createOperation({
   operationId: 'uploadFile',
   method: 'POST',
   path: '/pet/{petId}/uploadImage',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  requestBody: { content: [{ contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const findByStatusNode = ast.createOperation({
+const findByStatusNode = ast.factory.createOperation({
   operationId: 'findPetsByStatus',
   method: 'GET',
   path: '/pet/findByStatus',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) })],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const requiredOneOfRequestBodyNode = ast.createOperation({
+const requiredOneOfRequestBodyNode = ast.factory.createOperation({
   operationId: 'createOrder',
   method: 'POST',
   path: '/orders',
@@ -121,82 +145,109 @@ const requiredOneOfRequestBodyNode = ast.createOperation({
     content: [
       {
         contentType: 'application/json',
-        schema: ast.createSchema({ type: 'union', schemas: [ast.createSchema({ type: 'object', properties: [] }), ast.createSchema({ type: 'string' })] }),
+        schema: ast.factory.createSchema({
+          type: 'union',
+          schemas: [ast.factory.createSchema({ type: 'object', properties: [] }), ast.factory.createSchema({ type: 'string' })],
+        }),
       },
     ],
   },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const multiContentTypeNode = ast.createOperation({
+const multiContentTypeNode = ast.factory.createOperation({
   operationId: 'uploadFile',
   method: 'POST',
   path: '/pet/{petId}/uploadImage',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
   requestBody: {
     content: [
       {
         contentType: 'application/json',
-        schema: ast.createSchema({
+        schema: ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) })],
+          properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
       },
       {
         contentType: 'multipart/form-data',
-        schema: ast.createSchema({
+        schema: ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'file', required: true, schema: ast.createSchema({ type: 'string' }) })],
+          properties: [ast.factory.createProperty({ name: 'file', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
       },
     ],
   },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const dashedPathParamsNode = ast.createOperation({
+const dashedPathParamsNode = ast.factory.createOperation({
   operationId: 'getOrganization',
   method: 'GET',
   path: '/organizations/{organization-id}',
   tags: ['organizations'],
-  parameters: [ast.createParameter({ name: 'organization-id', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'organization-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const underscoredPathParamsNode = ast.createOperation({
+const underscoredPathParamsNode = ast.factory.createOperation({
   operationId: 'getItem',
   method: 'GET',
   path: '/v1/items/{item_id}',
   tags: ['items'],
-  parameters: [ast.createParameter({ name: 'item_id', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'item_id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const multiStatusNode = ast.createOperation({
+const multiStatusNode = ast.factory.createOperation({
   operationId: 'createPet',
   method: 'POST',
   path: '/pet',
   tags: ['pet'],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
   responses: [
-    ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Pet created' }),
-    ast.createResponse({ statusCode: '405', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
+    ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Pet created' }),
+    ast.factory.createResponse({ statusCode: '405', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
   ],
 })
 
-const downloadFileNode = ast.createOperation({
+const downloadFileNode = ast.factory.createOperation({
   operationId: 'downloadFile',
   method: 'GET',
   path: '/files/{fileId}',
   tags: ['files'],
-  parameters: [ast.createParameter({ name: 'fileId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  parameters: [ast.factory.createParameter({ name: 'fileId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
   responses: [
-    ast.createResponse({
+    ast.factory.createResponse({
       statusCode: '200',
       description: 'The file',
-      schema: ast.createSchema({ type: 'string' }),
-      content: [{ contentType: 'application/octet-stream', schema: ast.createSchema({ type: 'string' }) }],
+      schema: ast.factory.createSchema({ type: 'string' }),
+      content: [{ contentType: 'application/octet-stream', schema: ast.factory.createSchema({ type: 'string' }) }],
     }),
   ],
 })

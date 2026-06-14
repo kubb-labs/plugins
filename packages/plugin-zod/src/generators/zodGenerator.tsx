@@ -206,9 +206,9 @@ export const zodGenerator = defineGenerator<PluginZod>({
       direction?: 'input' | 'output',
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
-      const unionSchema = ast.createSchema({
+      const unionSchema = ast.factory.createSchema({
         type: 'union',
-        members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })),
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
       })
       return (
         <>
@@ -268,8 +268,10 @@ export const zodGenerator = defineGenerator<PluginZod>({
               return null
             }
 
-            const members = responsesWithSchema.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }))
-            const unionNode = members.length === 1 ? members[0]! : ast.createSchema({ type: 'union', members })
+            const members = responsesWithSchema.map((res) =>
+              ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+            )
+            const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
 
             return renderSchemaEntry({
               schema: unionNode,

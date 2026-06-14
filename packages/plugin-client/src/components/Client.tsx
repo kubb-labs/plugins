@@ -59,7 +59,7 @@ export function buildClientParamsNode({
   tsResolver,
   isConfigurable,
 }: GetParamsProps): ast.FunctionParametersNode {
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
@@ -67,7 +67,7 @@ export function buildClientParamsNode({
     extraParams: [
       ...(isConfigurable
         ? [
-            ast.createFunctionParameter({
+            ast.factory.createFunctionParameter({
               name: 'config',
               type: buildRequestConfigType(node, tsResolver),
               default: '{}',

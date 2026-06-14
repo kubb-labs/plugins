@@ -46,7 +46,7 @@ function buildInfiniteQueryParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const optionsParam = ast.createFunctionParameter({
+  const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<UseInfiniteQueryOptions<${[TData, TError, 'TQueryData', 'TQueryKey', 'TQueryData'].join(', ')}>> & { client?: QueryClient },
@@ -55,7 +55,7 @@ function buildInfiniteQueryParamsNode(
     default: '{}',
   })
 
-  const baseParams = ast.createOperationParams(node, {
+  const baseParams = ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

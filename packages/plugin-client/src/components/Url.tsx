@@ -38,7 +38,7 @@ export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, n
     requestBody: undefined,
   }
 
-  return ast.createOperationParams(urlNode, {
+  return ast.factory.createOperationParams(urlNode, {
     paramsType: paramsType === 'object' ? 'object' : 'inline',
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

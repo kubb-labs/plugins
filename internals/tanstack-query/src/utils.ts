@@ -25,13 +25,13 @@ export function buildQueryOptionsParams(
   const { paramsType, paramsCasing, pathParamsType, resolver } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
 
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver,
     extraParams: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'config',
         type: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
         default: '{}',
@@ -160,21 +160,21 @@ export function buildQueryKeyParams(
   if (pathParams.length) {
     const pathChildren = pathParams.map((p) => ({ name: p.name, type: ast.resolveParamType({ node, param: p, resolver }), optional: !p.required }))
     if (pathParamsType === 'object') {
-      params.push(ast.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
+      params.push(ast.factory.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
     } else {
-      params.push(...pathChildren.map((child) => ast.createFunctionParameter(child)))
+      params.push(...pathChildren.map((child) => ast.factory.createFunctionParameter(child)))
     }
   }
 
   // Request body
   if (bodyType) {
-    params.push(ast.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
+    params.push(ast.factory.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
   }
 
   // Query params
   params.push(...ast.buildGroupParam({ name: 'params', node, params: queryParams, groupType: queryGroupType, resolver, wrapType: (type) => type }))
 
-  return ast.createFunctionParameters({ params })
+  return ast.factory.createFunctionParameters({ params })
 }
 
 /**
@@ -212,13 +212,13 @@ export function markParamsOptional(paramsNode: ast.FunctionParametersNode, names
     const members = groupMembers(param)
     if (members) {
       const next = members.map((member) => (nameSet.has(member.name) ? { ...member, optional: true } : member))
-      return { ...param, type: ast.createTypeLiteral({ members: next }) }
+      return { ...param, type: ast.factory.createTypeLiteral({ members: next }) }
     }
     return typeof param.name === 'string' && nameSet.has(param.name)
-      ? ast.createFunctionParameter({ name: param.name, type: param.type, rest: param.rest, optional: true })
+      ? ast.factory.createFunctionParameter({ name: param.name, type: param.type, rest: param.rest, optional: true })
       : param
   })
-  return ast.createFunctionParameters({ params })
+  return ast.factory.createFunctionParameters({ params })
 }
 
 /**
