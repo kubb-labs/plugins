@@ -55,6 +55,7 @@
     "grouped-enum-options-const-casing",
     "jolly-maps-taste",
     "knip-remove-unused-code",
+    "migrate-plugins-param-type-model",
     "modernize-node-22-natives",
     "multi-content-type-request-body",
     "multi-content-type-response",
