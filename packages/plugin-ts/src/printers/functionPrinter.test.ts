@@ -204,10 +204,10 @@ describe('defineFunctionPrinter', () => {
       name: 'upper',
       options,
       nodes: {
-        functionParameter(node) {
+        FunctionParameter(node) {
           return typeof node.name === 'string' ? node.name.toUpperCase() : ''
         },
-        functionParameters(node) {
+        FunctionParameters(node) {
           return node.params
             .map((p) => this.transform(p))
             .filter(Boolean)

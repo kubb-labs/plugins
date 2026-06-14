@@ -1,6 +1,6 @@
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
-import { caseParams, resolveGroupType, resolveParamType } from '@kubb/ast/utils'
+import { buildGroupParam, caseParams, resolveGroupType, resolveParamType } from '@kubb/ast/utils'
 import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import type { ParamsCasing, ParamsType, PathParamsType } from './types.ts'
 

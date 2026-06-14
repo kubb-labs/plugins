@@ -5,14 +5,9 @@ import { PARAM_RANK } from '../constants.ts'
  * Maps each function-printer handler key to its concrete node type.
  */
 export type FunctionNodeByType = {
-  functionParameter: ast.FunctionParameterNode
-  functionParameters: ast.FunctionParametersNode
+  FunctionParameter: ast.FunctionParameterNode
+  FunctionParameters: ast.FunctionParametersNode
 }
-
-const kindToHandlerKey = {
-  FunctionParameter: 'functionParameter',
-  FunctionParameters: 'functionParameters',
-} satisfies Partial<Record<string, ast.FunctionParamKind>>
 
 /**
  * Renders a {@link ast.TypeExpression} to its TypeScript source.
@@ -124,9 +119,7 @@ function renderGroupType(
  * Uses `createPrinterFactory` and dispatches handlers by `node.kind`
  * (for function nodes) rather than by `node.type` (for schema nodes).
  */
-export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionParamKind, FunctionNodeByType>(
-  (node) => kindToHandlerKey[node.kind as keyof typeof kindToHandlerKey],
-)
+export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionParamKind, FunctionNodeByType>((node) => node.kind)
 
 /**
  * Default function-signature printer. Renders a parameter list in one of two modes:
@@ -150,7 +143,7 @@ export const functionPrinter = defineFunctionPrinter<DefaultPrinter>((options) =
   name: 'functionParameters',
   options,
   nodes: {
-    functionParameter(node) {
+    FunctionParameter(node) {
       const { mode, transformName, transformType } = this.options
       const isGroup = typeof node.name !== 'string'
 
@@ -189,7 +182,7 @@ export const functionPrinter = defineFunctionPrinter<DefaultPrinter>((options) =
       }
       return node.default ? `${name} = ${node.default}` : name
     },
-    functionParameters(node) {
+    FunctionParameters(node) {
       return sortParams(node.params)
         .map((p) => this.transform(p))
         .filter(Boolean)
