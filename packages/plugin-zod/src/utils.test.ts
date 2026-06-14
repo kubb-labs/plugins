@@ -288,13 +288,13 @@ describe('shouldCoerce', () => {
 })
 
 describe('buildSchemaNames', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'listPets',
     method: 'GET',
     path: '/pets',
     responses: [
-      ast.createResponse({ statusCode: '200', description: 'OK', schema: ast.createSchema({ type: 'object' }) }),
-      ast.createResponse({ statusCode: '400', description: 'Bad Request', schema: ast.createSchema({ type: 'object' }) }),
+      ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'object' }) }),
+      ast.factory.createResponse({ statusCode: '400', description: 'Bad Request', schema: ast.factory.createSchema({ type: 'object' }) }),
     ],
   })
 
@@ -313,11 +313,11 @@ describe('buildSchemaNames', () => {
   })
 
   test('resolves request name when request body exists', () => {
-    const nodeWithBody = ast.createOperation({
+    const nodeWithBody = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
-      requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object' }) }] },
+      requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }] },
     })
     const result = buildSchemaNames(nodeWithBody, { params: [], resolver: resolverZod })
 
@@ -326,8 +326,8 @@ describe('buildSchemaNames', () => {
 
   test('resolves path and query parameter names', () => {
     const params = [
-      ast.createParameter({ name: 'petId', schema: ast.createSchema({ type: 'string' }), in: 'path', required: true }),
-      ast.createParameter({ name: 'limit', schema: ast.createSchema({ type: 'integer' }), in: 'query', required: false }),
+      ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true }),
+      ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false }),
     ]
     const result = buildSchemaNames(node, { params, resolver: resolverZod })
 
@@ -339,7 +339,7 @@ describe('buildSchemaNames', () => {
 
 describe('buildGroupedParamsSchema', () => {
   test('creates an object schema with primitive: object', () => {
-    const params = [ast.createParameter({ name: 'petId', schema: ast.createSchema({ type: 'string' }), in: 'path', required: true })]
+    const params = [ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true })]
     const result = buildGroupedParamsSchema({ params })
 
     expect(result.type).toBe('object')
@@ -348,7 +348,7 @@ describe('buildGroupedParamsSchema', () => {
   })
 
   test('propagates optional flag', () => {
-    const params = [ast.createParameter({ name: 'limit', schema: ast.createSchema({ type: 'integer' }), in: 'query', required: false })]
+    const params = [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })]
     const result = buildGroupedParamsSchema({ params, optional: true })
 
     expect(result.optional).toBe(true)
@@ -356,8 +356,8 @@ describe('buildGroupedParamsSchema', () => {
 
   test('maps each parameter to a property with matching name and required', () => {
     const params = [
-      ast.createParameter({ name: 'id', schema: ast.createSchema({ type: 'string' }), in: 'path', required: true }),
-      ast.createParameter({ name: 'q', schema: ast.createSchema({ type: 'string' }), in: 'query', required: false }),
+      ast.factory.createParameter({ name: 'id', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true }),
+      ast.factory.createParameter({ name: 'q', schema: ast.factory.createSchema({ type: 'string' }), in: 'query', required: false }),
     ]
     const result = buildGroupedParamsSchema({ params })
     const obj = ast.narrowSchema(result, 'object')!
@@ -372,7 +372,7 @@ describe('buildGroupedParamsSchema', () => {
 
 describe('codec', () => {
   test('date-time with representation "date" decodes and encodes', () => {
-    const node = ast.createSchema({ type: 'date', representation: 'date', format: 'date-time' })
+    const node = ast.factory.createSchema({ type: 'date', representation: 'date', format: 'date-time' })
 
     const codec = getCodec(node)
     expect(hasCodec(node)).toBe(true)
@@ -381,7 +381,7 @@ describe('codec', () => {
   })
 
   test('date with representation "date" preserves YYYY-MM-DD precision', () => {
-    const node = ast.createSchema({ type: 'date', representation: 'date', format: 'date' })
+    const node = ast.factory.createSchema({ type: 'date', representation: 'date', format: 'date' })
 
     const codec = getCodec(node)
     expect(codec?.decode(node)).toBe('z.iso.date().transform((value) => new Date(value))')
@@ -389,15 +389,15 @@ describe('codec', () => {
   })
 
   test('date with representation "string" has no codec', () => {
-    const node = ast.createSchema({ type: 'date', representation: 'string', format: 'date-time' })
+    const node = ast.factory.createSchema({ type: 'date', representation: 'string', format: 'date-time' })
 
     expect(hasCodec(node)).toBe(false)
     expect(getCodec(node)).toBeUndefined()
   })
 
   test('non-registered types have no codec', () => {
-    expect(hasCodec(ast.createSchema({ type: 'bigint' }))).toBe(false)
-    expect(hasCodec(ast.createSchema({ type: 'string' }))).toBe(false)
+    expect(hasCodec(ast.factory.createSchema({ type: 'bigint' }))).toBe(false)
+    expect(hasCodec(ast.factory.createSchema({ type: 'string' }))).toBe(false)
     expect(hasCodec(undefined)).toBe(false)
   })
 })

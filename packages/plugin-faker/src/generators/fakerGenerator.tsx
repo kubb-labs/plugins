@@ -1,6 +1,7 @@
 import { getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
+import { caseParams } from '@kubb/ast/utils'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'
@@ -109,7 +110,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const params = ast.caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, paramsCasing)
     const paramEntries = params.map((param) => ({
       param,
       name: resolveParamNameByLocation(resolver, node, param),
@@ -133,7 +134,10 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         return [{ schema: decorate ? decorate(primary.schema) : primary.schema, name: baseName, typeName: tsBaseName, description, skipImportNames: [] }]
       }
       const variants = resolveContentTypeVariants(entries, baseName)
-      const unionSchema = ast.createSchema({ type: 'union', members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })) })
+      const unionSchema = ast.factory.createSchema({
+        type: 'union',
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
+      })
       return [
         ...variants.map((variant) => ({
           schema: decorate ? decorate(variant.schema) : variant.schema,

@@ -46,61 +46,73 @@ const mockedFakerPlugin = createMockedPlugin<any>({
   resolver: resolverFaker,
 })
 
-const listPetsNode = ast.createOperation({
+const listPetsNode = ast.factory.createOperation({
   operationId: 'listPets',
   method: 'GET',
   path: '/pets',
   tags: ['pets'],
-  parameters: [ast.createParameter({ name: 'limit', in: 'query', schema: ast.createSchema({ type: 'string' }) })],
+  parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) })],
   responses: [
-    ast.createResponse({
+    ast.factory.createResponse({
       statusCode: '200',
       description: 'A paged array of pets',
-      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'object', properties: [] })] }),
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'object', properties: [] })] }),
     }),
-    ast.createResponse({ statusCode: '400', description: 'Invalid', schema: ast.createSchema({ type: 'void' }) }),
-    ast.createResponse({ statusCode: 'default', description: 'unexpected error', schema: ast.createSchema({ type: 'object', properties: [] }) }),
+    ast.factory.createResponse({ statusCode: '400', description: 'Invalid', schema: ast.factory.createSchema({ type: 'void' }) }),
+    ast.factory.createResponse({
+      statusCode: 'default',
+      description: 'unexpected error',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+    }),
   ],
 })
 
-const showPetByIdNode = ast.createOperation({
+const showPetByIdNode = ast.factory.createOperation({
   operationId: 'showPetById',
   method: 'GET',
   path: '/pets/{petId}',
   tags: ['pets'],
   parameters: [
-    ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
-    ast.createParameter({ name: 'testId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+    ast.factory.createParameter({ name: 'testId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
   ],
   responses: [
-    ast.createResponse({
+    ast.factory.createResponse({
       statusCode: '200',
       description: 'Expected response to a valid request',
-      schema: ast.createSchema({ type: 'object', properties: [] }),
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
     }),
-    ast.createResponse({ statusCode: 'default', description: 'unexpected error', schema: ast.createSchema({ type: 'object', properties: [] }) }),
+    ast.factory.createResponse({
+      statusCode: 'default',
+      description: 'unexpected error',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+    }),
   ],
 })
 
-const createPetsNode = ast.createOperation({
+const createPetsNode = ast.factory.createOperation({
   operationId: 'createPets',
   method: 'POST',
   path: '/pets',
   tags: ['pets'],
-  requestBody: { required: true, content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: { required: true, content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
   responses: [
-    ast.createResponse({ statusCode: '201', description: 'Null response', schema: ast.createSchema({ type: 'void' }) }),
-    ast.createResponse({ statusCode: 'default', description: 'unexpected error', schema: ast.createSchema({ type: 'object', properties: [] }) }),
+    ast.factory.createResponse({ statusCode: '201', description: 'Null response', schema: ast.factory.createSchema({ type: 'void' }) }),
+    ast.factory.createResponse({
+      statusCode: 'default',
+      description: 'unexpected error',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+    }),
   ],
 })
 
-const deletePetsPetidNode = ast.createOperation({
+const deletePetsPetidNode = ast.factory.createOperation({
   operationId: 'deletePetsPetid',
   method: 'DELETE',
   path: '/pets/{petId}',
   tags: ['pets'],
-  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-  responses: [ast.createResponse({ statusCode: '200', description: 'deleted', schema: ast.createSchema({ type: 'void' }) })],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  responses: [ast.factory.createResponse({ statusCode: '200', description: 'deleted', schema: ast.factory.createSchema({ type: 'void' }) })],
 })
 
 describe('mswGenerator operation', () => {

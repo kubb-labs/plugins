@@ -1,5 +1,6 @@
 import { jsStringEscape } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
+import { containsCircularRef } from '@kubb/ast/utils'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -57,11 +58,11 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   if (!useGenericOverride) {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
-    const params = ast.createFunctionParameters({
+    const params = ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           name: dataParamName,
-          type: ast.createParamsType({ variant: 'reference', name: dataType }),
+          type: dataType,
           optional: true,
         }),
       ],
@@ -110,7 +111,7 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   const hasGetters =
     node.type === 'object' &&
     !!cyclicSchemas &&
-    (node.properties ?? []).some((p) => ast.containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
+    (node.properties ?? []).some((p) => containsCircularRef(p.schema, { circularSchemas: cyclicSchemas, excludeName: schemaName }))
 
   const functionBody = hasGetters
     ? `{

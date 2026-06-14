@@ -44,20 +44,17 @@ function buildQueryParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const optionsParam = ast.createFunctionParameter({
+  const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
-    type: ast.createParamsType({
-      variant: 'reference',
-      name: `{
+    type: `{
   query?: Partial<UseQueryOptions<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
   client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
 }`,
-    }),
     default: '{}',
   })
 
   // Vue-query wraps operation params with MaybeRefOrGetter
-  const baseParams = ast.createOperationParams(node, {
+  const baseParams = ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

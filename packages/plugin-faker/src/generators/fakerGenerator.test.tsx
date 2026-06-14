@@ -1,6 +1,7 @@
 import { aliasConflictingImports, rewriteAliasedImports } from '@internals/utils'
 import type { Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
+import { findCircularSchemas } from '@kubb/ast/utils'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation, renderGeneratorSchema } from '@kubb/core/mocks'
 import { parserTs } from '@kubb/parser-ts'
 import { type PluginTs, resolverTs } from '@kubb/plugin-ts'
@@ -10,39 +11,39 @@ import { resolverFaker } from '../resolvers/resolverFaker.ts'
 import type { PluginFaker } from '../types.ts'
 import { fakerGenerator } from './fakerGenerator.tsx'
 
-const categorySchema = ast.createSchema({
+const categorySchema = ast.factory.createSchema({
   type: 'object',
   name: 'Category',
-  properties: [ast.createProperty({ name: 'label', required: true, schema: ast.createSchema({ type: 'string' }) })],
+  properties: [ast.factory.createProperty({ name: 'label', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
 })
 
-const errorSchema = ast.createSchema({
+const errorSchema = ast.factory.createSchema({
   type: 'object',
   name: 'Error',
-  properties: [ast.createProperty({ name: 'message', required: true, schema: ast.createSchema({ type: 'string' }) })],
+  properties: [ast.factory.createProperty({ name: 'message', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
 })
 
-const emojiSchema = ast.createSchema({
+const emojiSchema = ast.factory.createSchema({
   type: 'string',
   name: 'Emoji',
   description: 'Emoji shortcode',
 })
 
-const petSchema = ast.createSchema({
+const petSchema = ast.factory.createSchema({
   type: 'object',
   name: 'Pet',
   properties: [
-    ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
-    ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
-    ast.createProperty({ name: 'code', schema: ast.createSchema({ type: 'string', pattern: '^[A-Z]{3}$' }) }),
-    ast.createProperty({ name: 'shipDate', schema: ast.createSchema({ type: 'date', representation: 'string' }) }),
-    ast.createProperty({
+    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
+    ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+    ast.factory.createProperty({ name: 'code', schema: ast.factory.createSchema({ type: 'string', pattern: '^[A-Z]{3}$' }) }),
+    ast.factory.createProperty({ name: 'shipDate', schema: ast.factory.createSchema({ type: 'date', representation: 'string' }) }),
+    ast.factory.createProperty({
       name: 'category',
-      schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+      schema: ast.factory.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
     }),
-    ast.createProperty({
+    ast.factory.createProperty({
       name: 'status',
-      schema: ast.createSchema({
+      schema: ast.factory.createSchema({
         type: 'enum',
         primitive: 'string',
         enumValues: ['available', 'pending', 'sold'],
@@ -51,18 +52,18 @@ const petSchema = ast.createSchema({
   ],
 })
 
-const treeNodeSchema = ast.createSchema({
+const treeNodeSchema = ast.factory.createSchema({
   type: 'object',
   name: 'TreeNode',
   properties: [
-    ast.createProperty({ name: 'value', required: true, schema: ast.createSchema({ type: 'string' }) }),
-    ast.createProperty({
+    ast.factory.createProperty({ name: 'value', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+    ast.factory.createProperty({
       name: 'left',
-      schema: ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+      schema: ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
     }),
-    ast.createProperty({
+    ast.factory.createProperty({
       name: 'right',
-      schema: ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
+      schema: ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' }),
     }),
   ],
 })
@@ -70,54 +71,54 @@ const treeNodeSchema = ast.createSchema({
 // Indirect/polymorphic circular reference scenario from issue #3172:
 // Pet (union) → Cat → Pet → ... causes runtime stack overflow without lazy
 // getter support. Cat/Dog reference Pet via array and union members.
-const petPolySchema = ast.createSchema({
+const petPolySchema = ast.factory.createSchema({
   type: 'union',
   name: 'Pet',
   members: [
-    ast.createSchema({ type: 'ref', name: 'Cat', ref: '#/components/schemas/Cat' }),
-    ast.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
+    ast.factory.createSchema({ type: 'ref', name: 'Cat', ref: '#/components/schemas/Cat' }),
+    ast.factory.createSchema({ type: 'ref', name: 'Dog', ref: '#/components/schemas/Dog' }),
   ],
 })
 
-const catSchema = ast.createSchema({
+const catSchema = ast.factory.createSchema({
   type: 'object',
   name: 'Cat',
   properties: [
-    ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
-    ast.createProperty({
+    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
+    ast.factory.createProperty({
       name: 'archEnemy',
-      schema: ast.createSchema({
+      schema: ast.factory.createSchema({
         type: 'union',
-        members: [ast.createSchema({ type: 'null' }), ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+        members: [ast.factory.createSchema({ type: 'null' }), ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
       }),
     }),
-    ast.createProperty({
+    ast.factory.createProperty({
       name: 'friends',
-      schema: ast.createSchema({
+      schema: ast.factory.createSchema({
         type: 'array',
-        items: [ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+        items: [ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
       }),
     }),
   ],
 })
 
-const dogSchema = ast.createSchema({
+const dogSchema = ast.factory.createSchema({
   type: 'object',
   name: 'Dog',
   properties: [
-    ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
-    ast.createProperty({
+    ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
+    ast.factory.createProperty({
       name: 'archEnemy',
-      schema: ast.createSchema({
+      schema: ast.factory.createSchema({
         type: 'union',
-        members: [ast.createSchema({ type: 'null' }), ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+        members: [ast.factory.createSchema({ type: 'null' }), ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
       }),
     }),
-    ast.createProperty({
+    ast.factory.createProperty({
       name: 'friends',
-      schema: ast.createSchema({
+      schema: ast.factory.createSchema({
         type: 'array',
-        items: [ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
+        items: [ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' })],
       }),
     }),
   ],
@@ -184,7 +185,7 @@ describe('fakerGenerator — schema', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema])],
+        circularNames: [...findCircularSchemas([categorySchema, emojiSchema, errorSchema, petSchema, treeNodeSchema, petPolySchema, catSchema, dogSchema])],
         enumNames: [],
       },
       driver,
@@ -224,22 +225,22 @@ describe('fakerGenerator — operation', () => {
   test.each([
     {
       name: 'showPetById',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'showPetById',
         method: 'GET',
         path: '/pets/{petId}',
         tags: ['pets'],
-        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
         responses: [
-          ast.createResponse({
+          ast.factory.createResponse({
             statusCode: '200',
             description: 'Expected response to a valid request',
-            schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
           }),
-          ast.createResponse({
+          ast.factory.createResponse({
             statusCode: 'default',
             description: 'Unexpected error',
-            schema: ast.createSchema({ type: 'ref', name: 'Error', ref: '#/components/schemas/Error' }),
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Error', ref: '#/components/schemas/Error' }),
           }),
         ],
       }),
@@ -247,7 +248,7 @@ describe('fakerGenerator — operation', () => {
     },
     {
       name: 'createPet',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'createPet',
         method: 'POST',
         path: '/pets',
@@ -257,13 +258,13 @@ describe('fakerGenerator — operation', () => {
           content: [
             {
               contentType: 'application/json',
-              schema: ast.createSchema({
+              schema: ast.factory.createSchema({
                 type: 'object',
                 properties: [
-                  ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
-                  ast.createProperty({
+                  ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+                  ast.factory.createProperty({
                     name: 'category',
-                    schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+                    schema: ast.factory.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
                   }),
                 ],
               }),
@@ -271,10 +272,10 @@ describe('fakerGenerator — operation', () => {
           ],
         },
         responses: [
-          ast.createResponse({
+          ast.factory.createResponse({
             statusCode: '201',
             description: 'Created pet',
-            schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
           }),
         ],
       }),
@@ -292,7 +293,7 @@ describe('fakerGenerator — operation', () => {
       config: testConfig,
       adapter: createMockedAdapter(),
       meta: {
-        circularNames: [...ast.findCircularSchemas([categorySchema, errorSchema, petSchema, treeNodeSchema])],
+        circularNames: [...findCircularSchemas([categorySchema, errorSchema, petSchema, treeNodeSchema])],
         enumNames: [],
       },
       driver,

@@ -46,63 +46,77 @@ describe('cypressGenerator — Operation', () => {
   const operations = [
     {
       name: 'showPetById',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'showPetById',
         method: 'GET',
         path: '/pets/{petId}',
         tags: ['pets'],
-        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-        responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Expected response' })],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'Expected response',
+          }),
+        ],
       }),
     },
     {
       name: 'getPets',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'getPets',
         method: 'GET',
         path: '/pets',
         tags: ['pets'],
-        parameters: [ast.createParameter({ name: 'limit', in: 'query', schema: ast.createSchema({ type: 'integer' }) })],
+        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
         responses: [
-          ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' }),
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'A paged array of pets',
+          }),
         ],
       }),
     },
     {
       name: 'createPet',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'createPets',
         method: 'POST',
         path: '/pets',
         tags: ['pets'],
         requestBody: {
           description: 'Pet to add',
-          content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }],
+          content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }],
         },
-        responses: [ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Null response' })],
+        responses: [
+          ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Null response' }),
+        ],
       }),
     },
     {
       name: 'updatePet',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'updatePet',
         method: 'PUT',
         path: '/pets/{petId}',
         tags: ['pets'],
-        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-        requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-        responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' })],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' }),
+        ],
       }),
     },
     {
       name: 'deletePet',
-      node: ast.createOperation({
+      node: ast.factory.createOperation({
         operationId: 'deletePet',
         method: 'DELETE',
         path: '/pets/{petId}',
         tags: ['pets'],
-        parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
-        responses: [ast.createResponse({ statusCode: '204', description: 'No content', schema: ast.createSchema({ type: 'void' }) })],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [ast.factory.createResponse({ statusCode: '204', description: 'No content', schema: ast.factory.createSchema({ type: 'void' }) })],
       }),
     },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode }>
@@ -128,13 +142,19 @@ describe('cypressGenerator — Operation', () => {
 })
 
 describe('cypressGenerator — dataReturnType', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'getPets',
     method: 'GET',
     path: '/pets',
     tags: ['pets'],
-    parameters: [ast.createParameter({ name: 'limit', in: 'query', schema: ast.createSchema({ type: 'integer' }) })],
-    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' })],
+    parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A paged array of pets',
+      }),
+    ],
   })
 
   test('data — returns res.body', async () => {
@@ -177,17 +197,19 @@ describe('cypressGenerator — dataReturnType', () => {
 })
 
 describe('cypressGenerator — paramsType', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'updatePet',
     method: 'PUT',
     path: '/pets/{petId}',
     tags: ['pets'],
     parameters: [
-      ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
-      ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+      ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+      ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
     ],
-    requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' })],
+    requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+    responses: [
+      ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' }),
+    ],
   })
 
   test('inline — separate arguments per param group', async () => {
@@ -230,16 +252,18 @@ describe('cypressGenerator — paramsType', () => {
 })
 
 describe('cypressGenerator — pathParamsType', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'showPetById',
     method: 'GET',
     path: '/pets/{petId}',
     tags: ['pets'],
     parameters: [
-      ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true }),
-      ast.createParameter({ name: 'limit', in: 'query', schema: ast.createSchema({ type: 'integer' }) }),
+      ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
+      ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
     ],
-    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Expected response' })],
+    responses: [
+      ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Expected response' }),
+    ],
   })
 
   test('inline — each path param as individual argument', async () => {
@@ -282,13 +306,19 @@ describe('cypressGenerator — pathParamsType', () => {
 })
 
 describe('cypressGenerator — paramsCasing', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'getPets',
     method: 'GET',
     path: '/pets',
     tags: ['pets'],
-    parameters: [ast.createParameter({ name: 'page_size', in: 'query', schema: ast.createSchema({ type: 'integer' }) })],
-    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' })],
+    parameters: [ast.factory.createParameter({ name: 'page_size', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A paged array of pets',
+      }),
+    ],
   })
 
   test('camelcase — query param name is camelCased', async () => {
@@ -331,16 +361,22 @@ describe('cypressGenerator — paramsCasing', () => {
 })
 
 describe('cypressGenerator — paramsCasing headers', () => {
-  const nodeWithHeaders = ast.createOperation({
+  const nodeWithHeaders = ast.factory.createOperation({
     operationId: 'getPets',
     method: 'GET',
     path: '/pets',
     tags: ['pets'],
     parameters: [
-      ast.createParameter({ name: 'page_size', in: 'query', schema: ast.createSchema({ type: 'integer' }) }),
-      ast.createParameter({ name: 'x-api-key', in: 'header', schema: ast.createSchema({ type: 'string' }), required: true }),
+      ast.factory.createParameter({ name: 'page_size', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
+      ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
     ],
-    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A paged array of pets',
+      }),
+    ],
   })
 
   test('camelcase — header and query param names are camelCased and remapped', async () => {
@@ -364,13 +400,19 @@ describe('cypressGenerator — paramsCasing headers', () => {
 })
 
 describe('cypressGenerator — baseURL', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'getPets',
     method: 'GET',
     path: '/pets',
     tags: ['pets'],
-    parameters: [ast.createParameter({ name: 'limit', in: 'query', schema: ast.createSchema({ type: 'integer' }) })],
-    responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'A paged array of pets' })],
+    parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'A paged array of pets',
+      }),
+    ],
   })
 
   test('static string — prepended to url', async () => {
@@ -429,13 +471,15 @@ describe('cypressGenerator — transformers', () => {
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
     })
 
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'createPets',
       method: 'POST',
       path: '/pets',
       tags: ['pets'],
-      requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-      responses: [ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Null response' })],
+      requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+      responses: [
+        ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Null response' }),
+      ],
     })
 
     await renderGeneratorOperation(cypressGenerator, node, {

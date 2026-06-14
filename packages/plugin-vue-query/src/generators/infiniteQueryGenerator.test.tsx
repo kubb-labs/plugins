@@ -59,24 +59,24 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   resolver: resolverTs,
 })
 
-const findByTagsNode = ast.createOperation({
+const findByTagsNode = ast.factory.createOperation({
   operationId: 'findPetsByTags',
   method: 'GET',
   path: '/pet/findByTags',
   tags: ['pet'],
   parameters: [
-    ast.createParameter({
+    ast.factory.createParameter({
       name: 'tags',
       in: 'query',
-      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
       required: true,
     }),
-    ast.createParameter({ name: 'pageSize', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'pageSize', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
   ],
   responses: [
-    ast.createResponse({
+    ast.factory.createResponse({
       statusCode: '200',
-      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'object', properties: [] })] }),
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'object', properties: [] })] }),
       description: 'successful operation',
     }),
   ],

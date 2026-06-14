@@ -27,18 +27,18 @@ export const operationsGenerator = defineGenerator<PluginClient>({
     }
 
     return [
-      ast.createFile({
+      ast.factory.createFile({
         baseName: file.baseName,
         path: file.path,
         meta: file.meta,
         banner: resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
         footer: resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } }),
         sources: [
-          ast.createSource({
+          ast.factory.createSource({
             name,
             isExportable: true,
             isIndexable: true,
-            nodes: [ast.createConst({ name, export: true, nodes: [ast.createText(JSON.stringify(operationsObject, undefined, 2))] })],
+            nodes: [ast.factory.createConst({ name, export: true, nodes: [ast.factory.createText(JSON.stringify(operationsObject, undefined, 2))] })],
           }),
         ],
       }),

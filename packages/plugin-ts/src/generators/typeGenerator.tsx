@@ -1,5 +1,6 @@
 import { resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
+import { caseParams } from '@kubb/ast/utils'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'
@@ -80,7 +81,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
     const { enum: enumOptions, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
-    const params = ast.caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, paramsCasing)
 
     const meta = {
       file: resolver.resolveFile(
@@ -141,9 +142,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
     ) {
       const variants = resolveContentTypeVariants(entries, baseName)
-      const unionSchema = ast.createSchema({
+      const unionSchema = ast.factory.createSchema({
         type: 'union',
-        members: variants.map((variant) => ast.createSchema({ type: 'ref', name: variant.name })),
+        members: variants.map((variant) => ast.factory.createSchema({ type: 'ref', name: variant.name })),
       })
       return (
         <>

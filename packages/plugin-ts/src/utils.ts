@@ -1,6 +1,7 @@
 import { jsStringEscape, stringify } from '@kubb/ast/utils'
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
+import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
 
 /**
@@ -11,7 +12,7 @@ import type { ResolverTs } from './types.ts'
 
  */
 export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string | undefined> {
-  const meta = ast.syncSchemaRef(schema)
+  const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
 
@@ -53,13 +54,13 @@ type BuildOperationSchemaOptions = {
 }
 
 export function buildParams(node: ast.OperationNode, { params, resolver }: BuildParamsSchemaOptions): ast.SchemaNode {
-  return ast.createSchema({
+  return ast.factory.createSchema({
     type: 'object',
     properties: params.map((param) =>
-      ast.createProperty({
+      ast.factory.createProperty({
         name: param.name,
         required: param.required,
-        schema: ast.createSchema({
+        schema: ast.factory.createSchema({
           type: 'ref',
           name: resolver.resolveParamName(node, param),
         }),
@@ -71,39 +72,39 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
-  return ast.createSchema({
+  return ast.factory.createSchema({
     type: 'object',
     deprecated: node.deprecated,
     properties: [
-      ast.createProperty({
+      ast.factory.createProperty({
         name: 'data',
         schema: node.requestBody?.content?.[0]?.schema
-          ? ast.createSchema({ type: 'ref', name: resolver.resolveDataName(node), optional: true })
-          : ast.createSchema({ type: 'never', primitive: undefined, optional: true }),
+          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveDataName(node), optional: true })
+          : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
-      ast.createProperty({
+      ast.factory.createProperty({
         name: 'pathParams',
         required: pathParams.length > 0,
-        schema: pathParams.length > 0 ? buildParams(node, { params: pathParams, resolver }) : ast.createSchema({ type: 'never', primitive: undefined }),
+        schema: pathParams.length > 0 ? buildParams(node, { params: pathParams, resolver }) : ast.factory.createSchema({ type: 'never', primitive: undefined }),
       }),
-      ast.createProperty({
+      ast.factory.createProperty({
         name: 'queryParams',
         schema:
           queryParams.length > 0
-            ? ast.createSchema({ ...buildParams(node, { params: queryParams, resolver }), optional: true })
-            : ast.createSchema({ type: 'never', primitive: undefined, optional: true }),
+            ? ast.factory.createSchema({ ...buildParams(node, { params: queryParams, resolver }), optional: true })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
-      ast.createProperty({
+      ast.factory.createProperty({
         name: 'headerParams',
         schema:
           headerParams.length > 0
-            ? ast.createSchema({ ...buildParams(node, { params: headerParams, resolver }), optional: true })
-            : ast.createSchema({ type: 'never', primitive: undefined, optional: true }),
+            ? ast.factory.createSchema({ ...buildParams(node, { params: headerParams, resolver }), optional: true })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
-      ast.createProperty({
+      ast.factory.createProperty({
         name: 'url',
         required: true,
-        schema: ast.createSchema({ type: 'url', path: node.path }),
+        schema: ast.factory.createSchema({ type: 'url', path: node.path }),
       }),
     ],
   })
@@ -114,13 +115,13 @@ export function buildResponses(node: ast.OperationNode, { resolver }: BuildOpera
     return null
   }
 
-  return ast.createSchema({
+  return ast.factory.createSchema({
     type: 'object',
     properties: node.responses.map((res) =>
-      ast.createProperty({
+      ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+        schema: ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
       }),
     ),
   })
@@ -133,8 +134,8 @@ export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildO
     return null
   }
 
-  return ast.createSchema({
+  return ast.factory.createSchema({
     type: 'union',
-    members: responsesWithSchema.map((res) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })),
+    members: responsesWithSchema.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })),
   })
 }

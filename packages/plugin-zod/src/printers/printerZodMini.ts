@@ -1,6 +1,7 @@
 import { buildList, buildObject, extractRefName, objectKey, stringify } from '@kubb/ast/utils'
 
 import { ast } from '@kubb/core'
+import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
 import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini } from '../utils.ts'
 
@@ -174,20 +175,20 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
         const entries = node.properties.map((prop) => {
           const { name: propName, schema } = prop
 
-          const meta = ast.syncSchemaRef(schema)
+          const meta = syncSchemaRef(schema)
 
           const isNullable = meta.nullable
           const isOptional = schema.optional
           const isNullish = schema.nullish
 
-          const hasSelfRef = this.options.cyclicSchemas != null && ast.containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
+          const hasSelfRef = this.options.cyclicSchemas != null && containsCircularRef(schema, { circularSchemas: this.options.cyclicSchemas })
           // Inside a getter the getter itself defers evaluation, so suppress
           // z.lazy() wrapping on nested refs by temporarily clearing cyclicSchemas.
           // Save before clearing: this.options === options (same reference via definePrinter),
           // so reading options.cyclicSchemas after mutation would return undefined.
           const savedCyclicSchemas = this.options.cyclicSchemas
           if (hasSelfRef) this.options.cyclicSchemas = undefined
-          const baseOutput = this.transform(schema) ?? this.transform(ast.createSchema({ type: 'unknown' }))!
+          const baseOutput = this.transform(schema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
           if (hasSelfRef) this.options.cyclicSchemas = savedCyclicSchemas
 
           const wrappedOutput = this.options.wrapOutput ? this.options.wrapOutput({ output: baseOutput, schema }) || baseOutput : baseOutput
@@ -210,7 +211,7 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
       },
       array(node) {
         const items = (node.items ?? []).map((item) => this.transform(item)).filter(Boolean)
-        const inner = items.join(', ') || this.transform(ast.createSchema({ type: 'unknown' }))!
+        const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
         const base = `z.array(${inner})${lengthChecksMini(node)}`
 
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
@@ -264,7 +265,7 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
       const transformed = this.transform(node)
       if (!transformed) return null
 
-      const meta = ast.syncSchemaRef(node)
+      const meta = syncSchemaRef(node)
 
       const base = (() => {
         if (!keysToOmit?.length || meta.primitive !== 'object' || (meta.type === 'union' && meta.discriminatorPropertyName)) return transformed

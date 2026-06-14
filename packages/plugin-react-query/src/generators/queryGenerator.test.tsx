@@ -62,52 +62,74 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
 })
 
 // Shared operation nodes
-const findByTagsNode = ast.createOperation({
+const findByTagsNode = ast.factory.createOperation({
   operationId: 'findPetsByTags',
   method: 'GET',
   path: '/pet/findByTags',
   tags: ['pet'],
   parameters: [
-    ast.createParameter({
+    ast.factory.createParameter({
       name: 'tags',
       in: 'query',
-      schema: ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] }),
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
       required: true,
     }),
-    ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
-    ast.createParameter({ name: 'pageSize', in: 'query', schema: ast.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
+    ast.factory.createParameter({ name: 'pageSize', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
   ],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const getPetByIdNode = ast.createOperation({
+const getPetByIdNode = ast.factory.createOperation({
   operationId: 'getPetById',
   method: 'GET',
   path: '/pet/{petId}',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'petId', in: 'path', schema: ast.createSchema({ type: 'string' }), required: true })],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
   responses: [
-    ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' }),
-    ast.createResponse({ statusCode: '400', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+    ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid ID supplied' }),
   ],
 })
 
-const findByStatusNode = ast.createOperation({
+const findByStatusNode = ast.factory.createOperation({
   operationId: 'findPetsByStatus',
   method: 'GET',
   path: '/pet/findByStatus',
   tags: ['pet'],
-  parameters: [ast.createParameter({ name: 'status', in: 'query', schema: ast.createSchema({ type: 'string' }) })],
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  parameters: [ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
-const createUsersWithListInputNode = ast.createOperation({
+const createUsersWithListInputNode = ast.factory.createOperation({
   operationId: 'createUsersWithListInput',
   method: 'POST',
   path: '/user/createWithList',
   tags: ['user'],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object', properties: [] }) }] },
-  responses: [ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object', properties: [] }), description: 'successful operation' })],
+  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
 })
 
 describe('queryGenerator operation', () => {

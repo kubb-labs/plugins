@@ -5,14 +5,14 @@ import { printerFaker } from './printerFaker.ts'
 
 describe('printerFaker', () => {
   test('renders object properties recursively', () => {
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'object',
       properties: [
-        ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer', min: 1, max: 10 }) }),
-        ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
-        ast.createProperty({
+        ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer', min: 1, max: 10 }) }),
+        ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createProperty({
           name: 'category',
-          schema: ast.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Category', ref: '#/components/schemas/Category' }),
         }),
       ],
     })
@@ -29,7 +29,7 @@ describe('printerFaker', () => {
   })
 
   test('renders enums with their target type', () => {
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'enum',
       name: 'PetStatus',
       primitive: 'string',
@@ -42,7 +42,7 @@ describe('printerFaker', () => {
   })
 
   test('renders string dates with custom date parser', () => {
-    const node = ast.createSchema({ type: 'date', representation: 'string' })
+    const node = ast.factory.createSchema({ type: 'date', representation: 'string' })
 
     expect(printerFaker({ resolver: resolverFaker, dateParser: 'dayjs' }).print(node)).toMatchInlineSnapshot(
       `"dayjs(faker.date.anytime()).format("YYYY-MM-DD")"`,
@@ -50,19 +50,19 @@ describe('printerFaker', () => {
   })
 
   test('renders regex matches with randexp', () => {
-    const node = ast.createSchema({ type: 'string', pattern: '^[A-Z]+$' })
+    const node = ast.factory.createSchema({ type: 'string', pattern: '^[A-Z]+$' })
 
     expect(printerFaker({ resolver: resolverFaker, regexGenerator: 'randexp' }).print(node)).toMatchInlineSnapshot(`"new RandExp("^[A-Z]+$").gen()"`)
   })
 
   test('guards self refs', () => {
-    const node = ast.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
+    const node = ast.factory.createSchema({ type: 'ref', name: 'TreeNode', ref: '#/components/schemas/TreeNode' })
 
     expect(printerFaker({ resolver: resolverFaker, schemaName: 'TreeNode' }).print(node)).toMatchInlineSnapshot(`"undefined as any"`)
   })
 
   test('does not re-resolve internal helper refs', () => {
-    const node = ast.createSchema({ type: 'ref', name: 'showPetByIdResponseFaker' })
+    const node = ast.factory.createSchema({ type: 'ref', name: 'showPetByIdResponseFaker' })
 
     expect(
       printerFaker({
@@ -77,10 +77,10 @@ describe('printerFaker', () => {
   })
 
   test('resolves ref names from ref path when name is missing', () => {
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'ref',
       ref: '#/components/schemas/EpisodeBase',
-      schema: ast.createSchema({
+      schema: ast.factory.createSchema({
         type: 'object',
         name: 'EpisodeBase',
         properties: [],
@@ -91,12 +91,12 @@ describe('printerFaker', () => {
   })
 
   test('uses tuple item types for nested enum members', () => {
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'tuple',
       items: [
-        ast.createSchema({ type: 'integer' }),
-        ast.createSchema({ type: 'string' }),
-        ast.createSchema({
+        ast.factory.createSchema({ type: 'integer' }),
+        ast.factory.createSchema({ type: 'string' }),
+        ast.factory.createSchema({
           type: 'enum',
           primitive: 'string',
           enumValues: ['NW', 'NE', 'SW', 'SE'],
@@ -116,15 +116,19 @@ describe('printerFaker', () => {
 
   test('narrows discriminated oneOf variants to their own branch', () => {
     const makeVariant = (protocol: string, algorithms: Array<string>) =>
-      ast.createSchema({
+      ast.factory.createSchema({
         type: 'object',
         properties: [
-          ast.createProperty({ name: 'protocol', required: true, schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: [protocol] }) }),
-          ast.createProperty({ name: 'algorithm', schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: algorithms }) }),
+          ast.factory.createProperty({
+            name: 'protocol',
+            required: true,
+            schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: [protocol] }),
+          }),
+          ast.factory.createProperty({ name: 'algorithm', schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: algorithms }) }),
         ],
       })
 
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'union',
       discriminatorPropertyName: 'protocol',
       members: [makeVariant('udp', ['random', 'rotate']), makeVariant('tcp', ['source'])],
@@ -143,17 +147,17 @@ describe('printerFaker', () => {
     // `NonNullable<Filter>["+order"]` would be a TS2339. Members index via
     // `(NonNullable<Filter> & Record<"+order", unknown>)["+order"]`, which stays valid and
     // resolves to `unknown` rather than `any`.
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'union',
       name: 'Filter',
       members: [
-        ast.createSchema({ type: 'object', properties: [] }),
-        ast.createSchema({
+        ast.factory.createSchema({ type: 'object', properties: [] }),
+        ast.factory.createSchema({
           type: 'object',
           properties: [
-            ast.createProperty({
+            ast.factory.createProperty({
               name: '+order',
-              schema: ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['asc', 'desc'] }),
+              schema: ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['asc', 'desc'] }),
             }),
           ],
         }),
@@ -210,13 +214,13 @@ describe('printerFaker', () => {
     // Cat.friend → Pet which is cyclic; the getter must cache its computed value via
     // Object.defineProperty so that repeated access returns the same object instance.
     const cyclicSchemas = new Set(['Pet'])
-    const node = ast.createSchema({
+    const node = ast.factory.createSchema({
       type: 'object',
       properties: [
-        ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'integer' }) }),
-        ast.createProperty({
+        ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) }),
+        ast.factory.createProperty({
           name: 'friend',
-          schema: ast.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+          schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
         }),
       ],
     })

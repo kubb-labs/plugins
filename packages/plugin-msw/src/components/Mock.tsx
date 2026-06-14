@@ -32,14 +32,11 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
     : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = declarationPrinter.print(
-    ast.createFunctionParameters({
+    ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           name: 'data',
-          type: ast.createParamsType({
-            variant: 'reference',
-            name: `${dataType} | ${callbackType}`,
-          }),
+          type: `${dataType} | ${callbackType}`,
           optional: true,
         }),
       ],

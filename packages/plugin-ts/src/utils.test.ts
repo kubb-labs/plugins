@@ -24,8 +24,8 @@ function printSchema(schema: ReturnType<typeof buildParams>): string {
 
 describe('buildParams', () => {
   it('builds required params as non-optional properties', () => {
-    const params = [ast.createParameter({ name: 'petId', schema: ast.createSchema({ type: 'string' }), in: 'path', required: true })]
-    const node = ast.createOperation({ operationId: 'showPetById', method: 'GET', path: '/pets/{petId}' })
+    const params = [ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true })]
+    const node = ast.factory.createOperation({ operationId: 'showPetById', method: 'GET', path: '/pets/{petId}' })
 
     expect(printSchema(buildParams(node, { params, resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
@@ -35,8 +35,8 @@ describe('buildParams', () => {
   })
 
   it('marks optional params with ?', () => {
-    const params = [ast.createParameter({ name: 'limit', schema: ast.createSchema({ type: 'integer' }), in: 'query', required: false })]
-    const node = ast.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+    const params = [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })]
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
     expect(printSchema(buildParams(node, { params, resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
@@ -47,10 +47,10 @@ describe('buildParams', () => {
 })
 
 describe('buildData', () => {
-  const baseNode = ast.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+  const baseNode = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
   it('emits data?: never when no request body', () => {
-    const node = ast.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
@@ -67,11 +67,11 @@ describe('buildData', () => {
   })
 
   it('emits data? referencing the Data type when body exists', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
-      requestBody: { content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object' }) }] },
+      requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }] },
     })
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
@@ -89,11 +89,11 @@ describe('buildData', () => {
   })
 
   it('emits required pathParams when path parameters exist', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'showPetById',
       method: 'GET',
       path: '/pets/{petId}',
-      parameters: [ast.createParameter({ name: 'petId', schema: ast.createSchema({ type: 'string' }), in: 'path', required: true })],
+      parameters: [ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true })],
     })
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
@@ -116,10 +116,10 @@ describe('buildData', () => {
   })
 
   it('emits optional queryParams when query parameters exist', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       ...baseNode,
       operationId: 'listPets',
-      parameters: [ast.createParameter({ name: 'limit', schema: ast.createSchema({ type: 'integer' }), in: 'query', required: false })],
+      parameters: [ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false })],
     })
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
@@ -142,13 +142,13 @@ describe('buildData', () => {
   })
 
   it('emits JSDoc on queryParams properties when parameters have descriptions', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       ...baseNode,
       operationId: 'listPets',
       parameters: [
-        ast.createParameter({
+        ast.factory.createParameter({
           name: 'limit',
-          schema: ast.createSchema({ type: 'integer', description: 'Maximum number of results' }),
+          schema: ast.factory.createSchema({ type: 'integer', description: 'Maximum number of results' }),
           in: 'query',
           required: false,
         }),
@@ -177,13 +177,13 @@ describe('buildData', () => {
 
 describe('buildResponses', () => {
   it('emits a keyed object type for responses with schemas', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'listPets',
       method: 'GET',
       path: '/pets',
       responses: [
-        ast.createResponse({ statusCode: '200', description: 'OK', schema: ast.createSchema({ type: 'object' }) }),
-        ast.createResponse({ statusCode: 'default', description: 'Error', schema: ast.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: 'default', description: 'Error', schema: ast.factory.createSchema({ type: 'object' }) }),
       ],
     })
 
@@ -198,13 +198,13 @@ describe('buildResponses', () => {
 
 describe('buildResponseUnion', () => {
   it('emits a union of all response types', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'listPets',
       method: 'GET',
       path: '/pets',
       responses: [
-        ast.createResponse({ statusCode: '200', description: 'OK', schema: ast.createSchema({ type: 'object' }) }),
-        ast.createResponse({ statusCode: '405', description: 'Error', schema: ast.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '405', description: 'Error', schema: ast.factory.createSchema({ type: 'object' }) }),
       ],
     })
 
@@ -214,7 +214,7 @@ describe('buildResponseUnion', () => {
 
 describe('buildPropertyJSDocComments', () => {
   it('emits @description, @deprecated and @default for a richly annotated schema', () => {
-    const schema = ast.createSchema({ type: 'string', description: 'A pet name', deprecated: true, default: 'Fluffy' })
+    const schema = ast.factory.createSchema({ type: 'string', description: 'A pet name', deprecated: true, default: 'Fluffy' })
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).toContain('@description A pet name')
@@ -223,7 +223,7 @@ describe('buildPropertyJSDocComments', () => {
   })
 
   it('does not emit @minLength/@maxLength for array schemas', () => {
-    const schema = ast.createSchema({ type: 'array', primitive: 'array', min: 1, max: 10 })
+    const schema = ast.factory.createSchema({ type: 'array', primitive: 'array', min: 1, max: 10 })
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).not.toContain('@minLength 1')
@@ -231,7 +231,7 @@ describe('buildPropertyJSDocComments', () => {
   })
 
   it('emits format on a separate line when both description and format exist', () => {
-    const schema = ast.createSchema({ type: 'string', format: 'uuid', description: 'Unique identifier' })
+    const schema = ast.factory.createSchema({ type: 'string', format: 'uuid', description: 'Unique identifier' })
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).toContain('@description Unique identifier')
@@ -240,7 +240,7 @@ describe('buildPropertyJSDocComments', () => {
   })
 
   it('emits @description and Format on separate lines when only format exists', () => {
-    const schema = ast.createSchema({ type: 'string', format: 'date-time' })
+    const schema = ast.factory.createSchema({ type: 'string', format: 'date-time' })
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).toContain('@description')
@@ -248,7 +248,7 @@ describe('buildPropertyJSDocComments', () => {
   })
 
   it('does not emit @description when neither description nor format exist', () => {
-    const schema = ast.createSchema({ type: 'string' })
+    const schema = ast.factory.createSchema({ type: 'string' })
     const comments = buildPropertyJSDocComments(schema)
 
     expect(comments).not.toContain('@description')

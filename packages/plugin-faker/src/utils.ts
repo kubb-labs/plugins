@@ -116,12 +116,12 @@ export function buildResponseUnionSchema(node: ast.OperationNode, resolver: Reso
       return schema
     }
 
-    return ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, responses[0]!.statusCode) })
+    return ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, responses[0]!.statusCode) })
   }
 
-  return ast.createSchema({
+  return ast.factory.createSchema({
     type: 'union',
-    members: responses.map((response) => ast.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, response.statusCode) })),
+    members: responses.map((response) => ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, response.statusCode) })),
   })
 }
 

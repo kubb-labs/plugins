@@ -31,14 +31,11 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
     : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = declarationPrinter.print(
-    ast.createFunctionParameters({
+    ast.factory.createFunctionParameters({
       params: [
-        ast.createFunctionParameter({
+        ast.factory.createFunctionParameter({
           name: 'data',
-          type: ast.createParamsType({
-            variant: 'reference',
-            name: `${typeName} | ${callbackType}`,
-          }),
+          type: `${typeName} | ${callbackType}`,
           optional: true,
         }),
       ],

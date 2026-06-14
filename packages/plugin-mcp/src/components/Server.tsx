@@ -55,7 +55,7 @@ type Props = {
   }>
 }
 
-const keysPrinter = functionPrinter({ mode: 'keys' })
+const keysPrinter = functionPrinter({ mode: 'call' })
 
 export function Server({ name, serverName, serverVersion, paramsCasing, operations }: Props): KubbReactNode {
   const registrations = operations
@@ -86,11 +86,9 @@ export function Server({ name, serverName, serverVersion, paramsCasing, operatio
       const entries = [...pathEntries, ...otherEntries]
 
       const paramsNode = entries.length
-        ? ast.createFunctionParameters({
+        ? ast.factory.createFunctionParameters({
             params: [
-              ast.createParameterGroup({
-                properties: entries.map((e) => ast.createFunctionParameter({ name: e.key, optional: false })),
-              }),
+              { kind: 'FunctionParameter', name: ast.factory.createObjectBindingPattern({ elements: entries.map((e) => ({ name: e.key })) }), optional: false },
             ],
           })
         : null

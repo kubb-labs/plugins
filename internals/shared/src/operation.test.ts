@@ -46,7 +46,7 @@ const resolver: RequestConfigResolver & ResponseNameResolver & ResponseStatusNam
 
 describe('getContentTypeInfo', () => {
   test('returns defaults for operations without a request body', () => {
-    const node = ast.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
     expect(getContentTypeInfo(node)).toStrictEqual({
       contentTypes: [],
@@ -58,14 +58,14 @@ describe('getContentTypeInfo', () => {
   })
 
   test('detects multiple content types and form data', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
       requestBody: {
         content: [
-          { contentType: 'application/json', schema: ast.createSchema({ type: 'object' }) },
-          { contentType: 'multipart/form-data', schema: ast.createSchema({ type: 'object' }) },
+          { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
+          { contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object' }) },
         ],
       },
     })
@@ -82,14 +82,14 @@ describe('getContentTypeInfo', () => {
 
 describe('buildRequestConfigType', () => {
   test('adds the request data type and content type option when needed', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
       requestBody: {
         content: [
-          { contentType: 'application/json', schema: ast.createSchema({ type: 'object' }) },
-          { contentType: 'application/xml', schema: ast.createSchema({ type: 'object' }) },
+          { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
+          { contentType: 'application/xml', schema: ast.factory.createSchema({ type: 'object' }) },
         ],
       },
     })
@@ -100,7 +100,7 @@ describe('buildRequestConfigType', () => {
   })
 
   test('uses the untyped request config when no request schema exists', () => {
-    const node = ast.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
+    const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
     expect(buildRequestConfigType(node, resolver)).toBe('Partial<RequestConfig> & { client?: Client }')
   })
@@ -108,7 +108,7 @@ describe('buildRequestConfigType', () => {
 
 describe('buildOperationComments', () => {
   test('builds path-template links by default', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
       path: '/pets/{petId}',
@@ -121,7 +121,7 @@ describe('buildOperationComments', () => {
   })
 
   test('supports URLPath links before deprecation and multiline trimming', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
       path: '/pets/{pet-id}',
@@ -139,14 +139,14 @@ describe('buildOperationComments', () => {
 })
 
 describe('response status helpers', () => {
-  const node = ast.createOperation({
+  const node = ast.factory.createOperation({
     operationId: 'createPet',
     method: 'POST',
     path: '/pets',
     responses: [
-      ast.createResponse({ statusCode: '201', schema: ast.createSchema({ type: 'object' }) }),
-      ast.createResponse({ statusCode: '400', schema: ast.createSchema({ type: 'object' }) }),
-      ast.createResponse({ statusCode: 'default', schema: ast.createSchema({ type: 'object' }) }),
+      ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object' }) }),
+      ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object' }) }),
+      ast.factory.createResponse({ statusCode: 'default', schema: ast.factory.createSchema({ type: 'object' }) }),
     ],
   })
 
@@ -195,15 +195,15 @@ describe('response status helpers', () => {
 
 describe('getOperationParameters', () => {
   test('groups cased parameters by location', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
       path: '/pets/{pet-id}',
       parameters: [
-        ast.createParameter({ name: 'pet-id', in: 'path', schema: ast.createSchema({ type: 'string' }) }),
-        ast.createParameter({ name: 'page-size', in: 'query', schema: ast.createSchema({ type: 'number' }) }),
-        ast.createParameter({ name: 'x-api-key', in: 'header', schema: ast.createSchema({ type: 'string' }) }),
-        ast.createParameter({ name: 'session-id', in: 'cookie', schema: ast.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'pet-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'page-size', in: 'query', schema: ast.factory.createSchema({ type: 'number' }) }),
+        ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'session-id', in: 'cookie', schema: ast.factory.createSchema({ type: 'string' }) }),
       ],
     })
 
@@ -218,21 +218,21 @@ describe('getOperationParameters', () => {
 
 describe('resolveOperationTypeNames', () => {
   test('collects parameter, request, response, and status type names', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'POST',
       path: '/pets/{pet-id}',
       parameters: [
-        ast.createParameter({ name: 'pet-id', in: 'path', schema: ast.createSchema({ type: 'string' }) }),
-        ast.createParameter({ name: 'page-size', in: 'query', schema: ast.createSchema({ type: 'number' }) }),
-        ast.createParameter({ name: 'x-api-key', in: 'header', schema: ast.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'pet-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'page-size', in: 'query', schema: ast.factory.createSchema({ type: 'number' }) }),
+        ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
       ],
       requestBody: {
-        content: [{ contentType: 'application/json', schema: ast.createSchema({ type: 'object' }) }],
+        content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }],
       },
       responses: [
-        ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object' }) }),
-        ast.createResponse({ statusCode: '400', schema: ast.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '400', schema: ast.factory.createSchema({ type: 'object' }) }),
       ],
     })
 
@@ -247,13 +247,13 @@ describe('resolveOperationTypeNames', () => {
   })
 
   test('can include only error status type names', () => {
-    const node = ast.createOperation({
+    const node = ast.factory.createOperation({
       operationId: 'showPet',
       method: 'GET',
       path: '/pets/{petId}',
       responses: [
-        ast.createResponse({ statusCode: '200', schema: ast.createSchema({ type: 'object' }) }),
-        ast.createResponse({ statusCode: '404', schema: ast.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object' }) }),
+        ast.factory.createResponse({ statusCode: '404', schema: ast.factory.createSchema({ type: 'object' }) }),
       ],
     })
 

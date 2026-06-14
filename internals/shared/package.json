@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@internals/utils": "workspace:*",
+    "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:"
   },
   "devDependencies": {

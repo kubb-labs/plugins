@@ -66,7 +66,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
   const TError = `ResponseErrorConfig<${errorType}>`
   const generics = [responseName, TError, requestName || 'unknown'].filter(Boolean)
 
-  const paramsNode = ast.createOperationParams(node, {
+  const paramsNode = ast.factory.createOperationParams(node, {
     paramsType: 'object',
     pathParamsType: 'inline',
     resolver,

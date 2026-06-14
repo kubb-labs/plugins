@@ -34,85 +34,85 @@ describe('printerTs', () => {
 
   describe('scalar types', () => {
     it('any', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'any' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'any' }))
 
       expect(await formatTS(result)).toBe('any')
     })
 
     it('unknown', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'unknown' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'unknown' }))
 
       expect(await formatTS(result)).toBe('unknown')
     })
 
     it('void', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'void' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'void' }))
 
       expect(await formatTS(result)).toBe('void')
     })
 
     it('boolean', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'boolean' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'boolean' }))
 
       expect(await formatTS(result)).toBe('boolean')
     })
 
     it('null', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'null' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'null' }))
 
       expect(await formatTS(result)).toBe('null')
     })
 
     it('string', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'string' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'string' }))
 
       expect(await formatTS(result)).toBe('string')
     })
 
     it('uuid', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'uuid' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'uuid' }))
 
       expect(await formatTS(result)).toBe('string')
     })
 
     it('email', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'email' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'email' }))
 
       expect(await formatTS(result)).toBe('string')
     })
 
     it('url', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'url' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'url' }))
 
       expect(await formatTS(result)).toBe('string')
     })
 
     it('datetime', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'datetime' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'datetime' }))
 
       expect(await formatTS(result)).toBe('string')
     })
 
     it('number', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'number' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'number' }))
 
       expect(await formatTS(result)).toBe('number')
     })
 
     it('integer', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'integer' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'integer' }))
 
       expect(await formatTS(result)).toBe('number')
     })
 
     it('bigint', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'bigint' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'bigint' }))
 
       expect(await formatTS(result)).toBe('bigint')
     })
 
     it('blob', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'blob' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'blob' }))
 
       expect(await formatTS(result)).toBe('Blob')
     })
@@ -120,25 +120,25 @@ describe('printerTs', () => {
 
   describe('date / time', () => {
     it('date with representation=date returns Date', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'date', representation: 'date' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'date', representation: 'date' }))
 
       expect(await formatTS(result)).toBe('Date')
     })
 
     it('date without date representation returns string', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'date', representation: 'string' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'date', representation: 'string' }))
 
       expect(await formatTS(result)).toBe('string')
     })
 
     it('time with representation=date returns Date', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'time', representation: 'date' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'time', representation: 'date' }))
 
       expect(await formatTS(result)).toBe('Date')
     })
 
     it('time without date representation returns string', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'time', representation: 'string' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'time', representation: 'string' }))
 
       expect(await formatTS(result)).toBe('string')
     })
@@ -146,13 +146,13 @@ describe('printerTs', () => {
 
   describe('ref', () => {
     it('ref with name returns type reference', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'ref', name: 'MyType' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'ref', name: 'MyType' }))
 
       expect(await formatTS(result)).toBe('MyType')
     })
 
     it('ref without name returns undefined', () => {
-      const result = printer.transform(ast.createSchema({ type: 'ref' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'ref' }))
 
       expect(result).toBeNull()
     })
@@ -160,7 +160,7 @@ describe('printerTs', () => {
     it('ref with $ref path uses canonical name from path, not node.name (Bug 1: allOf name override)', async () => {
       // When allOf flatten overrides node.name to the property name ("content"),
       // the printer should still resolve to the $ref target name ("TestContent").
-      const result = printer.transform(ast.createSchema({ type: 'ref', name: 'content', ref: '#/components/schemas/TestContent' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'ref', name: 'content', ref: '#/components/schemas/TestContent' }))
 
       expect(await formatTS(result)).toBe('TestContent')
     })
@@ -168,21 +168,21 @@ describe('printerTs', () => {
     it('ref with $ref path resolves discriminator child to parent (Bug 2: circular discriminator)', async () => {
       // ClientDisconnectedProblem allOf $ref -> Problem. The node.name is overridden
       // to "ClientDisconnectedProblem" by the flatten, but the ref points to Problem.
-      const result = printer.transform(ast.createSchema({ type: 'ref', name: 'ClientDisconnectedProblem', ref: '#/components/schemas/Problem' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'ref', name: 'ClientDisconnectedProblem', ref: '#/components/schemas/Problem' }))
 
       expect(await formatTS(result)).toBe('Problem')
     })
 
     it('ref without $ref path (inline ref) uses node.name directly', async () => {
       // Inline refs from getImports/utils don't carry a $ref path — node.name is the resolved type.
-      const result = printer.transform(ast.createSchema({ type: 'ref', name: 'ResolvedType' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'ref', name: 'ResolvedType' }))
 
       expect(await formatTS(result)).toBe('ResolvedType')
     })
 
     it('ref with $ref path falls back to node.name when path segment missing', async () => {
       // Defensive: if $ref path has no segments, fall back to node.name
-      const result = printer.transform(ast.createSchema({ type: 'ref', name: 'FallbackType', ref: '' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'ref', name: 'FallbackType', ref: '' }))
 
       expect(await formatTS(result)).toBe('FallbackType')
     })
@@ -190,55 +190,55 @@ describe('printerTs', () => {
 
   describe('enum', () => {
     it('inlineLiteral (default) renders literal union', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'enum', enumValues: ['a', 'b', 'c'] }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'enum', enumValues: ['a', 'b', 'c'] }))
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`"'a' | 'b' | 'c'"`)
     })
 
     it('inlineLiteral with mixed types', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'enum', enumValues: ['x', 1, true] }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'enum', enumValues: ['x', 1, true] }))
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`"'x' | 1 | true"`)
     })
 
     it('enum without name still renders inline literal even when enumType is not inlineLiteral', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: enumEnum })
-      const result = p.transform(ast.createSchema({ type: 'enum', enumValues: ['a', 'b'] }))
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', enumValues: ['a', 'b'] }))
 
       expect(await formatTS(result)).toMatchInlineSnapshot(`"'a' | 'b'"`)
     })
 
     it('enum with name and enumType=enum renders reference', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: enumEnum })
-      const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('Status')
     })
 
     it('enum with name and enumType=asConst renders reference with Key suffix', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: asConstEnum })
-      const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('StatusKey')
     })
 
     it('enum with name and enumType=literal renders reference', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: literalEnum })
-      const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('Status')
     })
 
     it('enum with name and enumType=constEnum renders reference without Key suffix', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: constEnumEnum })
-      const result = p.transform(ast.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', enumValues: ['active', 'inactive'] }))
 
       expect(await formatTS(result)).toBe('Status')
     })
 
     it('namedEnumValues are used when provided', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'enum',
           namedEnumValues: [
             { name: 'Active', value: 'active', primitive: 'string' },
@@ -252,7 +252,7 @@ describe('printerTs', () => {
 
     it('namedEnumValues take precedence over enumValues', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'enum',
           namedEnumValues: [{ name: 'Yes', value: 1, primitive: 'number' }],
           enumValues: ['ignored'],
@@ -266,9 +266,9 @@ describe('printerTs', () => {
   describe('union', () => {
     it('renders a union of members', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'union',
-          members: [ast.createSchema({ type: 'string' }), ast.createSchema({ type: 'number' })],
+          members: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' })],
         }),
       )
 
@@ -277,11 +277,11 @@ describe('printerTs', () => {
 
     it('renders nested union', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'union',
           members: [
-            ast.createSchema({ type: 'string' }),
-            ast.createSchema({ type: 'union', members: [ast.createSchema({ type: 'number' }), ast.createSchema({ type: 'boolean' })] }),
+            ast.factory.createSchema({ type: 'string' }),
+            ast.factory.createSchema({ type: 'union', members: [ast.factory.createSchema({ type: 'number' }), ast.factory.createSchema({ type: 'boolean' })] }),
           ],
         }),
       )
@@ -291,9 +291,9 @@ describe('printerTs', () => {
 
     it('renders string & {} when union has string literal and plain string', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'union',
-          members: [ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['test'] }), ast.createSchema({ type: 'email' })],
+          members: [ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['test'] }), ast.factory.createSchema({ type: 'email' })],
         }),
       )
 
@@ -302,9 +302,9 @@ describe('printerTs', () => {
 
     it('renders string & {} when union has const-derived string enum (primitive only) and plain string', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'union',
-          members: [ast.createSchema({ type: 'enum', primitive: 'string', enumValues: ['accepted'] }), ast.createSchema({ type: 'string' })],
+          members: [ast.factory.createSchema({ type: 'enum', primitive: 'string', enumValues: ['accepted'] }), ast.factory.createSchema({ type: 'string' })],
         }),
       )
 
@@ -315,11 +315,17 @@ describe('printerTs', () => {
   describe('intersection', () => {
     it('renders an intersection of members', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'intersection',
           members: [
-            ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'a', required: true, schema: ast.createSchema({ type: 'string' }) })] }),
-            ast.createSchema({ type: 'object', properties: [ast.createProperty({ name: 'b', required: true, schema: ast.createSchema({ type: 'number' }) })] }),
+            ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'a', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
+            }),
+            ast.factory.createSchema({
+              type: 'object',
+              properties: [ast.factory.createProperty({ name: 'b', required: true, schema: ast.factory.createSchema({ type: 'number' }) })],
+            }),
           ],
         }),
       )
@@ -343,9 +349,9 @@ describe('printerTs', () => {
   describe('array', () => {
     it('arrayType=array renders T[]', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'array',
-          items: [ast.createSchema({ type: 'string' })],
+          items: [ast.factory.createSchema({ type: 'string' })],
         }),
       )
 
@@ -355,9 +361,9 @@ describe('printerTs', () => {
     it('arrayType=generic renders Array<T>', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'generic', enum: inlineLiteralEnum })
       const result = p.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'array',
-          items: [ast.createSchema({ type: 'number' })],
+          items: [ast.factory.createSchema({ type: 'number' })],
         }),
       )
 
@@ -366,9 +372,9 @@ describe('printerTs', () => {
 
     it('renders array with multiple item types as union', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'array',
-          items: [ast.createSchema({ type: 'string' }), ast.createSchema({ type: 'number' })],
+          items: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' })],
         }),
       )
 
@@ -379,9 +385,9 @@ describe('printerTs', () => {
   describe('tuple', () => {
     it('renders a basic tuple', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'tuple',
-          items: [ast.createSchema({ type: 'string' }), ast.createSchema({ type: 'number' })],
+          items: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' })],
         }),
       )
 
@@ -390,10 +396,10 @@ describe('printerTs', () => {
 
     it('renders tuple with rest element', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'tuple',
-          items: [ast.createSchema({ type: 'string' })],
-          rest: ast.createSchema({ type: 'number' }),
+          items: [ast.factory.createSchema({ type: 'string' })],
+          rest: ast.factory.createSchema({ type: 'number' }),
         }),
       )
 
@@ -402,9 +408,9 @@ describe('printerTs', () => {
 
     it('renders tuple with min — optional items after min', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'tuple',
-          items: [ast.createSchema({ type: 'string' }), ast.createSchema({ type: 'number' }), ast.createSchema({ type: 'boolean' })],
+          items: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' }), ast.factory.createSchema({ type: 'boolean' })],
           min: 1,
         }),
       )
@@ -414,9 +420,9 @@ describe('printerTs', () => {
 
     it('renders tuple with max — items truncated to max', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'tuple',
-          items: [ast.createSchema({ type: 'string' }), ast.createSchema({ type: 'number' }), ast.createSchema({ type: 'boolean' })],
+          items: [ast.factory.createSchema({ type: 'string' }), ast.factory.createSchema({ type: 'number' }), ast.factory.createSchema({ type: 'boolean' })],
           max: 2,
         }),
       )
@@ -426,10 +432,10 @@ describe('printerTs', () => {
 
     it('renders tuple with max and rest — fills up to max with rest type', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'tuple',
-          items: [ast.createSchema({ type: 'string' })],
-          rest: ast.createSchema({ type: 'number' }),
+          items: [ast.factory.createSchema({ type: 'string' })],
+          rest: ast.factory.createSchema({ type: 'number' }),
           max: 3,
         }),
       )
@@ -440,18 +446,18 @@ describe('printerTs', () => {
 
   describe('object', () => {
     it('empty object returns object keyword', async () => {
-      const result = printer.transform(ast.createSchema({ type: 'object' }))
+      const result = printer.transform(ast.factory.createSchema({ type: 'object' }))
 
       expect(await formatTS(result)).toBe('object')
     })
 
     it('renders object with properties', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
           properties: [
-            ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'number' }) }),
-            ast.createProperty({ name: 'name', required: true, schema: ast.createSchema({ type: 'string' }) }),
+            ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'number' }) }),
+            ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
           ],
         }),
       )
@@ -472,9 +478,9 @@ describe('printerTs', () => {
 
     it('optional property with optionalType=questionToken', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'tag', schema: ast.createSchema({ type: 'string', optional: true }) })],
+          properties: [ast.factory.createProperty({ name: 'tag', schema: ast.factory.createSchema({ type: 'string', optional: true }) })],
         }),
       )
 
@@ -491,9 +497,9 @@ describe('printerTs', () => {
     it('optional property with optionalType=undefined adds | undefined', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'undefined', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'tag', schema: ast.createSchema({ type: 'string', optional: true }) })],
+          properties: [ast.factory.createProperty({ name: 'tag', schema: ast.factory.createSchema({ type: 'string', optional: true }) })],
         }),
       )
 
@@ -510,9 +516,9 @@ describe('printerTs', () => {
     it('optional property with optionalType=questionTokenAndUndefined adds both', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionTokenAndUndefined', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'tag', schema: ast.createSchema({ type: 'string', optional: true }) })],
+          properties: [ast.factory.createProperty({ name: 'tag', schema: ast.factory.createSchema({ type: 'string', optional: true }) })],
         }),
       )
 
@@ -528,9 +534,9 @@ describe('printerTs', () => {
 
     it('nullable property adds | null', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'value', required: true, schema: ast.createSchema({ type: 'string', nullable: true }) })],
+          properties: [ast.factory.createProperty({ name: 'value', required: true, schema: ast.factory.createSchema({ type: 'string', nullable: true }) })],
         }),
       )
 
@@ -546,9 +552,9 @@ describe('printerTs', () => {
 
     it('readonly property', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'number', readOnly: true }) })],
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'number', readOnly: true }) })],
         }),
       )
 
@@ -564,7 +570,7 @@ describe('printerTs', () => {
 
     it('additionalProperties=true adds index signature of unknown', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
           properties: [],
           additionalProperties: true,
@@ -580,10 +586,10 @@ describe('printerTs', () => {
 
     it('additionalProperties as SchemaNode adds typed index signature', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
           properties: [],
-          additionalProperties: ast.createSchema({ type: 'string' }),
+          additionalProperties: ast.factory.createSchema({ type: 'string' }),
         }),
       )
 
@@ -596,10 +602,10 @@ describe('printerTs', () => {
 
     it('additionalProperties with existing properties uses unknown for index', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'id', required: true, schema: ast.createSchema({ type: 'number' }) })],
-          additionalProperties: ast.createSchema({ type: 'string' }),
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'number' }) })],
+          additionalProperties: ast.factory.createSchema({ type: 'string' }),
         }),
       )
 
@@ -616,10 +622,10 @@ describe('printerTs', () => {
 
     it('patternProperties adds index signature', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
           properties: [],
-          patternProperties: { '^S_': ast.createSchema({ type: 'string' }) },
+          patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
         }),
       )
 
@@ -632,10 +638,10 @@ describe('printerTs', () => {
 
     it('patternProperties with nullable adds | null to index type', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
           properties: [],
-          patternProperties: { '^S_': ast.createSchema({ type: 'string', nullable: true }) },
+          patternProperties: { '^S_': ast.factory.createSchema({ type: 'string', nullable: true }) },
         }),
       )
 
@@ -648,9 +654,9 @@ describe('printerTs', () => {
 
     it('nullish property with optionalType=questionToken adds ?', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'tag', schema: ast.createSchema({ type: 'string', nullish: true }) })],
+          properties: [ast.factory.createProperty({ name: 'tag', schema: ast.factory.createSchema({ type: 'string', nullish: true }) })],
         }),
       )
 
@@ -667,9 +673,9 @@ describe('printerTs', () => {
     it('nullish property with optionalType=undefined adds | undefined', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'undefined', arrayType: 'array', enum: inlineLiteralEnum })
       const result = p.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'tag', schema: ast.createSchema({ type: 'string', nullish: true }) })],
+          properties: [ast.factory.createProperty({ name: 'tag', schema: ast.factory.createSchema({ type: 'string', nullish: true }) })],
         }),
       )
 
@@ -685,9 +691,9 @@ describe('printerTs', () => {
 
     it('property with description adds @description JSDoc comment', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'name', schema: ast.createSchema({ type: 'string', description: 'The user name' }) })],
+          properties: [ast.factory.createProperty({ name: 'name', schema: ast.factory.createSchema({ type: 'string', description: 'The user name' }) })],
         }),
       )
 
@@ -704,9 +710,9 @@ describe('printerTs', () => {
 
     it('property with deprecated flag adds @deprecated JSDoc comment', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'oldField', schema: ast.createSchema({ type: 'string', deprecated: true }) })],
+          properties: [ast.factory.createProperty({ name: 'oldField', schema: ast.factory.createSchema({ type: 'string', deprecated: true }) })],
         }),
       )
 
@@ -723,9 +729,9 @@ describe('printerTs', () => {
 
     it('property with min/max adds Minimum/Maximum length JSDoc comments', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'code', schema: ast.createSchema({ type: 'string', min: 2, max: 10 }) })],
+          properties: [ast.factory.createProperty({ name: 'code', schema: ast.factory.createSchema({ type: 'string', min: 2, max: 10 }) })],
         }),
       )
 
@@ -743,9 +749,9 @@ describe('printerTs', () => {
 
     it('property with default adds @default JSDoc comment', async () => {
       const result = printer.transform(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'count', schema: ast.createSchema({ type: 'number', default: 0 }) })],
+          properties: [ast.factory.createProperty({ name: 'count', schema: ast.factory.createSchema({ type: 'number', default: 0 }) })],
         }),
       )
 
@@ -764,7 +770,7 @@ describe('printerTs', () => {
   describe('print', () => {
     it('without typeName returns raw type string', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum })
-      const result = p.print(ast.createSchema({ type: 'string' }))
+      const result = p.print(ast.factory.createSchema({ type: 'string' }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "string
@@ -774,7 +780,7 @@ describe('printerTs', () => {
 
     it('with typeName wraps in export type declaration', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'MyType' })
-      const result = p.print(ast.createSchema({ type: 'string' }))
+      const result = p.print(ast.factory.createSchema({ type: 'string' }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "/**
@@ -788,9 +794,9 @@ describe('printerTs', () => {
     it('with typeName and object uses interface syntax by default', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'MyObject' })
       const result = p.print(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'id', schema: ast.createSchema({ type: 'number' }) })],
+          properties: [ast.factory.createProperty({ name: 'id', schema: ast.factory.createSchema({ type: 'number' }) })],
         }),
       )
 
@@ -818,9 +824,9 @@ describe('printerTs', () => {
         syntaxType: 'type',
       })
       const result = p.print(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
-          properties: [ast.createProperty({ name: 'id', schema: ast.createSchema({ type: 'number' }) })],
+          properties: [ast.factory.createProperty({ name: 'id', schema: ast.factory.createSchema({ type: 'number' }) })],
         }),
       )
 
@@ -840,7 +846,7 @@ describe('printerTs', () => {
 
     it('nullable node adds | null to the declaration', async () => {
       const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: inlineLiteralEnum, name: 'Status' })
-      const result = p.print(ast.createSchema({ type: 'string', nullable: true }))
+      const result = p.print(ast.factory.createSchema({ type: 'string', nullable: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "/**
@@ -859,7 +865,7 @@ describe('printerTs', () => {
         enum: inlineLiteralEnum,
         name: 'MaybeValue',
       })
-      const result = p.print(ast.createSchema({ type: 'string', optional: true }))
+      const result = p.print(ast.factory.createSchema({ type: 'string', optional: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "/**
@@ -879,7 +885,7 @@ describe('printerTs', () => {
         name: 'Described',
         description: 'A well-described type',
       })
-      const result = p.print(ast.createSchema({ type: 'string' }))
+      const result = p.print(ast.factory.createSchema({ type: 'string' }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "/**
@@ -901,12 +907,12 @@ describe('printerTs', () => {
         keysToOmit: ['id', 'createdAt'],
       })
       const result = p.print(
-        ast.createSchema({
+        ast.factory.createSchema({
           type: 'object',
           properties: [
-            ast.createProperty({ name: 'id', schema: ast.createSchema({ type: 'number' }) }),
-            ast.createProperty({ name: 'name', schema: ast.createSchema({ type: 'string' }) }),
-            ast.createProperty({ name: 'createdAt', schema: ast.createSchema({ type: 'string' }) }),
+            ast.factory.createProperty({ name: 'id', schema: ast.factory.createSchema({ type: 'number' }) }),
+            ast.factory.createProperty({ name: 'name', schema: ast.factory.createSchema({ type: 'string' }) }),
+            ast.factory.createProperty({ name: 'createdAt', schema: ast.factory.createSchema({ type: 'string' }) }),
           ],
         }),
       )
@@ -945,7 +951,7 @@ describe('printerTs', () => {
         name: 'AddFiles200',
         keysToOmit: ['name'],
       })
-      const result = p.print(ast.createSchema({ type: 'ref', name: 'Pet', optional: true }))
+      const result = p.print(ast.factory.createSchema({ type: 'ref', name: 'Pet', optional: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "export type AddFiles200 = Omit<NonNullable<Pet>, 'name'> | undefined
@@ -962,7 +968,7 @@ describe('printerTs', () => {
         name: 'AddFiles200',
         keysToOmit: ['name'],
       })
-      const result = p.print(ast.createSchema({ type: 'ref', name: 'Pet', nullable: true }))
+      const result = p.print(ast.factory.createSchema({ type: 'ref', name: 'Pet', nullable: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "export type AddFiles200 = Omit<NonNullable<Pet>, 'name'> | null
@@ -978,7 +984,7 @@ describe('printerTs', () => {
         enum: inlineLiteralEnum,
         name: 'AddFilesMutationRequest',
       })
-      const result = p.print(ast.createSchema({ type: 'ref', name: 'Pet', optional: true }))
+      const result = p.print(ast.factory.createSchema({ type: 'ref', name: 'Pet', optional: true }))
 
       expect(await format(result ?? '')).toMatchInlineSnapshot(`
         "export type AddFilesMutationRequest = Pet | undefined
@@ -996,7 +1002,7 @@ describe('printerTs', () => {
         enum: inlineLiteralEnum,
         nodes: { date: () => ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
       })
-      expect(await formatTS(p.transform(ast.createSchema({ type: 'date', representation: 'string' })))).toBe('string')
+      expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'date', representation: 'string' })))).toBe('string')
     })
 
     it('override does not affect other node types', async () => {
@@ -1007,7 +1013,7 @@ describe('printerTs', () => {
         enum: inlineLiteralEnum,
         nodes: { date: () => ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword) },
       })
-      expect(await formatTS(p.transform(ast.createSchema({ type: 'number' })))).toBe('number')
+      expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'number' })))).toBe('number')
     })
 
     it('override can call this.transform for nested nodes', async () => {
@@ -1023,7 +1029,7 @@ describe('printerTs', () => {
           },
         },
       })
-      const node = ast.createSchema({ type: 'array', items: [ast.createSchema({ type: 'string' })] })
+      const node = ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] })
       expect(await formatTS(p.transform(node))).toBe('Set<string>')
     })
 
@@ -1042,7 +1048,7 @@ describe('printerTs', () => {
           },
         },
       })
-      expect(await formatTS(p.transform(ast.createSchema({ type: 'string' })))).toBe('string')
+      expect(await formatTS(p.transform(ast.factory.createSchema({ type: 'string' })))).toBe('string')
     })
   })
 })

@@ -1,5 +1,6 @@
 import { buildObject, extractRefName, objectKey, stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
+import { containsCircularRef } from '@kubb/ast/utils'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
 
 /**
@@ -385,7 +386,7 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           // emit a memoizing lazy getter. On first access it computes the value,
           // replaces itself with a plain data property via Object.defineProperty,
           // and returns the cached value – so every subsequent read is stable.
-          if (cyclicSchemas && ast.containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
+          if (cyclicSchemas && containsCircularRef(property.schema, { circularSchemas: cyclicSchemas, excludeName: this.options.schemaName })) {
             return `get ${objectKey(property.name)}() { const _value = ${value}; Object.defineProperty(this, ${JSON.stringify(property.name)}, { value: _value, configurable: true, writable: true, enumerable: true }); return _value }`
           }
 

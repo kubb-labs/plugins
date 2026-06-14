@@ -30,7 +30,7 @@ function createMutationArgParams(
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
     paramsCasing: options.paramsCasing,
@@ -61,17 +61,14 @@ function buildMutationParamsNode(
   const TRequest = mutationArgParamsNode.params.length > 0 ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'undefined', 'TContext'].join(', ')
 
-  return ast.createFunctionParameters({
+  return ast.factory.createFunctionParameters({
     params: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'options',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: `{
+        type: `{
   mutation?: UseMutationOptions<${generics}> & { client?: QueryClient },
   client?: ${buildRequestConfigType(node, resolver)},
 }`,
-        }),
         default: '{}',
       }),
     ],

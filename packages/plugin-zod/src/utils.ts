@@ -1,5 +1,6 @@
 import { extractRefName, stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
+import { syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from './types.ts'
 
 /**
@@ -91,7 +92,7 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
       if (seen.has(refName)) return false
       seen.add(refName)
     }
-    const resolved = ast.syncSchemaRef(node)
+    const resolved = syncSchemaRef(node)
     if (resolved.type === 'ref') return false
     return containsCodec(resolved, seen)
   }
@@ -284,12 +285,12 @@ type BuildGroupedParamsSchemaOptions = {
  * The `primitive: 'object'` marker ensures the Zod printer emits `z.object(…)` rather than a record.
  */
 export function buildGroupedParamsSchema({ params, optional }: BuildGroupedParamsSchemaOptions): ast.SchemaNode {
-  return ast.createSchema({
+  return ast.factory.createSchema({
     type: 'object',
     optional,
     primitive: 'object',
     properties: params.map((param) =>
-      ast.createProperty({
+      ast.factory.createProperty({
         name: param.name,
         required: param.required,
         schema: param.schema,

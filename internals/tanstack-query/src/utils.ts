@@ -1,7 +1,17 @@
 import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
+import { buildGroupParam, caseParams, resolveGroupType, resolveParamType } from '@kubb/ast/utils'
 import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
 import type { ParamsCasing, ParamsType, PathParamsType } from './types.ts'
+
+/**
+ * Returns the `TypeLiteral` members of a destructured group parameter, or `null`
+ * for a plain named parameter.
+ */
+function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: string; type: ast.TypeExpression; optional?: boolean }> | null {
+  if (typeof param.name === 'string') return null
+  return param.type && typeof param.type !== 'string' && param.type.kind === 'TypeLiteral' ? param.type.members : []
+}
 
 /**
  * Builds the shared `(…params, config = {})` parameter list for a TanStack
@@ -16,18 +26,15 @@ export function buildQueryOptionsParams(
   const { paramsType, paramsCasing, pathParamsType, resolver } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
 
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver,
     extraParams: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'config',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
-        }),
+        type: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
         default: '{}',
       }),
     ],
@@ -127,79 +134,6 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
 }
 
 /**
- * Resolve the type for a single path parameter.
- *
- * - When the resolver's group name differs from the individual param name
- *   (e.g. kubbV4) → `GroupName['paramName']` (member access).
- * - When they match (v5 default) → `TypeName` (direct reference).
- */
-export function resolvePathParamType(node: ast.OperationNode, param: ast.ParameterNode, resolver: PluginTs['resolver']): ast.ParamsTypeNode {
-  const individualName = resolver.resolveParamName(node, param)
-  const groupName = resolver.resolvePathParamsName(node, param)
-
-  if (groupName !== individualName) {
-    return ast.createParamsType({ variant: 'member', base: groupName, key: param.name })
-  }
-  return ast.createParamsType({ variant: 'reference', name: individualName })
-}
-
-type QueryGroupResult = { type: ast.ParamsTypeNode; optional: boolean } | null
-
-/**
- * Derive a query-params group type from the resolver.
- * Returns `null` when no query params exist or when the group name
- * equals the individual param name (no real group).
- */
-export function resolveQueryGroupType(node: ast.OperationNode, params: ast.ParameterNode[], resolver: PluginTs['resolver']): QueryGroupResult {
-  if (!params.length) return null
-  const firstParam = params[0]!
-  const groupName = resolver.resolveQueryParamsName(node, firstParam)
-  if (groupName === resolver.resolveParamName(node, firstParam)) return null
-  return { type: ast.createParamsType({ variant: 'reference', name: groupName }), optional: params.every((p) => !p.required) }
-}
-
-/**
- * Derive a header-params group type from the resolver.
- */
-export function resolveHeaderGroupType(node: ast.OperationNode, params: ast.ParameterNode[], resolver: PluginTs['resolver']): QueryGroupResult {
-  if (!params.length) return null
-  const firstParam = params[0]!
-  const groupName = resolver.resolveHeaderParamsName(node, firstParam)
-  if (groupName === resolver.resolveParamName(node, firstParam)) return null
-  return { type: ast.createParamsType({ variant: 'reference', name: groupName }), optional: params.every((p) => !p.required) }
-}
-
-/**
- * Build a single `FunctionParameterNode` for a query or header group.
- */
-export function buildGroupParam(
-  name: string,
-  node: ast.OperationNode,
-  params: ast.ParameterNode[],
-  groupType: QueryGroupResult,
-  resolver: PluginTs['resolver'],
-): ast.FunctionParameterNode[] {
-  if (groupType) {
-    return [ast.createFunctionParameter({ name, type: groupType.type, optional: groupType.optional })]
-  }
-  if (params.length) {
-    const structProps = params.map((p) => ({
-      name: p.name,
-      type: ast.createParamsType({ variant: 'reference', name: resolver.resolveParamName(node, p) }),
-      optional: !p.required,
-    }))
-    return [
-      ast.createFunctionParameter({
-        name,
-        type: ast.createParamsType({ variant: 'struct', properties: structProps }),
-        optional: params.every((p) => !p.required),
-      }),
-    ]
-  }
-  return []
-}
-
-/**
  * Build QueryKey params: pathParams + data + queryParams (NO headers, NO config).
  */
 export function buildQueryKeyParams(
@@ -212,39 +146,36 @@ export function buildQueryKeyParams(
 ): ast.FunctionParametersNode {
   const { pathParamsType, paramsCasing, resolver } = options
 
-  const casedParams = ast.caseParams(node.parameters, paramsCasing)
+  const casedParams = caseParams(node.parameters, paramsCasing)
   const pathParams = casedParams.filter((p) => p.in === 'path')
   const queryParams = casedParams.filter((p) => p.in === 'query')
 
-  const queryGroupType = resolveQueryGroupType(node, queryParams, resolver)
+  const queryGroupType = resolveGroupType({ node, params: queryParams, group: 'query', resolver })
 
-  const bodyType = node.requestBody?.content?.[0]?.schema ? ast.createParamsType({ variant: 'reference', name: resolver.resolveDataName(node) }) : null
+  const bodyType = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const bodyRequired = node.requestBody?.required ?? false
 
-  const params: Array<ast.FunctionParameterNode | ast.ParameterGroupNode> = []
+  const params: Array<ast.FunctionParameterNode> = []
 
   // Path params
   if (pathParams.length) {
-    const pathChildren = pathParams.map((p) =>
-      ast.createFunctionParameter({ name: p.name, type: resolvePathParamType(node, p, resolver), optional: !p.required }),
-    )
-    params.push({
-      kind: 'ParameterGroup',
-      properties: pathChildren,
-      inline: pathParamsType === 'inline',
-      default: pathChildren.every((c) => c.optional) ? '{}' : undefined,
-    })
+    const pathChildren = pathParams.map((p) => ({ name: p.name, type: resolveParamType({ node, param: p, resolver }), optional: !p.required }))
+    if (pathParamsType === 'object') {
+      params.push(ast.factory.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
+    } else {
+      params.push(...pathChildren.map((child) => ast.factory.createFunctionParameter(child)))
+    }
   }
 
   // Request body
   if (bodyType) {
-    params.push(ast.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
+    params.push(ast.factory.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
   }
 
   // Query params
-  params.push(...buildGroupParam('params', node, queryParams, queryGroupType, resolver))
+  params.push(...buildGroupParam({ name: 'params', node, params: queryParams, groupType: queryGroupType, resolver, wrapType: (type) => type }))
 
-  return ast.createFunctionParameters({ params })
+  return ast.factory.createFunctionParameters({ params })
 }
 
 /**
@@ -255,18 +186,13 @@ export function buildQueryKeyParams(
 export function getEnabledParamNames(paramsNode: ast.FunctionParametersNode): string[] {
   const required: string[] = []
   for (const param of paramsNode.params) {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      for (const child of group.properties) {
-        if (!child.optional && child.default === undefined) {
-          required.push(child.name)
-        }
+    const members = groupMembers(param)
+    if (members) {
+      for (const member of members) {
+        if (!member.optional) required.push(member.name)
       }
-    } else {
-      const fp = param as ast.FunctionParameterNode
-      if (!fp.optional && fp.default === undefined) {
-        required.push(fp.name)
-      }
+    } else if (typeof param.name === 'string' && !param.optional && param.default === undefined) {
+      required.push(param.name)
     }
   }
   return required
@@ -284,19 +210,16 @@ export function markParamsOptional(paramsNode: ast.FunctionParametersNode, names
   if (names.length === 0) return paramsNode
   const nameSet = new Set(names)
   const params = paramsNode.params.map((param) => {
-    if ('kind' in param && (param as ast.ParameterGroupNode).kind === 'ParameterGroup') {
-      const group = param as ast.ParameterGroupNode
-      return {
-        ...group,
-        properties: group.properties.map((child) =>
-          nameSet.has(child.name) ? ast.createFunctionParameter({ name: child.name, type: child.type, rest: child.rest, optional: true }) : child,
-        ),
-      }
+    const members = groupMembers(param)
+    if (members) {
+      const next = members.map((member) => (nameSet.has(member.name) ? { ...member, optional: true } : member))
+      return { ...param, type: ast.factory.createTypeLiteral({ members: next }) }
     }
-    const fp = param as ast.FunctionParameterNode
-    return nameSet.has(fp.name) ? ast.createFunctionParameter({ name: fp.name, type: fp.type, rest: fp.rest, optional: true }) : fp
+    return typeof param.name === 'string' && nameSet.has(param.name)
+      ? ast.factory.createFunctionParameter({ name: param.name, type: param.type, rest: param.rest, optional: true })
+      : param
   })
-  return ast.createFunctionParameters({ params })
+  return ast.factory.createFunctionParameters({ params })
 }
 
 /**

@@ -31,15 +31,15 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function Request({ baseURL = '', name, dataReturnType, resolver, node, paramsType, pathParamsType, paramsCasing }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
-  const paramsNode = ast.createOperationParams(node, {
+  const paramsNode = ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType,
     paramsCasing,
     resolver,
     extraParams: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'options',
-        type: ast.createParamsType({ variant: 'reference', name: 'Partial<Cypress.RequestOptions>' }),
+        type: 'Partial<Cypress.RequestOptions>',
         default: '{}',
       }),
     ],

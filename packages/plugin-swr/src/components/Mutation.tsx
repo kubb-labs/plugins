@@ -22,7 +22,7 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
-const keysPrinter = functionPrinter({ mode: 'keys' })
+const keysPrinter = functionPrinter({ mode: 'call' })
 
 function createMutationArgParams(
   node: ast.OperationNode,
@@ -31,7 +31,7 @@ function createMutationArgParams(
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  return ast.createOperationParams(node, {
+  return ast.factory.createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
     paramsCasing: options.paramsCasing,
@@ -56,18 +56,15 @@ function buildMutationParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  return ast.createFunctionParameters({
+  return ast.factory.createFunctionParameters({
     params: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'options',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: `{
+        type: `{
   mutation?: SWRMutationConfiguration<${TData}, ${TError}, ${mutationKeyTypeName} | null, ${mutationArgTypeName}> & { throwOnError?: boolean },
   client?: ${buildRequestConfigType(node, resolver)},
   shouldFetch?: boolean,
 }`,
-        }),
         default: '{}',
       }),
     ],
@@ -109,18 +106,15 @@ export function Mutation({
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  const clientCallParamsNode = ast.createOperationParams(node, {
+  const clientCallParamsNode = ast.factory.createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
     resolver: tsResolver,
     extraParams: [
-      ast.createFunctionParameter({
+      ast.factory.createFunctionParameter({
         name: 'config',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: buildRequestConfigType(node, tsResolver),
-        }),
+        type: buildRequestConfigType(node, tsResolver),
         default: '{}',
       }),
     ],
