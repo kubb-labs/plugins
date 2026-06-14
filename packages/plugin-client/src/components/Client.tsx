@@ -69,10 +69,7 @@ export function buildClientParamsNode({
         ? [
             ast.createFunctionParameter({
               name: 'config',
-              type: ast.createParamsType({
-                variant: 'reference',
-                name: buildRequestConfigType(node, tsResolver),
-              }),
+              type: buildRequestConfigType(node, tsResolver),
               default: '{}',
             }),
           ]

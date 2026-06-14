@@ -35,10 +35,7 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
       params: [
         ast.createFunctionParameter({
           name: 'data',
-          type: ast.createParamsType({
-            variant: 'reference',
-            name: `${typeName} | ${callbackType}`,
-          }),
+          type: `${typeName} | ${callbackType}`,
           optional: true,
         }),
       ],

@@ -1,12 +1,4 @@
-export {
-  buildGroupParam,
-  buildQueryKeyParams,
-  resolveHeaderGroupType,
-  resolveOperationOverrides,
-  resolvePathParamType,
-  resolveQueryGroupType,
-  resolveZodSchemaNames,
-} from '@internals/tanstack-query'
+export { buildQueryKeyParams, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
 export {
   buildOperationComments as getComments,
   buildRequestConfigType,

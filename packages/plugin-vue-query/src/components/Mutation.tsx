@@ -21,7 +21,7 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
-const keysPrinter = functionPrinter({ mode: 'keys' })
+const keysPrinter = functionPrinter({ mode: 'call' })
 
 function createMutationArgParams(
   node: ast.OperationNode,
@@ -63,13 +63,10 @@ function buildMutationParamsNode(
     params: [
       ast.createFunctionParameter({
         name: 'options',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: `{
+        type: `{
   mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'undefined', 'TContext'].join(', ')}> & { client?: QueryClient },
   client?: ${buildRequestConfigType(node, resolver)},
 }`,
-        }),
         default: '{}',
       }),
     ],
@@ -115,10 +112,7 @@ export function Mutation({
     extraParams: [
       ast.createFunctionParameter({
         name: 'config',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: buildRequestConfigType(node, tsResolver),
-        }),
+        type: buildRequestConfigType(node, tsResolver),
         default: '{}',
       }),
     ],

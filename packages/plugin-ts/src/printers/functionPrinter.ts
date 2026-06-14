@@ -6,40 +6,51 @@ import { PARAM_RANK } from '../constants.ts'
  */
 export type FunctionNodeByType = {
   functionParameter: ast.FunctionParameterNode
-  parameterGroup: ast.ParameterGroupNode
   functionParameters: ast.FunctionParametersNode
-  paramsType: ast.ParamsTypeNode
 }
 
 const kindToHandlerKey = {
   FunctionParameter: 'functionParameter',
-  ParameterGroup: 'parameterGroup',
   FunctionParameters: 'functionParameters',
-  ParamsType: 'paramsType',
-} satisfies Record<string, ast.FunctionNodeType>
+} satisfies Partial<Record<string, ast.FunctionNodeType>>
 
 /**
- * Creates a function-parameter printer factory.
+ * Renders a {@link ast.TypeExpression} to its TypeScript source.
  *
- * Uses `createPrinterFactory` and dispatches handlers by `node.kind`
- * (for function nodes) rather than by `node.type` (for schema nodes).
+ * - a `string` is a type reference, returned as-is
+ * - an `IndexedAccessType` becomes `objectType['indexType']`
+ * - a `TypeLiteral` becomes `{ key: Type; key?: Type }`
+ *
+ * `transformType` is applied once to the fully rendered type, matching how the
+ * printer wrapped reference types before the `ts.factory` model.
  */
-export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionNodeType, FunctionNodeByType>(
-  (node) => kindToHandlerKey[node.kind],
-)
+export function renderType(type: ast.TypeExpression, transformType?: (type: string) => string): string {
+  const rendered = renderTypeExpression(type)
+  return transformType ? transformType(rendered) : rendered
+}
+
+function renderTypeExpression(type: ast.TypeExpression): string {
+  if (typeof type === 'string') return type
+  if (type.kind === 'IndexedAccessType') return `${type.objectType}['${type.indexType}']`
+
+  const parts = type.members.map((member) => {
+    const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(member.name) ? member.name : JSON.stringify(member.name)
+    const value = renderTypeExpression(member.type)
+    return member.optional ? `${key}?: ${value}` : `${key}: ${value}`
+  })
+  return `{ ${parts.join('; ')} }`
+}
 
 export type FunctionPrinterOptions = {
   /**
    * Rendering modes supported by `functionPrinter`.
    *
-   * | Mode          | Output example                              | Use case                        |
-   * |---------------|---------------------------------------------|---------------------------------|
-   * | `declaration` | `id: string, config: Config = {}`           | Function parameter declaration |
-   * | `call`        | `id, { method, url }`                       | Function call arguments |
-   * | `keys`        | `{ id, config }`                            | Key names only (destructuring) |
-   * | `values`      | `{ id: id, config: config }`                | Key/value object entries |
+   * | Mode          | Output example                    | Use case                       |
+   * |---------------|-----------------------------------|--------------------------------|
+   * | `declaration` | `id: string, config: Config = {}` | Function parameter declaration |
+   * | `call`        | `id, { method, url }`             | Function call arguments        |
    */
-  mode: 'declaration' | 'call' | 'keys' | 'values'
+  mode: 'declaration' | 'call'
   /**
    * Optional transformation applied to every parameter name before printing.
    */
@@ -52,28 +63,71 @@ export type FunctionPrinterOptions = {
 
 type DefaultPrinter = ast.PrinterFactoryOptions<'functionParameters', FunctionPrinterOptions, string>
 
-function rank(param: ast.FunctionParameterNode | ast.ParameterGroupNode): number {
-  if (param.kind === 'ParameterGroup') {
-    if (param.default) return PARAM_RANK.withDefault
-    const isOptional = param.optional ?? param.properties.every((p) => p.optional || p.default !== undefined)
-    return isOptional ? PARAM_RANK.optional : PARAM_RANK.required
-  }
+function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: string; optional?: boolean }> | null {
+  if (typeof param.name === 'string') return null
+  return param.type && typeof param.type !== 'string' && param.type.kind === 'TypeLiteral' ? param.type.members : []
+}
+
+function rank(param: ast.FunctionParameterNode): number {
   if (param.rest) return PARAM_RANK.rest
   if (param.default) return PARAM_RANK.withDefault
+  const members = groupMembers(param)
+  if (members) return members.every((m) => m.optional) ? PARAM_RANK.optional : PARAM_RANK.required
   return param.optional ? PARAM_RANK.optional : PARAM_RANK.required
 }
 
-function sortParams(params: ReadonlyArray<ast.FunctionParameterNode | ast.ParameterGroupNode>): Array<ast.FunctionParameterNode | ast.ParameterGroupNode> {
-  return params.toSorted((a, b) => rank(a) - rank(b))
-}
-
-function sortChildParams(params: Array<ast.FunctionParameterNode>): Array<ast.FunctionParameterNode> {
+function sortParams(params: ReadonlyArray<ast.FunctionParameterNode>): Array<ast.FunctionParameterNode> {
   return params.toSorted((a, b) => rank(a) - rank(b))
 }
 
 /**
- * Default function-signature printer.
- * Covers the four standard output modes used across Kubb plugins.
+ * Orders a destructured group's binding elements and type members together,
+ * required fields first, matching how grouped children were sorted before.
+ */
+function sortedGroupMembers(name: ast.ObjectBindingPatternNode, type: ast.TypeExpression | undefined): Array<{ name: string; type?: ast.TypeExpression; optional?: boolean }> {
+  const members = type && typeof type !== 'string' && type.kind === 'TypeLiteral' ? type.members : []
+  const memberRank = (optional?: boolean) => (optional ? PARAM_RANK.optional : PARAM_RANK.required)
+  return name.elements
+    .map((element, index) => ({ name: element.name, type: members[index]?.type, optional: members[index]?.optional }))
+    .toSorted((a, b) => memberRank(a.optional) - memberRank(b.optional))
+}
+
+/**
+ * Renders the type annotation of a destructured group. An inline object type is
+ * rendered from the already-sorted members so its key order matches the binding;
+ * a reference type is rendered as-is.
+ */
+function renderGroupType(
+  type: ast.TypeExpression | undefined,
+  sorted: Array<{ name: string; type?: ast.TypeExpression; optional?: boolean }>,
+  transformType?: (type: string) => string,
+): string | undefined {
+  if (!type) return undefined
+  if (typeof type === 'string' || type.kind !== 'TypeLiteral') return renderType(type)
+
+  const typed = sorted.filter((member) => member.type !== undefined)
+  if (!typed.length) return undefined
+  const parts = typed.map((member) => {
+    const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(member.name) ? member.name : JSON.stringify(member.name)
+    const value = renderType(member.type!, transformType)
+    return member.optional ? `${key}?: ${value}` : `${key}: ${value}`
+  })
+  return `{ ${parts.join('; ')} }`
+}
+
+/**
+ * Creates a function-parameter printer factory.
+ *
+ * Uses `createPrinterFactory` and dispatches handlers by `node.kind`
+ * (for function nodes) rather than by `node.type` (for schema nodes).
+ */
+export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionNodeType, FunctionNodeByType>(
+  (node) => kindToHandlerKey[node.kind as keyof typeof kindToHandlerKey],
+)
+
+/**
+ * Default function-signature printer. Renders a parameter list in one of two modes:
+ * `declaration` for the function signature and `call` for the call arguments.
  *
  * @example
  * ```ts
@@ -93,38 +147,35 @@ export const functionPrinter = defineFunctionPrinter<DefaultPrinter>((options) =
   name: 'functionParameters',
   options,
   nodes: {
-    paramsType(node) {
-      if (node.kind !== 'ParamsType') return null
-      if (node.variant === 'member') {
-        return `${node.base}['${node.key}']`
-      }
-      if (node.variant === 'struct') {
-        const parts = node.properties.map((p) => {
-          const typeStr = this.transform(p.type)
-          const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(p.name) ? p.name : JSON.stringify(p.name)
-          return p.optional ? `${key}?: ${typeStr}` : `${key}: ${typeStr}`
-        })
-        return `{ ${parts.join('; ')} }`
-      }
-      if (node.variant === 'reference') {
-        return node.name
-      }
-      return null
-    },
     functionParameter(node) {
       const { mode, transformName, transformType } = this.options
-      const name = transformName ? transformName(node.name) : node.name
-
-      const rawType = node.type ? this.transform(node.type) : undefined
-      const type = rawType != null && transformType ? transformType(rawType) : rawType
-
-      if (mode === 'keys' || mode === 'values') {
-        return node.rest ? `...${name}` : name
-      }
+      const isGroup = typeof node.name !== 'string'
 
       if (mode === 'call') {
+        if (isGroup) {
+          const keys = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
+            .map((member) => member.name)
+            .join(', ')
+          return `{ ${keys} }`
+        }
+        const name = transformName ? transformName(node.name as string) : (node.name as string)
         return node.rest ? `...${name}` : name
       }
+
+      if (isGroup) {
+        const sorted = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
+        const binding = `{ ${sorted.map((member) => (transformName ? transformName(member.name) : member.name)).join(', ')} }`
+        const allOptional = sorted.every((member) => member.optional)
+        const type = renderGroupType(node.type, sorted, transformType)
+        if (type) {
+          if (allOptional) return `${binding}: ${type} = ${node.default ?? '{}'}`
+          return node.default ? `${binding}: ${type} = ${node.default}` : `${binding}: ${type}`
+        }
+        return node.default ? `${binding} = ${node.default}` : binding
+      }
+
+      const name = transformName ? transformName(node.name as string) : (node.name as string)
+      const type = node.type ? renderType(node.type, transformType) : undefined
 
       if (node.rest) {
         return type ? `...${name}: ${type}` : `...${name}`
@@ -135,60 +186,8 @@ export const functionPrinter = defineFunctionPrinter<DefaultPrinter>((options) =
       }
       return node.default ? `${name} = ${node.default}` : name
     },
-    parameterGroup(node) {
-      const { mode, transformName, transformType } = this.options
-      const sorted = sortChildParams(node.properties)
-      const isOptional = node.optional ?? sorted.every((p) => p.optional || p.default !== undefined)
-
-      if (node.inline) {
-        return sorted
-          .map((p) => this.transform(p))
-          .filter(Boolean)
-          .join(', ')
-      }
-
-      if (mode === 'keys' || mode === 'values') {
-        const keys = sorted.map((p) => p.name).join(', ')
-        return `{ ${keys} }`
-      }
-
-      if (mode === 'call') {
-        const keys = sorted.map((p) => p.name).join(', ')
-        return `{ ${keys} }`
-      }
-
-      const names = sorted.map((p) => {
-        const n = transformName ? transformName(p.name) : p.name
-
-        return n
-      })
-
-      const nameStr = names.length ? `{ ${names.join(', ')} }` : undefined
-      if (!nameStr) return null
-
-      let typeAnnotation: string | undefined = node.type ? (this.transform(node.type) ?? undefined) : undefined
-      if (!typeAnnotation) {
-        const typeParts = sorted
-          .filter((p) => p.type)
-          .map((p) => {
-            const rawT = p.type ? this.transform(p.type) : undefined
-            const t = rawT != null && transformType ? transformType(rawT) : rawT
-            return p.optional || p.default !== undefined ? `${p.name}?: ${t}` : `${p.name}: ${t}`
-          })
-        typeAnnotation = typeParts.length ? `{ ${typeParts.join('; ')} }` : undefined
-      }
-
-      if (typeAnnotation) {
-        if (isOptional) return `${nameStr}: ${typeAnnotation} = ${node.default ?? '{}'}`
-        return node.default ? `${nameStr}: ${typeAnnotation} = ${node.default}` : `${nameStr}: ${typeAnnotation}`
-      }
-
-      return node.default ? `${nameStr} = ${node.default}` : nameStr
-    },
     functionParameters(node) {
-      const sorted = sortParams(node.params)
-
-      return sorted
+      return sortParams(node.params)
         .map((p) => this.transform(p))
         .filter(Boolean)
         .join(', ')

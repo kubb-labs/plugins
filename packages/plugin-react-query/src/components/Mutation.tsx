@@ -65,13 +65,10 @@ function buildMutationParamsNode(
     params: [
       ast.createFunctionParameter({
         name: 'options',
-        type: ast.createParamsType({
-          variant: 'reference',
-          name: `{
+        type: `{
   mutation?: UseMutationOptions<${generics}> & { client?: QueryClient },
   client?: ${buildRequestConfigType(node, resolver)},
 }`,
-        }),
         default: '{}',
       }),
     ],

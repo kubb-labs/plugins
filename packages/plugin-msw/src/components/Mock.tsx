@@ -36,10 +36,7 @@ export function Mock({ baseURL = '', name, typeName, requestTypeName, node }: Pr
       params: [
         ast.createFunctionParameter({
           name: 'data',
-          type: ast.createParamsType({
-            variant: 'reference',
-            name: `${dataType} | ${callbackType}`,
-          }),
+          type: `${dataType} | ${callbackType}`,
           optional: true,
         }),
       ],

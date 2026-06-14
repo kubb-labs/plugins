@@ -45,13 +45,10 @@ function buildSuspenseQueryParamsNode(
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
-    type: ast.createParamsType({
-      variant: 'reference',
-      name: `{
+    type: `{
   query?: Partial<UseSuspenseQueryOptions<${[TData, TError, 'TData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
   client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
 }`,
-    }),
     default: '{}',
   })
 

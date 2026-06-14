@@ -43,13 +43,10 @@ function buildSuspenseInfiniteQueryParamsNode(
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
-    type: ast.createParamsType({
-      variant: 'reference',
-      name: `{
+    type: `{
   query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
   client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
 }`,
-    }),
     default: '{}',
   })
 

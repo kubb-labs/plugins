@@ -44,15 +44,12 @@ function buildQueryParamsNode(
 
   const optionsParam = ast.createFunctionParameter({
     name: 'options',
-    type: ast.createParamsType({
-      variant: 'reference',
-      name: `{
+    type: `{
   query?: SWRConfiguration<${[TData, TError].join(', ')}>,
   client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'},
   shouldFetch?: boolean,
   immutable?: boolean
 }`,
-    }),
     default: '{}',
   })
 
