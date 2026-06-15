@@ -1,5 +1,13 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.57
+
+### Patch Changes
+
+- [#414](https://github.com/kubb-labs/plugins/pull/414) [`451f3b7`](https://github.com/kubb-labs/plugins/commit/451f3b7a24eb95fb4881bee8de59839e81686386) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Consume the shared schema-traversal helpers (`mapSchemaProperties`, `mapSchemaMembers`,
+  `mapSchemaItems`, `lazyGetter`) from `@kubb/ast/utils` in the zod, zod-mini, faker, and TypeScript
+  printers, replacing the per-printer property, member, and item walks. Generated output is unchanged.
+
 ## 5.0.0-beta.56
 
 ### Major Changes
