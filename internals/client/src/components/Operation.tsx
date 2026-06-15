@@ -1,0 +1,86 @@
+import { buildOperationComments } from '@internals/shared'
+import { ast } from '@kubb/core'
+import type { ResolverTs } from '@kubb/plugin-ts'
+import type { ResolverZod } from '@kubb/plugin-zod'
+import { File, Function } from '@kubb/renderer-jsx'
+import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildReturnStatement } from '../builders/returnStatement.ts'
+import { buildSecurityMetadata, type SecurityRequirement } from '../builders/security.ts'
+import { buildGroupedOptionsSignature } from '../builders/signature.ts'
+import { buildValidatorHooks } from '../builders/validator.ts'
+import type { ParserOptions } from '../types.ts'
+
+type Props = {
+  /**
+   * The generated function name.
+   */
+  name: string
+  /**
+   * The operation being generated.
+   */
+  node: ast.OperationNode
+  /**
+   * Resolver for the plugin-ts type names the signature references.
+   */
+  tsResolver: ResolverTs
+  /**
+   * Resolver for the zod schema names the validators reference, when `parser` is on.
+   */
+  zodResolver?: ResolverZod | null
+  /**
+   * The active parser option, driving the validator-hook wiring.
+   */
+  parser?: ParserOptions
+  /**
+   * Per-operation security requirements, serialized onto the call config (consumed by #395).
+   */
+  security?: Array<SecurityRequirement>
+  isExportable?: boolean
+  isIndexable?: boolean
+}
+
+/**
+ * Renders one slim client operation: the grouped `<Name>Data` type and the async-free function that
+ * forwards a single `options` object to the resolved client and returns the `RequestResult`.
+ */
+export function Operation({ name, node, tsResolver, zodResolver, parser, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+  if (!ast.isHttpOperationNode(node)) return null
+
+  const signature = buildGroupedOptionsSignature({ node, tsResolver })
+  const validators = buildValidatorHooks({ node, parser, zodResolver })
+  const securityLiteral = buildSecurityMetadata({ security })
+
+  const callConfig = `{ ${[
+    `method: '${node.method.toUpperCase()}'`,
+    `url: '${node.path}'`,
+    securityLiteral ? `security: ${securityLiteral}` : null,
+    validators.requestValidator ? `requestValidator: ${validators.requestValidator}` : null,
+    validators.responseValidator ? `responseValidator: ${validators.responseValidator}` : null,
+    '...config',
+  ]
+    .filter(Boolean)
+    .join(', ')} }`
+
+  return (
+    <>
+      <File.Source name={signature.dataTypeName} isExportable isIndexable isTypeOnly>
+        {`export type ${signature.dataTypeName} = ${signature.dataTypeDefinition}`}
+      </File.Source>
+      <br />
+      <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
+        <Function
+          name={name}
+          export={isExportable}
+          generics={signature.generics}
+          params={signature.paramsSignature}
+          returnType={signature.returnType}
+          JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
+        >
+          {'const { client: request = client, ...config } = options'}
+          <br />
+          {buildReturnStatement({ node, tsResolver, callConfig })}
+        </Function>
+      </File.Source>
+    </>
+  )
+}
