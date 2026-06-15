@@ -1,6 +1,7 @@
 import { getOperationParameters } from '@internals/shared'
 import { camelCase, Url } from '@internals/utils'
 import { ast } from '@kubb/core'
+import { createOperationParams } from '@kubb/ast/utils'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -31,7 +32,7 @@ const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function Request({ baseURL = '', name, dataReturnType, resolver, node, paramsType, pathParamsType, paramsCasing }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
-  const paramsNode = ast.factory.createOperationParams(node, {
+  const paramsNode = createOperationParams(node, {
     paramsType,
     pathParamsType,
     paramsCasing,
