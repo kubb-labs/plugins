@@ -1,4 +1,4 @@
-import { buildObject, extractRefName, objectKey, stringify, toRegExpString } from '@kubb/ast/utils'
+import { buildObject, extractRefName, mapSchemaItems, mapSchemaMembers, objectKey, stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import { containsCircularRef } from '@kubb/ast/utils'
 import type { PluginFaker, ResolverFaker } from '../types.ts'
@@ -312,46 +312,46 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
         const { discriminatorPropertyName } = node
         const baseTypeName = this.options.typeName
 
-        const items: Array<string> = (node.members ?? [])
-          .map((member) => {
-            // For a discriminated union, narrow each variant to its own branch so nested
-            // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
-            const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
+        const items: Array<string> = mapSchemaMembers(node, (member) => {
+          // For a discriminated union, narrow each variant to its own branch so nested
+          // `NonNullable<T>[K]` indexes resolve against that branch instead of the whole union.
+          const value = discriminatorPropertyName ? getDiscriminatorValue(member, discriminatorPropertyName) : undefined
 
-            if (baseTypeName && value !== undefined) {
-              const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
+          if (baseTypeName && value !== undefined) {
+            const typeName = `Extract<NonNullable<${baseTypeName}>, { ${JSON.stringify(discriminatorPropertyName)}: ${parseEnumValue(value)} }>`
 
-              return printNested(member, { typeName, nestedInObject: true })
-            }
+            return printNested(member, { typeName, nestedInObject: true })
+          }
 
-            // Without a discriminator, keep the union type but guard each indexed access (see
-            // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
-            // rather than erroring with TS2339.
-            return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
-          })
+          // Without a discriminator, keep the union type but guard each indexed access (see
+          // `indexedTypeName`) so a key carried by only some branches resolves to `unknown`
+          // rather than erroring with TS2339.
+          return printNested(member, { typeName: baseTypeName, nestedInObject: true, nestedInUnion: true })
+        })
+          .map(({ output }) => output)
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.union(items)
       },
       intersection(node): string {
-        const items: Array<string> = (node.members ?? [])
-          .map((member) =>
-            printNested(member, {
-              nestedInObject: true,
-            }),
-          )
+        const items: Array<string> = mapSchemaMembers(node, (member) =>
+          printNested(member, {
+            nestedInObject: true,
+          }),
+        )
+          .map(({ output }) => output)
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.and(items)
       },
       array(node): string {
-        const items: Array<string> = (node.items ?? [])
-          .map((member) =>
-            printNested(member, {
-              typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
-              nestedInObject: true,
-            }),
-          )
+        const items: Array<string> = mapSchemaItems(node, (member) =>
+          printNested(member, {
+            typeName: this.options.typeName ? `NonNullable<${this.options.typeName}>[number]` : undefined,
+            nestedInObject: true,
+          }),
+        )
+          .map(({ output }) => output)
           .filter((item): item is string => Boolean(item))
 
         return fakerKeywordMapper.array(items, node.min, node.max)
