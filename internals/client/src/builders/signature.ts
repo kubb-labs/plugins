@@ -1,6 +1,8 @@
-import type { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
+import { ast } from '@kubb/core'
+import { functionPrinter, type ResolverTs, renderType } from '@kubb/plugin-ts'
 import { buildRequestResultGenerics } from './generics.ts'
+
+const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 /**
  * The pieces of a generated operation function's grouped-options signature.
@@ -11,7 +13,7 @@ export type GroupedOptionsSignature = {
    */
   dataTypeName: string
   /**
-   * Body of the per-operation grouped data type, with the contract key names
+   * Rendered body of the per-operation grouped data type, with the contract key names
    * (`body` / `path` / `query` / `headers` / `url`) derived from the plugin-ts `<Name>RequestConfig`.
    */
   dataTypeDefinition: string
@@ -38,9 +40,9 @@ export type GroupedOptionsSignature = {
  * carries a literal `url`, and a `RequestResult` return type keyed to the plugin-ts per-status
  * responses record. There are no positional arguments.
  *
- * The grouped data type reuses the plugin-ts `<Name>RequestConfig` through indexed access, so the
- * generated file only imports `<Name>RequestConfig` and `<Name>Responses` and never collides with
- * the per-direction type names.
+ * The grouped data type is an AST type literal whose members index into the plugin-ts
+ * `<Name>RequestConfig`, so the generated file only imports `<Name>RequestConfig` and `<Name>Responses`
+ * and never collides with the per-direction type names.
  */
 export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.OperationNode; tsResolver: ResolverTs }): GroupedOptionsSignature {
   const requestConfigName = tsResolver.resolveRequestConfigName(node)
@@ -49,20 +51,30 @@ export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.O
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const resultGenerics = buildRequestResultGenerics({ node, tsResolver })
 
-  const dataTypeDefinition = [
-    '{',
-    `  body${hasBody ? '' : '?'}: ${requestConfigName}['data']`,
-    `  path?: ${requestConfigName}['pathParams']`,
-    `  query?: ${requestConfigName}['queryParams']`,
-    `  headers?: ${requestConfigName}['headerParams']`,
-    `  url: ${requestConfigName}['url']`,
-    '}',
-  ].join('\n')
+  const indexed = (indexType: string) => ast.factory.createIndexedAccessType({ objectType: requestConfigName, indexType })
+  const dataTypeDefinition = renderType(
+    ast.factory.createTypeLiteral({
+      members: [
+        { name: 'body', type: indexed('data'), optional: !hasBody },
+        { name: 'path', type: indexed('pathParams'), optional: true },
+        { name: 'query', type: indexed('queryParams'), optional: true },
+        { name: 'headers', type: indexed('headerParams'), optional: true },
+        { name: 'url', type: indexed('url'), optional: false },
+      ],
+    }),
+  )
+
+  const paramsSignature =
+    declarationPrinter.print(
+      ast.factory.createFunctionParameters({
+        params: [ast.factory.createFunctionParameter({ name: 'options', type: `Options<${dataTypeName}, ThrowOnError>` })],
+      }),
+    ) ?? ''
 
   return {
     dataTypeName,
     dataTypeDefinition,
-    paramsSignature: `options: Options<${dataTypeName}, ThrowOnError>`,
+    paramsSignature,
     returnType: `Promise<RequestResult<${resultGenerics}>>`,
     generics: ['ThrowOnError extends boolean = true'],
     importedTypeNames: [requestConfigName, responsesName],

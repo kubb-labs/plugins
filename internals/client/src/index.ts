@@ -13,6 +13,7 @@ export { buildGroupedOptionsSignature, type GroupedOptionsSignature } from './bu
 export { buildValidatorHooks, type ValidatorHooks } from './builders/validator.ts'
 export { Operation } from './components/Operation.tsx'
 export { composeClientRuntime, injectClientRuntime, type InjectClientRuntimeParams, runtimeSource, type TransportDescriptor } from './inject/injectRuntime.ts'
+export { defaultMacros } from './macros.ts'
 export { resolveOptions } from './options.ts'
 export { resolverClient } from './resolver.ts'
 export type { Options, ParserOptions, PluginSlimClient, ResolvedOptions, ResolverClient } from './types.ts'
