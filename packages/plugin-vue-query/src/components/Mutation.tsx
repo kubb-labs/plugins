@@ -1,3 +1,4 @@
+import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -30,7 +31,7 @@ function createMutationArgParams(
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  return ast.factory.createOperationParams(node, {
+  return createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
     paramsCasing: options.paramsCasing,
@@ -104,7 +105,7 @@ export function Mutation({
   const mutationKeyParamsNode = ast.factory.createFunctionParameters({ params: [] })
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
 
-  const clientCallParamsNode = ast.factory.createOperationParams(node, {
+  const clientCallParamsNode = createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
