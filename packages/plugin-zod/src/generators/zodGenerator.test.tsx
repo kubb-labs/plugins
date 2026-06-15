@@ -716,7 +716,8 @@ describe('zodGenerator — paramsCasing', () => {
 
 describe('zodGenerator — transformers', () => {
   test('schema transformer — removes optional properties from object', async () => {
-    const removeOptionalProperties: ast.Visitor = {
+    const removeOptionalProperties: ast.Macro = {
+      name: 'remove-optional-properties',
       schema(node) {
         if ('properties' in node) {
           return { ...node, properties: node.properties.filter((p) => p.required) }
@@ -724,7 +725,7 @@ describe('zodGenerator — transformers', () => {
         return node
       },
     }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod, transformer: removeOptionalProperties })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod, macros: [removeOptionalProperties] })
     const driver = createMockedPluginDriver({ name: 'transformers removeOptionalProperties' })
 
     await renderGeneratorSchema(zodGenerator, objectSchema, {
@@ -740,13 +741,14 @@ describe('zodGenerator — transformers', () => {
   })
 
   test('schema transformer — maps integer type to string', async () => {
-    const integerToString: ast.Visitor = {
+    const integerToString: ast.Macro = {
+      name: 'integer-to-string',
       schema(node) {
         if (node.type === 'integer') return { ...node, type: 'string' }
         return node
       },
     }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod, transformer: integerToString })
+    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options: defaultOptions, resolver: resolverZod, macros: [integerToString] })
     const driver = createMockedPluginDriver({ name: 'transformers integerToString' })
 
     const schemaWithInteger = ast.factory.createSchema({

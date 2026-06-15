@@ -456,7 +456,8 @@ describe('cypressGenerator — baseURL', () => {
 
 describe('cypressGenerator — transformers', () => {
   test('schema visitor — filters to required properties only', async () => {
-    const transformer: ast.Visitor = {
+    const macro: ast.Macro = {
+      name: 'required-properties-only',
       schema(node) {
         if ('properties' in node) {
           return { ...node, properties: node.properties.filter((p) => p.required) }
@@ -465,7 +466,7 @@ describe('cypressGenerator — transformers', () => {
       },
     }
 
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress, transformer })
+    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options: defaultOptions, resolver: resolverCypress, macros: [macro] })
     const driver = createMockedPluginDriver({
       name: 'transformers schema visitor',
       plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
