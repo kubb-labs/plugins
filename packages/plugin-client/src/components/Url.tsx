@@ -1,6 +1,7 @@
 import { buildParamsMapping, getOperationParameters } from '@internals/shared'
 import { isValidVarName, Url as UrlHelper } from '@internals/utils'
 import { ast } from '@kubb/core'
+import { createOperationParams } from '@kubb/ast/utils'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
@@ -38,7 +39,7 @@ export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, n
     requestBody: undefined,
   }
 
-  return ast.factory.createOperationParams(urlNode, {
+  return createOperationParams(urlNode, {
     paramsType: paramsType === 'object' ? 'object' : 'inline',
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

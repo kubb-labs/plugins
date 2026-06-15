@@ -1,4 +1,5 @@
 import { ast } from '@kubb/core'
+import { createOperationParams } from '@kubb/ast/utils'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -55,7 +56,7 @@ function buildInfiniteQueryParamsNode(
     default: '{}',
   })
 
-  const baseParams = ast.factory.createOperationParams(node, {
+  const baseParams = createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,

@@ -1,4 +1,5 @@
 import { ast } from '@kubb/core'
+import { createOperationParams } from '@kubb/ast/utils'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
@@ -54,7 +55,7 @@ export function MutationOptions({
   const configParamsNode = buildMutationConfigParamsNode(node, tsResolver)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
-  const mutationArgParamsNode = ast.factory.createOperationParams(node, {
+  const mutationArgParamsNode = createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
     paramsCasing,
@@ -65,7 +66,7 @@ export function MutationOptions({
   const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
 
-  const clientCallParamsNode = ast.factory.createOperationParams(node, {
+  const clientCallParamsNode = createOperationParams(node, {
     paramsType,
     pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
     paramsCasing,
