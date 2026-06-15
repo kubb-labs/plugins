@@ -143,9 +143,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverFaker> & ThisType<ResolverFaker>
   /**
-   * AST visitor applied to schema and operation nodes before printing.
+   * Macros applied to schema and operation nodes before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Replace the Faker handler for a specific schema type (`'integer'`, `'date'`, ...).
    * Each handler returns the Faker expression as a string.

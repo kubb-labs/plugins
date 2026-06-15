@@ -262,19 +262,22 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverTs> & ThisType<ResolverTs>
   /**
-   * AST visitor applied to each schema or operation node before printing.
-   * Methods you omit fall back to the preset transformer.
+   * Macros applied to each schema or operation node before printing.
+   * Callbacks you omit fall back to the preset behavior.
    *
    * @example Drop writeOnly properties from response types
    * ```ts
-   * transformer: {
-   *   property(node) {
-   *     if (node.schema.writeOnly) return undefined
-   *   }
-   * }
+   * macros: [
+   *   {
+   *     name: 'drop-write-only',
+   *     property(node) {
+   *       if (node.schema.writeOnly) return undefined
+   *     },
+   *   },
+   * ]
    * ```
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Replace the TypeScript handler for a specific schema type (`'integer'`, `'date'`, ...).
    * Each handler returns a TypeScript AST node for that schema type. Use `this.transform`

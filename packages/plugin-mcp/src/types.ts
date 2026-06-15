@@ -59,9 +59,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverMcp> & ThisType<ResolverMcp>
   /**
-   * AST visitor applied to each operation node before printing.
+   * Macros applied to each operation node before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Custom generators that run alongside the built-in MCP generators.
    */

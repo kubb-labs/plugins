@@ -371,8 +371,8 @@ const configs = [
   },
   {
     /**
-     * Verifies that `transformer` is applied to each SchemaNode before printing.
-     * The visitor strips `description` from every node, so generated type files
+     * Verifies that a macro is applied to each SchemaNode before printing.
+     * The macro strips `description` from every node, so generated type files
      * contain no `@description` JSDoc tags.
      */
     name: 'transformerStripDescriptions',
@@ -385,11 +385,14 @@ const configs = [
       plugins: [
         pluginTs({
           output: { path: './types', barrel: false },
-          transformer: {
-            schema(node) {
-              return { ...node, example: 'test', description: undefined }
+          macros: [
+            {
+              name: 'strip-descriptions',
+              schema(node) {
+                return { ...node, example: 'test', description: undefined }
+              },
             },
-          },
+          ],
         }),
       ],
     },

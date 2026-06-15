@@ -876,7 +876,8 @@ describe('typeGenerator — arrayType', () => {
 
 describe('typeGenerator — transformers', () => {
   test('schema transformer — removes optional properties from object', async () => {
-    const removeOptionalProperties: ast.Visitor = {
+    const removeOptionalProperties: ast.Macro = {
+      name: 'remove-optional-properties',
       schema(node) {
         if ('properties' in node) {
           return { ...node, properties: node.properties.filter((p) => p.required) }
@@ -884,7 +885,7 @@ describe('typeGenerator — transformers', () => {
         return node
       },
     }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, transformer: removeOptionalProperties })
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, macros: [removeOptionalProperties] })
     const driver = createMockedPluginDriver({ name: 'transformers removeOptionalProperties' })
 
     await renderGeneratorSchema(typeGenerator, objectSchema, {
@@ -900,13 +901,14 @@ describe('typeGenerator — transformers', () => {
   })
 
   test('schema transformer — maps integer type to string', async () => {
-    const integerToString: ast.Visitor = {
+    const integerToString: ast.Macro = {
+      name: 'integer-to-string',
       schema(node) {
         if (node.type === 'integer') return { ...node, type: 'string' }
         return node
       },
     }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, transformer: integerToString })
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options: defaultOptions, resolver: resolverTs, macros: [integerToString] })
     const driver = createMockedPluginDriver({ name: 'transformers integerToString' })
 
     const schemaWithInteger = ast.factory.createSchema({

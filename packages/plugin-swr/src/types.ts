@@ -156,9 +156,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverSwr> & ThisType<ResolverSwr>
   /**
-   * AST visitor to transform generated nodes.
+   * Macros that rewrite generated nodes before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Additional generators alongside the default generators.
    */

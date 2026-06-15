@@ -68,7 +68,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     sdk,
     baseURL,
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
   } = options
 
   const resolvedImportPath = importPath ?? (!bundle ? `@kubb/plugin-client/clients/${client}` : undefined)
@@ -112,8 +112,8 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           resolver,
         })
         ctx.setResolver(resolver)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
         for (const gen of selectedGenerators) {
           ctx.addGenerator(gen)

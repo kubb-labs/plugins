@@ -48,7 +48,7 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     paramsCasing,
     printer,
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
     generators: userGenerators = [],
   } = options
 
@@ -80,8 +80,8 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverTs, ...userResolver } : resolverTs)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
         ctx.addGenerator(typeGenerator)
         for (const gen of userGenerators) {

@@ -51,9 +51,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverMsw> & ThisType<ResolverMsw>
   /**
-   * AST visitor applied to operation nodes before printing.
+   * Macros applied to operation nodes before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Emit a `handlers.ts` file that re-exports every handler grouped by HTTP method.
    * Drop the file into `setupServer(...handlers)` or `setupWorker(...handlers)`.

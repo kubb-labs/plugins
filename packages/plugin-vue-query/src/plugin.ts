@@ -61,7 +61,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     paramsCasing,
     client,
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
     generators: userGenerators = [],
   } = options
 
@@ -132,8 +132,8 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
           resolver,
         })
         ctx.setResolver(resolver)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
 
         for (const gen of selectedGenerators) {

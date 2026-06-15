@@ -1,5 +1,4 @@
 import { resolveContentTypeVariants } from '@internals/shared'
-import { extractRefName } from '@kubb/ast/utils'
 import type { Adapter } from '@kubb/core'
 import { caseParams } from '@kubb/ast/utils'
 import { ast, defineGenerator } from '@kubb/core'
@@ -11,7 +10,7 @@ import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
 import { printerZod } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { buildSchemaNames, containsCodec } from '../utils.ts'
+import { buildSchemaNames, collectCodecRefNames, containsCodec } from '../utils.ts'
 
 type StdPrinters = { output: ReturnType<typeof printerZod>; input: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; dateType: unknown }
@@ -73,13 +72,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     // `string → Date`, and an `${name}InputSchema` variant encodes `Date → string` for requests.
     const hasCodec = !mini && containsCodec(node)
 
-    const codecRefNames = new Set(
-      hasCodec
-        ? ast.collect<string>(node, {
-            schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (extractRefName(n.ref) ?? undefined) : undefined),
-          })
-        : [],
-    )
+    const codecRefNames = new Set(hasCodec ? collectCodecRefNames(node) : [])
     const importEntries = adapter.getImports(node, (schemaName) => ({
       name: resolver.resolveSchemaName(schemaName),
       path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,
@@ -168,14 +161,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
       const inferTypeName = inferred ? resolver.resolveTypeName(name) : null
 
       // In the input direction, refs to codec components resolve to their input variant.
-      const codecRefNames =
-        direction === 'input' && !mini
-          ? new Set(
-              ast.collect<string>(schema, {
-                schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (extractRefName(n.ref) ?? undefined) : undefined),
-              }),
-            )
-          : null
+      const codecRefNames = direction === 'input' && !mini ? new Set(collectCodecRefNames(schema)) : null
       const imports = adapter.getImports(schema, (schemaName) => ({
         name: codecRefNames?.has(schemaName) ? resolver.resolveInputSchemaName(schemaName) : resolver.resolveSchemaName(schemaName),
         path: resolver.resolveFile({ name: schemaName, extname: '.ts' }, { root, output, group: group ?? undefined }).path,

@@ -1,7 +1,7 @@
 import { buildParamsMapping, getOperationParameters } from '@internals/shared'
 import { isValidVarName, Url as UrlHelper } from '@internals/utils'
-import { ast } from '@kubb/core'
 import { createOperationParams } from '@kubb/ast/utils'
+import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'

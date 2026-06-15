@@ -185,9 +185,9 @@ export type Options = OutputOptions & {
     nodes?: PrinterZodNodes | PrinterZodMiniNodes
   }
   /**
-   * AST visitor applied to each schema or operation node before printing.
+   * Macros applied to each schema or operation node before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
 }
 
 type ResolvedOptions = {
