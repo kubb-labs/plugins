@@ -1,5 +1,6 @@
 import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
+import { createOperationParams } from '@kubb/ast/utils'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'

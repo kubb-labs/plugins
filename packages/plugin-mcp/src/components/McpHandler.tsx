@@ -2,6 +2,7 @@ import { buildOperationComments, buildTransformedParamsMapping, getOperationPara
 import { camelCase, isValidVarName, Url } from '@internals/utils'
 import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
+import { createOperationParams } from '@kubb/ast/utils'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
