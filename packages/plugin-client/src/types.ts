@@ -233,10 +233,10 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverClient> & ThisType<ResolverClient>
   /**
-   * AST visitor applied to each operation node before code is printed.
-   * Return `null` or `undefined` to leave the node unchanged.
+   * Macros applied to each operation node before code is printed.
+   * Return `null` or `undefined` from a callback to leave the node unchanged.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Custom generators that run alongside the built-in client generators.
    */

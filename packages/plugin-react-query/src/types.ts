@@ -317,9 +317,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverReactQuery> & ThisType<ResolverReactQuery>
   /**
-   * AST visitor applied to each operation node before printing.
+   * Macros applied to each operation node before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Custom generators that run alongside the built-in React Query generators.
    */

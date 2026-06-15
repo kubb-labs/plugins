@@ -53,7 +53,7 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     paramsCasing,
     printer,
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
     generators: userGenerators = [],
   } = options
 
@@ -82,8 +82,8 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverZod, ...userResolver } : resolverZod)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
         ctx.addGenerator(zodGenerator)
         for (const gen of userGenerators) {

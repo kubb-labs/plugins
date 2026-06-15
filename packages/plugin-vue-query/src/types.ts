@@ -226,9 +226,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverVueQuery> & ThisType<ResolverVueQuery>
   /**
-   * AST visitor applied to each operation node before printing.
+   * Macros applied to each operation node before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Custom generators that run alongside the built-in Vue Query generators.
    */

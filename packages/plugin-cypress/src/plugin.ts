@@ -47,7 +47,7 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     paramsType = 'inline',
     pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
     generators: userGenerators = [],
   } = options
 
@@ -75,8 +75,8 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
           resolver,
         })
         ctx.setResolver(resolver)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
         ctx.addGenerator(cypressGenerator)
         for (const gen of userGenerators) {

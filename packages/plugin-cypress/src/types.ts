@@ -89,9 +89,9 @@ export type Options = OutputOptions & {
    */
   resolver?: Partial<ResolverCypress> & ThisType<ResolverCypress>
   /**
-   * AST visitor applied to each operation node before printing.
+   * Macros applied to each operation node before printing.
    */
-  transformer?: ast.Visitor
+  macros?: Array<ast.Macro>
   /**
    * Custom generators that run alongside the built-in Cypress generators.
    */

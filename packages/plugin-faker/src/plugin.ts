@@ -51,7 +51,7 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     paramsCasing,
     printer,
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
   } = options
 
   const groupConfig = createGroupConfig(group)
@@ -77,8 +77,8 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverFaker, ...userResolver } : resolverFaker)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
         ctx.addGenerator(fakerGenerator)
         for (const generator of userGenerators) {

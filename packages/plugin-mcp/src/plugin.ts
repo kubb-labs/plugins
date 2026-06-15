@@ -57,7 +57,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     paramsCasing,
     client,
     resolver: userResolver,
-    transformer: userTransformer,
+    macros: userMacros,
     generators: userGenerators = [],
   } = options
 
@@ -93,8 +93,8 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           resolver,
         })
         ctx.setResolver(resolver)
-        if (userTransformer) {
-          ctx.setTransformer(userTransformer)
+        if (userMacros?.length) {
+          ctx.setMacros(userMacros)
         }
         ctx.addGenerator(mcpGenerator)
         ctx.addGenerator(serverGenerator)
