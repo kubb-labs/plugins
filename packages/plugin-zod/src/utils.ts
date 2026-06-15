@@ -107,9 +107,8 @@ export function containsCodec(node: ast.SchemaNode | undefined, seen: Set<string
 }
 
 /**
- * Collects the names of `$ref` schemas that transitively contain a codec, so callers can route them
- * to their input (encode) variant. Wraps the {@link containsCodec} ref scan the generator runs in
- * both the output and input directions.
+ * Collects the names of `$ref` schemas that transitively contain a codec, so the generator can route
+ * them to their input (encode) variant.
  */
 export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
   return ast.collect<string>(node, {
