@@ -13,7 +13,7 @@ allowBuilds:
 
 catalog:
   '@kubb/adapter-oas': 5.0.0-beta.75
-  '@kubb/ast': 5.0.0-beta.75
+  '@kubb/ast': 5.0.0-beta.63
   '@kubb/core': 5.0.0-beta.75
   '@kubb/plugin-barrel': 5.0.0-beta.63
   '@kubb/parser-ts': 5.0.0-beta.75

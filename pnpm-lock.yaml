@@ -10,8 +10,8 @@ catalogs:
       specifier: 5.0.0-beta.75
       version: 5.0.0-beta.75
     '@kubb/ast':
-      specifier: 5.0.0-beta.75
-      version: 5.0.0-beta.75
+      specifier: 5.0.0-beta.63
+      version: 5.0.0-beta.63
     '@kubb/core':
       specifier: 5.0.0-beta.75
       version: 5.0.0-beta.75
@@ -683,7 +683,7 @@ importers:
         version: link:../utils
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -708,7 +708,7 @@ importers:
         version: link:../utils
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -727,7 +727,7 @@ importers:
         version: link:../utils
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -752,7 +752,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -780,7 +780,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -802,7 +802,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -824,7 +824,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -852,7 +852,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -877,7 +877,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -921,7 +921,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -952,7 +952,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -977,7 +977,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
@@ -1008,7 +1008,7 @@ importers:
     dependencies:
       '@kubb/ast':
         specifier: 'catalog:'
-        version: 5.0.0-beta.75
+        version: 5.0.0-beta.63
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.75(@kubb/renderer-jsx@5.0.0-beta.75)
