@@ -204,7 +204,7 @@ export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options)
           const value = applyMiniModifiers({
             value: wrappedOutput,
             nullable: meta.nullable,
-            optional: schema.optional,
+            optional: schema.optional || property.required === false,
             nullish: schema.nullish,
             defaultValue: meta.default,
           })
