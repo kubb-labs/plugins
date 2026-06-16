@@ -245,17 +245,18 @@ export const printerTs = ast.definePrinter<PrinterTs>((options) => {
 
         const propertyNodes: Array<ts.TypeElement> = mapSchemaProperties(node, (schema) => transform(schema)).map(({ name, property, output }) => {
           const baseType = output ?? factory.keywordTypeNodes.unknown
-          const type = factory.buildPropertyType(property.schema, baseType, options.optionalType)
+          const optional = !property.required || !!property.schema.optional || !!property.schema.nullish
+          const type = factory.buildPropertyType(property.schema, baseType, options.optionalType, optional)
           const propMeta = syncSchemaRef(property.schema)
 
           const propertyNode = factory.createPropertySignature({
-            questionToken: property.schema.optional || property.schema.nullish ? addsQuestionToken : false,
+            questionToken: optional ? addsQuestionToken : false,
             name,
             type,
             readOnly: propMeta?.readOnly,
           })
 
-          return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema) })
+          return factory.appendJSDocToNode({ node: propertyNode, comments: buildPropertyJSDocComments(property.schema, optional) })
         })
 
         const allElements = [...propertyNodes, ...factory.buildIndexSignatures(node, propertyNodes.length, transform)]

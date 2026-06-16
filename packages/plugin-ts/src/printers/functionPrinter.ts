@@ -26,7 +26,7 @@ export function renderType(type: ast.TypeExpression, transformType?: (type: stri
 
 function renderTypeExpression(type: ast.TypeExpression): string {
   if (typeof type === 'string') return type
-  if (type.kind === 'IndexedAccessType') return `${type.objectType}['${type.indexType}']`
+  if (ast.indexedAccessTypeDef.is(type)) return `${type.target}['${type.key}']`
 
   const parts = type.members.map((member) => {
     const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(member.name) ? member.name : JSON.stringify(member.name)
@@ -60,7 +60,7 @@ type DefaultPrinter = ast.PrinterFactoryOptions<'functionParameters', FunctionPr
 
 function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: string; optional?: boolean }> | null {
   if (typeof param.name === 'string') return null
-  return param.type && typeof param.type !== 'string' && param.type.kind === 'TypeLiteral' ? param.type.members : []
+  return param.type && ast.typeLiteralDef.is(param.type) ? param.type.members : []
 }
 
 function rank(param: ast.FunctionParameterNode): number {
@@ -83,7 +83,7 @@ function sortedGroupMembers(
   name: ast.ObjectBindingPatternNode,
   type: ast.TypeExpression | undefined,
 ): Array<{ name: string; type?: ast.TypeExpression; optional?: boolean }> {
-  const members = type && typeof type !== 'string' && type.kind === 'TypeLiteral' ? type.members : []
+  const members = type && ast.typeLiteralDef.is(type) ? type.members : []
   const memberRank = (optional?: boolean) => (optional ? PARAM_RANK.optional : PARAM_RANK.required)
   return name.elements
     .map((element, index) => ({ name: element.name, type: members[index]?.type, optional: members[index]?.optional }))
@@ -101,7 +101,7 @@ function renderGroupType(
   transformType?: (type: string) => string,
 ): string | undefined {
   if (!type) return undefined
-  if (typeof type === 'string' || type.kind !== 'TypeLiteral') return renderType(type)
+  if (!ast.typeLiteralDef.is(type)) return renderType(type)
 
   const typed = sorted.filter((member) => member.type !== undefined)
   if (!typed.length) return undefined

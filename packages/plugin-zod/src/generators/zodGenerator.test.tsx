@@ -159,14 +159,14 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
   ],
   requestBody: {
     content: [
-      {
+      ast.factory.createContent({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'object',
           primitive: 'object',
           properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
+      }),
     ],
   },
   responses: [
@@ -406,7 +406,12 @@ describe('zodGenerator — Operation', () => {
         path: '/pet',
         tags: ['pet'],
         requestBody: {
-          content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] }) }],
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [] }),
+            }),
+          ],
         },
         responses: [
           ast.factory.createResponse({
@@ -466,10 +471,10 @@ describe('zodGenerator — Operation', () => {
         parameters: [ast.factory.createParameter({ name: 'orderId', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true })],
         requestBody: {
           content: [
-            {
+            ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], description: 'Order payload' }),
-            },
+            }),
           ],
         },
         responses: [
@@ -531,14 +536,14 @@ describe('zodGenerator — Operation', () => {
         tags: ['pet'],
         requestBody: {
           content: [
-            {
+            ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
                 type: 'object',
                 primitive: 'object',
                 properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
               }),
-            },
+            }),
           ],
         },
         responses: [
@@ -578,7 +583,7 @@ describe('zodGenerator — Operation', () => {
         tags: ['pets'],
         requestBody: {
           content: [
-            {
+            ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
                 type: 'object',
@@ -588,7 +593,7 @@ describe('zodGenerator — Operation', () => {
                   ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) }),
                 ],
               }),
-            },
+            }),
           ],
         },
         responses: [

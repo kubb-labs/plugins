@@ -256,7 +256,7 @@ describe('fakerGenerator — operation', () => {
         requestBody: {
           description: 'Pet to add',
           content: [
-            {
+            ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
                 type: 'object',
@@ -268,7 +268,7 @@ describe('fakerGenerator — operation', () => {
                   }),
                 ],
               }),
-            },
+            }),
           ],
         },
         responses: [

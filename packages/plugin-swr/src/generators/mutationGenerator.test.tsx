@@ -85,7 +85,9 @@ const updatePetWithFormNode = ast.factory.createOperation({
   path: '/pet/{petId}',
   tags: ['pet'],
   parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
@@ -112,7 +114,9 @@ const createPetNode = ast.factory.createOperation({
   method: 'POST',
   path: '/pet',
   tags: ['pet'],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({
       statusCode: '200',

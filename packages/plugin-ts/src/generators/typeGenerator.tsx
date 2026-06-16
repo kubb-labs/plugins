@@ -162,7 +162,7 @@ export const typeGenerator = defineGenerator<PluginTs>({
 
     const paramTypes = params.map((param) =>
       renderSchemaType({
-        schema: param.schema,
+        schema: { ...param.schema, optional: !param.required },
         name: resolver.resolveParamName(node, param),
       }),
     )
