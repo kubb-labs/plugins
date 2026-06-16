@@ -36,7 +36,7 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
 
 /**
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
- * `RequestConfig` and adds them back, typed per operation, from the plugin-ts `<Name>Data` type.
+ * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
  */
 export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown; url: string }
 
@@ -116,7 +116,7 @@ export type RequestConfig<TData = unknown, TRequest = Request, TResponse = Respo
 
 /**
  * The grouped options object passed to every generated function: the request config minus the
- * data-shaped keys, plus the per-operation `<Name>Data` (minus its literal `url`).
+ * data-shaped keys, plus the per-operation `<Name>Request` (minus its literal `url`).
  */
 export type Options<TData extends DataShape, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = Omit<
   RequestConfig<unknown, TRequest, TResponse>,

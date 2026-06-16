@@ -23,7 +23,7 @@ const listPets = ast.factory.createOperation({
 describe('buildGroupedOptionsSignature', () => {
   test('emits a single grouped options parameter with a ThrowOnError generic', () => {
     const signature = buildGroupedOptionsSignature({ node: addPet, tsResolver: resolverTs })
-    expect(signature.paramsSignature).toBe('options: Options<AddPetData, ThrowOnError>')
+    expect(signature.paramsSignature).toBe('options: Options<AddPetRequest, ThrowOnError>')
     expect(signature.generics).toStrictEqual(['ThrowOnError extends boolean = true'])
   })
 
@@ -34,7 +34,7 @@ describe('buildGroupedOptionsSignature', () => {
 
   test('derives the grouped data type from RequestConfig with the contract key names', () => {
     const signature = buildGroupedOptionsSignature({ node: addPet, tsResolver: resolverTs })
-    expect(signature.dataTypeName).toBe('AddPetData')
+    expect(signature.dataTypeName).toBe('AddPetRequest')
     expect(signature.dataTypeDefinition).toContain("body: AddPetRequestConfig['data']")
     expect(signature.dataTypeDefinition).toContain("path?: AddPetRequestConfig['pathParams']")
     expect(signature.dataTypeDefinition).toContain("query?: AddPetRequestConfig['queryParams']")

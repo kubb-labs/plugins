@@ -1,0 +1,5 @@
+export { DeleteOrderRequest, deleteOrder } from './deleteOrder.ts'
+export { GetInventoryRequest, getInventory } from './getInventory.ts'
+export { GetOrderByIdRequest, getOrderById } from './getOrderById.ts'
+export { PlaceOrderRequest, placeOrder } from './placeOrder.ts'
+export { PlaceOrderPatchRequest, placeOrderPatch } from './placeOrderPatch.ts'

@@ -1,0 +1,8 @@
+export { AddPetRequest, addPet } from './addPet.ts'
+export { DeletePetRequest, deletePet } from './deletePet.ts'
+export { FindPetsByStatusRequest, findPetsByStatus } from './findPetsByStatus.ts'
+export { FindPetsByTagsRequest, findPetsByTags } from './findPetsByTags.ts'
+export { GetPetByIdRequest, getPetById } from './getPetById.ts'
+export { UpdatePetRequest, updatePet } from './updatePet.ts'
+export { UpdatePetWithFormRequest, updatePetWithForm } from './updatePetWithForm.ts'
+export { UploadFileRequest, uploadFile } from './uploadFile.ts'

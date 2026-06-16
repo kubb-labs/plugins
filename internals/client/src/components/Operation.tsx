@@ -40,7 +40,7 @@ type Props = {
 }
 
 /**
- * Renders one slim client operation: the grouped `<Name>Data` type and the function that forwards a
+ * Renders one slim client operation: the grouped `<Name>Request` type and the function that forwards a
  * single `options` object to the resolved client and returns the `RequestResult`. The type, signature,
  * and call config are built with the AST factory; only the jsx-renderer emits the source.
  */
@@ -64,9 +64,11 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
 
   return (
     <>
-      <Type export={isExportable} name={signature.dataTypeName}>
-        {signature.dataTypeDefinition}
-      </Type>
+      <File.Source name={signature.dataTypeName} isExportable={isExportable} isIndexable={isIndexable}>
+        <Type export={isExportable} name={signature.dataTypeName}>
+          {signature.dataTypeDefinition}
+        </Type>
+      </File.Source>
       <br />
       <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
         <Function
