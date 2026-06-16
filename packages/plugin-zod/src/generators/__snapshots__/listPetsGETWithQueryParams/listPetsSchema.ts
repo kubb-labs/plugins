@@ -5,7 +5,7 @@
 
 import * as z from 'zod'
 
-export const listPetsQueryLimitSchema = z.int()
+export const listPetsQueryLimitSchema = z.int().optional()
 
 export const listPetsStatus200Schema = z.object({})
 

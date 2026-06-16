@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 export const updatePetPathPetIdSchema = z.string()
 
-export const updatePetQueryIncludeDeletedSchema = z.boolean()
+export const updatePetQueryIncludeDeletedSchema = z.boolean().optional()
 
 export const updatePetStatus200Schema = z.object({})
 

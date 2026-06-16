@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 export const getPetsHeaderXRequestIdSchema = z.string()
 
-export const getPetsHeaderXCorrelationIdSchema = z.string()
+export const getPetsHeaderXCorrelationIdSchema = z.string().optional()
 
 export const getPetsStatus200Schema = z.object({})
 

@@ -5,7 +5,7 @@
 
 import * as z from 'zod'
 
-export const listPetsInferredQueryLimitSchema = z.int()
+export const listPetsInferredQueryLimitSchema = z.int().optional()
 
 export type ListPetsInferredQueryLimitSchemaType = z.infer<typeof listPetsInferredQueryLimitSchema>
 
