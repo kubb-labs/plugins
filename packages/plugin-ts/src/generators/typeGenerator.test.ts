@@ -656,6 +656,34 @@ describe('typeGenerator — enumType', () => {
   })
 })
 
+describe('typeGenerator — enumType — empty string value', () => {
+  const emptyStringEnumSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'proxyHostALPN',
+    primitive: 'string',
+    enumValues: ['', 'h3', 'h2', 'http/1.1'],
+  })
+
+  const enumTypes = ['asConst', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType — empty string value is preserved', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `emptyStringEnum ${enumType}` })
+
+    await renderGeneratorSchema(typeGenerator, emptyStringEnumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `emptyStringEnum ${enumType}`)
+  })
+})
+
 describe('typeGenerator — enumType — dotted name', () => {
   const dottedEnumSchema = ast.factory.createSchema({
     type: 'enum',
