@@ -87,7 +87,7 @@ describe('cypressGenerator — Operation', () => {
         tags: ['pets'],
         requestBody: {
           description: 'Pet to add',
-          content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }],
+          content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
         },
         responses: [
           ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Null response' }),
@@ -102,7 +102,9 @@ describe('cypressGenerator — Operation', () => {
         path: '/pets/{petId}',
         tags: ['pets'],
         parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-        requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+        requestBody: {
+          content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        },
         responses: [
           ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' }),
         ],
@@ -206,7 +208,9 @@ describe('cypressGenerator — paramsType', () => {
       ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
       ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
     ],
-    requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+    requestBody: {
+      content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+    },
     responses: [
       ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' }),
     ],
@@ -477,7 +481,9 @@ describe('cypressGenerator — transformers', () => {
       method: 'POST',
       path: '/pets',
       tags: ['pets'],
-      requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+      requestBody: {
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+      },
       responses: [
         ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Null response' }),
       ],

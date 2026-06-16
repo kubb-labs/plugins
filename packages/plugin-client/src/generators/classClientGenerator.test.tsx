@@ -78,7 +78,9 @@ const operationNodes: Array<ast.OperationNode> = [
     path: '/pet/{petId}',
     tags: ['pet'],
     parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-    requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+    requestBody: {
+      content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+    },
     responses: [
       ast.factory.createResponse({
         statusCode: '200',

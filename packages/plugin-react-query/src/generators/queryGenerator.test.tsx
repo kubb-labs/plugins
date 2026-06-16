@@ -122,7 +122,9 @@ const createUsersWithListInputNode = ast.factory.createOperation({
   method: 'POST',
   path: '/user/createWithList',
   tags: ['user'],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({
       statusCode: '200',

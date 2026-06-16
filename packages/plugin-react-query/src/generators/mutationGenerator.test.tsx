@@ -90,7 +90,9 @@ const updatePetByIdNode = ast.factory.createOperation({
   path: '/pet/{petId}',
   tags: ['pet'],
   parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
@@ -120,20 +122,20 @@ const multiContentTypeNode = ast.factory.createOperation({
   parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
   requestBody: {
     content: [
-      {
+      ast.factory.createContent({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'object',
           properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
-      {
+      }),
+      ast.factory.createContent({
         contentType: 'multipart/form-data',
         schema: ast.factory.createSchema({
           type: 'object',
           properties: [ast.factory.createProperty({ name: 'file', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
+      }),
     ],
   },
   responses: [

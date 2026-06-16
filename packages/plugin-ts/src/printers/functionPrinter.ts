@@ -26,7 +26,7 @@ export function renderType(type: ast.TypeExpression, transformType?: (type: stri
 
 function renderTypeExpression(type: ast.TypeExpression): string {
   if (typeof type === 'string') return type
-  if (type.kind === 'IndexedAccessType') return `${type.objectType}['${type.indexType}']`
+  if (type.kind === 'IndexedAccessType') return `${type.target}['${type.key}']`
 
   const parts = type.members.map((member) => {
     const key = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(member.name) ? member.name : JSON.stringify(member.name)

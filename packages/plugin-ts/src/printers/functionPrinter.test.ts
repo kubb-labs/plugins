@@ -17,7 +17,7 @@ describe('renderType', () => {
   })
 
   it('renders an indexed access type', () => {
-    expect(renderType(ast.factory.createIndexedAccessType({ objectType: 'GetPetPathParams', indexType: 'petId' }))).toBe("GetPetPathParams['petId']")
+    expect(renderType(ast.factory.createIndexedAccessType({ target: 'GetPetPathParams', key: 'petId' }))).toBe("GetPetPathParams['petId']")
   })
 
   it('renders a type literal with optional members', () => {

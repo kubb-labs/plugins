@@ -71,7 +71,7 @@ describe('buildData', () => {
       operationId: 'createPet',
       method: 'POST',
       path: '/pets',
-      requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }] },
+      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })] },
     })
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`

@@ -920,6 +920,7 @@ export function buildPropertyType(
   schema: ast.SchemaNode,
   baseType: ts.TypeNode,
   optionalType: 'questionToken' | 'undefined' | 'questionTokenAndUndefined',
+  optional?: boolean,
 ): ts.TypeNode {
   const addsUndefined = OPTIONAL_ADDS_UNDEFINED.has(optionalType)
   const meta = syncSchemaRef(schema)
@@ -930,7 +931,7 @@ export function buildPropertyType(
     type = createUnionDeclaration({ nodes: [type, keywordTypeNodes.null] })
   }
 
-  if ((meta.nullish || meta.optional) && addsUndefined) {
+  if ((optional || meta.nullish || meta.optional) && addsUndefined) {
     type = createUnionDeclaration({ nodes: [type, keywordTypeNodes.undefined] })
   }
 

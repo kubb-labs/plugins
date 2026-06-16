@@ -72,13 +72,13 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
   ],
   requestBody: {
     content: [
-      {
+      ast.factory.createContent({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'object',
           properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
+      }),
     ],
   },
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
@@ -160,7 +160,9 @@ describe('typeGenerator — Operation', () => {
         method: 'POST',
         path: '/pet',
         tags: ['pet'],
-        requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+        requestBody: {
+          content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        },
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
@@ -198,7 +200,12 @@ describe('typeGenerator — Operation', () => {
         tags: ['store'],
         parameters: [ast.factory.createParameter({ name: 'orderId', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true })],
         requestBody: {
-          content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [], description: 'Order payload' }) }],
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({ type: 'object', properties: [], description: 'Order payload' }),
+            }),
+          ],
         },
         responses: [
           ast.factory.createResponse({
@@ -363,20 +370,20 @@ describe('typeGenerator — Operation', () => {
         parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
         requestBody: {
           content: [
-            {
+            ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
                 type: 'object',
                 properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
               }),
-            },
-            {
+            }),
+            ast.factory.createContent({
               contentType: 'multipart/form-data',
               schema: ast.factory.createSchema({
                 type: 'object',
                 properties: [ast.factory.createProperty({ name: 'file', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
               }),
-            },
+            }),
           ],
         },
         responses: [
@@ -405,20 +412,20 @@ describe('typeGenerator — Operation', () => {
               properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
             }),
             content: [
-              {
+              ast.factory.createContent({
                 contentType: 'application/json',
                 schema: ast.factory.createSchema({
                   type: 'object',
                   properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
                 }),
-              },
-              {
+              }),
+              ast.factory.createContent({
                 contentType: 'application/xml',
                 schema: ast.factory.createSchema({
                   type: 'object',
                   properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
                 }),
-              },
+              }),
             ],
           }),
         ],
