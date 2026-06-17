@@ -62,14 +62,15 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     parser = false,
     client = 'axios',
     importPath,
-    bundle = false,
     sdk,
     baseURL,
     resolver: userResolver,
     macros: userMacros,
   } = options
 
-  const resolvedImportPath = importPath ?? (!bundle ? `@kubb/plugin-client/clients/${client}` : undefined)
+  // The client runtime is always bundled into the output. A custom `importPath` opts out by
+  // re-exporting from an external module instead.
+  const resolvedImportPath = importPath
 
   const selectedGenerators =
     options.generators ??
@@ -92,7 +93,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
         ctx.setOptions({
           client,
           clientType,
-          bundle,
           output,
           exclude,
           include,
@@ -122,7 +122,7 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
         const isRelativePath = resolvedImportPath?.startsWith('.')
 
         if (!isRelativePath) {
-          const isInlineSource = bundle && !resolvedImportPath
+          const isInlineSource = !resolvedImportPath
 
           ctx.injectFile({
             baseName: 'client.ts',

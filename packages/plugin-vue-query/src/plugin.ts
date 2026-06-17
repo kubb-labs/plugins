@@ -64,7 +64,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   } = options
 
   const clientName = client?.client ?? 'axios'
-  const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
+  const clientImportPath = client?.importPath
 
   const selectedGenerators =
     options.generators ??
@@ -83,7 +83,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
         ctx.setOptions({
           output,
           client: {
-            bundle: client?.bundle,
             baseURL: client?.baseURL,
             client: clientName,
             clientType: client?.clientType ?? 'function',
@@ -144,7 +143,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const hasClientPlugin = !!ctx.config.plugins?.some((p) => (p as { name?: string }).name === pluginClientName)
 
-        if (client?.bundle && !hasClientPlugin && !clientImportPath) {
+        if (!hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),

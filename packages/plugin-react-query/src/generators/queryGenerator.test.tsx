@@ -28,7 +28,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
     dataReturnType: 'data',
     client: 'axios',
     clientType: 'function',
-    bundle: false,
   },
   parser: 'zod',
   paramsCasing: undefined,
