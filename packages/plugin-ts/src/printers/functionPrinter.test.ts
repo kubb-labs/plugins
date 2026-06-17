@@ -1,13 +1,13 @@
 import { ast } from '@kubb/core'
 import { describe, expect, it } from 'vitest'
-import { defineFunctionPrinter, functionPrinter, renderType } from './functionPrinter.ts'
+import { functionPrinter, renderType } from './functionPrinter.ts'
 
 /**
  * Builds a destructured group parameter with an explicit object-binding name and
  * type, used to cover the cases `createFunctionParameter({ properties })` cannot
  * express (a reference type, or an untyped binding).
  */
-function group(elements: Array<{ name: string }>, type?: ast.TypeExpression, default_?: string): ast.FunctionParameterNode {
+function group(elements: Array<{ name: string; propertyName?: string }>, type?: ast.TypeExpression, default_?: string): ast.FunctionParameterNode {
   return { kind: 'FunctionParameter', name: ast.factory.createObjectBindingPattern({ elements }), type, default: default_, optional: false }
 }
 
@@ -149,6 +149,26 @@ describe('functionPrinter in declaration mode', () => {
     const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'config', default: '{}' })] })
     expect(printer.print(sig)).toBe('config = {}')
   })
+
+  it('prints an empty parameter list as an empty string', () => {
+    expect(printer.print(ast.factory.createFunctionParameters({ params: [] }))).toBe('')
+  })
+
+  it('prints an untyped group as a bare binding', () => {
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'method' }, { name: 'url' }])] })
+    expect(printer.print(sig)).toBe('{ method, url }')
+  })
+
+  it('prints an untyped group with a default', () => {
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'method' }], undefined, '{}')] })
+    expect(printer.print(sig)).toBe('{ method } = {}')
+  })
+
+  it('renders a renamed binding element as `source: local`', () => {
+    const type = ast.factory.createTypeLiteral({ members: [{ name: 'petId', type: 'string', optional: false }] })
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'id', propertyName: 'petId' }], type)] })
+    expect(printer.print(sig)).toBe('{ petId: id }: { petId: string }')
+  })
 })
 
 describe('functionPrinter in call mode', () => {
@@ -173,6 +193,11 @@ describe('functionPrinter in call mode', () => {
     const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'args', rest: true })] })
     expect(printer.print(sig)).toBe('...args')
   })
+
+  it('forwards a renamed binding as `source: local`', () => {
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'id', propertyName: 'petId' }, { name: 'url' }])] })
+    expect(printer.print(sig)).toBe('{ petId: id, url }')
+  })
 })
 
 describe('functionPrinter transform options', () => {
@@ -193,39 +218,5 @@ describe('functionPrinter transform options', () => {
     const printer = functionPrinter(options)
     const sig = ast.factory.createFunctionParameters({ params: [param] })
     expect(printer.print(sig)).toBe(expected)
-  })
-})
-
-describe('defineFunctionPrinter', () => {
-  it('builds a custom function-node printer', () => {
-    type UpperPrinter = { name: 'upper'; options: { mode: 'declaration' }; output: string; printOutput: string }
-
-    const upperPrinter = defineFunctionPrinter<UpperPrinter>((options) => ({
-      name: 'upper',
-      options,
-      nodes: {
-        FunctionParameter(node) {
-          return typeof node.name === 'string' ? node.name.toUpperCase() : ''
-        },
-        FunctionParameters(node) {
-          return node.params
-            .map((p) => this.transform(p))
-            .filter(Boolean)
-            .join(' | ')
-        },
-      },
-    }))
-
-    const sig = ast.factory.createFunctionParameters({
-      params: [
-        ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
-        ast.factory.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
-      ],
-    })
-
-    const printer = upperPrinter({ mode: 'declaration' })
-
-    expect(printer.name).toBe('upper')
-    expect(printer.print(sig)).toBe('PETID | CONFIG')
   })
 })
