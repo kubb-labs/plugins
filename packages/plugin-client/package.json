@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "5.0.0-beta.65",
+  "version": "5.0.0-beta.66",
   "description": "Generate type-safe HTTP clients with Kubb, the meta framework for code generation. Supports Axios, Fetch, and custom client adapters with full TypeScript inference and zero boilerplate.",
   "keywords": [
     "api-client",

@@ -254,6 +254,8 @@ export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
 
+export const uploadFileDataSchema = z.instanceof(File).optional()
+
 export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema

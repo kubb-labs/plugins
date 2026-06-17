@@ -69,6 +69,7 @@ export {
   createUpdatePetWithFormStatus405,
 } from './pet/createUpdatePetWithForm.ts'
 export {
+  createUploadFileData,
   createUploadFilePathPetId,
   createUploadFileQueryAdditionalMetadata,
   createUploadFileResponse,

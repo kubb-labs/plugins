@@ -58,4 +58,10 @@ export {
   createUpdatePetWithFormResponse,
   createUpdatePetWithFormStatus405,
 } from './createUpdatePetWithForm.ts'
-export { createUploadFilePathPetId, createUploadFileQueryAdditionalMetadata, createUploadFileResponse, createUploadFileStatus200 } from './createUploadFile.ts'
+export {
+  createUploadFileData,
+  createUploadFilePathPetId,
+  createUploadFileQueryAdditionalMetadata,
+  createUploadFileResponse,
+  createUploadFileStatus200,
+} from './createUploadFile.ts'

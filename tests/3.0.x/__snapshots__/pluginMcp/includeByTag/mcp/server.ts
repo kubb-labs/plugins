@@ -18,7 +18,7 @@ import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from '..
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
 import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
 import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.ts'
-import { uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
+import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -101,9 +101,9 @@ export function getServer() {
     title: "uploads an image",
     description: "Make a POST request to /pet/{petId}/uploadImage",
     outputSchema: { data: uploadFileStatus200Schema },
-    inputSchema: { petId: uploadFilePathPetIdSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
-  }, async ({ petId, params }, request) => {
-    return uploadFileHandler({ petId, params }, request)
+    inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
+  }, async ({ petId, data, params }, request) => {
+    return uploadFileHandler({ petId, data, params }, request)
   })
 
   return server

@@ -122,7 +122,7 @@ type PrinterTs = PrinterTsFactory
  * const declaration = printer.print(schemaNode) // ts.TypeAliasDeclaration | ts.InterfaceDeclaration
  * ```
  */
-export const printerTs = ast.definePrinter<PrinterTs>((options) => {
+export const printerTs = ast.createPrinter<PrinterTs>((options) => {
   const addsUndefined = OPTIONAL_ADDS_UNDEFINED.has(options.optionalType)
 
   return {

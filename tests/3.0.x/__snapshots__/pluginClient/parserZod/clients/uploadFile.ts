@@ -4,9 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { uploadFileResponseSchema } from '../zod/uploadFileSchema.ts'
+import type { z } from 'zod'
+import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
 function getUploadFileUrl(petId: UploadFilePathPetId) {
   const res = { method: 'POST', url: `/pet/${petId}/uploadImage` as const }
@@ -18,10 +19,12 @@ function getUploadFileUrl(petId: UploadFilePathPetId) {
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(petId: UploadFilePathPetId, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'POST', url: getUploadFileUrl(petId).url.toString(), params, ...requestConfig })
+  const requestData = uploadFileDataSchema.parse(data)
+
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.output<typeof uploadFileDataSchema>>({ method: 'POST', url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return uploadFileResponseSchema.parse(res.data)
 }

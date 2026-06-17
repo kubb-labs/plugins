@@ -107,6 +107,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/ts/pet/UpdatePetWithForm.ts'
 export type {
+  UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -321,6 +322,7 @@ export type {
   UpdatePetWithFormStatus405SchemaType,
 } from './zod/pet/updatePetWithFormSchema.ts'
 export type {
+  UploadFileDataSchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
@@ -529,6 +531,7 @@ export {
   createUpdatePetWithFormStatus405Faker,
 } from './mocks/pet/createUpdatePetWithFormFaker.ts'
 export {
+  createUploadFileDataFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
   createUploadFileResponseFaker,
@@ -715,6 +718,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './zod/pet/updatePetWithFormSchema.ts'
 export {
+  uploadFileDataSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
