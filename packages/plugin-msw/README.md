@@ -22,9 +22,9 @@
 
 # @kubb/plugin-msw
 
-### Generate MSW request handlers from OpenAPI
+### Generate MSW request handlers with Kubb
 
-`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers from your OpenAPI specification. The handlers work in both browser and Node.js environments via MSW v2.
+`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers with Kubb, the meta framework for code generation. The handlers work in both browser and Node.js environments via MSW v2.
 
 ## Installation
 

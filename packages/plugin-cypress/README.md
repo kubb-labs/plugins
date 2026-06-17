@@ -22,9 +22,9 @@
 
 # @kubb/plugin-cypress
 
-### Generate Cypress commands from OpenAPI
+### Generate Cypress commands with Kubb
 
-`@kubb/plugin-cypress` generates Cypress request commands from your OpenAPI specification. Each operation in the spec becomes a typed Cypress command, ready to use in your test files.
+`@kubb/plugin-cypress` generates Cypress request commands with Kubb, the meta framework for code generation. Each operation becomes a typed Cypress command, ready to use in your test files.
 
 ## Installation
 

@@ -22,9 +22,9 @@
 
 # @kubb/plugin-mcp
 
-### Generate MCP tool definitions from OpenAPI
+### Generate MCP tool definitions with Kubb
 
-`@kubb/plugin-mcp` generates Model Context Protocol (MCP) tool definitions from your OpenAPI specification. Each API operation becomes a typed MCP tool that AI assistants can call directly.
+`@kubb/plugin-mcp` generates Model Context Protocol (MCP) tool definitions with Kubb, the meta framework for code generation. Each API operation becomes a typed MCP tool that AI assistants can call directly.
 
 ## Installation
 

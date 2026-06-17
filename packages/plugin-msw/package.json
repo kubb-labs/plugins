@@ -1,19 +1,18 @@
 {
   "name": "@kubb/plugin-msw",
   "version": "5.0.0-beta.65",
-  "description": "Generate Mock Service Worker (MSW) request handlers from your OpenAPI specification. Intercept HTTP requests in the browser or Node.js for seamless frontend development and testing.",
+  "description": "Generate Mock Service Worker (MSW) request handlers with Kubb, the meta framework for code generation. Intercept HTTP requests in the browser or Node.js for seamless frontend development and testing.",
   "keywords": [
     "api-mocking",
     "code-generation",
     "codegen",
     "kubb",
+    "meta-framework",
     "mock-service-worker",
     "mocking",
     "mocks",
     "msw",
-    "openapi",
     "service-worker",
-    "swagger",
     "typescript"
   ],
   "license": "MIT",

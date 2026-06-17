@@ -2,7 +2,7 @@
   "name": "@internals/client",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared generator builders and runtime sources for Kubb's slim HTTP client plugins (plugin-fetch, plugin-axios, plugin-ky). Not intended for direct use.",
+  "description": "Shared generator builders and runtime sources for the HTTP client plugins (plugin-fetch, plugin-axios, plugin-ky) of Kubb, the meta framework for code generation. Not intended for direct use.",
   "keywords": [
     "axios",
     "client",
@@ -11,6 +11,7 @@
     "internal",
     "kubb",
     "ky",
+    "meta-framework",
     "typescript",
     "workspace"
   ],
