@@ -22,9 +22,9 @@
 
 # @kubb/plugin-react-query
 
-### Generate TanStack Query hooks from OpenAPI
+### Generate TanStack Query hooks with Kubb
 
-`@kubb/plugin-react-query` generates TanStack Query hooks from your OpenAPI specification. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` hook.
+`@kubb/plugin-react-query` generates TanStack Query hooks with Kubb. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` hook.
 
 ## Installation
 

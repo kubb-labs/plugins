@@ -22,9 +22,9 @@
 
 # @kubb/plugin-client
 
-### Generate type-safe HTTP clients from OpenAPI
+### Generate type-safe HTTP clients with Kubb
 
-`@kubb/plugin-client` generates HTTP clients from your OpenAPI specification. It supports Axios, Fetch, and custom adapters, with request and response types inferred directly from the spec.
+`@kubb/plugin-client` generates HTTP clients with Kubb. It supports Axios, Fetch, and custom adapters, with request and response types inferred directly from your schema.
 
 ## Installation
 
