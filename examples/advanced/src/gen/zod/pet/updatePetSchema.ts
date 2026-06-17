@@ -14,7 +14,10 @@ export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, u
 export type UpdatePetStatus200SchemaType = z.infer<typeof updatePetStatus200Schema>
 
 export const updatePetStatus202Schema = z.object({
-  id: z.int().optional(),
+  id: z
+    .int()
+    .optional()
+    .meta({ examples: [10] }),
 })
 
 export type UpdatePetStatus202SchemaType = z.infer<typeof updatePetStatus202Schema>

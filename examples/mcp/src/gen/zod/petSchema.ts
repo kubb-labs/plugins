@@ -8,8 +8,11 @@ import { categorySchema } from './categorySchema.js'
 import { petStatusEnumSchema } from './petStatusEnumSchema.js'
 
 export const petSchema = z.object({
-  id: z.int().optional(),
-  name: z.string(),
+  id: z
+    .int()
+    .optional()
+    .meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(categorySchema).optional(),

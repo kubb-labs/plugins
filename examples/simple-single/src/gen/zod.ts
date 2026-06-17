@@ -8,34 +8,72 @@ import * as z from 'zod'
 export const petStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
 
 export const orderSchema = z.object({
-  id: z.bigint().optional(),
-  petId: z.bigint().optional(),
-  quantity: z.int().optional(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  petId: z
+    .bigint()
+    .optional()
+    .meta({ examples: [198772] }),
+  quantity: z
+    .int()
+    .optional()
+    .meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
-  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
+  status: z
+    .enum(['placed', 'approved', 'delivered'])
+    .optional()
+    .describe('Order Status')
+    .meta({ examples: ['approved'] }),
   http_status: z
     .union([z.literal(200), z.literal(400), z.literal(500)])
     .optional()
-    .describe("HTTP Status's and item of this"),
+    .describe("HTTP Status's and item of this")
+    .meta({ examples: [200] }),
   complete: z.boolean().optional(),
 })
 
 export const addressSchema = z.object({
-  street: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
+  street: z
+    .string()
+    .optional()
+    .meta({ examples: ['437 Lytton'] }),
+  city: z
+    .string()
+    .optional()
+    .meta({ examples: ['Palo Alto'] }),
+  state: z
+    .string()
+    .optional()
+    .meta({ examples: ['CA'] }),
+  zip: z
+    .string()
+    .optional()
+    .meta({ examples: ['94301'] }),
 })
 
 export const customerSchema = z.object({
-  id: z.bigint().optional(),
-  username: z.string().optional(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [100000] }),
+  username: z
+    .string()
+    .optional()
+    .meta({ examples: ['fehguy'] }),
   address: z.array(addressSchema).optional(),
 })
 
 export const categorySchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string().optional(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [1] }),
+  name: z
+    .string()
+    .optional()
+    .meta({ examples: ['Dogs'] }),
 })
 
 export const personSchema = z.object({
@@ -44,20 +82,48 @@ export const personSchema = z.object({
 
 export const userSchema = personSchema.and(
   z.object({
-    id: z.bigint().optional(),
-    username: z.string().optional(),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-    email: z.string().optional(),
-    password: z.string().optional(),
-    phone: z.string().optional(),
-    userStatus: z.int().optional().describe('User Status'),
+    id: z
+      .bigint()
+      .optional()
+      .meta({ examples: [10] }),
+    username: z
+      .string()
+      .optional()
+      .meta({ examples: ['theUser'] }),
+    firstName: z
+      .string()
+      .optional()
+      .meta({ examples: ['John'] }),
+    lastName: z
+      .string()
+      .optional()
+      .meta({ examples: ['James'] }),
+    email: z
+      .string()
+      .optional()
+      .meta({ examples: ['john@email.com'] }),
+    password: z
+      .string()
+      .optional()
+      .meta({ examples: ['12345'] }),
+    phone: z
+      .string()
+      .optional()
+      .meta({ examples: ['12345'] }),
+    userStatus: z
+      .int()
+      .optional()
+      .describe('User Status')
+      .meta({ examples: [1] }),
   }),
 )
 
 export const petSchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(categorySchema).optional(),
@@ -187,8 +253,6 @@ export const uploadFileQueryAdditionalMetadataSchema = z.string().optional().des
 export const uploadFileStatus200Schema = apiResponseSchema
 
 export const uploadFileResponseSchema = uploadFileStatus200Schema
-
-export const uploadFileDataSchema = z.instanceof(File).optional()
 
 export const getInventoryStatus200Schema = z.object({}).catchall(z.int())
 

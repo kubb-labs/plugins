@@ -253,4 +253,12 @@ describe('buildPropertyJSDocComments', () => {
 
     expect(comments).not.toContain('@description')
   })
+
+  it('emits one @example per entry in the examples array', () => {
+    const schema = ast.factory.createSchema({ type: 'string', examples: ['a', 'b'] })
+    const comments = buildPropertyJSDocComments(schema)
+
+    expect(comments).toContain('@example a')
+    expect(comments).toContain('@example b')
+  })
 })

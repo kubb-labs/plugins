@@ -4,7 +4,7 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../types/UploadFile.ts'
+import type { UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../clients/uploadFile.ts'
@@ -13,7 +13,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
-export type UploadFileMutationArg = { petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }
+export type UploadFileMutationArg = { petId: UploadFilePathPetId, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }
 
 /**
  * @summary uploads an image
@@ -21,7 +21,7 @@ export type UploadFileMutationArg = { petId: UploadFilePathPetId, data?: UploadF
  */
 export function useUploadFile(options: {
   mutation?: SWRMutationConfiguration<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
+  client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -29,8 +29,8 @@ export function useUploadFile(options: {
 
   return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, data, params } }) => {
-      return uploadFile(petId, data, params, config)
+    async (_url, { arg: { petId, params } }) => {
+      return uploadFile(petId, params, config)
     },
     mutationOptions
   )

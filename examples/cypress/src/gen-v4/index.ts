@@ -169,7 +169,6 @@ export type {
   UpdateUserResponses,
   UpdateUserStatusDefault,
   UpdateUserXmlData,
-  UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
