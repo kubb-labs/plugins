@@ -7,7 +7,7 @@ import { functionPrinter, renderType } from './functionPrinter.ts'
  * type, used to cover the cases `createFunctionParameter({ properties })` cannot
  * express (a reference type, or an untyped binding).
  */
-function group(elements: Array<{ name: string }>, type?: ast.TypeExpression, default_?: string): ast.FunctionParameterNode {
+function group(elements: Array<{ name: string; propertyName?: string }>, type?: ast.TypeExpression, default_?: string): ast.FunctionParameterNode {
   return { kind: 'FunctionParameter', name: ast.factory.createObjectBindingPattern({ elements }), type, default: default_, optional: false }
 }
 
@@ -149,6 +149,26 @@ describe('functionPrinter in declaration mode', () => {
     const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'config', default: '{}' })] })
     expect(printer.print(sig)).toBe('config = {}')
   })
+
+  it('prints an empty parameter list as an empty string', () => {
+    expect(printer.print(ast.factory.createFunctionParameters({ params: [] }))).toBe('')
+  })
+
+  it('prints an untyped group as a bare binding', () => {
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'method' }, { name: 'url' }])] })
+    expect(printer.print(sig)).toBe('{ method, url }')
+  })
+
+  it('prints an untyped group with a default', () => {
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'method' }], undefined, '{}')] })
+    expect(printer.print(sig)).toBe('{ method } = {}')
+  })
+
+  it('renders a renamed binding element as `source: local`', () => {
+    const type = ast.factory.createTypeLiteral({ members: [{ name: 'petId', type: 'string', optional: false }] })
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'id', propertyName: 'petId' }], type)] })
+    expect(printer.print(sig)).toBe('{ petId: id }: { petId: string }')
+  })
 })
 
 describe('functionPrinter in call mode', () => {
@@ -172,6 +192,11 @@ describe('functionPrinter in call mode', () => {
   it('keeps spread syntax for rest parameters', () => {
     const sig = ast.factory.createFunctionParameters({ params: [ast.factory.createFunctionParameter({ name: 'args', rest: true })] })
     expect(printer.print(sig)).toBe('...args')
+  })
+
+  it('forwards a renamed binding as `source: local`', () => {
+    const sig = ast.factory.createFunctionParameters({ params: [group([{ name: 'id', propertyName: 'petId' }, { name: 'url' }])] })
+    expect(printer.print(sig)).toBe('{ petId: id, url }')
   })
 })
 
