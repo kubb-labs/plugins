@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client } from './.kubb/client.ts'
 
 function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/store/order/${orderId}` as const }

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client } from './.kubb/client.ts'
 
 function getLoginUserUrl() {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/login` as const }

@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
 import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client } from './.kubb/client.ts'
 import { buildFormData } from './.kubb/config.ts'
 
 function getUploadFileUrl(petId: UploadFilePathPetId) {

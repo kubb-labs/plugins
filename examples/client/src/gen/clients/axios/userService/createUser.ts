@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.js'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/user/CreateUser.js'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client } from '../../../.kubb/client.js'
 
 function getCreateUserUrl() {
   const res = { method: 'POST', url: `/user` as const }

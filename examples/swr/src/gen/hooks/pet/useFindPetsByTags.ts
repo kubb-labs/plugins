@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type {
   FindPetsByTagsResponse,
   FindPetsByTagsQueryTags,
@@ -13,8 +13,8 @@ import type {
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
+import { client } from '../../.kubb/client.ts'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }) =>
   [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const

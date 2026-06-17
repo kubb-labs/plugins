@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client.ts'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/store/DeleteOrder.ts'
 import type { GetInventoryResponse, GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
 import type {
@@ -15,7 +15,7 @@ import type {
 } from './models/ts/store/GetOrderById.ts'
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderStatus200 } from './models/ts/store/PlaceOrder.ts'
 import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchStatus200 } from './models/ts/store/PlaceOrderPatch.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from './.kubb/client.ts'
 
 /**
  * @description Returns a map of status codes to quantities

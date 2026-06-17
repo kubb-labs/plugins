@@ -195,6 +195,7 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
+export { client } from './.kubb/client.ts'
 export { addPet, addPetMutationKey, useAddPet } from './hooks/useAddPet.ts'
 export { createUser, createUserMutationKey, useCreateUser } from './hooks/useCreateUser.ts'
 export { createUsersWithListInput, createUsersWithListInputMutationKey, useCreateUsersWithListInput } from './hooks/useCreateUsersWithListInput.ts'

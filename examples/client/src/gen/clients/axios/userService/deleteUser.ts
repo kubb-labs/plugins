@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.js'
 import type { DeleteUserPathUsername, DeleteUserResponse, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.js'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client } from '../../../.kubb/client.js'
 
 function getDeleteUserUrl({ username }: { username: DeleteUserPathUsername }) {
   const res = { method: 'DELETE', url: `/user/${username}` as const }

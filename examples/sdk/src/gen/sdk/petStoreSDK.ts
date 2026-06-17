@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig } from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig } from '../.kubb/client.ts'
 import { pet } from './pet/pet.ts'
 import { store } from './store/store.ts'
 import { user } from './user/user.ts'

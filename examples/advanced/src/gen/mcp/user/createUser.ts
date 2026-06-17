@@ -1,6 +1,6 @@
-import client from '@kubb/plugin-client/clients/axios'
+import client from '../../../axios-client.ts'
+import type { ResponseErrorConfig } from '../../../axios-client.ts'
 import type { CreateUserData, CreateUserResponse } from '../../models/ts/user/CreateUser.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 

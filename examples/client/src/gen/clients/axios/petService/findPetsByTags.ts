@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.js'
 import type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
@@ -8,7 +8,7 @@ import type {
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../../models/ts/pet/FindPetsByTags.js'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client } from '../../../.kubb/client.js'
 
 function getFindPetsByTagsUrl() {
   const res = { method: 'GET', url: `/pet/findByTags` as const }

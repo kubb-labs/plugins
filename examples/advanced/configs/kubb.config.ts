@@ -163,6 +163,7 @@ export default defineConfig({
       group: { type: 'tag' },
       paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
       client: {
+        importPath: '../../../axios-client.ts',
         baseURL: 'https://petstore.swagger.io/v2',
       },
     }),

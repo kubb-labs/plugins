@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type {
   FindPetsByStatusResponse,
   FindPetsByStatusQueryStatus,
   FindPetsByStatusStatus200,
   FindPetsByStatusStatus400,
 } from '../../models/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
+import { client } from '../../.kubb/client.ts'
 
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
   [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../models/pet/AddPet.ts'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus.ts'
@@ -24,9 +24,8 @@ import type {
   UpdatePetWithFormStatus405,
 } from '../../models/pet/UpdatePetWithForm.ts'
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../../models/pet/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { client, mergeConfig } from '../../.kubb/client.ts'
 import { buildFormData } from '../../.kubb/config.ts'
-import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class pet {
   #config: Partial<RequestConfig> & { client?: Client }
