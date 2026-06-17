@@ -164,12 +164,6 @@ export {
   updateUserResponseSchema,
   updateUserStatusDefaultSchema,
 } from './updateUserSchema.ts'
-export {
-  uploadFileDataSchema,
-  uploadFilePathPetIdSchema,
-  uploadFileQueryAdditionalMetadataSchema,
-  uploadFileResponseSchema,
-  uploadFileStatus200Schema,
-} from './uploadFileSchema.ts'
+export { uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileResponseSchema, uploadFileStatus200Schema } from './uploadFileSchema.ts'
 export { userArraySchema } from './userArraySchema.ts'
 export { userSchema } from './userSchema.ts'

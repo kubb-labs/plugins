@@ -8,9 +8,7 @@ import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments } from '../utils.ts'
 
-function isNonNullable<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined
-}
+const { isNonNullable } = factory
 
 /**
  * Partial map of node-type overrides for the TypeScript printer.

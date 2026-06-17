@@ -9,8 +9,11 @@ import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 import { tagSchema } from './tagSchema.ts'
 
 export const addPetRequestSchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
   get category() {
     return categorySchema.optional()
   },

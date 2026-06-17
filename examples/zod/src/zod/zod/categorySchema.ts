@@ -6,8 +6,14 @@
 import { z } from '../../zod.ts'
 
 export const categorySchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string().optional(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [1] }),
+  name: z
+    .string()
+    .optional()
+    .meta({ examples: ['Dogs'] }),
   get parent() {
     return categorySchema.optional()
   },

@@ -13,7 +13,10 @@ export const updatePetStatus200SchemaXml = petSchema.omit({ name: true })
 export const updatePetStatus200Schema = z.union([updatePetStatus200SchemaJson, updatePetStatus200SchemaXml])
 
 export const updatePetStatus202Schema = z.object({
-  id: z.int().optional(),
+  id: z
+    .int()
+    .optional()
+    .meta({ examples: [10] }),
 })
 
 export const updatePetStatus400Schema = z.any()

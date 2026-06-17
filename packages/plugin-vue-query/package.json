@@ -53,14 +53,6 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./components": {
-      "import": "./dist/components.js",
-      "require": "./dist/components.cjs"
-    },
-    "./generators": {
-      "import": "./dist/generators.js",
-      "require": "./dist/generators.cjs"
-    },
     "./package.json": "./package.json"
   },
   "publishConfig": {

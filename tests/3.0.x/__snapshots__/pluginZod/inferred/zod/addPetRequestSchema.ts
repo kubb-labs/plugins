@@ -8,8 +8,8 @@ import { categorySchema } from './categorySchema.ts'
 import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 
 export const addPetRequestSchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string(),
+  id: z.bigint().optional().meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(categorySchema).optional(),

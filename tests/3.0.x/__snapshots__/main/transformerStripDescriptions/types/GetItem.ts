@@ -8,13 +8,11 @@ import type { Item } from './Item.ts'
 /**
  * @description
  * Format: `int64`
- * @example test
  * @type integer
 */
 export type GetItemPathId = bigint;
 
 /**
- * @example test
  * @type object
 */
 export type GetItemStatus200 = Item;

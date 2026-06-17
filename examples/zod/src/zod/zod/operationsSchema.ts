@@ -82,13 +82,7 @@ import {
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.ts'
 import { updateUserDataSchema, updateUserPathUsernameSchema, updateUserResponseSchema } from './updateUserSchema.ts'
-import {
-  uploadFileDataSchema,
-  uploadFilePathPetIdSchema,
-  uploadFileQueryAdditionalMetadataSchema,
-  uploadFileResponseSchema,
-  uploadFileStatus200Schema,
-} from './uploadFileSchema.ts'
+import { uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileResponseSchema, uploadFileStatus200Schema } from './uploadFileSchema.ts'
 
 export type OperationSchema = {
   readonly request: z.ZodTypeAny | undefined
@@ -252,7 +246,7 @@ export const operations = {
     },
   },
   uploadFile: {
-    request: uploadFileDataSchema,
+    request: null,
     parameters: {
       path: uploadFilePathPetIdSchema,
       query: uploadFileQueryAdditionalMetadataSchema,

@@ -30,6 +30,9 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
         : ['@description', `Format: \`${meta.format}\``]
       : []
 
+  // OAS 3.1 carries schema examples as an `examples` array, one `@example` line each.
+  const exampleValues = meta?.examples ?? []
+
   return [
     hasDescription ? `@description ${jsStringEscape(meta.description)}` : null,
     ...formatComment,
@@ -41,7 +44,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: bo
     meta && 'default' in meta && meta.default !== undefined
       ? `@default ${'primitive' in meta && meta.primitive === 'string' ? stringify(meta.default as string) : meta.default}`
       : null,
-    meta && 'example' in meta && meta.example !== undefined ? `@example ${meta.example}` : null,
+    ...exampleValues.map((example) => `@example ${example}`),
     meta && 'primitive' in meta && meta.primitive
       ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null,
