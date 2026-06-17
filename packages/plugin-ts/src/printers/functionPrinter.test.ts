@@ -1,6 +1,6 @@
 import { ast } from '@kubb/core'
 import { describe, expect, it } from 'vitest'
-import { defineFunctionPrinter, functionPrinter, renderType } from './functionPrinter.ts'
+import { functionPrinter, renderType } from './functionPrinter.ts'
 
 /**
  * Builds a destructured group parameter with an explicit object-binding name and
@@ -193,39 +193,5 @@ describe('functionPrinter transform options', () => {
     const printer = functionPrinter(options)
     const sig = ast.factory.createFunctionParameters({ params: [param] })
     expect(printer.print(sig)).toBe(expected)
-  })
-})
-
-describe('defineFunctionPrinter', () => {
-  it('builds a custom function-node printer', () => {
-    type UpperPrinter = { name: 'upper'; options: { mode: 'declaration' }; output: string; printOutput: string }
-
-    const upperPrinter = defineFunctionPrinter<UpperPrinter>((options) => ({
-      name: 'upper',
-      options,
-      nodes: {
-        FunctionParameter(node) {
-          return typeof node.name === 'string' ? node.name.toUpperCase() : ''
-        },
-        FunctionParameters(node) {
-          return node.params
-            .map((p) => this.transform(p))
-            .filter(Boolean)
-            .join(' | ')
-        },
-      },
-    }))
-
-    const sig = ast.factory.createFunctionParameters({
-      params: [
-        ast.factory.createFunctionParameter({ name: 'petId', type: 'string', optional: false }),
-        ast.factory.createFunctionParameter({ name: 'config', type: 'Config', optional: false }),
-      ],
-    })
-
-    const printer = upperPrinter({ mode: 'declaration' })
-
-    expect(printer.name).toBe('upper')
-    expect(printer.print(sig)).toBe('PETID | CONFIG')
   })
 })

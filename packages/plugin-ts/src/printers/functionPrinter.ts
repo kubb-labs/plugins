@@ -2,14 +2,6 @@ import { ast } from '@kubb/core'
 import { PARAM_RANK } from '../constants.ts'
 
 /**
- * Maps each function-printer handler key to its concrete node type.
- */
-export type FunctionNodeByType = {
-  FunctionParameter: ast.FunctionParameterNode
-  FunctionParameters: ast.FunctionParametersNode
-}
-
-/**
  * Renders a {@link ast.TypeExpression} to its TypeScript source.
  *
  * - a `string` is a type reference, returned as-is
@@ -55,8 +47,6 @@ export type FunctionPrinterOptions = {
    */
   transformType?: (type: string) => string
 }
-
-type DefaultPrinter = ast.PrinterFactoryOptions<'functionParameters', FunctionPrinterOptions, string>
 
 function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: string; optional?: boolean }> | null {
   if (typeof param.name === 'string') return null
@@ -113,13 +103,45 @@ function renderGroupType(
   return `{ ${parts.join('; ')} }`
 }
 
-/**
- * Creates a function-parameter printer factory.
- *
- * Uses `createPrinterFactory` and dispatches handlers by `node.kind`
- * (for function nodes) rather than by `node.type` (for schema nodes).
- */
-export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamNode, ast.FunctionParamKind, FunctionNodeByType>((node) => node.kind)
+function printParameter(node: ast.FunctionParameterNode, options: FunctionPrinterOptions): string {
+  const { mode, transformName, transformType } = options
+  const isGroup = typeof node.name !== 'string'
+
+  if (mode === 'call') {
+    if (isGroup) {
+      const keys = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
+        .map((member) => member.name)
+        .join(', ')
+      return `{ ${keys} }`
+    }
+    const name = transformName ? transformName(node.name as string) : (node.name as string)
+    return node.rest ? `...${name}` : name
+  }
+
+  if (isGroup) {
+    const sorted = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
+    const binding = `{ ${sorted.map((member) => (transformName ? transformName(member.name) : member.name)).join(', ')} }`
+    const allOptional = sorted.every((member) => member.optional)
+    const type = renderGroupType(node.type, sorted, transformType)
+    if (type) {
+      if (allOptional) return `${binding}: ${type} = ${node.default ?? '{}'}`
+      return node.default ? `${binding}: ${type} = ${node.default}` : `${binding}: ${type}`
+    }
+    return node.default ? `${binding} = ${node.default}` : binding
+  }
+
+  const name = transformName ? transformName(node.name as string) : (node.name as string)
+  const type = node.type ? renderType(node.type, transformType) : undefined
+
+  if (node.rest) {
+    return type ? `...${name}: ${type}` : `...${name}`
+  }
+  if (type) {
+    if (node.optional) return `${name}?: ${type}`
+    return node.default ? `${name}: ${type} = ${node.default}` : `${name}: ${type}`
+  }
+  return node.default ? `${name} = ${node.default}` : name
+}
 
 /**
  * Default function-signature printer. Renders a parameter list in one of two modes:
@@ -139,54 +161,15 @@ export const defineFunctionPrinter = ast.createPrinterFactory<ast.FunctionParamN
  * printer.print(sig)  // → "petId: string, config: Config = {}"
  * ```
  */
-export const functionPrinter = defineFunctionPrinter<DefaultPrinter>((options) => ({
-  name: 'functionParameters',
-  options,
-  nodes: {
-    FunctionParameter(node) {
-      const { mode, transformName, transformType } = this.options
-      const isGroup = typeof node.name !== 'string'
-
-      if (mode === 'call') {
-        if (isGroup) {
-          const keys = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
-            .map((member) => member.name)
-            .join(', ')
-          return `{ ${keys} }`
-        }
-        const name = transformName ? transformName(node.name as string) : (node.name as string)
-        return node.rest ? `...${name}` : name
-      }
-
-      if (isGroup) {
-        const sorted = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
-        const binding = `{ ${sorted.map((member) => (transformName ? transformName(member.name) : member.name)).join(', ')} }`
-        const allOptional = sorted.every((member) => member.optional)
-        const type = renderGroupType(node.type, sorted, transformType)
-        if (type) {
-          if (allOptional) return `${binding}: ${type} = ${node.default ?? '{}'}`
-          return node.default ? `${binding}: ${type} = ${node.default}` : `${binding}: ${type}`
-        }
-        return node.default ? `${binding} = ${node.default}` : binding
-      }
-
-      const name = transformName ? transformName(node.name as string) : (node.name as string)
-      const type = node.type ? renderType(node.type, transformType) : undefined
-
-      if (node.rest) {
-        return type ? `...${name}: ${type}` : `...${name}`
-      }
-      if (type) {
-        if (node.optional) return `${name}?: ${type}`
-        return node.default ? `${name}: ${type} = ${node.default}` : `${name}: ${type}`
-      }
-      return node.default ? `${name} = ${node.default}` : name
-    },
-    FunctionParameters(node) {
+export function functionPrinter(options: FunctionPrinterOptions) {
+  return {
+    name: 'functionParameters' as const,
+    options,
+    print(node: ast.FunctionParametersNode): string {
       return sortParams(node.params)
-        .map((p) => this.transform(p))
+        .map((p) => printParameter(p, options))
         .filter(Boolean)
         .join(', ')
     },
-  },
-}))
+  }
+}
