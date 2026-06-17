@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
-import { client } from '../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const addPetQueryKey = (data?: AddPetData) => [{ url: '/pet' }, ...(data ? [data] : [])] as const
 

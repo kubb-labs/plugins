@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { client } from '../.kubb/client.ts'
 import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 

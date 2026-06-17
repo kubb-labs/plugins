@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsQueryPage,
@@ -11,9 +11,9 @@ import type {
   FindPetsByTagsStatus200,
   FindPetsByTagsStatus400,
 } from '../../models/FindPetsByTags.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { InfiniteData, QueryKey, QueryClient, InfiniteQueryObserverOptions, UseInfiniteQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { client } from '../../.kubb/client.ts'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsInfiniteQueryKey = (params?: {

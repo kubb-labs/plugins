@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import type { z } from 'zod'
-import { client } from '../.kubb/client.ts'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
 

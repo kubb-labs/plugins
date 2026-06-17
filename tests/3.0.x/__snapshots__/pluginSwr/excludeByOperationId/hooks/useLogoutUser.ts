@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
+import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { client } from '../.kubb/client.ts'
 
 export const logoutUserQueryKey = () => [{ url: '/user/logout' }] as const
 

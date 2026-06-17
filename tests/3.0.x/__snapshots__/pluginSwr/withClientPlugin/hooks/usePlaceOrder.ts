@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../clients/placeOrder.ts'
 

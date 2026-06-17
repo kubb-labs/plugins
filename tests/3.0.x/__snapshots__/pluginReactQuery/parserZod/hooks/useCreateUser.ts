@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import type { z } from 'zod'
-import { client } from '../.kubb/client.ts'
 import { createUserResponseSchema, createUserDataSchema } from '../zod/createUserSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 

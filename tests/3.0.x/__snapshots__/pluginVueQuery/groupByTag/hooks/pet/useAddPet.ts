@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../types/AddPet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { client } from '../../.kubb/client.ts'
 import { useMutation } from '@tanstack/vue-query'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const

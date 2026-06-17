@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const getPetByIdQueryKey = ({ pet_id }: { pet_id?: GetPetByIdPathPetId } = {}) => ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }] as const

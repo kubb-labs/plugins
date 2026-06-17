@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
+import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../types/GetPetById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { client } from '../../.kubb/client.ts'
 
 export const getPetByIdQueryKey = (petId?: GetPetByIdPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 

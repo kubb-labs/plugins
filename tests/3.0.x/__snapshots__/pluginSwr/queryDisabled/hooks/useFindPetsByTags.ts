@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
-import { client } from '../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
 

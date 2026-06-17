@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import { logoutUser } from '../clients/logoutUser.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'

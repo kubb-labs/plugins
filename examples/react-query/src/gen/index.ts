@@ -202,7 +202,6 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
-export { client } from './.kubb/client.ts'
 export { addPetHook, addPetMutationKey, addPetMutationOptionsHook, useAddPetHook } from './hooks/pet/useAddPetHook.ts'
 export { deletePetHook, deletePetMutationKey, deletePetMutationOptionsHook, useDeletePetHook } from './hooks/pet/useDeletePetHook.ts'
 export {

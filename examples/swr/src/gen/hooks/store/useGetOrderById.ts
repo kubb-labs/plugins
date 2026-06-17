@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
+import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type {
   GetOrderByIdResponse,
   GetOrderByIdPathOrderId,
@@ -12,8 +12,8 @@ import type {
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
 } from '../../models/GetOrderById.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
-import { client } from '../../.kubb/client.ts'
 
 export const getOrderByIdQueryKey = ({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}) =>
   [{ url: '/store/order/:orderId', params: { orderId: orderId } }] as const

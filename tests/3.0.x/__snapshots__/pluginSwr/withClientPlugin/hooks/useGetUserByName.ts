@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetUserByNameResponse, GetUserByNamePathUsername, GetUserByNameStatus400, GetUserByNameStatus404 } from '../types/GetUserByName.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 import { getUserByName } from '../clients/getUserByName.ts'
 

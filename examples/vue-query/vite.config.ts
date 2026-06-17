@@ -32,6 +32,9 @@ export default defineConfig({
               path: './hooks',
             },
             pathParamsType: 'object',
+            client: {
+              importPath: '@kubb/plugin-client/clients/axios',
+            },
           }),
         ],
       },

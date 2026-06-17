@@ -176,7 +176,6 @@ export type {
   User,
   UserArray,
 } from './models'
-export { client } from './.kubb/client'
 export {
   addPet,
   addPetMutationKey,

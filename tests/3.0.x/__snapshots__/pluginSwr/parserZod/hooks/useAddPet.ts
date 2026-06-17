@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
+import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import type { z } from 'zod'
-import { client } from '../.kubb/client.ts'
 import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const

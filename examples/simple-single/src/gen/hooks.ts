@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import client from '@kubb/plugin-client/clients/axios'
 import type {
   AddPetData,
   AddPetStatus200,
@@ -74,6 +74,7 @@ import type {
   DeleteUserStatus400,
   DeleteUserStatus404,
 } from './models'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type {
   QueryKey,
   QueryClient,
@@ -84,7 +85,6 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from '@tanstack/react-query'
-import { client } from './.kubb/client'
 import { mutationOptions, queryOptions, useQuery, useSuspenseQuery, useMutation } from '@tanstack/react-query'
 
 export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
