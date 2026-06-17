@@ -33,7 +33,8 @@
     "@kubb/plugin-swr": "5.0.0-beta.32",
     "@internals/shared": "0.0.0",
     "@internals/tanstack-query": "0.0.0",
-    "performance": "0.0.1-beta.20"
+    "performance": "0.0.1-beta.20",
+    "@internals/client": "0.0.0"
   },
   "changesets": [
     "circular-schema-detection-shared",
@@ -43,7 +44,9 @@
     "client-tag-class-client-suffix",
     "consolidate-jsx-renderer",
     "consume-ast-utils",
+    "createoperationparams-from-utils",
     "dull-areas-happen",
+    "empty-string-enum-typescript",
     "enforce-array-type-syntax",
     "faker-discriminated-union-variant-types",
     "fix-group-name-callback-ts-zod",
@@ -55,6 +58,7 @@
     "grouped-enum-options-const-casing",
     "jolly-maps-taste",
     "knip-remove-unused-code",
+    "migrate-plugins-param-type-model",
     "modernize-node-22-natives",
     "multi-content-type-request-body",
     "multi-content-type-response",
@@ -103,8 +107,11 @@
     "plugin-zod-codec-ref-named-import",
     "plugin-zod-discriminator-ref-description",
     "plugin-zod-oneof-union",
+    "plugin-zod-optional-ref-property",
     "plugin-zod-v5-rewrite",
+    "plugins-macros-option",
     "printer-options-api",
+    "printer-shared-traversal",
     "rare-birds-beg",
     "react-query-suspense-no-enabled",
     "remove-extension-yaml-manifests",
@@ -125,6 +132,7 @@
     "ts-discriminator-string-types",
     "ts-fix-request-body-description",
     "vue-query-enabled-tovalue",
+    "zod-collect-codec-refs",
     "zod-date-roundtrip",
     "zod-faker-object-builder",
     "zod-inferred-type-suffix"
