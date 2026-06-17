@@ -24,7 +24,7 @@
 
 ### Generate Zod schemas with Kubb
 
-`@kubb/plugin-zod` generates Zod validation schemas with Kubb, the meta framework for code generation. Each schema becomes a Zod object you can use to parse and validate data at runtime.
+`@kubb/plugin-zod` generates Zod validation schemas with Kubb. Each schema becomes a Zod object you can use to parse and validate data at runtime.
 
 ## Installation
 

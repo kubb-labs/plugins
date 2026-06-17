@@ -1,7 +1,7 @@
 {
   "name": "@kubb/plugin-redoc",
   "version": "5.0.0-beta.66",
-  "description": "Generate a ReDoc API reference page with Kubb, the meta framework for code generation. Produces a standalone HTML file you can host without a build step.",
+  "description": "Generate a ReDoc API reference page with Kubb. Produces a standalone HTML file you can host without a build step.",
   "keywords": [
     "api-docs",
     "api-reference",

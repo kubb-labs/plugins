@@ -24,7 +24,7 @@
 
 ### Generate type-safe HTTP clients with Kubb
 
-`@kubb/plugin-client` generates HTTP clients with Kubb, the meta framework for code generation. It supports Axios, Fetch, and custom adapters, with request and response types inferred directly from your schema.
+`@kubb/plugin-client` generates HTTP clients with Kubb. It supports Axios, Fetch, and custom adapters, with request and response types inferred directly from your schema.
 
 ## Installation
 

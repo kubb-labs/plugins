@@ -24,7 +24,7 @@
 
 ### Generate Cypress commands with Kubb
 
-`@kubb/plugin-cypress` generates Cypress request commands with Kubb, the meta framework for code generation. Each operation becomes a typed Cypress command, ready to use in your test files.
+`@kubb/plugin-cypress` generates Cypress request commands with Kubb. Each operation becomes a typed Cypress command, ready to use in your test files.
 
 ## Installation
 

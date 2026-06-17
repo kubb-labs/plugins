@@ -24,7 +24,7 @@
 
 ### Generate Vue Query composables with Kubb
 
-`@kubb/plugin-vue-query` generates TanStack Query composables with Kubb, the meta framework for code generation. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` composable for Vue 3.
+`@kubb/plugin-vue-query` generates TanStack Query composables with Kubb. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` composable for Vue 3.
 
 ## Installation
 

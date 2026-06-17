@@ -24,7 +24,7 @@
 
 ### Generate MSW request handlers with Kubb
 
-`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers with Kubb, the meta framework for code generation. The handlers work in both browser and Node.js environments via MSW v2.
+`@kubb/plugin-msw` generates Mock Service Worker (MSW) request handlers with Kubb. The handlers work in both browser and Node.js environments via MSW v2.
 
 ## Installation
 

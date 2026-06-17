@@ -12,4 +12,4 @@
 '@kubb/plugin-zod': patch
 ---
 
-Reframe each plugin description and its keywords around Kubb, the meta framework for code generation, instead of naming OpenAPI. The READMEs use the same wording.
+Reframe each plugin description and its keywords around Kubb instead of naming OpenAPI. The READMEs use the same wording.

@@ -24,7 +24,7 @@
 
 ### Generate TypeScript types with Kubb
 
-`@kubb/plugin-ts` generates TypeScript types with Kubb, the meta framework for code generation. It produces interfaces, enums, union types, and string literals that other Kubb plugins import and build on.
+`@kubb/plugin-ts` generates TypeScript types with Kubb. It produces interfaces, enums, union types, and string literals that other Kubb plugins import and build on.
 
 ## Installation
 

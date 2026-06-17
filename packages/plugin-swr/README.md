@@ -24,7 +24,7 @@
 
 ### Generate SWR hooks with Kubb
 
-`@kubb/plugin-swr` generates SWR hooks with Kubb, the meta framework for code generation. Each operation becomes a typed `useSWR` or `useSWRMutation` hook.
+`@kubb/plugin-swr` generates SWR hooks with Kubb. Each operation becomes a typed `useSWR` or `useSWRMutation` hook.
 
 ## Installation
 

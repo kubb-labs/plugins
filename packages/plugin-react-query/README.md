@@ -24,7 +24,7 @@
 
 ### Generate TanStack Query hooks with Kubb
 
-`@kubb/plugin-react-query` generates TanStack Query hooks with Kubb, the meta framework for code generation. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` hook.
+`@kubb/plugin-react-query` generates TanStack Query hooks with Kubb. Each operation becomes a typed `useQuery`, `useMutation`, or `useInfiniteQuery` hook.
 
 ## Installation
 
