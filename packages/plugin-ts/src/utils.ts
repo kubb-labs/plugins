@@ -11,7 +11,11 @@ import type { ResolverTs } from './types.ts'
  * Constraint metadata (min/max length, pattern, multipleOf, min/maxProperties) is emitted as plain-text lines.
 
  */
-export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string | undefined> {
+function isSchemaOptional(schema: ast.SchemaNode): boolean {
+  return Boolean(('optional' in schema && schema.optional) || ('nullish' in schema && schema.nullish))
+}
+
+export function buildPropertyJSDocComments(schema: ast.SchemaNode, optional?: boolean): Array<string | undefined> {
   const meta = syncSchemaRef(schema)
 
   const isArray = meta?.primitive === 'array'
@@ -39,7 +43,7 @@ export function buildPropertyJSDocComments(schema: ast.SchemaNode): Array<string
       : null,
     meta && 'example' in meta && meta.example !== undefined ? `@example ${meta.example}` : null,
     meta && 'primitive' in meta && meta.primitive
-      ? [`@type ${meta.primitive}`, 'optional' in schema && schema.optional ? ' | undefined' : null].filter(Boolean).join('')
+      ? [`@type ${meta.primitive}`, (optional ?? isSchemaOptional(schema)) ? ' | undefined' : null].filter(Boolean).join('')
       : null,
   ].filter(Boolean)
 }
@@ -63,6 +67,7 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
         schema: ast.factory.createSchema({
           type: 'ref',
           name: resolver.resolveParamName(node, param),
+          optional: !param.required,
         }),
       }),
     ),
@@ -85,7 +90,10 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
       ast.factory.createProperty({
         name: 'pathParams',
         required: pathParams.length > 0,
-        schema: pathParams.length > 0 ? buildParams(node, { params: pathParams, resolver }) : ast.factory.createSchema({ type: 'never', primitive: undefined }),
+        schema:
+          pathParams.length > 0
+            ? buildParams(node, { params: pathParams, resolver })
+            : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
         name: 'queryParams',

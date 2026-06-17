@@ -53,7 +53,7 @@ export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.O
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const resultGenerics = buildRequestResultGenerics({ node, tsResolver })
 
-  const indexed = (indexType: string) => ast.factory.createIndexedAccessType({ objectType: requestConfigName, indexType })
+  const indexed = (key: string) => ast.factory.createIndexedAccessType({ target: requestConfigName, key })
   const dataTypeDefinition = renderType(
     ast.factory.createTypeLiteral({
       members: [

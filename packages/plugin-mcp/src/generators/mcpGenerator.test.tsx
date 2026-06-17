@@ -110,7 +110,7 @@ describe('mcpGenerator — Operation', () => {
         tags: ['pets'],
         requestBody: {
           description: 'Pet to add',
-          content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }],
+          content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
         },
         responses: [
           ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Null response' }),

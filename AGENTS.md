@@ -50,10 +50,10 @@ The `internals/` directory provides shared utilities:
 
 ### Plugin docs and metadata
 
-Plugin docs live in the platform repo ([kubb-labs/platform](https://github.com/kubb-labs/platform)). Each plugin has a hand-written page at `apps/kubb.dev/plugins/<name>.md` and a small metadata file at `extensions/plugins/<name>.yaml`, published on [kubb.dev](https://kubb.dev).
+Plugin docs live in the docs repo ([kubb-labs/docs](https://github.com/kubb-labs/docs)). Each plugin is a single hand-written page at `plugins/<name>.md` whose frontmatter carries the registry metadata (name, category, npm package, maintainers, compatibility), published on [kubb.dev](https://kubb.dev).
 
 > [!IMPORTANT]
-> **Changing a plugin's options? Update its kubb.dev page in the platform repo.**
+> **Changing a plugin's options? Update its kubb.dev page in the docs repo.**
 >
 > A documented option must exist in the plugin's `src/types.ts` `Options` type and be honored in `src/plugin.ts`. Keep the documented defaults matching the destructuring defaults in `plugin.ts`.
 

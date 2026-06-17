@@ -82,7 +82,9 @@ const updatePetByIdNode = ast.factory.createOperation({
   path: '/pet/{petId}',
   tags: ['pet'],
   parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
@@ -110,7 +112,9 @@ const uploadFileNode = ast.factory.createOperation({
   path: '/pet/{petId}/uploadImage',
   tags: ['pet'],
   parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
-  requestBody: { content: [{ contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({
       statusCode: '200',
@@ -143,13 +147,13 @@ const requiredOneOfRequestBodyNode = ast.factory.createOperation({
   requestBody: {
     required: true,
     content: [
-      {
+      ast.factory.createContent({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'union',
           schemas: [ast.factory.createSchema({ type: 'object', properties: [] }), ast.factory.createSchema({ type: 'string' })],
         }),
-      },
+      }),
     ],
   },
   responses: [
@@ -169,20 +173,20 @@ const multiContentTypeNode = ast.factory.createOperation({
   parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
   requestBody: {
     content: [
-      {
+      ast.factory.createContent({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'object',
           properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
-      {
+      }),
+      ast.factory.createContent({
         contentType: 'multipart/form-data',
         schema: ast.factory.createSchema({
           type: 'object',
           properties: [ast.factory.createProperty({ name: 'file', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
+      }),
     ],
   },
   responses: [
@@ -229,7 +233,9 @@ const multiStatusNode = ast.factory.createOperation({
   method: 'POST',
   path: '/pet',
   tags: ['pet'],
-  requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+  requestBody: {
+    content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+  },
   responses: [
     ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Pet created' }),
     ast.factory.createResponse({ statusCode: '405', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Invalid input' }),
@@ -247,7 +253,7 @@ const downloadFileNode = ast.factory.createOperation({
       statusCode: '200',
       description: 'The file',
       schema: ast.factory.createSchema({ type: 'string' }),
-      content: [{ contentType: 'application/octet-stream', schema: ast.factory.createSchema({ type: 'string' }) }],
+      content: [ast.factory.createContent({ contentType: 'application/octet-stream', schema: ast.factory.createSchema({ type: 'string' }) })],
     }),
   ],
 })

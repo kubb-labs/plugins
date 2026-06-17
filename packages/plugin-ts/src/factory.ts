@@ -562,7 +562,7 @@ export function createEnumDeclaration({
               if (typeof value === 'boolean') {
                 return factory.createLiteralTypeNode(value ? factory.createTrue() : factory.createFalse())
               }
-              if (value) {
+              if (value !== null && value !== undefined) {
                 return factory.createLiteralTypeNode(factory.createStringLiteral(value.toString()))
               }
 
@@ -604,7 +604,7 @@ export function createEnumDeclaration({
               return factory.createEnumMember(propertyName(casingKey), initializer)
             }
 
-            if (key) {
+            if (key !== null && key !== undefined) {
               const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
               return factory.createEnumMember(propertyName(casingKey), initializer)
             }
@@ -667,7 +667,7 @@ export function createEnumDeclaration({
                       initializer = value ? factory.createTrue() : factory.createFalse()
                     }
 
-                    if (key) {
+                    if (key !== null && key !== undefined) {
                       const casingKey = applyEnumKeyCasing(key.toString(), enumKeyCasing)
                       return factory.createPropertyAssignment(propertyName(casingKey), initializer)
                     }
@@ -920,6 +920,7 @@ export function buildPropertyType(
   schema: ast.SchemaNode,
   baseType: ts.TypeNode,
   optionalType: 'questionToken' | 'undefined' | 'questionTokenAndUndefined',
+  optional?: boolean,
 ): ts.TypeNode {
   const addsUndefined = OPTIONAL_ADDS_UNDEFINED.has(optionalType)
   const meta = syncSchemaRef(schema)
@@ -930,7 +931,7 @@ export function buildPropertyType(
     type = createUnionDeclaration({ nodes: [type, keywordTypeNodes.null] })
   }
 
-  if ((meta.nullish || meta.optional) && addsUndefined) {
+  if ((optional || meta.nullish || meta.optional) && addsUndefined) {
     type = createUnionDeclaration({ nodes: [type, keywordTypeNodes.undefined] })
   }
 

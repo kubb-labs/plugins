@@ -259,7 +259,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
           const value = applyModifiers({
             value: wrappedOutput,
             nullable: meta.nullable,
-            optional: schema.optional,
+            optional: schema.optional || property.required === false,
             nullish: schema.nullish,
             defaultValue: meta.default,
             description: descriptionToApply,

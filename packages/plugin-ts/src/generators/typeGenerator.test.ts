@@ -72,13 +72,13 @@ const operationWithSnakeCaseParams: ast.OperationNode = ast.factory.createOperat
   ],
   requestBody: {
     content: [
-      {
+      ast.factory.createContent({
         contentType: 'application/json',
         schema: ast.factory.createSchema({
           type: 'object',
           properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
         }),
-      },
+      }),
     ],
   },
   responses: [ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Success' })],
@@ -160,7 +160,9 @@ describe('typeGenerator — Operation', () => {
         method: 'POST',
         path: '/pet',
         tags: ['pet'],
-        requestBody: { content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) }] },
+        requestBody: {
+          content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        },
         responses: [
           ast.factory.createResponse({
             statusCode: '200',
@@ -198,7 +200,12 @@ describe('typeGenerator — Operation', () => {
         tags: ['store'],
         parameters: [ast.factory.createParameter({ name: 'orderId', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true })],
         requestBody: {
-          content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [], description: 'Order payload' }) }],
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({ type: 'object', properties: [], description: 'Order payload' }),
+            }),
+          ],
         },
         responses: [
           ast.factory.createResponse({
@@ -363,20 +370,20 @@ describe('typeGenerator — Operation', () => {
         parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
         requestBody: {
           content: [
-            {
+            ast.factory.createContent({
               contentType: 'application/json',
               schema: ast.factory.createSchema({
                 type: 'object',
                 properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
               }),
-            },
-            {
+            }),
+            ast.factory.createContent({
               contentType: 'multipart/form-data',
               schema: ast.factory.createSchema({
                 type: 'object',
                 properties: [ast.factory.createProperty({ name: 'file', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
               }),
-            },
+            }),
           ],
         },
         responses: [
@@ -405,20 +412,20 @@ describe('typeGenerator — Operation', () => {
               properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
             }),
             content: [
-              {
+              ast.factory.createContent({
                 contentType: 'application/json',
                 schema: ast.factory.createSchema({
                   type: 'object',
                   properties: [ast.factory.createProperty({ name: 'name', required: true, schema: ast.factory.createSchema({ type: 'string' }) })],
                 }),
-              },
-              {
+              }),
+              ast.factory.createContent({
                 contentType: 'application/xml',
                 schema: ast.factory.createSchema({
                   type: 'object',
                   properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
                 }),
-              },
+              }),
             ],
           }),
         ],
@@ -646,6 +653,34 @@ describe('typeGenerator — enumType', () => {
     })
 
     await matchFiles(driver.fileManager.files, `enumType ${enumType}`)
+  })
+})
+
+describe('typeGenerator — enumType — empty string value', () => {
+  const emptyStringEnumSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'proxyHostALPN',
+    primitive: 'string',
+    enumValues: ['', 'h3', 'h2', 'http/1.1'],
+  })
+
+  const enumTypes = ['asConst', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType — empty string value is preserved', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `emptyStringEnum ${enumType}` })
+
+    await renderGeneratorSchema(typeGenerator, emptyStringEnumSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+    })
+
+    await matchFiles(driver.fileManager.files, `emptyStringEnum ${enumType}`)
   })
 })
 
