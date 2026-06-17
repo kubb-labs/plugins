@@ -4,26 +4,22 @@
 */
 
 /**
- * @example test
  * @type object
 */
 export type Item = {
     /**
      * @description
      * Format: `int64`
-     * @example test
      * @type integer
     */
     id: bigint;
     /**
-     * @example test
      * @type string
     */
     name: string;
     /**
      * @description
      * Format: `int32`
-     * @example test
      * @type integer | undefined
     */
     count?: number;

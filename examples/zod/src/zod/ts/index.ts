@@ -218,7 +218,6 @@ export type {
   UpdateUserXmlData,
 } from './UpdateUser.ts'
 export type {
-  UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

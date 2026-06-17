@@ -6,19 +6,19 @@
 import * as z from 'zod'
 
 export const orderSchema = z.object({
-  id: z.bigint().optional(),
-  petId: z.bigint().optional(),
-  quantity: z.int().optional(),
+  id: z.bigint().optional().meta({ examples: [10] }),
+  petId: z.bigint().optional().meta({ examples: [198772] }),
+  quantity: z.int().optional().meta({ examples: [7] }),
   shipDate: z.iso.datetime().transform((value) => new Date(value)).optional(),
-  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status').meta({ examples: ['approved'] }),
   complete: z.boolean().optional(),
 })
 
 export const orderInputSchema = z.object({
-  id: z.bigint().optional(),
-  petId: z.bigint().optional(),
-  quantity: z.int().optional(),
+  id: z.bigint().optional().meta({ examples: [10] }),
+  petId: z.bigint().optional().meta({ examples: [198772] }),
+  quantity: z.int().optional().meta({ examples: [7] }),
   shipDate: z.date().transform((value) => value.toISOString()).optional(),
-  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status').meta({ examples: ['approved'] }),
   complete: z.boolean().optional(),
 })

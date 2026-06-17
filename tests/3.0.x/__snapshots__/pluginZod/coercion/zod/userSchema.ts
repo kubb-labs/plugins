@@ -6,12 +6,12 @@
 import * as z from 'zod'
 
 export const userSchema = z.object({
-  id: z.coerce.bigint().optional(),
-  username: z.coerce.string().optional(),
-  firstName: z.coerce.string().optional(),
-  lastName: z.coerce.string().optional(),
-  email: z.coerce.string().optional(),
-  password: z.coerce.string().optional(),
-  phone: z.coerce.string().optional(),
-  userStatus: z.coerce.number().int().optional().describe('User Status'),
+  id: z.coerce.bigint().optional().meta({ examples: [10] }),
+  username: z.coerce.string().optional().meta({ examples: ['theUser'] }),
+  firstName: z.coerce.string().optional().meta({ examples: ['John'] }),
+  lastName: z.coerce.string().optional().meta({ examples: ['James'] }),
+  email: z.coerce.string().optional().meta({ examples: ['john@email.com'] }),
+  password: z.coerce.string().optional().meta({ examples: ['12345'] }),
+  phone: z.coerce.string().optional().meta({ examples: ['12345'] }),
+  userStatus: z.coerce.number().int().optional().describe('User Status').meta({ examples: [1] }),
 })

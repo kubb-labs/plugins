@@ -42,8 +42,6 @@ export type UploadFileJsonData = {
  */
 export type UploadFileFormData = {
   /**
-   * @description
-   * Format: `binary`
    * @type string
    */
   file: Blob

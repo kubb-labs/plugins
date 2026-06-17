@@ -205,6 +205,7 @@ export type ModifierOptions = {
   nullish?: boolean
   defaultValue?: unknown
   description?: string
+  examples?: Array<unknown>
 }
 
 /**
@@ -258,10 +259,10 @@ export function lengthChecksMini({ min, max, pattern }: LengthConstraints): stri
 }
 
 /**
- * Apply nullable / optional / nullish modifiers and an optional `.describe()` call
- * to a schema value string using the chainable Zod v4 API.
+ * Apply nullable / optional / nullish modifiers, an optional `.describe()` call, and an
+ * optional `.meta({ examples })` call to a schema value string using the chainable Zod v4 API.
  */
-export function applyModifiers({ value, nullable, optional, nullish, defaultValue, description }: ModifierOptions): string {
+export function applyModifiers({ value, nullable, optional, nullish, defaultValue, description, examples }: ModifierOptions): string {
   const withModifier = (() => {
     if (nullish || (nullable && optional)) return `${value}.nullish()`
     if (optional) return `${value}.optional()`
@@ -269,7 +270,8 @@ export function applyModifiers({ value, nullable, optional, nullish, defaultValu
     return value
   })()
   const withDefault = defaultValue !== undefined ? `${withModifier}.default(${formatDefault(defaultValue)})` : withModifier
-  return description ? `${withDefault}.describe(${stringify(description)})` : withDefault
+  const withDescription = description ? `${withDefault}.describe(${stringify(description)})` : withDefault
+  return examples?.length ? `${withDescription}.meta({ examples: [${examples.map(formatDefault).join(', ')}] })` : withDescription
 }
 
 /**

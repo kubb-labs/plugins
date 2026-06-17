@@ -11,7 +11,7 @@ import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsSt
 import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
 import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
 import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from '../types/UpdatePetWithForm.ts'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { mergeConfig } from '@kubb/plugin-client/clients/axios'
 
@@ -104,10 +104,9 @@ export class PetClient {
    * @summary uploads an image
    * {@link /pet/:petId/uploadImage}
    */
-  async uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+  async uploadFile(petId: UploadFilePathPetId, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ ...requestConfig, method: "POST", url: `/pet/${petId}/uploadImage`, params, data: requestData, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+    const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: "POST", url: `/pet/${petId}/uploadImage`, params })
     return res.data
   }
 }
