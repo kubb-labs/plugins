@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-faker",
-  "version": "5.0.0-beta.66",
+  "version": "5.0.0-beta.67",
   "description": "Generate Faker.js mock data factories with Kubb. Produces realistic seed data and fixtures for development and testing.",
   "keywords": [
     "code-generation",

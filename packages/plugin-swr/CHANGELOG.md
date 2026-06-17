@@ -1,5 +1,20 @@
 # @kubb/plugin-swr
 
+## 5.0.0-beta.67
+
+### Patch Changes
+
+- [#443](https://github.com/kubb-labs/plugins/pull/443) [`ce1e109`](https://github.com/kubb-labs/plugins/commit/ce1e1093490a0bc3459276d25a8d8f39eaf1d981) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit the client templates by copying the real `.ts` files into the generated folder instead of inlining their source as strings at build time. The templates ship as real files and `@kubb/plugin-client` exposes them through `@kubb/plugin-client/templates` (resolved absolute paths for the new `copy` file field) and the `@kubb/plugin-client/templates/*` subpath (the raw files). This replaces the build-time `importAttributeTextPlugin` and the `templates/*.source` wrapper exports.
+
+  Remove the `bundle` option. The client runtime is now always bundled into the generated output. Generated code no longer imports from `@kubb/plugin-client/clients/{client}` by default. The selected client is emitted into `.kubb/client.ts` and imported locally, and a custom `importPath` imports it from an external module instead.
+
+- [#439](https://github.com/kubb-labs/plugins/pull/439) [`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reframe each plugin description and its keywords around Kubb instead of naming OpenAPI. The READMEs use the same wording.
+
+- Updated dependencies [[`e5e0412`](https://github.com/kubb-labs/plugins/commit/e5e041268bc7661008f466156c420f8aec53e8fa), [`ce1e109`](https://github.com/kubb-labs/plugins/commit/ce1e1093490a0bc3459276d25a8d8f39eaf1d981), [`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2), [`4390631`](https://github.com/kubb-labs/plugins/commit/439063187de7b6d6b3fbeafe09a5391ab136bd20)]:
+  - @kubb/plugin-client@5.0.0-beta.67
+  - @kubb/plugin-ts@5.0.0-beta.67
+  - @kubb/plugin-zod@5.0.0-beta.67
+
 ## 5.0.0-beta.65
 
 ### Patch Changes

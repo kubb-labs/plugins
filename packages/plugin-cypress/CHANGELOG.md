@@ -1,5 +1,14 @@
 # @kubb/plugin-cypress
 
+## 5.0.0-beta.67
+
+### Patch Changes
+
+- [#439](https://github.com/kubb-labs/plugins/pull/439) [`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reframe each plugin description and its keywords around Kubb instead of naming OpenAPI. The READMEs use the same wording.
+
+- Updated dependencies [[`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2), [`4390631`](https://github.com/kubb-labs/plugins/commit/439063187de7b6d6b3fbeafe09a5391ab136bd20)]:
+  - @kubb/plugin-ts@5.0.0-beta.67
+
 ## 5.0.0-beta.65
 
 ### Patch Changes
