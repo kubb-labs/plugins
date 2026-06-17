@@ -125,6 +125,7 @@
     "sanitize-leading-digit-identifiers",
     "shared-group-config-helper",
     "shared-operation-file-entry",
+    "simplify-function-printer",
     "single-quote-output-spacing",
     "standardize-client-runtime-symbol",
     "swr-enabled-params-client-alignment",

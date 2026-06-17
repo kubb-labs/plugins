@@ -1,5 +1,7 @@
 # @kubb/plugin-redoc
 
+## 5.0.0-beta.67
+
 ## 5.0.0-beta.65
 
 ## 5.0.0-beta.64
