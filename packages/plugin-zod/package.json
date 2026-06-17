@@ -23,7 +23,6 @@
     "directory": "packages/plugin-zod"
   },
   "files": [
-    "src",
     "templates",
     "dist",
     "!/**/**.test.**",

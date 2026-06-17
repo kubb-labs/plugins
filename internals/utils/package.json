@@ -18,7 +18,6 @@
     "directory": "internals/utils"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

@@ -26,7 +26,6 @@
     "directory": "packages/plugin-react-query"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

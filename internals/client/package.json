@@ -22,7 +22,6 @@
     "directory": "internals/client"
   },
   "files": [
-    "src",
     "templates",
     "dist",
     "!/**/**.test.**",

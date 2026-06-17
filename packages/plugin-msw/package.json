@@ -24,7 +24,6 @@
     "directory": "packages/plugin-msw"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

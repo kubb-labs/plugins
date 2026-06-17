@@ -22,7 +22,6 @@
     "directory": "internals/tanstack-query"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

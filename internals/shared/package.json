@@ -19,7 +19,6 @@
     "directory": "internals/shared"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",
