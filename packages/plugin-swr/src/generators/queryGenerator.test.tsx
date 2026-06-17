@@ -28,7 +28,6 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
     dataReturnType: 'data',
     client: 'axios',
     clientType: 'function',
-    bundle: false,
   },
   parser: false,
   paramsCasing: undefined,

@@ -35,6 +35,7 @@ export default defineConfig({
         type: 'tag',
       },
       client: {
+        importPath: '@kubb/plugin-client/clients/axios',
         dataReturnType: 'data',
       },
       pathParamsType: 'object',

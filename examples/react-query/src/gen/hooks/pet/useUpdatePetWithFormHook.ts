@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type {
   UpdatePetWithFormResponse,
   UpdatePetWithFormPathPetId,
@@ -11,9 +11,9 @@ import type {
   UpdatePetWithFormQueryStatus,
   UpdatePetWithFormStatus405,
 } from '../../models/UpdatePetWithForm.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
-import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const updatePetWithFormQueryKey = (

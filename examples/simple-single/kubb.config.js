@@ -40,6 +40,9 @@ export default defineConfig([
           path: './hooks.ts',
           mode: 'file',
         },
+        client: {
+          importPath: '@kubb/plugin-client/clients/axios',
+        },
       }),
       pluginZod({
         output: {

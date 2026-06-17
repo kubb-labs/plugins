@@ -33,6 +33,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },
@@ -51,6 +52,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           paramsType: 'object',
         }),
       ],
@@ -70,6 +72,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           pathParamsType: 'object',
         }),
       ],
@@ -89,7 +92,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
-          client: { dataReturnType: 'full' },
+          client: { importPath: '@kubb/plugin-client/clients/axios', dataReturnType: 'full' },
         }),
       ],
     },
@@ -109,6 +112,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           parser: 'zod',
         }),
       ],
@@ -128,6 +132,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           query: {
             methods: ['get'],
             importPath: 'swr',
@@ -153,6 +158,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           query: false,
         }),
       ],
@@ -172,6 +178,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           mutation: false,
         }),
       ],
@@ -191,6 +198,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           paramsCasing: 'camelcase',
         }),
       ],
@@ -210,6 +218,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -230,6 +239,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -249,6 +259,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
           group: { type: 'tag' },
         }),
       ],
@@ -266,28 +277,10 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginClient({ output: { path: './clients', barrel: false } }),
+        pluginClient({ output: { path: './clients', barrel: false }, importPath: '@kubb/plugin-client/clients/axios' }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
-        }),
-      ],
-    },
-  },
-
-  // ─── bundled client ─────────────────────────────────────────────────────
-  {
-    name: 'bundleClient',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
-      parsers: [parserTs],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false },
-          client: { bundle: true },
+          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },

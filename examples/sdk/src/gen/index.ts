@@ -203,7 +203,6 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './models/user/UpdateUser.ts'
-export { client } from './.kubb/client.ts'
 export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
 export { petStatusEnum } from './models/PetStatusEnum.ts'
 export { pet } from './sdk/pet/pet.ts'

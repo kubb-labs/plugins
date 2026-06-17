@@ -3,9 +3,9 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { GetInventoryStatus200 } from '../../models/GetInventory.ts'
-import { client } from '../../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { queryOptions } from '@tanstack/react-query'
 
 export const getInventoryQueryKey = () => ['v5', { url: '/store/inventory' }] as const

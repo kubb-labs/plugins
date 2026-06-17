@@ -10,9 +10,7 @@ import { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 import { operationsGenerator } from './generators/operationsGenerator.ts'
 import { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
 import { resolverClient } from './resolvers/resolverClient.ts'
-import { source as axiosClientSource } from './templates/clients/axios.source.ts'
-import { source as fetchClientSource } from './templates/clients/fetch.source.ts'
-import { source as configSource } from './templates/config.source.ts'
+import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from './templates.ts'
 import type { PluginClient } from './types.ts'
 import { isParserEnabled } from './utils.ts'
 
@@ -64,14 +62,15 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     parser = false,
     client = 'axios',
     importPath,
-    bundle = false,
     sdk,
     baseURL,
     resolver: userResolver,
     macros: userMacros,
   } = options
 
-  const resolvedImportPath = importPath ?? (!bundle ? `@kubb/plugin-client/clients/${client}` : undefined)
+  // Without `importPath` the client runtime is bundled into `.kubb/client.ts`. Any `importPath`
+  // opts out: the generated code imports the client from that module and nothing is bundled.
+  const resolvedImportPath = importPath
 
   const selectedGenerators =
     options.generators ??
@@ -94,7 +93,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
         ctx.setOptions({
           client,
           clientType,
-          bundle,
           output,
           exclude,
           include,
@@ -121,33 +119,33 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
 
-        const isRelativePath = resolvedImportPath?.startsWith('.')
-
-        if (!isRelativePath) {
-          const isInlineSource = bundle && !resolvedImportPath
-
+        // Only emit the bundled client when no `importPath` is set. Any `importPath` (a relative
+        // module or a package such as `@kubb/plugin-client/clients/axios`) makes the generated
+        // code import the client from there, so no `.kubb/client.ts` is written.
+        if (!resolvedImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
+            copy: client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'client',
-                nodes: isInlineSource ? [ast.factory.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
+                nodes: [],
                 isExportable: true,
                 isIndexable: true,
               }),
             ],
-            exports: !isInlineSource && resolvedImportPath ? [ast.factory.createExport({ path: resolvedImportPath })] : [],
           })
         }
 
         ctx.injectFile({
           baseName: 'config.ts',
           path: path.resolve(root, '.kubb/config.ts'),
+          copy: configTemplatePath,
           sources: [
             ast.factory.createSource({
               name: 'config',
-              nodes: [ast.factory.createText(configSource)],
+              nodes: [],
               isExportable: false,
               isIndexable: false,
             }),

@@ -37,6 +37,7 @@ export default defineConfig([
           banner: '/* eslint-disable no-alert, no-console */',
         },
         client: 'fetch',
+        importPath: '@kubb/plugin-client/clients/fetch',
         exclude: [{ type: 'tag', pattern: 'store' }],
         group: {
           type: 'tag',
@@ -62,6 +63,7 @@ export default defineConfig([
           barrel: { type: 'all', nested: true },
           banner: '/* eslint-disable no-alert, no-console */',
         },
+        importPath: '@kubb/plugin-client/clients/axios',
         include: [{ type: 'operationId', pattern: 'uploadFile' }],
         pathParamsType: 'object',
       }),
@@ -76,6 +78,7 @@ export default defineConfig([
       tsPlugin,
       pluginClient({
         output: { path: './tagObject.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [clientStaticGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
         dataReturnType: 'full',
@@ -91,6 +94,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './tagClientOperation.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [clientOperationGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
         dataReturnType: 'full',
@@ -106,6 +110,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './tagClientOperationReact.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [clientOperationReactGenerator],
         include: [{ type: 'tag', pattern: 'store' }],
         dataReturnType: 'full',
@@ -122,6 +127,7 @@ export default defineConfig([
       tsPlugin,
       pluginClient({
         output: { path: './tag.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         parser: false,
         include: [{ type: 'tag', pattern: 'store' }],
       }),
@@ -144,6 +150,7 @@ export default defineConfig([
           banner: '/* eslint-disable no-alert, no-console */',
         },
         client: 'fetch',
+        importPath: '@kubb/plugin-client/clients/fetch',
         clientType: 'class',
         group: { type: 'tag' },
         pathParamsType: 'object',

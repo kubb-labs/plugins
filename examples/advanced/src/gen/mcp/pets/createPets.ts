@@ -1,4 +1,5 @@
-import client from '@kubb/plugin-client/clients/axios'
+import client from '../../../axios-client.ts'
+import type { ResponseErrorConfig } from '../../../axios-client.ts'
 import type {
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
@@ -7,7 +8,6 @@ import type {
   CreatePetsQueryOffset,
   CreatePetsResponse,
 } from '../../models/ts/pets/CreatePets.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
