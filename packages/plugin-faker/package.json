@@ -24,7 +24,6 @@
     "directory": "packages/plugin-faker"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

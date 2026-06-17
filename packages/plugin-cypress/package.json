@@ -22,7 +22,6 @@
     "directory": "packages/plugin-cypress"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

@@ -28,7 +28,6 @@
     "directory": "packages/plugin-vue-query"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

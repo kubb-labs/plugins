@@ -24,7 +24,6 @@
     "directory": "packages/plugin-swr"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

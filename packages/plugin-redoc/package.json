@@ -22,7 +22,6 @@
     "directory": "packages/plugin-redoc"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

@@ -22,7 +22,6 @@
     "directory": "packages/plugin-ts"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",

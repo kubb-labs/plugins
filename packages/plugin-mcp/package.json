@@ -23,7 +23,6 @@
     "directory": "packages/plugin-mcp"
   },
   "files": [
-    "src",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",
