@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.js'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../../../models/ts/pet/AddPet.js'
-import { client } from '../../../.kubb/client.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getAddPetUrl() {
   const res = { method: 'POST', url: `/pet` as const }

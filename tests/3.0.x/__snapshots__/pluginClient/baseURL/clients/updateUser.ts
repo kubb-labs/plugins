@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { UpdateUserPathUsername, UpdateUserData, UpdateUserResponse } from '../types/UpdateUser.ts'
-import { client } from '../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getUpdateUserUrl(username: UpdateUserPathUsername) {
   const res = { method: 'PUT', url: `https://api.example.com/v1/user/${username}` as const }

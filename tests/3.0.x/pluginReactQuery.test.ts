@@ -294,7 +294,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginClient({ output: { path: './clients', barrel: false } }),
+        pluginClient({ output: { path: './clients', barrel: false }, importPath: '@kubb/plugin-client/clients/axios' }),
         pluginReactQuery({
           output: { path: './hooks', barrel: false },
           client: { importPath: '@kubb/plugin-client/clients/axios' },

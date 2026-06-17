@@ -1,8 +1,8 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.js'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/user/CreateUsersWithListInput.js'
-import { client } from '../../../.kubb/client.js'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: `/user/createWithList` as const }

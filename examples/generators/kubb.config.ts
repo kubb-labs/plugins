@@ -21,6 +21,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './example1.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [example1],
       }),
     ],
@@ -33,6 +34,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './example2.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [example2],
       }),
     ],
@@ -48,6 +50,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './example3.tsx', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [example3],
       }),
     ],

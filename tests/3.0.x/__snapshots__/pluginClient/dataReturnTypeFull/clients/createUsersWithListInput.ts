@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatusDefault } from '../types/CreateUsersWithListInput.ts'
-import { client } from '../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 function getCreateUsersWithListInputUrl() {
   const res = { method: 'POST', url: `/user/createWithList` as const }

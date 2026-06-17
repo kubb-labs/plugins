@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/axios'
 import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
@@ -11,7 +11,8 @@ import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameSt
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../types/UpdateUser.ts'
-import { client, mergeConfig } from '../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { mergeConfig } from '@kubb/plugin-client/clients/axios'
 
 export class UserClient {
   #config: Partial<RequestConfig> & { client?: Client }

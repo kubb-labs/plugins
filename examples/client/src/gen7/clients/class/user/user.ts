@@ -1,6 +1,6 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { CreateUserData, CreateUserResponse } from '../../../models/ts/user/CreateUser.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../../../models/ts/user/CreateUsersWithListInput.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../../../models/ts/user/DeleteUser.ts'
@@ -13,7 +13,8 @@ import type {
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../../../models/ts/user/LoginUser.ts'
 import type { LogoutUserResponse } from '../../../models/ts/user/LogoutUser.ts'
 import type { UpdateUserData, UpdateUserResponse, UpdateUserPathUsername } from '../../../models/ts/user/UpdateUser.ts'
-import { client, mergeConfig } from '../../../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class user {
   #config: Partial<RequestConfig> & { client?: Client }

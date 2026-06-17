@@ -3,13 +3,14 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import client from '@kubb/plugin-client/clients/fetch'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/store/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from '../../models/store/GetInventory.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/store/GetOrderById.ts'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder.ts'
 import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/store/PlaceOrderPatch.ts'
-import { client, mergeConfig } from '../../.kubb/client.ts'
+import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
+import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
 
 export class store {
   #config: Partial<RequestConfig> & { client?: Client }

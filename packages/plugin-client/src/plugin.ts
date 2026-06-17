@@ -68,8 +68,8 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     macros: userMacros,
   } = options
 
-  // The client runtime is always bundled into the output. A custom `importPath` opts out by
-  // re-exporting from an external module instead.
+  // Without `importPath` the client runtime is bundled into `.kubb/client.ts`. Any `importPath`
+  // opts out: the generated code imports the client from that module and nothing is bundled.
   const resolvedImportPath = importPath
 
   const selectedGenerators =
@@ -119,15 +119,14 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
 
-        const isRelativePath = resolvedImportPath?.startsWith('.')
-
-        if (!isRelativePath) {
-          const isInlineSource = !resolvedImportPath
-
+        // Only emit the bundled client when no `importPath` is set. Any `importPath` (a relative
+        // module or a package such as `@kubb/plugin-client/clients/axios`) makes the generated
+        // code import the client from there, so no `.kubb/client.ts` is written.
+        if (!resolvedImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: isInlineSource ? (client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath) : undefined,
+            copy: client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'client',
@@ -136,7 +135,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
                 isIndexable: true,
               }),
             ],
-            exports: !isInlineSource && resolvedImportPath ? [ast.factory.createExport({ path: resolvedImportPath })] : [],
           })
         }
 
