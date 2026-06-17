@@ -10,9 +10,7 @@ import { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 import { operationsGenerator } from './generators/operationsGenerator.ts'
 import { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
 import { resolverClient } from './resolvers/resolverClient.ts'
-import { source as axiosClientSource } from './templates/clients/axios.source.ts'
-import { source as fetchClientSource } from './templates/clients/fetch.source.ts'
-import { source as configSource } from './templates/config.source.ts'
+import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from './templates.ts'
 import type { PluginClient } from './types.ts'
 import { isParserEnabled } from './utils.ts'
 
@@ -129,10 +127,11 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
+            copy: isInlineSource ? (client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath) : undefined,
             sources: [
               ast.factory.createSource({
                 name: 'client',
-                nodes: isInlineSource ? [ast.factory.createText(client === 'fetch' ? fetchClientSource : axiosClientSource)] : [],
+                nodes: [],
                 isExportable: true,
                 isIndexable: true,
               }),
@@ -144,10 +143,11 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
         ctx.injectFile({
           baseName: 'config.ts',
           path: path.resolve(root, '.kubb/config.ts'),
+          copy: configTemplatePath,
           sources: [
             ast.factory.createSource({
               name: 'config',
-              nodes: [ast.factory.createText(configSource)],
+              nodes: [],
               isExportable: false,
               isIndexable: false,
             }),

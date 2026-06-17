@@ -3,9 +3,7 @@ import { createGroupConfig } from '@internals/shared'
 
 import { ast, definePlugin } from '@kubb/core'
 import { pluginClientName } from '@kubb/plugin-client'
-import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
-import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
-import { source as configSource } from '@kubb/plugin-client/templates/config.source'
+import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from '@kubb/plugin-client/templates'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
@@ -109,10 +107,11 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
+            copy: clientName === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'client',
-                nodes: [ast.factory.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
+                nodes: [],
                 isExportable: true,
                 isIndexable: true,
               }),
@@ -124,10 +123,11 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           ctx.injectFile({
             baseName: 'config.ts',
             path: path.resolve(root, '.kubb/config.ts'),
+            copy: configTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'config',
-                nodes: [ast.factory.createText(configSource)],
+                nodes: [],
                 isExportable: false,
                 isIndexable: false,
               }),
