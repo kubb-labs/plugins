@@ -26,7 +26,15 @@ export function importAttributeTextPlugin() {
         throw new Error(`[import-attribute-text-plugin] Could not read template file: ${templatePath}`, { cause: err })
       }
 
-      return `export const source = ${JSON.stringify(content)}`
+      // Strip // @ts-ignore comments that are only present for type-checking the template itself
+      const stripped = content
+        .split('\n')
+        .filter((line) => !/^\s*\/\/ @ts-nocheck/.test(line))
+        .join('\n')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+
+      return `export const source = ${JSON.stringify(stripped)}`
     },
   }
 }

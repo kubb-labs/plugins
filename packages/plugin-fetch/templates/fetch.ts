@@ -1,8 +1,8 @@
+// @ts-nocheck
 /**
- * plugin-fetch transport prelude. A TypeScript fragment kept as text (`.txt`) so it is never
- * type-checked on its own: it is appended after the shared client runtime, so the runtime types
+ * plugin-fetch transport prelude. Appended after the shared client runtime, so the runtime types
  * (`Transport`, `ResolvedRequest`, `TransportResult`, `ResponseType`) and `createClientCore` are
- * only in scope once composed.
+ * in scope once composed.
  *
  * It wraps `globalThis.fetch` as the default transport and exports the default `client` plus a
  * `createClient` factory. To swap or extend the transport, pass a `transport` through the client
