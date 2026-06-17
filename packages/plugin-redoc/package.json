@@ -1,7 +1,7 @@
 {
   "name": "@kubb/plugin-redoc",
   "version": "5.0.0-beta.66",
-  "description": "Generate a beautiful, interactive ReDoc API reference page from your OpenAPI specification. Produces a standalone HTML file with a responsive, developer-friendly UI.",
+  "description": "Generate a ReDoc API reference page with Kubb. Produces a standalone HTML file you can host without a build step.",
   "keywords": [
     "api-docs",
     "api-reference",
@@ -9,9 +9,8 @@
     "codegen",
     "documentation",
     "kubb",
-    "openapi",
+    "meta-framework",
     "redoc",
-    "swagger",
     "typescript"
   ],
   "license": "MIT",

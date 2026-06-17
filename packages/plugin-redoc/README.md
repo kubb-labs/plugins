@@ -22,9 +22,9 @@
 
 # @kubb/plugin-redoc
 
-### Generate a ReDoc API reference from OpenAPI
+### Generate a ReDoc API reference with Kubb
 
-`@kubb/plugin-redoc` generates a ReDoc API reference page from your OpenAPI specification. The output is a standalone HTML file you can host without a build step or server.
+`@kubb/plugin-redoc` generates a ReDoc API reference page with Kubb. The output is a standalone HTML file you can host without a build step or server.
 
 ## Installation
 

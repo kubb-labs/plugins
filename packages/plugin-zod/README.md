@@ -22,9 +22,9 @@
 
 # @kubb/plugin-zod
 
-### Generate Zod schemas from OpenAPI
+### Generate Zod schemas with Kubb
 
-`@kubb/plugin-zod` generates Zod validation schemas from your OpenAPI specification. Each schema becomes a Zod object you can use to parse and validate data at runtime.
+`@kubb/plugin-zod` generates Zod validation schemas with Kubb. Each schema becomes a Zod object you can use to parse and validate data at runtime.
 
 ## Installation
 

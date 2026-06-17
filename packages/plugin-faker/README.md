@@ -22,9 +22,9 @@
 
 # @kubb/plugin-faker
 
-### Generate Faker mock data from OpenAPI
+### Generate Faker mock data with Kubb
 
-`@kubb/plugin-faker` generates Faker.js factory functions from your OpenAPI schemas. Each schema produces a function that returns realistic mock data matching the schema's structure.
+`@kubb/plugin-faker` generates Faker.js factory functions with Kubb. Each schema produces a function that returns realistic mock data matching the schema's structure.
 
 ## Installation
 

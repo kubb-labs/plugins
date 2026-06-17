@@ -1,16 +1,15 @@
 {
   "name": "@kubb/plugin-swr",
   "version": "5.0.0-beta.66",
-  "description": "Generate type-safe SWR hooks from your OpenAPI specification. Covers useSWR and useSWRMutation with full TypeScript support.",
+  "description": "Generate type-safe SWR hooks with Kubb. Covers useSWR and useSWRMutation with full TypeScript support.",
   "keywords": [
     "code-generation",
     "codegen",
     "data-fetching",
     "hooks",
     "kubb",
-    "openapi",
+    "meta-framework",
     "react",
-    "swagger",
     "swr",
     "typescript",
     "use-swr",
