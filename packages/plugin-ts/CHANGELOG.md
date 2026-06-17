@@ -1,5 +1,13 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.65
+
+### Minor Changes
+
+- [#435](https://github.com/kubb-labs/plugins/pull/435) [`f324806`](https://github.com/kubb-labs/plugins/commit/f32480645960533b8dffe5af273c5382fa0e4964) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit one `@example` JSDoc line per entry of a schema's `examples` array.
+
+  OpenAPI 3.1 carries schema examples as an `examples` array, surfaced on the AST schema node by `@kubb/adapter-oas`. `plugin-ts` renders a `@example` line for each entry.
+
 ## 5.0.0-beta.64
 
 ### Major Changes
