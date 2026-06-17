@@ -1,5 +1,13 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.65
+
+### Minor Changes
+
+- [#435](https://github.com/kubb-labs/plugins/pull/435) [`f324806`](https://github.com/kubb-labs/plugins/commit/f32480645960533b8dffe5af273c5382fa0e4964) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `.meta({ examples: [...] })` for schemas that carry examples.
+
+  OpenAPI examples are surfaced on the AST schema node by `@kubb/adapter-oas`. The Zod plugin now renders them through the Zod v4 `.meta()` metadata API, alongside the existing `.describe()` and `.default()` chain.
+
 ## 5.0.0-beta.64
 
 ### Major Changes
