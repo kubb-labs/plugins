@@ -1,7 +1,7 @@
 {
   "name": "@kubb/plugin-cypress",
   "version": "5.0.0-beta.66",
-  "description": "Generate Cypress request commands and e2e test fixtures with Kubb, the meta framework for code generation, enabling automated API testing with zero manual setup.",
+  "description": "Generate Cypress request commands and e2e test fixtures with Kubb, the meta framework for code generation, for automated API testing.",
   "keywords": [
     "code-generation",
     "codegen",
