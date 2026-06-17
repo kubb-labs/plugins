@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200, CreateUsersWithListInputStatusDefault } from '../types/CreateUsersWithListInput.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { client } from '../.kubb/client.ts'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 

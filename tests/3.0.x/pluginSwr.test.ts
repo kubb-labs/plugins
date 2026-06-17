@@ -273,25 +273,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       ],
     },
   },
-
-  // ─── bundled client ─────────────────────────────────────────────────────
-  {
-    name: 'bundleClient',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
-      parsers: [parserTs],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false },
-          client: { bundle: true },
-        }),
-      ],
-    },
-  },
 ]
 
 describe(`plugin-swr options ${version}`, () => {

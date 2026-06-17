@@ -3,12 +3,12 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import type { z } from 'zod'
+import { client } from '../.kubb/client.ts'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const

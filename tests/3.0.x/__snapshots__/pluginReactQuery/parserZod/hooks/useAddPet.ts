@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import type { z } from 'zod'
+import { client } from '../.kubb/client.ts'
 import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 

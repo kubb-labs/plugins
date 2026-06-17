@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { updatePet } from '../clients/updatePet.ts'
 

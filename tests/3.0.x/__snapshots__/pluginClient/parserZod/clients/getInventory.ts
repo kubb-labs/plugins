@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
 
 function getGetInventoryUrl() {

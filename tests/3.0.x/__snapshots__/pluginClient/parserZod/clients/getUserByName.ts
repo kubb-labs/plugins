@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../types/GetUserByName.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 import { getUserByNameResponseSchema } from '../zod/getUserByNameSchema.ts'
 
 function getGetUserByNameUrl(username: GetUserByNamePathUsername) {

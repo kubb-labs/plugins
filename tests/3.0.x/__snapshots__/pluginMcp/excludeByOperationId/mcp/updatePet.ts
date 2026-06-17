@@ -1,8 +1,8 @@
-import client from '@kubb/plugin-client/clients/axios'
+import type { ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.ts'
 
 /**
  * @description Update an existing pet by Id

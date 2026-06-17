@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { CreateUserData, CreateUserResponse } from '../types/CreateUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 export const createUserQueryKey = (data?: CreateUserData) => [{ url: '/user' }, ...(data ? [data] : [])] as const
 

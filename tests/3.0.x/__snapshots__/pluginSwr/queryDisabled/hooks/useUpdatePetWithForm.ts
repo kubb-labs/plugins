@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from '../types/UpdatePetWithForm.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 export const updatePetWithFormQueryKey = (petId?: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }) => [{ url: '/pet/:petId', params: {petId:petId} }, ...(params ? [params] : [])] as const
 

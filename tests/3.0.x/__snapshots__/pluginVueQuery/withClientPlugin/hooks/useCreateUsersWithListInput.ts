@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { createUsersWithListInput } from '../clients/createUsersWithListInput.ts'

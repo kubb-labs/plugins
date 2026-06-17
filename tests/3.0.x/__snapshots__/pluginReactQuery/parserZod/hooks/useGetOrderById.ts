@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { getOrderByIdResponseSchema } from '../zod/getOrderByIdSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 

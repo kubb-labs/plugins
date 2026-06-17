@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { updatePet } from '../clients/updatePet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../../types/GetUserByName.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import { client } from '../../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 

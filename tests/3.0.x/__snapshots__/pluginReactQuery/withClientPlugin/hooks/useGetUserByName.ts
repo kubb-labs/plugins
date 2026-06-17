@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../types/GetUserByName.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { getUserByName } from '../clients/getUserByName.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'

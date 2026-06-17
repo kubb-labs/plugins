@@ -1,8 +1,8 @@
-import client from '@kubb/plugin-client/clients/axios'
+import type { ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetPetByIdPathPetId, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.ts'
 
 /**
  * @description Returns a single pet

@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { z } from 'zod'
+import { client } from '../.kubb/client.ts'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
 function getUploadFileUrl(petId: UploadFilePathPetId) {

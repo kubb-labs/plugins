@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200, LoginUserStatus400 } from '../types/LoginUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 function getLoginUserUrl() {
   const res = { method: 'GET', url: `https://api.example.com/v1/user/login` as const }

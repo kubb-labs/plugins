@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByStatusResponse, FindPetsByStatusQueryStatus, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
 

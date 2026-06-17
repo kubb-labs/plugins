@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const

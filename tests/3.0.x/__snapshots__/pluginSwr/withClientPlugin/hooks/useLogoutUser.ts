@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { LogoutUserResponse } from '../types/LogoutUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 import { logoutUser } from '../clients/logoutUser.ts'
 

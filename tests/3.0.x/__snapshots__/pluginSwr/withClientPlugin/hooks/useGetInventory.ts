@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetInventoryResponse } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 import { getInventory } from '../clients/getInventory.ts'
 

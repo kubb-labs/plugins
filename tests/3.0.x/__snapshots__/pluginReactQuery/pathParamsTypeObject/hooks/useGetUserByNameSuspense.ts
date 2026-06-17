@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetUserByNamePathUsername, GetUserByNameStatus200, GetUserByNameStatus400, GetUserByNameStatus404 } from '../types/GetUserByName.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getUserByNameSuspenseQueryKey = ({ username }: { username?: GetUserByNamePathUsername } = {}) => [{ url: '/user/:username', params: {username:username} }] as const

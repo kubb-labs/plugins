@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeleteUserResponse, DeleteUserPathUsername, DeleteUserStatus400, DeleteUserStatus404 } from '../types/DeleteUser.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { client } from '../.kubb/client.ts'
 import { deleteUserResponseSchema } from '../zod/deleteUserSchema.ts'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { client } from '../.kubb/client.ts'
 import { deleteOrderResponseSchema } from '../zod/deleteOrderSchema.ts'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const

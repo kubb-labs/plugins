@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { CreateUsersWithListInputData, CreateUsersWithListInputStatus200 } from '../types/CreateUsersWithListInput.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { z } from 'zod'
+import { client } from '../.kubb/client.ts'
 import { createUsersWithListInputResponseSchema, createUsersWithListInputDataSchema } from '../zod/createUsersWithListInputSchema.ts'
 
 function getCreateUsersWithListInputUrl() {

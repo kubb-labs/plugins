@@ -3,13 +3,12 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { mergeConfig } from '@kubb/plugin-client/clients/axios'
+import { client, mergeConfig } from '../.kubb/client.ts'
 
 export class StoreClient {
   #config: Partial<RequestConfig> & { client?: Client }

@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
   const res = { method: 'DELETE', url: `/store/order/${orderId}` as const }

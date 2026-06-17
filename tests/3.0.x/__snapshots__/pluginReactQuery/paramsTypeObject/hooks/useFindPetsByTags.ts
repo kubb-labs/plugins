@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags }) => [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const

@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { placeOrder } from '../clients/placeOrder.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'

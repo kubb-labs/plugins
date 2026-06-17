@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByTags } from '../clients/findPetsByTags.ts'

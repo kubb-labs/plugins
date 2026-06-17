@@ -64,8 +64,8 @@ describe('getContentTypeInfo', () => {
       path: '/pets',
       requestBody: {
         content: [
-          { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
-          { contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object' }) },
+          ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+          ast.factory.createContent({ contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object' }) }),
         ],
       },
     })
@@ -88,8 +88,8 @@ describe('buildRequestConfigType', () => {
       path: '/pets',
       requestBody: {
         content: [
-          { contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) },
-          { contentType: 'application/xml', schema: ast.factory.createSchema({ type: 'object' }) },
+          ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }),
+          ast.factory.createContent({ contentType: 'application/xml', schema: ast.factory.createSchema({ type: 'object' }) }),
         ],
       },
     })
@@ -228,7 +228,7 @@ describe('resolveOperationTypeNames', () => {
         ast.factory.createParameter({ name: 'x-api-key', in: 'header', schema: ast.factory.createSchema({ type: 'string' }) }),
       ],
       requestBody: {
-        content: [{ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) }],
+        content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })],
       },
       responses: [
         ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object' }) }),

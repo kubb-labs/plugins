@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 function getPlaceOrderUrl() {
   const res = { method: 'POST', url: `/store/order` as const }

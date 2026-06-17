@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { CreateEventData, CreateEventStatus201, CreateEventStatus400 } from '../types/CreateEvent.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { z } from 'zod'
+import { client } from '../.kubb/client.ts'
 import { createEventResponseSchema, createEventDataSchema } from '../zod/createEventSchema.ts'
 
 function getCreateEventUrl() {

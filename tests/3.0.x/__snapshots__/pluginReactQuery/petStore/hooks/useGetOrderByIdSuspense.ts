@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getOrderByIdSuspenseQueryKey = (orderId?: GetOrderByIdPathOrderId) => [{ url: '/store/order/:orderId', params: {orderId:orderId} }] as const

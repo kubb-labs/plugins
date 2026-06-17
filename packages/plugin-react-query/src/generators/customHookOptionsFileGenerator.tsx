@@ -15,12 +15,11 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
   name: 'react-query-custom-hook-options-file',
   renderer: jsxRenderer,
   operations(nodes, ctx) {
-    const { resolver, config, root } = ctx
+    const { resolver, root } = ctx
     const { output, customOptions, query, group } = ctx.options
 
     if (!customOptions) return null
 
-    const override = output.override ?? config.output.override ?? false
     const { importPath, name } = customOptions
     const hookOptionsName = resolver.resolveHookOptionsName()
     const customHookOptionsName = resolver.resolveCustomHookOptionsName()
@@ -53,7 +52,7 @@ export const customHookOptionsFileGenerator = defineGenerator<PluginReactQuery>(
       path: path.resolve(basePath, actualFilePath),
     }
 
-    if (fs.existsSync(file.path) && !override) return null
+    if (fs.existsSync(file.path)) return null
 
     return (
       <File baseName={file.baseName} path={file.path}>
