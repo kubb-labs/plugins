@@ -6,19 +6,34 @@
 import { z } from '../../zod.ts'
 
 export const orderSchema = z.object({
-  id: z.bigint().optional(),
-  petId: z.bigint().optional(),
-  quantity: z.int().optional(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  petId: z
+    .bigint()
+    .optional()
+    .meta({ examples: [198772] }),
+  quantity: z
+    .int()
+    .optional()
+    .meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
-  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
+  status: z
+    .enum(['placed', 'approved', 'delivered'])
+    .optional()
+    .describe('Order Status')
+    .meta({ examples: ['approved'] }),
   http_status: z
     .union([z.literal(200), z.literal(400), z.literal(500)])
     .optional()
-    .describe('HTTP Status'),
+    .describe('HTTP Status')
+    .meta({ examples: [200] }),
   value: z
     .union([z.literal(0), z.literal(1), z.literal(2), z.literal(3), z.literal(3.5), z.literal(4)])
     .optional()
-    .describe('Price'),
+    .describe('Price')
+    .meta({ examples: [2] }),
   complete: z.boolean().optional(),
 })
 

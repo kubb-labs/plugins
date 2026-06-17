@@ -228,10 +228,18 @@ describe('applyModifiers', () => {
     expect(applyModifiers({ value: 'z.string()', description: 'A name' })).toMatchInlineSnapshot(`"z.string().describe('A name')"`)
   })
 
+  test('examples', () => {
+    expect(applyModifiers({ value: 'z.string()', examples: ['a', 'b'] })).toMatchInlineSnapshot(`"z.string().meta({ examples: ['a', 'b'] })"`)
+  })
+
+  test('ignores an empty examples array', () => {
+    expect(applyModifiers({ value: 'z.string()', examples: [] })).toBe('z.string()')
+  })
+
   test('all modifiers combined', () => {
-    expect(applyModifiers({ value: 'z.string()', optional: true, nullable: true, defaultValue: 'x', description: 'desc' })).toMatchInlineSnapshot(
-      `"z.string().nullish().default('x').describe('desc')"`,
-    )
+    expect(
+      applyModifiers({ value: 'z.string()', optional: true, nullable: true, defaultValue: 'x', description: 'desc', examples: ['a'] }),
+    ).toMatchInlineSnapshot(`"z.string().nullish().default('x').describe('desc').meta({ examples: ['a'] })"`)
   })
 })
 

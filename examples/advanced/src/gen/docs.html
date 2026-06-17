@@ -18,7 +18,7 @@
     <div id="redoc-container"></div>
     <script>
       const data = {
-        openapi: '3.0.3',
+        openapi: '3.1.1',
         info: {
           title: 'Swagger PetStore - OpenAPI 3.0',
           description:
@@ -196,7 +196,7 @@
                           id: {
                             type: 'integer',
                             format: 'int64',
-                            example: 10,
+                            examples: [10],
                           },
                         },
                       },
@@ -617,12 +617,7 @@
               requestBody: {
                 required: true,
                 content: {
-                  'application/octet-stream': {
-                    schema: {
-                      type: 'string',
-                      format: 'binary',
-                    },
-                  },
+                  'application/octet-stream': {},
                 },
               },
               responses: {
@@ -1105,14 +1100,14 @@
                 id: {
                   type: 'integer',
                   format: 'int64',
-                  example: 10,
                   minLength: 3,
                   maxLength: 100,
+                  examples: [10],
                 },
                 petId: {
                   type: 'integer',
                   format: 'int64',
-                  example: 198772,
+                  examples: [198772],
                 },
                 params: {
                   type: 'object',
@@ -1120,8 +1115,8 @@
                     status: {
                       type: 'string',
                       description: 'Order Status',
-                      example: 'approved',
                       enum: ['placed', 'approved', 'delivered'],
+                      examples: ['approved'],
                     },
                     type: {
                       type: 'string',
@@ -1132,7 +1127,7 @@
                 quantity: {
                   type: 'integer',
                   format: 'int32',
-                  example: 7,
+                  examples: [7],
                 },
                 orderType: {
                   type: 'string',
@@ -1141,7 +1136,7 @@
                 type: {
                   type: 'string',
                   description: 'Order Status',
-                  example: 'approved',
+                  examples: ['approved'],
                 },
                 shipDate: {
                   type: 'string',
@@ -1150,15 +1145,15 @@
                 status: {
                   type: 'string',
                   description: 'Order Status',
-                  example: 'approved',
                   enum: ['placed', 'approved', 'delivered'],
+                  examples: ['approved'],
                 },
                 http_status: {
                   type: 'number',
                   description: 'HTTP Status',
-                  example: 200,
                   enum: [200, 400, 500],
                   'x-enumNames': ['ok', 'not_found'],
+                  examples: [200],
                 },
                 complete: {
                   type: 'boolean',
@@ -1174,11 +1169,11 @@
                 id: {
                   type: 'integer',
                   format: 'int64',
-                  example: 100000,
+                  examples: [100000],
                 },
                 username: {
                   type: 'string',
-                  example: 'fehguy',
+                  examples: ['fehguy'],
                 },
                 params: {
                   type: 'object',
@@ -1186,8 +1181,8 @@
                     status: {
                       type: 'string',
                       description: 'Order Status',
-                      example: 'approved',
                       enum: ['placed', 'approved', 'delivered'],
+                      examples: ['approved'],
                     },
                     type: {
                       type: 'string',
@@ -1215,19 +1210,19 @@
               properties: {
                 street: {
                   type: 'string',
-                  example: '437 Lytton',
+                  examples: ['437 Lytton'],
                 },
                 city: {
                   type: 'string',
-                  example: 'Palo Alto',
+                  examples: ['Palo Alto'],
                 },
                 state: {
                   type: 'string',
-                  example: 'CA',
+                  examples: ['CA'],
                 },
                 zip: {
                   type: 'string',
-                  example: '94301',
+                  examples: ['94301'],
                 },
               },
               xml: {
@@ -1240,11 +1235,11 @@
                 id: {
                   type: 'integer',
                   format: 'int64',
-                  example: 1,
+                  examples: [1],
                 },
                 name: {
                   type: 'string',
-                  example: 'Dogs',
+                  examples: ['Dogs'],
                 },
               },
               xml: {
@@ -1257,11 +1252,11 @@
                 id: {
                   type: 'integer',
                   format: 'int64',
-                  example: 10,
+                  examples: [10],
                 },
                 username: {
                   type: 'string',
-                  example: 'theUser',
+                  examples: ['theUser'],
                 },
                 uuid: {
                   type: 'string',
@@ -1276,30 +1271,30 @@
                 },
                 firstName: {
                   type: 'string',
-                  example: 'John',
+                  examples: ['John'],
                 },
                 lastName: {
                   type: 'string',
-                  example: 'James',
+                  examples: ['James'],
                 },
                 email: {
                   type: 'string',
                   format: 'email',
-                  example: 'john@email.com',
+                  examples: ['john@email.com'],
                 },
                 password: {
                   type: 'string',
-                  example: '12345',
+                  examples: ['12345'],
                 },
                 phone: {
                   type: 'string',
-                  example: '12345',
+                  examples: ['12345'],
                 },
                 userStatus: {
                   type: 'integer',
                   description: 'User Status',
                   format: 'int32',
-                  example: 1,
+                  examples: [1],
                 },
               },
               xml: {
@@ -1333,8 +1328,8 @@
                 id: {
                   type: 'integer',
                   format: 'int64',
-                  example: 10,
                   readOnly: true,
+                  examples: [10],
                 },
                 parent: {
                   type: 'array',
@@ -1348,8 +1343,8 @@
                 },
                 name: {
                   type: 'string',
-                  example: 'doggie',
                   writeOnly: true,
+                  examples: ['doggie'],
                 },
                 url: {
                   type: 'string',
@@ -1397,11 +1392,11 @@
                 id: {
                   type: 'integer',
                   format: 'int64',
-                  example: 10,
+                  examples: [10],
                 },
                 name: {
                   type: 'string',
-                  example: 'doggie',
+                  examples: ['doggie'],
                 },
                 category: {
                   $ref: '#/components/schemas/Category',
@@ -1504,14 +1499,13 @@
               additionalProperties: false,
             },
             Image: {
-              example: 'linode/debian10',
               readOnly: true,
               allOf: [
                 {
-                  type: 'string',
-                  nullable: true,
+                  type: ['string', 'null'],
                 },
               ],
+              examples: ['linode/debian10'],
             },
             Dog: {
               title: 'Dog',

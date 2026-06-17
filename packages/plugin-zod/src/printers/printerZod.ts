@@ -129,7 +129,7 @@ function getMemberConstraint(member: ast.SchemaNode): string | undefined {
  * const code = printer.print(stringNode) // "z.string()"
  * ```
  */
-export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
+export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
   return {
     name: 'zod',
     options,
@@ -263,6 +263,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
             nullish: schema.nullish,
             defaultValue: meta.default,
             description: descriptionToApply,
+            examples: meta.examples,
           })
 
           return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
@@ -360,6 +361,7 @@ export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
         nullish: meta.nullish,
         defaultValue: meta.default,
         description: meta.description,
+        examples: meta.examples,
       })
     },
   }

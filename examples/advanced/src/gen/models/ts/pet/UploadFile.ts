@@ -20,8 +20,6 @@ export type UploadFileQueryAdditionalMetadata = string | undefined
 export type UploadFileStatus200 = ApiResponse
 
 /**
- * @description
- * Format: `binary`
  * @type string
  */
 export type UploadFileData = Blob

@@ -1,10 +1,22 @@
 import * as z from 'zod'
 
 export const addressSchema = z.object({
-  street: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zip: z.string().optional(),
+  street: z
+    .string()
+    .optional()
+    .meta({ examples: ['437 Lytton'] }),
+  city: z
+    .string()
+    .optional()
+    .meta({ examples: ['Palo Alto'] }),
+  state: z
+    .string()
+    .optional()
+    .meta({ examples: ['CA'] }),
+  zip: z
+    .string()
+    .optional()
+    .meta({ examples: ['94301'] }),
 })
 
 export type AddressSchemaType = z.infer<typeof addressSchema>

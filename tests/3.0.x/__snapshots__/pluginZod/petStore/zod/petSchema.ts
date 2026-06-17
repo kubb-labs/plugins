@@ -8,9 +8,9 @@ import { categorySchema } from './categorySchema.ts'
 import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 
 export const petSchema = z.object({
-  id: z.bigint().optional(),
-  name: z.string(),
-  log: z.string().min(2).max(42).regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/).optional(),
+  id: z.bigint().optional().meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
+  log: z.string().min(2).max(42).regex(/^[A-Za-z0-9()\[\]'"][-A-Za-z0-9_. \/()\[\]]{0,40}[A-Za-z0-9()\[\]'"]$/).optional().meta({ examples: ['my_log_destination'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
   tags: z.array(categorySchema).optional(),

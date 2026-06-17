@@ -3,7 +3,10 @@ import { categorySchema } from './categorySchema.ts'
 import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 
 export const petSchema = z.object({
-  id: z.int().optional(),
+  id: z
+    .int()
+    .optional()
+    .meta({ examples: [10] }),
   get parent() {
     return z.array(petSchema).optional()
   },
@@ -11,7 +14,7 @@ export const petSchema = z.object({
     .string()
     .regex(/^data:image\/(png|jpeg|gif|webp);base64,([A-Za-z0-9+/]+={0,2})$/)
     .optional(),
-  name: z.string(),
+  name: z.string().meta({ examples: ['doggie'] }),
   url: z.url().max(255).optional(),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),

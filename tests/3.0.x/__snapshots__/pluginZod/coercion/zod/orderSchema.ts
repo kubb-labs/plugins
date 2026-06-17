@@ -6,10 +6,10 @@
 import * as z from 'zod'
 
 export const orderSchema = z.object({
-  id: z.coerce.bigint().optional(),
-  petId: z.coerce.bigint().optional(),
-  quantity: z.coerce.number().int().optional(),
+  id: z.coerce.bigint().optional().meta({ examples: [10] }),
+  petId: z.coerce.bigint().optional().meta({ examples: [198772] }),
+  quantity: z.coerce.number().int().optional().meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
-  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status'),
+  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status').meta({ examples: ['approved'] }),
   complete: z.boolean().optional(),
 })

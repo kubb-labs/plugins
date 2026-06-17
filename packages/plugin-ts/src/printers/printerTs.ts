@@ -8,9 +8,7 @@ import * as factory from '../factory.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
 import { buildPropertyJSDocComments } from '../utils.ts'
 
-function isNonNullable<T>(value: T | null | undefined): value is T {
-  return value !== null && value !== undefined
-}
+const { isNonNullable } = factory
 
 /**
  * Partial map of node-type overrides for the TypeScript printer.
@@ -124,7 +122,7 @@ type PrinterTs = PrinterTsFactory
  * const declaration = printer.print(schemaNode) // ts.TypeAliasDeclaration | ts.InterfaceDeclaration
  * ```
  */
-export const printerTs = ast.definePrinter<PrinterTs>((options) => {
+export const printerTs = ast.createPrinter<PrinterTs>((options) => {
   const addsUndefined = OPTIONAL_ADDS_UNDEFINED.has(options.optionalType)
 
   return {

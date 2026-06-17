@@ -6,13 +6,38 @@
 import * as z from 'zod'
 
 export const userSchema = z.object({
-  id: z.int().optional(),
-  username: z.string().optional(),
+  id: z
+    .int()
+    .optional()
+    .meta({ examples: [10] }),
+  username: z
+    .string()
+    .optional()
+    .meta({ examples: ['theUser'] }),
   uuid: z.uuid().optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  email: z.email().optional(),
-  password: z.string().optional(),
-  phone: z.string().optional(),
-  userStatus: z.int().optional().describe('User Status'),
+  firstName: z
+    .string()
+    .optional()
+    .meta({ examples: ['John'] }),
+  lastName: z
+    .string()
+    .optional()
+    .meta({ examples: ['James'] }),
+  email: z
+    .email()
+    .optional()
+    .meta({ examples: ['john@email.com'] }),
+  password: z
+    .string()
+    .optional()
+    .meta({ examples: ['12345'] }),
+  phone: z
+    .string()
+    .optional()
+    .meta({ examples: ['12345'] }),
+  userStatus: z
+    .int()
+    .optional()
+    .describe('User Status')
+    .meta({ examples: [1] }),
 })

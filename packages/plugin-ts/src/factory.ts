@@ -41,7 +41,7 @@ export const syntaxKind = {
   stringLiteral: SyntaxKind.StringLiteral,
 } as const
 
-function isNonNullable<T>(value: T | null | undefined): value is T {
+export function isNonNullable<T>(value: T | null | undefined): value is T {
   return value !== null && value !== undefined
 }
 

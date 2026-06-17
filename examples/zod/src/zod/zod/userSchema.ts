@@ -6,14 +6,39 @@
 import { z } from '../../zod.ts'
 
 export const userSchema = z.object({
-  id: z.bigint().optional(),
-  username: z.string().optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  email: z.string().optional(),
-  password: z.string().optional(),
-  phone: z.string().optional(),
-  userStatus: z.int().optional().describe('User Status'),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  username: z
+    .string()
+    .optional()
+    .meta({ examples: ['theUser'] }),
+  firstName: z
+    .string()
+    .optional()
+    .meta({ examples: ['John'] }),
+  lastName: z
+    .string()
+    .optional()
+    .meta({ examples: ['James'] }),
+  email: z
+    .string()
+    .optional()
+    .meta({ examples: ['john@email.com'] }),
+  password: z
+    .string()
+    .optional()
+    .meta({ examples: ['12345'] }),
+  phone: z
+    .string()
+    .optional()
+    .meta({ examples: ['12345'] }),
+  userStatus: z
+    .int()
+    .optional()
+    .describe('User Status')
+    .meta({ examples: [1] }),
 })
 
 export type UserSchemaType = z.infer<typeof userSchema>

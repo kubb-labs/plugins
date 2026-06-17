@@ -1,5 +1,31 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.65
+
+### Minor Changes
+
+- [#435](https://github.com/kubb-labs/plugins/pull/435) [`f324806`](https://github.com/kubb-labs/plugins/commit/f32480645960533b8dffe5af273c5382fa0e4964) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Emit `.meta({ examples: [...] })` for schemas that carry examples.
+
+  OpenAPI examples are surfaced on the AST schema node by `@kubb/adapter-oas`. The Zod plugin now renders them through the Zod v4 `.meta()` metadata API, alongside the existing `.describe()` and `.default()` chain.
+
+## 5.0.0-beta.64
+
+### Major Changes
+
+- [#417](https://github.com/kubb-labs/plugins/pull/417) [`0aa9573`](https://github.com/kubb-labs/plugins/commit/0aa9573825f6eff87e3301377016085ff334bc39) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Replace the `transformer` option with `macros`.
+
+  Every plugin now takes `macros?: Array<ast.Macro>` instead of `transformer?: ast.Visitor`, and registers them with `ctx.setMacros` in `kubb:plugin:setup`. Macros are named and composable, so a list runs in order and a later macro sees the output of an earlier one. Move a single visitor into a macro by wrapping it: `macros: [{ name: 'my-macro', schema(node) { … } }]`.
+
+### Patch Changes
+
+- [#421](https://github.com/kubb-labs/plugins/pull/421) [`1d58e1a`](https://github.com/kubb-labs/plugins/commit/1d58e1a6bf6514930bb8bbb214c6435bcb608530) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix optional ref properties not being wrapped in `.optional()` (or `z.optional()` in mini mode) inside `z.object()`. Properties declared with `required: false` were emitted without the optional modifier because the printers checked `schema.optional` instead of `property.required`.
+
+- [#414](https://github.com/kubb-labs/plugins/pull/414) [`451f3b7`](https://github.com/kubb-labs/plugins/commit/451f3b7a24eb95fb4881bee8de59839e81686386) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Consume the shared schema-traversal helpers (`mapSchemaProperties`, `mapSchemaMembers`,
+  `mapSchemaItems`, `lazyGetter`) from `@kubb/ast/utils` in the zod, zod-mini, faker, and TypeScript
+  printers, replacing the per-printer property, member, and item walks. Generated output is unchanged.
+
+- [#417](https://github.com/kubb-labs/plugins/pull/417) [`0aa9573`](https://github.com/kubb-labs/plugins/commit/0aa9573825f6eff87e3301377016085ff334bc39) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Deduplicate the codec ref-name collection in the Zod generator behind a `collectCodecRefNames` helper. No output change.
+
 ## 5.0.0-beta.56
 
 ### Major Changes

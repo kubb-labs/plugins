@@ -9,15 +9,19 @@ import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 import { tagSchema } from './tagSchema.ts'
 
 export const petSchema = z.object({
-  id: z.bigint().optional(),
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
   get parent() {
     return z.array(petSchema).optional()
   },
   internalId: z
     .string()
     .regex(/^[0-9]{1,19}$/)
-    .optional(),
-  name: z.string(),
+    .optional()
+    .meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
   get category() {
     return categorySchema.optional()
   },

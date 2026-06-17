@@ -6,8 +6,8 @@
 import * as z from 'zod'
 
 export const addressSchema = z.object({
-  street: z.coerce.string().optional(),
-  city: z.coerce.string().optional(),
-  state: z.coerce.string().optional(),
-  zip: z.coerce.string().optional(),
+  street: z.coerce.string().optional().meta({ examples: ['437 Lytton'] }),
+  city: z.coerce.string().optional().meta({ examples: ['Palo Alto'] }),
+  state: z.coerce.string().optional().meta({ examples: ['CA'] }),
+  zip: z.coerce.string().optional().meta({ examples: ['94301'] }),
 })

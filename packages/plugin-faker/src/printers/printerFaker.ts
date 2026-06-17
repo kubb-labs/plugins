@@ -235,7 +235,7 @@ function indexedTypeName(typeName: string, propertyName: string, nestedInUnion?:
  * Creates a Faker printer that generates mock data generation code from schema nodes.
  * Handles circular references gracefully by emitting memoizing getters for cyclic properties.
  */
-export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.definePrinter<PrinterFakerFactory>((options) => {
+export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<PrinterFakerFactory> = ast.createPrinter<PrinterFakerFactory>((options) => {
   const printNested = (node: ast.SchemaNode, overrideOptions: Partial<PrinterFakerOptions> = {}): string => {
     return (
       printerFaker({
