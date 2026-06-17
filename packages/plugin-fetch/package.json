@@ -1,7 +1,7 @@
 {
   "name": "@kubb/plugin-fetch",
   "version": "5.0.0-beta.61",
-  "description": "Generate a slim, type-safe HTTP client from your OpenAPI specification, pinned to the Fetch API. One grouped options object per operation and a single RequestResult contract, with the runtime bundled into the generated output.",
+  "description": "Generate a slim, type-safe HTTP client with Kubb based on the native Fetch api.",
   "keywords": [
     "api-client",
     "code-generation",
