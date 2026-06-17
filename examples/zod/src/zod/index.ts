@@ -218,6 +218,7 @@ export type {
   UpdateUserXmlData,
 } from './ts/UpdateUser.ts'
 export type {
+  UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
@@ -409,6 +410,7 @@ export type {
   UpdateUserStatusDefaultSchemaType,
 } from './zod/updateUserSchema.ts'
 export type {
+  UploadFileDataSchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
@@ -587,6 +589,7 @@ export {
   updateUserStatusDefaultSchema,
 } from './zod/updateUserSchema.ts'
 export {
+  uploadFileDataSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,

@@ -107,6 +107,7 @@ export type {
   UpdatePetWithFormStatus405,
 } from './pet/UpdatePetWithForm.ts'
 export type {
+  UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,

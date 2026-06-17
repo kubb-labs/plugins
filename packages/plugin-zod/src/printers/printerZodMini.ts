@@ -100,7 +100,7 @@ function getMemberConstraintMini(member: ast.SchemaNode): string | undefined {
  * const code = printer.print(optionalStringNode) // "z.optional(z.string())"
  * ```
  */
-export const printerZodMini = ast.definePrinter<PrinterZodMiniFactory>((options) => {
+export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options) => {
   return {
     name: 'zod-mini',
     options,

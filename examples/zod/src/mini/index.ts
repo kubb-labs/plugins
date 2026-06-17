@@ -165,6 +165,7 @@ export {
   updateUserStatusDefaultSchema,
 } from './zod/updateUserSchema.ts'
 export {
+  uploadFileDataSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,

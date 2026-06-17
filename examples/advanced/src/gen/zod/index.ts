@@ -86,6 +86,7 @@ export type {
   UpdatePetWithFormStatus405SchemaType,
 } from './pet/updatePetWithFormSchema.ts'
 export type {
+  UploadFileDataSchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
@@ -241,6 +242,7 @@ export {
   updatePetWithFormStatus405Schema,
 } from './pet/updatePetWithFormSchema.ts'
 export {
+  uploadFileDataSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,

@@ -5,7 +5,7 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -17,15 +17,17 @@ export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ petId, params }: { petId: UploadFilePathPetId; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function uploadFile({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, ...requestConfig })
+  const requestData = data
+
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return res.data
 }
 
-export type UploadFileMutationArg = { petId: UploadFilePathPetId, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }
+export type UploadFileMutationArg = { petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }
 
 /**
  * @summary uploads an image
@@ -33,7 +35,7 @@ export type UploadFileMutationArg = { petId: UploadFilePathPetId, params?: { add
  */
 export function useUploadFile(options: {
   mutation?: SWRMutationConfiguration<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -41,8 +43,8 @@ export function useUploadFile(options: {
 
   return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, params } }) => {
-      return uploadFile({ petId, params }, config)
+    async (_url, { arg: { petId, data, params } }) => {
+      return uploadFile({ petId, data, params }, config)
     },
     mutationOptions
   )

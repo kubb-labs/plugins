@@ -129,7 +129,7 @@ function getMemberConstraint(member: ast.SchemaNode): string | undefined {
  * const code = printer.print(stringNode) // "z.string()"
  * ```
  */
-export const printerZod = ast.definePrinter<PrinterZodFactory>((options) => {
+export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
   return {
     name: 'zod',
     options,

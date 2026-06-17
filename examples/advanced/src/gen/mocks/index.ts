@@ -91,6 +91,7 @@ export {
   createUpdatePetWithFormStatus405Faker,
 } from './pet/createUpdatePetWithFormFaker.ts'
 export {
+  createUploadFileDataFaker,
   createUploadFilePathPetIdFaker,
   createUploadFileQueryAdditionalMetadataFaker,
   createUploadFileResponseFaker,
