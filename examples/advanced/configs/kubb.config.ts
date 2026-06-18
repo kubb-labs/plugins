@@ -19,7 +19,7 @@ export default defineConfig({
   },
   adapter: adapterOas({
     validate: true,
-    discriminator: 'strict',
+    discriminator: 'preserve',
     integerType: 'number',
   }),
   output: {
