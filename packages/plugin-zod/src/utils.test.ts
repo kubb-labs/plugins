@@ -123,6 +123,14 @@ describe('lengthConstraints', () => {
   test('all constraints combined', () => {
     expect(lengthConstraints({ min: 1, max: 10, pattern: '^[a-z]+$' })).toBe('.min(1).max(10).regex(/^[a-z]+$/)')
   })
+
+  test('regexType literal emits a regex literal', () => {
+    expect(lengthConstraints({ pattern: '^\\d+$', regexType: 'literal' })).toBe('.regex(/^\\d+$/)')
+  })
+
+  test('regexType constructor emits new RegExp(...)', () => {
+    expect(lengthConstraints({ pattern: '^\\d+$', regexType: 'constructor' })).toBe('.regex(new RegExp("^\\\\d+$"))')
+  })
 })
 
 describe('numberChecksMini', () => {
@@ -188,6 +196,10 @@ describe('lengthChecksMini', () => {
 
   test('all constraints combined', () => {
     expect(lengthChecksMini({ min: 1, max: 10, pattern: '^[a-z]+$' })).toBe('.check(z.minLength(1), z.maxLength(10), z.regex(/^[a-z]+$/))')
+  })
+
+  test('regexType constructor emits new RegExp(...)', () => {
+    expect(lengthChecksMini({ pattern: '^\\d+$', regexType: 'constructor' })).toBe('.check(z.regex(new RegExp("^\\\\d+$")))')
   })
 })
 

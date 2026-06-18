@@ -46,6 +46,13 @@ export type PrinterZodMiniOptions = {
    */
   guidType?: PluginZod['resolvedOptions']['guidType']
   /**
+   * Output form for an OpenAPI `pattern` inside `z.regex(...)`: a regex literal
+   * (`'literal'`) or the `RegExp` constructor (`'constructor'`).
+   *
+   * @default 'literal'
+   */
+  regexType?: PluginZod['resolvedOptions']['regexType']
+  /**
    * Hook to transform generated Zod schema before output.
    */
   wrapOutput?: PluginZod['resolvedOptions']['wrapOutput']
@@ -81,11 +88,11 @@ function strictOneOfMember(member: string, node: ast.SchemaNode): string {
   return member
 }
 
-function getMemberConstraintMini(member: ast.SchemaNode): string | undefined {
-  if (member.primitive === 'string') return lengthChecksMini(ast.narrowSchema(member, 'string') ?? {}) || undefined
+function getMemberConstraintMini({ member, regexType }: { member: ast.SchemaNode; regexType: PrinterZodMiniOptions['regexType'] }): string | undefined {
+  if (member.primitive === 'string') return lengthChecksMini({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
     return numberChecksMini(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
-  if (member.primitive === 'array') return lengthChecksMini(ast.narrowSchema(member, 'array') ?? {}) || undefined
+  if (member.primitive === 'array') return lengthChecksMini({ ...(ast.narrowSchema(member, 'array') ?? {}), regexType }) || undefined
 }
 
 /**
@@ -112,7 +119,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       boolean: () => 'z.boolean()',
       null: () => 'z.null()',
       string(node) {
-        return `z.string()${lengthChecksMini(node)}`
+        return `z.string()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
       },
       number(node) {
         return `z.number()${numberChecksMini(node)}`
@@ -144,13 +151,13 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
       uuid(node) {
         const base = this.options.guidType === 'guid' ? 'z.guid()' : 'z.uuid()'
 
-        return `${base}${lengthChecksMini(node)}`
+        return `${base}${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
       },
       email(node) {
-        return `z.email()${lengthChecksMini(node)}`
+        return `z.email()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
       },
       url(node) {
-        return `z.url()${lengthChecksMini(node)}`
+        return `z.url()${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
       },
       ipv4: () => 'z.ipv4()',
       ipv6: () => 'z.ipv6()',
@@ -219,7 +226,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           .map(({ output }) => output)
           .filter(Boolean)
         const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-        const base = `z.array(${inner})${lengthChecksMini(node)}`
+        const base = `z.array(${inner})${lengthChecksMini({ ...node, regexType: this.options.regexType })}`
 
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
       },
@@ -256,7 +263,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
         if (!firstBase) return ''
 
         return rest.reduce((acc, member) => {
-          const constraint = getMemberConstraintMini(member)
+          const constraint = getMemberConstraintMini({ member, regexType: this.options.regexType })
           if (constraint) return acc + constraint
           const transformed = this.transform(member)
           return transformed ? `z.intersection(${acc}, ${transformed})` : acc

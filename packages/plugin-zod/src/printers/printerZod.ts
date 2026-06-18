@@ -50,6 +50,13 @@ export type PrinterZodOptions = {
    */
   guidType?: PluginZod['resolvedOptions']['guidType']
   /**
+   * Output form for an OpenAPI `pattern` inside `.regex(...)`: a regex literal
+   * (`'literal'`) or the `RegExp` constructor (`'constructor'`).
+   *
+   * @default 'literal'
+   */
+  regexType?: PluginZod['resolvedOptions']['regexType']
+  /**
    * Date format in the OpenAPI spec (`'date'` or `'date-time'`).
    */
   dateType?: AdapterOas['resolvedOptions']['dateType']
@@ -110,11 +117,11 @@ function strictOneOfMember(member: string, node: ast.SchemaNode): string {
   return member
 }
 
-function getMemberConstraint(member: ast.SchemaNode): string | undefined {
-  if (member.primitive === 'string') return lengthConstraints(ast.narrowSchema(member, 'string') ?? {}) || undefined
+function getMemberConstraint({ member, regexType }: { member: ast.SchemaNode; regexType: PrinterZodOptions['regexType'] }): string | undefined {
+  if (member.primitive === 'string') return lengthConstraints({ ...(ast.narrowSchema(member, 'string') ?? {}), regexType }) || undefined
   if (member.primitive === 'number' || member.primitive === 'integer')
     return numberConstraints(ast.narrowSchema(member, 'number') ?? ast.narrowSchema(member, 'integer') ?? {}) || undefined
-  if (member.primitive === 'array') return lengthConstraints(ast.narrowSchema(member, 'array') ?? {}) || undefined
+  if (member.primitive === 'array') return lengthConstraints({ ...(ast.narrowSchema(member, 'array') ?? {}), regexType }) || undefined
 }
 
 /**
@@ -143,7 +150,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       string(node) {
         const base = shouldCoerce(this.options.coercion, 'strings') ? 'z.coerce.string()' : 'z.string()'
 
-        return `${base}${lengthConstraints(node)}`
+        return `${base}${lengthConstraints({ ...node, regexType: this.options.regexType })}`
       },
       number(node) {
         const base = shouldCoerce(this.options.coercion, 'numbers') ? 'z.coerce.number()' : 'z.number()'
@@ -186,13 +193,13 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
       uuid(node) {
         const base = this.options.guidType === 'guid' ? 'z.guid()' : 'z.uuid()'
 
-        return `${base}${lengthConstraints(node)}`
+        return `${base}${lengthConstraints({ ...node, regexType: this.options.regexType })}`
       },
       email(node) {
-        return `z.email()${lengthConstraints(node)}`
+        return `z.email()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
       },
       url(node) {
-        return `z.url()${lengthConstraints(node)}`
+        return `z.url()${lengthConstraints({ ...node, regexType: this.options.regexType })}`
       },
       ipv4: () => 'z.ipv4()',
       ipv6: () => 'z.ipv6()',
@@ -289,7 +296,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           .map(({ output }) => output)
           .filter(Boolean)
         const inner = items.join(', ') || this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-        const base = `z.array(${inner})${lengthConstraints(node)}`
+        const base = `z.array(${inner})${lengthConstraints({ ...node, regexType: this.options.regexType })}`
 
         return node.unique ? `${base}.refine(items => new Set(items).size === items.length, { message: "Array entries must be unique" })` : base
       },
@@ -326,7 +333,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
         if (!firstBase) return ''
 
         return rest.reduce((acc, member) => {
-          const constraint = getMemberConstraint(member)
+          const constraint = getMemberConstraint({ member, regexType: this.options.regexType })
           if (constraint) return acc + constraint
           const transformed = this.transform(member)
           return transformed ? `${acc}.and(${transformed})` : acc

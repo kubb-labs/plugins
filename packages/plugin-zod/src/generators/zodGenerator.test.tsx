@@ -29,6 +29,7 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   coercion: false,
   operations: false,
   guidType: 'uuid',
+  regexType: 'literal',
   mini: false,
   wrapOutput: undefined,
   paramsCasing: undefined,
@@ -268,6 +269,8 @@ describe('zodGenerator — Schema', () => {
     { name: 'default', node: schemaWithDefault },
     // schema with pattern/regex
     { name: 'pattern', node: schemaWithPattern },
+    // regexType: constructor emits new RegExp(...) instead of a regex literal
+    { name: 'regexType constructor', node: schemaWithPattern, options: { regexType: 'constructor' } },
     // object with additionalProperties
     { name: 'additionalProperties', node: additionalPropertiesObjectSchema },
     // datetime variants

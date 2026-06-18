@@ -193,6 +193,21 @@ export type LengthConstraints = {
   min?: number
   max?: number
   pattern?: string
+  /**
+   * Output form for the `pattern` regex. `'literal'` emits a regex literal,
+   * `'constructor'` emits `new RegExp(...)`.
+   *
+   * @default 'literal'
+   */
+  regexType?: PluginZod['resolvedOptions']['regexType']
+}
+
+/**
+ * Map a `regexType` to the `func` argument of `toRegExpString`: `'constructor'` emits
+ * `new RegExp(...)`, while `'literal'` (the default) emits a regex literal.
+ */
+function regexFunc(regexType: PluginZod['resolvedOptions']['regexType'] | undefined): string | null {
+  return regexType === 'constructor' ? 'RegExp' : null
 }
 
 /**
@@ -226,11 +241,11 @@ export function numberConstraints({ min, max, exclusiveMinimum, exclusiveMaximum
  * Build `.min()` / `.max()` / `.regex()` chains for strings/arrays
  * using the standard chainable Zod v4 API.
  */
-export function lengthConstraints({ min, max, pattern }: LengthConstraints): string {
+export function lengthConstraints({ min, max, pattern, regexType }: LengthConstraints): string {
   return [
     min !== undefined ? `.min(${min})` : '',
     max !== undefined ? `.max(${max})` : '',
-    pattern !== undefined ? `.regex(${toRegExpString(pattern, null)})` : '',
+    pattern !== undefined ? `.regex(${toRegExpString(pattern, regexFunc(regexType))})` : '',
   ].join('')
 }
 
@@ -250,11 +265,11 @@ export function numberChecksMini({ min, max, exclusiveMinimum, exclusiveMaximum,
 /**
  * Build `.check(z.minLength(), z.maxLength(), z.regex())` for `zod/mini` length constraints.
  */
-export function lengthChecksMini({ min, max, pattern }: LengthConstraints): string {
+export function lengthChecksMini({ min, max, pattern, regexType }: LengthConstraints): string {
   const checks: Array<string> = []
   if (min !== undefined) checks.push(`z.minLength(${min})`)
   if (max !== undefined) checks.push(`z.maxLength(${max})`)
-  if (pattern !== undefined) checks.push(`z.regex(${toRegExpString(pattern, null)})`)
+  if (pattern !== undefined) checks.push(`z.regex(${toRegExpString(pattern, regexFunc(regexType))})`)
   return checks.length ? `.check(${checks.join(', ')})` : ''
 }
 
