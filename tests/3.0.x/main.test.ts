@@ -50,7 +50,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false, discriminator: 'inherit' }),
+      adapter: adapterOas({ validate: false, discriminator: 'propagate' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
