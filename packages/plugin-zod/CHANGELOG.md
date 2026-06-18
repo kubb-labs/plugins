@@ -1,5 +1,15 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.67
+
+### Minor Changes
+
+- [#445](https://github.com/kubb-labs/plugins/pull/445) [`7f3a055`](https://github.com/kubb-labs/plugins/commit/7f3a0556b967af0d468c5f9946455b073a1716c8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `regexType` option that picks how an OpenAPI `pattern` is emitted inside `.regex(...)`. `'literal'` (the default) keeps the current regex literal `.regex(/^[a-z]+$/)`, and `'constructor'` emits `.regex(new RegExp("^[a-z]+$"))`. The constructor form helps when a regex literal trips up your toolchain or you need the pattern as a string. Both the chainable and `zod/mini` printers honor it.
+
+### Patch Changes
+
+- [#439](https://github.com/kubb-labs/plugins/pull/439) [`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reframe each plugin description and its keywords around Kubb instead of naming OpenAPI. The READMEs use the same wording.
+
 ## 5.0.0-beta.65
 
 ### Minor Changes

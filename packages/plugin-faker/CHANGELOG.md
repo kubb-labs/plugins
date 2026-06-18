@@ -1,5 +1,16 @@
 # @kubb/plugin-faker
 
+## 5.0.0-beta.67
+
+### Patch Changes
+
+- [#447](https://github.com/kubb-labs/plugins/pull/447) [`3b4b366`](https://github.com/kubb-labs/plugins/commit/3b4b3664d8ce4e12694d150dfed6c7817625e950) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Drop shapeless `allOf` members from generated mocks instead of spreading `...undefined`. An `allOf` that combines a `$ref` with a metadata-only schema (just `description`/`example`) produced invalid `{...createEquipmentCategory(), ...undefined}`. The metadata-only member now drops out, leaving `createEquipmentCategory()`.
+
+- [#439](https://github.com/kubb-labs/plugins/pull/439) [`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Reframe each plugin description and its keywords around Kubb instead of naming OpenAPI. The READMEs use the same wording.
+
+- Updated dependencies [[`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2), [`4390631`](https://github.com/kubb-labs/plugins/commit/439063187de7b6d6b3fbeafe09a5391ab136bd20)]:
+  - @kubb/plugin-ts@5.0.0-beta.67
+
 ## 5.0.0-beta.65
 
 ### Patch Changes
