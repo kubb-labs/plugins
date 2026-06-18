@@ -45,6 +45,11 @@ describe('printerZodMini', () => {
         'z.string().check(z.minLength(1), z.maxLength(10), z.regex(/^[a-z]+$/))',
       )
     })
+
+    test('string with pattern and regexType constructor', () => {
+      const p = printerZodMini({ regexType: 'constructor' })
+      expect(p.print(ast.factory.createSchema({ type: 'string', pattern: '^\\d+$' }))).toBe('z.string().check(z.regex(new RegExp("^\\\\d+$")))')
+    })
   })
 
   describe('number', () => {
