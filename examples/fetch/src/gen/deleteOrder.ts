@@ -8,7 +8,7 @@ import type { DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400,
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/store/order/${orderId}` as const }
+  const res = { method: 'DELETE', url: `/store/order/${orderId}` as const }
 
   return res
 }

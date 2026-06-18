@@ -8,7 +8,7 @@ import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, Dele
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getDeletePetUrl(petId: DeletePetPathPetId) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/pet/${petId}` as const }
+  const res = { method: 'DELETE', url: `/pet/${petId}` as const }
 
   return res
 }

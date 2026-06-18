@@ -8,7 +8,7 @@ import type { CreateUserData, CreateUserResponse } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getCreateUserUrl() {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/user` as const }
+  const res = { method: 'POST', url: `/user` as const }
 
   return res
 }

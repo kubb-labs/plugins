@@ -8,7 +8,7 @@ import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStat
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getPlaceOrderPatchUrl() {
-  const res = { method: 'PATCH', url: `https://petstore3.swagger.io/api/v3/store/order` as const }
+  const res = { method: 'PATCH', url: `/store/order` as const }
 
   return res
 }

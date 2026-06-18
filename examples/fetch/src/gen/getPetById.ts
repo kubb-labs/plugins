@@ -8,7 +8,7 @@ import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, Get
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/${petId}` as const }
+  const res = { method: 'GET', url: `/pet/${petId}` as const }
 
   return res
 }

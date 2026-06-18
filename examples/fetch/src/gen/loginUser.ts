@@ -8,7 +8,7 @@ import type { LoginUserQueryUsername, LoginUserQueryPassword, LoginUserStatus200
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getLoginUserUrl() {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/login` as const }
+  const res = { method: 'GET', url: `/user/login` as const }
 
   return res
 }

@@ -8,7 +8,7 @@ import type { LogoutUserResponse } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getLogoutUserUrl() {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/user/logout` as const }
+  const res = { method: 'GET', url: `/user/logout` as const }
 
   return res
 }

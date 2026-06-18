@@ -8,7 +8,7 @@ import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '.
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getPlaceOrderUrl() {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/store/order` as const }
+  const res = { method: 'POST', url: `/store/order` as const }
 
   return res
 }

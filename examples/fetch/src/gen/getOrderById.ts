@@ -8,7 +8,7 @@ import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/store/order/${orderId}` as const }
+  const res = { method: 'GET', url: `/store/order/${orderId}` as const }
 
   return res
 }
