@@ -1,9 +1,7 @@
 export { createAddPetRequest } from './createAddPetRequest.ts'
 export { createAddPetRequestStatusEnum } from './createAddPetRequestStatusEnum.ts'
-export { createAddress } from './createAddress.ts'
 export { createApiResponse } from './createApiResponse.ts'
 export { createCategory } from './createCategory.ts'
-export { createCustomer } from './createCustomer.ts'
 export { createFindPetsByStatusStatus } from './createFindPetsByStatusStatus.ts'
 export { createOrder } from './createOrder.ts'
 export { createOrderHttpStatusEnum } from './createOrderHttpStatusEnum.ts'
@@ -12,8 +10,6 @@ export { createPet } from './createPet.ts'
 export { createPetNotFound } from './createPetNotFound.ts'
 export { createPetStatusEnum } from './createPetStatusEnum.ts'
 export { createTag } from './createTag.ts'
-export { createUser } from './createUser.ts'
-export { createUserArray } from './createUserArray.ts'
 export {
   createAddPetData,
   createAddPetFormUrlEncodedData,
@@ -110,50 +106,3 @@ export {
   createPlaceOrderPatchStatus405,
   createPlaceOrderPatchXmlData,
 } from './store/createPlaceOrderPatch.ts'
-export {
-  createCreateUserData,
-  createCreateUserFormUrlEncodedData,
-  createCreateUserJsonData,
-  createCreateUserResponse,
-  createCreateUserStatusDefault,
-  createCreateUserStatusDefaultJson,
-  createCreateUserStatusDefaultXml,
-  createCreateUserXmlData,
-} from './user/createCreateUser.ts'
-export {
-  createCreateUsersWithListInputData,
-  createCreateUsersWithListInputResponse,
-  createCreateUsersWithListInputStatus200,
-  createCreateUsersWithListInputStatus200Json,
-  createCreateUsersWithListInputStatus200Xml,
-  createCreateUsersWithListInputStatusDefault,
-} from './user/createCreateUsersWithListInput.ts'
-export { createDeleteUserPathUsername, createDeleteUserResponse, createDeleteUserStatus400, createDeleteUserStatus404 } from './user/createDeleteUser.ts'
-export {
-  createGetUserByNamePathUsername,
-  createGetUserByNameResponse,
-  createGetUserByNameStatus200,
-  createGetUserByNameStatus200Json,
-  createGetUserByNameStatus200Xml,
-  createGetUserByNameStatus400,
-  createGetUserByNameStatus404,
-} from './user/createGetUserByName.ts'
-export {
-  createLoginUserQueryPassword,
-  createLoginUserQueryUsername,
-  createLoginUserResponse,
-  createLoginUserStatus200,
-  createLoginUserStatus200Json,
-  createLoginUserStatus200Xml,
-  createLoginUserStatus400,
-} from './user/createLoginUser.ts'
-export { createLogoutUserResponse, createLogoutUserStatusDefault } from './user/createLogoutUser.ts'
-export {
-  createUpdateUserData,
-  createUpdateUserFormUrlEncodedData,
-  createUpdateUserJsonData,
-  createUpdateUserPathUsername,
-  createUpdateUserResponse,
-  createUpdateUserStatusDefault,
-  createUpdateUserXmlData,
-} from './user/createUpdateUser.ts'

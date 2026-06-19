@@ -13,32 +13,8 @@ export type {
 } from './models/AddPet.ts'
 export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum.ts'
-export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './models/CreateUser.ts'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './models/CreateUsersWithListInput.ts'
-export type { Customer } from './models/Customer.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -55,14 +31,6 @@ export type {
   DeletePetResponses,
   DeletePetStatus400,
 } from './models/DeletePet.ts'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './models/DeleteUser.ts'
 export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
@@ -109,29 +77,6 @@ export type {
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './models/GetPetById.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './models/GetUserByName.ts'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './models/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
 export type {
   OptionsFindPetsByStatusRequestConfig,
   OptionsFindPetsByStatusResponse,
@@ -192,17 +137,6 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/UpdatePetWithForm.ts'
 export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './models/UpdateUser.ts'
-export type {
   UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
@@ -211,14 +145,10 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './models/UploadFile.ts'
-export type { User } from './models/User.ts'
-export type { UserArray } from './models/UserArray.ts'
 export { createAddPetRequest } from './mocks/createAddPetRequest.ts'
 export { createAddPetRequestStatusEnum } from './mocks/createAddPetRequestStatusEnum.ts'
-export { createAddress } from './mocks/createAddress.ts'
 export { createApiResponse } from './mocks/createApiResponse.ts'
 export { createCategory } from './mocks/createCategory.ts'
-export { createCustomer } from './mocks/createCustomer.ts'
 export { createFindPetsByStatusStatus } from './mocks/createFindPetsByStatusStatus.ts'
 export { createOrder } from './mocks/createOrder.ts'
 export { createOrderHttpStatusEnum } from './mocks/createOrderHttpStatusEnum.ts'
@@ -227,8 +157,6 @@ export { createPet } from './mocks/createPet.ts'
 export { createPetNotFound } from './mocks/createPetNotFound.ts'
 export { createPetStatusEnum } from './mocks/createPetStatusEnum.ts'
 export { createTag } from './mocks/createTag.ts'
-export { createUser } from './mocks/createUser.ts'
-export { createUserArray } from './mocks/createUserArray.ts'
 export {
   createAddPetData,
   createAddPetFormUrlEncodedData,
@@ -330,53 +258,6 @@ export {
   createPlaceOrderPatchStatus405,
   createPlaceOrderPatchXmlData,
 } from './mocks/store/createPlaceOrderPatch.ts'
-export {
-  createCreateUserData,
-  createCreateUserFormUrlEncodedData,
-  createCreateUserJsonData,
-  createCreateUserResponse,
-  createCreateUserStatusDefault,
-  createCreateUserStatusDefaultJson,
-  createCreateUserStatusDefaultXml,
-  createCreateUserXmlData,
-} from './mocks/user/createCreateUser.ts'
-export {
-  createCreateUsersWithListInputData,
-  createCreateUsersWithListInputResponse,
-  createCreateUsersWithListInputStatus200,
-  createCreateUsersWithListInputStatus200Json,
-  createCreateUsersWithListInputStatus200Xml,
-  createCreateUsersWithListInputStatusDefault,
-} from './mocks/user/createCreateUsersWithListInput.ts'
-export { createDeleteUserPathUsername, createDeleteUserResponse, createDeleteUserStatus400, createDeleteUserStatus404 } from './mocks/user/createDeleteUser.ts'
-export {
-  createGetUserByNamePathUsername,
-  createGetUserByNameResponse,
-  createGetUserByNameStatus200,
-  createGetUserByNameStatus200Json,
-  createGetUserByNameStatus200Xml,
-  createGetUserByNameStatus400,
-  createGetUserByNameStatus404,
-} from './mocks/user/createGetUserByName.ts'
-export {
-  createLoginUserQueryPassword,
-  createLoginUserQueryUsername,
-  createLoginUserResponse,
-  createLoginUserStatus200,
-  createLoginUserStatus200Json,
-  createLoginUserStatus200Xml,
-  createLoginUserStatus400,
-} from './mocks/user/createLoginUser.ts'
-export { createLogoutUserResponse, createLogoutUserStatusDefault } from './mocks/user/createLogoutUser.ts'
-export {
-  createUpdateUserData,
-  createUpdateUserFormUrlEncodedData,
-  createUpdateUserJsonData,
-  createUpdateUserPathUsername,
-  createUpdateUserResponse,
-  createUpdateUserStatusDefault,
-  createUpdateUserXmlData,
-} from './mocks/user/createUpdateUser.ts'
 export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
 export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'
 export { orderHttpStatusEnum } from './models/OrderHttpStatusEnum.ts'
@@ -413,15 +294,3 @@ export {
 } from './msw/store/Handlers/getOrderByIdHandler.ts'
 export { placeOrderHandler, placeOrderHandlerResponse200, placeOrderHandlerResponse405 } from './msw/store/Handlers/placeOrderHandler.ts'
 export { placeOrderPatchHandler, placeOrderPatchHandlerResponse200, placeOrderPatchHandlerResponse405 } from './msw/store/Handlers/placeOrderPatchHandler.ts'
-export { createUserHandler } from './msw/user/Handlers/createUserHandler.ts'
-export { createUsersWithListInputHandler, createUsersWithListInputHandlerResponse200 } from './msw/user/Handlers/createUsersWithListInputHandler.ts'
-export { deleteUserHandler, deleteUserHandlerResponse400, deleteUserHandlerResponse404 } from './msw/user/Handlers/deleteUserHandler.ts'
-export {
-  getUserByNameHandler,
-  getUserByNameHandlerResponse200,
-  getUserByNameHandlerResponse400,
-  getUserByNameHandlerResponse404,
-} from './msw/user/Handlers/getUserByNameHandler.ts'
-export { loginUserHandler, loginUserHandlerResponse200, loginUserHandlerResponse400 } from './msw/user/Handlers/loginUserHandler.ts'
-export { logoutUserHandler } from './msw/user/Handlers/logoutUserHandler.ts'
-export { updateUserHandler } from './msw/user/Handlers/updateUserHandler.ts'

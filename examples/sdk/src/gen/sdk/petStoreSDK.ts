@@ -6,16 +6,13 @@
 import type { Client, RequestConfig } from '@kubb/plugin-client/clients/fetch'
 import { pet } from './pet/pet.ts'
 import { store } from './store/store.ts'
-import { user } from './user/user.ts'
 
 export class PetStoreSDK {
   readonly pet: pet
   readonly store: store
-  readonly user: user
 
   constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
     this.pet = new pet(config)
     this.store = new store(config)
-    this.user = new user(config)
   }
 }

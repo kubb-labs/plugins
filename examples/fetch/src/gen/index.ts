@@ -12,28 +12,8 @@ export type {
   AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
-  Address,
   ApiResponse,
   Category,
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-  Customer,
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
   DeleteOrderResponse,
@@ -46,12 +26,6 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus400,
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
   FindPetsByStatusResponse,
@@ -93,28 +67,6 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-  LogoutUserRequestConfig,
-  LogoutUserResponse,
-  LogoutUserResponses,
-  LogoutUserStatusDefault,
   Order,
   OrderHttpStatusEnumKey,
   OrderStatusEnumKey,
@@ -160,15 +112,6 @@ export type {
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
   UpdatePetXmlData,
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
   UploadFileData,
   UploadFileFormData,
   UploadFileJsonData,
@@ -178,27 +121,18 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-  User,
-  UserArray,
 } from './models.ts'
 export { addPet } from './addPet.ts'
-export { createUser } from './createUser.ts'
-export { createUsersWithListInput } from './createUsersWithListInput.ts'
 export { deleteOrder } from './deleteOrder.ts'
 export { deletePet } from './deletePet.ts'
-export { deleteUser } from './deleteUser.ts'
 export { findPetsByStatus } from './findPetsByStatus.ts'
 export { findPetsByTags } from './findPetsByTags.ts'
 export { getInventory } from './getInventory.ts'
 export { getOrderById } from './getOrderById.ts'
 export { getPetById } from './getPetById.ts'
-export { getUserByName } from './getUserByName.ts'
-export { loginUser } from './loginUser.ts'
-export { logoutUser } from './logoutUser.ts'
 export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
 export { placeOrder } from './placeOrder.ts'
 export { placeOrderPatch } from './placeOrderPatch.ts'
 export { updatePet } from './updatePet.ts'
 export { updatePetWithForm } from './updatePetWithForm.ts'
-export { updateUser } from './updateUser.ts'
 export { uploadFile } from './uploadFile.ts'

@@ -24,16 +24,6 @@ import { getOrderByIdQueryOptionsHook } from './store/useGetOrderByIdHook.ts'
 import { getOrderByIdSuspenseQueryOptionsHook } from './store/useGetOrderByIdSuspenseHook.ts'
 import { placeOrderMutationOptionsHook } from './store/usePlaceOrderHook.ts'
 import { placeOrderPatchMutationOptionsHook } from './store/usePlaceOrderPatchHook.ts'
-import { createUserMutationOptionsHook } from './user/useCreateUserHook.ts'
-import { createUsersWithListInputMutationOptionsHook } from './user/useCreateUsersWithListInputHook.ts'
-import { deleteUserMutationOptionsHook } from './user/useDeleteUserHook.ts'
-import { getUserByNameQueryOptionsHook } from './user/useGetUserByNameHook.ts'
-import { getUserByNameSuspenseQueryOptionsHook } from './user/useGetUserByNameSuspenseHook.ts'
-import { loginUserQueryOptionsHook } from './user/useLoginUserHook.ts'
-import { loginUserSuspenseQueryOptionsHook } from './user/useLoginUserSuspenseHook.ts'
-import { logoutUserQueryOptionsHook } from './user/useLogoutUserHook.ts'
-import { logoutUserSuspenseQueryOptionsHook } from './user/useLogoutUserSuspenseHook.ts'
-import { updateUserMutationOptionsHook } from './user/useUpdateUserHook.ts'
 
 export type HookOptions = {
   useUpdatePetHook: Partial<ReturnType<typeof updatePetMutationOptionsHook>>
@@ -57,14 +47,4 @@ export type HookOptions = {
   useGetOrderByIdHook: Partial<ReturnType<typeof getOrderByIdQueryOptionsHook>>
   useGetOrderByIdSuspenseHook: Partial<ReturnType<typeof getOrderByIdSuspenseQueryOptionsHook>>
   useDeleteOrderHook: Partial<ReturnType<typeof deleteOrderMutationOptionsHook>>
-  useCreateUserHook: Partial<ReturnType<typeof createUserMutationOptionsHook>>
-  useCreateUsersWithListInputHook: Partial<ReturnType<typeof createUsersWithListInputMutationOptionsHook>>
-  useLoginUserHook: Partial<ReturnType<typeof loginUserQueryOptionsHook>>
-  useLoginUserSuspenseHook: Partial<ReturnType<typeof loginUserSuspenseQueryOptionsHook>>
-  useLogoutUserHook: Partial<ReturnType<typeof logoutUserQueryOptionsHook>>
-  useLogoutUserSuspenseHook: Partial<ReturnType<typeof logoutUserSuspenseQueryOptionsHook>>
-  useGetUserByNameHook: Partial<ReturnType<typeof getUserByNameQueryOptionsHook>>
-  useGetUserByNameSuspenseHook: Partial<ReturnType<typeof getUserByNameSuspenseQueryOptionsHook>>
-  useUpdateUserHook: Partial<ReturnType<typeof updateUserMutationOptionsHook>>
-  useDeleteUserHook: Partial<ReturnType<typeof deleteUserMutationOptionsHook>>
 }
