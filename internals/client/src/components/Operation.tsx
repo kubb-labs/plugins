@@ -42,7 +42,7 @@ type Props = {
 /**
  * Renders one slim client operation: the grouped `<Name>Request` type and the function that forwards a
  * single `options` object to the resolved client and returns the `RequestResult`. The type, signature,
- * and call config are built with the AST factory; only the jsx-renderer emits the source.
+ * and call config are built with the AST factory, and only the jsx-renderer emits the source.
  */
 export function Operation({ name, node, tsResolver, zodResolver, parser, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
