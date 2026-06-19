@@ -20,16 +20,16 @@ catalog:
   '@kubb/renderer-jsx': 5.0.0-beta.69
   '@types/node': ^22.19.21
   '@types/react': ^19.2.17
-  '@vitest/coverage-v8': ^4.1.8
-  '@vitest/ui': ^4.1.8
+  '@vitest/coverage-v8': ^4.1.9
+  '@vitest/ui': ^4.1.9
   kubb: 5.0.0-beta.69
   oxfmt: ^0.47.0
-  oxlint: ^1.69.0
+  oxlint: ^1.70.0
   prettier: ^3.8.4
   tsdown: ^0.22.2
   typescript: ^6.0.3
   unplugin-kubb: 5.0.0-beta.69
-  vitest: ^4.1.8
+  vitest: ^4.1.9
 #
 #overrides:
 #  '@kubb/adapter-oas': link:../kubb/packages/adapter-oas

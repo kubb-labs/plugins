@@ -17,6 +17,7 @@ export type { Address } from './Address.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Cat } from './Cat.ts'
 export type { Category } from './Category.ts'
+export type { Category1 } from './Category1.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,

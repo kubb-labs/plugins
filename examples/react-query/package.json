@@ -28,7 +28,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
     "@tanstack/react-query-devtools": "^5.101.0",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "kubb": "catalog:",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",

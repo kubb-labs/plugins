@@ -93,7 +93,7 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "axios": "^1.17.0"
+    "axios": "^1.18.0"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:",
