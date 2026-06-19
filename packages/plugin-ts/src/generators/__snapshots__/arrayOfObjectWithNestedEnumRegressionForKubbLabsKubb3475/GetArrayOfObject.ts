@@ -28,10 +28,10 @@ export type GetArrayOfObjectStatus200 = {
  * @type object
  */
 export type GetArrayOfObjectRequestConfig = {
-  data?: never
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body?: never
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

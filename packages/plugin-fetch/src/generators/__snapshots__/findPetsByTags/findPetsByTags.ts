@@ -4,19 +4,11 @@ import type { Options, RequestResult } from './.kubb/client'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from './FindPetsByTags'
 import { client } from './.kubb/client'
 
-type FindPetsByTagsRequest = {
-  body?: FindPetsByTagsRequestConfig['data']
-  path?: FindPetsByTagsRequestConfig['pathParams']
-  query?: FindPetsByTagsRequestConfig['queryParams']
-  headers?: FindPetsByTagsRequestConfig['headerParams']
-  url: FindPetsByTagsRequestConfig['url']
-}
-
 /**
  * {@link /pet/findByTags}
  */
 export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsRequest, ThrowOnError>,
+  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

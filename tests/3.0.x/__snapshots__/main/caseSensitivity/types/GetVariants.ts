@@ -14,10 +14,10 @@ export type GetVariantsStatus200 = Variant;
  * @type object
 */
 export type GetVariantsRequestConfig = {
-    data?: never;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

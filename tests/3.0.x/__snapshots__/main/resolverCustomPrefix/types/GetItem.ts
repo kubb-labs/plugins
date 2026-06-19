@@ -17,15 +17,15 @@ export type CustomGetItemStatus200 = Item;
  * @type object
 */
 export type CustomGetItemRequestConfig = {
-    data?: never;
+    body?: never;
     /**
-     * @type object
+     * @type object | undefined
     */
-    pathParams: {
+    path?: {
         id: CustomGetItemPathId;
     };
-    queryParams?: never;
-    headerParams?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

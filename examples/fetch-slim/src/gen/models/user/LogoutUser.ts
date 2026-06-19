@@ -12,10 +12,10 @@ export type LogoutUserStatusDefault = any
  * @type object
  */
 export type LogoutUserRequestConfig = {
-  data?: never
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body?: never
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

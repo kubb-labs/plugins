@@ -47,10 +47,10 @@ export type AddPetData = (AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedD
  * @type object
 */
 export type AddPetRequestConfig = {
-    data?: AddPetData;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body: AddPetData;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

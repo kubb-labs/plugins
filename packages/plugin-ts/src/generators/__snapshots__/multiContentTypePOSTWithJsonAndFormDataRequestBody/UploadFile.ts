@@ -39,15 +39,15 @@ export type UploadFileData = UploadFileJsonData | UploadFileFormData
  * @type object
  */
 export type UploadFileRequestConfig = {
-  data?: UploadFileData
+  body: UploadFileData
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: UploadFilePathPetId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

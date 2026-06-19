@@ -32,21 +32,21 @@ export type UpdatePetWithFormStatus405 = object
  * @type object
  */
 export type UpdatePetWithFormRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: UpdatePetWithFormPathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     name?: UpdatePetWithFormQueryName
     status?: UpdatePetWithFormQueryStatus
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */

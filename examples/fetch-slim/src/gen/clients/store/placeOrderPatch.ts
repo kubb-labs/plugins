@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
 import { client } from '../../.kubb/client.ts'
 
-type PlaceOrderPatchRequest = {
-  body: PlaceOrderPatchRequestConfig['data']
-  path?: PlaceOrderPatchRequestConfig['pathParams']
-  query?: PlaceOrderPatchRequestConfig['queryParams']
-  headers?: PlaceOrderPatchRequestConfig['headerParams']
-  url: PlaceOrderPatchRequestConfig['url']
-}
-
 /**
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
 export function placeOrderPatch<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderPatchRequest, ThrowOnError>,
+  options: Options<PlaceOrderPatchRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { DeleteOrderRequestConfig, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
 import { client } from '../../.kubb/client.ts'
 
-type DeleteOrderRequest = {
-  body?: DeleteOrderRequestConfig['data']
-  path?: DeleteOrderRequestConfig['pathParams']
-  query?: DeleteOrderRequestConfig['queryParams']
-  headers?: DeleteOrderRequestConfig['headerParams']
-  url: DeleteOrderRequestConfig['url']
-}
-
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
 export function deleteOrder<ThrowOnError extends boolean = true>(
-  options: Options<DeleteOrderRequest, ThrowOnError>,
+  options: Options<DeleteOrderRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

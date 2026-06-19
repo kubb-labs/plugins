@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { CreateUserRequestConfig, CreateUserResponses } from '../../models/user/CreateUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-type CreateUserRequest = {
-  body: CreateUserRequestConfig['data']
-  path?: CreateUserRequestConfig['pathParams']
-  query?: CreateUserRequestConfig['queryParams']
-  headers?: CreateUserRequestConfig['headerParams']
-  url: CreateUserRequestConfig['url']
-}
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Create user
  * {@link /user}
  */
 export function createUser<ThrowOnError extends boolean = true>(
-  options: Options<CreateUserRequest, ThrowOnError>,
+  options: Options<CreateUserRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

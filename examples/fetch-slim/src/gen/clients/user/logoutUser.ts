@@ -7,20 +7,12 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { LogoutUserRequestConfig, LogoutUserResponses } from '../../models/user/LogoutUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-type LogoutUserRequest = {
-  body?: LogoutUserRequestConfig['data']
-  path?: LogoutUserRequestConfig['pathParams']
-  query?: LogoutUserRequestConfig['queryParams']
-  headers?: LogoutUserRequestConfig['headerParams']
-  url: LogoutUserRequestConfig['url']
-}
-
 /**
  * @summary Logs out current logged in user session
  * {@link /user/logout}
  */
 export function logoutUser<ThrowOnError extends boolean = true>(
-  options: Options<LogoutUserRequest, ThrowOnError>,
+  options: Options<LogoutUserRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<LogoutUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

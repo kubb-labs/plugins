@@ -37,21 +37,21 @@ export type UpdatePetData = {
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  data?: UpdatePetData
+  body: UpdatePetData
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     pet_id: UpdatePetPathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     include_deleted?: UpdatePetQueryIncludeDeleted
     request_source?: UpdatePetQueryRequestSource
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */

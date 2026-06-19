@@ -17,15 +17,15 @@ export type DeletePetStatus204 = void
  * @type object
  */
 export type DeletePetRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: DeletePetPathPetId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

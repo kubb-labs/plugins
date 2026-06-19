@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { UpdateUserRequestConfig, UpdateUserResponses } from '../../models/user/UpdateUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-type UpdateUserRequest = {
-  body: UpdateUserRequestConfig['data']
-  path?: UpdateUserRequestConfig['pathParams']
-  query?: UpdateUserRequestConfig['queryParams']
-  headers?: UpdateUserRequestConfig['headerParams']
-  url: UpdateUserRequestConfig['url']
-}
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Update user
  * {@link /user/:username}
  */
 export function updateUser<ThrowOnError extends boolean = true>(
-  options: Options<UpdateUserRequest, ThrowOnError>,
+  options: Options<UpdateUserRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

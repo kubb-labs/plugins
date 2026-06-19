@@ -20,10 +20,10 @@ export type CreateConfigV20250Data = ConfigCreate;
  * @type object
 */
 export type CreateConfigV20250RequestConfig = {
-    data?: CreateConfigV20250Data;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body: CreateConfigV20250Data;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

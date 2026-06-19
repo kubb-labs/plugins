@@ -31,10 +31,10 @@ export type CreateUsersWithListInputData = User[] | undefined
  * @type object
  */
 export type CreateUsersWithListInputRequestConfig = {
-  data?: CreateUsersWithListInputData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: CreateUsersWithListInputData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
