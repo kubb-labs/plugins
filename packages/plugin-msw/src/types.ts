@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * Resolver for MSW that provides naming methods for handler functions.
@@ -69,10 +69,6 @@ export type Options = OutputOptions & {
    * @default 'data'
    */
   parser?: 'data' | 'faker'
-  /**
-   * Custom generators that run alongside the built-in MSW generators.
-   */
-  generators?: Array<Generator<PluginMsw>>
 }
 
 type ResolvedOptions = {

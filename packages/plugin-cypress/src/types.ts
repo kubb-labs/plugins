@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * Resolver for Cypress that provides naming methods for test functions.
@@ -57,10 +57,6 @@ export type Options = OutputOptions & {
    * Macros applied to each operation node before printing.
    */
   macros?: Array<ast.Macro>
-  /**
-   * Custom generators that run alongside the built-in Cypress generators.
-   */
-  generators?: Array<Generator<PluginCypress>>
 }
 
 type ResolvedOptions = {

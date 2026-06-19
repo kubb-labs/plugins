@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
  * The concrete resolver type for `@kubb/plugin-ts`.
@@ -246,10 +246,6 @@ export type Options = OutputOptions & {
    * @default 'array'
    */
   arrayType?: 'generic' | 'array'
-  /**
-   * Custom generators that run alongside the built-in TypeScript generators.
-   */
-  generators?: Array<Generator<PluginTs>>
   /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the

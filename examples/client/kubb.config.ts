@@ -2,9 +2,6 @@ import { adapterOas } from '@kubb/adapter-oas'
 import { pluginClient } from '@kubb/plugin-client'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
-import { clientOperationGenerator } from './src/generators/clientOperationGenerator'
-import { clientOperationReactGenerator } from './src/generators/clientOperationReactGenerator'
-import { clientStaticGenerator } from './src/generators/clientStaticGenerator'
 
 const input = { path: './petStore.yaml' } as const
 
@@ -46,6 +43,7 @@ export default defineConfig([
           },
         },
         operations: true,
+        pathParamsType: 'object',
       }),
     ],
   },
@@ -64,52 +62,7 @@ export default defineConfig([
         },
         importPath: '@kubb/plugin-client/clients/axios',
         include: [{ type: 'operationId', pattern: 'uploadFile' }],
-      }),
-    ],
-  },
-  {
-    root: '.',
-    input,
-    output: { path: './src/gen3', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
-    plugins: [
-      tsPlugin,
-      pluginClient({
-        output: { path: './tagObject.ts', mode: 'file' },
-        importPath: '@kubb/plugin-client/clients/axios',
-        generators: [clientStaticGenerator],
-        include: [{ type: 'tag', pattern: 'store' }],
-        dataReturnType: 'full',
-      }),
-    ],
-  },
-  {
-    root: '.',
-    input,
-    output: { path: './src/gen4', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
-    plugins: [
-      pluginClient({
-        output: { path: './tagClientOperation.ts', mode: 'file' },
-        importPath: '@kubb/plugin-client/clients/axios',
-        generators: [clientOperationGenerator],
-        include: [{ type: 'tag', pattern: 'store' }],
-        dataReturnType: 'full',
-      }),
-    ],
-  },
-  {
-    root: '.',
-    input,
-    output: { path: './src/gen5', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
-    plugins: [
-      pluginClient({
-        output: { path: './tagClientOperationReact.ts', mode: 'file' },
-        importPath: '@kubb/plugin-client/clients/axios',
-        generators: [clientOperationReactGenerator],
-        include: [{ type: 'tag', pattern: 'store' }],
-        dataReturnType: 'full',
+        pathParamsType: 'object',
       }),
     ],
   },
@@ -148,6 +101,7 @@ export default defineConfig([
         importPath: '@kubb/plugin-client/clients/fetch',
         clientType: 'class',
         group: { type: 'tag' },
+        pathParamsType: 'object',
       }),
     ],
   },

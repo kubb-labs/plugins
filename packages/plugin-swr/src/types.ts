@@ -1,5 +1,5 @@
 import type { Transformer } from '@internals/tanstack-query'
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
@@ -143,10 +143,6 @@ export type Options = OutputOptions & {
    * Macros that rewrite generated nodes before printing.
    */
   macros?: Array<ast.Macro>
-  /**
-   * Additional generators alongside the default generators.
-   */
-  generators?: Array<Generator<PluginSwr>>
 }
 
 type ResolvedOptions = {

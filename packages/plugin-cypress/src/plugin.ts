@@ -45,7 +45,6 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     baseURL,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const groupConfig = createGroupConfig(group)
@@ -73,9 +72,6 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
           ctx.setMacros(userMacros)
         }
         ctx.addGenerator(cypressGenerator)
-        for (const gen of userGenerators) {
-          ctx.addGenerator(gen)
-        }
       },
     },
   }

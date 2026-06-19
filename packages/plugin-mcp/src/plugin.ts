@@ -55,7 +55,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     client,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const clientName = client?.client ?? 'axios'
@@ -92,9 +91,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
         }
         ctx.addGenerator(mcpGenerator)
         ctx.addGenerator(serverGenerator)
-        for (const gen of userGenerators) {
-          ctx.addGenerator(gen)
-        }
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const hasClientPlugin = ctx.config.plugins?.some((p) => p.name === pluginClientName)

@@ -345,43 +345,6 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
-  examples/generators:
-    dependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.69(@kubb/renderer-jsx@5.0.0-beta.69)(openapi-types@12.1.3)
-      '@kubb/core':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.69(@kubb/renderer-jsx@5.0.0-beta.69)
-      '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.69(@kubb/renderer-jsx@5.0.0-beta.69)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.69
-      axios:
-        specifier: ^1.18.0
-        version: 1.18.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.0.0-beta.69(openapi-types@12.1.3)(typescript@6.0.3)
-    devDependencies:
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.17
-      react:
-        specifier: ^19.2.7
-        version: 19.2.7
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
-
   examples/mcp:
     dependencies:
       '@kubb/adapter-oas':

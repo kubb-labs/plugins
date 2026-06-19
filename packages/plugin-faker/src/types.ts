@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
 /**
@@ -127,10 +127,6 @@ export type Options = OutputOptions & {
    * which is useful for snapshot tests.
    */
   seed?: number | Array<number>
-  /**
-   * Custom generators that run alongside the built-in Faker generators.
-   */
-  generators?: Array<Generator<PluginFaker>>
   /**
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.

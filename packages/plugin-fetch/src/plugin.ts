@@ -38,7 +38,7 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
 export const pluginFetch = definePlugin<PluginFetch>((options) => {
   const resolved = resolveOptions(options)
   const { baseURL } = resolved
-  const selectedGenerators = options.generators ?? [clientGenerator]
+  const selectedGenerators = [clientGenerator]
 
   return {
     name: pluginFetchName,

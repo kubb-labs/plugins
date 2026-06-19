@@ -57,15 +57,14 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     client,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath
 
-  const selectedGenerators =
-    options.generators ??
-    [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
+  const selectedGenerators = [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> =>
+    Boolean(generator),
+  )
 
   const groupConfig = createGroupConfig(group)
 
@@ -127,9 +126,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
         }
 
         for (const gen of selectedGenerators) {
-          ctx.addGenerator(gen)
-        }
-        for (const gen of userGenerators) {
           ctx.addGenerator(gen)
         }
 

@@ -69,13 +69,11 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
   // opts out: the generated code imports the client from that module and nothing is bundled.
   const resolvedImportPath = importPath
 
-  const selectedGenerators =
-    options.generators ??
-    [
-      clientType === 'staticClass' ? staticClassClientGenerator : clientType === 'class' ? classClientGenerator : clientGenerator,
-      group && clientType === 'function' ? groupedClientGenerator : null,
-      operations ? operationsGenerator : null,
-    ].filter((x): x is NonNullable<typeof x> => Boolean(x))
+  const selectedGenerators = [
+    clientType === 'staticClass' ? staticClassClientGenerator : clientType === 'class' ? classClientGenerator : clientGenerator,
+    group && clientType === 'function' ? groupedClientGenerator : null,
+    operations ? operationsGenerator : null,
+  ].filter((x): x is NonNullable<typeof x> => Boolean(x))
 
   const groupConfig = createGroupConfig(group)
 

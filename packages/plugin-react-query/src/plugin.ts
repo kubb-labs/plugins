@@ -67,23 +67,20 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     client,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath
 
-  const selectedGenerators =
-    options.generators ??
-    [
-      queryGenerator,
-      suspenseQueryGenerator,
-      infiniteQueryGenerator,
-      suspenseInfiniteQueryGenerator,
-      mutationGenerator,
-      hookOptionsGenerator,
-      customHookOptionsFileGenerator,
-    ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
+  const selectedGenerators = [
+    queryGenerator,
+    suspenseQueryGenerator,
+    infiniteQueryGenerator,
+    suspenseInfiniteQueryGenerator,
+    mutationGenerator,
+    hookOptionsGenerator,
+    customHookOptionsFileGenerator,
+  ].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
   const groupConfig = createGroupConfig(group)
 
@@ -147,9 +144,6 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
         }
 
         for (const gen of selectedGenerators) {
-          ctx.addGenerator(gen)
-        }
-        for (const gen of userGenerators) {
           ctx.addGenerator(gen)
         }
 

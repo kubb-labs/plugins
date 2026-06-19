@@ -54,7 +54,6 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     printer,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const groupConfig = createGroupConfig(group)
@@ -86,9 +85,6 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           ctx.setMacros(userMacros)
         }
         ctx.addGenerator(zodGenerator)
-        for (const gen of userGenerators) {
-          ctx.addGenerator(gen)
-        }
       },
     },
   }

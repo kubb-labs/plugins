@@ -27,14 +27,12 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     client,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const clientName = client?.client ?? 'axios'
   const clientImportPath = client?.importPath
 
-  const selectedGenerators =
-    options.generators ?? [queryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
+  const selectedGenerators = [queryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
   const groupConfig = createGroupConfig(group) ?? undefined
 
@@ -86,9 +84,6 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
         }
 
         for (const gen of selectedGenerators) {
-          ctx.addGenerator(gen)
-        }
-        for (const gen of userGenerators) {
           ctx.addGenerator(gen)
         }
 
