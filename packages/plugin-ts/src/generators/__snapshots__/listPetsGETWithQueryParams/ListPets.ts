@@ -22,15 +22,15 @@ export type ListPetsStatusDefault = object
  * @type object
  */
 export type ListPetsRequestConfig = {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     limit?: ListPetsQueryLimit
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */

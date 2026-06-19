@@ -29,10 +29,10 @@ export type CreateOrderData = {
  * @type object
 */
 export type CreateOrderRequestConfig = {
-    data?: CreateOrderData;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body: CreateOrderData;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

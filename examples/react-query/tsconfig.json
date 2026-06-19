@@ -17,5 +17,5 @@
     "noEmit": true
   },
   "include": ["./src/**/*", "./templates/**/*"],
-  "exclude": ["**/node_modules", "**/types/**", "**/mocks/**"]
+  "exclude": ["**/node_modules", "**/types/**", "**/mocks/**", "**/.kubb/**"]
 }

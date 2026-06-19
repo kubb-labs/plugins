@@ -25,10 +25,10 @@ export type CreateEventData = Event;
  * @type object
 */
 export type CreateEventRequestConfig = {
-    data?: CreateEventData;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body: CreateEventData;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

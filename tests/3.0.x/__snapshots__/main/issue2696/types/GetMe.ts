@@ -14,10 +14,10 @@ export type GetMeStatus200 = User;
  * @type object
 */
 export type GetMeRequestConfig = {
-    data?: never;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

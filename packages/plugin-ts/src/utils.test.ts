@@ -49,15 +49,15 @@ describe('buildParams', () => {
 describe('buildData', () => {
   const baseNode = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-  it('emits data?: never when no request body', () => {
+  it('emits body?: never when no request body', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
-          data?: never;
-          pathParams?: never;
-          queryParams?: never;
-          headerParams?: never;
+          body?: never;
+          path?: never;
+          query?: never;
+          headers?: never;
           /**
            * @type string
           */
@@ -66,7 +66,7 @@ describe('buildData', () => {
     `)
   })
 
-  it('emits data? referencing the Data type when body exists', () => {
+  it('emits required body referencing the Data type when body exists', () => {
     const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
@@ -76,10 +76,10 @@ describe('buildData', () => {
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
-          data?: CreatePetData;
-          pathParams?: never;
-          queryParams?: never;
-          headerParams?: never;
+          body: CreatePetData;
+          path?: never;
+          query?: never;
+          headers?: never;
           /**
            * @type string
           */
@@ -88,7 +88,7 @@ describe('buildData', () => {
     `)
   })
 
-  it('emits required pathParams when path parameters exist', () => {
+  it('emits optional path when path parameters exist', () => {
     const node = ast.factory.createOperation({
       operationId: 'showPetById',
       method: 'GET',
@@ -98,15 +98,15 @@ describe('buildData', () => {
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
-          data?: never;
+          body?: never;
           /**
-           * @type object
+           * @type object | undefined
           */
-          pathParams: {
+          path?: {
               petId: ShowPetByIdPathPetId;
           };
-          queryParams?: never;
-          headerParams?: never;
+          query?: never;
+          headers?: never;
           /**
            * @type string
           */
@@ -115,7 +115,7 @@ describe('buildData', () => {
     `)
   })
 
-  it('emits optional queryParams when query parameters exist', () => {
+  it('emits optional query when query parameters exist', () => {
     const node = ast.factory.createOperation({
       ...baseNode,
       operationId: 'listPets',
@@ -124,15 +124,15 @@ describe('buildData', () => {
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
-          data?: never;
-          pathParams?: never;
+          body?: never;
+          path?: never;
           /**
            * @type object | undefined
           */
-          queryParams?: {
+          query?: {
               limit?: ListPetsQueryLimit;
           };
-          headerParams?: never;
+          headers?: never;
           /**
            * @type string
           */
@@ -141,7 +141,7 @@ describe('buildData', () => {
     `)
   })
 
-  it('emits JSDoc on queryParams properties when parameters have descriptions', () => {
+  it('emits JSDoc on query properties when parameters have descriptions', () => {
     const node = ast.factory.createOperation({
       ...baseNode,
       operationId: 'listPets',
@@ -157,15 +157,15 @@ describe('buildData', () => {
 
     expect(printSchema(buildData(node, { resolver: resolverTs }))).toMatchInlineSnapshot(`
       "{
-          data?: never;
-          pathParams?: never;
+          body?: never;
+          path?: never;
           /**
            * @type object | undefined
           */
-          queryParams?: {
+          query?: {
               limit?: ListPetsQueryLimit;
           };
-          headerParams?: never;
+          headers?: never;
           /**
            * @type string
           */

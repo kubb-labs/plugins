@@ -14,10 +14,10 @@ export type GetEmployersStatus200 = Employer[];
  * @type object
 */
 export type GetEmployersRequestConfig = {
-    data?: never;
-    pathParams?: never;
-    queryParams?: never;
-    headerParams?: never;
+    body?: never;
+    path?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */
