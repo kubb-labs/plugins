@@ -1,6 +1,5 @@
 export { createAddPetRequestFaker } from './createAddPetRequestFaker.ts'
 export { createAddPetRequestStatusEnumFaker } from './createAddPetRequestStatusEnumFaker.ts'
-export { createAddressFaker } from './createAddressFaker.ts'
 export { createAnimalFaker } from './createAnimalFaker.ts'
 export { createAnimalTypeEnumFaker } from './createAnimalTypeEnumFaker.ts'
 export { createApiResponseFaker } from './createApiResponseFaker.ts'
@@ -8,8 +7,6 @@ export { createCatFaker } from './createCatFaker.ts'
 export { createCategoryFaker } from './createCategoryFaker.ts'
 export { createCreatePetsBoolParamFaker } from './createCreatePetsBoolParamFaker.ts'
 export { createCreatePetsXEXAMPLEFaker } from './createCreatePetsXEXAMPLEFaker.ts'
-export { createCustomerFaker } from './createCustomerFaker.ts'
-export { createCustomerParamsStatusEnumFaker } from './createCustomerParamsStatusEnumFaker.ts'
 export { createDogFaker } from './createDogFaker.ts'
 export { createFindPetsByTagsXEXAMPLEFaker } from './createFindPetsByTagsXEXAMPLEFaker.ts'
 export { createImageFaker } from './createImageFaker.ts'
@@ -21,8 +18,6 @@ export { createOrderStatusEnumFaker } from './createOrderStatusEnumFaker.ts'
 export { createPetFaker } from './createPetFaker.ts'
 export { createPetNotFoundFaker } from './createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './createPetStatusEnumFaker.ts'
-export { createUserArrayFaker } from './createUserArrayFaker.ts'
-export { createUserFaker } from './createUserFaker.ts'
 export {
   createAddFilesDataFaker,
   createAddFilesDataFakerFormData,
@@ -115,55 +110,3 @@ export {
   createCreatePetsStatusDefaultFaker,
 } from './pets/createCreatePetsFaker.ts'
 export { createTagTagFaker } from './tag/createTagFaker.ts'
-export {
-  createCreateUserDataFaker,
-  createCreateUserDataFakerFormUrlEncoded,
-  createCreateUserDataFakerJson,
-  createCreateUserDataFakerXml,
-  createCreateUserResponseFaker,
-  createCreateUserStatusDefaultFaker,
-  createCreateUserStatusDefaultFakerJson,
-  createCreateUserStatusDefaultFakerXml,
-} from './user/createCreateUserFaker.ts'
-export {
-  createCreateUsersWithListInputDataFaker,
-  createCreateUsersWithListInputResponseFaker,
-  createCreateUsersWithListInputStatus200Faker,
-  createCreateUsersWithListInputStatus200FakerJson,
-  createCreateUsersWithListInputStatus200FakerXml,
-  createCreateUsersWithListInputStatusDefaultFaker,
-} from './user/createCreateUsersWithListInputFaker.ts'
-export {
-  createDeleteUserPathUsernameFaker,
-  createDeleteUserResponseFaker,
-  createDeleteUserStatus400Faker,
-  createDeleteUserStatus404Faker,
-} from './user/createDeleteUserFaker.ts'
-export {
-  createGetUserByNamePathUsernameFaker,
-  createGetUserByNameResponseFaker,
-  createGetUserByNameStatus200Faker,
-  createGetUserByNameStatus200FakerJson,
-  createGetUserByNameStatus200FakerXml,
-  createGetUserByNameStatus400Faker,
-  createGetUserByNameStatus404Faker,
-} from './user/createGetUserByNameFaker.ts'
-export {
-  createLoginUserQueryPasswordFaker,
-  createLoginUserQueryUsernameFaker,
-  createLoginUserResponseFaker,
-  createLoginUserStatus200Faker,
-  createLoginUserStatus200FakerJson,
-  createLoginUserStatus200FakerXml,
-  createLoginUserStatus400Faker,
-} from './user/createLoginUserFaker.ts'
-export { createLogoutUserResponseFaker, createLogoutUserStatusDefaultFaker } from './user/createLogoutUserFaker.ts'
-export {
-  createUpdateUserDataFaker,
-  createUpdateUserDataFakerFormUrlEncoded,
-  createUpdateUserDataFakerJson,
-  createUpdateUserDataFakerXml,
-  createUpdateUserPathUsernameFaker,
-  createUpdateUserResponseFaker,
-  createUpdateUserStatusDefaultFaker,
-} from './user/createUpdateUserFaker.ts'

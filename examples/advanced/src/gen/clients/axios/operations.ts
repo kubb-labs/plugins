@@ -39,32 +39,4 @@ export const operations = {
     path: '/pet/:petId/uploadImage',
     method: 'post',
   },
-  createUser: {
-    path: '/user',
-    method: 'post',
-  },
-  createUsersWithListInput: {
-    path: '/user/createWithList',
-    method: 'post',
-  },
-  loginUser: {
-    path: '/user/login',
-    method: 'get',
-  },
-  logoutUser: {
-    path: '/user/logout',
-    method: 'get',
-  },
-  getUserByName: {
-    path: '/user/:username',
-    method: 'get',
-  },
-  updateUser: {
-    path: '/user/:username',
-    method: 'put',
-  },
-  deleteUser: {
-    path: '/user/:username',
-    method: 'delete',
-  },
 }

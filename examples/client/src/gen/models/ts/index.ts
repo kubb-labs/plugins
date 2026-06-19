@@ -1,9 +1,7 @@
 export type { AddPetRequest } from './AddPetRequest.js'
 export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
-export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
-export type { Customer } from './Customer.js'
 export type { FindPetsByStatusStatusKey } from './FindPetsByStatusStatus.js'
 export type { Order } from './Order.js'
 export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.js'
@@ -12,8 +10,6 @@ export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type { PetStatusEnumKey } from './PetStatusEnum.js'
 export type { Tag } from './Tag.js'
-export type { User } from './User.js'
-export type { UserArray } from './UserArray.js'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
@@ -145,70 +141,6 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.js'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './user/CreateUser.js'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './user/CreateUsersWithListInput.js'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './user/DeleteUser.js'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './user/GetUserByName.js'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './user/LoginUser.js'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './user/LogoutUser.js'
-export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './user/UpdateUser.js'
 export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.js'
 export { findPetsByStatusStatus } from './FindPetsByStatusStatus.js'
 export { orderHttpStatusEnum } from './OrderHttpStatusEnum.js'

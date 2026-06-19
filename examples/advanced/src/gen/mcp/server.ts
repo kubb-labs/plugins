@@ -8,13 +8,6 @@ import { updatePetHandler } from './pet/updatePet.ts'
 import { updatePetWithFormHandler } from './pet/updatePetWithForm.ts'
 import { uploadFileHandler } from './pet/uploadFile.ts'
 import { createPetsHandler } from './pets/createPets.ts'
-import { createUserHandler } from './user/createUser.ts'
-import { createUsersWithListInputHandler } from './user/createUsersWithListInput.ts'
-import { deleteUserHandler } from './user/deleteUser.ts'
-import { getUserByNameHandler } from './user/getUserByName.ts'
-import { loginUserHandler } from './user/loginUser.ts'
-import { logoutUserHandler } from './user/logoutUser.ts'
-import { updateUserHandler } from './user/updateUser.ts'
 import { addFilesDataSchema, addFilesStatus200Schema } from '../zod/pet/addFilesSchema.ts'
 import { addPetDataSchema } from '../zod/pet/addPetSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/pet/deletePetSchema.ts'
@@ -43,12 +36,6 @@ import {
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
 } from '../zod/pets/createPetsSchema.ts'
-import { createUserDataSchema } from '../zod/user/createUserSchema.ts'
-import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from '../zod/user/createUsersWithListInputSchema.ts'
-import { deleteUserPathUsernameSchema } from '../zod/user/deleteUserSchema.ts'
-import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from '../zod/user/getUserByNameSchema.ts'
-import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from '../zod/user/loginUserSchema.ts'
-import { updateUserDataSchema, updateUserPathUsernameSchema } from '../zod/user/updateUserSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -198,92 +185,6 @@ export function getServer() {
     },
     async ({ petId, data, params }, request) => {
       return uploadFileHandler({ petId, data, params }, request)
-    },
-  )
-
-  server.registerTool(
-    'createUser',
-    {
-      title: 'Create user',
-      description: 'This can only be done by the logged in user.',
-      inputSchema: { data: createUserDataSchema },
-    },
-    async ({ data }, request) => {
-      return createUserHandler({ data }, request)
-    },
-  )
-
-  server.registerTool(
-    'createUsersWithListInput',
-    {
-      title: 'Creates list of users with given input array',
-      description: 'Creates list of users with given input array',
-      outputSchema: { data: createUsersWithListInputStatus200Schema },
-      inputSchema: { data: createUsersWithListInputDataSchema },
-    },
-    async ({ data }, request) => {
-      return createUsersWithListInputHandler({ data }, request)
-    },
-  )
-
-  server.registerTool(
-    'loginUser',
-    {
-      title: 'Logs user into the system',
-      description: 'Make a GET request to /user/login',
-      outputSchema: { data: loginUserStatus200Schema },
-      inputSchema: { params: z.object({ username: loginUserQueryUsernameSchema, password: loginUserQueryPasswordSchema }) },
-    },
-    async ({ params }, request) => {
-      return loginUserHandler({ params }, request)
-    },
-  )
-
-  server.registerTool(
-    'logoutUser',
-    {
-      title: 'Logs out current logged in user session',
-      description: 'Make a GET request to /user/logout',
-    },
-    async (request) => {
-      return logoutUserHandler(request)
-    },
-  )
-
-  server.registerTool(
-    'getUserByName',
-    {
-      title: 'Get user by user name',
-      description: 'Make a GET request to /user/{username}',
-      outputSchema: { data: getUserByNameStatus200Schema },
-      inputSchema: { username: getUserByNamePathUsernameSchema },
-    },
-    async ({ username }, request) => {
-      return getUserByNameHandler({ username }, request)
-    },
-  )
-
-  server.registerTool(
-    'updateUser',
-    {
-      title: 'Update user',
-      description: 'This can only be done by the logged in user.',
-      inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
-    },
-    async ({ username, data }, request) => {
-      return updateUserHandler({ username, data }, request)
-    },
-  )
-
-  server.registerTool(
-    'deleteUser',
-    {
-      title: 'Delete user',
-      description: 'This can only be done by the logged in user.',
-      inputSchema: { username: deleteUserPathUsernameSchema },
-    },
-    async ({ username }, request) => {
-      return deleteUserHandler({ username }, request)
     },
   )
 

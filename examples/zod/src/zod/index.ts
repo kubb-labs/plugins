@@ -12,7 +12,6 @@ export type {
   AddPetXmlData,
 } from './ts/AddPet.ts'
 export type { AddPetRequest, AddPetRequestStatusEnumKey } from './ts/AddPetRequest.ts'
-export type { Address } from './ts/Address.ts'
 export type { ApiResponse } from './ts/ApiResponse.ts'
 export type { Category } from './ts/Category.ts'
 export type {
@@ -27,29 +26,6 @@ export type {
   CreatePetsStatusDefault,
   CreatePetsXEXAMPLEKey,
 } from './ts/CreatePets.ts'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './ts/CreateUser.ts'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './ts/CreateUsersWithListInput.ts'
-export type { Customer } from './ts/Customer.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -66,14 +42,6 @@ export type {
   DeletePetResponses,
   DeletePetStatus400,
 } from './ts/DeletePet.ts'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './ts/DeleteUser.ts'
 export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
@@ -131,29 +99,6 @@ export type {
   GetThingsStatus201,
   GetThingsStatusDefault,
 } from './ts/GetThings.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './ts/GetUserByName.ts'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './ts/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './ts/LogoutUser.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey, OrderValueEnumKey } from './ts/Order.ts'
 export type { Pet, PetStatusEnumKey } from './ts/Pet.ts'
 export type { PetNotFound } from './ts/PetNotFound.ts'
@@ -208,17 +153,6 @@ export type {
   UpdatePetWithFormStatus405,
 } from './ts/UpdatePetWithForm.ts'
 export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './ts/UpdateUser.ts'
-export type {
   UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
@@ -227,8 +161,6 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './ts/UploadFile.ts'
-export type { User } from './ts/User.ts'
-export type { UserArray } from './ts/UserArray.ts'
 export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema.ts'
 export type {
   AddPetDataSchemaFormUrlEncodedType,
@@ -241,7 +173,6 @@ export type {
   AddPetStatus200SchemaXmlType,
   AddPetStatus405SchemaType,
 } from './zod/addPetSchema.ts'
-export type { AddressSchemaType } from './zod/addressSchema.ts'
 export type { ApiResponseSchemaType } from './zod/apiResponseSchema.ts'
 export type { CategorySchemaType } from './zod/categorySchema.ts'
 export type {
@@ -254,25 +185,6 @@ export type {
   CreatePetsStatusDefaultSchemaType,
 } from './zod/createPetsSchema.ts'
 export type {
-  CreateUserDataSchemaFormUrlEncodedType,
-  CreateUserDataSchemaJsonType,
-  CreateUserDataSchemaType,
-  CreateUserDataSchemaXmlType,
-  CreateUserResponseSchemaType,
-  CreateUserStatusDefaultSchemaJsonType,
-  CreateUserStatusDefaultSchemaType,
-  CreateUserStatusDefaultSchemaXmlType,
-} from './zod/createUserSchema.ts'
-export type {
-  CreateUsersWithListInputDataSchemaType,
-  CreateUsersWithListInputResponseSchemaType,
-  CreateUsersWithListInputStatus200SchemaJsonType,
-  CreateUsersWithListInputStatus200SchemaType,
-  CreateUsersWithListInputStatus200SchemaXmlType,
-  CreateUsersWithListInputStatusDefaultSchemaType,
-} from './zod/createUsersWithListInputSchema.ts'
-export type { CustomerSchemaType } from './zod/customerSchema.ts'
-export type {
   DeleteOrderPathOrderIdSchemaType,
   DeleteOrderResponseSchemaType,
   DeleteOrderStatus400SchemaType,
@@ -284,12 +196,6 @@ export type {
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
 } from './zod/deletePetSchema.ts'
-export type {
-  DeleteUserPathUsernameSchemaType,
-  DeleteUserResponseSchemaType,
-  DeleteUserStatus400SchemaType,
-  DeleteUserStatus404SchemaType,
-} from './zod/deleteUserSchema.ts'
 export type {
   FindPetsByStatusQueryStatusSchemaType,
   FindPetsByStatusResponseSchemaType,
@@ -335,25 +241,6 @@ export type {
   GetThingsStatus201SchemaType,
   GetThingsStatusDefaultSchemaType,
 } from './zod/getThingsSchema.ts'
-export type {
-  GetUserByNamePathUsernameSchemaType,
-  GetUserByNameResponseSchemaType,
-  GetUserByNameStatus200SchemaJsonType,
-  GetUserByNameStatus200SchemaType,
-  GetUserByNameStatus200SchemaXmlType,
-  GetUserByNameStatus400SchemaType,
-  GetUserByNameStatus404SchemaType,
-} from './zod/getUserByNameSchema.ts'
-export type {
-  LoginUserQueryPasswordSchemaType,
-  LoginUserQueryUsernameSchemaType,
-  LoginUserResponseSchemaType,
-  LoginUserStatus200SchemaJsonType,
-  LoginUserStatus200SchemaType,
-  LoginUserStatus200SchemaXmlType,
-  LoginUserStatus400SchemaType,
-} from './zod/loginUserSchema.ts'
-export type { LogoutUserResponseSchemaType, LogoutUserStatusDefaultSchemaType } from './zod/logoutUserSchema.ts'
 export type { OrderSchemaType } from './zod/orderSchema.ts'
 export type { PetNotFoundSchemaType } from './zod/petNotFoundSchema.ts'
 export type { PetSchemaType } from './zod/petSchema.ts'
@@ -400,23 +287,12 @@ export type {
   UpdatePetWithFormStatus405SchemaType,
 } from './zod/updatePetWithFormSchema.ts'
 export type {
-  UpdateUserDataSchemaFormUrlEncodedType,
-  UpdateUserDataSchemaJsonType,
-  UpdateUserDataSchemaType,
-  UpdateUserDataSchemaXmlType,
-  UpdateUserPathUsernameSchemaType,
-  UpdateUserResponseSchemaType,
-  UpdateUserStatusDefaultSchemaType,
-} from './zod/updateUserSchema.ts'
-export type {
   UploadFileDataSchemaType,
   UploadFilePathPetIdSchemaType,
   UploadFileQueryAdditionalMetadataSchemaType,
   UploadFileResponseSchemaType,
   UploadFileStatus200SchemaType,
 } from './zod/uploadFileSchema.ts'
-export type { UserArraySchemaType } from './zod/userArraySchema.ts'
-export type { UserSchemaType } from './zod/userSchema.ts'
 export { addPetRequestStatusEnum } from './ts/AddPetRequest.ts'
 export { createPetsXEXAMPLE } from './ts/CreatePets.ts'
 export { findPetsByStatusStatus } from './ts/FindPetsByStatus.ts'
@@ -435,7 +311,6 @@ export {
   addPetStatus200SchemaXml,
   addPetStatus405Schema,
 } from './zod/addPetSchema.ts'
-export { addressSchema } from './zod/addressSchema.ts'
 export { apiResponseSchema } from './zod/apiResponseSchema.ts'
 export { categorySchema } from './zod/categorySchema.ts'
 export {
@@ -447,28 +322,8 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './zod/createPetsSchema.ts'
-export {
-  createUserDataSchema,
-  createUserDataSchemaFormUrlEncoded,
-  createUserDataSchemaJson,
-  createUserDataSchemaXml,
-  createUserResponseSchema,
-  createUserStatusDefaultSchema,
-  createUserStatusDefaultSchemaJson,
-  createUserStatusDefaultSchemaXml,
-} from './zod/createUserSchema.ts'
-export {
-  createUsersWithListInputDataSchema,
-  createUsersWithListInputResponseSchema,
-  createUsersWithListInputStatus200Schema,
-  createUsersWithListInputStatus200SchemaJson,
-  createUsersWithListInputStatus200SchemaXml,
-  createUsersWithListInputStatusDefaultSchema,
-} from './zod/createUsersWithListInputSchema.ts'
-export { customerSchema } from './zod/customerSchema.ts'
 export { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './zod/deleteOrderSchema.ts'
 export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './zod/deletePetSchema.ts'
-export { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './zod/deleteUserSchema.ts'
 export {
   findPetsByStatusQueryStatusSchema,
   findPetsByStatusResponseSchema,
@@ -514,25 +369,6 @@ export {
   getThingsStatus201Schema,
   getThingsStatusDefaultSchema,
 } from './zod/getThingsSchema.ts'
-export {
-  getUserByNamePathUsernameSchema,
-  getUserByNameResponseSchema,
-  getUserByNameStatus200Schema,
-  getUserByNameStatus200SchemaJson,
-  getUserByNameStatus200SchemaXml,
-  getUserByNameStatus400Schema,
-  getUserByNameStatus404Schema,
-} from './zod/getUserByNameSchema.ts'
-export {
-  loginUserQueryPasswordSchema,
-  loginUserQueryUsernameSchema,
-  loginUserResponseSchema,
-  loginUserStatus200Schema,
-  loginUserStatus200SchemaJson,
-  loginUserStatus200SchemaXml,
-  loginUserStatus400Schema,
-} from './zod/loginUserSchema.ts'
-export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './zod/logoutUserSchema.ts'
 export { OperationSchema, OperationsMap, operations, paths } from './zod/operationsSchema.ts'
 export { orderSchema } from './zod/orderSchema.ts'
 export { petNotFoundSchema } from './zod/petNotFoundSchema.ts'
@@ -580,20 +416,9 @@ export {
   updatePetWithFormStatus405Schema,
 } from './zod/updatePetWithFormSchema.ts'
 export {
-  updateUserDataSchema,
-  updateUserDataSchemaFormUrlEncoded,
-  updateUserDataSchemaJson,
-  updateUserDataSchemaXml,
-  updateUserPathUsernameSchema,
-  updateUserResponseSchema,
-  updateUserStatusDefaultSchema,
-} from './zod/updateUserSchema.ts'
-export {
   uploadFileDataSchema,
   uploadFilePathPetIdSchema,
   uploadFileQueryAdditionalMetadataSchema,
   uploadFileResponseSchema,
   uploadFileStatus200Schema,
 } from './zod/uploadFileSchema.ts'
-export { userArraySchema } from './zod/userArraySchema.ts'
-export { userSchema } from './zod/userSchema.ts'

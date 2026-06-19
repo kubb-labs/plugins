@@ -19,7 +19,6 @@ export {
   addPetStatus200SchemaXml,
   addPetStatus405Schema,
 } from './addPetSchema.js'
-export { addressSchema } from './addressSchema.js'
 export { apiResponseSchema } from './apiResponseSchema.js'
 export { categorySchema } from './categorySchema.js'
 export {
@@ -32,28 +31,8 @@ export {
   createPetsStatusDefaultSchema,
 } from './createPetsSchema.js'
 export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.js'
-export {
-  createUserDataSchema,
-  createUserDataSchemaFormUrlEncoded,
-  createUserDataSchemaJson,
-  createUserDataSchemaXml,
-  createUserResponseSchema,
-  createUserStatusDefaultSchema,
-  createUserStatusDefaultSchemaJson,
-  createUserStatusDefaultSchemaXml,
-} from './createUserSchema.js'
-export {
-  createUsersWithListInputDataSchema,
-  createUsersWithListInputResponseSchema,
-  createUsersWithListInputStatus200Schema,
-  createUsersWithListInputStatus200SchemaJson,
-  createUsersWithListInputStatus200SchemaXml,
-  createUsersWithListInputStatusDefaultSchema,
-} from './createUsersWithListInputSchema.js'
-export { customerSchema } from './customerSchema.js'
 export { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './deleteOrderSchema.js'
 export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './deletePetSchema.js'
-export { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './deleteUserSchema.js'
 export {
   findPetsByStatusPathStepIdSchema,
   findPetsByStatusResponseSchema,
@@ -93,25 +72,6 @@ export {
   getPetByIdStatus400Schema,
   getPetByIdStatus404Schema,
 } from './getPetByIdSchema.js'
-export {
-  getUserByNamePathUsernameSchema,
-  getUserByNameResponseSchema,
-  getUserByNameStatus200Schema,
-  getUserByNameStatus200SchemaJson,
-  getUserByNameStatus200SchemaXml,
-  getUserByNameStatus400Schema,
-  getUserByNameStatus404Schema,
-} from './getUserByNameSchema.js'
-export {
-  loginUserQueryPasswordSchema,
-  loginUserQueryUsernameSchema,
-  loginUserResponseSchema,
-  loginUserStatus200Schema,
-  loginUserStatus200SchemaJson,
-  loginUserStatus200SchemaXml,
-  loginUserStatus400Schema,
-} from './loginUserSchema.js'
-export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './logoutUserSchema.js'
 export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.js'
 export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.js'
 export { orderSchema } from './orderSchema.js'
@@ -159,14 +119,3 @@ export {
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.js'
-export {
-  updateUserDataSchema,
-  updateUserDataSchemaFormUrlEncoded,
-  updateUserDataSchemaJson,
-  updateUserDataSchemaXml,
-  updateUserPathUsernameSchema,
-  updateUserResponseSchema,
-  updateUserStatusDefaultSchema,
-} from './updateUserSchema.js'
-export { userArraySchema } from './userArraySchema.js'
-export { userSchema } from './userSchema.js'

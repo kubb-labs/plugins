@@ -29,15 +29,3 @@ export {
 } from './store/Handlers/getOrderByIdHandler.ts'
 export { placeOrderHandler, placeOrderHandlerResponse200, placeOrderHandlerResponse405 } from './store/Handlers/placeOrderHandler.ts'
 export { placeOrderPatchHandler, placeOrderPatchHandlerResponse200, placeOrderPatchHandlerResponse405 } from './store/Handlers/placeOrderPatchHandler.ts'
-export { createUserHandler } from './user/Handlers/createUserHandler.ts'
-export { createUsersWithListInputHandler, createUsersWithListInputHandlerResponse200 } from './user/Handlers/createUsersWithListInputHandler.ts'
-export { deleteUserHandler, deleteUserHandlerResponse400, deleteUserHandlerResponse404 } from './user/Handlers/deleteUserHandler.ts'
-export {
-  getUserByNameHandler,
-  getUserByNameHandlerResponse200,
-  getUserByNameHandlerResponse400,
-  getUserByNameHandlerResponse404,
-} from './user/Handlers/getUserByNameHandler.ts'
-export { loginUserHandler, loginUserHandlerResponse200, loginUserHandlerResponse400 } from './user/Handlers/loginUserHandler.ts'
-export { logoutUserHandler } from './user/Handlers/logoutUserHandler.ts'
-export { updateUserHandler } from './user/Handlers/updateUserHandler.ts'
