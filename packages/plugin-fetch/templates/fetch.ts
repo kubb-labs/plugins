@@ -77,15 +77,14 @@ export type AuthCallback = (params: { schemeName: string; scopes: Array<string> 
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
  * from the grouped options; everything else is plain request configuration.
  */
-export type RequestConfig<TData = unknown, TRequest = Request, TResponse = Response> = {
+export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Response> = {
   baseURL?: string
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
   path?: Record<string, unknown>
   query?: unknown
   params?: unknown
-  body?: TData
-  data?: TData
+  body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
   credentials?: RequestCredentials
@@ -205,7 +204,7 @@ export type Interceptors<TRequest = Request, TResponse = Response> = {
  * `createClient` factory bound to the same transport.
  */
 export type ClientInstance<TRequest = Request, TResponse = Response> = {
-  <TData = unknown>(config: RequestConfig<TData, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
+  <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
   getConfig: () => ClientConfig<TRequest, TResponse>
   setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
   interceptors: Interceptors<TRequest, TResponse>
@@ -389,7 +388,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     error: createInterceptorStack<ResponseError<unknown, TRequest, TResponse>>(),
   }
 
-  const client = (async <TData = unknown>(requestConfig: RequestConfig<TData, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
+  const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
     const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
@@ -409,7 +408,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       query,
     })
 
-    const rawBody = requestConfig.body ?? requestConfig.data
+    const rawBody = requestConfig.body
     const validatedBody = await runValidator(requestConfig.requestValidator, rawBody)
     const search = querySerializer(query)
     const pathParams = requestConfig.path ?? {}
