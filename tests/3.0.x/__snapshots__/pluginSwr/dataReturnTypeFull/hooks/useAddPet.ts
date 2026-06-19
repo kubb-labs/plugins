@@ -21,9 +21,9 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 export async function addPet({ body }: Omit<AddPetRequestConfig, 'url'>, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
-  const res = await request<AddPetStatus200 | AddPetStatus405, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, body: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200 | AddPetStatus405, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, body: requestBody, contentType, ...requestConfig })
 
   return res as ({ status: 200; data: AddPetStatus200; statusText: string } | { status: 405; data: AddPetStatus405; statusText: string })
 }

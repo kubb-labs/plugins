@@ -30,12 +30,12 @@ export class PetClient {
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const { petId } = path
-    const requestData = body
+    const requestBody = body
     const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}`,
-      body: requestData,
+      body: requestBody,
     })
     return res.data
   }

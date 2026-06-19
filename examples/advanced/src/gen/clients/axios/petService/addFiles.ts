@@ -20,13 +20,13 @@ export async function addFiles(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
-  const formData = buildFormData(requestData)
+  const requestBody = body
+  const formData = buildFormData(requestBody)
 
   const res = await request<AddFilesStatus200 | AddFilesStatus405, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>({
     method: 'POST',
     url: getAddFilesUrl().url.toString(),
-    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
     contentType,
     ...requestConfig,
   })

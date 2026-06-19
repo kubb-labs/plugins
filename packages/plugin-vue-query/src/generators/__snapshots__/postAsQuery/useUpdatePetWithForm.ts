@@ -35,13 +35,13 @@ export async function updatePetWithForm(
 
   const { petId } = path
 
-  const requestData = UpdatePetWithFormData.parse(body)
+  const requestBody = UpdatePetWithFormData.parse(body)
 
   const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, z.input<typeof UpdatePetWithFormData>>({
     method: 'POST',
     url: `/pet/${petId}`,
     query,
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
   })
 

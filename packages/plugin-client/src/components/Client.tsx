@@ -119,10 +119,10 @@ export function Client({
           ? {
               value:
                 isMultipleContentTypes && hasFormData
-                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
+                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestBody"
                   : isFormData
                     ? 'formData as FormData'
-                    : 'requestData',
+                    : 'requestBody',
             }
           : null,
         contentType: isConfigurable && isMultipleContentTypes ? {} : null,
@@ -201,9 +201,9 @@ export function Client({
               <br />
             </>
           )}
-          {requestParser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(body)` : requestName && 'const requestData = body'}
+          {requestParser === 'zod' && zodRequestName ? `const requestBody = ${zodRequestName}.parse(body)` : requestName && 'const requestBody = body'}
           {zodQueryParamsName && `const requestParams = ${zodQueryParamsName}.parse(query)`}
-          {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
+          {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestBody)'}
           <br />
           {isConfigurable
             ? `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`

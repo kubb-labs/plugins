@@ -34,8 +34,8 @@ export class StoreClient {
    */
   async placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = body
-    const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, body: requestData, contentType })
+    const requestBody = body
+    const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, body: requestBody, contentType })
     return res.data
   }
 }

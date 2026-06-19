@@ -16,12 +16,12 @@ export function getCreateOrderUrl() {
 export async function createOrder({ body }: Omit<CreateOrderRequestConfig, 'url'>, config: Partial<RequestConfig<CreateOrderData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<CreateOrderStatus200, ResponseErrorConfig<Error>, CreateOrderData>({
     method: 'POST',
     url: getCreateOrderUrl().url.toString(),
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
   })
 

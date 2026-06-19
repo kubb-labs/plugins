@@ -33,12 +33,12 @@ export async function updatePetHook(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: `/pet`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

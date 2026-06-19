@@ -19,10 +19,10 @@ export async function createPetsHandler(
 ): Promise<Promise<CallToolResult>> {
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const requestData = data
+  const requestBody = data
 
   const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>(
-    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, query: params, body: requestData, headers: { ...mappedHeaders } },
+    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, query: params, body: requestBody, headers: { ...mappedHeaders } },
     request,
   )
 

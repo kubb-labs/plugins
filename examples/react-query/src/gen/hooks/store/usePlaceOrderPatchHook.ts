@@ -26,12 +26,12 @@ export async function placeOrderPatchHook(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

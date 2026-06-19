@@ -155,10 +155,10 @@ export function buildClassClientParams({
           ? {
               value:
                 isMultipleContentTypes && hasFormData
-                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
+                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestBody"
                   : isFormData
                     ? 'formData as FormData'
-                    : 'requestData',
+                    : 'requestBody',
             }
           : null,
         contentType: isMultipleContentTypes ? {} : null,
@@ -189,10 +189,10 @@ export function buildRequestDataLine({
   const requestParser = resolveRequestParser(parser)
   const zodRequestName = zodResolver && requestParser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
   if (requestParser === 'zod' && zodRequestName) {
-    return `const requestData = ${zodRequestName}.parse(body)`
+    return `const requestBody = ${zodRequestName}.parse(body)`
   }
   if (node.requestBody?.content?.[0]?.schema) {
-    return 'const requestData = body'
+    return 'const requestBody = body'
   }
   return ''
 }
@@ -224,7 +224,7 @@ export function buildQueryParamsLine({
  * Returns empty string if not applicable.
  */
 export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): string {
-  return isFormData && hasRequest ? 'const formData = buildFormData(requestData)' : ''
+  return isFormData && hasRequest ? 'const formData = buildFormData(requestBody)' : ''
 }
 
 /**

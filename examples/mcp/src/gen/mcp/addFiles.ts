@@ -13,10 +13,10 @@ export async function addFilesHandler(
   { data }: { data?: AddFilesData } = {},
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestData = data
+  const requestBody = data
 
   const res = await client<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
-    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, body: requestData },
+    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody },
     request,
   )
 

@@ -23,9 +23,9 @@ function getAddPetUrl() {
 export async function addPet({ body }: Omit<AddPetRequestConfig, 'url'>, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = addPetDataSchema.parse(body)
+  const requestBody = addPetDataSchema.parse(body)
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({ method: 'POST', url: getAddPetUrl().url.toString(), body: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({ method: 'POST', url: getAddPetUrl().url.toString(), body: requestBody, contentType, ...requestConfig })
 
   return addPetResponseSchema.parse(res.data)
 }

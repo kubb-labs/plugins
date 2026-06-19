@@ -48,12 +48,12 @@ export class store {
     } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = body
+    const requestBody = body
     const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
       ...requestConfig,
       method: 'POST',
       url: `/store/order`,
-      body: requestData,
+      body: requestBody,
       contentType,
     })
     return res.data
@@ -72,12 +72,12 @@ export class store {
     } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = body
+    const requestBody = body
     const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
       ...requestConfig,
       method: 'PATCH',
       url: `/store/order`,
-      body: requestData,
+      body: requestBody,
       contentType,
     })
     return res.data

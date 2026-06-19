@@ -492,12 +492,12 @@ export async function updatePet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: `/pet`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -591,12 +591,12 @@ export async function addPet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: `/pet`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -806,13 +806,13 @@ export async function uploadFile(
 
   const { petId } = path
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     query,
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
     headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })
@@ -1120,12 +1120,12 @@ export async function placeOrder(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: `/store/order`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -1201,12 +1201,12 @@ export async function placeOrderPatch(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

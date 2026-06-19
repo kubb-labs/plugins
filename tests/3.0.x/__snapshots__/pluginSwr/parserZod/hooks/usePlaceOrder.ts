@@ -23,9 +23,9 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = placeOrderDataSchema.parse(body)
+  const requestBody = placeOrderDataSchema.parse(body)
 
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.input<typeof placeOrderDataSchema>>({ method: 'POST', url: `/store/order`, body: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.input<typeof placeOrderDataSchema>>({ method: 'POST', url: `/store/order`, body: requestBody, contentType, ...requestConfig })
 
   return placeOrderResponseSchema.parse(res.data)
 }

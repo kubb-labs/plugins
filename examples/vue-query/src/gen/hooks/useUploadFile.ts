@@ -23,13 +23,13 @@ export async function uploadFile(
 
   const { petId } = path
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     query,
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
     headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
   })

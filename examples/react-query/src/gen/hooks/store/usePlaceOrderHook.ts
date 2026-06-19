@@ -26,12 +26,12 @@ export async function placeOrderHook(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: `/store/order`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

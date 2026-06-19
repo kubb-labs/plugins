@@ -24,12 +24,12 @@ export async function addPet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = addPetDataSchema.parse(body)
+  const requestBody = addPetDataSchema.parse(body)
 
   const res = await request<AddPetStatus405 | AddPetStatusDefault, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

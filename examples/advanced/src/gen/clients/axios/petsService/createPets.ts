@@ -30,13 +30,13 @@ export async function createPets(
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const requestData = createPetsDataSchema.parse(body)
+  const requestBody = createPetsDataSchema.parse(body)
 
   const res = await request<CreatePetsStatus201 | CreatePetsStatusDefault, ResponseErrorConfig<Error>, z.input<typeof createPetsDataSchema>>({
     method: 'POST',
     url: getCreatePetsUrl(path).url.toString(),
     query: mappedParams,
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })

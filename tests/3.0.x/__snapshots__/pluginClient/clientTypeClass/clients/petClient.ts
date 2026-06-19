@@ -26,8 +26,8 @@ export class PetClient {
    */
   async addPet({ body }: Omit<AddPetRequestConfig, 'url'>, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = body
-    const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ ...requestConfig, method: "POST", url: `/pet`, body: requestData, contentType })
+    const requestBody = body
+    const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ ...requestConfig, method: "POST", url: `/pet`, body: requestBody, contentType })
     return res.data
   }
 
@@ -74,8 +74,8 @@ export class PetClient {
   async uploadFile({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const { petId } = path
-    const requestData = body
-    const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ ...requestConfig, method: "POST", url: `/pet/${petId}/uploadImage`, query, body: requestData, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+    const requestBody = body
+    const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ ...requestConfig, method: "POST", url: `/pet/${petId}/uploadImage`, query, body: requestBody, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
     return res.data
   }
 }

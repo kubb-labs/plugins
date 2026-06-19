@@ -19,9 +19,9 @@ export type CreatePetMutationKey = ReturnType<typeof createPetMutationKey>
 export async function createPet({ body }: Omit<CreatePetRequestConfig, 'url'>, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
-  const res = await request<CreatePetStatus200, ResponseErrorConfig<Error>, CreatePetData>({ method: 'POST', url: `/pet`, body: requestData, ...requestConfig })
+  const res = await request<CreatePetStatus200, ResponseErrorConfig<Error>, CreatePetData>({ method: 'POST', url: `/pet`, body: requestBody, ...requestConfig })
 
   return res.data
 }

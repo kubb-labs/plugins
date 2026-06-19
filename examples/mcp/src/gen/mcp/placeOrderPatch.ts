@@ -13,10 +13,10 @@ export async function placeOrderPatchHandler(
   { data }: { data?: PlaceOrderPatchData } = {},
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestData = data
+  const requestBody = data
 
   const res = await client<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>(
-    { method: 'PATCH', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, body: requestData },
+    { method: 'PATCH', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody },
     request,
   )
 

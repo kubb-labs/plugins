@@ -20,8 +20,8 @@ export async function uploadFile(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = body
-  const formData = buildFormData(requestData)
+  const requestBody = body
+  const formData = buildFormData(requestBody)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',

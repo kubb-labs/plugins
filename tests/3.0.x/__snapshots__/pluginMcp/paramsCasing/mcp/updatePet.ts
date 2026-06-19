@@ -12,9 +12,9 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
 
   const mappedParams = params ? { "include_deleted": params.includeDeleted, "request_source": params.requestSource } : undefined
 
-  const requestData = data
+  const requestBody = data
 
-  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, query: mappedParams, body: requestData }, request)
+  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, query: mappedParams, body: requestBody }, request)
 
   return {
     content: [

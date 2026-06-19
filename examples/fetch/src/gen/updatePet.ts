@@ -27,12 +27,12 @@ export async function updatePet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: getUpdatePetUrl().url.toString(),
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

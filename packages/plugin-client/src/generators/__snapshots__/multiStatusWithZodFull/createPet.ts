@@ -18,12 +18,12 @@ export function getCreatePetUrl() {
 export async function createPet({ body }: Omit<CreatePetRequestConfig, 'url'>, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = CreatePetData.parse(body)
+  const requestBody = CreatePetData.parse(body)
 
   const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, z.input<typeof CreatePetData>>({
     method: 'POST',
     url: getCreatePetUrl().url.toString(),
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
   })
 

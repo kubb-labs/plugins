@@ -29,12 +29,12 @@ export async function createUsersWithListInput(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = CreateUsersWithListInputData.parse(body)
+  const requestBody = CreateUsersWithListInputData.parse(body)
 
   const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, z.input<typeof CreateUsersWithListInputData>>({
     method: 'POST',
     url: `/user/createWithList`,
-    body: requestData,
+    body: requestBody,
     ...requestConfig,
   })
 

@@ -26,12 +26,12 @@ export async function addPetHook(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: `/pet`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

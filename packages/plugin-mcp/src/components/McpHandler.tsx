@@ -87,7 +87,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Pr
   fetchConfig.push(`url: ${Url.toTemplateString(node.path)}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
   if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'query: mappedParams' : 'query: params')
-  if (requestName) fetchConfig.push(`body: ${isFormData ? 'formData as FormData' : 'requestData'}`)
+  if (requestName) fetchConfig.push(`body: ${isFormData ? 'formData as FormData' : 'requestBody'}`)
   if (headers.length) fetchConfig.push(`headers: { ${headers.join(', ')} }`)
 
   const payload = dataReturnType === 'data' ? 'res.data' : 'res'
@@ -141,9 +141,9 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Pr
             <br />
           </>
         )}
-        {requestName && 'const requestData = data'}
+        {requestName && 'const requestBody = data'}
         <br />
-        {isFormData && requestName && 'const formData = buildFormData(requestData)'}
+        {isFormData && requestName && 'const formData = buildFormData(requestBody)'}
         <br />
         {`const res = await client<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
         <br />

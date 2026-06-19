@@ -22,9 +22,9 @@ function getCreateEventUrl() {
 export async function createEvent({ body }: Omit<CreateEventRequestConfig, 'url'>, config: Partial<RequestConfig<CreateEventData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = createEventDataSchema.parse(body)
+  const requestBody = createEventDataSchema.parse(body)
 
-  const res = await request<CreateEventStatus201, ResponseErrorConfig<CreateEventStatus400>, z.input<typeof createEventDataSchema>>({ method: 'POST', url: getCreateEventUrl().url.toString(), body: requestData, ...requestConfig })
+  const res = await request<CreateEventStatus201, ResponseErrorConfig<CreateEventStatus400>, z.input<typeof createEventDataSchema>>({ method: 'POST', url: getCreateEventUrl().url.toString(), body: requestBody, ...requestConfig })
 
   return createEventResponseSchema.parse(res.data)
 }

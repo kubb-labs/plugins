@@ -22,9 +22,9 @@ function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
 export async function uploadFile({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = uploadFileDataSchema.parse(body)
+  const requestBody = uploadFileDataSchema.parse(body)
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof uploadFileDataSchema>>({ method: 'POST', url: getUploadFileUrl(path).url.toString(), query, body: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof uploadFileDataSchema>>({ method: 'POST', url: getUploadFileUrl(path).url.toString(), query, body: requestBody, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return uploadFileResponseSchema.parse(res.data)
 }

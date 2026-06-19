@@ -21,14 +21,14 @@ export async function uploadFile(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
-  const formData = buildFormData(requestData)
+  const requestBody = body
+  const formData = buildFormData(requestBody)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
     url: getUploadFileUrl(path).url.toString(),
     query,
-    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
     contentType,
     ...requestConfig,
   })

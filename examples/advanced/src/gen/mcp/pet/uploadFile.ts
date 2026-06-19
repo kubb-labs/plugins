@@ -12,7 +12,7 @@ export async function uploadFileHandler(
   { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestData = data
+  const requestBody = data
 
   const res = await client<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>(
     {
@@ -20,7 +20,7 @@ export async function uploadFileHandler(
       url: `/pet/${petId}/uploadImage`,
       baseURL: `https://petstore.swagger.io/v2`,
       query: params,
-      body: requestData,
+      body: requestBody,
       headers: { 'Content-Type': 'application/octet-stream' },
     },
     request,

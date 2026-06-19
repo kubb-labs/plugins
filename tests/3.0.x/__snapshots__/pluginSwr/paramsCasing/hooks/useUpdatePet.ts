@@ -25,9 +25,9 @@ export async function updatePet({ path, query, body }: Omit<UpdatePetRequestConf
 
   const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
 
-  const requestData = body
+  const requestBody = body
 
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${pet_id}`, query: mappedParams, body: requestData, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${pet_id}`, query: mappedParams, body: requestBody, ...requestConfig })
 
   return res.data
 }

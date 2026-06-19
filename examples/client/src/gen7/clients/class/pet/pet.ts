@@ -40,12 +40,12 @@ export class pet {
     } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = body
+    const requestBody = body
     const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
       ...requestConfig,
       method: 'PUT',
       url: `/pet`,
-      body: requestData,
+      body: requestBody,
       contentType,
     })
     return res.data
@@ -64,12 +64,12 @@ export class pet {
     } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = body
+    const requestBody = body
     const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet`,
-      body: requestData,
+      body: requestBody,
       contentType,
     })
     return res.data
@@ -167,14 +167,14 @@ export class pet {
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const { petId } = path
-    const requestData = body
-    const formData = buildFormData(requestData)
+    const requestBody = body
+    const formData = buildFormData(requestBody)
     const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}/uploadImage`,
       query,
-      body: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+      body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
       contentType,
     })
     return res.data

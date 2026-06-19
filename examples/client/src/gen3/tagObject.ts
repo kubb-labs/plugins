@@ -65,12 +65,12 @@ export async function placeOrder(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<PlaceOrderStatus200 | PlaceOrderStatus405, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: `/store/order`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -100,12 +100,12 @@ export async function placeOrderPatch(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = body
+  const requestBody = body
 
   const res = await request<PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
-    body: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
