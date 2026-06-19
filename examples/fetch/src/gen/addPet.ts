@@ -19,7 +19,7 @@ function getAddPetUrl() {
  * {@link /pet}
  */
 export async function addPet(
-  data: AddPetData,
+  { data }: { data: AddPetData },
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'

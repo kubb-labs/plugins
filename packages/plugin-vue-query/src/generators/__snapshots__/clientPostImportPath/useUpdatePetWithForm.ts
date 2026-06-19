@@ -18,8 +18,7 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId,
-  data?: UpdatePetWithFormData,
+  { petId, data }: { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -57,7 +56,7 @@ export function useUpdatePetWithForm<TContext>(
   return useMutation<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData }, TContext>(
     {
       mutationFn: async ({ petId, data }) => {
-        return updatePetWithForm(petId, data, config)
+        return updatePetWithForm({ petId, data }, config)
       },
       mutationKey,
       ...mutationOptions,

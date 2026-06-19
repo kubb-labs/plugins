@@ -28,9 +28,6 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
     clientType: 'function',
   },
   parser: false,
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -128,12 +125,9 @@ const createPetNode = ast.factory.createOperation({
 describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'updatePetWithForm', node: updatePetWithFormNode, options: {} },
-    { name: 'updatePetWithFormObject', node: updatePetWithFormNode, options: { pathParamsType: 'object' as const } },
     { name: 'createPet', node: createPetNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
-    { name: 'deletePetObject', node: deletePetNode, options: { pathParamsType: 'object' as const } },
     { name: 'clientImportPath', node: updatePetWithFormNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
-    { name: 'updatePetWithFormCamelCase', node: updatePetWithFormNode, options: { paramsCasing: 'camelcase' as const } },
     {
       name: 'getAsMutation',
       node: findByTagsNode,

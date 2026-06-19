@@ -26,7 +26,7 @@ export function useUploadFile<TContext>(options: {
 
   return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, {petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }}, TContext>({
     mutationFn: async({ petId, data, params }) => {
-      return uploadFile(petId, data, params, config)
+      return uploadFile({ petId, data, params }, config)
     },
     mutationKey,
     ...mutationOptions

@@ -38,7 +38,6 @@ export default defineConfig({
         importPath: '@kubb/plugin-client/clients/axios',
         dataReturnType: 'data',
       },
-      pathParamsType: 'object',
     }),
   ],
 })

@@ -17,9 +17,6 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
@@ -40,10 +37,7 @@ export function InfiniteQueryOptions({
   previousParam,
   node,
   tsResolver,
-  paramsCasing,
-  paramsType,
   dataReturnType,
-  pathParamsType,
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
@@ -81,13 +75,13 @@ export function InfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledNames = getEnabledParamNames(queryKeyParamsNode)
   const enabledText = enabledNames.length ? `enabled: () => ${enabledNames.map((n) => `!!toValue(${n})`).join(' && ')},` : ''
 
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { resolver: tsResolver }), enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')

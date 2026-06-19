@@ -8,7 +8,7 @@ import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFile
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from './.kubb/config.ts'
 
-function getUploadFileUrl(petId: UploadFilePathPetId) {
+function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}/uploadImage` as const }
 
   return res
@@ -19,9 +19,7 @@ function getUploadFileUrl(petId: UploadFilePathPetId) {
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  petId: UploadFilePathPetId,
-  data: UploadFileData,
-  params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
@@ -31,7 +29,7 @@ export async function uploadFile(
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
-    url: getUploadFileUrl(petId).url.toString(),
+    url: getUploadFileUrl({ petId }).url.toString(),
     params,
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
     contentType,

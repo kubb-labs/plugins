@@ -171,12 +171,6 @@ export type Options = OutputOptions & {
    */
   wrapOutput?: (arg: { output: string; schema: ast.SchemaNode }) => string | undefined
   /**
-   * Rename properties inside path/query/header schemas. Body schemas are unaffected.
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
-  /**
    * Custom generators that run alongside the built-in Zod generators.
    */
   generators?: Array<Generator<PluginZod>>
@@ -213,7 +207,6 @@ type ResolvedOptions = {
   regexType: NonNullable<Options['regexType']>
   mini: NonNullable<Options['mini']>
   wrapOutput: Options['wrapOutput']
-  paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
 

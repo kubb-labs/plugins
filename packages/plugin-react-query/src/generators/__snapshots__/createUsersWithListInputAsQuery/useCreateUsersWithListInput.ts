@@ -18,7 +18,7 @@ type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInp
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput(
-  data?: CreateUsersWithListInputData,
+  { data }: { data?: CreateUsersWithListInputData } = {},
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -36,14 +36,14 @@ export async function createUsersWithListInput(
 }
 
 export function createUsersWithListInputQueryOptions(
-  data?: CreateUsersWithListInputData,
+  { data }: { data?: CreateUsersWithListInputData } = {},
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const queryKey = createUsersWithListInputQueryKey(data)
   return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return createUsersWithListInput(data, { ...config, signal: config.signal ?? signal })
+      return createUsersWithListInput({ data }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -56,7 +56,7 @@ export function useCreateUsersWithListInput<
   TQueryData = CreateUsersWithListInputStatus200,
   TQueryKey extends QueryKey = CreateUsersWithListInputQueryKey,
 >(
-  data?: CreateUsersWithListInputData,
+  { data }: { data?: CreateUsersWithListInputData } = {},
   options: {
     query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -70,7 +70,7 @@ export function useCreateUsersWithListInput<
 
   const query = useQuery(
     {
-      ...createUsersWithListInputQueryOptions(data, config),
+      ...createUsersWithListInputQueryOptions({ data }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

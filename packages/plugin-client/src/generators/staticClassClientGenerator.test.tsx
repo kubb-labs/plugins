@@ -22,9 +22,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
-  paramsType: 'inline',
-  paramsCasing: undefined,
-  pathParamsType: 'inline',
   client: 'axios',
   clientType: 'staticClass',
   importPath: undefined,

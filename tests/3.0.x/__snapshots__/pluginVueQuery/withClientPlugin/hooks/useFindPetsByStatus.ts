@@ -15,12 +15,12 @@ export const findPetsByStatusQueryKey = (params?: MaybeRefOrGetter<{ status?: Fi
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ params }: { params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }> } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByStatusQueryKey(params)
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return findPetsByStatus(toValue(params), { ...config, signal: config.signal ?? signal })
+      return findPetsByStatus({ params: toValue(params) }, { ...config, signal: config.signal ?? signal })
    },
   })
 }
@@ -30,7 +30,7 @@ export function findPetsByStatusQueryOptions(params?: MaybeRefOrGetter<{ status?
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>(params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }>, options: {
+export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ params }: { params?: MaybeRefOrGetter<{ status?: FindPetsByStatusQueryStatus }> } = {}, options: {
   query?: Partial<UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {
@@ -39,7 +39,7 @@ export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryDat
   const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? findPetsByStatusQueryKey(params)
 
   const query = useQuery({
-   ...findPetsByStatusQueryOptions(params, config),
+   ...findPetsByStatusQueryOptions({ params }, config),
    ...resolvedOptions,
    queryKey
   } as unknown as UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, FindPetsByStatusStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }

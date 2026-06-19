@@ -9,7 +9,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-cl
 import type { z } from 'zod'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
-function getUploadFileUrl(petId: UploadFilePathPetId) {
+function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `/pet/${petId}/uploadImage` as const }
 
   return res
@@ -19,12 +19,12 @@ function getUploadFileUrl(petId: UploadFilePathPetId) {
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = uploadFileDataSchema.parse(data)
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof uploadFileDataSchema>>({ method: 'POST', url: getUploadFileUrl(petId).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof uploadFileDataSchema>>({ method: 'POST', url: getUploadFileUrl({ petId }).url.toString(), params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return uploadFileResponseSchema.parse(res.data)
 }

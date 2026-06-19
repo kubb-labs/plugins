@@ -78,10 +78,10 @@ export const typeGenerator = defineGenerator<PluginTs>({
     )
   },
   operation(node, ctx) {
-    const { enum: enumOptions, optionalType, arrayType, syntaxType, paramsCasing, group, output, printer } = ctx.options
+    const { enum: enumOptions, optionalType, arrayType, syntaxType, group, output, printer } = ctx.options
     const { adapter, config, resolver, root } = ctx
 
-    const params = caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
       file: resolver.resolveFile(

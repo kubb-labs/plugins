@@ -28,9 +28,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
     clientType: 'function',
   },
   parser: 'zod',
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -151,9 +148,7 @@ describe('mutationGenerator operation', () => {
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
     { name: 'clientPostImportPath', node: updatePetByIdNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
-    { name: 'updatePetByIdPathParamsObject', node: updatePetByIdNode, options: { pathParamsType: 'object' as const } },
     { name: 'deletePet', node: deletePetNode, options: {} },
-    { name: 'deletePetObject', node: deletePetNode, options: { pathParamsType: 'object' as const } },
     { name: 'multiContentType', node: multiContentTypeNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 

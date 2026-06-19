@@ -6,8 +6,7 @@ import type {
 } from '../../models/ts/pet/UpdatePetWithForm.ts'
 
 export function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId,
-  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
+  { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UpdatePetWithFormResponse> {
   return cy

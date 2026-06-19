@@ -16,7 +16,7 @@ type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ data }: { data: AddPetData }, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
@@ -26,10 +26,10 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
   return res.data
 }
 
-export function addPetQueryOptions(data?: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export function addPetQueryOptions({ data }: { data?: AddPetData } = {}, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return addPet(data!, config)
+      return addPet({ data: data! }, config)
     },
   }
 }

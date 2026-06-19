@@ -27,7 +27,7 @@ export function usePlaceOrder<TContext>(options: {
 
   return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
     mutationFn: async({ data }) => {
-      return placeOrder(data, config)
+      return placeOrder({ data }, config)
     },
     mutationKey,
     ...mutationOptions

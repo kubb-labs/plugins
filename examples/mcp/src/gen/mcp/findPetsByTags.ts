@@ -21,13 +21,15 @@ export async function findPetsByTagsHandler(
     headers,
     params,
   }: {
-    headers: { 'X-EXAMPLE': FindPetsByTagsHeaderXEXAMPLE }
+    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
     params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
   },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
+  const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
+
   const res = await client<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
-    { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, params, headers: { ...headers } },
+    { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, params, headers: { ...mappedHeaders } },
     request,
   )
 

@@ -24,7 +24,7 @@ export type GetConfigIdV20250RequestConfig = {
      * @type object | undefined
     */
     path?: {
-        config_id: GetConfigIdV20250PathConfigId;
+        configId: GetConfigIdV20250PathConfigId;
     };
     query?: never;
     headers?: never;

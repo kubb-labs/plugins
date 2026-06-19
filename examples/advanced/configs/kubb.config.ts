@@ -45,7 +45,6 @@ export default defineConfig({
       },
       arrayType: 'generic',
       enum: { type: 'asConst' },
-      paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
       override: [
         {
           type: 'operationId',
@@ -71,7 +70,6 @@ export default defineConfig({
       inferred: true,
       typed: true,
       operations: false,
-      paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
     }),
     pluginReactQuery({
       output: {
@@ -109,8 +107,6 @@ export default defineConfig({
       },
       infinite: false,
       suspense: false,
-      paramsType: 'object',
-      paramsCasing: 'camelcase',
       parser: 'zod',
     }),
     pluginClient({
@@ -130,8 +126,6 @@ export default defineConfig({
       operations: true,
       baseURL: 'https://petstore3.swagger.io/api/v3',
       dataReturnType: 'full',
-      paramsCasing: 'camelcase',
-      paramsType: 'object',
       urlType: 'export',
       override: [
         {
@@ -162,7 +156,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
       client: {
         importPath: '../../../axios-client.ts',
         baseURL: 'https://petstore.swagger.io/v2',
@@ -179,7 +172,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      paramsCasing: 'camelcase',
       mapper: {
         status: `faker.helpers.arrayElement<any>(['working', 'idle'])`,
       },
@@ -195,7 +187,6 @@ export default defineConfig({
         barrel: false,
       },
       group: { type: 'tag' },
-      paramsCasing: 'camelcase',
     }),
     pluginMsw({
       output: {

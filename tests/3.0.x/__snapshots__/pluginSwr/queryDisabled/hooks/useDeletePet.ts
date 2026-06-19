@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const deletePetQueryKey = (petId?: DeletePetPathPetId) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
+export const deletePetQueryKey = ({ petId }: { petId?: DeletePetPathPetId } = {}) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
 
 type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
 
@@ -16,18 +16,20 @@ type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deletePet({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...headers, ...requestConfig.headers } })
+  const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
+
+  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...mappedHeaders, ...requestConfig.headers } })
 
   return res.data
 }
 
-export function deletePetQueryOptions(petId?: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deletePetQueryOptions({ petId, headers }: { petId?: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return deletePet(petId!, headers, config)
+      return deletePet({ petId: petId!, headers }, config)
     },
   }
 }

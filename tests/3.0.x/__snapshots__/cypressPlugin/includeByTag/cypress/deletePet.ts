@@ -5,11 +5,11 @@
 
 import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse } from '../types/DeletePet.ts'
 
-export function deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
+export function deletePet({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy.request<DeletePetResponse>({
     method: 'DELETE',
     url: `/pet/${petId}`,
-    headers,
+    headers: headers ? { 'api_key': headers.apiKey } : undefined,
     ...options
   }).then((res) => res.body)
 }

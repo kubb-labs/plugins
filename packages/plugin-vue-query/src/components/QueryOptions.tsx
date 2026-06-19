@@ -14,38 +14,17 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function getQueryOptionsParams(
-  node: ast.OperationNode,
-  options: {
-    paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
-    resolver: ResolverTs
-  },
-): ast.FunctionParametersNode {
+export function getQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs }): ast.FunctionParametersNode {
   return wrapWithMaybeRefOrGetter(buildQueryOptionsParams(node, options), (name) => name === 'config')
 }
 
-export function QueryOptions({
-  name,
-  clientName,
-  dataReturnType,
-  node,
-  tsResolver,
-  paramsCasing,
-  paramsType,
-  pathParamsType,
-  queryKeyName,
-}: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, dataReturnType, node, tsResolver, queryKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -53,13 +32,13 @@ export function QueryOptions({
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const enabledNames = getEnabledParamNames(queryKeyParamsNode)
   const enabledText = enabledNames.length ? `enabled: () => ${enabledNames.map((n) => `!!toValue(${n})`).join(' && ')},` : ''
 
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { resolver: tsResolver }), enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
 

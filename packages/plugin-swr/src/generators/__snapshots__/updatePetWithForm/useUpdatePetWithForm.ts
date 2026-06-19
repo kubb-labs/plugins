@@ -17,8 +17,7 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId,
-  data?: UpdatePetWithFormData,
+  { petId, data }: { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -58,7 +57,7 @@ export function useUpdatePetWithForm(
   return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { petId, data } }) => {
-      return updatePetWithForm(petId, data, config)
+      return updatePetWithForm({ petId, data }, config)
     },
     mutationOptions,
   )

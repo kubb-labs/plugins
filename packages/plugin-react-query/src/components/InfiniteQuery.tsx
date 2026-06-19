@@ -17,9 +17,6 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
@@ -32,15 +29,12 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-    paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
     pageParamGeneric: string
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
+  const { resolver, pageParamGeneric } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   const optionsParam = ast.factory.createFunctionParameter({
@@ -53,9 +47,9 @@ function buildInfiniteQueryParamsNode(
   })
 
   return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver,
     extraParams: [optionsParam],
   })
@@ -66,9 +60,6 @@ export function InfiniteQuery({
   queryKeyTypeName,
   queryOptionsName,
   queryKeyName,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
   dataReturnType,
   node,
   tsResolver,
@@ -120,18 +111,15 @@ export function InfiniteQuery({
     `TPageParam = ${pageParamType}`,
   ]
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
   const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
   const paramsNode = markParamsOptional(
     buildInfiniteQueryParamsNode(node, {
-      paramsType,
-      paramsCasing,
-      pathParamsType,
       dataReturnType,
       resolver: tsResolver,
       pageParamGeneric: 'TPageParam',

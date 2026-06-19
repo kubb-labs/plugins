@@ -6,7 +6,7 @@
 import type { GetPetsQueryLimit, GetPetsResponse } from './GetPets'
 
 export function getPets(
-  params?: { limit?: GetPetsQueryLimit },
+  { params }: { params?: { limit?: GetPetsQueryLimit } } = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<Cypress.Response<GetPetsResponse>> {
   return cy.request<GetPetsResponse>({

@@ -31,7 +31,7 @@ export function usePlaceOrder(options: {
   return useSWRMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { data } }) => {
-      return placeOrder(data, config)
+      return placeOrder({ data }, config)
     },
     mutationOptions
   )

@@ -5,10 +5,10 @@
 
 import type { GetConfigIdV20250PathConfigId, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250.ts'
 
-export function getConfigIdV20250(config_id: GetConfigIdV20250PathConfigId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
+export function getConfigIdV20250({ configId }: { configId: GetConfigIdV20250PathConfigId }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
   return cy.request<GetConfigIdV20250Response>({
     method: 'GET',
-    url: `/config/${config_id}`,
+    url: `/config/${configId}`,
     ...options
   }).then((res) => res.body)
 }

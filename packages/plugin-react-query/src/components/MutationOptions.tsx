@@ -13,9 +13,6 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
 }
 
@@ -35,17 +32,7 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver:
   })
 }
 
-export function MutationOptions({
-  name,
-  clientName,
-  dataReturnType,
-  node,
-  tsResolver,
-  paramsCasing,
-  paramsType,
-  pathParamsType,
-  mutationKeyName,
-}: Props): KubbReactNode {
+export function MutationOptions({ name, clientName, dataReturnType, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
@@ -58,7 +45,7 @@ export function MutationOptions({
   const mutationArgParamsNode = createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
-    paramsCasing,
+    paramsCasing: 'camelcase',
     resolver: tsResolver,
   })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
@@ -67,9 +54,9 @@ export function MutationOptions({
   const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
 
   const clientCallParamsNode = createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver: tsResolver,
     extraParams: [
       ast.factory.createFunctionParameter({

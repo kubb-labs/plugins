@@ -108,7 +108,7 @@ type Mutation = {
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
 export type Options = OutputOptions & {
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'paramsCasing'>
+  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>
   /**
    * Tags, operations, or paths to exclude from generation.
    */
@@ -121,22 +121,6 @@ export type Options = OutputOptions & {
    * Override options for specific tags, operations, or paths.
    */
   override?: Array<Override<ResolvedOptions>>
-  /**
-   * Apply casing to parameter names.
-   */
-  paramsCasing?: 'camelcase'
-  /**
-   * How parameters are passed: grouped in an object or spread inline.
-   *
-   * @default 'inline'
-   */
-  paramsType?: 'object' | 'inline'
-  /**
-   * How path parameters are passed: grouped in an object or spread inline.
-   *
-   * @default 'inline'
-   */
-  pathParamsType?: PluginClient['options']['pathParamsType']
   queryKey?: QueryKey
   /**
    * Configure useSWR behavior.
@@ -171,11 +155,8 @@ type ResolvedOptions = {
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'paramsCasing'>
+  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
   parser: NonNullable<Options['parser']>
-  pathParamsType: NonNullable<Options['pathParamsType']>
-  paramsCasing: Options['paramsCasing']
-  paramsType: NonNullable<Options['paramsType']>
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false
   mutationKey: MutationKey | undefined

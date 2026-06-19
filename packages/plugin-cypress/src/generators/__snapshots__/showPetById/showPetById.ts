@@ -5,7 +5,7 @@
 
 import type { ShowPetByIdPathPetId, ShowPetByIdResponse } from './ShowPetById'
 
-export function showPetById(petId: ShowPetByIdPathPetId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<ShowPetByIdResponse> {
+export function showPetById({ petId }: { petId: ShowPetByIdPathPetId }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<ShowPetByIdResponse> {
   return cy
     .request<ShowPetByIdResponse>({
       method: 'GET',

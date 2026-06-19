@@ -2,7 +2,6 @@ import { getOperationParameters } from '@internals/shared'
 import { ast } from '@kubb/core'
 import { buildGroupParam, caseParams, createOperationParams, resolveGroupType, resolveParamType } from '@kubb/ast/utils'
 import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
-import type { ParamsCasing, ParamsType, PathParamsType } from './types.ts'
 
 /**
  * Returns the `TypeLiteral` members of a destructured group parameter, or `null`
@@ -19,17 +18,14 @@ function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: s
  * `RequestConfig` with an optional `client`. Framework plugins wrap the result
  * when needed, for example vue-query applies `MaybeRefOrGetter`.
  */
-export function buildQueryOptionsParams(
-  node: ast.OperationNode,
-  options: { paramsType: ParamsType; paramsCasing: ParamsCasing; pathParamsType: PathParamsType; resolver: ResolverTs },
-): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver } = options
+export function buildQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs }): ast.FunctionParametersNode {
+  const { resolver } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
 
   return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver,
     extraParams: [
       ast.factory.createFunctionParameter({
@@ -136,17 +132,10 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
 /**
  * Build QueryKey params: pathParams + data + queryParams (NO headers, NO config).
  */
-export function buildQueryKeyParams(
-  node: ast.OperationNode,
-  options: {
-    pathParamsType: 'object' | 'inline'
-    paramsCasing: 'camelcase' | undefined
-    resolver: PluginTs['resolver']
-  },
-): ast.FunctionParametersNode {
-  const { pathParamsType, paramsCasing, resolver } = options
+export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): ast.FunctionParametersNode {
+  const { resolver } = options
 
-  const casedParams = caseParams(node.parameters, paramsCasing)
+  const casedParams = caseParams(node.parameters, 'camelcase')
   const pathParams = casedParams.filter((p) => p.in === 'path')
   const queryParams = casedParams.filter((p) => p.in === 'query')
 
@@ -160,11 +149,7 @@ export function buildQueryKeyParams(
   // Path params
   if (pathParams.length) {
     const pathChildren = pathParams.map((p) => ({ name: p.name, type: resolveParamType({ node, param: p, resolver }), optional: !p.required }))
-    if (pathParamsType === 'object') {
-      params.push(ast.factory.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
-    } else {
-      params.push(...pathChildren.map((child) => ast.factory.createFunctionParameter(child)))
-    }
+    params.push(ast.factory.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
   }
 
   // Request body

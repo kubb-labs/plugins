@@ -21,7 +21,7 @@ type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspen
  * {@link /pet/findByStatus}
  */
 export async function findPetsByStatusSuspenseHook(
-  params?: { status?: FindPetsByStatusQueryStatus },
+  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -37,14 +37,14 @@ export async function findPetsByStatusSuspenseHook(
 }
 
 export function findPetsByStatusSuspenseQueryOptionsHook(
-  params?: { status?: FindPetsByStatusQueryStatus },
+  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByStatusSuspenseQueryKey(params)
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatusSuspenseHook(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByStatusSuspenseHook({ params }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -55,7 +55,7 @@ export function findPetsByStatusSuspenseQueryOptionsHook(
  * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatusSuspenseHook<TData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusSuspenseQueryKey>(
-  params?: { status?: FindPetsByStatusQueryStatus },
+  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   options: {
     query?: Partial<UseSuspenseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -70,7 +70,7 @@ export function useFindPetsByStatusSuspenseHook<TData = FindPetsByStatusStatus20
 
   const query = useSuspenseQuery(
     {
-      ...findPetsByStatusSuspenseQueryOptionsHook(params, config),
+      ...findPetsByStatusSuspenseQueryOptionsHook({ params }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,

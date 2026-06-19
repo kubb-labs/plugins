@@ -128,12 +128,6 @@ export type Options = OutputOptions & {
    */
   seed?: number | Array<number>
   /**
-   * Rename properties inside path/query/header mocks. Body mocks are unaffected.
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
-  /**
    * Custom generators that run alongside the built-in Faker generators.
    */
   generators?: Array<Generator<PluginFaker>>
@@ -166,7 +160,6 @@ type ResolvedOptions = {
   mapper: NonNullable<Options['mapper']>
   seed: NonNullable<Options['seed']> | undefined
   locale: Options['locale']
-  paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
 

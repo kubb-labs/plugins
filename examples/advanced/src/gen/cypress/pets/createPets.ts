@@ -8,10 +8,17 @@ import type {
 } from '../../models/ts/pets/CreatePets.ts'
 
 export function createPets(
-  uuid: CreatePetsPathUuid,
-  data: CreatePetsData,
-  headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE },
-  params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset },
+  {
+    uuid,
+    data,
+    headers,
+    params,
+  }: {
+    uuid: CreatePetsPathUuid
+    data: CreatePetsData
+    headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
+    params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
+  },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<CreatePetsResponse> {
   return cy

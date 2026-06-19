@@ -32,10 +32,6 @@ type Props = {
    * @default 'data'
    */
   dataReturnType: PluginMcp['resolvedOptions']['client']['dataReturnType']
-  /**
-   * How to style your params.
-   */
-  paramsCasing?: PluginMcp['resolvedOptions']['paramsCasing']
 }
 
 /**
@@ -50,12 +46,12 @@ function buildRemappingCode(mapping: Record<string, string>, varName: string, so
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function McpHandler({ name, node, resolver, baseURL, dataReturnType, paramsCasing }: Props): KubbReactNode {
+export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
-  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
+  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
   const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
 
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
@@ -71,16 +67,16 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     paramsType: 'object',
     pathParamsType: 'inline',
     resolver,
-    paramsCasing,
+    paramsCasing: 'camelcase',
   })
   const baseParamsSignature = declarationPrinter.print(paramsNode) ?? ''
   const paramsSignature = baseParamsSignature
     ? `${baseParamsSignature}, request: RequestHandlerExtra<ServerRequest, ServerNotification>`
     : 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'
 
-  const pathParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalPathParams, camelCase) : null
-  const queryParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalQueryParams, camelCase) : null
-  const headerParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalHeaderParams, camelCase) : null
+  const pathParamsMapping = buildTransformedParamsMapping(originalPathParams, camelCase)
+  const queryParamsMapping = buildTransformedParamsMapping(originalQueryParams, camelCase)
+  const headerParamsMapping = buildTransformedParamsMapping(originalHeaderParams, camelCase)
 
   const contentTypeHeader =
     contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null

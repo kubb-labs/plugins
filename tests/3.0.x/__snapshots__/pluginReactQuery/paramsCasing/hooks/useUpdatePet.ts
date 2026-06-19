@@ -14,7 +14,7 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet(petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export async function updatePet({ petId, data, params }: { petId: UpdatePetPathPetId; data: UpdatePetData; params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource } }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const pet_id = petId
@@ -33,7 +33,7 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
   return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>({
     mutationKey,
     mutationFn: async({ petId, data, params }) => {
-      return updatePet(petId, data, params, config)
+      return updatePet({ petId, data, params }, config)
     },
   })
 }

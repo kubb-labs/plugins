@@ -16,9 +16,7 @@ function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  { petId }: { petId: UploadFilePathPetId },
-  data: UploadFileData,
-  params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config

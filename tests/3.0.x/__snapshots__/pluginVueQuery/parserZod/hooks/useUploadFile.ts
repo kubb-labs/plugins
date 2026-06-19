@@ -18,7 +18,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = uploadFileDataSchema.parse(data)
@@ -42,7 +42,7 @@ export function useUploadFile<TContext>(options: {
 
   return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, {petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }}, TContext>({
     mutationFn: async({ petId, data, params }) => {
-      return uploadFile(petId, data, params, config)
+      return uploadFile({ petId, data, params }, config)
     },
     mutationKey,
     ...mutationOptions

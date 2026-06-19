@@ -13,8 +13,6 @@ type Props = {
   typeName: string
   node: ast.OperationNode
   tsResolver: PluginTs['resolver']
-  paramsCasing: 'camelcase' | undefined
-  pathParamsType: 'object' | 'inline'
   transformer: Transformer | null | undefined
 }
 
@@ -32,11 +30,11 @@ export const queryKeyTransformer: Transformer = ({ node, casing }) => {
   ].filter(Boolean) as Array<string>
 }
 
-export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer }: Props): KubbReactNode {
-  const baseParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+export function QueryKey({ name, node, tsResolver, typeName, transformer }: Props): KubbReactNode {
+  const baseParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const paramsNode = markParamsOptional(baseParamsNode, getEnabledParamNames(baseParamsNode))
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = (transformer ?? queryKeyTransformer)({ node, casing: paramsCasing })
+  const keys = (transformer ?? queryKeyTransformer)({ node, casing: 'camelcase' })
 
   return (
     <>

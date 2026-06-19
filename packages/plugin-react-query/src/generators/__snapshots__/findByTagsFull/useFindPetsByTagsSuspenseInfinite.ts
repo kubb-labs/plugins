@@ -28,7 +28,7 @@ type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSu
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsSuspenseInfinite(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -39,7 +39,7 @@ export async function findPetsByTagsSuspenseInfinite(
 }
 
 export function findPetsByTagsSuspenseInfiniteQueryOptions(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey(params)
@@ -52,7 +52,7 @@ export function findPetsByTagsSuspenseInfiniteQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsSuspenseInfinite(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByTagsSuspenseInfinite({ params }, { ...config, signal: config.signal ?? signal })
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1),
@@ -70,7 +70,7 @@ export function useFindPetsByTagsSuspenseInfinite<
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
   TPageParam = number,
 >(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -82,7 +82,7 @@ export function useFindPetsByTagsSuspenseInfinite<
 
   const query = useSuspenseInfiniteQuery(
     {
-      ...findPetsByTagsSuspenseInfiniteQueryOptions(params, config),
+      ...findPetsByTagsSuspenseInfiniteQueryOptions({ params }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>,

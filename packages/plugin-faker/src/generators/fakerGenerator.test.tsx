@@ -146,7 +146,6 @@ const defaultOptions: PluginFaker['resolvedOptions'] = {
   regexGenerator: 'faker',
   seed: undefined,
   locale: undefined,
-  paramsCasing: undefined,
   printer: undefined,
 }
 

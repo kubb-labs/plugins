@@ -51,11 +51,13 @@ export { buildStatusUnionType }
 /**
  * Builds HTTP headers array for a client request.
  * Includes Content-Type (if not default) and spreads header parameters if present.
+ * `headerSpread` is the expression spread into the headers object, swapped to
+ * `...mappedHeaders` when the wire names need remapping to camelCase.
  */
-export function buildHeaders(contentType: string, hasHeaderParams: boolean): Array<string> {
+export function buildHeaders(contentType: string, hasHeaderParams: boolean, headerSpread = '...headers'): Array<string> {
   return [
     contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
-    hasHeaderParams ? '...headers' : null,
+    hasHeaderParams ? headerSpread : null,
   ].filter(Boolean) as Array<string>
 }
 
@@ -112,6 +114,7 @@ export function buildClassClientParams({
   hasFormData,
   headers,
   zodQueryParamsName,
+  queryParamsMapping,
 }: {
   node: ast.OperationNode
   url: string
@@ -122,6 +125,7 @@ export function buildClassClientParams({
   hasFormData: boolean
   headers: Array<string>
   zodQueryParamsName?: string | null
+  queryParamsMapping?: Record<string, string> | null
 }) {
   const { query: queryParams } = getOperationParameters(node)
   const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
@@ -146,7 +150,7 @@ export function buildClassClientParams({
               value: JSON.stringify(baseURL),
             }
           : null,
-        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : {}) : null,
+        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
         data: requestName
           ? {
               value:

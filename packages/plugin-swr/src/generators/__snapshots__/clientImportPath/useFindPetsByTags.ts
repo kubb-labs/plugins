@@ -18,7 +18,7 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
  * {@link /pet/findByTags}
  */
 export async function findPetsByTags(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -29,12 +29,12 @@ export async function findPetsByTags(
 }
 
 export function findPetsByTagsQueryOptions(
-  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  { params }: { params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   return {
     fetcher: async () => {
-      return findPetsByTags(params!, config)
+      return findPetsByTags({ params: params! }, config)
     },
   }
 }
@@ -43,7 +43,7 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags(
-  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  { params }: { params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } } = {},
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }
@@ -56,7 +56,7 @@ export function useFindPetsByTags(
   const queryKey = findPetsByTagsQueryKey(params)
 
   return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsQueryKey | null>(shouldFetch && !!params ? queryKey : null, {
-    ...findPetsByTagsQueryOptions(params, config),
+    ...findPetsByTagsQueryOptions({ params }, config),
     ...(immutable
       ? {
           revalidateIfStale: false,

@@ -5,7 +5,7 @@
 
 import type { GetPetByIdPathPetId, GetPetByIdResponse } from '../types/GetPetById.ts'
 
-export function getPetById(petId: GetPetByIdPathPetId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdResponse> {
+export function getPetById({ petId }: { petId: GetPetByIdPathPetId }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdResponse> {
   return cy.request<GetPetByIdResponse>({
     method: 'GET',
     url: `/pet/${petId}`,

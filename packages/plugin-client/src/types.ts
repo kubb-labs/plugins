@@ -73,45 +73,6 @@ export type ClientImportPath =
     }
 
 /**
- * Discriminated union that ties `pathParamsType` to the `paramsType` values where it is meaningful.
- *
- * - `paramsType: 'object'` — all parameters (including path params) are merged into a single
- *   destructured object. `pathParamsType` is never reached in this code path and has no effect.
- * - `paramsType?: 'inline'` (or omitted) — each parameter group is a separate function argument.
- *   `pathParamsType` controls whether the path-param group itself is destructured (`'object'`)
- *   or spread as individual arguments (`'inline'`).
- */
-type ParamsTypeOptions =
-  | {
-      /**
-       * Every operation parameter (path, query, headers, body) is wrapped in a single
-       * destructured object argument.
-       */
-      paramsType: 'object'
-      /**
-       * `pathParamsType` has no effect when `paramsType` is `'object'`.
-       * Path params already live inside the single destructured object.
-       */
-      pathParamsType?: never
-    }
-  | {
-      /**
-       * Each parameter group is emitted as a separate positional function argument.
-       *
-       * @default 'inline'
-       */
-      paramsType?: 'inline'
-      /**
-       * How URL path parameters are arranged inside the inline argument list.
-       * - `'object'` groups them into one destructured object: `{ petId }: PathParams`.
-       * - `'inline'` emits each path param as its own argument: `petId: string`.
-       *
-       * @default 'inline'
-       */
-      pathParamsType?: 'object' | 'inline'
-    }
-
-/**
  * Where the generated client files are written and how they are exported, plus the optional
  * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
  *
@@ -159,13 +120,6 @@ export type Options = OutputOptions & {
    * @default 'data'
    */
   dataReturnType?: 'data' | 'full'
-  /**
-   * Rename parameter properties in the generated client (path, query, headers).
-   * The HTTP request still uses the original spec names; Kubb writes the mapping for you.
-   *
-   * @note Use the same value on `@kubb/plugin-ts` so types stay compatible.
-   */
-  paramsCasing?: 'camelcase'
   /**
    * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
    * - `false` (default): no validation. The response is returned as-is.
@@ -227,8 +181,7 @@ export type Options = OutputOptions & {
    * Custom generators that run alongside the built-in client generators.
    */
   generators?: Array<Generator<PluginClient>>
-} & ClientImportPath &
-  ParamsTypeOptions
+} & ClientImportPath
 
 type ResolvedOptions = {
   output: Output
@@ -243,9 +196,6 @@ type ResolvedOptions = {
   importPath: Options['importPath']
   baseURL: Options['baseURL']
   dataReturnType: NonNullable<Options['dataReturnType']>
-  pathParamsType: NonNullable<NonNullable<Options['pathParamsType']>>
-  paramsType: NonNullable<Options['paramsType']>
-  paramsCasing: Options['paramsCasing']
   sdk: Options['sdk']
   resolver: ResolverClient
 }

@@ -13,7 +13,7 @@ export function getCreateOrderUrl() {
 /**
  * {@link /orders}
  */
-export async function createOrder(data: CreateOrderData, config: Partial<RequestConfig<CreateOrderData>> & { client?: Client } = {}) {
+export async function createOrder({ data }: { data: CreateOrderData }, config: Partial<RequestConfig<CreateOrderData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = data

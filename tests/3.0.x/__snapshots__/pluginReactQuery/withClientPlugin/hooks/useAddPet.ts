@@ -16,7 +16,7 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
     mutationKey,
     mutationFn: async({ data }) => {
-      return addPet(data, config)
+      return addPet({ data }, config)
     },
   })
 }

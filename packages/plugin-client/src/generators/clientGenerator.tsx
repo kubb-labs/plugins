@@ -20,7 +20,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, urlType, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath, group } = ctx.options
+    const { output, urlType, dataReturnType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -34,7 +34,7 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
+    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase' })
 
     const { query: queryParams } = getOperationParameters(node)
 
@@ -104,26 +104,13 @@ export const clientGenerator = defineGenerator<PluginClient>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <Url
-          name={meta.urlName}
-          baseURL={baseURL}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          node={node}
-          tsResolver={tsResolver}
-          isIndexable={urlType === 'export'}
-          isExportable={urlType === 'export'}
-        />
+        <Url name={meta.urlName} baseURL={baseURL} node={node} tsResolver={tsResolver} isIndexable={urlType === 'export'} isExportable={urlType === 'export'} />
 
         <Client
           name={meta.name}
           urlName={meta.urlName}
           baseURL={baseURL}
           dataReturnType={dataReturnType}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
           node={node}
           tsResolver={tsResolver}
           zodResolver={zodResolver}

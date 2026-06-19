@@ -21,7 +21,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group, customOptions } = ctx.options
+    const { output, query, mutation, infinite, parser, client: clientOptions, group, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -64,7 +64,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
     }
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
-      paramsCasing,
+      paramsCasing: 'camelcase',
       exclude: [queryKeyTypeName],
       order: 'body-response-first',
     })
@@ -127,24 +127,13 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <QueryKey
-          name={queryKeyName}
-          typeName={queryKeyTypeName}
-          node={node}
-          tsResolver={tsResolver}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          transformer={ctx.options.queryKey}
-        />
+        <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 
         {!shouldUseClientPlugin && (
           <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
             dataReturnType={clientOptions.dataReturnType || 'data'}
-            paramsCasing={clientOptions.paramsCasing || paramsCasing}
-            paramsType={paramsType}
-            pathParamsType={pathParamsType}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -161,9 +150,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           queryKeyName={queryKeyName}
           node={node}
           tsResolver={tsResolver}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
@@ -182,9 +168,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           queryKeyTypeName={queryKeyTypeName}
           node={node}
           tsResolver={tsResolver}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}

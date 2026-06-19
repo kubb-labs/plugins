@@ -5,7 +5,7 @@
 
 import type { DeletePetPathPetId, DeletePetResponse } from './DeletePet'
 
-export function deletePet(petId: DeletePetPathPetId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
+export function deletePet({ petId }: { petId: DeletePetPathPetId }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy
     .request<DeletePetResponse>({
       method: 'DELETE',

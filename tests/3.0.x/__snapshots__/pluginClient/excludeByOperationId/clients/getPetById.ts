@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
+function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
   const res = { method: 'GET', url: `/pet/${petId}` as const }
 
   return res
@@ -18,10 +18,10 @@ function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl(petId).url.toString(), ...requestConfig })
+  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl({ petId }).url.toString(), ...requestConfig })
 
   return res.data
 }

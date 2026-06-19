@@ -15,9 +15,6 @@ type Props = {
   mutationArgTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-  paramsType: PluginSwr['resolvedOptions']['paramsType']
-  pathParamsType: PluginSwr['resolvedOptions']['pathParamsType']
   dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
 }
 
@@ -28,14 +25,13 @@ const keysPrinter = functionPrinter({ mode: 'call' })
 function createMutationArgParams(
   node: ast.OperationNode,
   options: {
-    paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
   return createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
-    paramsCasing: options.paramsCasing,
+    paramsCasing: 'camelcase',
     resolver: options.resolver,
   })
 }
@@ -43,7 +39,6 @@ function createMutationArgParams(
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
     dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
     mutationKeyTypeName: string
     mutationArgTypeName: string
@@ -78,9 +73,6 @@ export function Mutation({
   mutationKeyName,
   mutationKeyTypeName,
   mutationArgTypeName,
-  paramsCasing,
-  paramsType,
-  pathParamsType,
   dataReturnType,
   node,
   tsResolver,
@@ -91,7 +83,7 @@ export function Mutation({
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = createMutationArgParams(node, { paramsCasing, resolver: tsResolver })
+  const mutationArgParamsNode = createMutationArgParams(node, { resolver: tsResolver })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
   const argTypeBody = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
   const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
@@ -99,7 +91,6 @@ export function Mutation({
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 
   const paramsNode = buildMutationParamsNode(node, {
-    paramsCasing,
     dataReturnType,
     mutationKeyTypeName,
     mutationArgTypeName,
@@ -108,9 +99,9 @@ export function Mutation({
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   const clientCallParamsNode = createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver: tsResolver,
     extraParams: [
       ast.factory.createFunctionParameter({

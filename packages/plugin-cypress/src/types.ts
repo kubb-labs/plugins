@@ -18,35 +18,6 @@ export type ResolverCypress = Resolver & {
 }
 
 /**
- * Parameter handling mode that determines how path params and query/body params are arranged in function signatures.
- */
-type ParamsTypeOptions =
-  | {
-      /**
-       * Every operation parameter is wrapped in a single destructured object argument.
-       */
-      paramsType: 'object'
-      /**
-       * `pathParamsType` has no effect when `paramsType` is `'object'`.
-       */
-      pathParamsType?: never
-    }
-  | {
-      /**
-       * Each parameter group is emitted as a separate positional function argument.
-       */
-      paramsType?: 'inline'
-      /**
-       * How URL path parameters are arranged inside the inline argument list.
-       * - `'object'` groups them into one destructured object.
-       * - `'inline'` emits each path param as its own argument.
-       *
-       * @default 'inline'
-       */
-      pathParamsType?: 'object' | 'inline'
-    }
-
-/**
  * Where the generated Cypress helpers are written and how they are exported, plus the optional
  * `group` strategy. The `group` option organizes `output.mode: 'directory'` output into per-tag or per-path subdirectories.
  *
@@ -61,12 +32,6 @@ export type Options = OutputOptions & {
    * @default 'data'
    */
   dataReturnType?: 'data' | 'full'
-  /**
-   * Rename parameter properties in the generated helpers (path, query, headers).
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
   /**
    * Base URL prepended to every request URL. When omitted, falls back to the
    * adapter's server URL (typically `servers[0].url`).
@@ -96,7 +61,7 @@ export type Options = OutputOptions & {
    * Custom generators that run alongside the built-in Cypress generators.
    */
   generators?: Array<Generator<PluginCypress>>
-} & ParamsTypeOptions
+}
 
 type ResolvedOptions = {
   output: Output
@@ -106,9 +71,6 @@ type ResolvedOptions = {
   group: Group | null
   baseURL: Options['baseURL'] | undefined
   dataReturnType: NonNullable<Options['dataReturnType']>
-  pathParamsType: NonNullable<NonNullable<Options['pathParamsType']>>
-  paramsType: NonNullable<Options['paramsType']>
-  paramsCasing: Options['paramsCasing']
   resolver: ResolverCypress
 }
 

@@ -37,7 +37,7 @@ export type DeletePetRequestConfig = {
      * @type object | undefined
     */
     headers?: {
-        api_key?: DeletePetHeaderApiKey;
+        apiKey?: DeletePetHeaderApiKey;
     };
     /**
      * @type string

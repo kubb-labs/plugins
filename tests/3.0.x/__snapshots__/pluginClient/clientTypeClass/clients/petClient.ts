@@ -24,7 +24,7 @@ export class PetClient {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  async addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+  async addPet({ data }: { data: AddPetData }, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ ...requestConfig, method: "POST", url: `/pet`, data: requestData, contentType })
@@ -36,7 +36,7 @@ export class PetClient {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-  async findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async findPetsByStatus({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ ...requestConfig, method: "GET", url: `/pet/findByStatus`, params })
     return res.data
@@ -47,7 +47,7 @@ export class PetClient {
    * @summary Find pet by ID
    * {@link /pet/:petId}
    */
-  async getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/pet/${petId}` })
     return res.data
@@ -58,9 +58,10 @@ export class PetClient {
    * @summary Deletes a pet
    * {@link /pet/:petId}
    */
-  async deletePet(petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async deletePet({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ ...requestConfig, method: "DELETE", url: `/pet/${petId}`, headers: { ...headers, ...requestConfig.headers } })
+    const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
+    const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ ...requestConfig, method: "DELETE", url: `/pet/${petId}`, headers: { ...mappedHeaders, ...requestConfig.headers } })
     return res.data
   }
 
@@ -68,7 +69,7 @@ export class PetClient {
    * @summary uploads an image
    * {@link /pet/:petId/uploadImage}
    */
-  async uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+  async uploadFile({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ ...requestConfig, method: "POST", url: `/pet/${petId}/uploadImage`, params, data: requestData, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })

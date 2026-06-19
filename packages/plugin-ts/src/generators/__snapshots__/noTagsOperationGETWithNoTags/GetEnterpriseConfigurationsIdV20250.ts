@@ -22,7 +22,7 @@ export type GetEnterpriseConfigurationsIdV20250RequestConfig = {
    * @type object | undefined
    */
   path?: {
-    enterprise_id: GetEnterpriseConfigurationsIdV20250PathEnterpriseId
+    enterpriseId: GetEnterpriseConfigurationsIdV20250PathEnterpriseId
   }
   query?: never
   headers?: never

@@ -19,7 +19,7 @@ function getCreateEventUrl() {
  * @summary Create an event
  * {@link /events}
  */
-export async function createEvent(data: CreateEventData, config: Partial<RequestConfig<CreateEventData>> & { client?: Client } = {}) {
+export async function createEvent({ data }: { data: CreateEventData }, config: Partial<RequestConfig<CreateEventData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = createEventDataSchema.parse(data)

@@ -16,7 +16,7 @@ export type CreatePetMutationKey = ReturnType<typeof createPetMutationKey>
 /**
  * {@link /pet}
  */
-export async function createPet(data?: CreatePetData, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
+export async function createPet({ data }: { data?: CreatePetData } = {}, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = data
@@ -46,7 +46,7 @@ export function useCreatePet(
   return useSWRMutation<CreatePetResponse, ResponseErrorConfig<Error>, CreatePetMutationKey | null, CreatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { data } }) => {
-      return createPet(data, config)
+      return createPet({ data }, config)
     },
     mutationOptions,
   )

@@ -18,7 +18,7 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
  * {@link /store/order}
  */
 export async function placeOrderPatchHook(
-  data?: PlaceOrderPatchData,
+  { data }: { data?: PlaceOrderPatchData } = {},
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -49,7 +49,7 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
     mutationKey,
     mutationFn: async ({ data }) => {
-      return placeOrderPatchHook(data, config)
+      return placeOrderPatchHook({ data }, config)
     },
   })
 }

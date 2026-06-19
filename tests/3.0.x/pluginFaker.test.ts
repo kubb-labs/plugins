@@ -153,7 +153,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginFaker({
           output: { path: './faker', barrel: false },
-          paramsCasing: 'camelcase',
         }),
       ],
     },

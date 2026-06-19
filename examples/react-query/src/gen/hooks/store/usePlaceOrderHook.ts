@@ -18,7 +18,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * {@link /store/order}
  */
 export async function placeOrderHook(
-  data?: PlaceOrderData,
+  { data }: { data?: PlaceOrderData } = {},
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -49,7 +49,7 @@ export function placeOrderMutationOptionsHook<TContext = unknown>(
   return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, { data?: PlaceOrderData }, TContext>({
     mutationKey,
     mutationFn: async ({ data }) => {
-      return placeOrderHook(data, config)
+      return placeOrderHook({ data }, config)
     },
   })
 }

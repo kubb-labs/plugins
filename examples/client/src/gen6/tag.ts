@@ -46,7 +46,7 @@ function getPlaceOrderUrl() {
  * {@link /store/order}
  */
 export async function placeOrder(
-  data?: PlaceOrderData,
+  { data }: { data?: PlaceOrderData } = {},
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -79,7 +79,7 @@ function getPlaceOrderPatchUrl() {
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  data?: PlaceOrderPatchData,
+  { data }: { data?: PlaceOrderPatchData } = {},
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -100,7 +100,7 @@ export async function placeOrderPatch(
   return res.data
 }
 
-function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
+function getGetOrderByIdUrl({ orderId }: { orderId: GetOrderByIdPathOrderId }) {
   const res = { method: 'GET', url: `/store/order/${orderId}` as const }
 
   return res
@@ -111,19 +111,19 @@ function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderById({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
     method: 'GET',
-    url: getGetOrderByIdUrl(orderId).url.toString(),
+    url: getGetOrderByIdUrl({ orderId }).url.toString(),
     ...requestConfig,
   })
 
   return res.data
 }
 
-function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
+function getDeleteOrderUrl({ orderId }: { orderId: DeleteOrderPathOrderId }) {
   const res = { method: 'DELETE', url: `/store/order/${orderId}` as const }
 
   return res
@@ -134,12 +134,12 @@ function getDeleteOrderUrl(orderId: DeleteOrderPathOrderId) {
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteOrder({ orderId }: { orderId: DeleteOrderPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',
-    url: getDeleteOrderUrl(orderId).url.toString(),
+    url: getDeleteOrderUrl({ orderId }).url.toString(),
     ...requestConfig,
   })
 

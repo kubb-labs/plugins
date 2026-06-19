@@ -16,7 +16,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Re
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, {petId: UploadFilePathPetId, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }}, TContext>({
     mutationKey,
     mutationFn: async({ petId, data, params }) => {
-      return uploadFile(petId, data, params, config)
+      return uploadFile({ petId, data, params }, config)
     },
   })
 }

@@ -16,17 +16,18 @@ function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
  * {@link /pet/:petId}
  */
 export async function deletePet(
-  { petId }: { petId: DeletePetPathPetId },
-  headers?: { api_key?: DeletePetHeaderApiKey },
+  { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
+
+  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
     url: getDeletePetUrl({ petId }).url.toString(),
     ...requestConfig,
-    headers: { ...headers, ...requestConfig.headers },
+    headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
   return res.data

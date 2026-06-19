@@ -153,12 +153,12 @@ export const zodGenerator = defineGenerator<PluginZod>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { adapter, config, resolver, root } = ctx
-    const { output, coercion, guidType, regexType, mini, wrapOutput, inferred, importPath, group, paramsCasing, printer } = ctx.options
+    const { output, coercion, guidType, regexType, mini, wrapOutput, inferred, importPath, group, printer } = ctx.options
     const dateType = (adapter as Adapter<AdapterOas>).options.dateType
 
     const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
 
-    const params = caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, 'camelcase')
 
     const meta = {
       file: resolver.resolveFile(
@@ -333,7 +333,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
   },
   operations(nodes, ctx) {
     const { config, resolver, root } = ctx
-    const { output, importPath, group, operations, paramsCasing } = ctx.options
+    const { output, importPath, group, operations } = ctx.options
 
     if (!operations) {
       return
@@ -345,7 +345,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
     } as const
 
     const transformedOperations = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const params = caseParams(node.parameters, paramsCasing)
+      const params = caseParams(node.parameters, 'camelcase')
 
       return {
         node,

@@ -33,7 +33,7 @@ export class store {
    * {@link /store/order}
    */
   async placeOrder(
-    data?: PlaceOrderData,
+    { data }: { data?: PlaceOrderData } = {},
     config: Partial<RequestConfig<PlaceOrderData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -57,7 +57,7 @@ export class store {
    * {@link /store/order}
    */
   async placeOrderPatch(
-    data?: PlaceOrderPatchData,
+    { data }: { data?: PlaceOrderPatchData } = {},
     config: Partial<RequestConfig<PlaceOrderPatchData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'

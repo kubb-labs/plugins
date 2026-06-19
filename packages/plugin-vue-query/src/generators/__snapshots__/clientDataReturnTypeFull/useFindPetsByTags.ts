@@ -21,7 +21,7 @@ export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
  * {@link /pet/findByTags}
  */
 export async function findPetsByTags(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -32,7 +32,7 @@ export async function findPetsByTags(
 }
 
 export function findPetsByTagsQueryOptions(
-  params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
+  { params }: { params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }> } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
@@ -44,7 +44,7 @@ export function findPetsByTagsQueryOptions(
     enabled: () => !!toValue(params),
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags(toValue(params!), { ...config, signal: config.signal ?? signal })
+      return findPetsByTags({ params: toValue(params!) }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -57,7 +57,7 @@ export function useFindPetsByTags<
   TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }>,
+  { params }: { params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }> } = {},
   options: {
     query?: Partial<
       UseQueryOptions<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>
@@ -71,7 +71,7 @@ export function useFindPetsByTags<
 
   const query = useQuery(
     {
-      ...findPetsByTagsQueryOptions(params, config),
+      ...findPetsByTagsQueryOptions({ params }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseQueryOptions<

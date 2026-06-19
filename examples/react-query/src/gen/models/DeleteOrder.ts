@@ -22,15 +22,15 @@ export type DeleteOrderStatus404 = any
  * @type object
  */
 export type DeleteOrderRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     orderId: DeleteOrderPathOrderId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

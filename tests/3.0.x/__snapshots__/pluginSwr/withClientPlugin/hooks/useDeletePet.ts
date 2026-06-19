@@ -13,7 +13,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 
-export type DeletePetMutationArg = { petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey } }
+export type DeletePetMutationArg = { petId: DeletePetPathPetId, headers?: { apiKey?: DeletePetHeaderApiKey } }
 
 /**
  * @description delete a pet
@@ -31,7 +31,7 @@ export function useDeletePet(options: {
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { petId, headers } }) => {
-      return deletePet(petId, headers, config)
+      return deletePet({ petId, headers }, config)
     },
     mutationOptions
   )

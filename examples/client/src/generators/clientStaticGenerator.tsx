@@ -13,7 +13,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver } = ctx
-    const { output, importPath, dataReturnType, pathParamsType, paramsType, paramsCasing, parser } = ctx.options
+    const { output, importPath, dataReturnType, parser } = ctx.options
     const baseURL = ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -98,9 +98,6 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
           name={name}
           baseURL={baseURL}
           dataReturnType={dataReturnType}
-          pathParamsType={pathParamsType}
-          paramsType={paramsType}
-          paramsCasing={paramsCasing}
           node={transformedNode}
           tsResolver={tsResolver}
           parser={parser}

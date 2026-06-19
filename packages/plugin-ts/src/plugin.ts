@@ -45,7 +45,6 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
     optionalType = 'questionToken',
     arrayType = 'array',
     syntaxType = 'type',
-    paramsCasing,
     printer,
     resolver: userResolver,
     macros: userMacros,
@@ -76,7 +75,6 @@ export const pluginTs = definePlugin<PluginTs>((options) => {
           arrayType,
           enum: resolvedEnum,
           syntaxType,
-          paramsCasing,
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverTs, ...userResolver } : resolverTs)

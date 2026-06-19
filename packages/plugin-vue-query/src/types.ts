@@ -160,7 +160,7 @@ export type Options = OutputOptions & {
    * HTTP client used inside every generated composable. Mirrors a subset of
    * `pluginClient` options.
    */
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'paramsCasing'>
+  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -173,24 +173,6 @@ export type Options = OutputOptions & {
    * Apply a different options object to operations matching a pattern.
    */
   override?: Array<Override<ResolvedOptions>>
-  /**
-   * Rename parameter properties in the generated composables.
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
-  /**
-   * How operation parameters appear in the generated composable signature.
-   *
-   * @default 'inline'
-   */
-  paramsType?: 'object' | 'inline'
-  /**
-   * How URL path parameters are arranged inside the inline argument list.
-   *
-   * @default 'inline'
-   */
-  pathParamsType?: PluginClient['options']['pathParamsType']
   /**
    * Enables `useInfiniteQuery` composables for cursor- or page-based pagination.
    * Pass an object to configure how the cursor is read; pass `false` to skip.
@@ -241,11 +223,8 @@ type ResolvedOptions = {
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'paramsCasing'>
+  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
   parser: NonNullable<Options['parser']>
-  pathParamsType: NonNullable<Options['pathParamsType']>
-  paramsCasing: Options['paramsCasing']
-  paramsType: NonNullable<Options['paramsType']>
   /**
    * Only used for infinite
    */

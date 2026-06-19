@@ -14,10 +14,7 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginVueQuery['resolvedOptions']['paramsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
-  pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -27,14 +24,13 @@ const keysPrinter = functionPrinter({ mode: 'call' })
 function createMutationArgParams(
   node: ast.OperationNode,
   options: {
-    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
   return createOperationParams(node, {
     paramsType: 'inline',
     pathParamsType: 'inline',
-    paramsCasing: options.paramsCasing,
+    paramsCasing: 'camelcase',
     resolver: options.resolver,
   })
 }
@@ -42,12 +38,11 @@ function createMutationArgParams(
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
     dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsCasing, dataReturnType, resolver } = options
+  const { dataReturnType, resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
@@ -55,7 +50,7 @@ function buildMutationParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = createMutationArgParams(node, { paramsCasing, resolver })
+  const mutationArgParamsNode = createMutationArgParams(node, { resolver })
 
   const wrappedParamsNode = wrapWithMaybeRefOrGetter(mutationArgParamsNode)
   const TRequestWrapped = wrappedParamsNode.params.length > 0 ? (declarationPrinter.print(wrappedParamsNode) ?? '') : ''
@@ -74,17 +69,7 @@ function buildMutationParamsNode(
   })
 }
 
-export function Mutation({
-  name,
-  clientName,
-  paramsCasing,
-  paramsType,
-  pathParamsType,
-  dataReturnType,
-  node,
-  tsResolver,
-  mutationKeyName,
-}: Props): KubbReactNode {
+export function Mutation({ name, clientName, dataReturnType, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -93,7 +78,6 @@ export function Mutation({
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const mutationArgParamsNode = createMutationArgParams(node, {
-    paramsCasing,
     resolver: tsResolver,
   })
   const hasMutationParams = mutationArgParamsNode.params.length > 0
@@ -106,9 +90,9 @@ export function Mutation({
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
 
   const clientCallParamsNode = createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver: tsResolver,
     extraParams: [
       ast.factory.createFunctionParameter({
@@ -120,7 +104,7 @@ export function Mutation({
   })
   const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
 
-  const paramsNode = buildMutationParamsNode(node, { paramsCasing, dataReturnType, resolver: tsResolver })
+  const paramsNode = buildMutationParamsNode(node, { dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

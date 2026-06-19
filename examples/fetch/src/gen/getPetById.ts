@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/fetch'
 import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
+function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/${petId}` as const }
 
   return res
@@ -18,12 +18,12 @@ function getGetPetByIdUrl(petId: GetPetByIdPathPetId) {
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
-    url: getGetPetByIdUrl(petId).url.toString(),
+    url: getGetPetByIdUrl({ petId }).url.toString(),
     ...requestConfig,
   })
 

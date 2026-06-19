@@ -16,9 +16,6 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
   initialPageParam: Infinite['initialPageParam']
@@ -31,15 +28,12 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildSuspenseInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-    paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
     pageParamGeneric: string
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver, pageParamGeneric } = options
+  const { resolver, pageParamGeneric } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   const optionsParam = ast.factory.createFunctionParameter({
@@ -52,9 +46,9 @@ function buildSuspenseInfiniteQueryParamsNode(
   })
 
   return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver,
     extraParams: [optionsParam],
   })
@@ -65,9 +59,6 @@ export function SuspenseInfiniteQuery({
   queryKeyTypeName,
   queryOptionsName,
   queryKeyName,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
   dataReturnType,
   node,
   tsResolver,
@@ -119,16 +110,13 @@ export function SuspenseInfiniteQuery({
     `TPageParam = ${pageParamType}`,
   ]
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
   const paramsNode = buildSuspenseInfiniteQueryParamsNode(node, {
-    paramsType,
-    paramsCasing,
-    pathParamsType,
     dataReturnType,
     resolver: tsResolver,
     pageParamGeneric: 'TPageParam',

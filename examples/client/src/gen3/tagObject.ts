@@ -44,7 +44,7 @@ getInventory.queryParams = {} as never
  * {@link /store/order}
  */
 export async function placeOrder(
-  data?: PlaceOrderData,
+  { data }: { data?: PlaceOrderData } = {},
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -79,7 +79,7 @@ placeOrder.queryParams = {} as never
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  data?: PlaceOrderPatchData,
+  { data }: { data?: PlaceOrderPatchData } = {},
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'

@@ -38,7 +38,7 @@ export class pet {
    * {@link /pet}
    */
   async updatePet(
-    data: UpdatePetData,
+    { data }: { data: UpdatePetData },
     config: Partial<RequestConfig<UpdatePetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -62,7 +62,7 @@ export class pet {
    * {@link /pet}
    */
   async addPet(
-    data: AddPetData,
+    { data }: { data: AddPetData },
     config: Partial<RequestConfig<AddPetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -85,7 +85,7 @@ export class pet {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-  async findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async findPetsByStatus({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
       ...requestConfig,
@@ -102,7 +102,7 @@ export class pet {
    * {@link /pet/findByTags}
    */
   async findPetsByTags(
-    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+    { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
@@ -135,8 +135,7 @@ export class pet {
    * {@link /pet/:petId}
    */
   async updatePetWithForm(
-    { petId }: { petId: UpdatePetWithFormPathPetId },
-    params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
+    { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
@@ -155,16 +154,16 @@ export class pet {
    * {@link /pet/:petId}
    */
   async deletePet(
-    { petId }: { petId: DeletePetPathPetId },
-    headers?: { api_key?: DeletePetHeaderApiKey },
+    { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
     config: Partial<RequestConfig> & { client?: Client } = {},
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
+    const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
     const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
       ...requestConfig,
       method: 'DELETE',
       url: `/pet/${petId}`,
-      headers: { ...headers, ...requestConfig.headers },
+      headers: { ...mappedHeaders, ...requestConfig.headers },
     })
     return res.data
   }
@@ -174,9 +173,7 @@ export class pet {
    * {@link /pet/:petId/uploadImage}
    */
   async uploadFile(
-    { petId }: { petId: UploadFilePathPetId },
-    data: UploadFileData,
-    params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+    { petId, data, params }: { petId: UploadFilePathPetId; data: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
     config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)

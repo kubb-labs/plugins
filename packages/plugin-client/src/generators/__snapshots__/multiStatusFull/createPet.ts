@@ -13,7 +13,7 @@ export function getCreatePetUrl() {
 /**
  * {@link /pet}
  */
-export async function createPet(data?: CreatePetData, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
+export async function createPet({ data }: { data?: CreatePetData } = {}, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = data

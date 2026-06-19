@@ -62,7 +62,7 @@ export function getServer() {
       inputSchema: {
         uuid: createPetsPathUuidSchema,
         data: createPetsDataSchema,
-        headers: z.object({ 'X-EXAMPLE': createPetsHeaderXEXAMPLESchema }),
+        headers: z.object({ xEXAMPLE: createPetsHeaderXEXAMPLESchema }),
         params: z.object({ offset: createPetsQueryOffsetSchema }),
       },
     },
@@ -103,10 +103,10 @@ export function getServer() {
       title: 'Finds Pets by status',
       description: 'Multiple status values can be provided with comma separated strings',
       outputSchema: { data: findPetsByStatusStatus200Schema },
-      inputSchema: { step_id: findPetsByStatusPathStepIdSchema },
+      inputSchema: { stepId: findPetsByStatusPathStepIdSchema },
     },
-    async ({ step_id }, request) => {
-      return findPetsByStatusHandler({ step_id }, request)
+    async ({ stepId }, request) => {
+      return findPetsByStatusHandler({ stepId }, request)
     },
   )
 
@@ -117,7 +117,7 @@ export function getServer() {
       description: 'Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.',
       outputSchema: { data: findPetsByTagsStatus200Schema },
       inputSchema: {
-        headers: z.object({ 'X-EXAMPLE': findPetsByTagsHeaderXEXAMPLESchema }),
+        headers: z.object({ xEXAMPLE: findPetsByTagsHeaderXEXAMPLESchema }),
         params: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
       },
     },
@@ -159,7 +159,7 @@ export function getServer() {
     {
       title: 'Deletes a pet',
       description: 'delete a pet',
-      inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ api_key: deletePetHeaderApiKeySchema }) },
+      inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ apiKey: deletePetHeaderApiKeySchema }) },
     },
     async ({ petId, headers }, request) => {
       return deletePetHandler({ petId, headers }, request)

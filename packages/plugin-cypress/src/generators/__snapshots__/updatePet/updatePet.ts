@@ -6,8 +6,7 @@
 import type { UpdatePetPathPetId, UpdatePetData, UpdatePetResponse } from './UpdatePet'
 
 export function updatePet(
-  petId: UpdatePetPathPetId,
-  data?: UpdatePetData,
+  { petId, data }: { petId: UpdatePetPathPetId; data?: UpdatePetData },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UpdatePetResponse> {
   return cy

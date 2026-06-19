@@ -1,7 +1,7 @@
 import type { FindPetsByStatusPathStepId, FindPetsByStatusResponse } from '../../models/ts/pet/FindPetsByStatus.ts'
 
 export function findPetsByStatus(
-  stepId: FindPetsByStatusPathStepId,
+  { stepId }: { stepId: FindPetsByStatusPathStepId },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByStatusResponse> {
   return cy

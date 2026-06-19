@@ -28,7 +28,7 @@ type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQu
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsSuspense(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -39,7 +39,7 @@ export async function findPetsByTagsSuspense(
 }
 
 export function findPetsByTagsSuspenseQueryOptions(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey(params)
@@ -51,7 +51,7 @@ export function findPetsByTagsSuspenseQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsSuspense(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByTagsSuspense({ params }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -63,7 +63,7 @@ export function useFindPetsByTagsSuspense<
   TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey,
 >(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   options: {
     query?: Partial<
       UseSuspenseQueryOptions<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, TData, TQueryKey>
@@ -77,7 +77,7 @@ export function useFindPetsByTagsSuspense<
 
   const query = useSuspenseQuery(
     {
-      ...findPetsByTagsSuspenseQueryOptions(params, config),
+      ...findPetsByTagsSuspenseQueryOptions({ params }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseSuspenseQueryOptions,

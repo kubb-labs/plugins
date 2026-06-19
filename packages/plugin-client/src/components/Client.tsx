@@ -30,9 +30,6 @@ type Props = {
 
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['pathParamsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   tsResolver: ResolverTs
@@ -41,9 +38,6 @@ type Props = {
 }
 
 type GetParamsProps = {
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['paramsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
   tsResolver: ResolverTs
   isConfigurable: boolean
@@ -51,18 +45,11 @@ type GetParamsProps = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function buildClientParamsNode({
-  paramsType,
-  paramsCasing,
-  pathParamsType,
-  node,
-  tsResolver,
-  isConfigurable,
-}: GetParamsProps): ast.FunctionParametersNode {
+export function buildClientParamsNode({ node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
   return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver: tsResolver,
     extraParams: [
       ...(isConfigurable
@@ -86,9 +73,6 @@ export function Client({
   baseURL,
   dataReturnType,
   parser,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
   node,
   tsResolver,
   zodResolver,
@@ -102,11 +86,11 @@ export function Client({
   const responseType = getResponseType(node)
 
   const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
-  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing })
+  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
-  const pathParamsMapping = paramsCasing && !urlName ? buildParamsMapping(originalPathParams, casedPathParams) : null
-  const queryParamsMapping = paramsCasing ? buildParamsMapping(originalQueryParams, casedQueryParams) : null
-  const headerParamsMapping = paramsCasing ? buildParamsMapping(originalHeaderParams, casedHeaderParams) : null
+  const pathParamsMapping = !urlName ? buildParamsMapping(originalPathParams, casedPathParams) : null
+  const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
+  const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)
 
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const successNames = resolveSuccessNames(node, tsResolver)
@@ -142,9 +126,6 @@ export function Client({
   const requestGenericType = parser === 'zod' && zodRequestName ? `z.input<typeof ${zodRequestName}>` : requestName || 'unknown'
   const generics = [genericsResponseName, TError, requestGenericType].filter(Boolean)
   const paramsNode = buildClientParamsNode({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
     node,
     tsResolver,
     isConfigurable,
@@ -152,9 +133,6 @@ export function Client({
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   const urlParamsNode = buildUrlParamsNode({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
     node,
     tsResolver,
   })

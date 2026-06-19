@@ -23,19 +23,16 @@ type Props = {
   resolver: ResolverTs
   baseURL: string | null | undefined
   dataReturnType: PluginCypress['resolvedOptions']['dataReturnType']
-  paramsCasing: PluginCypress['resolvedOptions']['paramsCasing']
-  paramsType: PluginCypress['resolvedOptions']['paramsType']
-  pathParamsType: PluginCypress['resolvedOptions']['pathParamsType']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function Request({ baseURL = '', name, dataReturnType, resolver, node, paramsType, pathParamsType, paramsCasing }: Props): KubbReactNode {
+export function Request({ baseURL = '', name, dataReturnType, resolver, node }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
   const paramsNode = createOperationParams(node, {
-    paramsType,
-    pathParamsType,
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver,
     extraParams: [
       ast.factory.createFunctionParameter({
@@ -50,7 +47,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
   const responseType = resolver.resolveResponseName(node)
   const returnType = dataReturnType === 'data' ? `Cypress.Chainable<${responseType}>` : `Cypress.Chainable<Cypress.Response<${responseType}>>`
 
-  const casedPathParams = getOperationParameters(node, { paramsCasing }).path
+  const casedPathParams = getOperationParameters(node, { paramsCasing: 'camelcase' }).path
   // Build a lookup keyed by camelCase-normalized name so that path-template names
   // (e.g. `{pet_id}`) correctly resolve to the function-parameter name (`petId`)
   // even when the OpenAPI spec has inconsistent casing between the two.
@@ -59,14 +56,14 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
   const urlTemplate = Url.toTemplateString(node.path, {
     prefix: baseURL,
     replacer: (param) => pathParamNameMap.get(camelCase(param)) ?? param,
-    casing: paramsCasing,
+    casing: 'camelcase',
   })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
   const queryParams = getOperationParameters(node).query
   if (queryParams.length > 0) {
-    const casedQueryParams = getOperationParameters(node, { paramsCasing }).query
+    const casedQueryParams = getOperationParameters(node, { paramsCasing: 'camelcase' }).query
     // When paramsCasing renames query params (e.g. page_size → pageSize), we must remap
     // the camelCase keys back to the original API names before passing them to `qs`.
     const needsQsTransform = casedQueryParams.some((p, i) => p.name !== queryParams[i]!.name)
@@ -80,7 +77,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node, pa
 
   const headerParams = getOperationParameters(node).header
   if (headerParams.length > 0) {
-    const casedHeaderParams = getOperationParameters(node, { paramsCasing }).header
+    const casedHeaderParams = getOperationParameters(node, { paramsCasing: 'camelcase' }).header
     // When paramsCasing renames header params (e.g. x-api-key → xApiKey), we must remap
     // the camelCase keys back to the original API names before passing them to `headers`.
     const needsHeaderTransform = casedHeaderParams.some((p, i) => p.name !== headerParams[i]!.name)

@@ -17,7 +17,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function placeOrder({ data }: { data?: PlaceOrderData } = {}, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
@@ -42,7 +42,7 @@ export function usePlaceOrder<TContext>(options: {
 
   return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, {data?: PlaceOrderData}, TContext>({
     mutationFn: async({ data }) => {
-      return placeOrder(data, config)
+      return placeOrder({ data }, config)
     },
     mutationKey,
     ...mutationOptions

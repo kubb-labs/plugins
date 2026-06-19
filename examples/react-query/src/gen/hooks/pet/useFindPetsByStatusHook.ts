@@ -20,7 +20,10 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatusHook(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByStatusHook(
+  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
@@ -33,12 +36,15 @@ export async function findPetsByStatusHook(params?: { status?: FindPetsByStatusQ
   return res.data
 }
 
-export function findPetsByStatusQueryOptionsHook(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptionsHook(
+  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
+  config: Partial<RequestConfig> & { client?: Client } = {},
+) {
   const queryKey = findPetsByStatusQueryKey(params)
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatusHook(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByStatusHook({ params }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -53,7 +59,7 @@ export function useFindPetsByStatusHook<
   TQueryData = FindPetsByStatusStatus200,
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
-  params?: { status?: FindPetsByStatusQueryStatus },
+  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
   options: {
     query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -68,7 +74,7 @@ export function useFindPetsByStatusHook<
 
   const query = useQuery(
     {
-      ...findPetsByStatusQueryOptionsHook(params, config),
+      ...findPetsByStatusQueryOptionsHook({ params }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,

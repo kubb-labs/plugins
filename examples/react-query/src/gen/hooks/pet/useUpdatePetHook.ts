@@ -18,7 +18,7 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export async function updatePetHook(
-  data: UpdatePetData,
+  { data }: { data: UpdatePetData },
   config: Partial<RequestConfig<UpdatePetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -54,7 +54,7 @@ export function updatePetMutationOptionsHook<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async ({ data }) => {
-      return updatePetHook(data, config)
+      return updatePetHook({ data }, config)
     },
   })
 }

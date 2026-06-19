@@ -7,8 +7,13 @@ import type {
 } from '../../models/ts/pet/FindPetsByTags.ts'
 
 export function findPetsByTags(
-  headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE },
-  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  {
+    headers,
+    params,
+  }: {
+    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
+    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
+  },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByTagsResponse> {
   return cy

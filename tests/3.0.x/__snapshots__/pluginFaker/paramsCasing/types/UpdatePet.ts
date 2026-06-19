@@ -40,14 +40,14 @@ export type UpdatePetRequestConfig = {
      * @type object | undefined
     */
     path?: {
-        pet_id: UpdatePetPathPetId;
+        petId: UpdatePetPathPetId;
     };
     /**
      * @type object | undefined
     */
     query?: {
-        include_deleted?: UpdatePetQueryIncludeDeleted;
-        request_source?: UpdatePetQueryRequestSource;
+        includeDeleted?: UpdatePetQueryIncludeDeleted;
+        requestSource?: UpdatePetQueryRequestSource;
     };
     headers?: never;
     /**

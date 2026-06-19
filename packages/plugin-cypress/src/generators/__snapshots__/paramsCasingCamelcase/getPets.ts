@@ -5,7 +5,10 @@
 
 import type { GetPetsResponse } from './GetPets'
 
-export function getPets(params?: { pageSize?: GetPetsQueryPageSize }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
+export function getPets(
+  { params }: { params?: { pageSize?: GetPetsQueryPageSize } } = {},
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<GetPetsResponse> {
   return cy
     .request<GetPetsResponse>({
       method: 'GET',

@@ -15,7 +15,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
+    const { output, query, mutation, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -47,7 +47,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
     }
 
     const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
-      paramsCasing,
+      paramsCasing: 'camelcase',
       exclude: [queryKeyTypeName],
       order: 'body-response-first',
     })
@@ -111,24 +111,13 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <QueryKey
-          name={queryKeyName}
-          typeName={queryKeyTypeName}
-          node={node}
-          tsResolver={tsResolver}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          transformer={ctx.options.queryKey}
-        />
+        <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 
         {!shouldUseClientPlugin && (
           <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
             dataReturnType={clientOptions.dataReturnType || 'data'}
-            paramsCasing={clientOptions.paramsCasing || paramsCasing}
-            paramsType={paramsType}
-            pathParamsType={pathParamsType}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -136,15 +125,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           />
         )}
 
-        <QueryOptions
-          name={queryOptionsName}
-          clientName={resolvedClientName}
-          node={node}
-          tsResolver={tsResolver}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          pathParamsType={pathParamsType}
-        />
+        <QueryOptions name={queryOptionsName} clientName={resolvedClientName} node={node} tsResolver={tsResolver} />
 
         {query && (
           <>
@@ -157,9 +138,6 @@ export const queryGenerator = defineGenerator<PluginSwr>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
-              paramsCasing={paramsCasing}
-              paramsType={paramsType}
-              pathParamsType={pathParamsType}
               dataReturnType={clientOptions.dataReturnType || 'data'}
             />
           </>

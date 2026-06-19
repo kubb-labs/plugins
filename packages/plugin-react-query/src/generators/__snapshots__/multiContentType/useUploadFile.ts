@@ -18,8 +18,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  petId: UploadFilePathPetId,
-  data?: UploadFileData,
+  { petId, data }: { petId: UploadFilePathPetId; data?: UploadFileData },
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
@@ -45,7 +44,7 @@ export function uploadFileMutationOptions<TContext = unknown>(
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext>({
     mutationKey,
     mutationFn: async ({ petId, data }) => {
-      return uploadFile(petId, data, config)
+      return uploadFile({ petId, data }, config)
     },
   })
 }

@@ -28,7 +28,7 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
  * {@link /pet/findByTags}
  */
 export async function findPetsByTags(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -39,7 +39,7 @@ export async function findPetsByTags(
 }
 
 export function findPetsByTagsQueryOptions(
-  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
@@ -52,7 +52,7 @@ export function findPetsByTagsQueryOptions(
     enabled: !!params,
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags(params!, { ...config, signal: config.signal ?? signal })
+      return findPetsByTags({ params: params! }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -65,7 +65,7 @@ export function useFindPetsByTags<
   TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus; pageSize?: FindPetsByTagsQueryPageSize } } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>
@@ -79,7 +79,7 @@ export function useFindPetsByTags<
 
   const query = useQuery(
     {
-      ...findPetsByTagsQueryOptions(params, config),
+      ...findPetsByTagsQueryOptions({ params }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,

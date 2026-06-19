@@ -6,7 +6,6 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { PluginClient } from '../types.ts'
 
 type Props = {
   name: string
@@ -14,24 +13,18 @@ type Props = {
   isIndexable?: boolean
 
   baseURL: string | null | undefined
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['pathParamsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
   tsResolver: ResolverTs
 }
 
 type GetParamsProps = {
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['paramsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
   tsResolver: ResolverTs
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
+export function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
   // Build a URL-only node with only path params (no body, query, header)
   const urlNode: ast.OperationNode = {
     ...node,
@@ -40,38 +33,25 @@ export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, n
   }
 
   return createOperationParams(urlNode, {
-    paramsType: paramsType === 'object' ? 'object' : 'inline',
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver: tsResolver,
   })
 }
 
-export function Url({
-  name,
-  isExportable = true,
-  isIndexable = true,
-  baseURL,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
-  node,
-  tsResolver,
-}: Props): KubbReactNode {
+export function Url({ name, isExportable = true, isIndexable = true, baseURL, node, tsResolver }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const paramsNode = buildUrlParamsNode({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
     node,
     tsResolver,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   const { path: originalPathParams } = getOperationParameters(node)
-  const { path: casedPathParams } = getOperationParameters(node, { paramsCasing })
-  const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : null
+  const { path: casedPathParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const pathParamsMapping = buildParamsMapping(originalPathParams, casedPathParams)
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>

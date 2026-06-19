@@ -20,7 +20,7 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ data }: { data: AddPetData }, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = addPetDataSchema.parse(data)
@@ -48,7 +48,7 @@ export function useAddPet(options: {
   return useSWRMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { data } }) => {
-      return addPet(data, config)
+      return addPet({ data }, config)
     },
     mutationOptions
   )

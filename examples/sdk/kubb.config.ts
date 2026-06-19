@@ -31,7 +31,6 @@ export default defineConfig({
       client: 'fetch',
       importPath: '@kubb/plugin-client/clients/fetch',
       group: { type: 'tag' },
-      pathParamsType: 'object',
       sdk: { className: 'PetStoreSDK' },
     }),
   ],

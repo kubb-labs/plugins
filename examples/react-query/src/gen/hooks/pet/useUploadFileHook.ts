@@ -17,9 +17,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFileHook(
-  { petId }: { petId: UploadFilePathPetId },
-  data?: UploadFileData,
-  params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  { petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } },
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -48,7 +46,7 @@ export function uploadFileMutationOptionsHook<TContext = unknown>(config: Partia
   >({
     mutationKey,
     mutationFn: async ({ petId, data, params }) => {
-      return uploadFileHook({ petId }, data, params, config)
+      return uploadFileHook({ petId, data, params }, config)
     },
   })
 }

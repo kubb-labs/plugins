@@ -1,8 +1,7 @@
 import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse } from '../../models/ts/pet/DeletePet.ts'
 
 export function deletePet(
-  petId: DeletePetPathPetId,
-  headers?: { apiKey?: DeletePetHeaderApiKey },
+  { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<DeletePetResponse> {
   return cy

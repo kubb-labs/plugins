@@ -18,7 +18,7 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByStatus({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, params, ...requestConfig })
@@ -26,10 +26,10 @@ export async function findPetsByStatus(params?: { status?: FindPetsByStatusQuery
   return res.data
 }
 
-export function findPetsByStatusQueryOptions(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return findPetsByStatus(params, config)
+      return findPetsByStatus({ params }, config)
     },
   }
 }
@@ -39,7 +39,7 @@ export function findPetsByStatusQueryOptions(params?: { status?: FindPetsByStatu
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, options: {
+export function useFindPetsByStatus({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, options: {
   query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
@@ -52,7 +52,7 @@ export function useFindPetsByStatus(params?: { status?: FindPetsByStatusQuerySta
   return useSWR<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
-     ...findPetsByStatusQueryOptions(params, config),
+     ...findPetsByStatusQueryOptions({ params }, config),
      ...(immutable ? {
          revalidateIfStale: false,
          revalidateOnFocus: false,

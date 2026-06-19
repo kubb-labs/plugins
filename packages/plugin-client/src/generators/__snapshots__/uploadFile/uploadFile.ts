@@ -5,7 +5,7 @@ import type { UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from '.
 import { client } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
 
-export function getUploadFileUrl(petId: UploadFilePathPetId) {
+export function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
   const res = { method: 'POST', url: `/pet/${petId}/uploadImage` as const }
 
   return res
@@ -14,7 +14,10 @@ export function getUploadFileUrl(petId: UploadFilePathPetId) {
 /**
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileData, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile(
+  { petId, data }: { petId: UploadFilePathPetId; data?: UploadFileData },
+  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
+) {
   const { client: request = client, ...requestConfig } = config
 
   const requestData = data
@@ -22,7 +25,7 @@ export async function uploadFile(petId: UploadFilePathPetId, data?: UploadFileDa
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
-    url: getUploadFileUrl(petId).url.toString(),
+    url: getUploadFileUrl({ petId }).url.toString(),
     data: formData as FormData,
     ...requestConfig,
   })

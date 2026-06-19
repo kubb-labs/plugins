@@ -52,7 +52,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     exclude = [],
     include,
     override = [],
-    paramsCasing,
     client,
     resolver: userResolver,
     macros: userMacros,
@@ -78,14 +77,12 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           include,
           override,
           group: groupConfig,
-          paramsCasing,
           client: {
             client: clientName,
             clientType: client?.clientType ?? 'function',
             importPath: clientImportPath,
             dataReturnType: client?.dataReturnType ?? 'data',
             baseURL: client?.baseURL,
-            paramsCasing: client?.paramsCasing,
           },
           resolver,
         })

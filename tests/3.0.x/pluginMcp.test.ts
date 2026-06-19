@@ -56,7 +56,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginMcp({
           output: { path: './mcp', barrel: false },
           client: { importPath: '@kubb/plugin-client/clients/axios' },
-          paramsCasing: 'camelcase',
         }),
       ],
     },

@@ -36,15 +36,15 @@ export type GetPetByIdStatus404 = any
  * @type object
  */
 export type GetPetByIdRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
-    pet_id: GetPetByIdPathPetId
+  path?: {
+    petId: GetPetByIdPathPetId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

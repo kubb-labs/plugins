@@ -27,7 +27,7 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsHook(
-  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -43,7 +43,7 @@ export async function findPetsByTagsHook(
 }
 
 export function findPetsByTagsQueryOptionsHook(
-  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey(params)
@@ -55,7 +55,7 @@ export function findPetsByTagsQueryOptionsHook(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsHook(params, { ...config, signal: config.signal ?? signal })
+      return findPetsByTagsHook({ params }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -70,7 +70,7 @@ export function useFindPetsByTagsHook<
   TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
   options: {
     query?: Partial<
       QueryObserverOptions<
@@ -91,7 +91,7 @@ export function useFindPetsByTagsHook<
 
   const query = useQuery(
     {
-      ...findPetsByTagsQueryOptionsHook(params, config),
+      ...findPetsByTagsQueryOptionsHook({ params }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,

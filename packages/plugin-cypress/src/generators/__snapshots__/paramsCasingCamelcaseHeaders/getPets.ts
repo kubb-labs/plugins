@@ -6,8 +6,7 @@
 import type { GetPetsResponse } from './GetPets'
 
 export function getPets(
-  headers: { xApiKey: GetPetsHeaderXApiKey },
-  params?: { pageSize?: GetPetsQueryPageSize },
+  { headers, params }: { headers: { xApiKey: GetPetsHeaderXApiKey }; params?: { pageSize?: GetPetsQueryPageSize } },
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<GetPetsResponse> {
   return cy

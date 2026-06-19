@@ -110,8 +110,6 @@ export const config = {
         importPath: '../../../useCustomHookOptions.ts',
         name: 'useCustomHookOptions',
       },
-      paramsType: 'inline',
-      pathParamsType: 'object',
       suspense: {},
       override: [
         {
@@ -148,7 +146,6 @@ export const config = {
               importPath: '@tanstack/react-query',
               methods: ['put', 'delete'],
             },
-            pathParamsType: 'inline',
           },
         },
       ],

@@ -16,9 +16,6 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-  paramsType: PluginSwr['resolvedOptions']['paramsType']
-  pathParamsType: PluginSwr['resolvedOptions']['pathParamsType']
   dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
 }
 
@@ -28,14 +25,11 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsType: PluginSwr['resolvedOptions']['paramsType']
-    paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginSwr['resolvedOptions']['pathParamsType']
     dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
+  const { dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
@@ -55,26 +49,15 @@ function buildQueryParamsNode(
   })
 
   return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
+    paramsType: 'object',
+    pathParamsType: 'object',
+    paramsCasing: 'camelcase',
     resolver,
     extraParams: [optionsParam],
   })
 }
 
-export function Query({
-  name,
-  queryKeyTypeName,
-  queryOptionsName,
-  queryKeyName,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
-  dataReturnType,
-  node,
-  tsResolver,
-}: Props): KubbReactNode {
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver }: Props): KubbReactNode {
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
@@ -82,17 +65,14 @@ export function Query({
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   const generics = [TData, TError, `${queryKeyTypeName} | null`]
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
   const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = markParamsOptional(
-    buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver }),
-    enabledNames,
-  )
+  const paramsNode = markParamsOptional(buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver }), enabledNames)
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   // SWR has no `enabled` option; fold the param-presence check into the null-key gate

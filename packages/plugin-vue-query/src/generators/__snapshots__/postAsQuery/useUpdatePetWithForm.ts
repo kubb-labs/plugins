@@ -19,7 +19,7 @@ import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
 export const updatePetWithFormQueryKey = (
-  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
+  { petId }: { petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId> } = {},
   data?: MaybeRefOrGetter<UpdatePetWithFormData>,
   params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
 ) => [{ url: '/pet/:petId', params: { petId: petId } }, ...(params ? [params] : []), ...(data ? [data] : [])] as const
@@ -30,9 +30,7 @@ export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQuery
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId,
-  data?: UpdatePetWithFormData,
-  params?: { status?: UpdatePetWithFormQueryStatus },
+  { petId, data, params }: { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData; params?: { status?: UpdatePetWithFormQueryStatus } },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -51,17 +49,23 @@ export async function updatePetWithForm(
 }
 
 export function updatePetWithFormQueryOptions(
-  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
-  data?: MaybeRefOrGetter<UpdatePetWithFormData>,
-  params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
+  {
+    petId,
+    data,
+    params,
+  }: {
+    petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>
+    data?: MaybeRefOrGetter<UpdatePetWithFormData>
+    params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>
+  } = {},
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
-  const queryKey = updatePetWithFormQueryKey(petId, data, params)
+  const queryKey = updatePetWithFormQueryKey({ petId }, data, params)
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
     enabled: () => !!toValue(petId),
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithForm(toValue(petId!), toValue(data), toValue(params), { ...config, signal: config.signal ?? signal })
+      return updatePetWithForm({ petId: toValue(petId!), data: toValue(data), params: toValue(params) }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -74,9 +78,15 @@ export function useUpdatePetWithForm<
   TQueryData = UpdatePetWithFormStatus200,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>,
-  data?: MaybeRefOrGetter<UpdatePetWithFormData>,
-  params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>,
+  {
+    petId,
+    data,
+    params,
+  }: {
+    petId?: MaybeRefOrGetter<UpdatePetWithFormPathPetId>
+    data?: MaybeRefOrGetter<UpdatePetWithFormData>
+    params?: MaybeRefOrGetter<{ status?: UpdatePetWithFormQueryStatus }>
+  } = {},
   options: {
     query?: Partial<UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client }
@@ -85,11 +95,11 @@ export function useUpdatePetWithForm<
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey =
-    (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? updatePetWithFormQueryKey(petId, data, params)
+    (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? updatePetWithFormQueryKey({ petId }, data, params)
 
   const query = useQuery(
     {
-      ...updatePetWithFormQueryOptions(petId, data, params, config),
+      ...updatePetWithFormQueryOptions({ petId, data, params }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, UpdatePetWithFormStatus200, TQueryKey>,

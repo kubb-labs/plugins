@@ -13,7 +13,7 @@ function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Pa
     useDeletePetHook: {
       onSuccess: (_data, variables, _onMutateResult, _context) => {
         // Invalidate queries using the provided variables
-        void queryClient.invalidateQueries({ queryKey: ['pet', variables.pet_id] })
+        void queryClient.invalidateQueries({ queryKey: ['pet', variables.petId] })
       },
     },
     useDeleteOrderHook: {

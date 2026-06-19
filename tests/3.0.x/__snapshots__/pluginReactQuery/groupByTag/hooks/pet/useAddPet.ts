@@ -16,7 +16,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ data }: { data: AddPetData }, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestData = data
@@ -31,7 +31,7 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
     mutationKey,
     mutationFn: async({ data }) => {
-      return addPet(data, config)
+      return addPet({ data }, config)
     },
   })
 }

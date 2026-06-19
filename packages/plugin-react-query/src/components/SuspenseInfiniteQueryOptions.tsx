@@ -15,9 +15,6 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
@@ -38,10 +35,7 @@ export function SuspenseInfiniteQueryOptions({
   previousParam,
   node,
   tsResolver,
-  paramsCasing,
-  paramsType,
   dataReturnType,
-  pathParamsType,
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
@@ -79,12 +73,12 @@ export function SuspenseInfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const paramsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
   const hasNewParams = nextParam != null || previousParam != null

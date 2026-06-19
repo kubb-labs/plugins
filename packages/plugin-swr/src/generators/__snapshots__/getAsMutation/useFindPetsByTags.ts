@@ -17,7 +17,7 @@ export type FindPetsByTagsMutationKey = ReturnType<typeof findPetsByTagsMutation
  * {@link /pet/findByTags}
  */
 export async function findPetsByTags(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -47,7 +47,7 @@ export function useFindPetsByTags(
   return useSWRMutation<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { params } }) => {
-      return findPetsByTags(params, config)
+      return findPetsByTags({ params }, config)
     },
     mutationOptions,
   )

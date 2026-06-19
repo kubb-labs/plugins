@@ -31,15 +31,15 @@ export type FindPetsByStatusStatus400 = any
  * @type object
  */
 export type FindPetsByStatusRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
-    step_id: FindPetsByStatusPathStepId
+  path?: {
+    stepId: FindPetsByStatusPathStepId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

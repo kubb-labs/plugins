@@ -247,13 +247,6 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
-   * Rename properties inside `PathParams`, `QueryParams`, and `HeaderParams` types.
-   * Response and request body types are not affected.
-   *
-   * @note Every plugin that touches operation parameters must use the same value.
-   */
-  paramsCasing?: 'camelcase'
-  /**
    * Custom generators that run alongside the built-in TypeScript generators.
    */
   generators?: Array<Generator<PluginTs>>
@@ -326,7 +319,6 @@ type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
-  paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
 

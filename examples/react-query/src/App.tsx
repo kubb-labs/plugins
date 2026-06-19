@@ -7,13 +7,13 @@ const queryClient = new QueryClient()
 
 function Pets() {
   const [status, setStatus] = useState<FindPetsByStatusQueryStatus>('available')
-  const { data: pets, queryKey } = useFindPetsByStatusHook({ status }, { query: { enabled: true } })
-  const { data } = useUpdatePetWithFormHook(2)
+  const { data: pets, queryKey } = useFindPetsByStatusHook({ params: { status } }, { query: { enabled: true } })
+  const { data } = useUpdatePetWithFormHook({ petId: 2 })
   const { queryKey: _queryKey, initialData } = findPetsByStatusQueryOptionsHook()
   const statuses: Array<FindPetsByStatusQueryStatus> = ['available', 'pending']
 
   const queries = useQueries({
-    queries: statuses.map((status) => findPetsByStatusQueryOptionsHook({ status })),
+    queries: statuses.map((status) => findPetsByStatusQueryOptionsHook({ params: { status } })),
   })
 
   console.log(data)
@@ -35,7 +35,7 @@ function Pets() {
   //            ^?
 
   const { data: firstPet, queryKey: firstQueryKey } = useFindPetsByStatusHook(
-    { status: 'available' },
+    { params: { status: 'available' } },
     {
       query: {
         queryKey: ['test'] as const,

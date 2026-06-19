@@ -13,7 +13,7 @@ import type {
 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getUpdatePetWithFormUrl(petId: UpdatePetWithFormPathPetId) {
+function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}` as const }
 
   return res
@@ -24,15 +24,14 @@ function getUpdatePetWithFormUrl(petId: UpdatePetWithFormPathPetId) {
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId,
-  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
+  { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
-    url: getUpdatePetWithFormUrl(petId).url.toString(),
+    url: getUpdatePetWithFormUrl({ petId }).url.toString(),
     params,
     ...requestConfig,
   })
