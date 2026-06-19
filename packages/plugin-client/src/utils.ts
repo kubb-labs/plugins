@@ -1,9 +1,64 @@
-import { buildStatusUnionType, getOperationParameters, getResponseType, resolveSuccessNames } from '@internals/shared'
+import {
+  buildOperationComments,
+  buildParamsMapping,
+  buildRequestParamsSignature,
+  buildStatusUnionType,
+  getContentTypeInfo,
+  getOperationParameters,
+  getResponseType,
+  resolveSuccessNames,
+} from '@internals/shared'
+import { Url } from '@internals/utils'
+import { buildJSDoc, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import { createFunctionParams } from './functionParams.ts'
+import { createFunctionParams, type ParamLeaf } from './functionParams.ts'
 import type { PluginClient } from './types.ts'
+
+/**
+ * Resolves the `query` entry for a client call: the parsed `requestParams` when zod validates the
+ * query, the remapped `mappedParams` when casing renames the wire keys, otherwise the plain `query`
+ * binding. Returns `null` when the operation carries no query parameters.
+ */
+export function buildQueryParamDescriptor({
+  queryParamsName,
+  zodQueryParamsName,
+  queryParamsMapping,
+}: {
+  queryParamsName: string | null
+  zodQueryParamsName?: string | null
+  queryParamsMapping?: Record<string, string> | null
+}): ParamLeaf | null {
+  if (!queryParamsName) return null
+  if (zodQueryParamsName) return { value: 'requestParams' }
+  if (queryParamsMapping) return { value: 'mappedParams' }
+  return {}
+}
+
+/**
+ * Resolves the `body` entry for a client call: the multipart `FormData` branch when several content
+ * types include form data, the single `FormData` cast for a form-data-only operation, otherwise the
+ * parsed `requestBody`. Returns `null` when the operation has no request body.
+ */
+export function buildBodyParamDescriptor({
+  requestName,
+  isFormData,
+  isMultipleContentTypes,
+  hasFormData,
+}: {
+  requestName: string | null
+  isFormData: boolean
+  isMultipleContentTypes: boolean
+  hasFormData: boolean
+}): ParamLeaf | null {
+  if (!requestName) return null
+  if (isMultipleContentTypes && hasFormData) {
+    return { value: "contentType === 'multipart/form-data' ? formData as FormData : requestBody" }
+  }
+  if (isFormData) return { value: 'formData as FormData' }
+  return { value: 'requestBody' }
+}
 
 type ParserOption = PluginClient['resolvedOptions']['parser']
 
@@ -150,17 +205,8 @@ export function buildClassClientParams({
               value: JSON.stringify(baseURL),
             }
           : null,
-        query: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
-        body: requestName
-          ? {
-              value:
-                isMultipleContentTypes && hasFormData
-                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestBody"
-                  : isFormData
-                    ? 'formData as FormData'
-                    : 'requestBody',
-            }
-          : null,
+        query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
+        body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
         contentType: isMultipleContentTypes ? {} : null,
         responseType: responseType ? { value: JSON.stringify(responseType) } : null,
         headers: headers.length
@@ -225,6 +271,98 @@ export function buildQueryParamsLine({
  */
 export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): string {
   return isFormData && hasRequest ? 'const formData = buildFormData(requestBody)' : ''
+}
+
+/**
+ * Builds a single client method for a generated client class. The body is identical for instance
+ * and static methods, so `isStatic` only switches the method header (`static async` vs `async`),
+ * keeping `ClassClient` and `StaticClassClient` from duplicating the whole builder.
+ */
+export function buildClassMethod({
+  node,
+  name,
+  tsResolver,
+  zodResolver,
+  baseURL,
+  dataReturnType,
+  parser,
+  isStatic,
+}: {
+  node: ast.OperationNode
+  name: string
+  tsResolver: ResolverTs
+  zodResolver?: ResolverZod | null
+  baseURL: string | null | undefined
+  dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
+  parser: PluginClient['resolvedOptions']['parser'] | undefined
+  isStatic: boolean
+}): string {
+  if (!ast.isHttpOperationNode(node)) return ''
+  const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
+  const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
+  const { query: queryParams, header: headerParams } = getOperationParameters(node)
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+
+  const queryParamsMapping = buildParamsMapping(queryParams, casedQueryParams)
+  const headerParamsMapping = buildParamsMapping(headerParams, casedHeaderParams)
+
+  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
+  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
+  const headerSpread = headerParamsMapping ? '...mappedHeaders' : '...headers'
+  const headers = isMultipleContentTypes ? (headerParamsName ? [headerSpread] : []) : buildHeaders(contentType, !!headerParamsName, headerSpread)
+  const generics = buildGenerics(node, tsResolver, { dataReturnType, zodResolver, parser })
+  const { signature: paramsSignature } = buildRequestParamsSignature(node, tsResolver, { isConfigurable: true })
+  const zodQueryParamsName =
+    zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
+  const clientParams = buildClassClientParams({
+    node,
+    url: Url.toGroupedTemplateString(node.path),
+    baseURL,
+    tsResolver,
+    isFormData,
+    isMultipleContentTypes,
+    hasFormData,
+    headers,
+    zodQueryParamsName,
+    queryParamsMapping,
+  })
+  const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
+
+  const mappedParamsLine =
+    queryParamsMapping && queryParamsName
+      ? `const mappedParams = query ? { ${Object.entries(queryParamsMapping)
+          .map(([originalName, camelCaseName]) => `"${originalName}": query.${camelCaseName}`)
+          .join(', ')} } : undefined`
+      : ''
+  const mappedHeadersLine =
+    headerParamsMapping && headerParamsName
+      ? `const mappedHeaders = headers ? { ${Object.entries(headerParamsMapping)
+          .map(([originalName, camelCaseName]) => `"${originalName}": headers.${camelCaseName}`)
+          .join(', ')} } : undefined`
+      : ''
+
+  const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
+  const queryParamsLine = buildQueryParamsLine({ parser, node, zodResolver })
+  const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
+  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver, tsResolver })
+
+  const methodBody = [
+    `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
+    '',
+    mappedParamsLine,
+    mappedHeadersLine,
+    requestDataLine,
+    queryParamsLine,
+    formDataLine,
+    `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`,
+    returnStatement,
+  ]
+    .filter(Boolean)
+    .map((line) => `    ${line}`)
+    .join('\n')
+
+  const header = isStatic ? '  static async ' : 'async '
+  return `${jsdoc}${header}${name}(${paramsSignature}) {\n${methodBody}\n  }`
 }
 
 /**

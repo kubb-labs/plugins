@@ -4,12 +4,12 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { z } from 'zod'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
-function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
   const res = { method: 'POST', url: `/pet/${path.petId}/uploadImage` as const }
 
   return res

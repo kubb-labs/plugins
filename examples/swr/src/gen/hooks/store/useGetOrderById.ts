@@ -15,7 +15,7 @@ import type {
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
@@ -63,7 +63,7 @@ export function useGetOrderById(
   const queryKey = getOrderByIdQueryKey({ path })
 
   return useSWR<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
-    shouldFetch && !!path ? queryKey : null,
+    shouldFetch ? queryKey : null,
     {
       ...getOrderByIdQueryOptions({ path }, config),
       ...(immutable

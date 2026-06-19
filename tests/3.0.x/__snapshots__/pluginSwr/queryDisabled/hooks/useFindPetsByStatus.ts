@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 

@@ -1,10 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetItemRequestConfig, GetItemPathItemId, GetItemStatus200 } from './GetItem'
+import type { GetItemRequestConfig, GetItemStatus200 } from './GetItem'
 import { client } from './.kubb/client'
 
-export function getGetItemUrl(path: { itemId: GetItemPathItemId }) {
+export function getGetItemUrl(path: GetItemRequestConfig['path']) {
   const res = { method: 'GET', url: `/v1/items/${path.itemId}` as const }
 
   return res

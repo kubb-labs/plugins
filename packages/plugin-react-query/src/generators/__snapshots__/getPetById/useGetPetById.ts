@@ -10,7 +10,7 @@ import { client } from './.kubb/client'
 import { GetPetByIdResponse } from './GetPetById'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -32,7 +32,6 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
 export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ path }, { ...config, signal: config.signal ?? signal })

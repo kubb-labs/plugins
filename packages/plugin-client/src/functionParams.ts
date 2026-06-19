@@ -1,7 +1,7 @@
 import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 
-type ParamLeaf = {
+export type ParamLeaf = {
   type?: string
   optional?: boolean
   default?: string

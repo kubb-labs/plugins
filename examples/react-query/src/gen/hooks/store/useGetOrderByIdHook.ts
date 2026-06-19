@@ -10,7 +10,8 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) => ['v5', { url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>) =>
+  ['v5', { url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
@@ -34,7 +35,6 @@ export async function getOrderByIdHook({ path }: Omit<GetOrderByIdRequestConfig,
 export function getOrderByIdQueryOptionsHook({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getOrderByIdQueryKey({ path })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderByIdHook({ path }, { ...config, signal: config.signal ?? signal })

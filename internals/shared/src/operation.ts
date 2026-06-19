@@ -207,6 +207,39 @@ export function getRequestGroups(node: ast.OperationNode): RequestGroups {
   }
 }
 
+export type RequestGroupOptionality = {
+  groups: RequestGroups
+  hasRequiredPath: boolean
+  hasRequiredQuery: boolean
+  hasRequiredHeader: boolean
+  /**
+   * Whether the grouped request parameter can default to `{}`. True only when no group carries a
+   * required member, so every member is safe to omit.
+   */
+  isOptional: boolean
+}
+
+/**
+ * Resolves which grouped request options an operation carries together with whether each group
+ * holds a required member. The grouped parameter stays optional only when nothing inside it is
+ * required, matching the generated `RequestConfig` type.
+ */
+export function getRequestGroupOptionality(node: ast.OperationNode): RequestGroupOptionality {
+  const groups = getRequestGroups(node)
+  const { path, query, header } = getOperationParameters(node)
+  const hasRequiredPath = path.some((param) => param.required)
+  const hasRequiredQuery = query.some((param) => param.required)
+  const hasRequiredHeader = header.some((param) => param.required)
+
+  return {
+    groups,
+    hasRequiredPath,
+    hasRequiredQuery,
+    hasRequiredHeader,
+    isOptional: !hasRequiredPath && !hasRequiredQuery && !hasRequiredHeader && !groups.body,
+  }
+}
+
 export type RequestConfigNameResolver = RequestConfigResolver & {
   resolveRequestConfigName(node: ast.OperationNode): string
 }
@@ -223,14 +256,11 @@ export function buildRequestParamsSignature(
   options: { isConfigurable?: boolean } = {},
 ): { signature: string; groups: RequestGroups } {
   const { isConfigurable = true } = options
-  const groups = getRequestGroups(node)
-  const { path: pathParams } = getOperationParameters(node)
+  const { groups, isOptional } = getRequestGroupOptionality(node)
 
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
-  const hasRequiredPath = pathParams.some((param) => param.required)
-  const firstOptional = !hasRequiredPath && !groups.body
 
-  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: Omit<${resolver.resolveRequestConfigName(node)}, 'url'>${firstOptional ? ' = {}' : ''}` : null
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: Omit<${resolver.resolveRequestConfigName(node)}, 'url'>${isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node, resolver)} = {}` : null
 
   return {

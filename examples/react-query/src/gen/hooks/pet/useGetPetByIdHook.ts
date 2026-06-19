@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => ['v5', { url: '/pet/:pet_id', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => ['v5', { url: '/pet/:pet_id', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -34,7 +34,6 @@ export async function getPetByIdHook({ path }: Omit<GetPetByIdRequestConfig, 'ur
 export function getPetByIdQueryOptionsHook({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetByIdHook({ path }, { ...config, signal: config.signal ?? signal })

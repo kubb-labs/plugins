@@ -10,7 +10,7 @@ import { client } from './.kubb/client'
 import { FindPetsByStatusResponse } from './FindPetsByStatus'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>

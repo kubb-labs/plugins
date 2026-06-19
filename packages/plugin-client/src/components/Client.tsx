@@ -16,7 +16,14 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildStatusUnionType, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
+import {
+  buildBodyParamDescriptor,
+  buildQueryParamDescriptor,
+  buildStatusUnionType,
+  resolveQueryParamsParser,
+  resolveRequestParser,
+  resolveResponseParser,
+} from '../utils.ts'
 
 type Props = {
   name: string
@@ -105,9 +112,7 @@ export function Client({
           value: stringify(node.method.toUpperCase()),
         },
         url: {
-          value: urlName
-            ? `${urlName}(${urlParamsCall}).url.toString()`
-            : Url.toTemplateString(node.path, { casing: 'camelcase', replacer: (name) => `path.${name}` }),
+          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toGroupedTemplateString(node.path),
         },
         baseURL:
           baseURL && !urlName
@@ -115,17 +120,8 @@ export function Client({
                 value: `\`${baseURL}\``,
               }
             : null,
-        query: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
-        body: requestName
-          ? {
-              value:
-                isMultipleContentTypes && hasFormData
-                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestBody"
-                  : isFormData
-                    ? 'formData as FormData'
-                    : 'requestBody',
-            }
-          : null,
+        query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
+        body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
         contentType: isConfigurable && isMultipleContentTypes ? {} : null,
         responseType: responseType ? { value: stringify(responseType) } : null,
         requestConfig: isConfigurable

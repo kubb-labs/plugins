@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const deletePetQueryKey = ({ path }: Omit<DeletePetRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
+export const deletePetQueryKey = ({ path }: Omit<DeletePetRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
 

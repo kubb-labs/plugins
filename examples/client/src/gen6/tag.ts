@@ -4,21 +4,9 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type {
-  DeleteOrderRequestConfig,
-  DeleteOrderPathOrderId,
-  DeleteOrderResponse,
-  DeleteOrderStatus400,
-  DeleteOrderStatus404,
-} from './models/ts/store/DeleteOrder.ts'
+import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/store/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
-import type {
-  GetOrderByIdRequestConfig,
-  GetOrderByIdPathOrderId,
-  GetOrderByIdStatus200,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
-} from './models/ts/store/GetOrderById.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models/ts/store/GetOrderById.ts'
 import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from './models/ts/store/PlaceOrder.ts'
 import type {
   PlaceOrderPatchRequestConfig,
@@ -117,7 +105,7 @@ export async function placeOrderPatch(
   return res.data
 }
 
-function getGetOrderByIdUrl(path: { orderId: GetOrderByIdPathOrderId }) {
+function getGetOrderByIdUrl(path: GetOrderByIdRequestConfig['path']) {
   const res = { method: 'GET', url: `/store/order/${path.orderId}` as const }
 
   return res
@@ -140,7 +128,7 @@ export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'ur
   return res.data
 }
 
-function getDeleteOrderUrl(path: { orderId: DeleteOrderPathOrderId }) {
+function getDeleteOrderUrl(path: DeleteOrderRequestConfig['path']) {
   const res = { method: 'DELETE', url: `/store/order/${path.orderId}` as const }
 
   return res

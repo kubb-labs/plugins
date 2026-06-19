@@ -39,7 +39,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node }: 
   const returnType = dataReturnType === 'data' ? `Cypress.Chainable<${responseType}>` : `Cypress.Chainable<Cypress.Response<${responseType}>>`
 
   // Reference the path object straight in the URL with camelCase placeholders.
-  const urlTemplate = Url.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase', replacer: (name) => `path.${name}` })
+  const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 

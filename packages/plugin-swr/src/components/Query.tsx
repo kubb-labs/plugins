@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildGroupedRequestParam, hasRequiredPathParams } from '@internals/tanstack-query'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -69,10 +69,6 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const paramsNode = buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  // SWR has no `enabled` option; fold the path-presence check into the null-key gate
-  // so passing no `path` disables the request (mirrors React Query).
-  const shouldFetchExpr = hasRequiredPathParams(node) ? 'shouldFetch && !!path' : 'shouldFetch'
-
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature} JSDoc={{ comments: getComments(node) }}>
@@ -82,7 +78,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
        const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 
        return useSWR<${generics.join(', ')}>(
-        ${shouldFetchExpr} ? queryKey : null,
+        shouldFetch ? queryKey : null,
         {
           ...${queryOptionsName}(${queryOptionsParamsCall}),
           ...(immutable ? {

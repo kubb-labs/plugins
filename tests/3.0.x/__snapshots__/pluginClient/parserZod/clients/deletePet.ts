@@ -4,11 +4,11 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetRequestConfig, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { deletePetResponseSchema } from '../zod/deletePetSchema.ts'
 
-function getDeletePetUrl(path: { petId: DeletePetPathPetId }) {
+function getDeletePetUrl(path: DeletePetRequestConfig['path']) {
   const res = { method: 'DELETE', url: `/pet/${path.petId}` as const }
 
   return res

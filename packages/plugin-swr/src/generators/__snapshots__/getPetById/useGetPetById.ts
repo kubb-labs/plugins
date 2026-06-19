@@ -9,7 +9,7 @@ import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus200, 
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -52,7 +52,7 @@ export function useGetPetById(
 
   const queryKey = getPetByIdQueryKey({ path })
 
-  return useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdQueryKey | null>(shouldFetch && !!path ? queryKey : null, {
+  return useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdQueryKey | null>(shouldFetch ? queryKey : null, {
     ...getPetByIdQueryOptions({ path }, config),
     ...(immutable
       ? {

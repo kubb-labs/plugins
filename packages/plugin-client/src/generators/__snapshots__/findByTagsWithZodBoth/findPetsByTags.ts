@@ -14,7 +14,7 @@ export function getFindPetsByTagsUrl() {
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestParams = FindPetsByTagsQueryTags.parse(query)

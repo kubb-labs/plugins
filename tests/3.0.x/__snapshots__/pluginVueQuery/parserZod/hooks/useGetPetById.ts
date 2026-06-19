@@ -12,7 +12,7 @@ import { getPetByIdResponseSchema } from '../zod/getPetByIdSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url'>['path']> }) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url' | 'headers'>['path']> }) => [{ url: '/pet/:petId', params: path }] as const
 
 export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -32,7 +32,6 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
 export function getPetByIdQueryOptions({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url'>['path']> }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
-   enabled: () => !!toValue(path),
    queryKey,
    queryFn: async ({ signal }) => {
       return getPetById({ path: toValue(path) }, { ...config, signal: config.signal ?? signal })

@@ -17,9 +17,9 @@ export const updatePetWithFormQueryKey = ({
   body,
   query,
 }: {
-  path: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['path']>
-  body: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['body']>
-  query?: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['query']>
+  path: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>['path']>
+  body: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>['body']>
+  query?: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>['query']>
 }) => [{ url: '/pet/:petId', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
@@ -60,10 +60,9 @@ export function updatePetWithFormQueryOptions(
 ) {
   const queryKey = updatePetWithFormQueryKey({ path, body, query })
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
-    enabled: () => !!toValue(path),
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithForm({ path: toValue(path), body: toValue(body), query: toValue(query) }, { ...config, signal: config.signal ?? signal })
+      return updatePetWithForm({ path: toValue(path), query: toValue(query), body: toValue(body) }, { ...config, signal: config.signal ?? signal })
     },
   })
 }

@@ -65,9 +65,9 @@ export type CreatePetsRequestConfig = {
     offset?: CreatePetsQueryOffset
   }
   /**
-   * @type object | undefined
+   * @type object
    */
-  headers?: {
+  headers: {
     xEXAMPLE: CreatePetsHeaderXEXAMPLE
   }
   /**

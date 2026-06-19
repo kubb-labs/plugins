@@ -4,7 +4,7 @@ import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400,
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { getPetById } from '../../axios/petService/getPetById.ts'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId:search', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId:search', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -20,7 +20,6 @@ export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, '
     | { status: 404; data: GetPetByIdStatus404; statusText: string },
     typeof queryKey
   >({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ path }, { ...config, signal: config.signal ?? signal })

@@ -14,7 +14,7 @@ import type {
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>

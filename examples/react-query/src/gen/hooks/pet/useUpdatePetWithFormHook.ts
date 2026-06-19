@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const updatePetWithFormQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>) =>
+export const updatePetWithFormQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>) =>
   ['v5', { url: '/pet/:pet_id', params: path }, ...(query ? [query] : [])] as const
 
 type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
@@ -41,7 +41,6 @@ export function updatePetWithFormQueryOptionsHook(
 ) {
   const queryKey = updatePetWithFormQueryKey({ path, query })
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormResponse, typeof queryKey>({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return updatePetWithFormHook({ path, query }, { ...config, signal: config.signal ?? signal })

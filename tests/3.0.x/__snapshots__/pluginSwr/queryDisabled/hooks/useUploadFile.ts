@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
+export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
 

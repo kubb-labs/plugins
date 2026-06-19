@@ -7,7 +7,6 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { hasRequiredPathParams } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -77,8 +76,6 @@ export function InfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledText = hasRequiredPathParams(node) ? 'enabled: !!path,' : ''
-
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
@@ -126,7 +123,7 @@ export function InfiniteQueryOptions({
         <Function name={name} export params={paramsSignature}>
           {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal, pageParam }) => {
     ${infiniteOverrideParams}
@@ -145,7 +142,7 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       <Function name={name} export params={paramsSignature}>
         {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal }) => {
     return ${clientName}(${clientCallStr})

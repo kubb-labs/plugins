@@ -1,15 +1,9 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type {
-  GetPetByIdRequestConfig,
-  GetPetByIdPathPetId,
-  GetPetByIdStatus200,
-  GetPetByIdStatus400,
-  GetPetByIdStatus404,
-} from '../../../models/ts/pet/GetPetById.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById.ts'
 import { getPetByIdResponseSchema } from '../../../zod/pet/getPetByIdSchema.ts'
 
-export function getGetPetByIdUrl(path: { petId: GetPetByIdPathPetId }) {
+export function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
   const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
 
   return res

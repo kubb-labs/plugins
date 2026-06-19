@@ -11,7 +11,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> } = {}) =>
+export const findPetsByTagsQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>['query']> } = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>

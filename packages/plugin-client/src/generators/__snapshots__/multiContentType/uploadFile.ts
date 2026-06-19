@@ -1,11 +1,11 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from './UploadFile'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from './UploadFile'
 import { client } from './.kubb/client'
 import { buildFormData } from './.kubb/config'
 
-export function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+export function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
   const res = { method: 'POST', url: `/pet/${path.petId}/uploadImage` as const }
 
   return res

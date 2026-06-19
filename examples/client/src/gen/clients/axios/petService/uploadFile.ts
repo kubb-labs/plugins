@@ -1,11 +1,11 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.js'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from '../../../.kubb/config.js'
 
-function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
   const res = { method: 'POST', url: `/pet/${path.petId}/uploadImage` as const }
 
   return res

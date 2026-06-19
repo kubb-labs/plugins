@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const updatePetWithFormSuspenseQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>) =>
+export const updatePetWithFormSuspenseQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>) =>
   ['v5', { url: '/pet/:pet_id', params: path }, ...(query ? [query] : [])] as const
 
 type UpdatePetWithFormSuspenseQueryKey = ReturnType<typeof updatePetWithFormSuspenseQueryKey>

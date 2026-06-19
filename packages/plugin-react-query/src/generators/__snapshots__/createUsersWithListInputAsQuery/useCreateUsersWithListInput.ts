@@ -15,7 +15,7 @@ import { client } from './.kubb/client'
 import { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from './CreateUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputRequestConfig, 'url'>) =>
+export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputRequestConfig, 'url' | 'headers'>) =>
   [{ url: '/user/createWithList' }, ...(body ? [body] : [])] as const
 
 type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInputQueryKey>

@@ -24,20 +24,14 @@ type GetParamsProps = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
-  const { path: pathParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { path: pathParams } = getOperationParameters(node)
 
   if (pathParams.length === 0) {
     return ast.factory.createFunctionParameters({ params: [] })
   }
 
-  const members = pathParams.map((param) => ({
-    name: param.name,
-    type: tsResolver.resolvePathParamsName(node, param),
-    optional: !param.required,
-  }))
-
   return ast.factory.createFunctionParameters({
-    params: [ast.factory.createFunctionParameter({ name: 'path', type: ast.factory.createTypeLiteral({ members }) })],
+    params: [ast.factory.createFunctionParameter({ name: 'path', type: `${tsResolver.resolveRequestConfigName(node)}['path']` })],
   })
 }
 
@@ -55,7 +49,7 @@ export function Url({ name, isExportable = true, isIndexable = true, baseURL, no
       <Function name={name} export={isExportable} params={paramsSignature}>
         <Const
           name={'res'}
-        >{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase', replacer: (name) => `path.${name}` })} as const }`}</Const>
+        >{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toGroupedTemplateString(node.path, { prefix: baseURL })} as const }`}</Const>
         <br />
         return res
       </Function>
