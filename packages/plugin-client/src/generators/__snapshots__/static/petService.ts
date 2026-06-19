@@ -4,9 +4,9 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from '../.kubb/client'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from '../DeletePet'
-import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from '../FindPetsByTags'
-import type { UpdatePetWithFormData, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from '../UpdatePetWithForm'
+import type { DeletePetRequestConfig, DeletePetStatus200 } from '../DeletePet'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200 } from '../FindPetsByTags'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormStatus200 } from '../UpdatePetWithForm'
 import { client, mergeConfig } from '../.kubb/client'
 
 export class petService {
@@ -15,12 +15,9 @@ export class petService {
   /**
    * {@link /pet/findByTags}
    */
-  static async findPetsByTags(
-    { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } },
-    config: Partial<RequestConfig> & { client?: Client } = {},
-  ) {
+  static async findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/pet/findByTags`, params })
+    const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/pet/findByTags`, query })
     return res.data
   }
 
@@ -28,16 +25,17 @@ export class petService {
    * {@link /pet/:petId}
    */
   static async updatePetWithForm(
-    { petId, data }: { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData },
+    { path, body }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
     config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
+    const { petId } = path
+    const requestData = body
     const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
       ...requestConfig,
       method: 'POST',
       url: `/pet/${petId}`,
-      data: requestData,
+      body: requestData,
     })
     return res.data
   }
@@ -45,11 +43,9 @@ export class petService {
   /**
    * {@link /pet/:petId}
    */
-  static async deletePet(
-    { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
-    config: Partial<RequestConfig> & { client?: Client } = {},
-  ) {
+  static async deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
+    const { petId } = path
     const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
     const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
       ...requestConfig,

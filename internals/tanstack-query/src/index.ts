@@ -2,11 +2,10 @@ export { MutationKey, mutationKeyTransformer } from './components/MutationKey.ts
 export { QueryKey, queryKeyTransformer } from './components/QueryKey.tsx'
 export type { ParamsCasing, ParamsType, PathParamsType, Transformer } from './types.ts'
 export {
+  buildGroupedRequestParam,
   buildQueryKeyParams,
   buildQueryOptionsParams,
-  getEnabledParamNames,
-  injectNonNullAssertions,
-  markParamsOptional,
+  hasRequiredPathParams,
   resolveOperationOverrides,
   resolveQueryParamsParser,
   resolveRequestParser,

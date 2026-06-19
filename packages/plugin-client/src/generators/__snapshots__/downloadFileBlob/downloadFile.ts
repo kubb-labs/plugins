@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DownloadFilePathFileId, DownloadFileStatus200 } from './DownloadFile'
+import type { DownloadFileRequestConfig, DownloadFilePathFileId, DownloadFileStatus200 } from './DownloadFile'
 import { client } from './.kubb/client'
 
 export function getDownloadFileUrl({ fileId }: { fileId: DownloadFilePathFileId }) {
@@ -13,12 +13,12 @@ export function getDownloadFileUrl({ fileId }: { fileId: DownloadFilePathFileId 
 /**
  * {@link /files/:fileId}
  */
-export async function downloadFile({ fileId }: { fileId: DownloadFilePathFileId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function downloadFile({ path }: Omit<DownloadFileRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<DownloadFileStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
-    url: getDownloadFileUrl({ fileId }).url.toString(),
+    url: getDownloadFileUrl(path).url.toString(),
     responseType: 'blob',
     ...requestConfig,
   })

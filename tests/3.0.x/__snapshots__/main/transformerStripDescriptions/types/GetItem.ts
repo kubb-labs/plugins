@@ -23,9 +23,9 @@ export type GetItemStatus200 = Item;
 export type GetItemRequestConfig = {
     body?: never;
     /**
-     * @type object | undefined
+     * @type object
     */
-    path?: {
+    path: {
         id: GetItemPathId;
     };
     query?: never;

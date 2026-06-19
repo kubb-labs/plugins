@@ -4,13 +4,19 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreateUsersWithListInputData, CreateUsersWithListInputResponse, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
+import type {
+  CreateUsersWithListInputRequestConfig,
+  CreateUsersWithListInputData,
+  CreateUsersWithListInputResponse,
+  CreateUsersWithListInputStatus200,
+} from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { client } from './.kubb/client'
 import { CreateUsersWithListInputResponse, CreateUsersWithListInputData } from './CreateUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const createUsersWithListInputQueryKey = (data?: CreateUsersWithListInputData) => [{ url: '/user/createWithList' }, ...(data ? [data] : [])] as const
+export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputRequestConfig, 'url'>) =>
+  [{ url: '/user/createWithList' }, ...(body ? [body] : [])] as const
 
 type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInputQueryKey>
 
@@ -18,17 +24,17 @@ type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInp
  * {@link /user/createWithList}
  */
 export async function createUsersWithListInput(
-  { data }: { data?: CreateUsersWithListInputData } = {},
+  { body }: Omit<CreateUsersWithListInputRequestConfig, 'url'>,
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = CreateUsersWithListInputData.parse(data)
+  const requestData = CreateUsersWithListInputData.parse(body)
 
   const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, z.input<typeof CreateUsersWithListInputData>>({
     method: 'POST',
     url: `/user/createWithList`,
-    data: requestData,
+    body: requestData,
     ...requestConfig,
   })
 
@@ -36,14 +42,14 @@ export async function createUsersWithListInput(
 }
 
 export function createUsersWithListInputQueryOptions(
-  { data }: { data?: CreateUsersWithListInputData } = {},
+  { body }: Omit<CreateUsersWithListInputRequestConfig, 'url'>,
   config: Partial<RequestConfig<CreateUsersWithListInputData>> & { client?: Client } = {},
 ) {
-  const queryKey = createUsersWithListInputQueryKey(data)
+  const queryKey = createUsersWithListInputQueryKey({ body })
   return queryOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return createUsersWithListInput({ data }, { ...config, signal: config.signal ?? signal })
+      return createUsersWithListInput({ body }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -56,7 +62,7 @@ export function useCreateUsersWithListInput<
   TQueryData = CreateUsersWithListInputStatus200,
   TQueryKey extends QueryKey = CreateUsersWithListInputQueryKey,
 >(
-  { data }: { data?: CreateUsersWithListInputData } = {},
+  { body }: Omit<CreateUsersWithListInputRequestConfig, 'url'>,
   options: {
     query?: Partial<QueryObserverOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -66,18 +72,18 @@ export function useCreateUsersWithListInput<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? createUsersWithListInputQueryKey(data)
+  const queryKey = resolvedOptions?.queryKey ?? createUsersWithListInputQueryKey({ body })
 
-  const query = useQuery(
+  const result = useQuery(
     {
-      ...createUsersWithListInputQueryOptions({ data }, config),
+      ...createUsersWithListInputQueryOptions({ body }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

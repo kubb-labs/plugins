@@ -1,11 +1,11 @@
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginVueQuery } from '../types.ts'
-import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -19,20 +19,10 @@ type Props = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
-const keysPrinter = functionPrinter({ mode: 'call' })
 
-function createMutationArgParams(
-  node: ast.OperationNode,
-  options: {
-    resolver: ResolverTs
-  },
-): ast.FunctionParametersNode {
-  return createOperationParams(node, {
-    paramsType: 'inline',
-    pathParamsType: 'inline',
-    paramsCasing: 'camelcase',
-    resolver: options.resolver,
-  })
+function resolveMutationRequestType(node: ast.OperationNode, resolver: ResolverTs): string {
+  const groupedParam = buildGroupedRequestParam(node, { resolver })
+  return groupedParam ? `Omit<${resolver.resolveRequestConfigName(node)}, 'url'>` : 'undefined'
 }
 
 function buildMutationParamsNode(
@@ -50,17 +40,14 @@ function buildMutationParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = createMutationArgParams(node, { resolver })
-
-  const wrappedParamsNode = wrapWithMaybeRefOrGetter(mutationArgParamsNode)
-  const TRequestWrapped = wrappedParamsNode.params.length > 0 ? (declarationPrinter.print(wrappedParamsNode) ?? '') : ''
+  const TRequest = resolveMutationRequestType(node, resolver)
 
   return ast.factory.createFunctionParameters({
     params: [
       ast.factory.createFunctionParameter({
         name: 'options',
         type: `{
-  mutation?: MutationObserverOptions<${[TData, TError, TRequestWrapped ? `{${TRequestWrapped}}` : 'undefined', 'TContext'].join(', ')}> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<${[TData, TError, TRequest, 'TContext'].join(', ')}> & { client?: QueryClient },
   client?: ${buildRequestConfigType(node, resolver)},
 }`,
         default: '{}',
@@ -77,32 +64,17 @@ export function Mutation({ name, clientName, dataReturnType, node, tsResolver, m
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = createMutationArgParams(node, {
-    resolver: tsResolver,
-  })
-  const hasMutationParams = mutationArgParamsNode.params.length > 0
-  const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
-  const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
+  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
+  const hasMutationParams = groupedParam !== null
+  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
+  const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
 
-  const generics = [TData, TError, TRequest ? `{${TRequest}}` : 'undefined', 'TContext'].join(', ')
+  const TRequest = resolveMutationRequestType(node, tsResolver)
+  const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
   const mutationKeyParamsNode = ast.factory.createFunctionParameters({ params: [] })
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
-
-  const clientCallParamsNode = createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver: tsResolver,
-    extraParams: [
-      ast.factory.createFunctionParameter({
-        name: 'config',
-        type: buildRequestConfigType(node, tsResolver),
-        default: '{}',
-      }),
-    ],
-  })
-  const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
 
   const paramsNode = buildMutationParamsNode(node, { dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
@@ -116,7 +88,7 @@ export function Mutation({ name, clientName, dataReturnType, node, tsResolver, m
         const mutationKey = mutationOptions?.mutationKey ?? ${mutationKeyName}(${mutationKeyParamsCall})
 
         return useMutation<${generics}>({
-          mutationFn: async(${hasMutationParams ? `{ ${argKeysStr} }` : ''}) => {
+          mutationFn: async(${hasMutationParams ? argBindingStr : ''}) => {
             return ${clientName}(${clientCallStr})
           },
           mutationKey,

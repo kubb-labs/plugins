@@ -16,7 +16,7 @@ export async function addFilesHandler(
   const requestData = data
 
   const res = await client<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
-    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
+    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, body: requestData },
     request,
   )
 

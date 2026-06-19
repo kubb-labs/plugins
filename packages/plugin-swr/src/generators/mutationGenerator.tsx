@@ -51,7 +51,10 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
       ),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', order: 'body-response-first' })
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', order: 'body-response-first', includeParams: false }),
+    ]
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : undefined
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined

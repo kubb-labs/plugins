@@ -16,7 +16,7 @@ export async function updatePetHandler(
   const requestData = data
 
   const res = await client<UpdatePetResponse, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>(
-    { method: 'PUT', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
+    { method: 'PUT', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, body: requestData },
     request,
   )
 

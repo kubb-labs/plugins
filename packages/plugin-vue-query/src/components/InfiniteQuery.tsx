@@ -1,12 +1,11 @@
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
-import { buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
+import { buildStatusUnionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -50,15 +49,9 @@ function buildInfiniteQueryParamsNode(
     default: '{}',
   })
 
-  const baseParams = createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver,
-    extraParams: [optionsParam],
-  })
+  const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper: maybeRefOrGetter })
 
-  return wrapWithMaybeRefOrGetter(baseParams, (name) => name === 'options')
+  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
 export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver }: Props): KubbReactNode {
@@ -73,12 +66,11 @@ export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryK
 
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = markParamsOptional(buildInfiniteQueryParamsNode(node, { dataReturnType, resolver: tsResolver }), enabledNames)
+  const paramsNode = buildInfiniteQueryParamsNode(node, { dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -89,15 +81,15 @@ export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryK
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? ${queryKeyName}(${queryKeyParamsCall})
 
-       const query = useInfiniteQuery({
+       const result = useInfiniteQuery({
         ...${queryOptionsName}(${queryOptionsParamsCall}),
         ...resolvedOptions,
         queryKey
        } as unknown as UseInfiniteQueryOptions<${TData}, ${TError}, ${TData}, TQueryKey, ${TData}>, toValue(queryClient)) as ${returnType}
 
-       query.queryKey = queryKey as TQueryKey
+       result.queryKey = queryKey as TQueryKey
 
-       return query
+       return result
        `}
       </Function>
     </File.Source>

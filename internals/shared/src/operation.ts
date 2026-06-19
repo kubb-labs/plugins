@@ -68,6 +68,11 @@ export type ResolveOperationTypeNameOptions = {
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
   order?: 'params-first' | 'body-response-first'
+  /**
+   * Include the individual `PathParams`/`QueryParams`/`HeaderParams` type names. Set to `false`
+   * for clients that reference the grouped `RequestConfig` type instead of the per-group types.
+   */
+  includeParams?: boolean
 }
 
 function getOperationLink(node: ast.OperationNode, link: OperationCommentLink): string | null {
@@ -182,6 +187,58 @@ export function buildRequestConfigType(node: ast.OperationNode, resolver: Reques
   return `${configType} & { ${configProps} }`
 }
 
+export type RequestGroups = {
+  path: boolean
+  query: boolean
+  body: boolean
+  headers: boolean
+}
+
+/**
+ * Which of the grouped request options an operation carries.
+ */
+export function getRequestGroups(node: ast.OperationNode): RequestGroups {
+  const { path, query, header } = getOperationParameters(node)
+  return {
+    path: path.length > 0,
+    query: query.length > 0,
+    body: Boolean(node.requestBody?.content?.[0]?.schema),
+    headers: header.length > 0,
+  }
+}
+
+export type RequestConfigNameResolver = RequestConfigResolver & {
+  resolveRequestConfigName(node: ast.OperationNode): string
+}
+
+/**
+ * Builds the grouped `{ path, query, body, headers }` parameter for a generated client
+ * function, typed from the operation's `RequestConfig` (minus `url`). Only the groups the
+ * operation actually has are destructured. The trailing `config` parameter carries the
+ * runtime `RequestConfig` overrides plus `client`.
+ */
+export function buildRequestParamsSignature(
+  node: ast.OperationNode,
+  resolver: RequestConfigNameResolver,
+  options: { isConfigurable?: boolean } = {},
+): { signature: string; groups: RequestGroups } {
+  const { isConfigurable = true } = options
+  const groups = getRequestGroups(node)
+  const { path: pathParams } = getOperationParameters(node)
+
+  const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
+  const hasRequiredPath = pathParams.some((param) => param.required)
+  const firstOptional = !hasRequiredPath && !groups.body
+
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: Omit<${resolver.resolveRequestConfigName(node)}, 'url'>${firstOptional ? ' = {}' : ''}` : null
+  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node, resolver)} = {}` : null
+
+  return {
+    signature: [firstParam, configParam].filter(Boolean).join(', '),
+    groups,
+  }
+}
+
 export function buildOperationComments(node: ast.OperationNode, options: BuildOperationCommentsOptions = {}): Array<string> {
   const { link = 'pathTemplate', linkPosition = 'afterDeprecated', splitLines = false } = options
   const linkComment = getOperationLink(node, link)
@@ -278,7 +335,7 @@ export function resolveOperationTypeNames(
   resolver: OperationTypeNameResolver,
   options: ResolveOperationTypeNameOptions = {},
 ): string[] {
-  const cacheKey = `${node.operationId}\0${options.paramsCasing ?? ''}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${(options.exclude ?? []).join(',')}`
+  const cacheKey = `${node.operationId}\0${options.paramsCasing ?? ''}\0${options.order ?? ''}\0${options.responseStatusNames ?? ''}\0${options.includeParams === false ? 'noparams' : ''}\0${(options.exclude ?? []).join(',')}`
   let byResolver = typeNamesByResolver.get(resolver)
   if (byResolver) {
     const cached = byResolver.get(cacheKey)
@@ -296,11 +353,14 @@ export function resolveOperationTypeNames(
         ? []
         : resolveStatusCodeNames(node, resolver)
   const exclude = new Set(options.exclude ?? [])
-  const paramNames = [
-    ...path.map((param) => resolver.resolvePathParamsName(node, param)),
-    ...query.map((param) => resolver.resolveQueryParamsName(node, param)),
-    ...header.map((param) => resolver.resolveHeaderParamsName(node, param)),
-  ]
+  const paramNames =
+    options.includeParams === false
+      ? []
+      : [
+          ...path.map((param) => resolver.resolvePathParamsName(node, param)),
+          ...query.map((param) => resolver.resolveQueryParamsName(node, param)),
+          ...header.map((param) => resolver.resolveHeaderParamsName(node, param)),
+        ]
   const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null, resolver.resolveResponseName(node)]
   const names =
     options.order === 'body-response-first'

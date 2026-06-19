@@ -1,24 +1,22 @@
 import {
   buildOperationComments,
   buildParamsMapping,
-  buildRequestConfigType,
+  buildRequestParamsSignature,
   getContentTypeInfo,
   getOperationParameters,
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
 import { isValidVarName, Url } from '@internals/utils'
-import { createOperationParams, stringify } from '@kubb/ast/utils'
+import { stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
 import { buildStatusUnionType, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
-import { buildUrlParamsNode } from './Url.tsx'
 
 type Props = {
   name: string
@@ -35,34 +33,6 @@ type Props = {
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
   children?: KubbReactNode
-}
-
-type GetParamsProps = {
-  node: ast.OperationNode
-  tsResolver: ResolverTs
-  isConfigurable: boolean
-}
-
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-
-export function buildClientParamsNode({ node, tsResolver, isConfigurable }: GetParamsProps): ast.FunctionParametersNode {
-  return createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver: tsResolver,
-    extraParams: [
-      ...(isConfigurable
-        ? [
-            ast.factory.createFunctionParameter({
-              name: 'config',
-              type: buildRequestConfigType(node, tsResolver),
-              default: '{}',
-            }),
-          ]
-        : []),
-    ],
-  })
 }
 
 export function Client({
@@ -125,19 +95,8 @@ export function Client({
   // z.input<> matches what the user provides before zod transforms/defaults are applied, keeping it compatible with the TS model types
   const requestGenericType = parser === 'zod' && zodRequestName ? `z.input<typeof ${zodRequestName}>` : requestName || 'unknown'
   const generics = [genericsResponseName, TError, requestGenericType].filter(Boolean)
-  const paramsNode = buildClientParamsNode({
-    node,
-    tsResolver,
-    isConfigurable,
-  })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-
-  const urlParamsNode = buildUrlParamsNode({
-    node,
-    tsResolver,
-  })
-  const callPrinter = functionPrinter({ mode: 'call' })
-  const urlParamsCall = callPrinter.print(urlParamsNode) ?? ''
+  const { signature: paramsSignature, groups } = buildRequestParamsSignature(node, tsResolver, { isConfigurable })
+  const urlParamsCall = groups.path ? 'path' : ''
 
   const clientParams = createFunctionParams({
     config: {
@@ -155,8 +114,8 @@ export function Client({
                 value: `\`${baseURL}\``,
               }
             : null,
-        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
-        data: requestName
+        query: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
+        body: requestName
           ? {
               value:
                 isMultipleContentTypes && hasFormData
@@ -218,6 +177,8 @@ export function Client({
             ? `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = config`
             : ''}
           <br />
+          {!urlName && groups.path && casedPathParams.length > 0 && `const { ${casedPathParams.map((param) => param.name).join(', ')} } = path`}
+          {!urlName && groups.path && <br />}
           {pathParamsMapping &&
             Object.entries(pathParamsMapping)
               .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
@@ -226,8 +187,8 @@ export function Client({
           {pathParamsMapping && <br />}
           {queryParamsMapping && queryParamsName && (
             <>
-              {`const mappedParams = params ? { ${Object.entries(queryParamsMapping)
-                .map(([originalName, camelCaseName]) => `"${originalName}": params.${camelCaseName}`)
+              {`const mappedParams = query ? { ${Object.entries(queryParamsMapping)
+                .map(([originalName, camelCaseName]) => `"${originalName}": query.${camelCaseName}`)
                 .join(', ')} } : undefined`}
               <br />
             </>
@@ -240,8 +201,8 @@ export function Client({
               <br />
             </>
           )}
-          {requestParser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
-          {zodQueryParamsName && `const requestParams = ${zodQueryParamsName}.parse(params)`}
+          {requestParser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(body)` : requestName && 'const requestData = body'}
+          {zodQueryParamsName && `const requestParams = ${zodQueryParamsName}.parse(query)`}
           {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
           <br />
           {isConfigurable

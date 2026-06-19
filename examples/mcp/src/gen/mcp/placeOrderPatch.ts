@@ -16,7 +16,7 @@ export async function placeOrderPatchHandler(
   const requestData = data
 
   const res = await client<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>(
-    { method: 'PATCH', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
+    { method: 'PATCH', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, body: requestData },
     request,
   )
 

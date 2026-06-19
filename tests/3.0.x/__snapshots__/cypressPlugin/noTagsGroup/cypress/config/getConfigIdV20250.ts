@@ -3,9 +3,11 @@
 * Do not edit manually.
 */
 
-import type { GetConfigIdV20250PathConfigId, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250.ts'
+import type { GetConfigIdV20250RequestConfig, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250.ts'
 
-export function getConfigIdV20250({ configId }: { configId: GetConfigIdV20250PathConfigId }, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
+export function getConfigIdV20250({ path }: Omit<GetConfigIdV20250RequestConfig, 'url'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
+  const { configId } = path
+
   return cy.request<GetConfigIdV20250Response>({
     method: 'GET',
     url: `/config/${configId}`,

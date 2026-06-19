@@ -3,8 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildQueryOptionsParams, getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
-import { buildQueryKeyParams } from '../utils.ts'
+import { buildQueryOptionsParams } from '@internals/tanstack-query'
 
 type Props = {
   name: string
@@ -21,12 +20,9 @@ export function getQueryOptionsParams(node: ast.OperationNode, options: { resolv
 }
 
 export function QueryOptions({ name, clientName, node, tsResolver }: Props): KubbReactNode {
-  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
-
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { resolver: tsResolver }), enabledNames)
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const clientCallStr = injectNonNullAssertions(callPrinter.print(paramsNode) ?? '', enabledNames)
+  const clientCallStr = callPrinter.print(paramsNode) ?? ''
 
   return (
     <File.Source name={name} isExportable isIndexable>

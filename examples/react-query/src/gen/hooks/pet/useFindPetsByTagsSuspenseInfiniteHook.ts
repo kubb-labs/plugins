@@ -4,23 +4,14 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type {
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsStatus200,
-  FindPetsByTagsStatus400,
-} from '../../models/FindPetsByTags.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/FindPetsByTags.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = (params?: {
-  tags?: FindPetsByTagsQueryTags
-  page?: FindPetsByTagsQueryPage
-  pageSize?: FindPetsByTagsQueryPageSize
-}) => ['v5', { url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+  ['v5', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
 
@@ -30,7 +21,7 @@ type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSu
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsSuspenseInfiniteHook(
-  { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -38,7 +29,7 @@ export async function findPetsByTagsSuspenseInfiniteHook(
   const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: `/pet/findByTags`,
-    params,
+    query,
     ...requestConfig,
   })
 
@@ -46,10 +37,10 @@ export async function findPetsByTagsSuspenseInfiniteHook(
 }
 
 export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(
-  { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = findPetsByTagsSuspenseInfiniteQueryKey(params)
+  const queryKey = findPetsByTagsSuspenseInfiniteQueryKey({ query })
   return infiniteQueryOptions<
     { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
     ResponseErrorConfig<FindPetsByTagsStatus400>,
@@ -59,7 +50,7 @@ export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsSuspenseInfiniteHook({ params }, { ...config, signal: config.signal ?? signal })
+      return findPetsByTagsSuspenseInfiniteHook({ query }, { ...config, signal: config.signal ?? signal })
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1),
@@ -79,7 +70,7 @@ export function useFindPetsByTagsSuspenseInfiniteHook<
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
   TPageParam = number,
 >(
-  { params }: { params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize } } = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -87,12 +78,12 @@ export function useFindPetsByTagsSuspenseInfiniteHook<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseInfiniteQueryKey(params)
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseInfiniteQueryKey({ query })
   const customOptions = useCustomHookOptions({ hookName: 'useFindPetsByTagsSuspenseInfiniteHook', operationId: 'findPetsByTags' })
 
-  const query = useSuspenseInfiniteQuery(
+  const result = useSuspenseInfiniteQuery(
     {
-      ...findPetsByTagsSuspenseInfiniteQueryOptionsHook({ params }, config),
+      ...findPetsByTagsSuspenseInfiniteQueryOptionsHook({ query }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,
@@ -100,7 +91,7 @@ export function useFindPetsByTagsSuspenseInfiniteHook<
     queryClient,
   ) as UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

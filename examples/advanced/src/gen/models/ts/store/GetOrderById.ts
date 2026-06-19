@@ -36,9 +36,9 @@ export type GetOrderByIdStatus404 = any
 export type GetOrderByIdRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     orderId: GetOrderByIdPathOrderId
   }
   query?: never

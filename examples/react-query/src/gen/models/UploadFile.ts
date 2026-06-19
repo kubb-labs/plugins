@@ -32,9 +32,9 @@ export type UploadFileData = Blob | undefined
 export type UploadFileRequestConfig = {
   body: UploadFileData
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: UploadFilePathPetId
   }
   /**

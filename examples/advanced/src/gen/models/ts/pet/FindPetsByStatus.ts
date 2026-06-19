@@ -28,9 +28,9 @@ export type FindPetsByStatusStatus400 = any
 export type FindPetsByStatusRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     stepId: FindPetsByStatusPathStepId
   }
   query?: never

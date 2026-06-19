@@ -1,6 +1,7 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
+  UpdatePetRequestConfig,
   UpdatePetData,
   UpdatePetStatus200,
   UpdatePetStatus202,
@@ -23,7 +24,7 @@ export function getUpdatePetUrl() {
  * {@link /pet}
  */
 export async function updatePet(
-  { data }: { data: UpdatePetData },
+  { body }: Omit<UpdatePetRequestConfig, 'url'>,
   config: Partial<RequestConfig<UpdatePetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -31,13 +32,13 @@ export async function updatePet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = updatePetDataSchema.parse(data)
+  const requestData = updatePetDataSchema.parse(body)
 
   const res = await request<
     UpdatePetStatus200 | UpdatePetStatus202 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     z.input<typeof updatePetDataSchema>
-  >({ method: 'PUT', url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
+  >({ method: 'PUT', url: getUpdatePetUrl().url.toString(), body: requestData, contentType, ...requestConfig })
 
   return { ...res, data: updatePetResponseSchema.parse(res.data) } as
     | { status: 200; data: UpdatePetStatus200; statusText: string }

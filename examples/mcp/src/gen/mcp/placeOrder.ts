@@ -16,7 +16,7 @@ export async function placeOrderHandler(
   const requestData = data
 
   const res = await client<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>(
-    { method: 'POST', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, data: requestData },
+    { method: 'POST', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, body: requestData },
     request,
   )
 

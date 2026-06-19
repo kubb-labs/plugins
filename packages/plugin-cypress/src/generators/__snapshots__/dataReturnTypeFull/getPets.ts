@@ -3,16 +3,16 @@
  * Do not edit manually.
  */
 
-import type { GetPetsQueryLimit, GetPetsResponse } from './GetPets'
+import type { GetPetsRequestConfig, GetPetsResponse } from './GetPets'
 
 export function getPets(
-  { params }: { params?: { limit?: GetPetsQueryLimit } } = {},
+  { query }: Omit<GetPetsRequestConfig, 'url'> = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<Cypress.Response<GetPetsResponse>> {
   return cy.request<GetPetsResponse>({
     method: 'GET',
     url: `/pets`,
-    qs: params,
+    qs: query,
     ...options,
   })
 }

@@ -100,9 +100,9 @@ describe('buildData', () => {
       "{
           body?: never;
           /**
-           * @type object | undefined
+           * @type object
           */
-          path?: {
+          path: {
               petId: ShowPetByIdPathPetId;
           };
           query?: never;

@@ -52,9 +52,9 @@ export type CreatePetsData = {
 export type CreatePetsRequestConfig = {
   body: CreatePetsData
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     uuid: CreatePetsPathUuid
   }
   /**

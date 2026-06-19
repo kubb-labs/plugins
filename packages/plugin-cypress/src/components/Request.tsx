@@ -1,9 +1,7 @@
-import { getOperationParameters } from '@internals/shared'
-import { camelCase, Url } from '@internals/utils'
-import { createOperationParams } from '@kubb/ast/utils'
+import { buildParamsMapping, buildRequestParamsSignature, getOperationParameters } from '@internals/shared'
+import { Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginCypress } from '../types.ts'
@@ -25,86 +23,74 @@ type Props = {
   dataReturnType: PluginCypress['resolvedOptions']['dataReturnType']
 }
 
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-
 export function Request({ baseURL = '', name, dataReturnType, resolver, node }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
-  const paramsNode = createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver,
-    extraParams: [
-      ast.factory.createFunctionParameter({
-        name: 'options',
-        type: 'Partial<Cypress.RequestOptions>',
-        default: '{}',
-      }),
-    ],
-  })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
+
+  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
+  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+
+  const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
+  const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)
+
+  const { signature, groups } = buildRequestParamsSignature(node, resolver, { isConfigurable: false })
+  const paramsSignature = [signature, 'options: Partial<Cypress.RequestOptions> = {}'].filter(Boolean).join(', ')
 
   const responseType = resolver.resolveResponseName(node)
   const returnType = dataReturnType === 'data' ? `Cypress.Chainable<${responseType}>` : `Cypress.Chainable<Cypress.Response<${responseType}>>`
 
-  const casedPathParams = getOperationParameters(node, { paramsCasing: 'camelcase' }).path
-  // Build a lookup keyed by camelCase-normalized name so that path-template names
-  // (e.g. `{pet_id}`) correctly resolve to the function-parameter name (`petId`)
-  // even when the OpenAPI spec has inconsistent casing between the two.
-  const pathParamNameMap = new Map(casedPathParams.map((p) => [camelCase(p.name), p.name]))
-
-  const urlTemplate = Url.toTemplateString(node.path, {
-    prefix: baseURL,
-    replacer: (param) => pathParamNameMap.get(camelCase(param)) ?? param,
-    casing: 'camelcase',
-  })
+  // camelCase the URL placeholders so they match the camelCase `path` bindings destructured below.
+  // The interpolated value is what reaches the request; the placeholder name is positional only.
+  const urlTemplate = Url.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase' })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
-  const queryParams = getOperationParameters(node).query
-  if (queryParams.length > 0) {
-    const casedQueryParams = getOperationParameters(node, { paramsCasing: 'camelcase' }).query
-    // When paramsCasing renames query params (e.g. page_size → pageSize), we must remap
-    // the camelCase keys back to the original API names before passing them to `qs`.
-    const needsQsTransform = casedQueryParams.some((p, i) => p.name !== queryParams[i]!.name)
-    if (needsQsTransform) {
-      const pairs = queryParams.map((orig, i) => `${orig.name}: params.${casedQueryParams[i]!.name}`).join(', ')
-      requestOptions.push(`qs: params ? { ${pairs} } : undefined`)
+  if (groups.query) {
+    if (queryParamsMapping) {
+      // When paramsCasing renames query params (e.g. page_size → pageSize), we must remap
+      // the camelCase keys back to the original API names before passing them to `qs`.
+      const pairs = Object.entries(queryParamsMapping)
+        .map(([originalName, camelCaseName]) => `${originalName}: query.${camelCaseName}`)
+        .join(', ')
+      requestOptions.push(`qs: query ? { ${pairs} } : undefined`)
     } else {
-      requestOptions.push('qs: params')
+      requestOptions.push('qs: query')
     }
   }
 
-  const headerParams = getOperationParameters(node).header
-  if (headerParams.length > 0) {
-    const casedHeaderParams = getOperationParameters(node, { paramsCasing: 'camelcase' }).header
-    // When paramsCasing renames header params (e.g. x-api-key → xApiKey), we must remap
-    // the camelCase keys back to the original API names before passing them to `headers`.
-    const needsHeaderTransform = casedHeaderParams.some((p, i) => p.name !== headerParams[i]!.name)
-    if (needsHeaderTransform) {
-      const pairs = headerParams.map((orig, i) => `'${orig.name}': headers.${casedHeaderParams[i]!.name}`).join(', ')
+  if (groups.headers) {
+    if (headerParamsMapping) {
+      // When paramsCasing renames header params (e.g. x-api-key → xApiKey), we must remap
+      // the camelCase keys back to the original API names before passing them to `headers`.
+      const pairs = Object.entries(headerParamsMapping)
+        .map(([originalName, camelCaseName]) => `'${originalName}': headers.${camelCaseName}`)
+        .join(', ')
       requestOptions.push(`headers: headers ? { ${pairs} } : undefined`)
     } else {
       requestOptions.push('headers')
     }
   }
 
-  if (node.requestBody?.content?.[0]?.schema) {
-    requestOptions.push('body: data')
+  if (groups.body) {
+    requestOptions.push('body')
   }
 
   requestOptions.push('...options')
 
+  const requestCall =
+    dataReturnType === 'data'
+      ? `return cy.request<${responseType}>({
+  ${requestOptions.join(',\n  ')}
+}).then((res) => res.body)`
+      : `return cy.request<${responseType}>({
+  ${requestOptions.join(',\n  ')}
+})`
+
   return (
     <File.Source name={name} isIndexable isExportable>
       <Function name={name} export params={paramsSignature} returnType={returnType}>
-        {dataReturnType === 'data'
-          ? `return cy.request<${responseType}>({
-  ${requestOptions.join(',\n  ')}
-}).then((res) => res.body)`
-          : `return cy.request<${responseType}>({
-  ${requestOptions.join(',\n  ')}
-})`}
+        {groups.path && casedPathParams.length > 0 && `const { ${casedPathParams.map((param) => param.name).join(', ')} } = path`}
+        {groups.path && <br />}
+        {requestCall}
       </Function>
     </File.Source>
   )

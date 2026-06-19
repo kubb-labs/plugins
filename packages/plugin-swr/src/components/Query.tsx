@@ -1,10 +1,9 @@
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
+import { buildGroupedRequestParam, hasRequiredPathParams } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -48,13 +47,9 @@ function buildQueryParamsNode(
     default: '{}',
   })
 
-  return createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver,
-    extraParams: [optionsParam],
-  })
+  const groupedParam = buildGroupedRequestParam(node, { resolver })
+
+  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
 export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver }: Props): KubbReactNode {
@@ -67,17 +62,16 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = markParamsOptional(buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver }), enabledNames)
+  const paramsNode = buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  // SWR has no `enabled` option; fold the param-presence check into the null-key gate
-  // so passing `undefined` for a required param disables the request (mirrors React Query #60).
-  const shouldFetchExpr = enabledNames.length ? `shouldFetch && !!(${enabledNames.join(' && ')})` : 'shouldFetch'
+  // SWR has no `enabled` option; fold the path-presence check into the null-key gate
+  // so passing no `path` disables the request (mirrors React Query).
+  const shouldFetchExpr = hasRequiredPathParams(node) ? 'shouldFetch && !!path' : 'shouldFetch'
 
   return (
     <File.Source name={name} isExportable isIndexable>

@@ -34,9 +34,14 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase' })
+    const { path: pathParams, query: queryParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
-    const { query: queryParams } = getOperationParameters(node)
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      // The `get<Operation>Url` helper still types each path param individually.
+      ...pathParams.map((param) => tsResolver.resolvePathParamsName(node, param)),
+      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', includeParams: false }),
+    ]
 
     const importedZodNames = zodResolver
       ? [

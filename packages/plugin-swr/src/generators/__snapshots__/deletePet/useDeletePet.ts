@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus200 } from './DeletePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,11 +16,10 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 /**
  * {@link /pet/:petId}
  */
-export async function deletePet(
-  { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const { petId } = path
 
   const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
@@ -34,7 +33,7 @@ export async function deletePet(
   return res.data
 }
 
-export type DeletePetMutationArg = { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }
+export type DeletePetMutationArg = Omit<DeletePetRequestConfig, 'url'>
 
 /**
  * {@link /pet/:petId}
@@ -53,8 +52,8 @@ export function useDeletePet(
 
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<Error>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, headers } }) => {
-      return deletePet({ petId, headers }, config)
+    async (_url, { arg: { path, headers } }) => {
+      return deletePet({ path, headers }, config)
     },
     mutationOptions,
   )

@@ -14,7 +14,7 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
 
   const requestData = data
 
-  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
+  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, query: mappedParams, body: requestData }, request)
 
   return {
     content: [

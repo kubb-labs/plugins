@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, DeletePetStatus400 } from './models.ts'
+import type { DeletePetRequestConfig, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
@@ -18,17 +18,14 @@ function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet(
-  { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
-    url: getDeletePetUrl({ petId }).url.toString(),
+    url: getDeletePetUrl(path).url.toString(),
     ...requestConfig,
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })

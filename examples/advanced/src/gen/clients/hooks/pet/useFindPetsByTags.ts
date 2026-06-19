@@ -1,32 +1,19 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
-import type {
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsStatus200,
-  FindPetsByTagsStatus400,
-} from '../../../models/ts/pet/FindPetsByTags.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
 
-export const findPetsByTagsQueryKey = (params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }) =>
-  [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 export function findPetsByTagsQueryOptions(
-  {
-    headers,
-    params,
-  }: {
-    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
-    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
-  },
+  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = findPetsByTagsQueryKey(params)
+  const queryKey = findPetsByTagsQueryKey({ query })
   return queryOptions<
     { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
     ResponseErrorConfig<FindPetsByTagsStatus400>,
@@ -35,7 +22,7 @@ export function findPetsByTagsQueryOptions(
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags({ headers, params }, { ...config, signal: config.signal ?? signal })
+      return findPetsByTags({ query, headers }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -50,13 +37,7 @@ export function useFindPetsByTags<
   TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  {
-    headers,
-    params,
-  }: {
-    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
-    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
-  },
+  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
   options: {
     query?: Partial<
       QueryObserverOptions<
@@ -72,18 +53,18 @@ export function useFindPetsByTags<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey(params)
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey({ query })
 
-  const query = useQuery(
+  const result = useQuery(
     {
-      ...findPetsByTagsQueryOptions({ headers, params }, config),
+      ...findPetsByTagsQueryOptions({ query, headers }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as QueryObserverOptions,
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

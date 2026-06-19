@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryPageSize, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { InfiniteData, QueryKey, QueryClient, UseInfiniteQueryOptions, UseInfiniteQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { client } from './.kubb/client'
@@ -12,8 +12,8 @@ import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsInfiniteQueryKey = (params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; pageSize?: FindPetsByTagsQueryPageSize }>) =>
-  [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsInfiniteQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> } = {}) =>
+  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
@@ -21,26 +21,25 @@ export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInf
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsInfinite(
-  { params }: { params: { tags: FindPetsByTagsQueryTags; pageSize?: FindPetsByTagsQueryPageSize } },
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
 
   return FindPetsByTagsResponse.parse(res.data)
 }
 
 export function findPetsByTagsInfiniteQueryOptions(
-  { params }: { params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; pageSize?: FindPetsByTagsQueryPageSize }> } = {},
+  { query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> } = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = findPetsByTagsInfiniteQueryKey(params)
+  const queryKey = findPetsByTagsInfiniteQueryKey({ query })
   return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, QueryKey, number>({
-    enabled: () => !!toValue(params),
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsInfinite({ params: toValue(params!) }, { ...config, signal: config.signal ?? signal })
+      return findPetsByTagsInfinite({ query: toValue(query) }, { ...config, signal: config.signal ?? signal })
     },
     initialPageParam: 0,
     getNextPageParam: (lastPage) => lastPage['cursor'],
@@ -56,7 +55,7 @@ export function useFindPetsByTagsInfinite<
   TQueryData = FindPetsByTagsStatus200,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
 >(
-  { params }: { params?: MaybeRefOrGetter<{ tags: FindPetsByTagsQueryTags; pageSize?: FindPetsByTagsQueryPageSize }> } = {},
+  { query }: { query?: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> } = {},
   options: {
     query?: Partial<UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TQueryData, TQueryKey, TQueryData>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -64,18 +63,19 @@ export function useFindPetsByTagsInfinite<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? findPetsByTagsInfiniteQueryKey(params)
+  const queryKey =
+    (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? findPetsByTagsInfiniteQueryKey({ query })
 
-  const query = useInfiniteQuery(
+  const result = useInfiniteQuery(
     {
-      ...findPetsByTagsInfiniteQueryOptions({ params }, config),
+      ...findPetsByTagsInfiniteQueryOptions({ query }, config),
       ...resolvedOptions,
       queryKey,
     } as unknown as UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, TQueryKey, FindPetsByTagsStatus200>,
     toValue(queryClient),
   ) as UseInfiniteQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

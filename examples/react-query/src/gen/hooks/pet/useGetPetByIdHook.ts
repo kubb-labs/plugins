@@ -4,13 +4,13 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = ({ petId }: { petId?: GetPetByIdPathPetId } = {}) => ['v5', { url: '/pet/:pet_id', params: { petId: petId } }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => ['v5', { url: '/pet/:pet_id', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -19,8 +19,10 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
  * @summary Find pet by ID
  * {@link /pet/:pet_id}
  */
-export async function getPetByIdHook({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetByIdHook({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const { petId } = path
 
   const pet_id = petId
 
@@ -33,13 +35,13 @@ export async function getPetByIdHook({ petId }: { petId: GetPetByIdPathPetId }, 
   return res.data
 }
 
-export function getPetByIdQueryOptionsHook({ petId }: { petId?: GetPetByIdPathPetId } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const queryKey = getPetByIdQueryKey({ petId })
+export function getPetByIdQueryOptionsHook({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!petId,
+    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetByIdHook({ petId: petId! }, { ...config, signal: config.signal ?? signal })
+      return getPetByIdHook({ path }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -50,7 +52,7 @@ export function getPetByIdQueryOptionsHook({ petId }: { petId?: GetPetByIdPathPe
  * {@link /pet/:pet_id}
  */
 export function useGetPetByIdHook<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
-  { petId }: { petId?: GetPetByIdPathPetId } = {},
+  { path }: Omit<GetPetByIdRequestConfig, 'url'>,
   options: {
     query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -60,12 +62,12 @@ export function useGetPetByIdHook<TData = GetPetByIdStatus200, TQueryData = GetP
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey({ petId })
+  const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey({ path })
   const customOptions = useCustomHookOptions({ hookName: 'useGetPetByIdHook', operationId: 'get_pet_by_id' })
 
-  const query = useQuery(
+  const result = useQuery(
     {
-      ...getPetByIdQueryOptionsHook({ petId }, config),
+      ...getPetByIdQueryOptionsHook({ path }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,
@@ -73,7 +75,7 @@ export function useGetPetByIdHook<TData = GetPetByIdStatus200, TQueryData = GetP
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

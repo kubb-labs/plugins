@@ -1,11 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type {
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormStatus405,
-} from '../../../models/ts/pet/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
 import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
 export function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
@@ -19,15 +14,15 @@ export function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPat
  * {@link /pet/:petId:search}
  */
 export async function updatePetWithForm(
-  { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
+  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormStatus405, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
-    url: getUpdatePetWithFormUrl({ petId }).url.toString(),
-    params,
+    url: getUpdatePetWithFormUrl(path).url.toString(),
+    query,
     ...requestConfig,
   })
 

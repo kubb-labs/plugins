@@ -4,7 +4,7 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../types/AddPet.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetResponse, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../clients/addPet.ts'
@@ -13,7 +13,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 
-export type AddPetMutationArg = { data: AddPetData }
+export type AddPetMutationArg = Omit<AddPetRequestConfig, 'url'>
 
 /**
  * @description Add a new pet to the store
@@ -30,8 +30,8 @@ export function useAddPet(options: {
 
   return useSWRMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return addPet({ data }, config)
+    async (_url, { arg: { body } }) => {
+      return addPet({ body }, config)
     },
     mutationOptions
   )

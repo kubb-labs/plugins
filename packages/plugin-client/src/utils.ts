@@ -150,8 +150,8 @@ export function buildClassClientParams({
               value: JSON.stringify(baseURL),
             }
           : null,
-        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
-        data: requestName
+        query: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
+        body: requestName
           ? {
               value:
                 isMultipleContentTypes && hasFormData
@@ -189,10 +189,10 @@ export function buildRequestDataLine({
   const requestParser = resolveRequestParser(parser)
   const zodRequestName = zodResolver && requestParser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
   if (requestParser === 'zod' && zodRequestName) {
-    return `const requestData = ${zodRequestName}.parse(data)`
+    return `const requestData = ${zodRequestName}.parse(body)`
   }
   if (node.requestBody?.content?.[0]?.schema) {
-    return 'const requestData = data'
+    return 'const requestData = body'
   }
   return ''
 }
@@ -216,7 +216,7 @@ export function buildQueryParamsLine({
   if (queryParams.length === 0) return ''
   const zodQueryParamsName = zodResolver.resolveQueryParamsName?.(node, queryParams[0]!)
   if (!zodQueryParamsName) return ''
-  return `const requestParams = ${zodQueryParamsName}.parse(params)`
+  return `const requestParams = ${zodQueryParamsName}.parse(query)`
 }
 
 /**

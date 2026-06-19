@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import client from 'axios'
-import type { FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 
 export function getFindPetsByTagsUrl() {
@@ -13,16 +13,13 @@ export function getFindPetsByTagsUrl() {
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags(
-  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getFindPetsByTagsUrl().url.toString(),
-    params,
+    query,
     ...requestConfig,
   })
 

@@ -63,11 +63,22 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       }),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
-      paramsCasing: 'camelcase',
-      exclude: [queryKeyTypeName],
-      order: 'body-response-first',
-    })
+    const rawQueryParams = getOperationParameters(node).query
+    const queryParamsTypeName =
+      rawQueryParams.length > 0 && tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
+        ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
+        : null
+
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      queryParamsTypeName,
+      ...resolveOperationTypeNames(node, tsResolver, {
+        paramsCasing: 'camelcase',
+        exclude: [queryKeyTypeName],
+        order: 'body-response-first',
+        includeParams: false,
+      }),
+    ].filter((name): name is string => Boolean(name))
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null

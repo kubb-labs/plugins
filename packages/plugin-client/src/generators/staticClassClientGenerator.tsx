@@ -27,7 +27,7 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
+  return [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false })]
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {

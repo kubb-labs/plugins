@@ -27,7 +27,7 @@ describe('axios client', () => {
     await client({
       url: '/pets',
       method: 'POST',
-      data: { name: 'Dog' },
+      body: { name: 'Dog' },
       contentType: 'application/json',
     })
 
@@ -53,7 +53,7 @@ describe('axios client', () => {
     await client({
       url: '/pets',
       method: 'POST',
-      data: new FormData(),
+      body: new FormData(),
       contentType: 'multipart/form-data',
     })
 

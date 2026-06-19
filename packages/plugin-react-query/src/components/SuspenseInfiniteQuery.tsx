@@ -1,10 +1,10 @@
 import { getOperationParameters } from '@internals/shared'
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -45,13 +45,9 @@ function buildSuspenseInfiniteQueryParamsNode(
     default: '{}',
   })
 
-  return createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver,
-    extraParams: [optionsParam],
-  })
+  const groupedParam = buildGroupedRequestParam(node, { resolver })
+
+  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
 export function SuspenseInfiniteQuery({
@@ -131,15 +127,15 @@ export function SuspenseInfiniteQuery({
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
-       const query = useSuspenseInfiniteQuery({
+       const result = useSuspenseInfiniteQuery({
         ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n        ...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
        } as unknown as UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient) as ${returnType}
 
-       query.queryKey = queryKey as TQueryKey
+       result.queryKey = queryKey as TQueryKey
 
-       return query
+       return result
        `}
       </Function>
     </File.Source>

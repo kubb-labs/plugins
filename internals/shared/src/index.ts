@@ -1,6 +1,8 @@
 export {
   buildOperationComments,
   buildRequestConfigType,
+  buildRequestParamsSignature,
+  getRequestGroups,
   findSuccessStatusCode,
   getContentTypeInfo,
   getContentTypeSuffix,
@@ -29,6 +31,8 @@ export {
   type OperationParameterGroups,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
+  type RequestConfigNameResolver,
+  type RequestGroups,
   type ResponseNameResolver,
   type ResponseStatusNameResolver,
   type ResponseType,

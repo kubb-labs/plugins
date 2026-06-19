@@ -5,7 +5,7 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../types/AddPet.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -18,17 +18,17 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet({ data }: { data: AddPetData }, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ body }: Omit<AddPetRequestConfig, 'url'>, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestData = body
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, body: requestData, contentType, ...requestConfig })
 
   return res.data
 }
 
-export type AddPetMutationArg = { data: AddPetData }
+export type AddPetMutationArg = Omit<AddPetRequestConfig, 'url'>
 
 /**
  * @description Add a new pet to the store
@@ -45,8 +45,8 @@ export function useAddPet(options: {
 
   return useSWRMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return addPet({ data }, config)
+    async (_url, { arg: { body } }) => {
+      return addPet({ body }, config)
     },
     mutationOptions
   )

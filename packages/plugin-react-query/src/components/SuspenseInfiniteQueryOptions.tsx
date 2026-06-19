@@ -111,8 +111,8 @@ export function SuspenseInfiniteQueryOptions({
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName
-      ? `params = {
-      ...(params ?? {}),
+      ? `query = {
+      ...(query ?? {}),
       ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
     } as ${queryParamsTypeName}`
       : ''

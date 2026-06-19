@@ -1,13 +1,5 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type {
-  CreatePetsData,
-  CreatePetsPathUuid,
-  CreatePetsQueryBoolParam,
-  CreatePetsQueryOffset,
-  CreatePetsHeaderXEXAMPLE,
-  CreatePetsStatus201,
-  CreatePetsStatusDefault,
-} from '../../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsRequestConfig, CreatePetsData, CreatePetsStatus201, CreatePetsStatusDefault } from '../../../models/ts/pets/CreatePets.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { createPets } from '../../axios/petsService/createPets.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -19,17 +11,12 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Re
   return mutationOptions<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    {
-      uuid: CreatePetsPathUuid
-      data: CreatePetsData
-      headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
-      params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
-    },
+    Omit<CreatePetsRequestConfig, 'url'>,
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ uuid, data, headers, params }) => {
-      return createPets({ uuid, data, headers, params }, config)
+    mutationFn: async ({ path, query, body, headers }) => {
+      return createPets({ path, query, body, headers }, config)
     },
   })
 }
@@ -43,12 +30,7 @@ export function useCreatePets<TContext>(
     mutation?: UseMutationOptions<
       { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
       ResponseErrorConfig<Error>,
-      {
-        uuid: CreatePetsPathUuid
-        data: CreatePetsData
-        headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
-        params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
-      },
+      Omit<CreatePetsRequestConfig, 'url'>,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<CreatePetsData>> & { client?: Client }
@@ -61,24 +43,14 @@ export function useCreatePets<TContext>(
   const baseOptions = createPetsMutationOptions(config) as UseMutationOptions<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    {
-      uuid: CreatePetsPathUuid
-      data: CreatePetsData
-      headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
-      params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
-    },
+    Omit<CreatePetsRequestConfig, 'url'>,
     TContext
   >
 
   return useMutation<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    {
-      uuid: CreatePetsPathUuid
-      data: CreatePetsData
-      headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
-      params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
-    },
+    Omit<CreatePetsRequestConfig, 'url'>,
     TContext
   >(
     {
@@ -90,12 +62,7 @@ export function useCreatePets<TContext>(
   ) as UseMutationResult<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    {
-      uuid: CreatePetsPathUuid
-      data: CreatePetsData
-      headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
-      params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
-    },
+    Omit<CreatePetsRequestConfig, 'url'>,
     TContext
   >
 }

@@ -11,7 +11,7 @@ export async function getPetsHandler(
   { params }: { params?: { limit?: GetPetsQueryLimit } } = {},
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await client<GetPetsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pets`, baseURL: `${123456}`, params }, request)
+  const res = await client<GetPetsResponse, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pets`, baseURL: `${123456}`, query: params }, request)
 
   return {
     content: [

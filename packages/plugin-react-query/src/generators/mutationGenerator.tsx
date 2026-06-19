@@ -52,7 +52,10 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
       }),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', order: 'body-response-first' })
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', order: 'body-response-first', includeParams: false }),
+    ]
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null

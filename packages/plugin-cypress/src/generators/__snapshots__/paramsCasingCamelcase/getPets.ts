@@ -3,17 +3,14 @@
  * Do not edit manually.
  */
 
-import type { GetPetsResponse } from './GetPets'
+import type { GetPetsRequestConfig, GetPetsResponse } from './GetPets'
 
-export function getPets(
-  { params }: { params?: { pageSize?: GetPetsQueryPageSize } } = {},
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<GetPetsResponse> {
+export function getPets({ query }: Omit<GetPetsRequestConfig, 'url'> = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
   return cy
     .request<GetPetsResponse>({
       method: 'GET',
       url: `/pets`,
-      qs: params ? { page_size: params.pageSize } : undefined,
+      qs: query ? { page_size: query.pageSize } : undefined,
       ...options,
     })
     .then((res) => res.body)

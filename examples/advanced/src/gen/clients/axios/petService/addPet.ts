@@ -1,6 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { AddPetData, AddPetStatus405, AddPetStatusDefault } from '../../../models/ts/pet/AddPet.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetStatus405, AddPetStatusDefault } from '../../../models/ts/pet/AddPet.ts'
 import type { z } from 'zod'
 import { addPetResponseSchema, addPetDataSchema } from '../../../zod/pet/addPetSchema.ts'
 
@@ -16,7 +16,7 @@ export function getAddPetUrl() {
  * {@link /pet}
  */
 export async function addPet(
-  { data }: { data: AddPetData },
+  { body }: Omit<AddPetRequestConfig, 'url'>,
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -24,12 +24,12 @@ export async function addPet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = addPetDataSchema.parse(data)
+  const requestData = addPetDataSchema.parse(body)
 
   const res = await request<AddPetStatus405 | AddPetStatusDefault, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
-    data: requestData,
+    body: requestData,
     contentType,
     ...requestConfig,
   })

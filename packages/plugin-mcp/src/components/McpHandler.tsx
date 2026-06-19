@@ -86,8 +86,8 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Pr
   fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
   fetchConfig.push(`url: ${Url.toTemplateString(node.path)}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
-  if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'params: mappedParams' : 'params')
-  if (requestName) fetchConfig.push(`data: ${isFormData ? 'formData as FormData' : 'requestData'}`)
+  if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'query: mappedParams' : 'query: params')
+  if (requestName) fetchConfig.push(`body: ${isFormData ? 'formData as FormData' : 'requestData'}`)
   if (headers.length) fetchConfig.push(`headers: { ${headers.join(', ')} }`)
 
   const payload = dataReturnType === 'data' ? 'res.data' : 'res'

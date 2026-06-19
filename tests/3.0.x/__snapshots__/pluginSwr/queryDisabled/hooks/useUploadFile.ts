@@ -4,10 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const uploadFileQueryKey = ({ petId }: { petId?: UploadFilePathPetId } = {}, data?: UploadFileData, params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata }) => [{ url: '/pet/:petId/uploadImage', params: {petId:petId} }, ...(params ? [params] : []), ...(data ? [data] : [])] as const
+export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
 
@@ -15,20 +15,22 @@ type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = data
+  const { petId } = path
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${petId}/uploadImage`, params, data: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
+  const requestData = body
+
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${petId}/uploadImage`, query, body: requestData, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
 
   return res.data
 }
 
-export function uploadFileQueryOptions({ petId, data, params }: { petId?: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } } = {}, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileQueryOptions({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return uploadFile({ petId: petId!, data, params }, config)
+      return uploadFile({ path, query, body }, config)
     },
   }
 }

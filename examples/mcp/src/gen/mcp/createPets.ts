@@ -22,7 +22,7 @@ export async function createPetsHandler(
   const requestData = data
 
   const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>(
-    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, params, data: requestData, headers: { ...mappedHeaders } },
+    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, query: params, body: requestData, headers: { ...mappedHeaders } },
     request,
   )
 

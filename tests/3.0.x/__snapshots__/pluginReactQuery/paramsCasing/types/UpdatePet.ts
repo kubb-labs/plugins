@@ -37,9 +37,9 @@ export type UpdatePetData = PetUpdate;
 export type UpdatePetRequestConfig = {
     body: UpdatePetData;
     /**
-     * @type object | undefined
+     * @type object
     */
-    path?: {
+    path: {
         petId: UpdatePetPathPetId;
     };
     /**

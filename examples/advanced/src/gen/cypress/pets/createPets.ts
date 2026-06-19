@@ -1,33 +1,18 @@
-import type {
-  CreatePetsPathUuid,
-  CreatePetsQueryBoolParam,
-  CreatePetsQueryOffset,
-  CreatePetsHeaderXEXAMPLE,
-  CreatePetsData,
-  CreatePetsResponse,
-} from '../../models/ts/pets/CreatePets.ts'
+import type { CreatePetsRequestConfig, CreatePetsResponse } from '../../models/ts/pets/CreatePets.ts'
 
 export function createPets(
-  {
-    uuid,
-    data,
-    headers,
-    params,
-  }: {
-    uuid: CreatePetsPathUuid
-    data: CreatePetsData
-    headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }
-    params?: { boolParam?: CreatePetsQueryBoolParam; offset?: CreatePetsQueryOffset }
-  },
+  { path, query, body, headers }: Omit<CreatePetsRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<CreatePetsResponse> {
+  const { uuid } = path
+
   return cy
     .request<CreatePetsResponse>({
       method: 'POST',
       url: `/pets/${uuid}`,
-      qs: params ? { bool_param: params.boolParam, offset: params.offset } : undefined,
+      qs: query ? { bool_param: query.boolParam, offset: query.offset } : undefined,
       headers: headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined,
-      body: data,
+      body,
       ...options,
     })
     .then((res) => res.body)

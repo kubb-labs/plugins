@@ -52,11 +52,15 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
       }),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
-      paramsCasing: 'camelcase',
-      exclude: [queryKeyTypeName],
-      order: 'body-response-first',
-    })
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      ...resolveOperationTypeNames(node, tsResolver, {
+        paramsCasing: 'camelcase',
+        exclude: [queryKeyTypeName],
+        order: 'body-response-first',
+        includeParams: false,
+      }),
+    ]
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null

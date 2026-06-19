@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildQueryOptionsParams, getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
+import { buildQueryOptionsParams, hasRequiredPathParams } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
@@ -35,15 +35,13 @@ export function QueryOptions({ name, clientName, dataReturnType, node, tsResolve
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
-  // Suspense queries can't be disabled, so their params stay required.
-  const optionalNames = suspense ? [] : enabledNames
-  const enabledText = suspense ? '' : enabledNames.length ? `enabled: !!(${enabledNames.join(' && ')}),` : ''
+  // Suspense queries can't be disabled, so they carry no `enabled` guard.
+  const enabledText = suspense || !hasRequiredPathParams(node) ? '' : 'enabled: !!path,'
 
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { resolver: tsResolver }), optionalNames)
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = injectNonNullAssertions(rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }'), optionalNames)
+  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
   return (
     <File.Source name={name} isExportable isIndexable>

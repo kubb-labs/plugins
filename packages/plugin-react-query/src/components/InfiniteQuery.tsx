@@ -1,12 +1,11 @@
 import { getOperationParameters } from '@internals/shared'
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -46,13 +45,9 @@ function buildInfiniteQueryParamsNode(
     default: '{}',
   })
 
-  return createOperationParams(node, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver,
-    extraParams: [optionsParam],
-  })
+  const groupedParam = buildGroupedRequestParam(node, { resolver })
+
+  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
 export function InfiniteQuery({
@@ -113,19 +108,15 @@ export function InfiniteQuery({
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = markParamsOptional(
-    buildInfiniteQueryParamsNode(node, {
-      dataReturnType,
-      resolver: tsResolver,
-      pageParamGeneric: 'TPageParam',
-    }),
-    enabledNames,
-  )
+  const paramsNode = buildInfiniteQueryParamsNode(node, {
+    dataReturnType,
+    resolver: tsResolver,
+    pageParamGeneric: 'TPageParam',
+  })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -136,15 +127,15 @@ export function InfiniteQuery({
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = resolvedOptions?.queryKey ?? ${queryKeyName}(${queryKeyParamsCall})${customOptions ? `\n       const customOptions = ${customOptions.name}({ hookName: '${name}', operationId: '${node.operationId}' })` : ''}
 
-       const query = useInfiniteQuery({
+       const result = useInfiniteQuery({
         ...${queryOptionsName}(${queryOptionsParamsCall}),${customOptions ? '\n        ...customOptions,' : ''}
         ...resolvedOptions,
         queryKey,
        } as unknown as InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>, queryClient) as ${returnType}
 
-       query.queryKey = queryKey as TQueryKey
+       result.queryKey = queryKey as TQueryKey
 
-       return query
+       return result
        `}
       </Function>
     </File.Source>

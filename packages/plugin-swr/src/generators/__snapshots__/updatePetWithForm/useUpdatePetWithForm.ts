@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -17,24 +17,26 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  { petId, data }: { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData },
+  { path, body }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = data
+  const { petId } = path
+
+  const requestData = body
 
   const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
     url: `/pet/${petId}`,
-    data: requestData,
+    body: requestData,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export type UpdatePetWithFormMutationArg = { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData }
+export type UpdatePetWithFormMutationArg = Omit<UpdatePetWithFormRequestConfig, 'url'>
 
 /**
  * {@link /pet/:petId}
@@ -56,8 +58,8 @@ export function useUpdatePetWithForm(
 
   return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, data } }) => {
-      return updatePetWithForm({ petId, data }, config)
+    async (_url, { arg: { path, body } }) => {
+      return updatePetWithForm({ path, body }, config)
     },
     mutationOptions,
   )

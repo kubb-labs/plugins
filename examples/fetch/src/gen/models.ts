@@ -539,9 +539,9 @@ export type GetPetByIdStatus404 = any
 export type GetPetByIdRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: GetPetByIdPathPetId
   }
   query?: never
@@ -597,9 +597,9 @@ export type UpdatePetWithFormStatus405 = any
 export type UpdatePetWithFormRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: UpdatePetWithFormPathPetId
   }
   /**
@@ -652,9 +652,9 @@ export type DeletePetStatus400 = any
 export type DeletePetRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: DeletePetPathPetId
   }
   query?: never
@@ -732,9 +732,9 @@ export type UploadFileData = UploadFileJsonData | UploadFileFormData
 export type UploadFileRequestConfig = {
   body: UploadFileData
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: UploadFilePathPetId
   }
   /**
@@ -939,9 +939,9 @@ export type GetOrderByIdStatus404 = any
 export type GetOrderByIdRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     orderId: GetOrderByIdPathOrderId
   }
   query?: never
@@ -990,9 +990,9 @@ export type DeleteOrderStatus404 = any
 export type DeleteOrderRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     orderId: DeleteOrderPathOrderId
   }
   query?: never

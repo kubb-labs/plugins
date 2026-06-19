@@ -7,7 +7,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
+import { hasRequiredPathParams } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -77,13 +77,12 @@ export function InfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
-  const enabledText = enabledNames.length ? `enabled: !!(${enabledNames.join(' && ')}),` : ''
+  const enabledText = hasRequiredPathParams(node) ? 'enabled: !!path,' : ''
 
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { resolver: tsResolver }), enabledNames)
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = injectNonNullAssertions(rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }'), enabledNames)
+  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
   const hasNewParams = nextParam != null || previousParam != null
 
@@ -115,8 +114,8 @@ export function InfiniteQueryOptions({
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName
-      ? `params = {
-      ...(params ?? {}),
+      ? `query = {
+      ...(query ?? {}),
       ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
     } as ${queryParamsTypeName}`
       : ''

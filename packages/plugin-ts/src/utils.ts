@@ -80,6 +80,7 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const hasRequiredPath = pathParams.some((param) => param.required)
 
   // NOTE(v5-stable): the fields were renamed from the legacy beta shape
   // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
@@ -97,9 +98,10 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
       }),
       ast.factory.createProperty({
         name: 'path',
+        required: hasRequiredPath,
         schema:
           pathParams.length > 0
-            ? ast.factory.createSchema({ ...buildParams(node, { params: pathParams, resolver }), optional: true })
+            ? ast.factory.createSchema({ ...buildParams(node, { params: pathParams, resolver }), optional: !hasRequiredPath })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({

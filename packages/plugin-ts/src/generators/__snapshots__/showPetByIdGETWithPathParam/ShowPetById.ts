@@ -24,9 +24,9 @@ export type ShowPetByIdStatusDefault = object
 export type ShowPetByIdRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: ShowPetByIdPathPetId
   }
   query?: never

@@ -13,7 +13,7 @@ export async function createPetsHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestData = data
 
-  const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({ method: 'POST', url: `/pets`, data: requestData }, request)
+  const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({ method: 'POST', url: `/pets`, body: requestData }, request)
 
   return {
     content: [

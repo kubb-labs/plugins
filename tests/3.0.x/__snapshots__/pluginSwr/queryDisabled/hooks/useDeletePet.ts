@@ -4,10 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const deletePetQueryKey = ({ petId }: { petId?: DeletePetPathPetId } = {}) => [{ url: '/pet/:petId', params: {petId:petId} }] as const
+export const deletePetQueryKey = ({ path }: Omit<DeletePetRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
 
@@ -16,8 +16,10 @@ type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const { petId } = path
 
   const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
 
@@ -26,10 +28,10 @@ export async function deletePet({ petId, headers }: { petId: DeletePetPathPetId;
   return res.data
 }
 
-export function deletePetQueryOptions({ petId, headers }: { petId?: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deletePetQueryOptions({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return deletePet({ petId: petId!, headers }, config)
+      return deletePet({ path, headers }, config)
     },
   }
 }

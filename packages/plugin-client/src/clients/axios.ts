@@ -18,8 +18,8 @@ export type RequestConfig<TData = unknown> = {
   baseURL?: string
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
-  params?: unknown
-  data?: TData | FormData
+  query?: unknown
+  body?: TData | FormData
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
   validateStatus?: (status: number) => boolean
@@ -93,10 +93,12 @@ export const client = async <TResponseData, TError = unknown, TRequestData = unk
   _request?: unknown,
 ): Promise<ResponseConfig<TResponseData>> => {
   const requestConfig = mergeConfig(getConfig(), config)
-  const { contentType, headers, ...axiosConfig } = requestConfig
+  const { contentType, headers, query, body, ...axiosConfig } = requestConfig
   return axiosInstance
     .request<TResponseData, ResponseConfig<TResponseData>>({
       ...axiosConfig,
+      params: query,
+      data: body,
       headers: {
         ...(contentType && contentType !== 'multipart/form-data' ? { 'Content-Type': contentType } : {}),
         ...serializeHeaders(headers),

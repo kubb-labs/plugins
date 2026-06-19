@@ -29,9 +29,9 @@ export type UpdatePetWithFormStatus405 = any
 export type UpdatePetWithFormRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: UpdatePetWithFormPathPetId
   }
   /**

@@ -1,11 +1,11 @@
-import type { ast } from '@kubb/core'
+import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { getEnabledParamNames, markParamsOptional, queryKeyTransformer } from '@internals/tanstack-query'
+import { buildGroupedRequestParam, queryKeyTransformer } from '@internals/tanstack-query'
 import type { Transformer } from '../types.ts'
-import { buildQueryKeyParams, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { maybeRefOrGetter } from '../utils.ts'
 
 type Props = {
   name: string
@@ -18,12 +18,13 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function buildQueryKeyParamsNode(node: ast.OperationNode, options: { resolver: ResolverTs }): ast.FunctionParametersNode {
-  return wrapWithMaybeRefOrGetter(buildQueryKeyParams(node, options))
+  const groupedParam = buildGroupedRequestParam(node, { resolver: options.resolver, keys: ['path', 'query', 'body'], memberTypeWrapper: maybeRefOrGetter })
+
+  return ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }
 
 export function QueryKey({ name, node, tsResolver, typeName, transformer }: Props): KubbReactNode {
-  const baseParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
-  const paramsNode = markParamsOptional(baseParamsNode, getEnabledParamNames(baseParamsNode))
+  const paramsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? queryKeyTransformer)({
     node,

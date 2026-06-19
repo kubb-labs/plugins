@@ -5,29 +5,31 @@
 
 import useSWR from 'swr'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetPetByIdResponse, GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
+import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
-export const getPetByIdQueryKey = ({ petId }: { petId?: GetPetByIdPathPetId } = {}) => [{ url: '/pet/:petId', params: { petId: petId } }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 /**
  * {@link /pet/:petId}
  */
-export async function getPetById({ petId }: { petId: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const { petId } = path
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({ method: 'GET', url: `/pet/${petId}`, ...requestConfig })
 
   return res.data
 }
 
-export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return getPetById({ petId: petId! }, config)
+      return getPetById({ path }, config)
     },
   }
 }
@@ -36,7 +38,7 @@ export function getPetByIdQueryOptions({ petId }: { petId?: GetPetByIdPathPetId 
  * {@link /pet/:petId}
  */
 export function useGetPetById(
-  { petId }: { petId?: GetPetByIdPathPetId } = {},
+  { path }: Omit<GetPetByIdRequestConfig, 'url'>,
   options: {
     query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>>
     client?: Partial<RequestConfig> & { client?: Client }
@@ -46,10 +48,10 @@ export function useGetPetById(
 ) {
   const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-  const queryKey = getPetByIdQueryKey({ petId })
+  const queryKey = getPetByIdQueryKey({ path })
 
-  return useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdQueryKey | null>(shouldFetch && !!petId ? queryKey : null, {
-    ...getPetByIdQueryOptions({ petId }, config),
+  return useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdQueryKey | null>(shouldFetch && !!path ? queryKey : null, {
+    ...getPetByIdQueryOptions({ path }, config),
     ...(immutable
       ? {
           revalidateIfStale: false,

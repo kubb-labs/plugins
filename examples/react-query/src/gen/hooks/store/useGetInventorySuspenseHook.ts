@@ -53,7 +53,7 @@ export function useGetInventorySuspenseHook<TData = GetInventoryStatus200, TQuer
   const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
   const customOptions = useCustomHookOptions({ hookName: 'useGetInventorySuspenseHook', operationId: 'getInventory' })
 
-  const query = useSuspenseQuery(
+  const result = useSuspenseQuery(
     {
       ...getInventorySuspenseQueryOptionsHook(config),
       ...customOptions,
@@ -63,7 +63,7 @@ export function useGetInventorySuspenseHook<TData = GetInventoryStatus200, TQuer
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

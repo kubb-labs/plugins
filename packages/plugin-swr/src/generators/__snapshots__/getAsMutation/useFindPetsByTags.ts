@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,18 +16,15 @@ export type FindPetsByTagsMutationKey = ReturnType<typeof findPetsByTagsMutation
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags(
-  { params }: { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
 
   return res.data
 }
 
-export type FindPetsByTagsMutationArg = { params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus } }
+export type FindPetsByTagsMutationArg = Omit<FindPetsByTagsRequestConfig, 'url'>
 
 /**
  * {@link /pet/findByTags}
@@ -46,8 +43,8 @@ export function useFindPetsByTags(
 
   return useSWRMutation<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { params } }) => {
-      return findPetsByTags({ params }, config)
+    async (_url, { arg: { query } }) => {
+      return findPetsByTags({ query }, config)
     },
     mutationOptions,
   )

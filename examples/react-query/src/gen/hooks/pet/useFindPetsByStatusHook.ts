@@ -4,14 +4,14 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/FindPetsByStatus.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/FindPetsByStatus.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) =>
-  ['v5', { url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
+  ['v5', { url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
@@ -21,7 +21,7 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * {@link /pet/findByStatus}
  */
 export async function findPetsByStatusHook(
-  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
+  { query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -29,7 +29,7 @@ export async function findPetsByStatusHook(
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
     method: 'GET',
     url: `/pet/findByStatus`,
-    params,
+    query,
     ...requestConfig,
   })
 
@@ -37,14 +37,14 @@ export async function findPetsByStatusHook(
 }
 
 export function findPetsByStatusQueryOptionsHook(
-  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
+  { query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = findPetsByStatusQueryKey(params)
+  const queryKey = findPetsByStatusQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatusHook({ params }, { ...config, signal: config.signal ?? signal })
+      return findPetsByStatusHook({ query }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -59,7 +59,7 @@ export function useFindPetsByStatusHook<
   TQueryData = FindPetsByStatusStatus200,
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
-  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
+  { query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {},
   options: {
     query?: Partial<QueryObserverOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
@@ -69,12 +69,12 @@ export function useFindPetsByStatusHook<
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey(params)
+  const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ query })
   const customOptions = useCustomHookOptions({ hookName: 'useFindPetsByStatusHook', operationId: 'findPetsByStatus' })
 
-  const query = useQuery(
+  const result = useQuery(
     {
-      ...findPetsByStatusQueryOptionsHook({ params }, config),
+      ...findPetsByStatusQueryOptionsHook({ query }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,
@@ -82,7 +82,7 @@ export function useFindPetsByStatusHook<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

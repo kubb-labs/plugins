@@ -4,22 +4,14 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type {
-  UpdatePetWithFormResponse,
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormStatus405,
-} from '../../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/UpdatePetWithForm.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const updatePetWithFormSuspenseQueryKey = (
-  { petId }: { petId?: UpdatePetWithFormPathPetId } = {},
-  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
-) => ['v5', { url: '/pet/:pet_id', params: { petId: petId } }, ...(params ? [params] : [])] as const
+export const updatePetWithFormSuspenseQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>) =>
+  ['v5', { url: '/pet/:pet_id', params: path }, ...(query ? [query] : [])] as const
 
 type UpdatePetWithFormSuspenseQueryKey = ReturnType<typeof updatePetWithFormSuspenseQueryKey>
 
@@ -28,17 +20,19 @@ type UpdatePetWithFormSuspenseQueryKey = ReturnType<typeof updatePetWithFormSusp
  * {@link /pet/:pet_id}
  */
 export async function updatePetWithFormSuspenseHook(
-  { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
+  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
+
+  const { petId } = path
 
   const pet_id = petId
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
     url: `/pet/${pet_id}`,
-    params,
+    query,
     ...requestConfig,
   })
 
@@ -46,14 +40,14 @@ export async function updatePetWithFormSuspenseHook(
 }
 
 export function updatePetWithFormSuspenseQueryOptionsHook(
-  { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
+  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
-  const queryKey = updatePetWithFormSuspenseQueryKey({ petId }, params)
+  const queryKey = updatePetWithFormSuspenseQueryKey({ path, query })
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormResponse, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithFormSuspenseHook({ petId, params }, { ...config, signal: config.signal ?? signal })
+      return updatePetWithFormSuspenseHook({ path, query }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -63,7 +57,7 @@ export function updatePetWithFormSuspenseQueryOptionsHook(
  * {@link /pet/:pet_id}
  */
 export function useUpdatePetWithFormSuspenseHook<TData = UpdatePetWithFormResponse, TQueryKey extends QueryKey = UpdatePetWithFormSuspenseQueryKey>(
-  { petId, params }: { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
+  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
   options: {
     query?: Partial<UseSuspenseQueryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -73,12 +67,12 @@ export function useUpdatePetWithFormSuspenseHook<TData = UpdatePetWithFormRespon
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? updatePetWithFormSuspenseQueryKey({ petId }, params)
+  const queryKey = resolvedOptions?.queryKey ?? updatePetWithFormSuspenseQueryKey({ path, query })
   const customOptions = useCustomHookOptions({ hookName: 'useUpdatePetWithFormSuspenseHook', operationId: 'updatePetWithForm' })
 
-  const query = useSuspenseQuery(
+  const result = useSuspenseQuery(
     {
-      ...updatePetWithFormSuspenseQueryOptionsHook({ petId, params }, config),
+      ...updatePetWithFormSuspenseQueryOptionsHook({ path, query }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,
@@ -86,7 +80,7 @@ export function useUpdatePetWithFormSuspenseHook<TData = UpdatePetWithFormRespon
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<UpdatePetWithFormStatus405>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  result.queryKey = queryKey as TQueryKey
 
-  return query
+  return result
 }

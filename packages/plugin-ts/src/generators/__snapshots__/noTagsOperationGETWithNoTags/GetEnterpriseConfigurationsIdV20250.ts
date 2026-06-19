@@ -19,9 +19,9 @@ export type GetEnterpriseConfigurationsIdV20250Status200 = object
 export type GetEnterpriseConfigurationsIdV20250RequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     enterpriseId: GetEnterpriseConfigurationsIdV20250PathEnterpriseId
   }
   query?: never

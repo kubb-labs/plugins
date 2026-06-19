@@ -35,6 +35,7 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
       { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
     )
 
+    const requestConfigName = tsResolver.resolveRequestConfigName(transformedNode)
     const requestName = transformedNode.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(transformedNode) : null
     const responseName = tsResolver.resolveResponseName(transformedNode)
     const pathParamsName =
@@ -66,9 +67,16 @@ export const clientStaticGenerator = defineGenerator<PluginClient>({
       .map((r) => tsResolver.resolveResponseStatusName(transformedNode, r.statusCode))
       .filter(Boolean) as Array<string>
 
-    const typeImportNames = [requestName, responseName, pathParamsName, queryParamsName, headerParamsName, ...errorTypeNames, ...successTypeNames].filter(
-      Boolean,
-    ) as Array<string>
+    const typeImportNames = [
+      requestConfigName,
+      requestName,
+      responseName,
+      pathParamsName,
+      queryParamsName,
+      headerParamsName,
+      ...errorTypeNames,
+      ...successTypeNames,
+    ].filter(Boolean) as Array<string>
 
     const banner = resolver.resolveBanner(ctx.meta, { output, config })
     const footer = resolver.resolveFooter(ctx.meta, { output, config })

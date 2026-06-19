@@ -96,15 +96,17 @@ export const config = {
         type: 'path',
       },
       queryKey({ node, casing }) {
+        const hasPathParams = node.parameters?.some((p) => p.in === 'path') ?? false
         const hasQueryParams = node.parameters?.some((p) => p.in === 'query') ?? false
         const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
 
-        return [
-          '"v5"',
-          Url.toObject(node.path, { type: 'path', stringify: true, casing }),
-          hasQueryParams ? '...(params ? [params] : [])' : undefined,
-          hasRequestBody ? '...(data ? [data] : [])' : undefined,
-        ].filter(Boolean) as [string, ...Array<string>]
+        const urlObject = hasPathParams
+          ? `{ url: '${Url.toPath(node.path)}', params: path }`
+          : Url.toObject(node.path, { type: 'path', stringify: true, casing })
+
+        return ['"v5"', urlObject, hasQueryParams ? '...(query ? [query] : [])' : undefined, hasRequestBody ? '...(body ? [body] : [])' : undefined].filter(
+          Boolean,
+        ) as [string, ...Array<string>]
       },
       customOptions: {
         importPath: '../../../useCustomHookOptions.ts',

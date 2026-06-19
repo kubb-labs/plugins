@@ -3,14 +3,17 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsData, CreatePetsResponse } from './CreatePets'
+import type { CreatePetsRequestConfig, CreatePetsResponse } from './CreatePets'
 
-export function createPets({ data }: { data?: CreatePetsData } = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreatePetsResponse> {
+export function createPets(
+  { body }: Omit<CreatePetsRequestConfig, 'url'>,
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<CreatePetsResponse> {
   return cy
     .request<CreatePetsResponse>({
       method: 'POST',
       url: `/pets`,
-      body: data,
+      body,
       ...options,
     })
     .then((res) => res.body)

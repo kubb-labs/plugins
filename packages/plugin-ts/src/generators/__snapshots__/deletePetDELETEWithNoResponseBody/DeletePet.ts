@@ -19,9 +19,9 @@ export type DeletePetStatus204 = void
 export type DeletePetRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: DeletePetPathPetId
   }
   query?: never

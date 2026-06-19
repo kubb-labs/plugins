@@ -4,17 +4,30 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from './models/ts/store/DeleteOrder.ts'
+import type {
+  DeleteOrderRequestConfig,
+  DeleteOrderResponse,
+  DeleteOrderPathOrderId,
+  DeleteOrderStatus400,
+  DeleteOrderStatus404,
+} from './models/ts/store/DeleteOrder.ts'
 import type { GetInventoryResponse, GetInventoryStatus200 } from './models/ts/store/GetInventory.ts'
 import type {
+  GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
   GetOrderByIdPathOrderId,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
   GetOrderByIdStatus200,
 } from './models/ts/store/GetOrderById.ts'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderStatus200 } from './models/ts/store/PlaceOrder.ts'
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus405, PlaceOrderPatchStatus200 } from './models/ts/store/PlaceOrderPatch.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderStatus200 } from './models/ts/store/PlaceOrder.ts'
+import type {
+  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchData,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchStatus405,
+  PlaceOrderPatchStatus200,
+} from './models/ts/store/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
 /**
@@ -44,7 +57,7 @@ getInventory.queryParams = {} as never
  * {@link /store/order}
  */
 export async function placeOrder(
-  { data }: { data?: PlaceOrderData } = {},
+  { body }: Omit<PlaceOrderRequestConfig, 'url'>,
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -52,12 +65,12 @@ export async function placeOrder(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestData = body
 
   const res = await request<PlaceOrderStatus200 | PlaceOrderStatus405, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: `/store/order`,
-    data: requestData,
+    body: requestData,
     contentType,
     ...requestConfig,
   })
@@ -79,7 +92,7 @@ placeOrder.queryParams = {} as never
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  { data }: { data?: PlaceOrderPatchData } = {},
+  { body }: Omit<PlaceOrderPatchRequestConfig, 'url'>,
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -87,12 +100,12 @@ export async function placeOrderPatch(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestData = body
 
   const res = await request<PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
-    data: requestData,
+    body: requestData,
     contentType,
     ...requestConfig,
   })
@@ -113,8 +126,10 @@ placeOrderPatch.queryParams = {} as never
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const { orderId } = path
 
   const res = await request<
     GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404,
@@ -141,8 +156,10 @@ getOrderById.queryParams = {} as never
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function deleteOrder({ orderId }: { orderId: DeleteOrderPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const { orderId } = path
 
   const res = await request<DeleteOrderStatus400 | DeleteOrderStatus404, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',
