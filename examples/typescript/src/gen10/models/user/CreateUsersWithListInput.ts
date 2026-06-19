@@ -25,7 +25,7 @@ export type CreateUsersWithListInputStatusDefault = any
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputData = User[] | undefined
+export type CreateUsersWithListInputData = Array<User> | undefined
 
 /**
  * @type object

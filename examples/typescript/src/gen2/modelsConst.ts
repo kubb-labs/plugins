@@ -195,7 +195,7 @@ export type Customer = {
   /**
    * @type array | undefined
    */
-  address?: Address[]
+  address?: Array<Address>
 }
 
 export type HappyCustomer = Customer & {
@@ -362,11 +362,11 @@ export type Pet = (
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  readonly tags?: Tag[]
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    */
@@ -408,11 +408,11 @@ export type AddPetRequest = {
   /**
    * @type array
    */
-  photoUrls: string[]
+  photoUrls: Array<string>
   /**
    * @type array | undefined
    */
-  tags?: Tag[]
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
    */
@@ -458,7 +458,7 @@ export type PetNotFound = {
 /**
  * @type array
  */
-export type UserArray = User[]
+export type UserArray = Array<User>
 
 export type UpdatePetStatus200Json = Pet
 
@@ -603,12 +603,12 @@ export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusenumType | undef
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200Json = Pet[]
+export type FindPetsByStatusStatus200Json = Array<Pet>
 
 /**
  * @type array
  */
-export type FindPetsByStatusStatus200Xml = Pet[]
+export type FindPetsByStatusStatus200Xml = Array<Pet>
 
 export type FindPetsByStatusStatus200 = FindPetsByStatusStatus200Json | FindPetsByStatusStatus200Xml
 
@@ -653,7 +653,7 @@ export type FindPetsByStatusResponse = FindPetsByStatusStatus200 | FindPetsBySta
  * @description Tags to filter by
  * @type array | undefined
  */
-export type FindPetsByTagsQueryTags = string[] | undefined
+export type FindPetsByTagsQueryTags = Array<string> | undefined
 
 /**
  * @description to request with required page number or pagination
@@ -670,12 +670,12 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200Json = Pet[]
+export type FindPetsByTagsStatus200Json = Array<Pet>
 
 /**
  * @type array
  */
-export type FindPetsByTagsStatus200Xml = Pet[]
+export type FindPetsByTagsStatus200Xml = Array<Pet>
 
 export type FindPetsByTagsStatus200 = FindPetsByTagsStatus200Json | FindPetsByTagsStatus200Xml
 
@@ -853,7 +853,7 @@ export type DeletePetPathPetId = bigint
 /**
  * @type array
  */
-export type DeletePetStatus200 = DeletePetStatus200EnumenumType[]
+export type DeletePetStatus200 = Array<DeletePetStatus200EnumenumType>
 
 /**
  * @type any
@@ -1292,7 +1292,7 @@ export type CreateUsersWithListInputStatusDefault = any
 /**
  * @type array | undefined
  */
-export type CreateUsersWithListInputData = User[] | undefined
+export type CreateUsersWithListInputData = Array<User> | undefined
 
 /**
  * @type object

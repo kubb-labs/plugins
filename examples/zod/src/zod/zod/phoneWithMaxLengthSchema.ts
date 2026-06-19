@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import { z } from '../../zod.ts'
+import type { z } from '../../zod.ts'
 import { phoneNumberSchema } from './phoneNumberSchema.ts'
 
 export const phoneWithMaxLengthSchema = phoneNumberSchema.max(15)
