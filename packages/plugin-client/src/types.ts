@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 
 /**
  * The concrete resolver type for `@kubb/plugin-client`.
@@ -223,10 +223,6 @@ export type Options = OutputOptions & {
    * Return `null` or `undefined` from a callback to leave the node unchanged.
    */
   macros?: Array<ast.Macro>
-  /**
-   * Custom generators that run alongside the built-in client generators.
-   */
-  generators?: Array<Generator<PluginClient>>
 } & ClientImportPath &
   ParamsTypeOptions
 

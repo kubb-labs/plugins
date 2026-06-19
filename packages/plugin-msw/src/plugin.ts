@@ -50,7 +50,6 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
     baseURL,
     resolver: userResolver,
     macros: userMacros,
-    generators: userGenerators = [],
   } = options
 
   const groupConfig = createGroupConfig(group)
@@ -82,9 +81,6 @@ export const pluginMsw = definePlugin<PluginMsw>((options) => {
         ctx.addGenerator(mswGenerator)
         if (handlers) {
           ctx.addGenerator(handlersGenerator)
-        }
-        for (const gen of userGenerators) {
-          ctx.addGenerator(gen)
         }
       },
     },

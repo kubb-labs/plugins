@@ -46,7 +46,6 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     override = [],
     mapper = {},
     dateParser = 'faker',
-    generators: userGenerators = [],
     regexGenerator = 'faker',
     paramsCasing,
     printer,
@@ -81,9 +80,6 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
           ctx.setMacros(userMacros)
         }
         ctx.addGenerator(fakerGenerator)
-        for (const generator of userGenerators) {
-          ctx.addGenerator(generator)
-        }
       },
     },
   }
