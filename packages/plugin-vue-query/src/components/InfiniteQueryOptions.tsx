@@ -6,9 +6,8 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildStatusUnionType, buildVueClientCallArgs, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
-import { hasRequiredPathParams } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -78,12 +77,9 @@ export function InfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledText = hasRequiredPathParams(node) ? 'enabled: () => !!toValue(path),' : ''
-
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
+  const clientCallArgs = buildVueClientCallArgs(node)
 
   const hasNewParams = nextParam != null || previousParam != null
 
@@ -127,11 +123,11 @@ export function InfiniteQueryOptions({
         <Function name={name} export params={paramsSignature}>
           {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal, pageParam }) => {
     ${infiniteOverrideParams}
-    return ${clientName}(${addToValueCalls(clientCallStr)})
+    return ${clientName}(${clientCallArgs})
   },
   ${queryOptionsArr.join(',\n  ')}
 })
@@ -146,10 +142,10 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       <Function name={name} export params={paramsSignature}>
         {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal }) => {
-    return ${clientName}(${addToValueCalls(clientCallStr)})
+    return ${clientName}(${clientCallArgs})
   },
   ${queryOptionsArr.join(',\n  ')}
 })
@@ -157,16 +153,4 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       </Function>
     </File.Source>
   )
-}
-
-function addToValueCalls(callStr: string): string {
-  return callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
-    if (inner.includes(':') || inner.includes('...')) return match
-    const keys = inner
-      .split(',')
-      .map((k: string) => k.trim())
-      .filter(Boolean)
-    const wrapped = keys.map((k: string) => `${k}: toValue(${k})`).join(', ')
-    return `{ ${wrapped} }`
-  })
 }

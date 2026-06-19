@@ -14,10 +14,7 @@ export function getFindPetsByTagsUrl() {
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags(
-  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTags({ query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined

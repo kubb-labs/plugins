@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'url'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
+export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'url' | 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 
 type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
 

@@ -55,7 +55,7 @@ export function Url({ name, isExportable = true, isIndexable = true, baseURL, no
       <Function name={name} export={isExportable} params={paramsSignature}>
         <Const
           name={'res'}
-        >{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase', replacer: (name) => `path.${name}` })} as const }`}</Const>
+        >{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toGroupedTemplateString(node.path, { prefix: baseURL })} as const }`}</Const>
         <br />
         return res
       </Function>

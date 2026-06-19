@@ -10,7 +10,7 @@ import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQueryKey>
@@ -18,10 +18,7 @@ type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQu
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsSuspense(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTagsSuspense({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -30,7 +27,7 @@ export async function findPetsByTagsSuspense(
 }
 
 export function findPetsByTagsSuspenseQueryOptions(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsSuspenseQueryKey({ query })
@@ -54,7 +51,7 @@ export function useFindPetsByTagsSuspense<
   TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey,
 >(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
   options: {
     query?: Partial<
       UseSuspenseQueryOptions<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, TData, TQueryKey>

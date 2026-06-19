@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'> = {}) =>
   ['v5', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>

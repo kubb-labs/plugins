@@ -10,7 +10,7 @@ import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
@@ -18,10 +18,7 @@ type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQu
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsInfinite(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTagsInfinite({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -30,7 +27,7 @@ export async function findPetsByTagsInfinite(
 }
 
 export function findPetsByTagsInfiniteQueryOptions(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
@@ -55,7 +52,7 @@ export function useFindPetsByTagsInfinite<
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
   TPageParam = number,
 >(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 

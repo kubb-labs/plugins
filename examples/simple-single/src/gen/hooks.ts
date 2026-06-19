@@ -65,7 +65,7 @@ import type {
 } from '@tanstack/react-query'
 import { mutationOptions, queryOptions, useQuery, useSuspenseQuery, useMutation } from '@tanstack/react-query'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
@@ -137,7 +137,7 @@ export function useFindPetsByStatus<
   return queryResult
 }
 
-export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
@@ -205,7 +205,7 @@ export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = 
   return queryResult
 }
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -229,7 +229,6 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
 export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return getPetById({ path }, { ...config, signal: config.signal ?? signal })
@@ -269,7 +268,7 @@ export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetBy
   return queryResult
 }
 
-export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
+export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
@@ -340,7 +339,7 @@ export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, T
   return queryResult
 }
 
-export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQueryKey>
@@ -409,7 +408,7 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
   return queryResult
 }
 
-export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
@@ -907,7 +906,7 @@ export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetI
   return queryResult
 }
 
-export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
@@ -931,7 +930,6 @@ export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'ur
 export function getOrderByIdQueryOptions({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getOrderByIdQueryKey({ path })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
-    enabled: !!path,
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderById({ path }, { ...config, signal: config.signal ?? signal })
@@ -1027,7 +1025,8 @@ export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey
   return queryResult
 }
 
-export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>) =>
+  [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 

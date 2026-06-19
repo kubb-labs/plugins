@@ -122,6 +122,19 @@ export class Url {
   }
 
   /**
+   * Converts an OpenAPI/Swagger path to a template literal that reads each parameter off the
+   * grouped `path` request option, e.g. `/pet/{petId}` becomes `` `/pet/${path.petId}` ``. Parameter
+   * names are camelCased to match the generated `path` type, and `prefix` is prepended inside the
+   * literal. Shared by the client and cypress generators that pass a grouped `path` object.
+   *
+   * @example
+   * Url.toGroupedTemplateString('/pet/{petId}') // '`/pet/${path.petId}`'
+   */
+  static toGroupedTemplateString(path: string, { prefix }: { prefix?: string | null } = {}): string {
+    return Url.toTemplateString(path, { prefix, casing: 'camelcase', replacer: (name) => `path.${name}` })
+  }
+
+  /**
    * Returns the path and its extracted params as a structured `URLObject`, or as a stringified
    * expression when `stringify` is set.
    *

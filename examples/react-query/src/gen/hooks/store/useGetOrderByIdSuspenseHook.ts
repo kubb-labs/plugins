@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) =>
+export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>) =>
   ['v5', { url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>

@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 

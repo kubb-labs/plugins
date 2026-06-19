@@ -10,7 +10,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-cl
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 

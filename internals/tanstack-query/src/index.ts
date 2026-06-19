@@ -5,7 +5,6 @@ export {
   buildGroupedRequestParam,
   buildQueryKeyParams,
   buildQueryOptionsParams,
-  hasRequiredPathParams,
   resolveOperationOverrides,
   resolveQueryParamsParser,
   resolveRequestParser,

@@ -69,9 +69,9 @@ export type FindPetsByTagsRequestConfig = {
     pageSize?: FindPetsByTagsQueryPageSize
   }
   /**
-   * @type object | undefined
+   * @type object
    */
-  headers?: {
+  headers: {
     xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE
   }
   /**

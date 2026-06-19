@@ -4,13 +4,13 @@ import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTa
 import { infiniteQueryOptions, useInfiniteQuery } from '../../../../tanstack-query-hook'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
 
-export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
+export const findPetsByTagsInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
 
 export function findPetsByTagsInfiniteQueryOptions(
-  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'>,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
@@ -43,7 +43,7 @@ export function useFindPetsByTagsInfinite<
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
   TPageParam = number,
 >(
-  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query, headers }: Omit<FindPetsByTagsRequestConfig, 'url'>,
   options: {
     query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

@@ -1,4 +1,4 @@
-import { getOperationParameters, getRequestGroups } from '@internals/shared'
+import { getOperationParameters, getRequestGroupOptionality } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
 
@@ -30,24 +30,34 @@ export function buildGroupedRequestParam(
   },
 ): ast.FunctionParameterNode | null {
   const { resolver, keys = requestGroupOrder, memberTypeWrapper } = options
-  const groups = getRequestGroups(node)
+  const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
   const names = keys.filter((key) => groups[key])
 
   if (names.length === 0) {
     return null
   }
 
-  const { path: pathParams } = getOperationParameters(node)
-  const hasRequiredPath = pathParams.some((param) => param.required)
-  const isOptional = !hasRequiredPath && !groups.body
+  const requiredByGroup: Record<RequestGroupKey, boolean> = {
+    path: hasRequiredPath,
+    query: hasRequiredQuery,
+    body: groups.body,
+    headers: hasRequiredHeader,
+  }
 
-  const requestConfigType = `Omit<${resolver.resolveRequestConfigName(node)}, 'url'>`
+  // The grouped object can default to `{}` only when none of the emitted groups is required. The
+  // query key narrows `keys`, so optionality is computed over the emitted groups, not all of them.
+  const isOptional = names.every((name) => !requiredByGroup[name])
+
+  // Drop both `url` and the groups this binding never destructures (the query key omits `headers`),
+  // so a group that is required elsewhere does not leak into a binding that does not carry it.
+  const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key))
+  const requestConfigType = `Omit<${resolver.resolveRequestConfigName(node)}, ${['url', ...omittedKeys].map((key) => `'${key}'`).join(' | ')}>`
 
   if (memberTypeWrapper) {
     const members = names.map((name) => ({
       name,
       type: memberTypeWrapper(`${requestConfigType}['${name}']`),
-      optional: name === 'path' ? !hasRequiredPath : name !== 'body',
+      optional: !requiredByGroup[name],
     }))
 
     return {
@@ -194,12 +204,4 @@ export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver
   const groupedParam = buildGroupedRequestParam(node, { resolver, keys: ['path', 'query', 'body'] })
 
   return ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-}
-
-/**
- * Whether the operation has a path parameter that drives the `enabled` guard.
- * A query stays disabled until the grouped `path` option is provided.
- */
-export function hasRequiredPathParams(node: ast.OperationNode): boolean {
-  return getOperationParameters(node).path.some((param) => param.required)
 }

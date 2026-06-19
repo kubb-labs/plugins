@@ -19,7 +19,7 @@ export class petService {
   /**
    * {@link /pet/findByTags}
    */
-  async findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/pet/findByTags`, query })
     return res.data

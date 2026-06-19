@@ -146,7 +146,6 @@ export const suspenseQueryGenerator = defineGenerator<PluginReactQuery>({
           node={node}
           tsResolver={tsResolver}
           dataReturnType={clientOptions.dataReturnType || 'data'}
-          suspense
         />
 
         {suspense && (

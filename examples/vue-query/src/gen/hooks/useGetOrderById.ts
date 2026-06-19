@@ -11,7 +11,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'url'>['path']> }) =>
+export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>['path']> }) =>
   [{ url: '/store/order/:orderId', params: path }] as const
 
 export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
@@ -39,7 +39,6 @@ export function getOrderByIdQueryOptions(
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200>({
-    enabled: () => !!toValue(path),
     queryKey,
     queryFn: async ({ signal }) => {
       return getOrderById({ path: toValue(path) }, { ...config, signal: config.signal ?? signal })

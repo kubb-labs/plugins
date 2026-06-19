@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'url'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
+export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'url' | 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
 
 type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
 

@@ -9,7 +9,7 @@ import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus200, 
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -50,7 +50,7 @@ export function useGetPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, op
   const queryKey = getPetByIdQueryKey({ path })
 
   return useSWR<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdQueryKey | null>(
-   shouldFetch && !!path ? queryKey : null,
+   shouldFetch ? queryKey : null,
    {
      ...getPetByIdQueryOptions({ path }, config),
      ...(immutable ? {

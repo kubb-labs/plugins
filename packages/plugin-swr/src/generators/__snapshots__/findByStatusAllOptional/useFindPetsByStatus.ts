@@ -9,7 +9,7 @@ import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsB
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>

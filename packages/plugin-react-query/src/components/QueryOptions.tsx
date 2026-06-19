@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildQueryOptionsParams, hasRequiredPathParams } from '@internals/tanstack-query'
+import { buildQueryOptionsParams } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
@@ -14,7 +14,6 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
-  suspense?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -24,7 +23,7 @@ export function getQueryOptionsParams(node: ast.OperationNode, options: { resolv
   return buildQueryOptionsParams(node, options)
 }
 
-export function QueryOptions({ name, clientName, dataReturnType, node, tsResolver, queryKeyName, suspense }: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, dataReturnType, node, tsResolver, queryKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -34,9 +33,6 @@ export function QueryOptions({ name, clientName, dataReturnType, node, tsResolve
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-
-  // Suspense queries can't be disabled, so they carry no `enabled` guard.
-  const enabledText = suspense || !hasRequiredPathParams(node) ? '' : 'enabled: !!path,'
 
   const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
@@ -48,7 +44,7 @@ export function QueryOptions({ name, clientName, dataReturnType, node, tsResolve
       <Function name={name} export params={paramsSignature}>
         {`
       const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-      return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({${enabledText ? `\n       ${enabledText}` : ''}
+      return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({
        queryKey,
        queryFn: async ({ signal }) => {
           return ${clientName}(${clientCallStr})
