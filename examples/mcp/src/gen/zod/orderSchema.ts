@@ -4,6 +4,9 @@
  */
 
 import * as z from 'zod'
+import { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.js'
+import { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.js'
+import { orderStatusEnumSchema } from './orderStatusEnumSchema.js'
 
 export const orderSchema = z.object({
   id: z
@@ -18,20 +21,18 @@ export const orderSchema = z.object({
     .int()
     .optional()
     .meta({ examples: [7] }),
-  orderType: z.enum(['foo', 'bar']).optional(),
+  orderType: orderOrderTypeEnumSchema.optional(),
   type: z
     .string()
     .optional()
     .describe('Order Status')
     .meta({ examples: ['approved'] }),
   shipDate: z.iso.datetime().optional(),
-  status: z
-    .enum(['placed', 'approved', 'delivered'])
+  status: orderStatusEnumSchema
     .optional()
     .describe('Order Status')
     .meta({ examples: ['approved'] }),
-  http_status: z
-    .union([z.literal(200), z.literal(400), z.literal(500)])
+  http_status: orderHttpStatusEnumSchema
     .optional()
     .describe('HTTP Status')
     .meta({ examples: [200] }),

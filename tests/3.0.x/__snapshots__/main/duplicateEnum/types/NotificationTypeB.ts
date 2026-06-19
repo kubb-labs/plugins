@@ -3,7 +3,7 @@
 * Do not edit manually.
 */
 
-import type { NotificationTypeAParamsChannelEnumKey } from './NotificationTypeAParamsChannelEnum.ts'
+import type { NotificationTypeBParamsChannelEnumKey } from './NotificationTypeBParamsChannelEnum.ts'
 
 /**
  * @type object
@@ -17,7 +17,7 @@ export type NotificationTypeB = {
      * @type object
     */
     params: {
-        channel: NotificationTypeAParamsChannelEnumKey;
+        channel: NotificationTypeBParamsChannelEnumKey;
         /**
          * @type string
         */

@@ -4,12 +4,6 @@ export { findPetsByStatusHandler, findPetsByStatusHandlerResponse200, findPetsBy
 export { findPetsByTagsHandler, findPetsByTagsHandlerResponse200, findPetsByTagsHandlerResponse400 } from './Handlers/findPetsByTagsHandler.ts'
 export { getPetByIdHandler, getPetByIdHandlerResponse200, getPetByIdHandlerResponse400, getPetByIdHandlerResponse404 } from './Handlers/getPetByIdHandler.ts'
 export { optionsFindPetsByStatusHandler, optionsFindPetsByStatusHandlerResponse200 } from './Handlers/optionsFindPetsByStatusHandler.ts'
-export {
-  updatePetHandler,
-  updatePetHandlerResponse200,
-  updatePetHandlerResponse400,
-  updatePetHandlerResponse404,
-  updatePetHandlerResponse405,
-} from './Handlers/updatePetHandler.ts'
+export { updatePetHandler, updatePetHandlerResponse200, updatePetHandlerResponse400, updatePetHandlerResponse404, updatePetHandlerResponse405 } from './Handlers/updatePetHandler.ts'
 export { updatePetWithFormHandler, updatePetWithFormHandlerResponse405 } from './Handlers/updatePetWithFormHandler.ts'
 export { uploadFileHandler, uploadFileHandlerResponse200 } from './Handlers/uploadFileHandler.ts'

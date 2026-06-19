@@ -1,9 +1,11 @@
 import * as z from 'zod'
 import { addPetRequestSchema } from '../addPetRequestSchema.ts'
-import { petNotFoundSchema } from '../petNotFoundSchema.ts'
 import { petSchema } from '../petSchema.ts'
 
-export const addPetStatus405Schema = petNotFoundSchema
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
+})
 
 export type AddPetStatus405SchemaType = z.infer<typeof addPetStatus405Schema>
 

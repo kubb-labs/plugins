@@ -1,15 +1,7 @@
+import type { CreatePetsBoolParamKey } from '../CreatePetsBoolParam.ts'
 import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
 import type { PetNotFound } from '../PetNotFound.ts'
 
-export const createPetsBoolParam = {
-  true: true,
-} as const
-
-export type CreatePetsBoolParamKey = (typeof createPetsBoolParam)[keyof typeof createPetsBoolParam]
-
-/**
- * @type boolean | undefined
- */
 export type CreatePetsQueryBoolParam = CreatePetsBoolParamKey | undefined
 
 /**

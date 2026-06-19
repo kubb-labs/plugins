@@ -5,7 +5,24 @@
 
 import * as z from 'zod'
 
+export const orderStatusEnumSchema = z
+  .enum(['placed', 'approved', 'delivered'])
+  .describe('Order Status')
+  .meta({ examples: ['approved'] })
+
+export const orderHttpStatusEnumSchema = z
+  .union([z.literal(200), z.literal(400), z.literal(500)])
+  .describe("HTTP Status's and item of this")
+  .meta({ examples: [200] })
+
 export const petStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
+
+export const addPetRequestStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
+
+export const findPetsByStatusStatusSchema = z
+  .enum(['available', 'pending', 'sold'])
+  .default('available')
+  .describe('Status values that need to be considered for filter')
 
 export const orderSchema = z.object({
   id: z
@@ -21,13 +38,11 @@ export const orderSchema = z.object({
     .optional()
     .meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
-  status: z
-    .enum(['placed', 'approved', 'delivered'])
+  status: orderStatusEnumSchema
     .optional()
     .describe('Order Status')
     .meta({ examples: ['approved'] }),
-  http_status: z
-    .union([z.literal(200), z.literal(400), z.literal(500)])
+  http_status: orderHttpStatusEnumSchema
     .optional()
     .describe("HTTP Status's and item of this")
     .meta({ examples: [200] }),
@@ -118,6 +133,11 @@ export const userSchema = personSchema.and(
   }),
 )
 
+export const tagSchema = z.object({
+  id: z.bigint().optional(),
+  name: z.string().optional(),
+})
+
 export const petSchema = z.object({
   id: z
     .bigint()
@@ -126,8 +146,20 @@ export const petSchema = z.object({
   name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
-  tags: z.array(categorySchema).optional(),
+  tags: z.array(tagSchema).optional(),
   status: petStatusEnumSchema.optional().describe('pet status in the store'),
+})
+
+export const addPetRequestSchema = z.object({
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
+  category: categorySchema.optional(),
+  photoUrls: z.array(z.string()),
+  tags: z.array(tagSchema).optional(),
+  status: addPetRequestStatusEnumSchema.optional().describe('pet status in the store'),
 })
 
 export const apiResponseSchema = z.object({
@@ -171,11 +203,14 @@ export const addPetStatus200SchemaXml = petSchema
 
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
-export const addPetStatus405Schema = petNotFoundSchema
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
+})
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetDataSchemaJson = petSchema.describe('Create a new pet in the store')
+export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
 export const addPetDataSchemaXml = petSchema.describe('Create a new pet in the store')
 
@@ -183,7 +218,7 @@ export const addPetDataSchemaFormUrlEncoded = petSchema.describe('Create a new p
 
 export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
-export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema
+export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusSchema
   .optional()
   .default('available')
   .describe('Status values that need to be considered for filter')

@@ -25,7 +25,7 @@ export default defineConfig([
     hooks: {
       done: ['npm run typecheck'],
     },
-    adapter: adapterOas({ collisionDetection: false }),
+    adapter: adapterOas({ collisionDetection: false, enums: 'root' }),
     plugins: [
       pluginRedoc({
         output: {

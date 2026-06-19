@@ -1,0 +1,39 @@
+// version: 1.0.11
+
+import type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.ts'
+import type { Category } from './Category.ts'
+import type { Tag } from './Tag.ts'
+
+/**
+ * @type object
+ */
+export type AddPetRequest = {
+  /**
+   * @description
+   * Format: `int64`
+   * @example 10
+   * @type integer | undefined
+   */
+  id?: number
+  /**
+   * @example doggie
+   * @type string
+   */
+  name: string
+  /**
+   * @type object | undefined
+   */
+  category?: Category
+  /**
+   * @type array
+   */
+  photoUrls: string[]
+  /**
+   * @type array | undefined
+   */
+  tags?: Tag[]
+  /**
+   * @description pet status in the store
+   */
+  status?: AddPetRequestStatusEnumKey
+}

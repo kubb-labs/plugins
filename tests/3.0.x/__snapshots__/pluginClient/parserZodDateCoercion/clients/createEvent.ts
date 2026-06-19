@@ -24,7 +24,7 @@ export async function createEvent(data: CreateEventData, config: Partial<Request
 
   const requestData = createEventDataSchema.parse(data)
 
-  const res = await request<CreateEventStatus201, ResponseErrorConfig<CreateEventStatus400>, z.output<typeof createEventDataSchema>>({ method: 'POST', url: getCreateEventUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<CreateEventStatus201, ResponseErrorConfig<CreateEventStatus400>, z.input<typeof createEventDataSchema>>({ method: 'POST', url: getCreateEventUrl().url.toString(), data: requestData, ...requestConfig })
 
   return createEventResponseSchema.parse(res.data)
 }

@@ -26,7 +26,7 @@ export async function createUser(
 
   const requestData = createUserDataSchema.parse(data)
 
-  const res = await request<CreateUserStatusDefault, ResponseErrorConfig<Error>, z.output<typeof createUserDataSchema>>({
+  const res = await request<CreateUserStatusDefault, ResponseErrorConfig<Error>, z.input<typeof createUserDataSchema>>({
     method: 'POST',
     url: getCreateUserUrl().url.toString(),
     data: requestData,

@@ -1,16 +1,23 @@
 export type { AddPetRequestSchemaType } from './addPetRequestSchema.ts'
+export type { AddPetRequestStatusEnumSchemaType } from './addPetRequestStatusEnumSchema.ts'
 export type { AddressSchemaType } from './addressSchema.ts'
 export type { AnimalSchemaType } from './animalSchema.ts'
+export type { AnimalTypeEnumSchemaType } from './animalTypeEnumSchema.ts'
 export type { ApiResponseSchemaType } from './apiResponseSchema.ts'
 export type { CatSchemaType } from './catSchema.ts'
 export type { CategorySchemaType } from './categorySchema.ts'
+export type { CreatePetsBoolParamSchemaType } from './createPetsBoolParamSchema.ts'
 export type { CreatePetsXEXAMPLESchemaType } from './createPetsXEXAMPLESchema.ts'
+export type { CustomerParamsStatusEnumSchemaType } from './customerParamsStatusEnumSchema.ts'
 export type { CustomerSchemaType } from './customerSchema.ts'
 export type { DogSchemaType } from './dogSchema.ts'
+export type { FindPetsByTagsXEXAMPLESchemaType } from './findPetsByTagsXEXAMPLESchema.ts'
 export type { ImageSchemaType } from './imageSchema.ts'
-export type { OrderParamsSchemaType } from './orderParamsSchema.ts'
+export type { OrderHttpStatusEnumSchemaType } from './orderHttpStatusEnumSchema.ts'
+export type { OrderOrderTypeEnumSchemaType } from './orderOrderTypeEnumSchema.ts'
 export type { OrderParamsStatusEnumSchemaType } from './orderParamsStatusEnumSchema.ts'
 export type { OrderSchemaType } from './orderSchema.ts'
+export type { OrderStatusEnumSchemaType } from './orderStatusEnumSchema.ts'
 export type {
   AddFilesDataSchemaFormDataType,
   AddFilesDataSchemaJsonType,
@@ -105,6 +112,7 @@ export type {
   CreatePetsStatus201SchemaType,
   CreatePetsStatusDefaultSchemaType,
 } from './pets/createPetsSchema.ts'
+export type { TagTagSchemaType } from './tag/tagSchema.ts'
 export type {
   CreateUserDataSchemaFormUrlEncodedType,
   CreateUserDataSchemaJsonType,
@@ -160,18 +168,25 @@ export type {
 export type { UserArraySchemaType } from './userArraySchema.ts'
 export type { UserSchemaType } from './userSchema.ts'
 export { addPetRequestSchema } from './addPetRequestSchema.ts'
+export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.ts'
 export { addressSchema } from './addressSchema.ts'
 export { animalSchema } from './animalSchema.ts'
+export { animalTypeEnumSchema } from './animalTypeEnumSchema.ts'
 export { apiResponseSchema } from './apiResponseSchema.ts'
 export { catSchema } from './catSchema.ts'
 export { categorySchema } from './categorySchema.ts'
+export { createPetsBoolParamSchema } from './createPetsBoolParamSchema.ts'
 export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
+export { customerParamsStatusEnumSchema } from './customerParamsStatusEnumSchema.ts'
 export { customerSchema } from './customerSchema.ts'
 export { dogSchema } from './dogSchema.ts'
+export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema.ts'
 export { imageSchema } from './imageSchema.ts'
-export { orderParamsSchema } from './orderParamsSchema.ts'
+export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.ts'
+export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.ts'
 export { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
 export { orderSchema } from './orderSchema.ts'
+export { orderStatusEnumSchema } from './orderStatusEnumSchema.ts'
 export {
   addFilesDataSchema,
   addFilesDataSchemaFormData,
@@ -261,6 +276,7 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './pets/createPetsSchema.ts'
+export { tagTagSchema } from './tag/tagSchema.ts'
 export {
   createUserDataSchema,
   createUserDataSchemaFormUrlEncoded,

@@ -1,6 +1,6 @@
 import * as z from 'zod'
 import { addressSchema } from './addressSchema.ts'
-import { orderParamsSchema } from './orderParamsSchema.ts'
+import { customerParamsStatusEnumSchema } from './customerParamsStatusEnumSchema.ts'
 
 export const customerSchema = z.object({
   id: z
@@ -11,7 +11,12 @@ export const customerSchema = z.object({
     .string()
     .optional()
     .meta({ examples: ['fehguy'] }),
-  params: orderParamsSchema.optional(),
+  params: z
+    .object({
+      status: customerParamsStatusEnumSchema.describe('Order Status').meta({ examples: ['approved'] }),
+      type: z.string(),
+    })
+    .optional(),
   address: z.array(addressSchema).optional(),
 })
 

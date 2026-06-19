@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { createPetsXEXAMPLESchema } from '../createPetsXEXAMPLESchema.ts'
+import { findPetsByTagsXEXAMPLESchema } from '../findPetsByTagsXEXAMPLESchema.ts'
 import { petSchema } from '../petSchema.ts'
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
@@ -14,7 +14,7 @@ export const findPetsByTagsQueryPageSizeSchema = z.number().optional().describe(
 
 export type FindPetsByTagsQueryPageSizeSchemaType = z.infer<typeof findPetsByTagsQueryPageSizeSchema>
 
-export const findPetsByTagsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
+export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLESchema.describe('Header parameters')
 
 export type FindPetsByTagsHeaderXEXAMPLESchemaType = z.infer<typeof findPetsByTagsHeaderXEXAMPLESchema>
 

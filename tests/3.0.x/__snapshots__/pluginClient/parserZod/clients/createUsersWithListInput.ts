@@ -25,7 +25,7 @@ export async function createUsersWithListInput(data?: CreateUsersWithListInputDa
 
   const requestData = createUsersWithListInputDataSchema.parse(data)
 
-  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, z.output<typeof createUsersWithListInputDataSchema>>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
+  const res = await request<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, z.input<typeof createUsersWithListInputDataSchema>>({ method: 'POST', url: getCreateUsersWithListInputUrl().url.toString(), data: requestData, ...requestConfig })
 
   return createUsersWithListInputResponseSchema.parse(res.data)
 }

@@ -27,7 +27,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -46,7 +46,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -66,7 +66,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -86,7 +86,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -106,7 +106,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -126,7 +126,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -147,7 +147,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/dateFieldRequest.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, dateType: 'date' }),
+      adapter: adapterOas({ validate: false, dateType: 'date', enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -168,7 +168,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -188,7 +188,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/paramsCasing.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -208,7 +208,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -228,7 +228,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -249,7 +249,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -269,7 +269,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/petStore.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
@@ -329,7 +329,7 @@ describe(`plugin-client options ${version}`, () => {
         root: __dirname,
         input: { path: '../../schemas/3.0.x/petStore.yaml' },
         output: { path: output, barrel: { type: 'named' } },
-        adapter: adapterOas({ validate: false }),
+        adapter: adapterOas({ validate: false, enums: 'root' }),
         parsers: [parserTs],
         reporters: [],
         storage: fsStorage(),

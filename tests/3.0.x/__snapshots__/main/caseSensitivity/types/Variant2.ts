@@ -3,11 +3,7 @@
 * Do not edit manually.
 */
 
-export const variant2CategoryEnum = {
-    lowercase: "lowercase"
-} as const;
-
-export type Variant2CategoryEnumKey = (typeof variant2CategoryEnum)[keyof typeof variant2CategoryEnum];
+import type { Variant2CategoryEnumKey } from './Variant2CategoryEnum.ts'
 
 /**
  * @type object
@@ -21,8 +17,5 @@ export type Variant2 = {
      * @type string | undefined
     */
     label?: string;
-    /**
-     * @type string | undefined
-    */
     category?: Variant2CategoryEnumKey;
 };

@@ -1,4 +1,5 @@
 import type { Animal } from '../models/ts/Animal.ts'
+import { createAnimalTypeEnumFaker } from './createAnimalTypeEnumFaker.ts'
 import { createCatFaker } from './createCatFaker.ts'
 import { createDogFaker } from './createDogFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -20,7 +21,7 @@ export function createAnimalFaker<TData extends Partial<Animal> = object>(data?:
       },
     ]),
     ...{
-      type: faker.helpers.arrayElement<NonNullable<Animal>['type']>(['cat', 'dog']),
+      type: createAnimalTypeEnumFaker(),
     },
   }
   return {

@@ -1,18 +1,22 @@
 import type { Order } from '../models/ts/Order.ts'
-import { createOrderParamsFaker } from './createOrderParamsFaker.ts'
+import { createOrderHttpStatusEnumFaker } from './createOrderHttpStatusEnumFaker.ts'
+import { createOrderOrderTypeEnumFaker } from './createOrderOrderTypeEnumFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createOrderFaker<TData extends Partial<Order> = object>(data?: TData) {
   const defaultFakeData = {
     id: faker.number.int(),
     petId: faker.number.int(),
-    params: createOrderParamsFaker(),
+    params: {
+      status: faker.helpers.arrayElement<any>(['working', 'idle']),
+      type: faker.string.alpha(),
+    },
     quantity: faker.number.int(),
-    orderType: faker.helpers.arrayElement<NonNullable<Order>['orderType']>(['foo', 'bar']),
+    orderType: createOrderOrderTypeEnumFaker(),
     type: faker.string.alpha(),
     shipDate: faker.date.anytime().toISOString(),
     status: faker.helpers.arrayElement<any>(['working', 'idle']),
-    http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
+    http_status: createOrderHttpStatusEnumFaker(),
     complete: faker.datatype.boolean(),
   }
   return {

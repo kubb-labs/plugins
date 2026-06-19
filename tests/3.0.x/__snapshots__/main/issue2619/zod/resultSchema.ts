@@ -5,9 +5,10 @@
 
 import * as z from 'zod'
 import { parcelSchema } from './parcelSchema.ts'
+import { resultStateEnumSchema } from './resultStateEnumSchema.ts'
 
 export const resultSchema = z.object({
   returnId: z.string(),
-  state: z.enum(['ACCEPTED', 'REJECTED']),
+  state: resultStateEnumSchema,
   parcels: z.array(parcelSchema).optional(),
 })

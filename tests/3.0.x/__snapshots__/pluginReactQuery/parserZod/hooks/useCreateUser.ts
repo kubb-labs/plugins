@@ -23,7 +23,7 @@ export async function createUser(data?: CreateUserData, config: Partial<RequestC
 
   const requestData = createUserDataSchema.parse(data)
 
-  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, z.output<typeof createUserDataSchema>>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
+  const res = await request<CreateUserResponse, ResponseErrorConfig<Error>, z.input<typeof createUserDataSchema>>({ method: 'POST', url: `/user`, data: requestData, contentType, ...requestConfig })
 
   return createUserResponseSchema.parse(res.data)
 }

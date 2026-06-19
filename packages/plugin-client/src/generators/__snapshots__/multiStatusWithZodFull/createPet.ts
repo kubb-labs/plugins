@@ -20,7 +20,7 @@ export async function createPet(data?: CreatePetData, config: Partial<RequestCon
 
   const requestData = CreatePetData.parse(data)
 
-  const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, z.output<typeof CreatePetData>>({
+  const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, z.input<typeof CreatePetData>>({
     method: 'POST',
     url: getCreatePetUrl().url.toString(),
     data: requestData,

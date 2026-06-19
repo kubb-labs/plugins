@@ -6,6 +6,8 @@ export {
   addFilesStatus200Schema,
   addFilesStatus405Schema,
 } from './addFilesSchema.js'
+export { addPetRequestSchema } from './addPetRequestSchema.js'
+export { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.js'
 export {
   addPetDataSchema,
   addPetDataSchemaFormUrlEncoded,
@@ -71,6 +73,7 @@ export {
   findPetsByTagsStatus200SchemaXml,
   findPetsByTagsStatus400Schema,
 } from './findPetsByTagsSchema.js'
+export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema.js'
 export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema.js'
 export {
   getOrderByIdPathOrderIdSchema,
@@ -109,7 +112,10 @@ export {
   loginUserStatus400Schema,
 } from './loginUserSchema.js'
 export { logoutUserResponseSchema, logoutUserStatusDefaultSchema } from './logoutUserSchema.js'
+export { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.js'
+export { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.js'
 export { orderSchema } from './orderSchema.js'
+export { orderStatusEnumSchema } from './orderStatusEnumSchema.js'
 export { petNotFoundSchema } from './petNotFoundSchema.js'
 export { petSchema } from './petSchema.js'
 export { petStatusEnumSchema } from './petStatusEnumSchema.js'
@@ -131,6 +137,7 @@ export {
   placeOrderStatus200Schema,
   placeOrderStatus405Schema,
 } from './placeOrderSchema.js'
+export { tagTagSchema } from './tag/tagSchema.js'
 export {
   updatePetDataSchema,
   updatePetDataSchemaFormUrlEncoded,

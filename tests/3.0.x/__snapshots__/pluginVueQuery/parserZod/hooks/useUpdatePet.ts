@@ -24,7 +24,7 @@ export async function updatePet(data: UpdatePetData, config: Partial<RequestConf
 
   const requestData = updatePetDataSchema.parse(data)
 
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, z.output<typeof updatePetDataSchema>>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, z.input<typeof updatePetDataSchema>>({ method: 'PUT', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return updatePetResponseSchema.parse(res.data)
 }

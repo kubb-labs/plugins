@@ -21,6 +21,7 @@ export default defineConfig({
     validate: true,
     discriminator: 'preserve',
     integerType: 'number',
+    enums: 'root',
   }),
   output: {
     path: './src/gen',

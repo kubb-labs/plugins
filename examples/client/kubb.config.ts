@@ -27,7 +27,7 @@ export default defineConfig([
       format: false,
       lint: false,
     },
-    adapter: adapterOas({ dateType: 'date' }),
+    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
     plugins: [
       tsPlugin,
       pluginClient({
@@ -54,7 +54,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen2', format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date', contentType: 'application/xml' }),
+    adapter: adapterOas({ dateType: 'date', contentType: 'application/xml', enums: 'root' }),
     plugins: [
       tsPlugin,
       pluginClient({
@@ -73,7 +73,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen3', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date' }),
+    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
     plugins: [
       tsPlugin,
       pluginClient({
@@ -90,7 +90,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen4', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date' }),
+    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
     plugins: [
       pluginClient({
         output: { path: './tagClientOperation.ts', mode: 'file' },
@@ -106,7 +106,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen5', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date' }),
+    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
     plugins: [
       pluginClient({
         output: { path: './tagClientOperationReact.ts', mode: 'file' },
@@ -122,7 +122,7 @@ export default defineConfig([
     root: '.',
     input,
     output: { path: './src/gen6', clean: true, format: false, lint: false },
-    adapter: adapterOas({ dateType: 'date' }),
+    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
     plugins: [
       tsPlugin,
       pluginClient({
@@ -140,7 +140,7 @@ export default defineConfig([
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
     },
-    adapter: adapterOas({ dateType: 'date' }),
+    adapter: adapterOas({ dateType: 'date', enums: 'root' }),
     plugins: [
       tsPlugin,
       pluginClient({

@@ -1,16 +1,23 @@
 export { createAddPetRequestFaker } from './createAddPetRequestFaker.ts'
+export { createAddPetRequestStatusEnumFaker } from './createAddPetRequestStatusEnumFaker.ts'
 export { createAddressFaker } from './createAddressFaker.ts'
 export { createAnimalFaker } from './createAnimalFaker.ts'
+export { createAnimalTypeEnumFaker } from './createAnimalTypeEnumFaker.ts'
 export { createApiResponseFaker } from './createApiResponseFaker.ts'
 export { createCatFaker } from './createCatFaker.ts'
 export { createCategoryFaker } from './createCategoryFaker.ts'
+export { createCreatePetsBoolParamFaker } from './createCreatePetsBoolParamFaker.ts'
 export { createCreatePetsXEXAMPLEFaker } from './createCreatePetsXEXAMPLEFaker.ts'
 export { createCustomerFaker } from './createCustomerFaker.ts'
+export { createCustomerParamsStatusEnumFaker } from './createCustomerParamsStatusEnumFaker.ts'
 export { createDogFaker } from './createDogFaker.ts'
+export { createFindPetsByTagsXEXAMPLEFaker } from './createFindPetsByTagsXEXAMPLEFaker.ts'
 export { createImageFaker } from './createImageFaker.ts'
 export { createOrderFaker } from './createOrderFaker.ts'
-export { createOrderParamsFaker } from './createOrderParamsFaker.ts'
+export { createOrderHttpStatusEnumFaker } from './createOrderHttpStatusEnumFaker.ts'
+export { createOrderOrderTypeEnumFaker } from './createOrderOrderTypeEnumFaker.ts'
 export { createOrderParamsStatusEnumFaker } from './createOrderParamsStatusEnumFaker.ts'
+export { createOrderStatusEnumFaker } from './createOrderStatusEnumFaker.ts'
 export { createPetFaker } from './createPetFaker.ts'
 export { createPetNotFoundFaker } from './createPetNotFoundFaker.ts'
 export { createPetStatusEnumFaker } from './createPetStatusEnumFaker.ts'
@@ -107,6 +114,7 @@ export {
   createCreatePetsStatus201Faker,
   createCreatePetsStatusDefaultFaker,
 } from './pets/createCreatePetsFaker.ts'
+export { createTagTagFaker } from './tag/createTagFaker.ts'
 export {
   createCreateUserDataFaker,
   createCreateUserDataFakerFormUrlEncoded,

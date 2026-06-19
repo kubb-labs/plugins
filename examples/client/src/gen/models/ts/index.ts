@@ -1,11 +1,17 @@
+export type { AddPetRequest } from './AddPetRequest.js'
+export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
 export type { Customer } from './Customer.js'
-export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './Order.js'
+export type { FindPetsByStatusStatusKey } from './FindPetsByStatusStatus.js'
+export type { Order } from './Order.js'
+export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.js'
+export type { OrderStatusEnumKey } from './OrderStatusEnum.js'
 export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type { PetStatusEnumKey } from './PetStatusEnum.js'
+export type { Tag } from './Tag.js'
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
 export type {
@@ -203,5 +209,8 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './user/UpdateUser.js'
-export { orderHttpStatusEnum, orderStatusEnum } from './Order.js'
+export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.js'
+export { findPetsByStatusStatus } from './FindPetsByStatusStatus.js'
+export { orderHttpStatusEnum } from './OrderHttpStatusEnum.js'
+export { orderStatusEnum } from './OrderStatusEnum.js'
 export { petStatusEnum } from './PetStatusEnum.js'
