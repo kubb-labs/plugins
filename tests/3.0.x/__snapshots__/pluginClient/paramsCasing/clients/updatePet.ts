@@ -4,10 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { UpdatePetRequestConfig, UpdatePetPathPetId, UpdatePetData, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { UpdatePetRequestConfig, UpdatePetData, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-function getUpdatePetUrl(path: { petId: UpdatePetPathPetId }) {
+function getUpdatePetUrl(path: UpdatePetRequestConfig['path']) {
   const res = { method: 'POST', url: `/pets/${path.petId}` as const }
 
   return res

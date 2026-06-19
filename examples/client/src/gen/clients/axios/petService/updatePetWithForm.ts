@@ -1,15 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type {
-  UpdatePetWithFormRequestConfig,
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormResponse,
-  UpdatePetWithFormStatus405,
-} from '../../../models/ts/pet/UpdatePetWithForm.js'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['path']) {
   const res = { method: 'POST', url: `/pet/${path.petId}` as const }
 
   return res

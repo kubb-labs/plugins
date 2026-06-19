@@ -1,10 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DownloadFileRequestConfig, DownloadFilePathFileId, DownloadFileStatus200 } from './DownloadFile'
+import type { DownloadFileRequestConfig, DownloadFileStatus200 } from './DownloadFile'
 import { client } from './.kubb/client'
 
-export function getDownloadFileUrl(path: { fileId: DownloadFilePathFileId }) {
+export function getDownloadFileUrl(path: DownloadFileRequestConfig['path']) {
   const res = { method: 'GET', url: `/files/${path.fileId}` as const }
 
   return res

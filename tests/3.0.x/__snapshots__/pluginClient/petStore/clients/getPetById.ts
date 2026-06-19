@@ -4,10 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { GetPetByIdRequestConfig, GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-function getGetPetByIdUrl(path: { petId: GetPetByIdPathPetId }) {
+function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
   const res = { method: 'GET', url: `/pet/${path.petId}` as const }
 
   return res

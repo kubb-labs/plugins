@@ -1,16 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type {
-  GetPetByIdRequestConfig,
-  GetPetByIdPathPetId,
-  GetPetByIdStatus200,
-  GetPetByIdStatus400,
-  GetPetByIdStatus404,
-} from '../../../models/ts/pet/GetPetById.js'
+import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getGetPetByIdUrl(path: { petId: GetPetByIdPathPetId }) {
+function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
   const res = { method: 'GET', url: `/pet/${path.petId}` as const }
 
   return res

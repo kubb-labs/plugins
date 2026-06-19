@@ -1,9 +1,9 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
 import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
-export function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+export function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['path']) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
 
   return res

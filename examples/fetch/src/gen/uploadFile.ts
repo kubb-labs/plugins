@@ -4,11 +4,11 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from './models.ts'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from './.kubb/config.ts'
 
-function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}/uploadImage` as const }
 
   return res

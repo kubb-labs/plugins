@@ -1,8 +1,8 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.ts'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.ts'
 
-export function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+export function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}/uploadImage` as const }
 
   return res

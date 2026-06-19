@@ -1,10 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormPathPetId, UpdatePetWithFormData, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import { client } from './.kubb/client'
 
-export function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+export function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['path']) {
   const res = { method: 'POST', url: `/pet/${path.petId}` as const }
 
   return res

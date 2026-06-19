@@ -1,10 +1,10 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetOrganizationRequestConfig, GetOrganizationPathOrganizationId, GetOrganizationStatus200 } from './GetOrganization'
+import type { GetOrganizationRequestConfig, GetOrganizationStatus200 } from './GetOrganization'
 import { client } from './.kubb/client'
 
-export function getGetOrganizationUrl(path: { organizationId: GetOrganizationPathOrganizationId }) {
+export function getGetOrganizationUrl(path: GetOrganizationRequestConfig['path']) {
   const res = { method: 'GET', url: `/organizations/${path.organizationId}` as const }
 
   return res
