@@ -9,8 +9,8 @@ import type {
 } from '../../../models/ts/pet/GetPetById.ts'
 import { getPetByIdResponseSchema } from '../../../zod/pet/getPetByIdSchema.ts'
 
-export function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/${petId}:search` as const }
+export function getGetPetByIdUrl(path: { petId: GetPetByIdPathPetId }) {
+  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
 
   return res
 }

@@ -20,15 +20,11 @@ export const deletePetMutationKey = () => [{ url: '/pet/:pet_id' }] as const
 export async function deletePetHook({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const { petId } = path
-
-  const pet_id = petId
-
   const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
-    url: `/pet/${pet_id}`,
+    url: `/pet/${path.petId}`,
     ...requestConfig,
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })

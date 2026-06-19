@@ -9,12 +9,10 @@ export function showPetById(
   { path }: Omit<ShowPetByIdRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<ShowPetByIdResponse> {
-  const { petId } = path
-
   return cy
     .request<ShowPetByIdResponse>({
       method: 'GET',
-      url: `/pets/${petId}`,
+      url: `/pets/${path.petId}`,
       ...options,
     })
     .then((res) => res.body)

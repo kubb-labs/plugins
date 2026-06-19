@@ -9,12 +9,10 @@ export function deleteOrder(
   { path }: Omit<DeleteOrderRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<DeleteOrderResponse> {
-  const { orderId } = path
-
   return cy
     .request<DeleteOrderResponse>({
       method: 'DELETE',
-      url: `http://localhost:3000/store/order/${orderId}`,
+      url: `http://localhost:3000/store/order/${path.orderId}`,
       ...options,
     })
     .then((res) => res.body)

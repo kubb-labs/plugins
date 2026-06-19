@@ -129,13 +129,11 @@ placeOrderPatch.queryParams = {} as never
 export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const { orderId } = path
-
   const res = await request<
     GetOrderByIdStatus200 | GetOrderByIdStatus400 | GetOrderByIdStatus404,
     ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>,
     unknown
-  >({ method: 'GET', url: `/store/order/${orderId}`, ...requestConfig })
+  >({ method: 'GET', url: `/store/order/${path.orderId}`, ...requestConfig })
 
   return res as
     | { status: 200; data: GetOrderByIdStatus200; statusText: string }
@@ -159,11 +157,9 @@ getOrderById.queryParams = {} as never
 export async function deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const { orderId } = path
-
   const res = await request<DeleteOrderStatus400 | DeleteOrderStatus404, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
     method: 'DELETE',
-    url: `/store/order/${orderId}`,
+    url: `/store/order/${path.orderId}`,
     ...requestConfig,
   })
 

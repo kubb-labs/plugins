@@ -3,8 +3,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axi
 import type { DeletePetRequestConfig, DeletePetPathPetId, DeletePetStatus400 } from '../../../models/ts/pet/DeletePet.ts'
 import { deletePetResponseSchema } from '../../../zod/pet/deletePetSchema.ts'
 
-export function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/pet/${petId}:search` as const }
+export function getDeletePetUrl(path: { petId: DeletePetPathPetId }) {
+  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
 
   return res
 }

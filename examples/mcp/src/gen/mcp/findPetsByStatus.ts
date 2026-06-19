@@ -13,10 +13,8 @@ export async function findPetsByStatusHandler(
   { stepId }: { stepId: FindPetsByStatusPathStepId },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const step_id = stepId
-
   const res = await client<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>(
-    { method: 'GET', url: `/pet/findByStatus/${step_id}`, baseURL: `https://petstore.swagger.io/v2` },
+    { method: 'GET', url: `/pet/findByStatus/${stepId}`, baseURL: `https://petstore.swagger.io/v2` },
     request,
   )
 

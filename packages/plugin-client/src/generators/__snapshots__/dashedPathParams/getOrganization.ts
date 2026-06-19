@@ -4,8 +4,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { GetOrganizationRequestConfig, GetOrganizationPathOrganizationId, GetOrganizationStatus200 } from './GetOrganization'
 import { client } from './.kubb/client'
 
-export function getGetOrganizationUrl({ organizationId }: { organizationId: GetOrganizationPathOrganizationId }) {
-  const res = { method: 'GET', url: `/organizations/${organizationId}` as const }
+export function getGetOrganizationUrl(path: { organizationId: GetOrganizationPathOrganizationId }) {
+  const res = { method: 'GET', url: `/organizations/${path.organizationId}` as const }
 
   return res
 }

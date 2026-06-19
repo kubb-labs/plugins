@@ -1,5 +1,5 @@
 import { buildOperationComments, buildParamsMapping, buildRequestParamsSignature, getContentTypeInfo, getOperationParameters } from '@internals/shared'
-import { isValidVarName, Url } from '@internals/utils'
+import { Url } from '@internals/utils'
 import { buildJSDoc, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -50,10 +50,9 @@ function generateMethod({ node, name, tsResolver, zodResolver, baseURL, dataRetu
   if (!ast.isHttpOperationNode(node)) return ''
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
-  const { path: originalPathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
-  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { query: queryParams, header: headerParams } = getOperationParameters(node)
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
-  const pathParamsMapping = buildParamsMapping(originalPathParams, casedPathParams)
   const queryParamsMapping = buildParamsMapping(queryParams, casedQueryParams)
   const headerParamsMapping = buildParamsMapping(headerParams, casedHeaderParams)
 
@@ -62,12 +61,12 @@ function generateMethod({ node, name, tsResolver, zodResolver, baseURL, dataRetu
   const headerSpread = headerParamsMapping ? '...mappedHeaders' : '...headers'
   const headers = isMultipleContentTypes ? (headerParamsName ? [headerSpread] : []) : buildHeaders(contentType, !!headerParamsName, headerSpread)
   const generics = buildGenerics(node, tsResolver, { dataReturnType, zodResolver, parser })
-  const { signature: paramsSignature, groups } = buildRequestParamsSignature(node, tsResolver, { isConfigurable: true })
+  const { signature: paramsSignature } = buildRequestParamsSignature(node, tsResolver, { isConfigurable: true })
   const zodQueryParamsName =
     zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
   const clientParams = buildClassClientParams({
     node,
-    url: Url.toTemplateString(node.path),
+    url: Url.toTemplateString(node.path, { casing: 'camelcase', replacer: (name) => `path.${name}` }),
     baseURL,
     tsResolver,
     isFormData,
@@ -79,13 +78,6 @@ function generateMethod({ node, name, tsResolver, zodResolver, baseURL, dataRetu
   })
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const pathDestructureLine = groups.path && casedPathParams.length > 0 ? `const { ${casedPathParams.map((param) => param.name).join(', ')} } = path` : ''
-  const pathMappingLines = pathParamsMapping
-    ? Object.entries(pathParamsMapping)
-        .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
-        .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
-        .join('\n')
-    : ''
   const mappedParamsLine =
     queryParamsMapping && queryParamsName
       ? `const mappedParams = query ? { ${Object.entries(queryParamsMapping)
@@ -107,8 +99,6 @@ function generateMethod({ node, name, tsResolver, zodResolver, baseURL, dataRetu
   const methodBody = [
     `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
     '',
-    pathDestructureLine,
-    pathMappingLines,
     mappedParamsLine,
     mappedHeadersLine,
     requestDataLine,

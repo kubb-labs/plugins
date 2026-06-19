@@ -10,8 +10,8 @@ import type {
 import type { z } from 'zod'
 import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/pets/createPetsSchema.ts'
 
-export function getCreatePetsUrl({ uuid }: { uuid: CreatePetsPathUuid }) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${uuid}` as const }
+export function getCreatePetsUrl(path: { uuid: CreatePetsPathUuid }) {
+  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${path.uuid}` as const }
 
   return res
 }

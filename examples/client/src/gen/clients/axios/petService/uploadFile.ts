@@ -5,8 +5,8 @@ import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, Uplo
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from '../../../.kubb/config.js'
 
-function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
-  const res = { method: 'POST', url: `/pet/${petId}/uploadImage` as const }
+function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+  const res = { method: 'POST', url: `/pet/${path.petId}/uploadImage` as const }
 
   return res
 }

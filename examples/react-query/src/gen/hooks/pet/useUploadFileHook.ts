@@ -22,13 +22,11 @@ export async function uploadFileHook(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const { petId } = path
-
   const requestBody = body
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
-    url: `/pet/${petId}/uploadImage`,
+    url: `/pet/${path.petId}/uploadImage`,
     query,
     body: requestBody,
     ...requestConfig,

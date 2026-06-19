@@ -7,8 +7,8 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { DeletePetRequestConfig, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
-  const res = { method: 'DELETE', url: `/pet/${petId}` as const }
+function getDeletePetUrl(path: { petId: DeletePetPathPetId }) {
+  const res = { method: 'DELETE', url: `/pet/${path.petId}` as const }
 
   return res
 }

@@ -3,8 +3,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axi
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
 import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
-export function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}:search` as const }
+export function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
 
   return res
 }

@@ -7,8 +7,8 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { UploadFileRequestConfig, UploadFilePathPetId, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
-  const res = { method: 'POST', url: `/pet/${petId}/uploadImage` as const }
+function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+  const res = { method: 'POST', url: `/pet/${path.petId}/uploadImage` as const }
 
   return res
 }

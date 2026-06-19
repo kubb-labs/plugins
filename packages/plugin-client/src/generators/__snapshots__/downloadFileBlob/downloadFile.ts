@@ -4,8 +4,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { DownloadFileRequestConfig, DownloadFilePathFileId, DownloadFileStatus200 } from './DownloadFile'
 import { client } from './.kubb/client'
 
-export function getDownloadFileUrl({ fileId }: { fileId: DownloadFilePathFileId }) {
-  const res = { method: 'GET', url: `/files/${fileId}` as const }
+export function getDownloadFileUrl(path: { fileId: DownloadFilePathFileId }) {
+  const res = { method: 'GET', url: `/files/${path.fileId}` as const }
 
   return res
 }

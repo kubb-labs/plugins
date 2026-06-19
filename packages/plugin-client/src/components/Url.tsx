@@ -1,6 +1,5 @@
-import { buildParamsMapping, getOperationParameters } from '@internals/shared'
-import { isValidVarName, Url as UrlHelper } from '@internals/utils'
-import { createOperationParams } from '@kubb/ast/utils'
+import { getOperationParameters } from '@internals/shared'
+import { Url as UrlHelper } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
@@ -25,18 +24,20 @@ type GetParamsProps = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 export function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
-  // Build a URL-only node with only path params (no body, query, header)
-  const urlNode: ast.OperationNode = {
-    ...node,
-    parameters: node.parameters.filter((p) => p.in === 'path'),
-    requestBody: undefined,
+  const { path: pathParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+
+  if (pathParams.length === 0) {
+    return ast.factory.createFunctionParameters({ params: [] })
   }
 
-  return createOperationParams(urlNode, {
-    paramsType: 'object',
-    pathParamsType: 'object',
-    paramsCasing: 'camelcase',
-    resolver: tsResolver,
+  const members = pathParams.map((param) => ({
+    name: param.name,
+    type: tsResolver.resolvePathParamsName(node, param),
+    optional: !param.required,
+  }))
+
+  return ast.factory.createFunctionParameters({
+    params: [ast.factory.createFunctionParameter({ name: 'path', type: ast.factory.createTypeLiteral({ members }) })],
   })
 }
 
@@ -49,20 +50,12 @@ export function Url({ name, isExportable = true, isIndexable = true, baseURL, no
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  const { path: originalPathParams } = getOperationParameters(node)
-  const { path: casedPathParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
-  const pathParamsMapping = buildParamsMapping(originalPathParams, casedPathParams)
-
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
       <Function name={name} export={isExportable} params={paramsSignature}>
-        {pathParamsMapping &&
-          Object.entries(pathParamsMapping)
-            .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
-            .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
-            .join('\n')}
-        {pathParamsMapping && Object.keys(pathParamsMapping).length > 0 && <br />}
-        <Const name={'res'}>{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toTemplateString(node.path, { prefix: baseURL })} as const }`}</Const>
+        <Const
+          name={'res'}
+        >{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase', replacer: (name) => `path.${name}` })} as const }`}</Const>
         <br />
         return res
       </Function>

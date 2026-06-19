@@ -22,13 +22,11 @@ export async function updatePetWithForm(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const { petId } = path
-
   const requestBody = body
 
   const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
-    url: `/pet/${petId}`,
+    url: `/pet/${path.petId}`,
     body: requestBody,
     ...requestConfig,
   })

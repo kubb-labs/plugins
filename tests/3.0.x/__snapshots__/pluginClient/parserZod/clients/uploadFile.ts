@@ -9,8 +9,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-cl
 import type { z } from 'zod'
 import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
 
-function getUploadFileUrl({ petId }: { petId: UploadFilePathPetId }) {
-  const res = { method: 'POST', url: `/pet/${petId}/uploadImage` as const }
+function getUploadFileUrl(path: { petId: UploadFilePathPetId }) {
+  const res = { method: 'POST', url: `/pet/${path.petId}/uploadImage` as const }
 
   return res
 }

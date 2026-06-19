@@ -117,8 +117,8 @@ export async function placeOrderPatch(
   return res.data
 }
 
-function getGetOrderByIdUrl({ orderId }: { orderId: GetOrderByIdPathOrderId }) {
-  const res = { method: 'GET', url: `/store/order/${orderId}` as const }
+function getGetOrderByIdUrl(path: { orderId: GetOrderByIdPathOrderId }) {
+  const res = { method: 'GET', url: `/store/order/${path.orderId}` as const }
 
   return res
 }
@@ -140,8 +140,8 @@ export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'ur
   return res.data
 }
 
-function getDeleteOrderUrl({ orderId }: { orderId: DeleteOrderPathOrderId }) {
-  const res = { method: 'DELETE', url: `/store/order/${orderId}` as const }
+function getDeleteOrderUrl(path: { orderId: DeleteOrderPathOrderId }) {
+  const res = { method: 'DELETE', url: `/store/order/${path.orderId}` as const }
 
   return res
 }

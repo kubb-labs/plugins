@@ -9,12 +9,10 @@ export function uploadFile(
   { path, query, body }: Omit<UploadFileRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UploadFileResponse> {
-  const { petId } = path
-
   return cy
     .request<UploadFileResponse>({
       method: 'POST',
-      url: `http://localhost:3000/pet/${petId}/uploadImage`,
+      url: `http://localhost:3000/pet/${path.petId}/uploadImage`,
       qs: query,
       body,
       ...options,

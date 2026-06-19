@@ -9,8 +9,8 @@ import type {
 } from '../../../models/ts/pet/UpdatePetWithForm.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
-  const res = { method: 'POST', url: `/pet/${petId}` as const }
+function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+  const res = { method: 'POST', url: `/pet/${path.petId}` as const }
 
   return res
 }

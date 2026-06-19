@@ -7,8 +7,8 @@ import client from '@kubb/plugin-client/clients/fetch'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormPathPetId, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}` as const }
+function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}` as const }
 
   return res
 }

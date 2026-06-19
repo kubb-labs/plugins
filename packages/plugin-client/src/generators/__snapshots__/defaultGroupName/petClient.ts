@@ -33,12 +33,11 @@ export class PetClient {
     config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { petId } = path
     const requestBody = body
     const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
       ...requestConfig,
       method: 'POST',
-      url: `/pet/${petId}`,
+      url: `/pet/${path.petId}`,
       body: requestBody,
     })
     return res.data
@@ -49,12 +48,11 @@ export class PetClient {
    */
   async deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { petId } = path
     const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
     const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
       ...requestConfig,
       method: 'DELETE',
-      url: `/pet/${petId}`,
+      url: `/pet/${path.petId}`,
       headers: { ...mappedHeaders, ...requestConfig.headers },
     })
     return res.data

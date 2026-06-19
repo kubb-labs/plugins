@@ -21,11 +21,9 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const { petId } = path
-
   const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
 
-  const res = await request<DeletePetStatus400, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${petId}`, ...requestConfig, headers: { ...mappedHeaders, ...requestConfig.headers } })
+  const res = await request<DeletePetStatus400, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${path.petId}`, ...requestConfig, headers: { ...mappedHeaders, ...requestConfig.headers } })
 
   return res as { status: 400; data: DeletePetStatus400; statusText: string }
 }

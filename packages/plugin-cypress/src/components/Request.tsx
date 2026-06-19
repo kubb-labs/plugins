@@ -27,7 +27,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node }: 
   if (!ast.isHttpOperationNode(node)) return null
 
   const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
-  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
   const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
   const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)
@@ -38,9 +38,8 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node }: 
   const responseType = resolver.resolveResponseName(node)
   const returnType = dataReturnType === 'data' ? `Cypress.Chainable<${responseType}>` : `Cypress.Chainable<Cypress.Response<${responseType}>>`
 
-  // camelCase the URL placeholders so they match the camelCase `path` bindings destructured below.
-  // The interpolated value is what reaches the request; the placeholder name is positional only.
-  const urlTemplate = Url.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase' })
+  // Reference the path object straight in the URL with camelCase placeholders.
+  const urlTemplate = Url.toTemplateString(node.path, { prefix: baseURL, casing: 'camelcase', replacer: (name) => `path.${name}` })
 
   const requestOptions: Array<string> = [`method: '${node.method}'`, `url: ${urlTemplate}`]
 
@@ -88,8 +87,6 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node }: 
   return (
     <File.Source name={name} isIndexable isExportable>
       <Function name={name} export params={paramsSignature} returnType={returnType}>
-        {groups.path && casedPathParams.length > 0 && `const { ${casedPathParams.map((param) => param.name).join(', ')} } = path`}
-        {groups.path && <br />}
         {requestCall}
       </Function>
     </File.Source>

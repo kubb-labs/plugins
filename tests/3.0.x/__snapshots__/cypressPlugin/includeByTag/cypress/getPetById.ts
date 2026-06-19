@@ -6,11 +6,9 @@
 import type { GetPetByIdRequestConfig, GetPetByIdResponse } from '../types/GetPetById.ts'
 
 export function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetByIdResponse> {
-  const { petId } = path
-
   return cy.request<GetPetByIdResponse>({
     method: 'GET',
-    url: `/pet/${petId}`,
+    url: `/pet/${path.petId}`,
     ...options
   }).then((res) => res.body)
 }

@@ -114,11 +114,10 @@ export class pet {
    */
   async getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { petId } = path
     const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
-      url: `/pet/${petId}`,
+      url: `/pet/${path.petId}`,
     })
     return res.data
   }
@@ -129,11 +128,10 @@ export class pet {
    */
   async updatePetWithForm({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { petId } = path
     const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
       ...requestConfig,
       method: 'POST',
-      url: `/pet/${petId}`,
+      url: `/pet/${path.petId}`,
       query,
     })
     return res.data
@@ -146,12 +144,11 @@ export class pet {
    */
   async deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { petId } = path
     const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
     const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
       ...requestConfig,
       method: 'DELETE',
-      url: `/pet/${petId}`,
+      url: `/pet/${path.petId}`,
       headers: { ...mappedHeaders, ...requestConfig.headers },
     })
     return res.data
@@ -166,13 +163,12 @@ export class pet {
     config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const { petId } = path
     const requestBody = body
     const formData = buildFormData(requestBody)
     const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
       ...requestConfig,
       method: 'POST',
-      url: `/pet/${petId}/uploadImage`,
+      url: `/pet/${path.petId}/uploadImage`,
       query,
       body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
       contentType,

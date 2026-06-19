@@ -17,15 +17,11 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 export async function updatePet({ path, query, body }: Omit<UpdatePetRequestConfig, 'url'>, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const { petId } = path
-
-  const pet_id = petId
-
   const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
 
   const requestBody = body
 
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${pet_id}`, query: mappedParams, body: requestBody, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${path.petId}`, query: mappedParams, body: requestBody, ...requestConfig })
 
   return res.data
 }

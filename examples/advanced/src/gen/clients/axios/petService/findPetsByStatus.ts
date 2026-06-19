@@ -8,10 +8,8 @@ import type {
 } from '../../../models/ts/pet/FindPetsByStatus.ts'
 import { findPetsByStatusResponseSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
-export function getFindPetsByStatusUrl({ stepId }: { stepId: FindPetsByStatusPathStepId }) {
-  const step_id = stepId
-
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/findByStatus/${step_id}` as const }
+export function getFindPetsByStatusUrl(path: { stepId: FindPetsByStatusPathStepId }) {
+  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/findByStatus/${path.stepId}` as const }
 
   return res
 }

@@ -10,8 +10,8 @@ import type {
 } from '../../../models/ts/pet/GetPetById.js'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
-  const res = { method: 'GET', url: `/pet/${petId}` as const }
+function getGetPetByIdUrl(path: { petId: GetPetByIdPathPetId }) {
+  const res = { method: 'GET', url: `/pet/${path.petId}` as const }
 
   return res
 }

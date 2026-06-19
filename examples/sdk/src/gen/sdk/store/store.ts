@@ -90,11 +90,10 @@ export class store {
    */
   async getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { orderId } = path
     const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
       ...requestConfig,
       method: 'GET',
-      url: `/store/order/${orderId}`,
+      url: `/store/order/${path.orderId}`,
     })
     return res.data
   }
@@ -106,11 +105,10 @@ export class store {
    */
   async deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const { orderId } = path
     const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
       ...requestConfig,
       method: 'DELETE',
-      url: `/store/order/${orderId}`,
+      url: `/store/order/${path.orderId}`,
     })
     return res.data
   }

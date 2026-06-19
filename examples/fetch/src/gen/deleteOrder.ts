@@ -7,8 +7,8 @@ import client from '@kubb/plugin-client/clients/fetch'
 import type { DeleteOrderRequestConfig, DeleteOrderPathOrderId, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getDeleteOrderUrl({ orderId }: { orderId: DeleteOrderPathOrderId }) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/store/order/${orderId}` as const }
+function getDeleteOrderUrl(path: { orderId: DeleteOrderPathOrderId }) {
+  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/store/order/${path.orderId}` as const }
 
   return res
 }

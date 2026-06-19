@@ -7,7 +7,7 @@ import {
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
-import { isValidVarName, Url } from '@internals/utils'
+import { Url } from '@internals/utils'
 import { stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -55,10 +55,9 @@ export function Client({
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const responseType = getResponseType(node)
 
-  const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
-  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
-  const pathParamsMapping = !urlName ? buildParamsMapping(originalPathParams, casedPathParams) : null
   const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
   const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)
 
@@ -106,7 +105,9 @@ export function Client({
           value: stringify(node.method.toUpperCase()),
         },
         url: {
-          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toTemplateString(node.path),
+          value: urlName
+            ? `${urlName}(${urlParamsCall}).url.toString()`
+            : Url.toTemplateString(node.path, { casing: 'camelcase', replacer: (name) => `path.${name}` }),
         },
         baseURL:
           baseURL && !urlName
@@ -177,14 +178,6 @@ export function Client({
             ? `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = config`
             : ''}
           <br />
-          {!urlName && groups.path && casedPathParams.length > 0 && `const { ${casedPathParams.map((param) => param.name).join(', ')} } = path`}
-          {!urlName && groups.path && <br />}
-          {pathParamsMapping &&
-            Object.entries(pathParamsMapping)
-              .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
-              .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
-              .join('\n')}
-          {pathParamsMapping && <br />}
           {queryParamsMapping && queryParamsName && (
             <>
               {`const mappedParams = query ? { ${Object.entries(queryParamsMapping)

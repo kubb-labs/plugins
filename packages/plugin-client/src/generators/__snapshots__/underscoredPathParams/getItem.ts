@@ -4,10 +4,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { GetItemRequestConfig, GetItemPathItemId, GetItemStatus200 } from './GetItem'
 import { client } from './.kubb/client'
 
-export function getGetItemUrl({ itemId }: { itemId: GetItemPathItemId }) {
-  const item_id = itemId
-
-  const res = { method: 'GET', url: `/v1/items/${item_id}` as const }
+export function getGetItemUrl(path: { itemId: GetItemPathItemId }) {
+  const res = { method: 'GET', url: `/v1/items/${path.itemId}` as const }
 
   return res
 }

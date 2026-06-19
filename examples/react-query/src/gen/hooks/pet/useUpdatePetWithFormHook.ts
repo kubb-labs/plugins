@@ -25,13 +25,9 @@ export async function updatePetWithFormHook(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const { petId } = path
-
-  const pet_id = petId
-
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
-    url: `/pet/${pet_id}`,
+    url: `/pet/${path.petId}`,
     query,
     ...requestConfig,
   })

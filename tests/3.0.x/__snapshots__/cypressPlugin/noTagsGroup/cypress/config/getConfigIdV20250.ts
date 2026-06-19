@@ -6,11 +6,9 @@
 import type { GetConfigIdV20250RequestConfig, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250.ts'
 
 export function getConfigIdV20250({ path }: Omit<GetConfigIdV20250RequestConfig, 'url'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
-  const { configId } = path
-
   return cy.request<GetConfigIdV20250Response>({
     method: 'GET',
-    url: `/config/${configId}`,
+    url: `/config/${path.configId}`,
     ...options
   }).then((res) => res.body)
 }

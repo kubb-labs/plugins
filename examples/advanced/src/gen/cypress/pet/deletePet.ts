@@ -4,12 +4,10 @@ export function deletePet(
   { path, headers }: Omit<DeletePetRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<DeletePetResponse> {
-  const { petId } = path
-
   return cy
     .request<DeletePetResponse>({
       method: 'DELETE',
-      url: `/pet/${petId}:search`,
+      url: `/pet/${path.petId}:search`,
       headers: headers ? { api_key: headers.apiKey } : undefined,
       ...options,
     })

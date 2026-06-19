@@ -6,12 +6,10 @@
 import type { DeletePetRequestConfig, DeletePetResponse } from './DeletePet'
 
 export function deletePet({ path }: Omit<DeletePetRequestConfig, 'url'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
-  const { petId } = path
-
   return cy
     .request<DeletePetResponse>({
       method: 'DELETE',
-      url: `/pets/${petId}`,
+      url: `/pets/${path.petId}`,
       ...options,
     })
     .then((res) => res.body)

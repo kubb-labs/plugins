@@ -8,8 +8,8 @@ import type { GetPetByIdRequestConfig, GetPetByIdPathPetId, GetPetByIdStatus200,
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { getPetByIdResponseSchema } from '../zod/getPetByIdSchema.ts'
 
-function getGetPetByIdUrl({ petId }: { petId: GetPetByIdPathPetId }) {
-  const res = { method: 'GET', url: `/pet/${petId}` as const }
+function getGetPetByIdUrl(path: { petId: GetPetByIdPathPetId }) {
+  const res = { method: 'GET', url: `/pet/${path.petId}` as const }
 
   return res
 }

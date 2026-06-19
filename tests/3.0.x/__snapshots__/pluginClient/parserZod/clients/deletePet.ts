@@ -8,8 +8,8 @@ import type { DeletePetRequestConfig, DeletePetPathPetId, DeletePetResponse, Del
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { deletePetResponseSchema } from '../zod/deletePetSchema.ts'
 
-function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
-  const res = { method: 'DELETE', url: `/pet/${petId}` as const }
+function getDeletePetUrl(path: { petId: DeletePetPathPetId }) {
+  const res = { method: 'DELETE', url: `/pet/${path.petId}` as const }
 
   return res
 }

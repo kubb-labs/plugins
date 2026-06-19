@@ -4,8 +4,8 @@ import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { DeletePetRequestConfig, DeletePetPathPetId, DeletePetStatus200 } from './DeletePet'
 import { client } from './.kubb/client'
 
-export function getDeletePetUrl({ petId }: { petId: DeletePetPathPetId }) {
-  const res = { method: 'DELETE', url: `/pet/${petId}` as const }
+export function getDeletePetUrl(path: { petId: DeletePetPathPetId }) {
+  const res = { method: 'DELETE', url: `/pet/${path.petId}` as const }
 
   return res
 }

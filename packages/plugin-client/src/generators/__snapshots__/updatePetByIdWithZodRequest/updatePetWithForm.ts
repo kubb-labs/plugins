@@ -5,8 +5,8 @@ import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormPathPetId, Update
 import { client } from './.kubb/client'
 import { UpdatePetWithFormData } from './UpdatePetWithForm'
 
-export function getUpdatePetWithFormUrl({ petId }: { petId: UpdatePetWithFormPathPetId }) {
-  const res = { method: 'POST', url: `/pet/${petId}` as const }
+export function getUpdatePetWithFormUrl(path: { petId: UpdatePetWithFormPathPetId }) {
+  const res = { method: 'POST', url: `/pet/${path.petId}` as const }
 
   return res
 }

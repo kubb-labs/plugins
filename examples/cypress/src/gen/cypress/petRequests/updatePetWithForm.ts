@@ -9,12 +9,10 @@ export function updatePetWithForm(
   { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UpdatePetWithFormResponse> {
-  const { petId } = path
-
   return cy
     .request<UpdatePetWithFormResponse>({
       method: 'POST',
-      url: `http://localhost:3000/pet/${petId}`,
+      url: `http://localhost:3000/pet/${path.petId}`,
       qs: query,
       ...options,
     })

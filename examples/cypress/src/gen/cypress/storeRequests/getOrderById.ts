@@ -9,12 +9,10 @@ export function getOrderById(
   { path }: Omit<GetOrderByIdRequestConfig, 'url'>,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<GetOrderByIdResponse> {
-  const { orderId } = path
-
   return cy
     .request<GetOrderByIdResponse>({
       method: 'GET',
-      url: `http://localhost:3000/store/order/${orderId}`,
+      url: `http://localhost:3000/store/order/${path.orderId}`,
       ...options,
     })
     .then((res) => res.body)
