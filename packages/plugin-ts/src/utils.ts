@@ -79,34 +79,38 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 
 export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
+  const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
 
+  // NOTE(v5-stable): the fields were renamed from the legacy beta shape
+  // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
+  // type matches the runtime client. Drop this note once v5 leaves beta.
   return ast.factory.createSchema({
     type: 'object',
     deprecated: node.deprecated,
     properties: [
       ast.factory.createProperty({
-        name: 'data',
-        schema: node.requestBody?.content?.[0]?.schema
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveDataName(node), optional: true })
+        name: 'body',
+        required: hasBody,
+        schema: hasBody
+          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveDataName(node) })
           : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
-        name: 'pathParams',
-        required: pathParams.length > 0,
+        name: 'path',
         schema:
           pathParams.length > 0
-            ? buildParams(node, { params: pathParams, resolver })
+            ? ast.factory.createSchema({ ...buildParams(node, { params: pathParams, resolver }), optional: true })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
-        name: 'queryParams',
+        name: 'query',
         schema:
           queryParams.length > 0
             ? ast.factory.createSchema({ ...buildParams(node, { params: queryParams, resolver }), optional: true })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
-        name: 'headerParams',
+        name: 'headers',
         schema:
           headerParams.length > 0
             ? ast.factory.createSchema({ ...buildParams(node, { params: headerParams, resolver }), optional: true })

@@ -40,15 +40,15 @@ export type UpdateUserData = UpdateUserJsonData | UpdateUserXmlData | UpdateUser
  * @type object
  */
 export type UpdateUserRequestConfig = {
-  data?: UpdateUserData
+  body: UpdateUserData
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     username: UpdateUserPathUsername
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

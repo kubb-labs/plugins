@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
 import { client } from '../../.kubb/client.ts'
 
-type GetOrderByIdRequest = {
-  body?: GetOrderByIdRequestConfig['data']
-  path?: GetOrderByIdRequestConfig['pathParams']
-  query?: GetOrderByIdRequestConfig['queryParams']
-  headers?: GetOrderByIdRequestConfig['headerParams']
-  url: GetOrderByIdRequestConfig['url']
-}
-
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
 export function getOrderById<ThrowOnError extends boolean = true>(
-  options: Options<GetOrderByIdRequest, ThrowOnError>,
+  options: Options<GetOrderByIdRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

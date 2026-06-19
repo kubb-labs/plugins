@@ -34,15 +34,15 @@ export type GetPetByIdStatus200 = GetPetByIdStatus200Json | GetPetByIdStatus200X
  * @type object
  */
 export type GetPetByIdRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: GetPetByIdPathPetId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

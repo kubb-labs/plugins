@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { AddPetRequestConfig, AddPetResponses } from '../../models/pet/AddPet.ts'
 import { client } from '../../.kubb/client.ts'
 
-type AddPetRequest = {
-  body: AddPetRequestConfig['data']
-  path?: AddPetRequestConfig['pathParams']
-  query?: AddPetRequestConfig['queryParams']
-  headers?: AddPetRequestConfig['headerParams']
-  url: AddPetRequestConfig['url']
-}
-
 /**
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
  * {@link /pet}
  */
 export function addPet<ThrowOnError extends boolean = true>(
-  options: Options<AddPetRequest, ThrowOnError>,
+  options: Options<AddPetRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

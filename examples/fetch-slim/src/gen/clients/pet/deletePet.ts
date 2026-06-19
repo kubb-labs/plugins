@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { DeletePetRequestConfig, DeletePetResponses } from '../../models/pet/DeletePet.ts'
 import { client } from '../../.kubb/client.ts'
 
-type DeletePetRequest = {
-  body?: DeletePetRequestConfig['data']
-  path?: DeletePetRequestConfig['pathParams']
-  query?: DeletePetRequestConfig['queryParams']
-  headers?: DeletePetRequestConfig['headerParams']
-  url: DeletePetRequestConfig['url']
-}
-
 /**
  * @description delete a pet
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
 export function deletePet<ThrowOnError extends boolean = true>(
-  options: Options<DeletePetRequest, ThrowOnError>,
+  options: Options<DeletePetRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

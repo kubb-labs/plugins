@@ -27,17 +27,17 @@ export type FindArtifactsStatus200 = object
  * @type object
  */
 export type FindArtifactsRequestConfig = {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     page?: FindArtifactsQueryPage
     limit?: FindArtifactsQueryLimit
     sort?: FindArtifactsQuerySort
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */

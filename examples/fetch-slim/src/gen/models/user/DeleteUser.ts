@@ -23,15 +23,15 @@ export type DeleteUserStatus404 = any
  * @type object
  */
 export type DeleteUserRequestConfig = {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     username: DeleteUserPathUsername
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

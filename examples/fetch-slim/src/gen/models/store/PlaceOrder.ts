@@ -36,10 +36,10 @@ export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrder
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  data?: PlaceOrderData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: PlaceOrderData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

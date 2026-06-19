@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../../models/store/PlaceOrder.ts'
 import { client } from '../../.kubb/client.ts'
 
-type PlaceOrderRequest = {
-  body: PlaceOrderRequestConfig['data']
-  path?: PlaceOrderRequestConfig['pathParams']
-  query?: PlaceOrderRequestConfig['queryParams']
-  headers?: PlaceOrderRequestConfig['headerParams']
-  url: PlaceOrderRequestConfig['url']
-}
-
 /**
  * @description Place a new order in the store
  * @summary Place an order for a pet
  * {@link /store/order}
  */
 export function placeOrder<ThrowOnError extends boolean = true>(
-  options: Options<PlaceOrderRequest, ThrowOnError>,
+  options: Options<PlaceOrderRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

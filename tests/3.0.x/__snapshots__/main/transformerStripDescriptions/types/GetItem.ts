@@ -21,15 +21,15 @@ export type GetItemStatus200 = Item;
  * @type object
 */
 export type GetItemRequestConfig = {
-    data?: never;
+    body?: never;
     /**
-     * @type object
+     * @type object | undefined
     */
-    pathParams: {
+    path?: {
         id: GetItemPathId;
     };
-    queryParams?: never;
-    headerParams?: never;
+    query?: never;
+    headers?: never;
     /**
      * @type string
     */

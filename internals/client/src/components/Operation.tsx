@@ -2,7 +2,7 @@ import { buildOperationComments } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import { File, Function, Type } from '@kubb/renderer-jsx'
+import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from '../builders/security.ts'
@@ -63,27 +63,19 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
     .join(', ')} }`
 
   return (
-    <>
-      <File.Source name={signature.dataTypeName} isExportable={false} isIndexable={false}>
-        <Type export={false} name={signature.dataTypeName}>
-          {signature.dataTypeDefinition}
-        </Type>
-      </File.Source>
-      <br />
-      <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
-        <Function
-          name={name}
-          export={isExportable}
-          generics={signature.generics}
-          params={signature.paramsSignature}
-          returnType={signature.returnType}
-          JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
-        >
-          {'const { client: request = client, ...config } = options'}
-          <br />
-          {buildReturnStatement({ node, tsResolver, callConfig })}
-        </Function>
-      </File.Source>
-    </>
+    <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
+      <Function
+        name={name}
+        export={isExportable}
+        generics={signature.generics}
+        params={signature.paramsSignature}
+        returnType={signature.returnType}
+        JSDoc={{ comments: buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }) }}
+      >
+        {'const { client: request = client, ...config } = options'}
+        <br />
+        {buildReturnStatement({ node, tsResolver, callConfig })}
+      </Function>
+    </File.Source>
   )
 }

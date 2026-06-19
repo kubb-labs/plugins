@@ -41,10 +41,10 @@ export type CreateUserData = CreateUserJsonData | CreateUserXmlData | CreateUser
  * @type object
  */
 export type CreateUserRequestConfig = {
-  data?: CreateUserData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: CreateUserData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

@@ -36,16 +36,16 @@ export type LoginUserStatus400 = any
  * @type object
  */
 export type LoginUserRequestConfig = {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     username?: LoginUserQueryUsername
     password?: LoginUserQueryPassword
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */

@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../models/pet/UpdatePet.ts'
 import { client } from '../../.kubb/client.ts'
 
-type UpdatePetRequest = {
-  body: UpdatePetRequestConfig['data']
-  path?: UpdatePetRequestConfig['pathParams']
-  query?: UpdatePetRequestConfig['queryParams']
-  headers?: UpdatePetRequestConfig['headerParams']
-  url: UpdatePetRequestConfig['url']
-}
-
 /**
  * @description Update an existing pet by Id
  * @summary Update an existing pet
  * {@link /pet}
  */
 export function updatePet<ThrowOnError extends boolean = true>(
-  options: Options<UpdatePetRequest, ThrowOnError>,
+  options: Options<UpdatePetRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

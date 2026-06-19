@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { DeleteUserRequestConfig, DeleteUserResponses } from '../../models/user/DeleteUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-type DeleteUserRequest = {
-  body?: DeleteUserRequestConfig['data']
-  path?: DeleteUserRequestConfig['pathParams']
-  query?: DeleteUserRequestConfig['queryParams']
-  headers?: DeleteUserRequestConfig['headerParams']
-  url: DeleteUserRequestConfig['url']
-}
-
 /**
  * @description This can only be done by the logged in user.
  * @summary Delete user
  * {@link /user/:username}
  */
 export function deleteUser<ThrowOnError extends boolean = true>(
-  options: Options<DeleteUserRequest, ThrowOnError>,
+  options: Options<DeleteUserRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

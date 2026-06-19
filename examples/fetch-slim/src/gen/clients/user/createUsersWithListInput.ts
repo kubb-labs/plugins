@@ -7,21 +7,13 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput.ts'
 import { client } from '../../.kubb/client.ts'
 
-type CreateUsersWithListInputRequest = {
-  body: CreateUsersWithListInputRequestConfig['data']
-  path?: CreateUsersWithListInputRequestConfig['pathParams']
-  query?: CreateUsersWithListInputRequestConfig['queryParams']
-  headers?: CreateUsersWithListInputRequestConfig['headerParams']
-  url: CreateUsersWithListInputRequestConfig['url']
-}
-
 /**
  * @description Creates list of users with given input array
  * @summary Creates list of users with given input array
  * {@link /user/createWithList}
  */
 export function createUsersWithListInput<ThrowOnError extends boolean = true>(
-  options: Options<CreateUsersWithListInputRequest, ThrowOnError>,
+  options: Options<CreateUsersWithListInputRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 

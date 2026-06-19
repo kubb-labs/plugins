@@ -7,20 +7,12 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { LoginUserRequestConfig, LoginUserResponses } from '../../models/user/LoginUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-type LoginUserRequest = {
-  body?: LoginUserRequestConfig['data']
-  path?: LoginUserRequestConfig['pathParams']
-  query?: LoginUserRequestConfig['queryParams']
-  headers?: LoginUserRequestConfig['headerParams']
-  url: LoginUserRequestConfig['url']
-}
-
 /**
  * @summary Logs user into the system
  * {@link /user/login}
  */
 export function loginUser<ThrowOnError extends boolean = true>(
-  options: Options<LoginUserRequest, ThrowOnError>,
+  options: Options<LoginUserRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
