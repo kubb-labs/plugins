@@ -50,12 +50,12 @@ export type FindPetsByTagsStatus400 = any
  * @type object
  */
 export type FindPetsByTagsRequestConfig = {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     tags?: FindPetsByTagsQueryTags
     page?: FindPetsByTagsQueryPage
     pageSize?: FindPetsByTagsQueryPageSize
@@ -63,7 +63,7 @@ export type FindPetsByTagsRequestConfig = {
   /**
    * @type object | undefined
    */
-  headerParams?: {
+  headers?: {
     'X-EXAMPLE': FindPetsByTagsHeaderXEXAMPLE
   }
   /**

@@ -449,10 +449,10 @@ export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetForm
  * @type object
  */
 export interface UpdatePetRequestConfig {
-  data?: UpdatePetData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: UpdatePetData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -518,10 +518,10 @@ export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedDa
  * @type object
  */
 export interface AddPetRequestConfig {
-  data?: AddPetData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: AddPetData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -568,15 +568,15 @@ export type FindPetsByStatusStatus400 = any
  * @type object
  */
 export interface FindPetsByStatusRequestConfig {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     status?: FindPetsByStatusQueryStatus
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */
@@ -635,17 +635,17 @@ export type FindPetsByTagsStatus400 = any
  * @type object
  */
 export interface FindPetsByTagsRequestConfig {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     tags?: FindPetsByTagsQueryTags
     page?: FindPetsByTagsQueryPage
     pageSize?: FindPetsByTagsQueryPageSize
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */
@@ -693,15 +693,15 @@ export type GetPetByIdStatus404 = any
  * @type object
  */
 export interface GetPetByIdRequestConfig {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: GetPetByIdPathPetId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -751,21 +751,21 @@ export type UpdatePetWithFormStatus405 = any
  * @type object
  */
 export interface UpdatePetWithFormRequestConfig {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: UpdatePetWithFormPathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     name?: UpdatePetWithFormQueryName
     status?: UpdatePetWithFormQueryStatus
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */
@@ -811,18 +811,18 @@ export type DeletePetStatus400 = any
  * @type object
  */
 export interface DeletePetRequestConfig {
-  data?: never
-  /**
-   * @type object
-   */
-  pathParams: {
-    petId: DeletePetPathPetId
-  }
-  queryParams?: never
+  body?: never
   /**
    * @type object | undefined
    */
-  headerParams?: {
+  path?: {
+    petId: DeletePetPathPetId
+  }
+  query?: never
+  /**
+   * @type object | undefined
+   */
+  headers?: {
     api_key?: DeletePetHeaderApiKey
   }
   /**
@@ -874,20 +874,20 @@ export type UploadFileData = Blob | undefined
  * @type object
  */
 export interface UploadFileRequestConfig {
-  data?: UploadFileData
+  body: UploadFileData
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     petId: UploadFilePathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */
@@ -917,10 +917,10 @@ export interface GetInventoryStatus200 {
  * @type object
  */
 export interface GetInventoryRequestConfig {
-  data?: never
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body?: never
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -971,10 +971,10 @@ export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrder
  * @type object
  */
 export interface PlaceOrderRequestConfig {
-  data?: PlaceOrderData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: PlaceOrderData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -1025,10 +1025,10 @@ export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlDa
  * @type object
  */
 export interface PlaceOrderPatchRequestConfig {
-  data?: PlaceOrderPatchData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: PlaceOrderPatchData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -1082,15 +1082,15 @@ export type GetOrderByIdStatus404 = any
  * @type object
  */
 export interface GetOrderByIdRequestConfig {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     orderId: GetOrderByIdPathOrderId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
@@ -1133,15 +1133,15 @@ export type DeleteOrderStatus404 = any
  * @type object
  */
 export interface DeleteOrderRequestConfig {
-  data?: never
+  body?: never
   /**
-   * @type object
+   * @type object | undefined
    */
-  pathParams: {
+  path?: {
     orderId: DeleteOrderPathOrderId
   }
-  queryParams?: never
-  headerParams?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

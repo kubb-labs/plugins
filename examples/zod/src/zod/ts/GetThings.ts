@@ -37,16 +37,16 @@ export type GetThingsStatusDefault = PetNotFound
  * @type object
  */
 export type GetThingsRequestConfig = {
-  data?: never
-  pathParams?: never
+  body?: never
+  path?: never
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     limit?: GetThingsQueryLimit
     skip?: GetThingsQuerySkip
   }
-  headerParams?: never
+  headers?: never
   /**
    * @type string
    */
