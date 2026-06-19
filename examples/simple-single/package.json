@@ -28,7 +28,7 @@
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "kubb": "catalog:",
     "react": "^19.2.7",
     "typescript": "catalog:",

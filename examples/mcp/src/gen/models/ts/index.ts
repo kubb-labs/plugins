@@ -21,6 +21,8 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.js'
+export type { AddPetRequest } from './AddPetRequest.js'
+export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
 export type { Address } from './Address.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
@@ -106,6 +108,7 @@ export type {
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './FindPetsByTags.js'
+export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
 export type {
   GetOrderByIdPathOrderId,
@@ -152,7 +155,10 @@ export type {
   LoginUserStatus400,
 } from './LoginUser.js'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.js'
-export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderStatusEnumKey } from './Order.js'
+export type { Order } from './Order.js'
+export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.js'
+export type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.js'
+export type { OrderStatusEnumKey } from './OrderStatusEnum.js'
 export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type { PetStatusEnumKey } from './PetStatusEnum.js'
@@ -216,6 +222,11 @@ export type {
 } from './UpdateUser.js'
 export type { User } from './User.js'
 export type { UserArray } from './UserArray.js'
+export type { TagTag } from './tag/Tag.js'
+export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.js'
 export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.js'
-export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTagsXEXAMPLE.js'
+export { orderHttpStatusEnum } from './OrderHttpStatusEnum.js'
+export { orderOrderTypeEnum } from './OrderOrderTypeEnum.js'
+export { orderStatusEnum } from './OrderStatusEnum.js'
 export { petStatusEnum } from './PetStatusEnum.js'

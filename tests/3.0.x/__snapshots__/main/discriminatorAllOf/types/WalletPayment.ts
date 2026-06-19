@@ -4,6 +4,10 @@
 */
 
 import type { PaymentMethod } from './PaymentMethod.ts'
-import type { WalletPayment2 } from './WalletPayment2.ts'
 
-export type WalletPayment = (PaymentMethod & WalletPayment2);
+export type WalletPayment = (PaymentMethod & {
+    /**
+     * @type string | undefined
+    */
+    walletId?: string;
+});

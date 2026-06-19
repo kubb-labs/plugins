@@ -36,7 +36,7 @@ export async function updatePet(
   const res = await request<
     UpdatePetStatus200 | UpdatePetStatus202 | UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    z.output<typeof updatePetDataSchema>
+    z.input<typeof updatePetDataSchema>
   >({ method: 'PUT', url: getUpdatePetUrl().url.toString(), data: requestData, contentType, ...requestConfig })
 
   return { ...res, data: updatePetResponseSchema.parse(res.data) } as

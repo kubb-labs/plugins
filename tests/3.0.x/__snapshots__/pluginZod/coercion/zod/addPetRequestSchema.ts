@@ -4,14 +4,15 @@
 */
 
 import * as z from 'zod'
+import { addPetRequestStatusEnumSchema } from './addPetRequestStatusEnumSchema.ts'
 import { categorySchema } from './categorySchema.ts'
-import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
+import { tagSchema } from './tagSchema.ts'
 
 export const addPetRequestSchema = z.object({
   id: z.coerce.bigint().optional().meta({ examples: [10] }),
   name: z.coerce.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.coerce.string()),
-  tags: z.array(categorySchema).optional(),
-  status: petStatusEnumSchema.optional().describe('pet status in the store'),
+  tags: z.array(tagSchema).optional(),
+  status: addPetRequestStatusEnumSchema.optional().describe('pet status in the store'),
 })

@@ -1,12 +1,6 @@
+import type { AnimalTypeEnumKey } from './AnimalTypeEnum.ts'
 import type { Cat } from './Cat.ts'
 import type { Dog } from './Dog.ts'
-
-export const animalTypeEnum = {
-  cat: 'cat',
-  dog: 'dog',
-} as const
-
-export type AnimalTypeEnumKey = (typeof animalTypeEnum)[keyof typeof animalTypeEnum]
 
 export type Animal = (
   | (Cat & {
@@ -22,8 +16,5 @@ export type Animal = (
       readonly type: 'dog'
     })
 ) & {
-  /**
-   * @type string
-   */
   readonly type: AnimalTypeEnumKey
 }

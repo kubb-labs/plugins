@@ -70,6 +70,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './models/FindPetsByStatus.ts'
 export type {
   FindPetsByTagsQueryTags,
@@ -129,8 +130,7 @@ export type {
 } from './models/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
 export type { Order, OrderStatusEnumKey } from './models/Order.ts'
-export type { Pet } from './models/Pet.ts'
-export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
+export type { Pet, PetStatusEnumKey } from './models/Pet.ts'
 export type {
   PlaceOrderData,
   PlaceOrderFormUrlEncodedData,
@@ -142,6 +142,7 @@ export type {
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
+export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -190,7 +191,7 @@ export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
 export { createCategory } from './faker/createCategory.ts'
 export { createPet } from './faker/createPet.ts'
-export { createPetStatusEnum } from './faker/createPetStatusEnum.ts'
+export { createTag } from './faker/createTag.ts'
 export {
   createUpdatePetData,
   createUpdatePetFormUrlEncodedData,
@@ -212,5 +213,6 @@ export {
   createUpdatePetWithFormStatus405,
 } from './faker/createUpdatePetWithForm.ts'
 export { addressIdentifierEnum } from './models/Address.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatus.ts'
 export { orderStatusEnum } from './models/Order.ts'
-export { petStatusEnum } from './models/PetStatusEnum.ts'
+export { petStatusEnum } from './models/Pet.ts'

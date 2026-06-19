@@ -4,7 +4,7 @@
  */
 
 import * as z from 'zod'
-import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.js'
+import { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema.js'
 import { petSchema } from './petSchema.js'
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
@@ -13,7 +13,7 @@ export const findPetsByTagsQueryPageSchema = z.string().optional().describe('to 
 
 export const findPetsByTagsQueryPageSizeSchema = z.string().optional().describe('to request with required page size')
 
-export const findPetsByTagsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
+export const findPetsByTagsHeaderXEXAMPLESchema = findPetsByTagsXEXAMPLESchema.describe('Header parameters')
 
 export const findPetsByTagsStatus200SchemaJson = z.array(petSchema)
 

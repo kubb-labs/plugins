@@ -44,7 +44,7 @@ export async function createPets(
 
   const requestData = createPetsDataSchema.parse(data)
 
-  const res = await request<CreatePetsStatus201 | CreatePetsStatusDefault, ResponseErrorConfig<Error>, z.output<typeof createPetsDataSchema>>({
+  const res = await request<CreatePetsStatus201 | CreatePetsStatusDefault, ResponseErrorConfig<Error>, z.input<typeof createPetsDataSchema>>({
     method: 'POST',
     url: getCreatePetsUrl({ uuid }).url.toString(),
     params: mappedParams,

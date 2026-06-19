@@ -4,7 +4,7 @@
  */
 
 import type { Address } from './Address.ts'
-import type { OrderParams } from './OrderParams.ts'
+import type { CustomerParamsStatusEnumKey } from './CustomerParamsStatusEnum.ts'
 
 /**
  * @type object
@@ -17,7 +17,20 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: CustomerParamsStatusEnumKey
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @example fehguy
    * @type string | undefined

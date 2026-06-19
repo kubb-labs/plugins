@@ -6,6 +6,7 @@
 import * as z from 'zod'
 import { categorySchema } from './categorySchema.js'
 import { petStatusEnumSchema } from './petStatusEnumSchema.js'
+import { tagTagSchema } from './tag/tagSchema.js'
 
 export const petSchema = z.object({
   id: z
@@ -15,6 +16,6 @@ export const petSchema = z.object({
   name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
-  tags: z.array(categorySchema).optional(),
+  tags: z.array(tagTagSchema).optional(),
   status: petStatusEnumSchema.optional().describe('pet status in the store'),
 })

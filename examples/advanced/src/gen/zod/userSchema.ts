@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { categorySchema } from './categorySchema.ts'
+import { tagTagSchema } from './tag/tagSchema.ts'
 
 export const userSchema = z.object({
   id: z
@@ -11,7 +11,7 @@ export const userSchema = z.object({
     .optional()
     .meta({ examples: ['theUser'] }),
   uuid: z.uuid().optional(),
-  tag: categorySchema.optional().describe('The active tag'),
+  tag: tagTagSchema.optional().describe('The active tag'),
   firstName: z
     .string()
     .optional()

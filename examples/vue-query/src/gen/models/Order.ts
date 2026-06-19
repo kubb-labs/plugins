@@ -3,13 +3,7 @@
  * Do not edit manually.
  */
 
-export const orderStatusEnum = {
-  placed: 'placed',
-  approved: 'approved',
-  delivered: 'delivered',
-} as const
-
-export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum]
+import type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
 
 /**
  * @type object
@@ -45,7 +39,6 @@ export type Order = {
   /**
    * @description Order Status
    * @example approved
-   * @type string | undefined
    */
   status?: OrderStatusEnumKey
   /**

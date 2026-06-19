@@ -3,14 +3,7 @@
  * Do not edit manually.
  */
 
-export const addressIdentifierEnum = {
-  NW: 'NW',
-  NE: 'NE',
-  SW: 'SW',
-  SE: 'SE',
-} as const
-
-export type AddressIdentifierEnumKey = (typeof addressIdentifierEnum)[keyof typeof addressIdentifierEnum]
+import type { AddressIdentifierEnumKey } from './AddressIdentifierEnum.ts'
 
 /**
  * @type object

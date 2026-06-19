@@ -8,7 +8,7 @@ export default defineConfig({
   input: {
     path: './petStore.yaml',
   },
-  adapter: adapterOas(),
+  adapter: adapterOas({ enums: 'root' }),
   output: {
     path: './src/gen',
     clean: true,

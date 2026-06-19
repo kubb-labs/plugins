@@ -1,7 +1,7 @@
 // version: 1.0.11
 
+import type { AddPetRequest } from './AddPetRequest.ts'
 import type { Pet } from './Pet.ts'
-import type { PetNotFound } from './PetNotFound.ts'
 
 /**
  * @type object
@@ -15,13 +15,27 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-export type AddPetStatus405 = PetNotFound
+/**
+ * @type object
+ */
+export type AddPetStatus405 = {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = Pet
+export type AddPetJsonData = AddPetRequest
 
 /**
  * @description Create a new pet in the store

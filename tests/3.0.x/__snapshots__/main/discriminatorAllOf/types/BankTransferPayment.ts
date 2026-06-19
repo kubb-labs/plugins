@@ -3,7 +3,11 @@
 * Do not edit manually.
 */
 
-import type { BankTransferPayment2 } from './BankTransferPayment2.ts'
 import type { PaymentMethod } from './PaymentMethod.ts'
 
-export type BankTransferPayment = (PaymentMethod & BankTransferPayment2);
+export type BankTransferPayment = (PaymentMethod & {
+    /**
+     * @type string | undefined
+    */
+    iban?: string;
+});

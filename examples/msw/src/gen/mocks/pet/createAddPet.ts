@@ -14,8 +14,8 @@ import type {
   AddPetStatus405,
   AddPetXmlData,
 } from '../../models/AddPet.ts'
+import { createAddPetRequest } from '../createAddPetRequest.ts'
 import { createPet } from '../createPet.ts'
-import { createPetNotFound } from '../createPetNotFound.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 /**
@@ -48,10 +48,16 @@ export function createAddPetStatus200(_data?: AddPetStatus200): AddPetStatus200 
 /**
  * @description Pet not found
  */
-export function createAddPetStatus405(data?: Partial<AddPetStatus405>): AddPetStatus405 {
+export function createAddPetStatus405<TData extends Partial<AddPetStatus405> = object>(data?: TData) {
   faker.seed([220])
-
-  return createPetNotFound(data) as AddPetStatus405
+  const defaultFakeData = {
+    code: faker.number.int(),
+    message: faker.string.alpha(),
+  }
+  return {
+    ...defaultFakeData,
+    ...(data || {}),
+  } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
 /**
@@ -60,7 +66,7 @@ export function createAddPetStatus405(data?: Partial<AddPetStatus405>): AddPetSt
 export function createAddPetJsonData(data?: Partial<AddPetJsonData>): AddPetJsonData {
   faker.seed([220])
 
-  return createPet(data) as AddPetJsonData
+  return createAddPetRequest(data) as AddPetJsonData
 }
 
 /**

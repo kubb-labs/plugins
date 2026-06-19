@@ -19,8 +19,9 @@ export default defineConfig({
   },
   adapter: adapterOas({
     validate: true,
-    discriminator: 'strict',
+    discriminator: 'preserve',
     integerType: 'number',
+    enums: 'root',
   }),
   output: {
     path: './src/gen',

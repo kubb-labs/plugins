@@ -32,7 +32,7 @@
     "@kubb/plugin-zod": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
     "@tanstack/vue-query": "^5.101.0",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "cypress": "^15.17.0",
     "kubb": "catalog:",
     "msw": "^2.14.6",

@@ -3,21 +3,6 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
-export type OrderParams = {
-  /**
-   * @description Order Status
-   * @example approved
-   */
-  status: OrderParamsStatusEnumKey
-  /**
-   * @type string
-   */
-  type: string
-}
-
 export const OrderParamsStatusEnum = {
   placed: 'placed',
   approved: 'approved',
@@ -25,14 +10,6 @@ export const OrderParamsStatusEnum = {
 } as const
 
 export type OrderParamsStatusEnumKey = (typeof OrderParamsStatusEnum)[keyof typeof OrderParamsStatusEnum]
-
-export const PetStatusEnum = {
-  available: 'available',
-  pending: 'pending',
-  sold: 'sold',
-} as const
-
-export type PetStatusEnumKey = (typeof PetStatusEnum)[keyof typeof PetStatusEnum]
 
 export const OrderStatus = {
   accepted: 'accepted',
@@ -47,6 +24,54 @@ export const OrderHttpStatusEnum = {
 } as const
 
 export type OrderHttpStatusEnumKey = (typeof OrderHttpStatusEnum)[keyof typeof OrderHttpStatusEnum]
+
+export const CustomerParamsStatusEnum = {
+  placed: 'placed',
+  approved: 'approved',
+  delivered: 'delivered',
+} as const
+
+export type CustomerParamsStatusEnumKey = (typeof CustomerParamsStatusEnum)[keyof typeof CustomerParamsStatusEnum]
+
+export const PetTypeEnum = {
+  dog: 'dog',
+  cat: 'cat',
+} as const
+
+export type PetTypeEnumKey = (typeof PetTypeEnum)[keyof typeof PetTypeEnum]
+
+export const PetStatusEnum = {
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+} as const
+
+export type PetStatusEnumKey = (typeof PetStatusEnum)[keyof typeof PetStatusEnum]
+
+export const AddPetRequestStatusEnum = {
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+  'in store': 'in store',
+} as const
+
+export type AddPetRequestStatusEnumKey = (typeof AddPetRequestStatusEnum)[keyof typeof AddPetRequestStatusEnum]
+
+export const FindPetsByStatusStatus = {
+  available: 'available',
+  pending: 'pending',
+  sold: 'sold',
+} as const
+
+export type FindPetsByStatusStatusKey = (typeof FindPetsByStatusStatus)[keyof typeof FindPetsByStatusStatus]
+
+export const DeletePetStatus200Enum = {
+  TYPE1: 'TYPE1',
+  TYPE2: 'TYPE2',
+  TYPE3: 'TYPE3',
+} as const
+
+export type DeletePetStatus200EnumKey = (typeof DeletePetStatus200Enum)[keyof typeof DeletePetStatus200Enum]
 
 /**
  * @type object
@@ -66,7 +91,20 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: OrderParamsStatusEnumKey
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @description
    * Format: `int32`
@@ -83,11 +121,10 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatusKey | (string & {})
+  status?: OrderStatusKey | string
   /**
    * @description HTTP Status
    * @example 200
-   * @type number | undefined
    */
   http_status?: OrderHttpStatusEnumKey
   /**
@@ -136,7 +173,20 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: CustomerParamsStatusEnumKey
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @example fehguy
    * @type string | undefined
@@ -238,6 +288,22 @@ export type User = {
 /**
  * @type object
  */
+export type Tag = {
+  /**
+   * @description
+   * Format: `int64`
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @type string | undefined
+   */
+  name?: string
+}
+
+/**
+ * @type object
+ */
 export type Dog = {
   /**
    * @minLength 1
@@ -265,12 +331,23 @@ export type Cat = {
   name?: string
 }
 
-export const PetTypeEnum = {
-  dog: 'dog',
-  cat: 'cat',
-} as const
-
-export type PetTypeEnumKey = (typeof PetTypeEnum)[keyof typeof PetTypeEnum]
+/**
+ * @type object
+ */
+export type Category1 = {
+  /**
+   * @description
+   * Format: `int64`
+   * @example 1
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @example Dogs
+   * @type string | undefined
+   */
+  name?: string
+}
 
 export type Pet = (
   | (Dog & {
@@ -293,16 +370,16 @@ export type Pet = (
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type string
-   */
   readonly type: PetTypeEnumKey
   /**
    * @example doggie
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
@@ -310,7 +387,7 @@ export type Pet = (
   /**
    * @type array | undefined
    */
-  readonly tags?: Array<Category>
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    */
@@ -328,15 +405,6 @@ export type FullAddress = Address & {
    */
   streetName: string
 }
-
-export const AddPetRequestStatusEnum = {
-  available: 'available',
-  pending: 'pending',
-  sold: 'sold',
-  'in store': 'in store',
-} as const
-
-export type AddPetRequestStatusEnumKey = (typeof AddPetRequestStatusEnum)[keyof typeof AddPetRequestStatusEnum]
 
 /**
  * @type object
@@ -365,10 +433,9 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags?: Array<Category>
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: AddPetRequestStatusEnumKey
 }
@@ -487,7 +554,21 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-export type AddPetStatus405 = PetNotFound
+/**
+ * @type object
+ */
+export type AddPetStatus405 = {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
 
 /**
  * @description Create a new pet in the store
@@ -538,7 +619,7 @@ export type AddPetResponse = AddPetStatus200 | AddPetStatus405
  * @description Status values that need to be considered for filter
  * @default available
  */
-export type FindPetsByStatusQueryStatus = PetStatusEnumKey | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
 
 /**
  * @type array
@@ -789,14 +870,6 @@ export type DeletePetHeaderApiKey = string | undefined
  * @type integer
  */
 export type DeletePetPathPetId = bigint
-
-export const DeletePetStatus200Enum = {
-  TYPE1: 'TYPE1',
-  TYPE2: 'TYPE2',
-  TYPE3: 'TYPE3',
-} as const
-
-export type DeletePetStatus200EnumKey = (typeof DeletePetStatus200Enum)[keyof typeof DeletePetStatus200Enum]
 
 /**
  * @type array

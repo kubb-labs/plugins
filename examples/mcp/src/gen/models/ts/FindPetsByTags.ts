@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
+import type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
 import type { Pet } from './Pet.js'
 
 /**
@@ -27,7 +27,7 @@ export type FindPetsByTagsQueryPageSize = string | undefined
 /**
  * @description Header parameters
  */
-export type FindPetsByTagsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
+export type FindPetsByTagsHeaderXEXAMPLE = FindPetsByTagsXEXAMPLEKey
 
 /**
  * @type array

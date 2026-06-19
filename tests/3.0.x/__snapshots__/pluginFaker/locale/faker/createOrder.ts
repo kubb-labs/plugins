@@ -4,6 +4,7 @@
 */
 
 import type { Order } from '../types/Order.ts'
+import { createOrderStatusEnum } from './createOrderStatusEnum.ts'
 import { fakerDE as faker } from '@faker-js/faker'
 
 export function createOrder<TData extends Partial<Order> = object>(data?: TData)
@@ -14,7 +15,7 @@ export function createOrder<TData extends Partial<Order> = object>(data?: TData)
   petId: faker.number.bigInt(),
   quantity: faker.number.int(),
   shipDate: faker.date.anytime().toISOString(),
-  status: faker.helpers.arrayElement<NonNullable<Order>["status"]>(['placed', 'approved', 'delivered']),
+  status: createOrderStatusEnum(),
   complete: faker.datatype.boolean(),
 }
   return {

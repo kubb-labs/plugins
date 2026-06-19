@@ -2,7 +2,9 @@ export type {
   AddPetData,
   AddPetFormUrlEncodedData,
   AddPetJsonData,
+  AddPetRequest,
   AddPetRequestConfig,
+  AddPetRequestStatusEnumKey,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -58,6 +60,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -140,6 +143,7 @@ export type {
   PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
+  Tag,
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
@@ -200,4 +204,4 @@ export { updatePet } from './cypress/updatePet.ts'
 export { updatePetWithForm } from './cypress/updatePetWithForm.ts'
 export { updateUser } from './cypress/updateUser.ts'
 export { uploadFile } from './cypress/uploadFile.ts'
-export { orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
+export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'

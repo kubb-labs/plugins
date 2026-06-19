@@ -7,10 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { FindPetsByTagsQueryTags, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../types/FindPetsByTags.ts'
 import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import type { UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../types/UpdatePet.ts'
-import type { UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormQueryName, UpdatePetWithFormQueryStatus, UpdatePetWithFormStatus405 } from '../types/UpdatePetWithForm.ts'
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { mergeConfig } from '@kubb/plugin-client/clients/axios'
@@ -20,18 +17,6 @@ export class PetClient {
 
   constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
     this.#config = config
-  }
-
-/**
-   * @description Update an existing pet by Id
-   * @summary Update an existing pet
-   * {@link /pet}
-   */
-  async updatePet(data: UpdatePetData, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestData = data
-    const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({ ...requestConfig, method: "PUT", url: `/pet`, data: requestData, contentType })
-    return res.data
   }
 
 /**
@@ -58,17 +43,6 @@ export class PetClient {
   }
 
 /**
-   * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
-   * @summary Finds Pets by tags
-   * {@link /pet/findByTags}
-   */
-  async findPetsByTags(params?: { tags?: FindPetsByTagsQueryTags }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({ ...requestConfig, method: "GET", url: `/pet/findByTags`, params })
-    return res.data
-  }
-
-/**
    * @description Returns a single pet
    * @summary Find pet by ID
    * {@link /pet/:petId}
@@ -76,16 +50,6 @@ export class PetClient {
   async getPetById(petId: GetPetByIdPathPetId, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/pet/${petId}` })
-    return res.data
-  }
-
-/**
-   * @summary Updates a pet in the store with form data
-   * {@link /pet/:petId}
-   */
-  async updatePetWithForm(petId: UpdatePetWithFormPathPetId, params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({ ...requestConfig, method: "POST", url: `/pet/${petId}`, params })
     return res.data
   }
 

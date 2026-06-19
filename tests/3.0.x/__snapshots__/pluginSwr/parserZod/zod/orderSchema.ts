@@ -4,12 +4,13 @@
 */
 
 import * as z from 'zod'
+import { orderStatusEnumSchema } from './orderStatusEnumSchema.ts'
 
 export const orderSchema = z.object({
   id: z.bigint().optional().meta({ examples: [10] }),
   petId: z.bigint().optional().meta({ examples: [198772] }),
   quantity: z.int().optional().meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
-  status: z.enum(['placed', 'approved', 'delivered']).optional().describe('Order Status').meta({ examples: ['approved'] }),
+  status: orderStatusEnumSchema.optional().describe('Order Status').meta({ examples: ['approved'] }),
   complete: z.boolean().optional(),
 })

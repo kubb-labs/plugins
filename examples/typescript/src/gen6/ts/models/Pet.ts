@@ -4,16 +4,11 @@
  */
 
 import type { Cat } from './Cat.ts'
-import type { Category } from './Category.ts'
+import type { Category1 } from './Category1.ts'
 import type { Dog } from './Dog.ts'
 import type { PetStatusEnumKey } from './PetStatusEnum.ts'
-
-export const petTypeEnum = {
-  dog: 'dog',
-  cat: 'cat',
-} as const
-
-export type PetTypeEnumKey = (typeof petTypeEnum)[keyof typeof petTypeEnum]
+import type { PetTypeEnumKey } from './PetTypeEnum.ts'
+import type { Tag } from './Tag.ts'
 
 export type Pet = (
   | (Dog & {
@@ -36,16 +31,16 @@ export type Pet = (
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type string
-   */
   readonly type: PetTypeEnumKey
   /**
    * @example doggie
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
@@ -53,7 +48,7 @@ export type Pet = (
   /**
    * @type array | undefined
    */
-  readonly tags?: Array<Category>
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    */

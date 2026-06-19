@@ -1,4 +1,4 @@
-import type { Category } from './Category.ts'
+import type { TagTag } from './tag/Tag.ts'
 
 /**
  * @type object
@@ -28,7 +28,7 @@ export type User = {
    * @deprecated
    * @type object | undefined
    */
-  readonly tag?: Category
+  readonly tag?: TagTag
   /**
    * @example John
    * @type string | undefined

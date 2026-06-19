@@ -26,7 +26,7 @@ export async function updateUser(
 
   const requestData = updateUserDataSchema.parse(data)
 
-  const res = await request<UpdateUserStatusDefault, ResponseErrorConfig<Error>, z.output<typeof updateUserDataSchema>>({
+  const res = await request<UpdateUserStatusDefault, ResponseErrorConfig<Error>, z.input<typeof updateUserDataSchema>>({
     method: 'PUT',
     url: getUpdateUserUrl({ username }).url.toString(),
     data: requestData,

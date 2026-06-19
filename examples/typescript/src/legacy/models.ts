@@ -3,31 +3,10 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
-export interface OrderParams {
-  /**
-   * @description Order Status
-   * @example approved
-   */
-  status: OrderParamsStatusEnum
-  /**
-   * @type string
-   */
-  type: string
-}
-
 export enum OrderParamsStatusEnum {
   placed = 'placed',
   approved = 'approved',
   delivered = 'delivered',
-}
-
-export enum PetStatusEnum {
-  available = 'available',
-  pending = 'pending',
-  sold = 'sold',
 }
 
 export enum OrderStatus {
@@ -38,6 +17,42 @@ export enum OrderHttpStatusEnum {
   OrderHttpStatusEnum_200 = 200,
   OrderHttpStatusEnum_400 = 400,
   OrderHttpStatusEnum_500 = 500,
+}
+
+export enum CustomerParamsStatusEnum {
+  placed = 'placed',
+  approved = 'approved',
+  delivered = 'delivered',
+}
+
+export enum PetTypeEnum {
+  dog = 'dog',
+  cat = 'cat',
+}
+
+export enum PetStatusEnum {
+  available = 'available',
+  pending = 'pending',
+  sold = 'sold',
+}
+
+export enum AddPetRequestStatusEnum {
+  available = 'available',
+  pending = 'pending',
+  sold = 'sold',
+  'in store' = 'in store',
+}
+
+export enum FindPetsByStatusStatus {
+  available = 'available',
+  pending = 'pending',
+  sold = 'sold',
+}
+
+export enum DeletePetStatus200Enum {
+  TYPE1 = 'TYPE1',
+  TYPE2 = 'TYPE2',
+  TYPE3 = 'TYPE3',
 }
 
 /**
@@ -58,7 +73,20 @@ export interface Order {
    * @type integer | undefined
    */
   petId?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: OrderParamsStatusEnum
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @description
    * Format: `int32`
@@ -75,11 +103,10 @@ export interface Order {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | (string & {})
+  status?: OrderStatus | string
   /**
    * @description HTTP Status
    * @example 200
-   * @type number | undefined
    */
   http_status?: OrderHttpStatusEnum
   /**
@@ -128,7 +155,20 @@ export interface Customer {
    * @type integer | undefined
    */
   id?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: CustomerParamsStatusEnum
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @example fehguy
    * @type string | undefined
@@ -230,6 +270,22 @@ export interface User {
 /**
  * @type object
  */
+export interface Tag {
+  /**
+   * @description
+   * Format: `int64`
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @type string | undefined
+   */
+  name?: string
+}
+
+/**
+ * @type object
+ */
 export interface Dog {
   /**
    * @minLength 1
@@ -257,9 +313,22 @@ export interface Cat {
   name?: string
 }
 
-export enum PetTypeEnum {
-  dog = 'dog',
-  cat = 'cat',
+/**
+ * @type object
+ */
+export interface Category1 {
+  /**
+   * @description
+   * Format: `int64`
+   * @example 1
+   * @type integer | undefined
+   */
+  id?: bigint
+  /**
+   * @example Dogs
+   * @type string | undefined
+   */
+  name?: string
 }
 
 export type Pet = (
@@ -283,16 +352,16 @@ export type Pet = (
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type string
-   */
   readonly type: PetTypeEnum
   /**
    * @example doggie
    * @type string
    */
   name: string
-  category?: Category
+  /**
+   * @type object | undefined
+   */
+  category?: Category1
   /**
    * @type array
    */
@@ -300,7 +369,7 @@ export type Pet = (
   /**
    * @type array | undefined
    */
-  readonly tags?: Array<Category>
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    */
@@ -317,13 +386,6 @@ export type FullAddress = Address & {
    * @type string
    */
   streetName: string
-}
-
-export enum AddPetRequestStatusEnum {
-  available = 'available',
-  pending = 'pending',
-  sold = 'sold',
-  'in store' = 'in store',
 }
 
 /**
@@ -353,10 +415,9 @@ export interface AddPetRequest {
   /**
    * @type array | undefined
    */
-  tags?: Array<Category>
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: AddPetRequestStatusEnum
 }
@@ -475,7 +536,21 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-export type AddPetStatus405 = PetNotFound
+/**
+ * @type object
+ */
+export interface AddPetStatus405 {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
 
 /**
  * @description Create a new pet in the store
@@ -526,7 +601,7 @@ export type AddPetResponse = AddPetStatus200 | AddPetStatus405
  * @description Status values that need to be considered for filter
  * @default available
  */
-export type FindPetsByStatusQueryStatus = PetStatusEnum | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatus | undefined
 
 /**
  * @type array
@@ -777,12 +852,6 @@ export type DeletePetHeaderApiKey = string | undefined
  * @type integer
  */
 export type DeletePetPathPetId = bigint
-
-export enum DeletePetStatus200Enum {
-  TYPE1 = 'TYPE1',
-  TYPE2 = 'TYPE2',
-  TYPE3 = 'TYPE3',
-}
 
 /**
  * @type array

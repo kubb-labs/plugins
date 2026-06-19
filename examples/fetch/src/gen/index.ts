@@ -2,7 +2,9 @@ export type {
   AddPetData,
   AddPetFormUrlEncodedData,
   AddPetJsonData,
+  AddPetRequest,
   AddPetRequestConfig,
+  AddPetRequestStatusEnumKey,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -58,6 +60,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -136,6 +139,7 @@ export type {
   PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
+  Tag,
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
@@ -191,7 +195,7 @@ export { getPetById } from './getPetById.ts'
 export { getUserByName } from './getUserByName.ts'
 export { loginUser } from './loginUser.ts'
 export { logoutUser } from './logoutUser.ts'
-export { orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
+export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
 export { placeOrder } from './placeOrder.ts'
 export { placeOrderPatch } from './placeOrderPatch.ts'
 export { updatePet } from './updatePet.ts'

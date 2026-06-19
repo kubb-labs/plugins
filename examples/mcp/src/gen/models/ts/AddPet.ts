@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
+import type { AddPetRequest } from './AddPetRequest.js'
 import type { Pet } from './Pet.js'
-import type { PetNotFound } from './PetNotFound.js'
 
 /**
  * @type object
@@ -18,13 +18,27 @@ export type AddPetStatus200Xml = Omit<NonNullable<Pet>, 'name'>
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-export type AddPetStatus405 = PetNotFound
+/**
+ * @type object
+ */
+export type AddPetStatus405 = {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
 
 /**
  * @description Create a new pet in the store
  * @type object
  */
-export type AddPetJsonData = Pet
+export type AddPetJsonData = AddPetRequest
 
 /**
  * @description Create a new pet in the store

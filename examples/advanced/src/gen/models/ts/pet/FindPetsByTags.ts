@@ -1,4 +1,4 @@
-import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
+import type { FindPetsByTagsXEXAMPLEKey } from '../FindPetsByTagsXEXAMPLE.ts'
 import type { Pet } from '../Pet.ts'
 
 /**
@@ -22,7 +22,7 @@ export type FindPetsByTagsQueryPageSize = number | undefined
 /**
  * @description Header parameters
  */
-export type FindPetsByTagsHeaderXEXAMPLE = CreatePetsXEXAMPLEKey
+export type FindPetsByTagsHeaderXEXAMPLE = FindPetsByTagsXEXAMPLEKey
 
 /**
  * @type array

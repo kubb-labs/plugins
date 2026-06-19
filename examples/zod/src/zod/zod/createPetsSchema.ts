@@ -4,7 +4,6 @@
  */
 
 import { z } from '../../zod.ts'
-import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
 export const createPetsPathUuidSchema = z.string().describe('UUID')
@@ -15,7 +14,7 @@ export const createPetsQueryOffsetSchema = z.int().optional().describe('Offset')
 
 export type CreatePetsQueryOffsetSchemaType = z.infer<typeof createPetsQueryOffsetSchema>
 
-export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema.describe('Header parameters')
+export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE']).describe('Header parameters')
 
 export type CreatePetsHeaderXEXAMPLESchemaType = z.infer<typeof createPetsHeaderXEXAMPLESchema>
 

@@ -1,5 +1,6 @@
+import type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.ts'
 import type { Category } from './Category.ts'
-import type { PetStatusEnumKey } from './PetStatusEnum.ts'
+import type { TagTag } from './tag/Tag.ts'
 
 /**
  * @type object
@@ -28,9 +29,9 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags?: Array<Category>
+  tags?: Array<TagTag>
   /**
    * @description pet status in the store
    */
-  status?: PetStatusEnumKey
+  status?: AddPetRequestStatusEnumKey
 }

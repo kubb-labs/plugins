@@ -23,6 +23,8 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './models/AddPet.ts'
+export type { AddPetRequest } from './models/AddPetRequest.ts'
+export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
@@ -83,6 +85,7 @@ export type {
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './models/FindPetsByStatus.ts'
+export type { FindPetsByStatusStatusKey } from './models/FindPetsByStatusStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
@@ -141,7 +144,9 @@ export type {
   LoginUserStatus400,
 } from './models/LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/Order.ts'
+export type { Order } from './models/Order.ts'
+export type { OrderHttpStatusEnumKey } from './models/OrderHttpStatusEnum.ts'
+export type { OrderStatusEnumKey } from './models/OrderStatusEnum.ts'
 export type { Person } from './models/Person.ts'
 export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
@@ -168,6 +173,7 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/PlaceOrderPatch.ts'
+export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -234,5 +240,8 @@ export { getUserByName, getUserByNameQueryKey, getUserByNameQueryOptions, useGet
 export { loginUser, loginUserQueryKey, loginUserQueryOptions, useLoginUser } from './hooks/user/useLoginUser.ts'
 export { logoutUser, logoutUserQueryKey, logoutUserQueryOptions, useLogoutUser } from './hooks/user/useLogoutUser.ts'
 export { updateUser, updateUserMutationKey, useUpdateUser } from './hooks/user/useUpdateUser.ts'
-export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
+export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'
+export { orderHttpStatusEnum } from './models/OrderHttpStatusEnum.ts'
+export { orderStatusEnum } from './models/OrderStatusEnum.ts'
 export { petStatusEnum } from './models/PetStatusEnum.ts'

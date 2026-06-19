@@ -11,6 +11,8 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './models/AddPet.ts'
+export type { AddPetRequest } from './models/AddPetRequest.ts'
+export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
@@ -71,6 +73,7 @@ export type {
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './models/FindPetsByStatus.ts'
+export type { FindPetsByStatusStatusKey } from './models/FindPetsByStatusStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
@@ -135,7 +138,9 @@ export type {
   OptionsFindPetsByStatusResponses,
   OptionsFindPetsByStatusStatus200,
 } from './models/OptionsFindPetsByStatus.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/Order.ts'
+export type { Order } from './models/Order.ts'
+export type { OrderHttpStatusEnumKey } from './models/OrderHttpStatusEnum.ts'
+export type { OrderStatusEnumKey } from './models/OrderStatusEnum.ts'
 export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
@@ -161,6 +166,7 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/PlaceOrderPatch.ts'
+export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -207,14 +213,20 @@ export type {
 } from './models/UploadFile.ts'
 export type { User } from './models/User.ts'
 export type { UserArray } from './models/UserArray.ts'
+export { createAddPetRequest } from './mocks/createAddPetRequest.ts'
+export { createAddPetRequestStatusEnum } from './mocks/createAddPetRequestStatusEnum.ts'
 export { createAddress } from './mocks/createAddress.ts'
 export { createApiResponse } from './mocks/createApiResponse.ts'
 export { createCategory } from './mocks/createCategory.ts'
 export { createCustomer } from './mocks/createCustomer.ts'
+export { createFindPetsByStatusStatus } from './mocks/createFindPetsByStatusStatus.ts'
 export { createOrder } from './mocks/createOrder.ts'
+export { createOrderHttpStatusEnum } from './mocks/createOrderHttpStatusEnum.ts'
+export { createOrderStatusEnum } from './mocks/createOrderStatusEnum.ts'
 export { createPet } from './mocks/createPet.ts'
 export { createPetNotFound } from './mocks/createPetNotFound.ts'
 export { createPetStatusEnum } from './mocks/createPetStatusEnum.ts'
+export { createTag } from './mocks/createTag.ts'
 export { createUser } from './mocks/createUser.ts'
 export { createUserArray } from './mocks/createUserArray.ts'
 export {
@@ -365,7 +377,10 @@ export {
   createUpdateUserStatusDefault,
   createUpdateUserXmlData,
 } from './mocks/user/createUpdateUser.ts'
-export { orderHttpStatusEnum, orderStatusEnum } from './models/Order.ts'
+export { addPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'
+export { orderHttpStatusEnum } from './models/OrderHttpStatusEnum.ts'
+export { orderStatusEnum } from './models/OrderStatusEnum.ts'
 export { petStatusEnum } from './models/PetStatusEnum.ts'
 export { handlers } from './msw/handlers.ts'
 export { addPetHandler, addPetHandlerResponse200, addPetHandlerResponse405 } from './msw/pet/Handlers/addPetHandler.ts'

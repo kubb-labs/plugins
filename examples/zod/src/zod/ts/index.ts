@@ -11,7 +11,7 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.ts'
-export type { AddPetRequest } from './AddPetRequest.ts'
+export type { AddPetRequest, AddPetRequestStatusEnumKey } from './AddPetRequest.ts'
 export type { Address } from './Address.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Category } from './Category.ts'
@@ -25,8 +25,8 @@ export type {
   CreatePetsResponses,
   CreatePetsStatus201,
   CreatePetsStatusDefault,
+  CreatePetsXEXAMPLEKey,
 } from './CreatePets.ts'
-export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -83,6 +83,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
 } from './FindPetsByStatus.ts'
 export type {
   FindPetsByTagsHeaderXEXAMPLE,
@@ -96,6 +97,7 @@ export type {
   FindPetsByTagsStatus200Json,
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
+  FindPetsByTagsXEXAMPLEKey,
 } from './FindPetsByTags.ts'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.ts'
 export type {
@@ -153,9 +155,8 @@ export type {
 } from './LoginUser.ts'
 export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey, OrderValueEnumKey } from './Order.ts'
-export type { Pet } from './Pet.ts'
+export type { Pet, PetStatusEnumKey } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
-export type { PetStatusEnumKey } from './PetStatusEnum.ts'
 export type { PhoneNumber } from './PhoneNumber.ts'
 export type { PhoneWithMaxLength } from './PhoneWithMaxLength.ts'
 export type { PhoneWithMaxLengthExplicit } from './PhoneWithMaxLengthExplicit.ts'
@@ -228,6 +229,9 @@ export type {
 } from './UploadFile.ts'
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
-export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.ts'
+export { addPetRequestStatusEnum } from './AddPetRequest.ts'
+export { createPetsXEXAMPLE } from './CreatePets.ts'
+export { findPetsByStatusStatus } from './FindPetsByStatus.ts'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTags.ts'
 export { orderHttpStatusEnum, orderStatusEnum, orderValueEnum } from './Order.ts'
-export { petStatusEnum } from './PetStatusEnum.ts'
+export { petStatusEnum } from './Pet.ts'

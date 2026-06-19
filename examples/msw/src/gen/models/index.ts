@@ -11,6 +11,8 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.ts'
+export type { AddPetRequest } from './AddPetRequest.ts'
+export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.ts'
 export type { Address } from './Address.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Category } from './Category.ts'
@@ -71,6 +73,7 @@ export type {
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './FindPetsByStatus.ts'
+export type { FindPetsByStatusStatusKey } from './FindPetsByStatusStatus.ts'
 export type {
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
@@ -135,7 +138,9 @@ export type {
   OptionsFindPetsByStatusResponses,
   OptionsFindPetsByStatusStatus200,
 } from './OptionsFindPetsByStatus.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './Order.ts'
+export type { Order } from './Order.ts'
+export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.ts'
+export type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
 export type { Pet } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
 export type { PetStatusEnumKey } from './PetStatusEnum.ts'
@@ -161,6 +166,7 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.ts'
+export type { Tag } from './Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -207,5 +213,8 @@ export type {
 } from './UploadFile.ts'
 export type { User } from './User.ts'
 export type { UserArray } from './UserArray.ts'
-export { orderHttpStatusEnum, orderStatusEnum } from './Order.ts'
+export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.ts'
+export { findPetsByStatusStatus } from './FindPetsByStatusStatus.ts'
+export { orderHttpStatusEnum } from './OrderHttpStatusEnum.ts'
+export { orderStatusEnum } from './OrderStatusEnum.ts'
 export { petStatusEnum } from './PetStatusEnum.ts'

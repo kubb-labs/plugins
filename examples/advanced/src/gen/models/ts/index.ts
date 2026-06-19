@@ -1,16 +1,23 @@
 export type { AddPetRequest } from './AddPetRequest.ts'
+export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.ts'
 export type { Address } from './Address.ts'
-export type { Animal, AnimalTypeEnumKey } from './Animal.ts'
+export type { Animal } from './Animal.ts'
+export type { AnimalTypeEnumKey } from './AnimalTypeEnum.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Cat } from './Cat.ts'
 export type { Category } from './Category.ts'
+export type { CreatePetsBoolParamKey } from './CreatePetsBoolParam.ts'
 export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.ts'
 export type { Customer } from './Customer.ts'
+export type { CustomerParamsStatusEnumKey } from './CustomerParamsStatusEnum.ts'
 export type { Dog } from './Dog.ts'
+export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.ts'
 export type { Image } from './Image.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey } from './Order.ts'
-export type { OrderParams } from './OrderParams.ts'
+export type { Order } from './Order.ts'
+export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.ts'
+export type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.ts'
 export type { OrderParamsStatusEnumKey } from './OrderParamsStatusEnum.ts'
+export type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
 export type { Pet } from './Pet.ts'
 export type { PetNotFound } from './PetNotFound.ts'
 export type { PetStatusEnumKey } from './PetStatusEnum.ts'
@@ -116,7 +123,6 @@ export type {
   UploadFileStatus200,
 } from './pet/UploadFile.ts'
 export type {
-  CreatePetsBoolParamKey,
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
@@ -170,6 +176,7 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.ts'
+export type { TagTag } from './tag/Tag.ts'
 export type {
   CreateUserData,
   CreateUserFormUrlEncodedData,
@@ -234,9 +241,14 @@ export type {
   UpdateUserStatusDefault,
   UpdateUserXmlData,
 } from './user/UpdateUser.ts'
-export { animalTypeEnum } from './Animal.ts'
+export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.ts'
+export { animalTypeEnum } from './AnimalTypeEnum.ts'
+export { createPetsBoolParam } from './CreatePetsBoolParam.ts'
 export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.ts'
-export { orderHttpStatusEnum, orderOrderTypeEnum } from './Order.ts'
+export { customerParamsStatusEnum } from './CustomerParamsStatusEnum.ts'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTagsXEXAMPLE.ts'
+export { orderHttpStatusEnum } from './OrderHttpStatusEnum.ts'
+export { orderOrderTypeEnum } from './OrderOrderTypeEnum.ts'
 export { orderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
+export { orderStatusEnum } from './OrderStatusEnum.ts'
 export { petStatusEnum } from './PetStatusEnum.ts'
-export { createPetsBoolParam } from './pets/CreatePets.ts'

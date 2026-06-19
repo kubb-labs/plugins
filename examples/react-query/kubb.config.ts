@@ -18,7 +18,7 @@ export const config = {
   input: {
     path: './petStore.yaml',
   },
-  adapter: adapterOas({ integerType: 'number' }),
+  adapter: adapterOas({ integerType: 'number', enums: 'root' }),
   output: {
     path: './src/gen',
     clean: true,

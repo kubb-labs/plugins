@@ -23,7 +23,7 @@ const configs = [
       input: {
         path: '../../schemas/3.0.x/petStore.yaml',
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       output: {
         path: './gen',
         barrel: false,
@@ -50,7 +50,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false, discriminator: 'inherit' }),
+      adapter: adapterOas({ validate: false, discriminator: 'propagate', enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -73,7 +73,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -97,7 +97,7 @@ const configs = [
         clean: true,
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [pluginTs({})],
     },
@@ -113,7 +113,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -136,7 +136,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
@@ -159,7 +159,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -182,7 +182,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -212,7 +212,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
@@ -244,7 +244,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -272,7 +272,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -300,7 +300,7 @@ const configs = [
         path: './gen',
         barrel: false,
       },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -325,7 +325,7 @@ const configs = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/simple.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
@@ -353,7 +353,7 @@ const configs = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/simple.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginZod({
@@ -380,7 +380,7 @@ const configs = [
       root: __dirname,
       input: { path: '../../schemas/3.0.x/simple.yaml' },
       output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false }),
+      adapter: adapterOas({ validate: false, enums: 'root' }),
       parsers: [parserTs],
       plugins: [
         pluginTs({
