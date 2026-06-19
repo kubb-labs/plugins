@@ -38,6 +38,9 @@ export type ResolverTs = Resolver &
     /**
      * Resolves the name for an operation's request config (`RequestConfig`).
      *
+     * The `RequestConfig` suffix is kept through the v5 beta to avoid churn, but it overlaps with the
+     * runtime client's `RequestConfig`. Renaming to `Request` is on the table before stable.
+     *
      * @example Request config names
      * `resolver.resolveRequestConfigName(node) // → 'ListPetsRequestConfig'`
      */

@@ -81,6 +81,9 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
 
+  // NOTE(v5-stable): the fields were renamed from the legacy beta shape
+  // (`data`/`pathParams`/`queryParams`/`headerParams`) to `body`/`path`/`query`/`headers` so the
+  // type matches the runtime client. Drop this note once v5 leaves beta.
   return ast.factory.createSchema({
     type: 'object',
     deprecated: node.deprecated,

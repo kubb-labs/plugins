@@ -45,6 +45,8 @@ export const resolverTs = defineResolver<PluginTs>(() => {
       return this.resolveTypeName(`${node.operationId} Data`)
     },
     resolveRequestConfigName(node) {
+      // NOTE(v5-stable): the `RequestConfig` suffix is kept through the beta to avoid churn, but it
+      // overlaps with the runtime client's `RequestConfig`. Revisit renaming to `Request` before stable.
       return this.resolveTypeName(`${node.operationId} RequestConfig`)
     },
     resolveResponsesName(node) {
