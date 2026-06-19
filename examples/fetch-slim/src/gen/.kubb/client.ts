@@ -1,15 +1,4 @@
 /**
- * Shared HTTP client runtime for the slim Kubb client plugins (plugin-fetch, plugin-axios,
- * plugin-ky). It is injected once into the generated output as `.kubb/client.ts`; each plugin
- * appends a small transport prelude that supplies the actual HTTP send and exports the default
- * `client` / `createClient`.
- *
- * Everything here is transport-agnostic. The native request and response objects flow through as
- * generic parameters (`TRequest` / `TResponse`, defaulting to `Request` / `Response`) so the axios
- * and ky plugins can specialize them without touching this core.
- */
-
-/**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
  * these; everything else is an error (thrown by default, or surfaced on `error`).
  */
@@ -479,15 +468,6 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
   return client
 }
-/**
- * plugin-fetch transport prelude. Appended after the shared client runtime, so the runtime types
- * (`Transport`, `ResolvedRequest`, `TransportResult`, `ResponseType`) and `createClientCore` are
- * in scope once composed.
- *
- * It wraps `globalThis.fetch` as the default transport and exports the default `client` plus a
- * `createClient` factory. To swap or extend the transport, pass a `transport` through the client
- * config (`client.setConfig({ transport })`); no custom plugin is needed.
- */
 
 /**
  * Picks a `responseType` from a `Content-Type` header, or `undefined` when it is not recognized.

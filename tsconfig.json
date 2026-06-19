@@ -9,7 +9,6 @@
       "@internals/shared": ["./internals/shared/src/index.ts"],
       "@internals/utils": ["./internals/utils/src/index.ts"],
       "@internals/tanstack-query": ["./internals/tanstack-query/src/index.ts"],
-      "@internals/client/templates/runtime.source": ["./internals/client/src/templates/runtime.source.ts"],
       "@internals/client": ["./internals/client/src/index.ts"],
       "@kubb/plugin-fetch": ["./packages/plugin-fetch/src/index.ts"],
       "@kubb/plugin-ts/components": ["./packages/plugin-ts/src/components/index.ts"],

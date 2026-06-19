@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { DeleteUserRequestConfig, DeleteUserResponses } from '../../models/user/DeleteUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type DeleteUserRequest = {
+type DeleteUserRequest = {
   body?: DeleteUserRequestConfig['data']
   path?: DeleteUserRequestConfig['pathParams']
   query?: DeleteUserRequestConfig['queryParams']

@@ -10,7 +10,7 @@ import {
   resolveAuth,
   type Transport,
   type TransportResult,
-} from './runtime.ts'
+} from './fetch.ts'
 
 type FakeResult = Partial<Pick<TransportResult, 'data' | 'status' | 'statusText'>>
 

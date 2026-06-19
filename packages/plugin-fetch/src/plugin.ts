@@ -1,10 +1,10 @@
 import path from 'node:path'
-import { defaultMacros, injectClientRuntime, isParserEnabled, resolveOptions } from '@internals/client'
+import { defaultMacros, isParserEnabled, resolveOptions } from '@internals/client'
 import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { source as fetchTransportSource } from './clients/fetch.source.ts'
 import { clientGenerator } from './generators/clientGenerator.tsx'
+import { fetchClientTemplatePath } from './templates.ts'
 import type { PluginFetch } from './types.ts'
 
 /**
@@ -55,9 +55,14 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
         }
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
-        const source = baseURL ? `${fetchTransportSource}\nclient.setConfig({ baseURL: ${JSON.stringify(baseURL)} })\n` : fetchTransportSource
 
-        injectClientRuntime({ injectFile: ctx.injectFile, root, transport: { source } })
+        ctx.injectFile({
+          baseName: 'client.ts',
+          path: path.resolve(root, '.kubb/client.ts'),
+          copy: fetchClientTemplatePath,
+          footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
+          sources: [],
+        })
       },
     },
   }

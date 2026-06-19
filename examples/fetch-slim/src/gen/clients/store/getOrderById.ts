@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type GetOrderByIdRequest = {
+type GetOrderByIdRequest = {
   body?: GetOrderByIdRequestConfig['data']
   path?: GetOrderByIdRequestConfig['pathParams']
   query?: GetOrderByIdRequestConfig['queryParams']

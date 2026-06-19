@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { GetInventoryRequestConfig, GetInventoryResponses } from '../../models/store/GetInventory.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type GetInventoryRequest = {
+type GetInventoryRequest = {
   body?: GetInventoryRequestConfig['data']
   path?: GetInventoryRequestConfig['pathParams']
   query?: GetInventoryRequestConfig['queryParams']

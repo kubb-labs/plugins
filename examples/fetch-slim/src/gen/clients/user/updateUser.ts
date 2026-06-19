@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { UpdateUserRequestConfig, UpdateUserResponses } from '../../models/user/UpdateUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type UpdateUserRequest = {
+type UpdateUserRequest = {
   body: UpdateUserRequestConfig['data']
   path?: UpdateUserRequestConfig['pathParams']
   query?: UpdateUserRequestConfig['queryParams']

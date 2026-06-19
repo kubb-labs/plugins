@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type PlaceOrderPatchRequest = {
+type PlaceOrderPatchRequest = {
   body: PlaceOrderPatchRequestConfig['data']
   path?: PlaceOrderPatchRequestConfig['pathParams']
   query?: PlaceOrderPatchRequestConfig['queryParams']

@@ -4,7 +4,7 @@ import type { Options, RequestResult } from './.kubb/client'
 import type { GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById'
 import { client } from './.kubb/client'
 
-export type GetPetByIdRequest = {
+type GetPetByIdRequest = {
   body?: GetPetByIdRequestConfig['data']
   path?: GetPetByIdRequestConfig['pathParams']
   query?: GetPetByIdRequestConfig['queryParams']

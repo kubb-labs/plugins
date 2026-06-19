@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { GetUserByNameRequestConfig, GetUserByNameResponses } from '../../models/user/GetUserByName.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type GetUserByNameRequest = {
+type GetUserByNameRequest = {
   body?: GetUserByNameRequestConfig['data']
   path?: GetUserByNameRequestConfig['pathParams']
   query?: GetUserByNameRequestConfig['queryParams']

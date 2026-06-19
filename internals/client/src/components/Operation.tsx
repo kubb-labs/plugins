@@ -64,8 +64,8 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
 
   return (
     <>
-      <File.Source name={signature.dataTypeName} isExportable={isExportable} isIndexable={isIndexable}>
-        <Type export={isExportable} name={signature.dataTypeName}>
+      <File.Source name={signature.dataTypeName} isExportable={false} isIndexable={false}>
+        <Type export={false} name={signature.dataTypeName}>
           {signature.dataTypeDefinition}
         </Type>
       </File.Source>

@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { CreateUserRequestConfig, CreateUserResponses } from '../../models/user/CreateUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type CreateUserRequest = {
+type CreateUserRequest = {
   body: CreateUserRequestConfig['data']
   path?: CreateUserRequestConfig['pathParams']
   query?: CreateUserRequestConfig['queryParams']

@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { DeleteOrderRequestConfig, DeleteOrderResponses } from '../../models/store/DeleteOrder.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type DeleteOrderRequest = {
+type DeleteOrderRequest = {
   body?: DeleteOrderRequestConfig['data']
   path?: DeleteOrderRequestConfig['pathParams']
   query?: DeleteOrderRequestConfig['queryParams']

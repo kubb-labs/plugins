@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputResponses } from '../../models/user/CreateUsersWithListInput.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type CreateUsersWithListInputRequest = {
+type CreateUsersWithListInputRequest = {
   body: CreateUsersWithListInputRequestConfig['data']
   path?: CreateUsersWithListInputRequestConfig['pathParams']
   query?: CreateUsersWithListInputRequestConfig['queryParams']

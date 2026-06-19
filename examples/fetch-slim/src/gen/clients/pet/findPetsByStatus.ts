@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type FindPetsByStatusRequest = {
+type FindPetsByStatusRequest = {
   body?: FindPetsByStatusRequestConfig['data']
   path?: FindPetsByStatusRequestConfig['pathParams']
   query?: FindPetsByStatusRequestConfig['queryParams']

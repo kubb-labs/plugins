@@ -4,7 +4,7 @@ import type { Options, RequestResult } from './.kubb/client'
 import type { DeletePetRequestConfig, DeletePetResponses } from './DeletePet'
 import { client } from './.kubb/client'
 
-export type DeletePetRequest = {
+type DeletePetRequest = {
   body?: DeletePetRequestConfig['data']
   path?: DeletePetRequestConfig['pathParams']
   query?: DeletePetRequestConfig['queryParams']

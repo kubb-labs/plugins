@@ -2,7 +2,7 @@
   "name": "@internals/client",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared generator builders and runtime sources for the HTTP client plugins (plugin-fetch, plugin-axios, plugin-ky) of Kubb. Not intended for direct use.",
+  "description": "Shared generator builders for the HTTP client plugins (plugin-fetch, plugin-axios, plugin-ky) of Kubb. Not intended for direct use.",
   "keywords": [
     "axios",
     "client",
@@ -23,7 +23,6 @@
     "directory": "internals/client"
   },
   "files": [
-    "templates",
     "dist",
     "!/**/**.test.**",
     "!/**/__tests__/**",
@@ -35,20 +34,12 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "typesVersions": {
-    "*": {
-      "templates/runtime.source": [
-        "./dist/templates/runtime.source.d.ts"
-      ]
-    }
+    "*": {}
   },
   "exports": {
     ".": {
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
-    },
-    "./templates/runtime.source": {
-      "import": "./dist/templates/runtime.source.js",
-      "require": "./dist/templates/runtime.source.cjs"
     },
     "./package.json": "./package.json"
   },

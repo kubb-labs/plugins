@@ -6,18 +6,18 @@
 import type { Category } from './Category.ts'
 import type { Tag } from './Tag.ts'
 
-export const petStatusEnum = {
+export const addPetRequestStatusEnum = {
   available: 'available',
   pending: 'pending',
   sold: 'sold',
 } as const
 
-export type PetStatusEnumKey = (typeof petStatusEnum)[keyof typeof petStatusEnum]
+export type AddPetRequestStatusEnumKey = (typeof addPetRequestStatusEnum)[keyof typeof addPetRequestStatusEnum]
 
 /**
  * @type object
  */
-export type Pet = {
+export type AddPetRequest = {
   /**
    * @description
    * Format: `int64`
@@ -46,5 +46,5 @@ export type Pet = {
    * @description pet status in the store
    * @type string | undefined
    */
-  status?: PetStatusEnumKey
+  status?: AddPetRequestStatusEnumKey
 }

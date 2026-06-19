@@ -1,10 +1,8 @@
 import { defineConfig } from 'vitest/config'
-import { importAttributeTextPlugin } from '../../configs/importAttributeTextPlugin.ts'
 
 export default defineConfig({
-  plugins: [importAttributeTextPlugin()],
   test: {
-    dir: './src',
+    include: ['./src/**/*.test.{ts,tsx}', './templates/**/*.test.{ts,tsx}'],
   },
   resolve: {
     tsconfigPaths: true,

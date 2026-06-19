@@ -47,8 +47,8 @@ export type GroupedOptionsSignature = {
 export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.OperationNode; tsResolver: ResolverTs }): GroupedOptionsSignature {
   const requestConfigName = tsResolver.resolveRequestConfigName(node)
   const responsesName = tsResolver.resolveResponsesName(node)
-  // A distinct name from plugin-ts's `<Name>RequestConfig` and `<Name>Data`, so all three can live
-  // in one merged barrel. Appending `Request` keeps the name unique even if the suffix ever changes.
+  // File-local type (not exported, never barreled), so it only has to stay distinct from the
+  // imported `<Name>RequestConfig` and `<Name>Responses` within the same file.
   const dataTypeName = `${requestConfigName.replace(/RequestConfig$/, '')}Request`
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const resultGenerics = buildRequestResultGenerics({ node, tsResolver })

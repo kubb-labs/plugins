@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { LoginUserRequestConfig, LoginUserResponses } from '../../models/user/LoginUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type LoginUserRequest = {
+type LoginUserRequest = {
   body?: LoginUserRequestConfig['data']
   path?: LoginUserRequestConfig['pathParams']
   query?: LoginUserRequestConfig['queryParams']

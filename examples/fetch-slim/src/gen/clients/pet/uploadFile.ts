@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { UploadFileRequestConfig, UploadFileResponses } from '../../models/pet/UploadFile.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type UploadFileRequest = {
+type UploadFileRequest = {
   body: UploadFileRequestConfig['data']
   path?: UploadFileRequestConfig['pathParams']
   query?: UploadFileRequestConfig['queryParams']

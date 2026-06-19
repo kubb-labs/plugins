@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { LogoutUserRequestConfig, LogoutUserResponses } from '../../models/user/LogoutUser.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type LogoutUserRequest = {
+type LogoutUserRequest = {
   body?: LogoutUserRequestConfig['data']
   path?: LogoutUserRequestConfig['pathParams']
   query?: LogoutUserRequestConfig['queryParams']

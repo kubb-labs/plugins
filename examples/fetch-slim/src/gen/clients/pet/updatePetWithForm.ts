@@ -7,7 +7,7 @@ import type { Options, RequestResult } from '../../.kubb/client.ts'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm.ts'
 import { client } from '../../.kubb/client.ts'
 
-export type UpdatePetWithFormRequest = {
+type UpdatePetWithFormRequest = {
   body?: UpdatePetWithFormRequestConfig['data']
   path?: UpdatePetWithFormRequestConfig['pathParams']
   query?: UpdatePetWithFormRequestConfig['queryParams']
