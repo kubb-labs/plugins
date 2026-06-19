@@ -37,15 +37,10 @@ export default defineConfig({
   },
   overrides: [
     {
-      // Generated code (kubb output) legitimately uses `T[]` array syntax and imports
-      // response types it does not always reference, so relax the purely-stylistic rules
-      // there. `ignorePatterns` cannot be used: oxlint then reports "No files found" and
-      // exits non-zero for the explicit file paths kubb passes.
-      files: ['**/gen*/**', '**/src/zod/**', '**/src/mini/**', '**/src/legacy/**'],
+      files: ['**/gen/**'],
       rules: {
         'typescript/array-type': 'off',
         'no-unused-vars': 'off',
-        'typescript/consistent-type-imports': 'off',
       },
     },
   ],
