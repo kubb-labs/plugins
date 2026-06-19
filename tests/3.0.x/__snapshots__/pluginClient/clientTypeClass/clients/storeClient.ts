@@ -4,9 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeleteOrderResponse, DeleteOrderPathOrderId, DeleteOrderStatus400, DeleteOrderStatus404 } from '../types/DeleteOrder.ts'
 import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../types/GetOrderById.ts'
 import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import { mergeConfig } from '@kubb/plugin-client/clients/axios'
@@ -38,28 +36,6 @@ export class StoreClient {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
     const requestData = data
     const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, data: requestData, contentType })
-    return res.data
-  }
-
-/**
-   * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
-   * @summary Find purchase order by ID
-   * {@link /store/order/:orderId}
-   */
-  async getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({ ...requestConfig, method: "GET", url: `/store/order/${orderId}` })
-    return res.data
-  }
-
-/**
-   * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
-   * @summary Delete purchase order by ID
-   * {@link /store/order/:orderId}
-   */
-  async deleteOrder(orderId: DeleteOrderPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({ ...requestConfig, method: "DELETE", url: `/store/order/${orderId}` })
     return res.data
   }
 }

@@ -6,18 +6,12 @@
 import { addPetHandler } from './addPet.ts'
 import { deletePetHandler } from './deletePet.ts'
 import { findPetsByStatusHandler } from './findPetsByStatus.ts'
-import { findPetsByTagsHandler } from './findPetsByTags.ts'
 import { getPetByIdHandler } from './getPetById.ts'
-import { updatePetHandler } from './updatePet.ts'
-import { updatePetWithFormHandler } from './updatePetWithForm.ts'
 import { uploadFileHandler } from './uploadFile.ts'
 import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.ts'
 import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.ts'
-import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from '../zod/findPetsByTagsSchema.ts'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
-import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
-import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.ts'
 import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
@@ -28,16 +22,6 @@ export function getServer() {
     name: 'Swagger PetStore - OpenAPI 3.0',
     version: '1.0.11',
   })
-
-  server.registerTool("updatePet", {
-    title: "Update an existing pet",
-    description: "Update an existing pet by Id",
-    outputSchema: { data: updatePetStatus200Schema },
-    inputSchema: { data: updatePetDataSchema },
-  }, async ({ data }, request) => {
-    return updatePetHandler({ data }, request)
-  })
-
 
   server.registerTool("addPet", {
     title: "Add a new pet to the store",
@@ -59,16 +43,6 @@ export function getServer() {
   })
 
 
-  server.registerTool("findPetsByTags", {
-    title: "Finds Pets by tags",
-    description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    outputSchema: { data: findPetsByTagsStatus200Schema },
-    inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
-  }, async ({ params }, request) => {
-    return findPetsByTagsHandler({ params }, request)
-  })
-
-
   server.registerTool("getPetById", {
     title: "Find pet by ID",
     description: "Returns a single pet",
@@ -76,15 +50,6 @@ export function getServer() {
     inputSchema: { petId: getPetByIdPathPetIdSchema },
   }, async ({ petId }, request) => {
     return getPetByIdHandler({ petId }, request)
-  })
-
-
-  server.registerTool("updatePetWithForm", {
-    title: "Updates a pet in the store with form data",
-    description: "Make a POST request to /pet/{petId}",
-    inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
-  }, async ({ petId, params }, request) => {
-    return updatePetWithFormHandler({ petId, params }, request)
   })
 
 

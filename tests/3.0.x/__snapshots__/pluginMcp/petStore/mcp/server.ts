@@ -4,41 +4,18 @@
 */
 
 import { addPetHandler } from './addPet.ts'
-import { createUserHandler } from './createUser.ts'
-import { createUsersWithListInputHandler } from './createUsersWithListInput.ts'
-import { deleteOrderHandler } from './deleteOrder.ts'
 import { deletePetHandler } from './deletePet.ts'
-import { deleteUserHandler } from './deleteUser.ts'
 import { findPetsByStatusHandler } from './findPetsByStatus.ts'
-import { findPetsByTagsHandler } from './findPetsByTags.ts'
 import { getInventoryHandler } from './getInventory.ts'
-import { getOrderByIdHandler } from './getOrderById.ts'
 import { getPetByIdHandler } from './getPetById.ts'
-import { getUserByNameHandler } from './getUserByName.ts'
-import { loginUserHandler } from './loginUser.ts'
-import { logoutUserHandler } from './logoutUser.ts'
 import { placeOrderHandler } from './placeOrder.ts'
-import { updatePetHandler } from './updatePet.ts'
-import { updatePetWithFormHandler } from './updatePetWithForm.ts'
-import { updateUserHandler } from './updateUser.ts'
 import { uploadFileHandler } from './uploadFile.ts'
 import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.ts'
-import { createUserDataSchema } from '../zod/createUserSchema.ts'
-import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from '../zod/createUsersWithListInputSchema.ts'
-import { deleteOrderPathOrderIdSchema } from '../zod/deleteOrderSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.ts'
-import { deleteUserPathUsernameSchema } from '../zod/deleteUserSchema.ts'
 import { findPetsByStatusQueryStatusSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.ts'
-import { findPetsByTagsQueryTagsSchema, findPetsByTagsStatus200Schema } from '../zod/findPetsByTagsSchema.ts'
 import { getInventoryStatus200Schema } from '../zod/getInventorySchema.ts'
-import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema.ts'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.ts'
-import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from '../zod/getUserByNameSchema.ts'
-import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from '../zod/loginUserSchema.ts'
 import { placeOrderDataSchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.ts'
-import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.ts'
-import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.ts'
-import { updateUserDataSchema, updateUserPathUsernameSchema } from '../zod/updateUserSchema.ts'
 import { uploadFileDataSchema, uploadFilePathPetIdSchema, uploadFileQueryAdditionalMetadataSchema, uploadFileStatus200Schema } from '../zod/uploadFileSchema.ts'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
@@ -49,16 +26,6 @@ export function getServer() {
     name: 'Swagger PetStore - OpenAPI 3.0',
     version: '1.0.11',
   })
-
-  server.registerTool("updatePet", {
-    title: "Update an existing pet",
-    description: "Update an existing pet by Id",
-    outputSchema: { data: updatePetStatus200Schema },
-    inputSchema: { data: updatePetDataSchema },
-  }, async ({ data }, request) => {
-    return updatePetHandler({ data }, request)
-  })
-
 
   server.registerTool("addPet", {
     title: "Add a new pet to the store",
@@ -80,16 +47,6 @@ export function getServer() {
   })
 
 
-  server.registerTool("findPetsByTags", {
-    title: "Finds Pets by tags",
-    description: "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-    outputSchema: { data: findPetsByTagsStatus200Schema },
-    inputSchema: { params: z.object({ "tags": findPetsByTagsQueryTagsSchema }) },
-  }, async ({ params }, request) => {
-    return findPetsByTagsHandler({ params }, request)
-  })
-
-
   server.registerTool("getPetById", {
     title: "Find pet by ID",
     description: "Returns a single pet",
@@ -97,15 +54,6 @@ export function getServer() {
     inputSchema: { petId: getPetByIdPathPetIdSchema },
   }, async ({ petId }, request) => {
     return getPetByIdHandler({ petId }, request)
-  })
-
-
-  server.registerTool("updatePetWithForm", {
-    title: "Updates a pet in the store with form data",
-    description: "Make a POST request to /pet/{petId}",
-    inputSchema: { petId: updatePetWithFormPathPetIdSchema, params: z.object({ "name": updatePetWithFormQueryNameSchema, "status": updatePetWithFormQueryStatusSchema }) },
-  }, async ({ petId, params }, request) => {
-    return updatePetWithFormHandler({ petId, params }, request)
   })
 
 
@@ -144,90 +92,6 @@ export function getServer() {
     inputSchema: { data: placeOrderDataSchema },
   }, async ({ data }, request) => {
     return placeOrderHandler({ data }, request)
-  })
-
-
-  server.registerTool("getOrderById", {
-    title: "Find purchase order by ID",
-    description: "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-    outputSchema: { data: getOrderByIdStatus200Schema },
-    inputSchema: { orderId: getOrderByIdPathOrderIdSchema },
-  }, async ({ orderId }, request) => {
-    return getOrderByIdHandler({ orderId }, request)
-  })
-
-
-  server.registerTool("deleteOrder", {
-    title: "Delete purchase order by ID",
-    description: "For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors",
-    inputSchema: { orderId: deleteOrderPathOrderIdSchema },
-  }, async ({ orderId }, request) => {
-    return deleteOrderHandler({ orderId }, request)
-  })
-
-
-  server.registerTool("createUser", {
-    title: "Create user",
-    description: "This can only be done by the logged in user.",
-    inputSchema: { data: createUserDataSchema },
-  }, async ({ data }, request) => {
-    return createUserHandler({ data }, request)
-  })
-
-
-  server.registerTool("createUsersWithListInput", {
-    title: "Creates list of users with given input array",
-    description: "Creates list of users with given input array",
-    outputSchema: { data: createUsersWithListInputStatus200Schema },
-    inputSchema: { data: createUsersWithListInputDataSchema },
-  }, async ({ data }, request) => {
-    return createUsersWithListInputHandler({ data }, request)
-  })
-
-
-  server.registerTool("loginUser", {
-    title: "Logs user into the system",
-    description: "Make a GET request to /user/login",
-    outputSchema: { data: loginUserStatus200Schema },
-    inputSchema: { params: z.object({ "username": loginUserQueryUsernameSchema, "password": loginUserQueryPasswordSchema }) },
-  }, async ({ params }, request) => {
-    return loginUserHandler({ params }, request)
-  })
-
-
-  server.registerTool("logoutUser", {
-    title: "Logs out current logged in user session",
-    description: "Make a GET request to /user/logout",
-  }, async (request) => {
-    return logoutUserHandler(request)
-  })
-
-
-  server.registerTool("getUserByName", {
-    title: "Get user by user name",
-    description: "Make a GET request to /user/{username}",
-    outputSchema: { data: getUserByNameStatus200Schema },
-    inputSchema: { username: getUserByNamePathUsernameSchema },
-  }, async ({ username }, request) => {
-    return getUserByNameHandler({ username }, request)
-  })
-
-
-  server.registerTool("updateUser", {
-    title: "Update user",
-    description: "This can only be done by the logged in user.",
-    inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
-  }, async ({ username, data }, request) => {
-    return updateUserHandler({ username, data }, request)
-  })
-
-
-  server.registerTool("deleteUser", {
-    title: "Delete user",
-    description: "This can only be done by the logged in user.",
-    inputSchema: { username: deleteUserPathUsernameSchema },
-  }, async ({ username }, request) => {
-    return deleteUserHandler({ username }, request)
   })
 
   return server
