@@ -1,21 +1,24 @@
 import { defineConfig, type UserConfig } from 'tsdown'
-import { importAttributeTextPlugin } from '../../configs/importAttributeTextPlugin.ts'
 
 const entry = {
   index: 'src/index.ts',
   'clients/axios': 'src/clients/axios.ts',
   'clients/fetch': 'src/clients/fetch.ts',
-  'templates/config.source': 'src/templates/config.source.ts',
-  'templates/clients/axios.source': 'src/templates/clients/axios.source.ts',
-  'templates/clients/fetch.source': 'src/templates/clients/fetch.source.ts',
+  templates: 'src/templates.ts',
 }
 
 const shared: Partial<UserConfig> = {
-  plugins: [importAttributeTextPlugin()],
   platform: 'node',
   sourcemap: true,
   shims: true,
-  exports: true,
+  // Expose the raw `.ts` templates so consumers can resolve them through
+  // `@kubb/plugin-client/templates/**` and copy them into the generated output.
+  exports: {
+    customExports(exports) {
+      exports['./templates/*'] = './templates/*'
+      return exports
+    },
+  },
   deps: {
     neverBundle: [/^@kubb\//],
     alwaysBundle: [/@internals/],

@@ -24,7 +24,7 @@
     "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/renderer-jsx": "catalog:",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "kubb": "catalog:"
   },
   "devDependencies": {

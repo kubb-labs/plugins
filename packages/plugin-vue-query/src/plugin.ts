@@ -2,9 +2,7 @@ import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 import { ast, definePlugin } from '@kubb/core'
 import { isParserEnabled, pluginClientName } from '@kubb/plugin-client'
-import { source as axiosClientSource } from '@kubb/plugin-client/templates/clients/axios.source'
-import { source as fetchClientSource } from '@kubb/plugin-client/templates/clients/fetch.source'
-import { source as configSource } from '@kubb/plugin-client/templates/config.source'
+import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from '@kubb/plugin-client/templates'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
@@ -66,7 +64,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
   } = options
 
   const clientName = client?.client ?? 'axios'
-  const clientImportPath = client?.importPath ?? (!client?.bundle ? `@kubb/plugin-client/clients/${clientName}` : undefined)
+  const clientImportPath = client?.importPath
 
   const selectedGenerators =
     options.generators ??
@@ -85,7 +83,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
         ctx.setOptions({
           output,
           client: {
-            bundle: client?.bundle,
             baseURL: client?.baseURL,
             client: clientName,
             clientType: client?.clientType ?? 'function',
@@ -146,14 +143,15 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const hasClientPlugin = !!ctx.config.plugins?.some((p) => (p as { name?: string }).name === pluginClientName)
 
-        if (client?.bundle && !hasClientPlugin && !clientImportPath) {
+        if (!hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
+            copy: clientName === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'client',
-                nodes: [ast.factory.createText(clientName === 'fetch' ? fetchClientSource : axiosClientSource)],
+                nodes: [],
                 isExportable: true,
                 isIndexable: true,
               }),
@@ -165,10 +163,11 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
           ctx.injectFile({
             baseName: 'config.ts',
             path: path.resolve(root, '.kubb/config.ts'),
+            copy: configTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'config',
-                nodes: [ast.factory.createText(configSource)],
+                nodes: [],
                 isExportable: false,
                 isIndexable: false,
               }),

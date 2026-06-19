@@ -5,6 +5,7 @@
 
 import type { Category } from './Category.ts'
 import type { PetStatusEnumKey } from './PetStatusEnum.ts'
+import type { Tag } from './Tag.ts'
 
 /**
  * @type object
@@ -33,7 +34,7 @@ export type Pet = {
   /**
    * @type array | undefined
    */
-  tags?: Category[]
+  tags?: Tag[]
   /**
    * @description pet status in the store
    */

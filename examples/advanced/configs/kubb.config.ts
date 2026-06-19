@@ -19,8 +19,9 @@ export default defineConfig({
   },
   adapter: adapterOas({
     validate: true,
-    discriminator: 'strict',
+    discriminator: 'preserve',
     integerType: 'number',
+    enums: 'root',
   }),
   output: {
     path: './src/gen',
@@ -163,6 +164,7 @@ export default defineConfig({
       group: { type: 'tag' },
       paramsCasing: 'camelcase', // make pathParams and queryParams camelCase to be in sync with client
       client: {
+        importPath: '../../../axios-client.ts',
         baseURL: 'https://petstore.swagger.io/v2',
       },
     }),

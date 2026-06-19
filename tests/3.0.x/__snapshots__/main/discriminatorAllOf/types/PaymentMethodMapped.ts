@@ -3,19 +3,11 @@
 * Do not edit manually.
 */
 
-export const paymentMethodMappedTypeEnum = {
-    card: "card",
-    bank_transfer: "bank_transfer"
-} as const;
-
-export type PaymentMethodMappedTypeEnumKey = (typeof paymentMethodMappedTypeEnum)[keyof typeof paymentMethodMappedTypeEnum];
+import type { PaymentMethodMappedTypeEnumKey } from './PaymentMethodMappedTypeEnum.ts'
 
 /**
  * @type object
 */
 export type PaymentMethodMapped = {
-    /**
-     * @type string
-    */
     type: PaymentMethodMappedTypeEnumKey;
 };

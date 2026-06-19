@@ -44,16 +44,15 @@ export type ResolverClient = Resolver & {
 
 /**
  * Use either a preset `client` type OR a custom `importPath`, not both.
- * `importPath` will override the default `client` preset when both are provided.
- * These options are mutually exclusive. `bundle` and `importPath` are also
- * mutually exclusive since `bundle` only has effect when `importPath` is not set.
+ * `importPath` overrides the bundled `client` preset when provided. These options are mutually
+ * exclusive.
  */
 export type ClientImportPath =
   | {
       /**
-       * HTTP client used by the generated code.
-       * - `'axios'` — imports from `@kubb/plugin-client/clients/axios`. Requires `axios` at runtime.
-       * - `'fetch'` — imports from `@kubb/plugin-client/clients/fetch`. Uses the global `fetch`.
+       * HTTP client bundled into the generated output.
+       * - `'axios'` — emits the axios client into `.kubb/client.ts`. Requires `axios` at runtime.
+       * - `'fetch'` — emits the fetch client into `.kubb/client.ts`. Uses the global `fetch`.
        *
        * @default 'axios'
        */
@@ -64,18 +63,13 @@ export type ClientImportPath =
       client?: never
       /**
        * Path to a custom client module. Generated files import their HTTP runtime from here
-       * instead of `@kubb/plugin-client/clients/{client}`. Accepts both relative paths and
-       * bare module specifiers; the value is used as-is.
+       * instead of the bundled `client`. Accepts both relative paths and bare module specifiers;
+       * the value is used as-is.
        *
        * @note When combined with a query plugin, the module must export `Client`,
        * `RequestConfig`, and `ResponseErrorConfig` types.
        */
       importPath: string
-      /**
-       * `bundle` has no effect when `importPath` is set.
-       * Use either `bundle` (with `client`) or `importPath`, not both.
-       */
-      bundle?: never
     }
 
 /**
@@ -197,14 +191,6 @@ export type Options = OutputOptions & {
    */
   clientType?: 'function' | 'class' | 'staticClass'
   /**
-   * Copy the HTTP client runtime into the generated output so consumers do not need
-   * `@kubb/plugin-client` at runtime. When `false`, generated files import from
-   * `@kubb/plugin-client/clients/{client}`.
-   *
-   * @default false
-   */
-  bundle?: boolean
-  /**
    * Generate a single SDK class composing every tag-based client into one entry point.
    * Automatically enables `clientType: 'class'`.
    *
@@ -252,7 +238,6 @@ type ResolvedOptions = {
   group: Group | null
   client: Options['client']
   clientType: NonNullable<Options['clientType']>
-  bundle: NonNullable<Options['bundle']>
   parser: NonNullable<Options['parser']>
   urlType: NonNullable<Options['urlType']>
   importPath: Options['importPath']

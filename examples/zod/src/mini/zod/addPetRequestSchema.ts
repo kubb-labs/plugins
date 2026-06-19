@@ -5,7 +5,6 @@
 
 import * as z from 'zod/mini'
 import { categorySchema } from './categorySchema.ts'
-import { petStatusEnumSchema } from './petStatusEnumSchema.ts'
 import { tagSchema } from './tagSchema.ts'
 
 export const addPetRequestSchema = z.object({
@@ -16,5 +15,5 @@ export const addPetRequestSchema = z.object({
   },
   photoUrls: z.array(z.string()),
   tags: z.optional(z.array(tagSchema)),
-  status: z.optional(petStatusEnumSchema),
+  status: z.optional(z.enum(['available', 'pending', 'sold'])),
 })

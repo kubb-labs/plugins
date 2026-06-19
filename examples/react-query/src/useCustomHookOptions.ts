@@ -1,6 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { useQueryClient } from '@tanstack/react-query'
-import { getUserByNameQueryKey, type HookOptions } from './gen/index.ts'
+import { getOrderByIdQueryKey, type HookOptions } from './gen/index.ts'
 
 function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Partial<HookOptions> {
   return {
@@ -16,16 +16,16 @@ function getCustomHookOptions({ queryClient }: { queryClient: QueryClient }): Pa
         void queryClient.invalidateQueries({ queryKey: ['pet', variables.pet_id] })
       },
     },
-    useUpdateUserHook: {
+    useDeleteOrderHook: {
       onSuccess: (_data, variables, _onMutateResult, _context) => {
         // Invalidate queries using the provided query key generator function
-        void queryClient.invalidateQueries({ queryKey: getUserByNameQueryKey({ username: variables.username }) })
+        void queryClient.invalidateQueries({ queryKey: getOrderByIdQueryKey({ orderId: variables.orderId }) })
       },
     },
-    useDeleteUserHook: {
+    useAddPetHook: {
       onError: (error, _variables, _onMutateResult, _context) => {
         // Implement custom error handling logic
-        console.error('Failed to delete user:', error)
+        console.error('Failed to add pet:', error)
       },
     },
     // Add more custom hook options here...

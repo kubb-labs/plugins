@@ -18,7 +18,7 @@ export const config = {
   input: {
     path: './petStore.yaml',
   },
-  adapter: adapterOas({ integerType: 'number' }),
+  adapter: adapterOas({ integerType: 'number', enums: 'root' }),
   output: {
     path: './src/gen',
     clean: true,
@@ -42,7 +42,7 @@ export const config = {
     }),
     pluginReactQuery({
       client: {
-        bundle: true,
+        importPath: '@kubb/plugin-client/clients/axios',
       },
       resolver: {
         resolveQueryName(node) {
@@ -119,6 +119,7 @@ export const config = {
           pattern: 'findPetsByTags',
           options: {
             client: {
+              importPath: '@kubb/plugin-client/clients/axios',
               dataReturnType: 'full',
             },
             infinite: {

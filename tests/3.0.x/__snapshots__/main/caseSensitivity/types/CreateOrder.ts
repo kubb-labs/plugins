@@ -4,7 +4,6 @@
 */
 
 import type { Order } from './Order.ts'
-import type { OrderRequest } from './OrderRequest.ts'
 
 /**
  * @type object
@@ -13,8 +12,18 @@ export type CreateOrderStatus201 = Order;
 
 /**
  * @description Order request body
+ * @type object | undefined
 */
-export type CreateOrderData = OrderRequest | undefined;
+export type CreateOrderData = {
+    /**
+     * @type string | undefined
+    */
+    userId?: string;
+    /**
+     * @type array | undefined
+    */
+    productIds?: string[];
+} | undefined;
 
 /**
  * @type object

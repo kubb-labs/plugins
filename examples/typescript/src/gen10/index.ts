@@ -1,21 +1,26 @@
 export type { AddPetRequest } from './models/AddPetRequest.ts'
+export type { AddPetRequestStatusEnum } from './models/AddPetRequestStatusEnum.ts'
 export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Cat } from './models/Cat.ts'
 export type { Category } from './models/Category.ts'
 export type { Customer } from './models/Customer.ts'
+export type { CustomerParamsStatusEnum } from './models/CustomerParamsStatusEnum.ts'
+export type { DeletePetStatus200Enum } from './models/DeletePetStatus200Enum.ts'
 export type { Dog } from './models/Dog.ts'
+export type { FindPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'
 export type { FullAddress } from './models/FullAddress.ts'
 export type { HappyCustomer } from './models/HappyCustomer.ts'
 export type { Order } from './models/Order.ts'
-export type { OrderParams } from './models/OrderParams.ts'
+export type { OrderHttpStatusEnum } from './models/OrderHttpStatusEnum.ts'
 export type { OrderParamsStatusEnum } from './models/OrderParamsStatusEnum.ts'
+export type { OrderStatus } from './models/OrderStatus.ts'
 export type { Pet } from './models/Pet.ts'
 export type { PetNotFound } from './models/PetNotFound.ts'
 export type { PetStatusEnum } from './models/PetStatusEnum.ts'
+export type { PetTypeEnum } from './models/PetTypeEnum.ts'
+export type { Tag } from './models/Tag.ts'
 export type { UnhappyCustomer } from './models/UnhappyCustomer.ts'
-export type { User } from './models/User.ts'
-export type { UserArray } from './models/UserArray.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
@@ -146,67 +151,3 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/store/PlaceOrderPatch.ts'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './models/user/CreateUser.ts'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './models/user/CreateUsersWithListInput.ts'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './models/user/DeleteUser.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './models/user/GetUserByName.ts'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './models/user/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/user/LogoutUser.ts'
-export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './models/user/UpdateUser.ts'

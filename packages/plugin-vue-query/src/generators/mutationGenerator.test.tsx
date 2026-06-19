@@ -28,7 +28,6 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
     client: 'axios',
     clientType: 'function',
     importPath: undefined,
-    bundle: false,
   },
   parser: 'zod',
   paramsType: 'inline',

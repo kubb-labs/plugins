@@ -13,15 +13,8 @@ import {
   createPetsResponseSchema,
   createPetsStatus201Schema,
 } from './createPetsSchema.ts'
-import { createUserDataSchema, createUserResponseSchema } from './createUserSchema.ts'
-import {
-  createUsersWithListInputDataSchema,
-  createUsersWithListInputResponseSchema,
-  createUsersWithListInputStatus200Schema,
-} from './createUsersWithListInputSchema.ts'
 import { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './deleteOrderSchema.ts'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './deletePetSchema.ts'
-import { deleteUserPathUsernameSchema, deleteUserResponseSchema, deleteUserStatus400Schema, deleteUserStatus404Schema } from './deleteUserSchema.ts'
 import {
   findPetsByStatusQueryStatusSchema,
   findPetsByStatusResponseSchema,
@@ -52,15 +45,6 @@ import {
 } from './getPetByIdSchema.ts'
 import { getThingsQueryLimitSchema, getThingsResponseSchema, getThingsStatus201Schema } from './getThingsSchema.ts'
 import {
-  getUserByNamePathUsernameSchema,
-  getUserByNameResponseSchema,
-  getUserByNameStatus200Schema,
-  getUserByNameStatus400Schema,
-  getUserByNameStatus404Schema,
-} from './getUserByNameSchema.ts'
-import { loginUserQueryUsernameSchema, loginUserResponseSchema, loginUserStatus200Schema, loginUserStatus400Schema } from './loginUserSchema.ts'
-import { logoutUserResponseSchema } from './logoutUserSchema.ts'
-import {
   placeOrderPatchDataSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
@@ -81,7 +65,6 @@ import {
   updatePetWithFormResponseSchema,
   updatePetWithFormStatus405Schema,
 } from './updatePetWithFormSchema.ts'
-import { updateUserDataSchema, updateUserPathUsernameSchema, updateUserResponseSchema } from './updateUserSchema.ts'
 import {
   uploadFileDataSchema,
   uploadFilePathPetIdSchema,
@@ -344,106 +327,6 @@ export const operations = {
       404: deleteOrderStatus404Schema,
     },
   },
-  createUser: {
-    request: createUserDataSchema,
-    parameters: {
-      path: null,
-      query: null,
-      header: null,
-    },
-    responses: {
-      default: createUserResponseSchema,
-    },
-    errors: {},
-  },
-  createUsersWithListInput: {
-    request: createUsersWithListInputDataSchema,
-    parameters: {
-      path: null,
-      query: null,
-      header: null,
-    },
-    responses: {
-      200: createUsersWithListInputStatus200Schema,
-      default: createUsersWithListInputResponseSchema,
-    },
-    errors: {},
-  },
-  loginUser: {
-    request: null,
-    parameters: {
-      path: null,
-      query: loginUserQueryUsernameSchema,
-      header: null,
-    },
-    responses: {
-      200: loginUserStatus200Schema,
-      400: loginUserStatus400Schema,
-      default: loginUserResponseSchema,
-    },
-    errors: {
-      400: loginUserStatus400Schema,
-    },
-  },
-  logoutUser: {
-    request: null,
-    parameters: {
-      path: null,
-      query: null,
-      header: null,
-    },
-    responses: {
-      default: logoutUserResponseSchema,
-    },
-    errors: {},
-  },
-  getUserByName: {
-    request: null,
-    parameters: {
-      path: getUserByNamePathUsernameSchema,
-      query: null,
-      header: null,
-    },
-    responses: {
-      200: getUserByNameStatus200Schema,
-      400: getUserByNameStatus400Schema,
-      404: getUserByNameStatus404Schema,
-      default: getUserByNameResponseSchema,
-    },
-    errors: {
-      400: getUserByNameStatus400Schema,
-      404: getUserByNameStatus404Schema,
-    },
-  },
-  updateUser: {
-    request: updateUserDataSchema,
-    parameters: {
-      path: updateUserPathUsernameSchema,
-      query: null,
-      header: null,
-    },
-    responses: {
-      default: updateUserResponseSchema,
-    },
-    errors: {},
-  },
-  deleteUser: {
-    request: null,
-    parameters: {
-      path: deleteUserPathUsernameSchema,
-      query: null,
-      header: null,
-    },
-    responses: {
-      400: deleteUserStatus400Schema,
-      404: deleteUserStatus404Schema,
-      default: deleteUserResponseSchema,
-    },
-    errors: {
-      400: deleteUserStatus400Schema,
-      404: deleteUserStatus404Schema,
-    },
-  },
 } as const
 
 export const paths = {
@@ -479,22 +362,5 @@ export const paths = {
   '/store/order/{orderId}': {
     GET: operations['getOrderById'],
     DELETE: operations['deleteOrder'],
-  },
-  '/user': {
-    POST: operations['createUser'],
-  },
-  '/user/createWithList': {
-    POST: operations['createUsersWithListInput'],
-  },
-  '/user/login': {
-    GET: operations['loginUser'],
-  },
-  '/user/logout': {
-    GET: operations['logoutUser'],
-  },
-  '/user/{username}': {
-    GET: operations['getUserByName'],
-    PUT: operations['updateUser'],
-    DELETE: operations['deleteUser'],
   },
 } as const

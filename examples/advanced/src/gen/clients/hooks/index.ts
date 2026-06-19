@@ -9,14 +9,3 @@ export { updatePetMutationKey, updatePetMutationOptions, useUpdatePet } from './
 export { updatePetWithFormMutationKey, updatePetWithFormMutationOptions, useUpdatePetWithForm } from './pet/useUpdatePetWithForm.ts'
 export { uploadFileMutationKey, uploadFileMutationOptions, useUploadFile } from './pet/useUploadFile.ts'
 export { createPetsMutationKey, createPetsMutationOptions, useCreatePets } from './pets/useCreatePets.ts'
-export { createUserMutationKey, createUserMutationOptions, useCreateUser } from './user/useCreateUser.ts'
-export {
-  createUsersWithListInputMutationKey,
-  createUsersWithListInputMutationOptions,
-  useCreateUsersWithListInput,
-} from './user/useCreateUsersWithListInput.ts'
-export { deleteUserMutationKey, deleteUserMutationOptions, useDeleteUser } from './user/useDeleteUser.ts'
-export { getUserByNameQueryKey, getUserByNameQueryOptions, useGetUserByName } from './user/useGetUserByName.ts'
-export { loginUserQueryKey, loginUserQueryOptions, useLoginUser } from './user/useLoginUser.ts'
-export { logoutUserQueryKey, logoutUserQueryOptions, useLogoutUser } from './user/useLogoutUser.ts'
-export { updateUserMutationKey, updateUserMutationOptions, useUpdateUser } from './user/useUpdateUser.ts'

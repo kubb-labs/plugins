@@ -3,7 +3,9 @@
  * Do not edit manually.
  */
 
-import type { OrderParams } from './OrderParams.ts'
+import type { OrderHttpStatusEnum } from './OrderHttpStatusEnum.ts'
+import type { OrderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
+import type { OrderStatus } from './OrderStatus.ts'
 
 /**
  * @type object
@@ -23,7 +25,20 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: OrderParamsStatusEnum
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @description
    * Format: `int32`
@@ -40,13 +55,12 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: 'accepted' | (string & {})
+  status?: OrderStatus | string
   /**
    * @description HTTP Status
    * @example 200
-   * @type number | undefined
    */
-  http_status?: 200 | 400 | 500
+  http_status?: OrderHttpStatusEnum
   /**
    * @type boolean | undefined
    */

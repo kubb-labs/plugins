@@ -1,4 +1,5 @@
 import * as z from 'zod'
+import { animalTypeEnumSchema } from './animalTypeEnumSchema.ts'
 import { catSchema } from './catSchema.ts'
 import { dogSchema } from './dogSchema.ts'
 
@@ -18,7 +19,7 @@ export const animalSchema = z
   .and(
     z
       .object({
-        type: z.enum(['cat', 'dog']),
+        type: animalTypeEnumSchema,
       })
       .strict(),
   )

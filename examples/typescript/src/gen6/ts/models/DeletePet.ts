@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
+import type { DeletePetStatus200EnumKey } from './DeletePetStatus200Enum.ts'
+
 /**
  * @type string | undefined
  */
@@ -15,14 +17,6 @@ export type DeletePetHeaderApiKey = string | undefined
  * @type integer
  */
 export type DeletePetPathPetId = bigint
-
-export const deletePetStatus200Enum = {
-  TYPE1: 'TYPE1',
-  TYPE2: 'TYPE2',
-  TYPE3: 'TYPE3',
-} as const
-
-export type DeletePetStatus200EnumKey = (typeof deletePetStatus200Enum)[keyof typeof deletePetStatus200Enum]
 
 /**
  * @type array

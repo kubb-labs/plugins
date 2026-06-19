@@ -28,7 +28,6 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   client: 'axios',
   clientType: 'staticClass',
   importPath: undefined,
-  bundle: false,
   parser: false,
   output: {
     path: '.',

@@ -4,6 +4,8 @@
  */
 
 import type { Order } from '../models/Order.ts'
+import { createOrderHttpStatusEnum } from './createOrderHttpStatusEnum.ts'
+import { createOrderStatusEnum } from './createOrderStatusEnum.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
 export function createOrder<TData extends Partial<Order> = object>(data?: TData) {
@@ -13,8 +15,8 @@ export function createOrder<TData extends Partial<Order> = object>(data?: TData)
     petId: faker.number.bigInt(),
     quantity: faker.number.int(),
     shipDate: faker.date.anytime().toISOString(),
-    status: faker.helpers.arrayElement<NonNullable<Order>['status']>(['placed', 'approved', 'delivered']),
-    http_status: faker.helpers.arrayElement<NonNullable<Order>['http_status']>([200, 400, 500]),
+    status: createOrderStatusEnum(),
+    http_status: createOrderHttpStatusEnum(),
     complete: faker.datatype.boolean(),
   }
   return {

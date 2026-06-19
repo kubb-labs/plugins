@@ -21,7 +21,8 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './AddPet.js'
-export type { Address } from './Address.js'
+export type { AddPetRequest } from './AddPetRequest.js'
+export type { AddPetRequestStatusEnumKey } from './AddPetRequestStatusEnum.js'
 export type { ApiResponse } from './ApiResponse.js'
 export type { Category } from './Category.js'
 export type {
@@ -36,29 +37,6 @@ export type {
   CreatePetsStatusDefault,
 } from './CreatePets.js'
 export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './CreateUser.js'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './CreateUsersWithListInput.js'
-export type { Customer } from './Customer.js'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -75,14 +53,6 @@ export type {
   DeletePetResponses,
   DeletePetStatus400,
 } from './DeletePet.js'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './DeleteUser.js'
 export type {
   FindPetsByStatusPathStepId,
   FindPetsByStatusRequestConfig,
@@ -106,6 +76,7 @@ export type {
   FindPetsByTagsStatus200Xml,
   FindPetsByTagsStatus400,
 } from './FindPetsByTags.js'
+export type { FindPetsByTagsXEXAMPLEKey } from './FindPetsByTagsXEXAMPLE.js'
 export type { GetInventoryRequestConfig, GetInventoryResponse, GetInventoryResponses, GetInventoryStatus200 } from './GetInventory.js'
 export type {
   GetOrderByIdPathOrderId,
@@ -129,30 +100,10 @@ export type {
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './GetPetById.js'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './GetUserByName.js'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './LoginUser.js'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './LogoutUser.js'
-export type { Order, OrderHttpStatusEnumKey, OrderOrderTypeEnumKey, OrderStatusEnumKey } from './Order.js'
+export type { Order } from './Order.js'
+export type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.js'
+export type { OrderOrderTypeEnumKey } from './OrderOrderTypeEnum.js'
+export type { OrderStatusEnumKey } from './OrderStatusEnum.js'
 export type { Pet } from './Pet.js'
 export type { PetNotFound } from './PetNotFound.js'
 export type { PetStatusEnumKey } from './PetStatusEnum.js'
@@ -203,19 +154,11 @@ export type {
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.js'
-export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './UpdateUser.js'
-export type { User } from './User.js'
-export type { UserArray } from './UserArray.js'
+export type { TagTag } from './tag/Tag.js'
+export { addPetRequestStatusEnum } from './AddPetRequestStatusEnum.js'
 export { createPetsXEXAMPLE } from './CreatePetsXEXAMPLE.js'
-export { orderHttpStatusEnum, orderOrderTypeEnum, orderStatusEnum } from './Order.js'
+export { findPetsByTagsXEXAMPLE } from './FindPetsByTagsXEXAMPLE.js'
+export { orderHttpStatusEnum } from './OrderHttpStatusEnum.js'
+export { orderOrderTypeEnum } from './OrderOrderTypeEnum.js'
+export { orderStatusEnum } from './OrderStatusEnum.js'
 export { petStatusEnum } from './PetStatusEnum.js'

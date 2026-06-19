@@ -11,7 +11,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    adapter: adapterOas({ validate: false }),
+    adapter: adapterOas({ validate: false, enums: 'root' }),
     output: {
       path: './src/gen',
       clean: true,
@@ -21,6 +21,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './example1.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [example1],
       }),
     ],
@@ -28,11 +29,12 @@ export default defineConfig([
   {
     root: '.',
     input,
-    adapter: adapterOas({ validate: false }),
+    adapter: adapterOas({ validate: false, enums: 'root' }),
     output: { path: './src/gen2', format: false, lint: false },
     plugins: [
       pluginClient({
         output: { path: './example2.ts', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [example2],
       }),
     ],
@@ -40,7 +42,7 @@ export default defineConfig([
   {
     root: '.',
     input,
-    adapter: adapterOas({ validate: false }),
+    adapter: adapterOas({ validate: false, enums: 'root' }),
     output: { path: './src/gen3', format: false, lint: false },
     hooks: {
       done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
@@ -48,6 +50,7 @@ export default defineConfig([
     plugins: [
       pluginClient({
         output: { path: './example3.tsx', mode: 'file' },
+        importPath: '@kubb/plugin-client/clients/axios',
         generators: [example3],
       }),
     ],

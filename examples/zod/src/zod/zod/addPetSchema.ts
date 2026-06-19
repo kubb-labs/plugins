@@ -5,7 +5,6 @@
 
 import { z } from '../../zod.ts'
 import { addPetRequestSchema } from './addPetRequestSchema.ts'
-import { petNotFoundSchema } from './petNotFoundSchema.ts'
 import { petSchema } from './petSchema.ts'
 
 export const addPetStatus200SchemaJson = z.lazy(() => petSchema)
@@ -20,7 +19,10 @@ export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetS
 
 export type AddPetStatus200SchemaType = z.infer<typeof addPetStatus200Schema>
 
-export const addPetStatus405Schema = petNotFoundSchema
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
+})
 
 export type AddPetStatus405SchemaType = z.infer<typeof addPetStatus405Schema>
 

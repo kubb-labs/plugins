@@ -1,6 +1,8 @@
 import * as z from 'zod'
-import { orderParamsSchema } from './orderParamsSchema.ts'
+import { orderHttpStatusEnumSchema } from './orderHttpStatusEnumSchema.ts'
+import { orderOrderTypeEnumSchema } from './orderOrderTypeEnumSchema.ts'
 import { orderParamsStatusEnumSchema } from './orderParamsStatusEnumSchema.ts'
+import { orderStatusEnumSchema } from './orderStatusEnumSchema.ts'
 
 export const orderSchema = z.object({
   id: z
@@ -11,24 +13,28 @@ export const orderSchema = z.object({
     .int()
     .optional()
     .meta({ examples: [198772] }),
-  params: orderParamsSchema.optional(),
+  params: z
+    .object({
+      status: orderParamsStatusEnumSchema.describe('Order Status').meta({ examples: ['approved'] }),
+      type: z.string(),
+    })
+    .optional(),
   quantity: z
     .int()
     .optional()
     .meta({ examples: [7] }),
-  orderType: z.enum(['foo', 'bar']).optional(),
+  orderType: orderOrderTypeEnumSchema.optional(),
   type: z
     .string()
     .optional()
     .describe('Order Status')
     .meta({ examples: ['approved'] }),
   shipDate: z.iso.datetime().optional(),
-  status: orderParamsStatusEnumSchema
+  status: orderStatusEnumSchema
     .optional()
     .describe('Order Status')
     .meta({ examples: ['approved'] }),
-  http_status: z
-    .union([z.literal(200), z.literal(400), z.literal(500)])
+  http_status: orderHttpStatusEnumSchema
     .optional()
     .describe('HTTP Status')
     .meta({ examples: [200] }),

@@ -1,13 +1,15 @@
-export type { Address } from './models/ts/Address.ts'
+export type { AddPetRequest } from './models/ts/AddPetRequest.ts'
+export type { AddPetRequestStatusEnumKey } from './models/ts/AddPetRequestStatusEnum.ts'
 export type { ApiResponse } from './models/ts/ApiResponse.ts'
 export type { Category } from './models/ts/Category.ts'
-export type { Customer } from './models/ts/Customer.ts'
-export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey } from './models/ts/Order.ts'
+export type { FindPetsByStatusStatusKey } from './models/ts/FindPetsByStatusStatus.ts'
+export type { Order } from './models/ts/Order.ts'
+export type { OrderHttpStatusEnumKey } from './models/ts/OrderHttpStatusEnum.ts'
+export type { OrderStatusEnumKey } from './models/ts/OrderStatusEnum.ts'
 export type { Pet } from './models/ts/Pet.ts'
 export type { PetNotFound } from './models/ts/PetNotFound.ts'
 export type { PetStatusEnumKey } from './models/ts/PetStatusEnum.ts'
-export type { User } from './models/ts/User.ts'
-export type { UserArray } from './models/ts/UserArray.ts'
+export type { Tag } from './models/ts/Tag.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
@@ -139,71 +141,9 @@ export type {
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/ts/store/PlaceOrderPatch.ts'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './models/ts/user/CreateUser.ts'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './models/ts/user/CreateUsersWithListInput.ts'
-export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './models/ts/user/DeleteUser.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './models/ts/user/GetUserByName.ts'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './models/ts/user/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/ts/user/LogoutUser.ts'
-export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './models/ts/user/UpdateUser.ts'
-export { client } from './.kubb/client.ts'
-export { orderHttpStatusEnum, orderStatusEnum } from './models/ts/Order.ts'
+export { addPetRequestStatusEnum } from './models/ts/AddPetRequestStatusEnum.ts'
+export { findPetsByStatusStatus } from './models/ts/FindPetsByStatusStatus.ts'
+export { orderHttpStatusEnum } from './models/ts/OrderHttpStatusEnum.ts'
+export { orderStatusEnum } from './models/ts/OrderStatusEnum.ts'
 export { petStatusEnum } from './models/ts/PetStatusEnum.ts'
 export { deleteOrder, getInventory, getOrderById, placeOrder, placeOrderPatch } from './tag.ts'

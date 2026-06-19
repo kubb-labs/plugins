@@ -27,7 +27,7 @@ export async function uploadFile(
   const requestData = UploadFileData.parse(data)
   const formData = buildFormData(requestData)
 
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.output<typeof UploadFileData>>({
+  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof UploadFileData>>({
     method: 'POST',
     url: `/pet/${petId}/uploadImage`,
     data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,

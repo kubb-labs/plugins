@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-client",
-  "version": "5.0.0-beta.66",
+  "version": "5.0.0-beta.69",
   "description": "Generate type-safe HTTP clients with Kubb. Supports Axios, Fetch, and custom client adapters with full TypeScript inference.",
   "keywords": [
     "api-client",
@@ -22,6 +22,7 @@
   },
   "files": [
     "dist",
+    "templates",
     "*.d.ts",
     "*.d.cts",
     "!/**/**.test.**",
@@ -41,14 +42,8 @@
       "clients/fetch": [
         "./dist/clients/fetch.d.ts"
       ],
-      "templates/config.source": [
-        "./dist/templates/config.source.d.ts"
-      ],
-      "templates/clients/axios.source": [
-        "./dist/templates/clients/axios.source.d.ts"
-      ],
-      "templates/clients/fetch.source": [
-        "./dist/templates/clients/fetch.source.d.ts"
+      "templates": [
+        "./dist/templates.d.ts"
       ]
     }
   },
@@ -65,19 +60,12 @@
       "import": "./dist/clients/fetch.js",
       "require": "./dist/clients/fetch.cjs"
     },
-    "./templates/clients/axios.source": {
-      "import": "./dist/templates/clients/axios.source.js",
-      "require": "./dist/templates/clients/axios.source.cjs"
+    "./templates": {
+      "import": "./dist/templates.js",
+      "require": "./dist/templates.cjs"
     },
-    "./templates/clients/fetch.source": {
-      "import": "./dist/templates/clients/fetch.source.js",
-      "require": "./dist/templates/clients/fetch.source.cjs"
-    },
-    "./templates/config.source": {
-      "import": "./dist/templates/config.source.js",
-      "require": "./dist/templates/config.source.cjs"
-    },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./templates/*": "./templates/*"
   },
   "publishConfig": {
     "access": "public",
@@ -105,7 +93,7 @@
   "devDependencies": {
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "axios": "^1.17.0"
+    "axios": "^1.18.0"
   },
   "peerDependencies": {
     "@kubb/renderer-jsx": "catalog:",

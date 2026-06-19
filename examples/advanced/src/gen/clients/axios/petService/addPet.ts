@@ -26,7 +26,7 @@ export async function addPet(
 
   const requestData = addPetDataSchema.parse(data)
 
-  const res = await request<AddPetStatus405 | AddPetStatusDefault, ResponseErrorConfig<AddPetStatus405>, z.output<typeof addPetDataSchema>>({
+  const res = await request<AddPetStatus405 | AddPetStatusDefault, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
     data: requestData,

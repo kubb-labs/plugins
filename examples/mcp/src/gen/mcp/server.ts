@@ -6,24 +6,17 @@
 import { addFilesHandler } from './addFiles.js'
 import { addPetHandler } from './addPet.js'
 import { createPetsHandler } from './createPets.js'
-import { createUserHandler } from './createUser.js'
-import { createUsersWithListInputHandler } from './createUsersWithListInput.js'
 import { deleteOrderHandler } from './deleteOrder.js'
 import { deletePetHandler } from './deletePet.js'
-import { deleteUserHandler } from './deleteUser.js'
 import { findPetsByStatusHandler } from './findPetsByStatus.js'
 import { findPetsByTagsHandler } from './findPetsByTags.js'
 import { getInventoryHandler } from './getInventory.js'
 import { getOrderByIdHandler } from './getOrderById.js'
 import { getPetByIdHandler } from './getPetById.js'
-import { getUserByNameHandler } from './getUserByName.js'
-import { loginUserHandler } from './loginUser.js'
-import { logoutUserHandler } from './logoutUser.js'
 import { placeOrderHandler } from './placeOrder.js'
 import { placeOrderPatchHandler } from './placeOrderPatch.js'
 import { updatePetHandler } from './updatePet.js'
 import { updatePetWithFormHandler } from './updatePetWithForm.js'
-import { updateUserHandler } from './updateUser.js'
 import { addFilesDataSchema, addFilesStatus200Schema } from '../zod/addFilesSchema.js'
 import { addPetDataSchema, addPetStatus200Schema } from '../zod/addPetSchema.js'
 import {
@@ -33,11 +26,8 @@ import {
   createPetsQueryOffsetSchema,
   createPetsStatus201Schema,
 } from '../zod/createPetsSchema.js'
-import { createUserDataSchema } from '../zod/createUserSchema.js'
-import { createUsersWithListInputDataSchema, createUsersWithListInputStatus200Schema } from '../zod/createUsersWithListInputSchema.js'
 import { deleteOrderPathOrderIdSchema } from '../zod/deleteOrderSchema.js'
 import { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema } from '../zod/deletePetSchema.js'
-import { deleteUserPathUsernameSchema } from '../zod/deleteUserSchema.js'
 import { findPetsByStatusPathStepIdSchema, findPetsByStatusStatus200Schema } from '../zod/findPetsByStatusSchema.js'
 import {
   findPetsByTagsHeaderXEXAMPLESchema,
@@ -49,13 +39,10 @@ import {
 import { getInventoryStatus200Schema } from '../zod/getInventorySchema.js'
 import { getOrderByIdPathOrderIdSchema, getOrderByIdStatus200Schema } from '../zod/getOrderByIdSchema.js'
 import { getPetByIdPathPetIdSchema, getPetByIdStatus200Schema } from '../zod/getPetByIdSchema.js'
-import { getUserByNamePathUsernameSchema, getUserByNameStatus200Schema } from '../zod/getUserByNameSchema.js'
-import { loginUserQueryPasswordSchema, loginUserQueryUsernameSchema, loginUserStatus200Schema } from '../zod/loginUserSchema.js'
 import { placeOrderPatchDataSchema, placeOrderPatchStatus200Schema } from '../zod/placeOrderPatchSchema.js'
 import { placeOrderDataSchema, placeOrderStatus200Schema } from '../zod/placeOrderSchema.js'
 import { updatePetDataSchema, updatePetStatus200Schema } from '../zod/updatePetSchema.js'
 import { updatePetWithFormPathPetIdSchema, updatePetWithFormQueryNameSchema, updatePetWithFormQueryStatusSchema } from '../zod/updatePetWithFormSchema.js'
-import { updateUserDataSchema, updateUserPathUsernameSchema } from '../zod/updateUserSchema.js'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
 import { z } from 'zod'
@@ -252,92 +239,6 @@ export function getServer() {
     },
     async ({ orderId }, request) => {
       return deleteOrderHandler({ orderId }, request)
-    },
-  )
-
-  server.registerTool(
-    'createUser',
-    {
-      title: 'Create user',
-      description: 'This can only be done by the logged in user.',
-      inputSchema: { data: createUserDataSchema },
-    },
-    async ({ data }, request) => {
-      return createUserHandler({ data }, request)
-    },
-  )
-
-  server.registerTool(
-    'createUsersWithListInput',
-    {
-      title: 'Creates list of users with given input array',
-      description: 'Creates list of users with given input array',
-      outputSchema: { data: createUsersWithListInputStatus200Schema },
-      inputSchema: { data: createUsersWithListInputDataSchema },
-    },
-    async ({ data }, request) => {
-      return createUsersWithListInputHandler({ data }, request)
-    },
-  )
-
-  server.registerTool(
-    'loginUser',
-    {
-      title: 'Logs user into the system',
-      description: 'Make a GET request to /user/login',
-      outputSchema: { data: loginUserStatus200Schema },
-      inputSchema: { params: z.object({ username: loginUserQueryUsernameSchema, password: loginUserQueryPasswordSchema }) },
-    },
-    async ({ params }, request) => {
-      return loginUserHandler({ params }, request)
-    },
-  )
-
-  server.registerTool(
-    'logoutUser',
-    {
-      title: 'Logs out current logged in user session',
-      description: 'Make a GET request to /user/logout',
-    },
-    async (request) => {
-      return logoutUserHandler(request)
-    },
-  )
-
-  server.registerTool(
-    'getUserByName',
-    {
-      title: 'Get user by user name',
-      description: 'Make a GET request to /user/{username}',
-      outputSchema: { data: getUserByNameStatus200Schema },
-      inputSchema: { username: getUserByNamePathUsernameSchema },
-    },
-    async ({ username }, request) => {
-      return getUserByNameHandler({ username }, request)
-    },
-  )
-
-  server.registerTool(
-    'updateUser',
-    {
-      title: 'Update user',
-      description: 'This can only be done by the logged in user.',
-      inputSchema: { username: updateUserPathUsernameSchema, data: updateUserDataSchema },
-    },
-    async ({ username, data }, request) => {
-      return updateUserHandler({ username, data }, request)
-    },
-  )
-
-  server.registerTool(
-    'deleteUser',
-    {
-      title: 'Delete user',
-      description: 'This can only be done by the logged in user.',
-      inputSchema: { username: deleteUserPathUsernameSchema },
-    },
-    async ({ username }, request) => {
-      return deleteUserHandler({ username }, request)
     },
   )
 

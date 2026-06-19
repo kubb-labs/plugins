@@ -3,9 +3,6 @@ export type { FindPetsByTagsQueryKey } from './hooks/useFindPetsByTags.ts'
 export type { GetInventoryQueryKey } from './hooks/useGetInventory.ts'
 export type { GetOrderByIdQueryKey } from './hooks/useGetOrderById.ts'
 export type { GetPetByIdQueryKey } from './hooks/useGetPetById.ts'
-export type { GetUserByNameQueryKey } from './hooks/useGetUserByName.ts'
-export type { LoginUserQueryKey } from './hooks/useLoginUser.ts'
-export type { LogoutUserQueryKey } from './hooks/useLogoutUser.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
@@ -19,32 +16,8 @@ export type {
   AddPetStatus405,
   AddPetXmlData,
 } from './models/AddPet.ts'
-export type { Address, AddressIdentifierEnumKey } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Category } from './models/Category.ts'
-export type {
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-} from './models/CreateUser.ts'
-export type {
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-} from './models/CreateUsersWithListInput.ts'
-export type { Customer } from './models/Customer.ts'
 export type {
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
@@ -62,14 +35,6 @@ export type {
   DeletePetStatus400,
 } from './models/DeletePet.ts'
 export type {
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
-} from './models/DeleteUser.ts'
-export type {
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
   FindPetsByStatusResponse,
@@ -79,6 +44,7 @@ export type {
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
 } from './models/FindPetsByStatus.ts'
+export type { FindPetsByStatusStatusKey } from './models/FindPetsByStatusStatus.ts'
 export type {
   FindPetsByTagsQueryTags,
   FindPetsByTagsRequestConfig,
@@ -112,30 +78,8 @@ export type {
   GetPetByIdStatus400,
   GetPetByIdStatus404,
 } from './models/GetPetById.ts'
-export type {
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-} from './models/GetUserByName.ts'
-export type {
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-} from './models/LoginUser.ts'
-export type { LogoutUserRequestConfig, LogoutUserResponse, LogoutUserResponses, LogoutUserStatusDefault } from './models/LogoutUser.ts'
-export type { Order, OrderStatusEnumKey } from './models/Order.ts'
+export type { Order } from './models/Order.ts'
+export type { OrderStatusEnumKey } from './models/OrderStatusEnum.ts'
 export type { Pet } from './models/Pet.ts'
 export type { PetStatusEnumKey } from './models/PetStatusEnum.ts'
 export type {
@@ -149,6 +93,7 @@ export type {
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
+export type { Tag } from './models/Tag.ts'
 export type {
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
@@ -174,17 +119,6 @@ export type {
   UpdatePetWithFormStatus405,
 } from './models/UpdatePetWithForm.ts'
 export type {
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
-} from './models/UpdateUser.ts'
-export type {
   UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
@@ -193,27 +127,18 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './models/UploadFile.ts'
-export type { User } from './models/User.ts'
-export type { UserArray } from './models/UserArray.ts'
 export { addPet, addPetMutationKey, useAddPet } from './hooks/useAddPet.ts'
-export { createUser, createUserMutationKey, useCreateUser } from './hooks/useCreateUser.ts'
-export { createUsersWithListInput, createUsersWithListInputMutationKey, useCreateUsersWithListInput } from './hooks/useCreateUsersWithListInput.ts'
 export { deleteOrder, deleteOrderMutationKey, useDeleteOrder } from './hooks/useDeleteOrder.ts'
 export { deletePet, deletePetMutationKey, useDeletePet } from './hooks/useDeletePet.ts'
-export { deleteUser, deleteUserMutationKey, useDeleteUser } from './hooks/useDeleteUser.ts'
 export { findPetsByStatus, findPetsByStatusQueryKey, findPetsByStatusQueryOptions, useFindPetsByStatus } from './hooks/useFindPetsByStatus.ts'
 export { findPetsByTags, findPetsByTagsQueryKey, findPetsByTagsQueryOptions, useFindPetsByTags } from './hooks/useFindPetsByTags.ts'
 export { getInventory, getInventoryQueryKey, getInventoryQueryOptions, useGetInventory } from './hooks/useGetInventory.ts'
 export { getOrderById, getOrderByIdQueryKey, getOrderByIdQueryOptions, useGetOrderById } from './hooks/useGetOrderById.ts'
 export { getPetById, getPetByIdQueryKey, getPetByIdQueryOptions, useGetPetById } from './hooks/useGetPetById.ts'
-export { getUserByName, getUserByNameQueryKey, getUserByNameQueryOptions, useGetUserByName } from './hooks/useGetUserByName.ts'
-export { loginUser, loginUserQueryKey, loginUserQueryOptions, useLoginUser } from './hooks/useLoginUser.ts'
-export { logoutUser, logoutUserQueryKey, logoutUserQueryOptions, useLogoutUser } from './hooks/useLogoutUser.ts'
 export { placeOrder, placeOrderMutationKey, usePlaceOrder } from './hooks/usePlaceOrder.ts'
 export { updatePet, updatePetMutationKey, useUpdatePet } from './hooks/useUpdatePet.ts'
 export { updatePetWithForm, updatePetWithFormMutationKey, useUpdatePetWithForm } from './hooks/useUpdatePetWithForm.ts'
-export { updateUser, updateUserMutationKey, useUpdateUser } from './hooks/useUpdateUser.ts'
 export { uploadFile, uploadFileMutationKey, useUploadFile } from './hooks/useUploadFile.ts'
-export { addressIdentifierEnum } from './models/Address.ts'
-export { orderStatusEnum } from './models/Order.ts'
+export { findPetsByStatusStatus } from './models/FindPetsByStatusStatus.ts'
+export { orderStatusEnum } from './models/OrderStatusEnum.ts'
 export { petStatusEnum } from './models/PetStatusEnum.ts'

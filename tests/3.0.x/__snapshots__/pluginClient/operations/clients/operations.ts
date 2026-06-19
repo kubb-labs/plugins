@@ -4,10 +4,6 @@
 */
 
 export const operations = {
-  "updatePet": {
-    "path": "/pet",
-    "method": "put"
-  },
   "addPet": {
     "path": "/pet",
     "method": "post"
@@ -16,17 +12,9 @@ export const operations = {
     "path": "/pet/findByStatus",
     "method": "get"
   },
-  "findPetsByTags": {
-    "path": "/pet/findByTags",
-    "method": "get"
-  },
   "getPetById": {
     "path": "/pet/:petId",
     "method": "get"
-  },
-  "updatePetWithForm": {
-    "path": "/pet/:petId",
-    "method": "post"
   },
   "deletePet": {
     "path": "/pet/:petId",
@@ -43,41 +31,5 @@ export const operations = {
   "placeOrder": {
     "path": "/store/order",
     "method": "post"
-  },
-  "getOrderById": {
-    "path": "/store/order/:orderId",
-    "method": "get"
-  },
-  "deleteOrder": {
-    "path": "/store/order/:orderId",
-    "method": "delete"
-  },
-  "createUser": {
-    "path": "/user",
-    "method": "post"
-  },
-  "createUsersWithListInput": {
-    "path": "/user/createWithList",
-    "method": "post"
-  },
-  "loginUser": {
-    "path": "/user/login",
-    "method": "get"
-  },
-  "logoutUser": {
-    "path": "/user/logout",
-    "method": "get"
-  },
-  "getUserByName": {
-    "path": "/user/:username",
-    "method": "get"
-  },
-  "updateUser": {
-    "path": "/user/:username",
-    "method": "put"
-  },
-  "deleteUser": {
-    "path": "/user/:username",
-    "method": "delete"
   }
 }

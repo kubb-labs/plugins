@@ -46,6 +46,16 @@ describe('printerZod', () => {
         'z.string().min(1).max(10).regex(/^[a-z]+$/)',
       )
     })
+
+    test('string with pattern and regexType constructor', () => {
+      const p = printerZod({ regexType: 'constructor' })
+      expect(p.print(ast.factory.createSchema({ type: 'string', pattern: '^\\d+$' }))).toBe('z.string().regex(new RegExp("^\\\\d+$"))')
+    })
+
+    test('string with pattern and regexType literal', () => {
+      const p = printerZod({ regexType: 'literal' })
+      expect(p.print(ast.factory.createSchema({ type: 'string', pattern: '^\\d+$' }))).toBe('z.string().regex(/^\\d+$/)')
+    })
   })
 
   describe('number', () => {

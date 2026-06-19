@@ -3,28 +3,23 @@
  * Do not edit manually.
  */
 
-/**
- * @type object
- */
-export type OrderParams = {
-  /**
-   * @description Order Status
-   * @example approved
-   */
-  status: OrderParamsStatusEnum
-  /**
-   * @type string
-   */
-  type: string
-}
-
 export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
-
-export type PetStatusEnum = 'available' | 'pending' | 'sold'
 
 export type OrderStatus = 'accepted'
 
 export type OrderHttpStatusEnum = 200 | 400 | 500
+
+export type CustomerParamsStatusEnum = 'placed' | 'approved' | 'delivered'
+
+export type PetTypeEnum = 'dog' | 'cat'
+
+export type PetStatusEnum = 'available' | 'pending' | 'sold'
+
+export type AddPetRequestStatusEnum = 'available' | 'pending' | 'sold' | 'in store'
+
+export type FindPetsByStatusStatus = 'available' | 'pending' | 'sold'
+
+export type DeletePetStatus200Enum = 'TYPE1' | 'TYPE2' | 'TYPE3'
 
 /**
  * @type object
@@ -44,7 +39,20 @@ export type Order = {
    * @type integer | undefined
    */
   petId?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: OrderParamsStatusEnum
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @description
    * Format: `int32`
@@ -61,11 +69,10 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | (string & {})
+  status?: OrderStatus | string
   /**
    * @description HTTP Status
    * @example 200
-   * @type number | undefined
    */
   http_status?: OrderHttpStatusEnum
   /**
@@ -114,7 +121,20 @@ export type Customer = {
    * @type integer | undefined
    */
   id?: bigint
-  params?: OrderParams
+  /**
+   * @type object | undefined
+   */
+  params?: {
+    /**
+     * @description Order Status
+     * @example approved
+     */
+    status: CustomerParamsStatusEnum
+    /**
+     * @type string
+     */
+    type: string
+  }
   /**
    * @example fehguy
    * @type string | undefined
@@ -165,52 +185,17 @@ export type Category = {
 /**
  * @type object
  */
-export type User = {
+export type Tag = {
   /**
    * @description
    * Format: `int64`
-   * @example 10
    * @type integer | undefined
    */
   id?: bigint
   /**
-   * @example theUser
    * @type string | undefined
    */
-  username?: string
-  /**
-   * @example John
-   * @type string | undefined
-   */
-  firstName?: string
-  /**
-   * @example James
-   * @type string | undefined
-   */
-  lastName?: string
-  /**
-   * @example john@email.com
-   * @type string | undefined
-   */
-  email?: string
-  /**
-   * @example 12345
-   * @type string | undefined
-   */
-  password?: string
-  /**
-   * @example 12345
-   * @type string | undefined
-   */
-  phone?: string
-  /**
-   * @description User Status
-   *
-   * Format: `int32`
-   * @example 1
-   * @type integer | undefined
-   */
-  userStatus?: number
+  name?: string
 }
 
 /**
@@ -243,8 +228,6 @@ export type Cat = {
   name?: string
 }
 
-export type PetTypeEnum = 'dog' | 'cat'
-
 export type Pet = (
   | (Dog & {
       /**
@@ -266,18 +249,12 @@ export type Pet = (
    * @type integer | undefined
    */
   id?: bigint
-  /**
-   * @type string
-   */
   readonly type: PetTypeEnum
   /**
    * @example doggie
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
   category?: Category
   /**
    * @type array
@@ -286,7 +263,7 @@ export type Pet = (
   /**
    * @type array | undefined
    */
-  readonly tags?: Array<Category>
+  readonly tags?: Array<Tag>
   /**
    * @description pet status in the store
    */
@@ -304,8 +281,6 @@ export type FullAddress = Address & {
    */
   streetName: string
 }
-
-export type AddPetRequestStatusEnum = 'available' | 'pending' | 'sold' | 'in store'
 
 /**
  * @type object
@@ -334,10 +309,9 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags?: Array<Category>
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
   status?: AddPetRequestStatusEnum
 }
@@ -377,11 +351,6 @@ export type PetNotFound = {
    */
   message?: string
 }
-
-/**
- * @type array
- */
-export type UserArray = Array<User>
 
 export type UpdatePetStatus200Json = Pet
 
@@ -456,7 +425,21 @@ export type AddPetStatus200Xml = Pet
 
 export type AddPetStatus200 = AddPetStatus200Json | AddPetStatus200Xml
 
-export type AddPetStatus405 = PetNotFound
+/**
+ * @type object
+ */
+export type AddPetStatus405 = {
+  /**
+   * @description
+   * Format: `int32`
+   * @type integer | undefined
+   */
+  code?: number
+  /**
+   * @type string | undefined
+   */
+  message?: string
+}
 
 /**
  * @description Create a new pet in the store
@@ -507,7 +490,7 @@ export type AddPetResponse = AddPetStatus200 | AddPetStatus405
  * @description Status values that need to be considered for filter
  * @default available
  */
-export type FindPetsByStatusQueryStatus = PetStatusEnum | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatus | undefined
 
 /**
  * @type array
@@ -758,8 +741,6 @@ export type DeletePetHeaderApiKey = string | undefined
  * @type integer
  */
 export type DeletePetPathPetId = bigint
-
-export type DeletePetStatus200Enum = 'TYPE1' | 'TYPE2' | 'TYPE3'
 
 /**
  * @type array
@@ -1124,374 +1105,3 @@ export type DeleteOrderResponses = {
  * @description Union of all possible responses
  */
 export type DeleteOrderResponse = DeleteOrderStatus400 | DeleteOrderStatus404
-
-/**
- * @type object
- */
-export type CreateUserStatusDefaultJson = User
-
-/**
- * @type object
- */
-export type CreateUserStatusDefaultXml = User
-
-export type CreateUserStatusDefault = CreateUserStatusDefaultJson | CreateUserStatusDefaultXml
-
-/**
- * @description Created user object
- * @type object | undefined
- */
-export type CreateUserJsonData = User | undefined
-
-/**
- * @description Created user object
- * @type object | undefined
- */
-export type CreateUserXmlData = User | undefined
-
-/**
- * @description Created user object
- * @type object | undefined
- */
-export type CreateUserFormUrlEncodedData = User | undefined
-
-export type CreateUserData = CreateUserJsonData | CreateUserXmlData | CreateUserFormUrlEncodedData
-
-/**
- * @type object
- */
-export type CreateUserRequestConfig = {
-  data?: CreateUserData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/user'
-}
-
-/**
- * @type object
- */
-export type CreateUserResponses = {
-  default: CreateUserStatusDefault
-}
-
-/**
- * @description Union of all possible responses
- */
-export type CreateUserResponse = CreateUserStatusDefault
-
-/**
- * @type object
- */
-export type CreateUsersWithListInputStatus200Json = User
-
-/**
- * @type object
- */
-export type CreateUsersWithListInputStatus200Xml = User
-
-export type CreateUsersWithListInputStatus200 = CreateUsersWithListInputStatus200Json | CreateUsersWithListInputStatus200Xml
-
-/**
- * @type any
- */
-export type CreateUsersWithListInputStatusDefault = any
-
-/**
- * @type array | undefined
- */
-export type CreateUsersWithListInputData = Array<User> | undefined
-
-/**
- * @type object
- */
-export type CreateUsersWithListInputRequestConfig = {
-  data?: CreateUsersWithListInputData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/user/createWithList'
-}
-
-/**
- * @type object
- */
-export type CreateUsersWithListInputResponses = {
-  '200': CreateUsersWithListInputStatus200
-  default: CreateUsersWithListInputStatusDefault
-}
-
-/**
- * @description Union of all possible responses
- */
-export type CreateUsersWithListInputResponse = CreateUsersWithListInputStatus200 | CreateUsersWithListInputStatusDefault
-
-/**
- * @description The user name for login
- * @type string | undefined
- */
-export type LoginUserQueryUsername = string | undefined
-
-/**
- * @description The password for login in clear text
- * @type string | undefined
- */
-export type LoginUserQueryPassword = string | undefined
-
-/**
- * @type string
- */
-export type LoginUserStatus200Xml = string
-
-/**
- * @type string
- */
-export type LoginUserStatus200Json = string
-
-export type LoginUserStatus200 = LoginUserStatus200Xml | LoginUserStatus200Json
-
-/**
- * @type any
- */
-export type LoginUserStatus400 = any
-
-/**
- * @type object
- */
-export type LoginUserRequestConfig = {
-  data?: never
-  pathParams?: never
-  /**
-   * @type object | undefined
-   */
-  queryParams?: {
-    username?: LoginUserQueryUsername
-    password?: LoginUserQueryPassword
-  }
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/user/login'
-}
-
-/**
- * @type object
- */
-export type LoginUserResponses = {
-  '200': LoginUserStatus200
-  '400': LoginUserStatus400
-}
-
-/**
- * @description Union of all possible responses
- */
-export type LoginUserResponse = LoginUserStatus200 | LoginUserStatus400
-
-/**
- * @type any
- */
-export type LogoutUserStatusDefault = any
-
-/**
- * @type object
- */
-export type LogoutUserRequestConfig = {
-  data?: never
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/user/logout'
-}
-
-/**
- * @type object
- */
-export type LogoutUserResponses = {
-  default: LogoutUserStatusDefault
-}
-
-/**
- * @description Union of all possible responses
- */
-export type LogoutUserResponse = LogoutUserStatusDefault
-
-/**
- * @description The name that needs to be fetched. Use user1 for testing.
- * @type string
- */
-export type GetUserByNamePathUsername = string
-
-/**
- * @type object
- */
-export type GetUserByNameStatus200Json = User
-
-/**
- * @type object
- */
-export type GetUserByNameStatus200Xml = User
-
-export type GetUserByNameStatus200 = GetUserByNameStatus200Json | GetUserByNameStatus200Xml
-
-/**
- * @type any
- */
-export type GetUserByNameStatus400 = any
-
-/**
- * @type any
- */
-export type GetUserByNameStatus404 = any
-
-/**
- * @type object
- */
-export type GetUserByNameRequestConfig = {
-  data?: never
-  /**
-   * @type object
-   */
-  pathParams: {
-    username: GetUserByNamePathUsername
-  }
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
-}
-
-/**
- * @type object
- */
-export type GetUserByNameResponses = {
-  '200': GetUserByNameStatus200
-  '400': GetUserByNameStatus400
-  '404': GetUserByNameStatus404
-}
-
-/**
- * @description Union of all possible responses
- */
-export type GetUserByNameResponse = GetUserByNameStatus200 | GetUserByNameStatus400 | GetUserByNameStatus404
-
-/**
- * @description name that need to be deleted
- * @type string
- */
-export type UpdateUserPathUsername = string
-
-/**
- * @type any
- */
-export type UpdateUserStatusDefault = any
-
-/**
- * @description Update an existent user in the store
- * @type object | undefined
- */
-export type UpdateUserJsonData = User | undefined
-
-/**
- * @description Update an existent user in the store
- * @type object | undefined
- */
-export type UpdateUserXmlData = User | undefined
-
-/**
- * @description Update an existent user in the store
- * @type object | undefined
- */
-export type UpdateUserFormUrlEncodedData = User | undefined
-
-export type UpdateUserData = UpdateUserJsonData | UpdateUserXmlData | UpdateUserFormUrlEncodedData
-
-/**
- * @type object
- */
-export type UpdateUserRequestConfig = {
-  data?: UpdateUserData
-  /**
-   * @type object
-   */
-  pathParams: {
-    username: UpdateUserPathUsername
-  }
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
-}
-
-/**
- * @type object
- */
-export type UpdateUserResponses = {
-  default: UpdateUserStatusDefault
-}
-
-/**
- * @description Union of all possible responses
- */
-export type UpdateUserResponse = UpdateUserStatusDefault
-
-/**
- * @description The name that needs to be deleted
- * @type string
- */
-export type DeleteUserPathUsername = string | null
-
-/**
- * @type any
- */
-export type DeleteUserStatus400 = any
-
-/**
- * @type any
- */
-export type DeleteUserStatus404 = any
-
-/**
- * @type object
- */
-export type DeleteUserRequestConfig = {
-  data?: never
-  /**
-   * @type object
-   */
-  pathParams: {
-    username: DeleteUserPathUsername
-  }
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
-}
-
-/**
- * @type object
- */
-export type DeleteUserResponses = {
-  '400': DeleteUserStatus400
-  '404': DeleteUserStatus404
-}
-
-/**
- * @description Union of all possible responses
- */
-export type DeleteUserResponse = DeleteUserStatus400 | DeleteUserStatus404

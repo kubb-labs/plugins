@@ -340,7 +340,9 @@ export const printerFaker: (options: PrinterFakerOptions) => ast.Printer<Printer
           }),
         )
           .map(({ output }) => output)
-          .filter((item): item is string => Boolean(item))
+          // An `allOf` member with no shape (any/unknown/void → 'undefined') adds no
+          // constraint. Keeping it would spread `...undefined` into the merged object.
+          .filter((item): item is string => Boolean(item) && item !== 'undefined')
 
         return fakerKeywordMapper.and(items)
       },

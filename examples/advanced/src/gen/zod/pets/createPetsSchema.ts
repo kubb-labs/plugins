@@ -1,8 +1,9 @@
 import * as z from 'zod'
+import { createPetsBoolParamSchema } from '../createPetsBoolParamSchema.ts'
 import { createPetsXEXAMPLESchema } from '../createPetsXEXAMPLESchema.ts'
 import { petNotFoundSchema } from '../petNotFoundSchema.ts'
 
-export const createPetsQueryBoolParamSchema = z.literal(true).optional()
+export const createPetsQueryBoolParamSchema = createPetsBoolParamSchema.optional()
 
 export type CreatePetsQueryBoolParamSchemaType = z.infer<typeof createPetsQueryBoolParamSchema>
 

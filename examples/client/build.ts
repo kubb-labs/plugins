@@ -12,7 +12,7 @@ async function run() {
       path: './src/gen2',
       clean: true,
     },
-    adapter: adapterOas(),
+    adapter: adapterOas({ enums: 'root' }),
     parsers: [parserTs],
     plugins: [pluginTs({ output: { path: './models', barrel: false } })],
   })

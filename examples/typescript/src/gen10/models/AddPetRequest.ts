@@ -3,7 +3,9 @@
  * Do not edit manually.
  */
 
+import type { AddPetRequestStatusEnum } from './AddPetRequestStatusEnum.ts'
 import type { Category } from './Category.ts'
+import type { Tag } from './Tag.ts'
 
 /**
  * @type object
@@ -32,10 +34,9 @@ export type AddPetRequest = {
   /**
    * @type array | undefined
    */
-  tags?: Array<Category>
+  tags?: Array<Tag>
   /**
    * @description pet status in the store
-   * @type string | undefined
    */
-  status?: 'available' | 'pending' | 'sold' | 'in store'
+  status?: AddPetRequestStatusEnum
 }

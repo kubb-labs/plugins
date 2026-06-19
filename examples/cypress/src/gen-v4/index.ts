@@ -2,7 +2,9 @@ export type {
   AddPetData,
   AddPetFormUrlEncodedData,
   AddPetJsonData,
+  AddPetRequest,
   AddPetRequestConfig,
+  AddPetRequestStatusEnumKey,
   AddPetResponse,
   AddPetResponses,
   AddPetStatus200,
@@ -10,28 +12,8 @@ export type {
   AddPetStatus200Xml,
   AddPetStatus405,
   AddPetXmlData,
-  Address,
   ApiResponse,
   Category,
-  CreateUserData,
-  CreateUserFormUrlEncodedData,
-  CreateUserJsonData,
-  CreateUserRequestConfig,
-  CreateUserResponse,
-  CreateUserResponses,
-  CreateUserStatusDefault,
-  CreateUserStatusDefaultJson,
-  CreateUserStatusDefaultXml,
-  CreateUserXmlData,
-  CreateUsersWithListInputData,
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputStatus200,
-  CreateUsersWithListInputStatus200Json,
-  CreateUsersWithListInputStatus200Xml,
-  CreateUsersWithListInputStatusDefault,
-  Customer,
   DeleteOrderPathOrderId,
   DeleteOrderRequestConfig,
   DeleteOrderResponse,
@@ -44,12 +26,6 @@ export type {
   DeletePetResponse,
   DeletePetResponses,
   DeletePetStatus400,
-  DeleteUserPathUsername,
-  DeleteUserRequestConfig,
-  DeleteUserResponse,
-  DeleteUserResponses,
-  DeleteUserStatus400,
-  DeleteUserStatus404,
   FindPetsByStatusQueryStatus,
   FindPetsByStatusRequestConfig,
   FindPetsByStatusResponse,
@@ -58,6 +34,7 @@ export type {
   FindPetsByStatusStatus200Json,
   FindPetsByStatusStatus200Xml,
   FindPetsByStatusStatus400,
+  FindPetsByStatusStatusKey,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
@@ -90,28 +67,6 @@ export type {
   GetPetByIdStatus200Xml,
   GetPetByIdStatus400,
   GetPetByIdStatus404,
-  GetUserByNamePathUsername,
-  GetUserByNameRequestConfig,
-  GetUserByNameResponse,
-  GetUserByNameResponses,
-  GetUserByNameStatus200,
-  GetUserByNameStatus200Json,
-  GetUserByNameStatus200Xml,
-  GetUserByNameStatus400,
-  GetUserByNameStatus404,
-  LoginUserQueryPassword,
-  LoginUserQueryUsername,
-  LoginUserRequestConfig,
-  LoginUserResponse,
-  LoginUserResponses,
-  LoginUserStatus200,
-  LoginUserStatus200Json,
-  LoginUserStatus200Xml,
-  LoginUserStatus400,
-  LogoutUserRequestConfig,
-  LogoutUserResponse,
-  LogoutUserResponses,
-  LogoutUserStatusDefault,
   OptionsFindPetsByStatusRequestConfig,
   OptionsFindPetsByStatusResponse,
   OptionsFindPetsByStatusResponses,
@@ -140,6 +95,7 @@ export type {
   PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
+  Tag,
   UpdatePetData,
   UpdatePetFormUrlEncodedData,
   UpdatePetJsonData,
@@ -160,15 +116,6 @@ export type {
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
   UpdatePetXmlData,
-  UpdateUserData,
-  UpdateUserFormUrlEncodedData,
-  UpdateUserJsonData,
-  UpdateUserPathUsername,
-  UpdateUserRequestConfig,
-  UpdateUserResponse,
-  UpdateUserResponses,
-  UpdateUserStatusDefault,
-  UpdateUserXmlData,
   UploadFileData,
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
@@ -176,28 +123,19 @@ export type {
   UploadFileResponse,
   UploadFileResponses,
   UploadFileStatus200,
-  User,
-  UserArray,
 } from './models.ts'
 export { addPet } from './cypress/addPet.ts'
-export { createUser } from './cypress/createUser.ts'
-export { createUsersWithListInput } from './cypress/createUsersWithListInput.ts'
 export { deleteOrder } from './cypress/deleteOrder.ts'
 export { deletePet } from './cypress/deletePet.ts'
-export { deleteUser } from './cypress/deleteUser.ts'
 export { findPetsByStatus } from './cypress/findPetsByStatus.ts'
 export { findPetsByTags } from './cypress/findPetsByTags.ts'
 export { getInventory } from './cypress/getInventory.ts'
 export { getOrderById } from './cypress/getOrderById.ts'
 export { getPetById } from './cypress/getPetById.ts'
-export { getUserByName } from './cypress/getUserByName.ts'
-export { loginUser } from './cypress/loginUser.ts'
-export { logoutUser } from './cypress/logoutUser.ts'
 export { optionsFindPetsByStatus } from './cypress/optionsFindPetsByStatus.ts'
 export { placeOrder } from './cypress/placeOrder.ts'
 export { placeOrderPatch } from './cypress/placeOrderPatch.ts'
 export { updatePet } from './cypress/updatePet.ts'
 export { updatePetWithForm } from './cypress/updatePetWithForm.ts'
-export { updateUser } from './cypress/updateUser.ts'
 export { uploadFile } from './cypress/uploadFile.ts'
-export { orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'
+export { addPetRequestStatusEnum, findPetsByStatusStatus, orderHttpStatusEnum, orderStatusEnum, petStatusEnum } from './models.ts'

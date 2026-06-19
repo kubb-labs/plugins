@@ -8,7 +8,7 @@ export default defineConfig({
   input: {
     path: './petStore.yaml',
   },
-  adapter: adapterOas(),
+  adapter: adapterOas({ enums: 'root' }),
   output: {
     path: './src/gen',
     clean: true,
@@ -35,6 +35,7 @@ export default defineConfig({
         type: 'tag',
       },
       client: {
+        importPath: '@kubb/plugin-client/clients/axios',
         dataReturnType: 'data',
       },
       pathParamsType: 'object',

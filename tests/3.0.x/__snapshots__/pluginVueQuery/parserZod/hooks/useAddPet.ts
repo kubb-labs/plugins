@@ -24,7 +24,7 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
 
   const requestData = addPetDataSchema.parse(data)
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.output<typeof addPetDataSchema>>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
 
   return addPetResponseSchema.parse(res.data)
 }

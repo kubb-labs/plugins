@@ -149,6 +149,14 @@ export type Options = OutputOptions & {
    */
   guidType?: 'uuid' | 'guid'
   /**
+   * Output form for an OpenAPI `pattern` inside `.regex(...)`.
+   * - `'literal'` — a regex literal: `.regex(/^[a-z]+$/)`.
+   * - `'constructor'` — the `RegExp` constructor: `.regex(new RegExp("^[a-z]+$"))`.
+   *
+   * @default 'literal'
+   */
+  regexType?: 'literal' | 'constructor'
+  /**
    * Switch to Zod Mini's functional API for better tree-shaking. Also defaults
    * `importPath` to `'zod/mini'`.
    *
@@ -202,6 +210,7 @@ type ResolvedOptions = {
   coercion: NonNullable<Options['coercion']>
   operations: NonNullable<Options['operations']>
   guidType: NonNullable<Options['guidType']>
+  regexType: NonNullable<Options['regexType']>
   mini: NonNullable<Options['mini']>
   wrapOutput: Options['wrapOutput']
   paramsCasing: Options['paramsCasing']

@@ -3,14 +3,14 @@
  * Do not edit manually.
  */
 
+import type { FindPetsByStatusStatusKey } from '../FindPetsByStatusStatus.js'
 import type { Pet } from '../Pet.js'
-import type { PetStatusEnumKey } from '../PetStatusEnum.js'
 
 /**
  * @description Status values that need to be considered for filter
  * @default available
  */
-export type FindPetsByStatusQueryStatus = PetStatusEnumKey | undefined
+export type FindPetsByStatusQueryStatus = FindPetsByStatusStatusKey | undefined
 
 /**
  * @type array

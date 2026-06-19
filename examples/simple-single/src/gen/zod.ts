@@ -5,7 +5,24 @@
 
 import * as z from 'zod'
 
+export const orderStatusEnumSchema = z
+  .enum(['placed', 'approved', 'delivered'])
+  .describe('Order Status')
+  .meta({ examples: ['approved'] })
+
+export const orderHttpStatusEnumSchema = z
+  .union([z.literal(200), z.literal(400), z.literal(500)])
+  .describe("HTTP Status's and item of this")
+  .meta({ examples: [200] })
+
 export const petStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
+
+export const addPetRequestStatusEnumSchema = z.enum(['available', 'pending', 'sold']).describe('pet status in the store')
+
+export const findPetsByStatusStatusSchema = z
+  .enum(['available', 'pending', 'sold'])
+  .default('available')
+  .describe('Status values that need to be considered for filter')
 
 export const orderSchema = z.object({
   id: z
@@ -21,48 +38,15 @@ export const orderSchema = z.object({
     .optional()
     .meta({ examples: [7] }),
   shipDate: z.iso.datetime().optional(),
-  status: z
-    .enum(['placed', 'approved', 'delivered'])
+  status: orderStatusEnumSchema
     .optional()
     .describe('Order Status')
     .meta({ examples: ['approved'] }),
-  http_status: z
-    .union([z.literal(200), z.literal(400), z.literal(500)])
+  http_status: orderHttpStatusEnumSchema
     .optional()
     .describe("HTTP Status's and item of this")
     .meta({ examples: [200] }),
   complete: z.boolean().optional(),
-})
-
-export const addressSchema = z.object({
-  street: z
-    .string()
-    .optional()
-    .meta({ examples: ['437 Lytton'] }),
-  city: z
-    .string()
-    .optional()
-    .meta({ examples: ['Palo Alto'] }),
-  state: z
-    .string()
-    .optional()
-    .meta({ examples: ['CA'] }),
-  zip: z
-    .string()
-    .optional()
-    .meta({ examples: ['94301'] }),
-})
-
-export const customerSchema = z.object({
-  id: z
-    .bigint()
-    .optional()
-    .meta({ examples: [100000] }),
-  username: z
-    .string()
-    .optional()
-    .meta({ examples: ['fehguy'] }),
-  address: z.array(addressSchema).optional(),
 })
 
 export const categorySchema = z.object({
@@ -76,47 +60,14 @@ export const categorySchema = z.object({
     .meta({ examples: ['Dogs'] }),
 })
 
-export const personSchema = z.object({
+export const tagSchema = z.object({
+  id: z.bigint().optional(),
   name: z.string().optional(),
 })
 
-export const userSchema = personSchema.and(
-  z.object({
-    id: z
-      .bigint()
-      .optional()
-      .meta({ examples: [10] }),
-    username: z
-      .string()
-      .optional()
-      .meta({ examples: ['theUser'] }),
-    firstName: z
-      .string()
-      .optional()
-      .meta({ examples: ['John'] }),
-    lastName: z
-      .string()
-      .optional()
-      .meta({ examples: ['James'] }),
-    email: z
-      .string()
-      .optional()
-      .meta({ examples: ['john@email.com'] }),
-    password: z
-      .string()
-      .optional()
-      .meta({ examples: ['12345'] }),
-    phone: z
-      .string()
-      .optional()
-      .meta({ examples: ['12345'] }),
-    userStatus: z
-      .int()
-      .optional()
-      .describe('User Status')
-      .meta({ examples: [1] }),
-  }),
-)
+export const personSchema = z.object({
+  name: z.string().optional(),
+})
 
 export const petSchema = z.object({
   id: z
@@ -126,8 +77,20 @@ export const petSchema = z.object({
   name: z.string().meta({ examples: ['doggie'] }),
   category: categorySchema.optional(),
   photoUrls: z.array(z.string()),
-  tags: z.array(categorySchema).optional(),
+  tags: z.array(tagSchema).optional(),
   status: petStatusEnumSchema.optional().describe('pet status in the store'),
+})
+
+export const addPetRequestSchema = z.object({
+  id: z
+    .bigint()
+    .optional()
+    .meta({ examples: [10] }),
+  name: z.string().meta({ examples: ['doggie'] }),
+  category: categorySchema.optional(),
+  photoUrls: z.array(z.string()),
+  tags: z.array(tagSchema).optional(),
+  status: addPetRequestStatusEnumSchema.optional().describe('pet status in the store'),
 })
 
 export const apiResponseSchema = z.object({
@@ -140,8 +103,6 @@ export const petNotFoundSchema = z.object({
   code: z.int().optional(),
   message: z.string().optional(),
 })
-
-export const userArraySchema = z.array(userSchema)
 
 export const updatePetStatus200SchemaJson = petSchema
 
@@ -171,11 +132,14 @@ export const addPetStatus200SchemaXml = petSchema
 
 export const addPetStatus200Schema = z.union([addPetStatus200SchemaJson, addPetStatus200SchemaXml])
 
-export const addPetStatus405Schema = petNotFoundSchema
+export const addPetStatus405Schema = z.object({
+  code: z.int().optional(),
+  message: z.string().optional(),
+})
 
 export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
 
-export const addPetDataSchemaJson = petSchema.describe('Create a new pet in the store')
+export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
 export const addPetDataSchemaXml = petSchema.describe('Create a new pet in the store')
 
@@ -183,7 +147,7 @@ export const addPetDataSchemaFormUrlEncoded = petSchema.describe('Create a new p
 
 export const addPetDataSchema = z.union([addPetDataSchemaJson, addPetDataSchemaXml, addPetDataSchemaFormUrlEncoded])
 
-export const findPetsByStatusQueryStatusSchema = petStatusEnumSchema
+export const findPetsByStatusQueryStatusSchema = findPetsByStatusStatusSchema
   .optional()
   .default('available')
   .describe('Status values that need to be considered for filter')
@@ -309,85 +273,3 @@ export const deleteOrderStatus400Schema = z.any()
 export const deleteOrderStatus404Schema = z.any()
 
 export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
-
-export const createUserStatusDefaultSchemaJson = userSchema
-
-export const createUserStatusDefaultSchemaXml = userSchema
-
-export const createUserStatusDefaultSchema = z.union([createUserStatusDefaultSchemaJson, createUserStatusDefaultSchemaXml])
-
-export const createUserResponseSchema = createUserStatusDefaultSchema
-
-export const createUserDataSchemaJson = userSchema.optional().describe('Created user object')
-
-export const createUserDataSchemaXml = userSchema.optional().describe('Created user object')
-
-export const createUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Created user object')
-
-export const createUserDataSchema = z.union([createUserDataSchemaJson, createUserDataSchemaXml, createUserDataSchemaFormUrlEncoded])
-
-export const createUsersWithListInputStatus200SchemaJson = userSchema
-
-export const createUsersWithListInputStatus200SchemaXml = userSchema
-
-export const createUsersWithListInputStatus200Schema = z.union([createUsersWithListInputStatus200SchemaJson, createUsersWithListInputStatus200SchemaXml])
-
-export const createUsersWithListInputStatusDefaultSchema = z.any()
-
-export const createUsersWithListInputResponseSchema = z.union([createUsersWithListInputStatus200Schema, createUsersWithListInputStatusDefaultSchema])
-
-export const createUsersWithListInputDataSchema = z.array(userSchema).optional()
-
-export const loginUserQueryUsernameSchema = z.string().optional().describe('The user name for login')
-
-export const loginUserQueryPasswordSchema = z.string().optional().describe('The password for login in clear text')
-
-export const loginUserStatus200SchemaXml = z.string()
-
-export const loginUserStatus200SchemaJson = z.string()
-
-export const loginUserStatus200Schema = z.union([loginUserStatus200SchemaXml, loginUserStatus200SchemaJson])
-
-export const loginUserStatus400Schema = z.any()
-
-export const loginUserResponseSchema = z.union([loginUserStatus200Schema, loginUserStatus400Schema])
-
-export const logoutUserStatusDefaultSchema = z.any()
-
-export const logoutUserResponseSchema = logoutUserStatusDefaultSchema
-
-export const getUserByNamePathUsernameSchema = z.string().describe('The name that needs to be fetched. Use user1 for testing. ')
-
-export const getUserByNameStatus200SchemaJson = userSchema
-
-export const getUserByNameStatus200SchemaXml = userSchema
-
-export const getUserByNameStatus200Schema = z.union([getUserByNameStatus200SchemaJson, getUserByNameStatus200SchemaXml])
-
-export const getUserByNameStatus400Schema = z.any()
-
-export const getUserByNameStatus404Schema = z.any()
-
-export const getUserByNameResponseSchema = z.union([getUserByNameStatus200Schema, getUserByNameStatus400Schema, getUserByNameStatus404Schema])
-
-export const updateUserPathUsernameSchema = z.string().describe('name that need to be deleted')
-
-export const updateUserStatusDefaultSchema = z.any()
-
-export const updateUserResponseSchema = updateUserStatusDefaultSchema
-
-export const updateUserDataSchemaJson = userSchema.optional().describe('Update an existent user in the store')
-
-export const updateUserDataSchemaXml = userSchema.optional().describe('Update an existent user in the store')
-
-export const updateUserDataSchemaFormUrlEncoded = userSchema.optional().describe('Update an existent user in the store')
-
-export const updateUserDataSchema = z.union([updateUserDataSchemaJson, updateUserDataSchemaXml, updateUserDataSchemaFormUrlEncoded])
-
-export const deleteUserPathUsernameSchema = z.string().describe('The name that needs to be deleted')
-
-export const deleteUserStatus400Schema = z.any()
-
-export const deleteUserStatus404Schema = z.any()
-
-export const deleteUserResponseSchema = z.union([deleteUserStatus400Schema, deleteUserStatus404Schema])

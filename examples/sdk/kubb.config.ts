@@ -17,7 +17,7 @@ export default defineConfig({
     format: false,
     lint: false,
   },
-  adapter: adapterOas(),
+  adapter: adapterOas({ enums: 'root' }),
   plugins: [
     pluginTs({
       output: { path: 'models' },
@@ -29,6 +29,7 @@ export default defineConfig({
         barrel: { type: 'all', nested: true },
       },
       client: 'fetch',
+      importPath: '@kubb/plugin-client/clients/fetch',
       group: { type: 'tag' },
       pathParamsType: 'object',
       sdk: { className: 'PetStoreSDK' },

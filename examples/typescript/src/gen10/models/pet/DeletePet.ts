@@ -3,6 +3,8 @@
  * Do not edit manually.
  */
 
+import type { DeletePetStatus200Enum } from '../DeletePetStatus200Enum.ts'
+
 /**
  * @type string | undefined
  */
@@ -19,7 +21,7 @@ export type DeletePetPathPetId = bigint
 /**
  * @type array
  */
-export type DeletePetStatus200 = Array<'TYPE1' | 'TYPE2' | 'TYPE3'>
+export type DeletePetStatus200 = Array<DeletePetStatus200Enum>
 
 /**
  * @type any

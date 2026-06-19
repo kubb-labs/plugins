@@ -173,6 +173,20 @@ describe('printerFaker', () => {
     )
   })
 
+  test('drops shapeless allOf members instead of spreading undefined', () => {
+    // `allOf: [{ $ref: EquipmentCategory }, { description }]` — the metadata-only member has no
+    // shape and mocks to `undefined`. It must be dropped, not spread as `{...x, ...undefined}`.
+    const node = ast.factory.createSchema({
+      type: 'intersection',
+      members: [
+        ast.factory.createSchema({ type: 'ref', name: 'EquipmentCategory', ref: '#/components/schemas/EquipmentCategory' }),
+        ast.factory.createSchema({ type: 'unknown' }),
+      ],
+    })
+
+    expect(printerFaker({ resolver: resolverFaker }).print(node)).toMatchInlineSnapshot(`"createEquipmentCategory()"`)
+  })
+
   test('memoizing getters return a stable reference and data overrides replace the getter', () => {
     // Simulate the runtime object-literal pattern the printer generates for cyclic
     // properties (e.g. Cat.friends → Pet → Cat).  The getter must memoize its value

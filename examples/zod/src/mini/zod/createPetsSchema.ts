@@ -4,14 +4,13 @@
  */
 
 import * as z from 'zod/mini'
-import { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.ts'
 import { petNotFoundSchema } from './petNotFoundSchema.ts'
 
 export const createPetsPathUuidSchema = z.string()
 
 export const createPetsQueryOffsetSchema = z.optional(z.int())
 
-export const createPetsHeaderXEXAMPLESchema = createPetsXEXAMPLESchema
+export const createPetsHeaderXEXAMPLESchema = z.enum(['ONE', 'TWO', 'THREE'])
 
 export const createPetsStatus201Schema = z.any()
 

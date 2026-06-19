@@ -65,7 +65,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean): Arr
  *
  * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented
  * status types. When `parser` is `'zod'` and a request body schema exists, the request type
- * uses `z.output<typeof schema>` to reflect post-transform types (e.g. date coercion).
+ * uses `z.input<typeof schema>` to match what the user provides before zod transforms/defaults are applied.
  */
 export function buildGenerics(
   node: ast.OperationNode,
@@ -93,7 +93,7 @@ export function buildGenerics(
   const zodRequestName =
     options.parser === 'zod' && options.zodResolver && node.requestBody?.content?.[0]?.schema ? (options.zodResolver.resolveDataName?.(node) ?? null) : null
 
-  const requestGenericType = zodRequestName ? `z.output<typeof ${zodRequestName}>` : requestName || 'unknown'
+  const requestGenericType = zodRequestName ? `z.input<typeof ${zodRequestName}>` : requestName || 'unknown'
 
   return [responseName, TError, requestGenericType].filter(Boolean)
 }

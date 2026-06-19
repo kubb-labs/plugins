@@ -23,7 +23,7 @@ export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestC
 
   const requestData = placeOrderDataSchema.parse(data)
 
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.output<typeof placeOrderDataSchema>>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.input<typeof placeOrderDataSchema>>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
 
   return placeOrderResponseSchema.parse(res.data)
 }

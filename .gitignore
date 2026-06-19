@@ -51,9 +51,6 @@ docs/.vitepress/graphs/**
 !__snapshots__
 kubb-files.json
 kubb.log
-**/.kubb/
-!**/src/gen/.kubb/
-!**/src/gen/.kubb/**
 hello
 .log
 .mcp.json
