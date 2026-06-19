@@ -61,7 +61,6 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           path: path.resolve(root, '.kubb/client.ts'),
           copy: fetchClientTemplatePath,
           footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
-          sources: [],
         })
       },
     },
