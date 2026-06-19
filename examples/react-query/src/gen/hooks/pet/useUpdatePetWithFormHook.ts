@@ -75,7 +75,7 @@ export function useUpdatePetWithFormHook<
   const queryKey = resolvedOptions?.queryKey ?? updatePetWithFormQueryKey({ path, query })
   const customOptions = useCustomHookOptions({ hookName: 'useUpdatePetWithFormHook', operationId: 'updatePetWithForm' })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...updatePetWithFormQueryOptionsHook({ path, query }, config),
       ...customOptions,
@@ -85,7 +85,7 @@ export function useUpdatePetWithFormHook<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<UpdatePetWithFormStatus405>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

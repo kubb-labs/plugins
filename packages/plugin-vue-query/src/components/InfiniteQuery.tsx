@@ -81,15 +81,15 @@ export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryK
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? ${queryKeyName}(${queryKeyParamsCall})
 
-       const result = useInfiniteQuery({
+       const queryResult = useInfiniteQuery({
         ...${queryOptionsName}(${queryOptionsParamsCall}),
         ...resolvedOptions,
         queryKey
        } as unknown as UseInfiniteQueryOptions<${TData}, ${TError}, ${TData}, TQueryKey, ${TData}>, toValue(queryClient)) as ${returnType}
 
-       result.queryKey = queryKey as TQueryKey
+       queryResult.queryKey = queryKey as TQueryKey
 
-       return result
+       return queryResult
        `}
       </Function>
     </File.Source>

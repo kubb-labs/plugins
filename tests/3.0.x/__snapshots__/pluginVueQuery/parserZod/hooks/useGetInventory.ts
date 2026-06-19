@@ -51,13 +51,13 @@ export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetI
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? getInventoryQueryKey()
 
-  const result = useQuery({
+  const queryResult = useQuery({
    ...getInventoryQueryOptions(config),
    ...resolvedOptions,
    queryKey
   } as unknown as UseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, GetInventoryStatus200, TQueryKey>, toValue(queryClient)) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

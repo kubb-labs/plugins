@@ -72,7 +72,7 @@ export function useFindPetsByStatusHook<
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ query })
   const customOptions = useCustomHookOptions({ hookName: 'useFindPetsByStatusHook', operationId: 'findPetsByStatus' })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...findPetsByStatusQueryOptionsHook({ query }, config),
       ...customOptions,
@@ -82,7 +82,7 @@ export function useFindPetsByStatusHook<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

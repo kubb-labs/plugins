@@ -81,7 +81,7 @@ export function useFindPetsByTagsInfiniteHook<
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsInfiniteQueryKey({ query })
   const customOptions = useCustomHookOptions({ hookName: 'useFindPetsByTagsInfiniteHook', operationId: 'findPetsByTags' })
 
-  const result = useInfiniteQuery(
+  const queryResult = useInfiniteQuery(
     {
       ...findPetsByTagsInfiniteQueryOptionsHook({ query }, config),
       ...customOptions,
@@ -91,7 +91,7 @@ export function useFindPetsByTagsInfiniteHook<
     queryClient,
   ) as UseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

@@ -64,7 +64,7 @@ export function useGetPetByIdSuspenseHook<TData = GetPetByIdStatus200, TQueryKey
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey({ path })
   const customOptions = useCustomHookOptions({ hookName: 'useGetPetByIdSuspenseHook', operationId: 'get_pet_by_id' })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...getPetByIdSuspenseQueryOptionsHook({ path }, config),
       ...customOptions,
@@ -74,7 +74,7 @@ export function useGetPetByIdSuspenseHook<TData = GetPetByIdStatus200, TQueryKey
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

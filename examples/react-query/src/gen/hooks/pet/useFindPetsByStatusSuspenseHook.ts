@@ -68,7 +68,7 @@ export function useFindPetsByStatusSuspenseHook<TData = FindPetsByStatusStatus20
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusSuspenseQueryKey({ query })
   const customOptions = useCustomHookOptions({ hookName: 'useFindPetsByStatusSuspenseHook', operationId: 'findPetsByStatus' })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...findPetsByStatusSuspenseQueryOptionsHook({ query }, config),
       ...customOptions,
@@ -78,7 +78,7 @@ export function useFindPetsByStatusSuspenseHook<TData = FindPetsByStatusStatus20
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

@@ -55,7 +55,7 @@ export function useFindPetsByTags<
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey({ query })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...findPetsByTagsQueryOptions({ query, headers }, config),
       ...resolvedOptions,
@@ -64,7 +64,7 @@ export function useFindPetsByTags<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

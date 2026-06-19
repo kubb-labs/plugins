@@ -70,7 +70,7 @@ export function useUpdatePetWithFormSuspenseHook<TData = UpdatePetWithFormRespon
   const queryKey = resolvedOptions?.queryKey ?? updatePetWithFormSuspenseQueryKey({ path, query })
   const customOptions = useCustomHookOptions({ hookName: 'useUpdatePetWithFormSuspenseHook', operationId: 'updatePetWithForm' })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...updatePetWithFormSuspenseQueryOptionsHook({ path, query }, config),
       ...customOptions,
@@ -80,7 +80,7 @@ export function useUpdatePetWithFormSuspenseHook<TData = UpdatePetWithFormRespon
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<UpdatePetWithFormStatus405>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

@@ -65,7 +65,7 @@ export function useGetPetByIdHook<TData = GetPetByIdStatus200, TQueryData = GetP
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey({ path })
   const customOptions = useCustomHookOptions({ hookName: 'useGetPetByIdHook', operationId: 'get_pet_by_id' })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...getPetByIdQueryOptionsHook({ path }, config),
       ...customOptions,
@@ -75,7 +75,7 @@ export function useGetPetByIdHook<TData = GetPetByIdStatus200, TQueryData = GetP
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

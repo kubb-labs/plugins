@@ -64,7 +64,7 @@ export function useGetPetById<
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey({ path })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...getPetByIdQueryOptions({ path }, config),
       ...resolvedOptions,
@@ -73,7 +73,7 @@ export function useGetPetById<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

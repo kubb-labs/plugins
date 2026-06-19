@@ -74,7 +74,7 @@ export function useCreateUsersWithListInput<
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? createUsersWithListInputQueryKey({ body })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...createUsersWithListInputQueryOptions({ body }, config),
       ...resolvedOptions,
@@ -83,7 +83,7 @@ export function useCreateUsersWithListInput<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

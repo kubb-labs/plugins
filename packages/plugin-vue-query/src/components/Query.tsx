@@ -80,15 +80,15 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? ${queryKeyName}(${queryKeyParamsCall})
 
-       const result = useQuery({
+       const queryResult = useQuery({
         ...${queryOptionsName}(${queryOptionsParamsCall}),
         ...resolvedOptions,
         queryKey
        } as unknown as UseQueryOptions<${TData}, ${TError}, TData, ${TData}, TQueryKey>, toValue(queryClient)) as ${returnType}
 
-       result.queryKey = queryKey as TQueryKey
+       queryResult.queryKey = queryKey as TQueryKey
 
-       return result
+       return queryResult
        `}
       </Function>
     </File.Source>

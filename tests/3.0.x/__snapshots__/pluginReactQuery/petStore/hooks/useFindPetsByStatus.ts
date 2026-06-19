@@ -49,13 +49,13 @@ export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryDat
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ query })
 
-  const result = useQuery({
+  const queryResult = useQuery({
    ...findPetsByStatusQueryOptions({ query }, config),
    ...resolvedOptions,
    queryKey,
   } as unknown as QueryObserverOptions, queryClient) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

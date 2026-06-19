@@ -71,7 +71,7 @@ export function useFindPetsByTagsSuspenseInfinite<
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseInfiniteQueryKey({ query })
 
-  const result = useSuspenseInfiniteQuery(
+  const queryResult = useSuspenseInfiniteQuery(
     {
       ...findPetsByTagsSuspenseInfiniteQueryOptions({ query }, config),
       ...resolvedOptions,
@@ -80,7 +80,7 @@ export function useFindPetsByTagsSuspenseInfinite<
     queryClient,
   ) as UseSuspenseInfiniteQueryResult<TData, TError> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

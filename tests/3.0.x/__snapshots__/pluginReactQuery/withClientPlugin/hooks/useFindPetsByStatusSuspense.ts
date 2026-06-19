@@ -36,13 +36,13 @@ export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, T
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusSuspenseQueryKey({ query })
 
-  const result = useSuspenseQuery({
+  const queryResult = useSuspenseQuery({
    ...findPetsByStatusSuspenseQueryOptions({ query }, config),
    ...resolvedOptions,
    queryKey,
   } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

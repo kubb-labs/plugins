@@ -66,7 +66,7 @@ export function useFindPetsByTagsInfinite<
   const queryKey =
     (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? findPetsByTagsInfiniteQueryKey({ query })
 
-  const result = useInfiniteQuery(
+  const queryResult = useInfiniteQuery(
     {
       ...findPetsByTagsInfiniteQueryOptions({ query }, config),
       ...resolvedOptions,
@@ -75,7 +75,7 @@ export function useFindPetsByTagsInfinite<
     toValue(queryClient),
   ) as UseInfiniteQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

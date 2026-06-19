@@ -97,7 +97,7 @@ export function useUpdatePetWithForm<
   const queryKey =
     (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? updatePetWithFormQueryKey({ path, body, query })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...updatePetWithFormQueryOptions({ path, body, query }, config),
       ...resolvedOptions,
@@ -106,7 +106,7 @@ export function useUpdatePetWithForm<
     toValue(queryClient),
   ) as UseQueryReturnType<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

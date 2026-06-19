@@ -51,7 +51,7 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey({ path })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...getPetByIdSuspenseQueryOptions({ path }, config),
       ...resolvedOptions,
@@ -60,7 +60,7 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }

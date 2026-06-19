@@ -123,7 +123,7 @@ export function useFindPetsByStatus<
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusQueryKey({ query })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...findPetsByStatusQueryOptions({ query }, config),
       ...resolvedOptions,
@@ -132,9 +132,9 @@ export function useFindPetsByStatus<
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
@@ -191,7 +191,7 @@ export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = 
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsQueryKey({ query })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...findPetsByTagsQueryOptions({ query }, config),
       ...resolvedOptions,
@@ -200,9 +200,9 @@ export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = 
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
@@ -257,7 +257,7 @@ export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetBy
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdQueryKey({ path })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...getPetByIdQueryOptions({ path }, config),
       ...resolvedOptions,
@@ -266,9 +266,9 @@ export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetBy
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}) =>
@@ -328,7 +328,7 @@ export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, T
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByStatusSuspenseQueryKey({ query })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...findPetsByStatusSuspenseQueryOptions({ query }, config),
       ...resolvedOptions,
@@ -337,9 +337,9 @@ export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, T
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByStatusStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}) =>
@@ -397,7 +397,7 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? findPetsByTagsSuspenseQueryKey({ query })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...findPetsByTagsSuspenseQueryOptions({ query }, config),
       ...resolvedOptions,
@@ -406,9 +406,9 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<FindPetsByTagsStatus400>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url'>) => [{ url: '/pet/:petId', params: path }] as const
@@ -462,7 +462,7 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey({ path })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...getPetByIdSuspenseQueryOptions({ path }, config),
       ...resolvedOptions,
@@ -471,9 +471,9 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
@@ -903,7 +903,7 @@ export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetI
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getInventoryQueryKey()
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...getInventoryQueryOptions(config),
       ...resolvedOptions,
@@ -912,9 +912,9 @@ export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetI
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) => [{ url: '/store/order/:orderId', params: path }] as const
@@ -969,7 +969,7 @@ export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetO
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getOrderByIdQueryKey({ path })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...getOrderByIdQueryOptions({ path }, config),
       ...resolvedOptions,
@@ -978,9 +978,9 @@ export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetO
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
@@ -1025,7 +1025,7 @@ export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...getInventorySuspenseQueryOptions(config),
       ...resolvedOptions,
@@ -1034,9 +1034,9 @@ export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url'>) => [{ url: '/store/order/:orderId', params: path }] as const
@@ -1090,7 +1090,7 @@ export function useGetOrderByIdSuspense<TData = GetOrderByIdStatus200, TQueryKey
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey({ path })
 
-  const result = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
       ...getOrderByIdSuspenseQueryOptions({ path }, config),
       ...resolvedOptions,
@@ -1099,9 +1099,9 @@ export function useGetOrderByIdSuspense<TData = GetOrderByIdStatus200, TQueryKey
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const

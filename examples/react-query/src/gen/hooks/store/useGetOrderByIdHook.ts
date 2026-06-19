@@ -63,7 +63,7 @@ export function useGetOrderByIdHook<TData = GetOrderByIdStatus200, TQueryData = 
   const queryKey = resolvedOptions?.queryKey ?? getOrderByIdQueryKey({ path })
   const customOptions = useCustomHookOptions({ hookName: 'useGetOrderByIdHook', operationId: 'getOrderById' })
 
-  const result = useQuery(
+  const queryResult = useQuery(
     {
       ...getOrderByIdQueryOptionsHook({ path }, config),
       ...customOptions,
@@ -73,7 +73,7 @@ export function useGetOrderByIdHook<TData = GetOrderByIdStatus200, TQueryData = 
     queryClient,
   ) as UseQueryResult<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
 
-  result.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return result
+  return queryResult
 }
