@@ -31,10 +31,10 @@ export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlDa
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  data?: PlaceOrderPatchData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: PlaceOrderPatchData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */

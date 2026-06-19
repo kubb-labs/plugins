@@ -41,10 +41,10 @@ export type AddFilesData = AddFilesJsonData | AddFilesFormData
  * @type object
  */
 export type AddFilesRequestConfig = {
-  data?: AddFilesData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
+  body: AddFilesData
+  path?: never
+  query?: never
+  headers?: never
   /**
    * @type string
    */
