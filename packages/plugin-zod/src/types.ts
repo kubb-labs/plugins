@@ -1,4 +1,4 @@
-import type { ast, Exclude, Generator, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
+import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterZodNodes } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
 
@@ -176,10 +176,6 @@ export type Options = OutputOptions & {
    * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
    */
   paramsCasing?: 'camelcase'
-  /**
-   * Custom generators that run alongside the built-in Zod generators.
-   */
-  generators?: Array<Generator<PluginZod>>
   /**
    * Override how schema and operation names are built. Methods you omit fall back
    * to the default `resolverZod`.
