@@ -26,7 +26,6 @@ const defaultOptions: PluginTs['resolvedOptions'] = {
   optionalType: 'questionToken',
   arrayType: 'array',
   syntaxType: 'type',
-  paramsCasing: undefined,
   output: { path: '.' },
   exclude: [],
   include: undefined,
@@ -597,26 +596,9 @@ describe('typeGenerator — Operation — output.mode', () => {
   })
 })
 
-describe('typeGenerator — paramsCasing', () => {
-  test('paramsCasing undefined — snake_case params kept as-is', async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, paramsCasing: undefined }
-    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
-    const driver = createMockedPluginDriver({ name: 'paramsCasing undefined' })
-
-    await renderGeneratorOperation(typeGenerator, operationWithSnakeCaseParams, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverTs,
-    })
-
-    await matchFiles(driver.fileManager.files, 'paramsCasing undefined')
-  })
-
-  test('paramsCasing camelcase — snake_case params converted to camelCase', async () => {
-    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, paramsCasing: 'camelcase' }
+describe('typeGenerator — params casing', () => {
+  test('snake_case params are always converted to camelCase', async () => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
     const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase' })
 

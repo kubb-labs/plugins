@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus200 } from './DeletePet'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus200 } from './DeletePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,24 +16,22 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 /**
  * {@link /pet/:petId}
  */
-export async function deletePet(
-  petId: DeletePetPathPetId,
-  headers?: { api_key?: DeletePetHeaderApiKey },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
   const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'DELETE',
-    url: `/pet/${petId}`,
+    url: `/pet/${path.petId}`,
     ...requestConfig,
-    headers: { ...headers, ...requestConfig.headers },
+    headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
   return res.data
 }
 
-export type DeletePetMutationArg = { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }
+export type DeletePetMutationArg = DeletePetRequestConfig
 
 /**
  * {@link /pet/:petId}
@@ -52,8 +50,8 @@ export function useDeletePet(
 
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<Error>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, headers } }) => {
-      return deletePet(petId, headers, config)
+    async (_url, { arg: { path, headers } }) => {
+      return deletePet({ path, headers }, config)
     },
     mutationOptions,
   )

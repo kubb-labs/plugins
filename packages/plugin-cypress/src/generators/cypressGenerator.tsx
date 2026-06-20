@@ -16,7 +16,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, resolver, driver, root } = ctx
-    const { output, baseURL, dataReturnType, paramsCasing, paramsType, pathParamsType, group } = ctx.options
+    const { output, baseURL, dataReturnType, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
 
@@ -26,7 +26,10 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing })
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', includeParams: false }),
+    ]
 
     const meta = {
       name: resolver.resolveName(node.operationId),
@@ -53,16 +56,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
-        <Request
-          name={meta.name}
-          node={node}
-          resolver={tsResolver}
-          dataReturnType={dataReturnType}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          pathParamsType={pathParamsType}
-          baseURL={baseURL}
-        />
+        <Request name={meta.name} node={node} resolver={tsResolver} dataReturnType={dataReturnType} baseURL={baseURL} />
       </File>
     )
   },

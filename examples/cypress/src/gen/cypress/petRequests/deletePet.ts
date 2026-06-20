@@ -3,18 +3,14 @@
  * Do not edit manually.
  */
 
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse } from '../../models.ts'
+import type { DeletePetRequestConfig, DeletePetResponse } from '../../models.ts'
 
-export function deletePet(
-  petId: DeletePetPathPetId,
-  headers?: { api_key?: DeletePetHeaderApiKey },
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<DeletePetResponse> {
+export function deletePet({ path, headers }: DeletePetRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy
     .request<DeletePetResponse>({
       method: 'DELETE',
-      url: `http://localhost:3000/pet/${petId}`,
-      headers,
+      url: `http://localhost:3000/pet/${path.petId}`,
+      headers: headers ? { api_key: headers.apiKey } : undefined,
       ...options,
     })
     .then((res) => res.body)

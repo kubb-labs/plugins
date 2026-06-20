@@ -29,7 +29,7 @@ export async function findPetsByTagsHandler(
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
   const res = await client<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
-    { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, params, headers: { ...mappedHeaders } },
+    { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, query: params, headers: { ...mappedHeaders } },
     request,
   )
 

@@ -43,9 +43,6 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
     override = [],
     dataReturnType = 'data',
     baseURL,
-    paramsCasing,
-    paramsType = 'inline',
-    pathParamsType = paramsType === 'object' ? 'object' : options.pathParamsType || 'inline',
     resolver: userResolver,
     macros: userMacros,
   } = options
@@ -68,9 +65,6 @@ export const pluginCypress = definePlugin<PluginCypress>((options) => {
           dataReturnType,
           group: groupConfig,
           baseURL,
-          paramsCasing,
-          paramsType,
-          pathParamsType,
           resolver,
         })
         ctx.setResolver(resolver)

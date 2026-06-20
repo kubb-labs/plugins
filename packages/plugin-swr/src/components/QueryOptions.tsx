@@ -3,42 +3,26 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildQueryOptionsParams, getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
-import type { PluginSwr } from '../types.ts'
-import { buildQueryKeyParams } from '../utils.ts'
+import { buildQueryOptionsParams } from '@internals/tanstack-query'
 
 type Props = {
   name: string
   clientName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-  paramsType: PluginSwr['resolvedOptions']['paramsType']
-  pathParamsType: PluginSwr['resolvedOptions']['pathParamsType']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function getQueryOptionsParams(
-  node: ast.OperationNode,
-  options: {
-    paramsType: PluginSwr['resolvedOptions']['paramsType']
-    paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginSwr['resolvedOptions']['pathParamsType']
-    resolver: ResolverTs
-  },
-): ast.FunctionParametersNode {
+export function getQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs }): ast.FunctionParametersNode {
   return buildQueryOptionsParams(node, options)
 }
 
-export function QueryOptions({ name, clientName, node, tsResolver, paramsCasing, paramsType, pathParamsType }: Props): KubbReactNode {
-  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
-
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+export function QueryOptions({ name, clientName, node, tsResolver }: Props): KubbReactNode {
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const clientCallStr = injectNonNullAssertions(callPrinter.print(paramsNode) ?? '', enabledNames)
+  const clientCallStr = callPrinter.print(paramsNode) ?? ''
 
   return (
     <File.Source name={name} isExportable isIndexable>

@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-import type { ShowPetByIdPathPetId, ShowPetByIdResponse } from './ShowPetById'
+import type { ShowPetByIdRequestConfig, ShowPetByIdResponse } from './ShowPetById'
 
-export function showPetById(petId: ShowPetByIdPathPetId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<ShowPetByIdResponse> {
+export function showPetById({ path }: ShowPetByIdRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<ShowPetByIdResponse> {
   return cy
     .request<ShowPetByIdResponse>({
       method: 'GET',
-      url: `/pets/${petId}`,
+      url: `/pets/${path.petId}`,
       ...options,
     })
     .then((res) => res.body)

@@ -4,10 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const placeOrderQueryKey = (data?: PlaceOrderData) => [{ url: '/store/order' }, ...(data ? [data] : [])] as const
+export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 
 type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
 
@@ -16,20 +16,20 @@ type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: `/store/order`, data: requestData, contentType, ...requestConfig })
+  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: `/store/order`, body: requestBody, contentType, ...requestConfig })
 
   return res.data
 }
 
-export function placeOrderQueryOptions(data?: PlaceOrderData, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return placeOrder(data, config)
+      return placeOrder({ body }, config)
     },
   }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreatePetData, CreatePetStatus201, CreatePetStatus405 } from './CreatePet'
+import type { CreatePetRequestConfig, CreatePetData, CreatePetStatus201, CreatePetStatus405 } from './CreatePet'
 import { client } from './.kubb/client'
 
 export function getCreatePetUrl() {
@@ -13,15 +13,15 @@ export function getCreatePetUrl() {
 /**
  * {@link /pet}
  */
-export async function createPet(data?: CreatePetData, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
+export async function createPet({ body }: CreatePetRequestConfig, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<CreatePetStatus201 | CreatePetStatus405, ResponseErrorConfig<CreatePetStatus405>, CreatePetData>({
     method: 'POST',
     url: getCreatePetUrl().url.toString(),
-    data: requestData,
+    body: requestBody,
     ...requestConfig,
   })
 

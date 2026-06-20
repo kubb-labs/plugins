@@ -39,46 +39,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── paramsType ─────────────────────────────────────────────────────────
-  {
-    name: 'paramsTypeObject',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
-          paramsType: 'object',
-        }),
-      ],
-    },
-  },
-
-  // ─── pathParamsType ─────────────────────────────────────────────────────
-  {
-    name: 'pathParamsTypeObject',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginSwr({
-          output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
-          pathParamsType: 'object',
-        }),
-      ],
-    },
-  },
-
   // ─── dataReturnType ─────────────────────────────────────────────────────
   {
     name: 'dataReturnTypeFull',
@@ -199,7 +159,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginSwr({
           output: { path: './hooks', barrel: false },
           client: { importPath: '@kubb/plugin-client/clients/axios' },
-          paramsCasing: 'camelcase',
         }),
       ],
     },

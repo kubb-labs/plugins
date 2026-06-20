@@ -33,24 +33,20 @@ export type UploadFileData = Blob | undefined
  * @type object
  */
 export type UploadFileRequestConfig = {
-  data?: UploadFileData
+  body: UploadFileData
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     petId: UploadFilePathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
+  headers?: never
 }
 
 /**

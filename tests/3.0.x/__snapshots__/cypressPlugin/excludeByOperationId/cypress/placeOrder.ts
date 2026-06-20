@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderData, PlaceOrderResponse } from '../types/PlaceOrder.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponse } from '../types/PlaceOrder.ts'
 
-export function placeOrder(data?: PlaceOrderData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
+export function placeOrder({ body }: PlaceOrderRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
   return cy.request<PlaceOrderResponse>({
     method: 'POST',
     url: `/store/order`,
-    body: data,
+    body,
     ...options
   }).then((res) => res.body)
 }

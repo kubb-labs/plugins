@@ -456,14 +456,10 @@ export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetForm
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  data: UpdatePetData | undefined
-  pathParams: never | undefined
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet'
+  body: UpdatePetData
+  path: never | undefined
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -525,14 +521,10 @@ export type AddPetData = AddPetJsonData | AddPetXmlData | AddPetFormUrlEncodedDa
  * @type object
  */
 export type AddPetRequestConfig = {
-  data: AddPetData | undefined
-  pathParams: never | undefined
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet'
+  body: AddPetData
+  path: never | undefined
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -575,21 +567,17 @@ export type FindPetsByStatusStatus400 = any
  * @type object
  */
 export type FindPetsByStatusRequestConfig = {
-  data: never | undefined
-  pathParams: never | undefined
+  body: never | undefined
+  path: never | undefined
   /**
    * @type object | undefined
    */
-  queryParams:
+  query:
     | {
         status: FindPetsByStatusQueryStatus | undefined
       }
     | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet/findByStatus'
+  headers: never | undefined
 }
 
 /**
@@ -644,23 +632,19 @@ export type FindPetsByTagsStatus400 = any
  * @type object
  */
 export type FindPetsByTagsRequestConfig = {
-  data: never | undefined
-  pathParams: never | undefined
+  body: never | undefined
+  path: never | undefined
   /**
    * @type object | undefined
    */
-  queryParams:
+  query:
     | {
         tags: FindPetsByTagsQueryTags | undefined
         page: FindPetsByTagsQueryPage | undefined
         pageSize: FindPetsByTagsQueryPageSize | undefined
       }
     | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
+  headers: never | undefined
 }
 
 /**
@@ -704,19 +688,15 @@ export type GetPetByIdStatus404 = any
  * @type object
  */
 export type GetPetByIdRequestConfig = {
-  data: never | undefined
+  body: never | undefined
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     petId: GetPetByIdPathPetId
   }
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -762,27 +742,23 @@ export type UpdatePetWithFormStatus405 = any
  * @type object
  */
 export type UpdatePetWithFormRequestConfig = {
-  data: never | undefined
+  body: never | undefined
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     petId: UpdatePetWithFormPathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams:
+  query:
     | {
         name: UpdatePetWithFormQueryName | undefined
         status: UpdatePetWithFormQueryStatus | undefined
       }
     | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
+  headers: never | undefined
 }
 
 /**
@@ -824,26 +800,22 @@ export type DeletePetStatus400 = any
  * @type object
  */
 export type DeletePetRequestConfig = {
-  data: never | undefined
+  body: never | undefined
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     petId: DeletePetPathPetId
   }
-  queryParams: never | undefined
+  query: never | undefined
   /**
    * @type object | undefined
    */
-  headerParams:
+  headers:
     | {
-        api_key: DeletePetHeaderApiKey | undefined
+        apiKey: DeletePetHeaderApiKey | undefined
       }
     | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -889,26 +861,22 @@ export type UploadFileData = Blob | undefined
  * @type object
  */
 export type UploadFileRequestConfig = {
-  data: UploadFileData | undefined
+  body: UploadFileData
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     petId: UploadFilePathPetId
   }
   /**
    * @type object | undefined
    */
-  queryParams:
+  query:
     | {
         additionalMetadata: UploadFileQueryAdditionalMetadata | undefined
       }
     | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
+  headers: never | undefined
 }
 
 /**
@@ -934,14 +902,10 @@ export type GetInventoryStatus200 = {
  * @type object
  */
 export type GetInventoryRequestConfig = {
-  data: never | undefined
-  pathParams: never | undefined
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/store/inventory'
+  body: never | undefined
+  path: never | undefined
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -988,14 +952,10 @@ export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrder
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  data: PlaceOrderData | undefined
-  pathParams: never | undefined
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/store/order'
+  body: PlaceOrderData
+  path: never | undefined
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -1042,14 +1002,10 @@ export type PlaceOrderPatchData = PlaceOrderPatchJsonData | PlaceOrderPatchXmlDa
  * @type object
  */
 export type PlaceOrderPatchRequestConfig = {
-  data: PlaceOrderPatchData | undefined
-  pathParams: never | undefined
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: '/store/order'
+  body: PlaceOrderPatchData
+  path: never | undefined
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -1099,19 +1055,15 @@ export type GetOrderByIdStatus404 = any
  * @type object
  */
 export type GetOrderByIdRequestConfig = {
-  data: never | undefined
+  body: never | undefined
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     orderId: GetOrderByIdPathOrderId
   }
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**
@@ -1150,19 +1102,15 @@ export type DeleteOrderStatus404 = any
  * @type object
  */
 export type DeleteOrderRequestConfig = {
-  data: never | undefined
+  body: never | undefined
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     orderId: DeleteOrderPathOrderId
   }
-  queryParams: never | undefined
-  headerParams: never | undefined
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
+  query: never | undefined
+  headers: never | undefined
 }
 
 /**

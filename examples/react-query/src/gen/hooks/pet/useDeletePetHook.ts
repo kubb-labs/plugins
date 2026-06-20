@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../models/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
@@ -17,18 +17,16 @@ export const deletePetMutationKey = () => [{ url: '/pet/:pet_id' }] as const
  * @summary Deletes a pet
  * {@link /pet/:pet_id}
  */
-export async function deletePetHook(
-  { pet_id }: { pet_id: DeletePetPathPetId },
-  headers?: { api_key?: DeletePetHeaderApiKey },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function deletePetHook({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
-    url: `/pet/${pet_id}`,
+    url: `/pet/${path.petId}`,
     ...requestConfig,
-    headers: { ...headers, ...requestConfig.headers },
+    headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
   return res.data
@@ -36,15 +34,10 @@ export async function deletePetHook(
 
 export function deletePetMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = deletePetMutationKey()
-  return mutationOptions<
-    DeletePetResponse,
-    ResponseErrorConfig<DeletePetStatus400>,
-    { pet_id: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
-    TContext
-  >({
+  return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>({
     mutationKey,
-    mutationFn: async ({ pet_id, headers }) => {
-      return deletePetHook({ pet_id }, headers, config)
+    mutationFn: async ({ path, headers }) => {
+      return deletePetHook({ path, headers }, config)
     },
   })
 }
@@ -56,12 +49,7 @@ export function deletePetMutationOptionsHook<TContext = unknown>(config: Partial
  */
 export function useDeletePetHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      DeletePetResponse,
-      ResponseErrorConfig<DeletePetStatus400>,
-      { pet_id: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
@@ -72,22 +60,17 @@ export function useDeletePetHook<TContext>(
   const baseOptions = deletePetMutationOptionsHook(config) as UseMutationOptions<
     DeletePetResponse,
     ResponseErrorConfig<DeletePetStatus400>,
-    { pet_id: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
+    DeletePetRequestConfig,
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useDeletePetHook', operationId: 'deletePet' }) as UseMutationOptions<
     DeletePetResponse,
     ResponseErrorConfig<DeletePetStatus400>,
-    { pet_id: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
+    DeletePetRequestConfig,
     TContext
   >
 
-  return useMutation<
-    DeletePetResponse,
-    ResponseErrorConfig<DeletePetStatus400>,
-    { pet_id: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
-    TContext
-  >(
+  return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -95,10 +78,5 @@ export function useDeletePetHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    DeletePetResponse,
-    ResponseErrorConfig<DeletePetStatus400>,
-    { pet_id: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } },
-    TContext
-  >
+  ) as UseMutationResult<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>
 }

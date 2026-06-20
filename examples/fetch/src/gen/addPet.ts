@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { AddPetData, AddPetStatus200, AddPetStatus405 } from './models.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getAddPetUrl() {
@@ -19,7 +19,7 @@ function getAddPetUrl() {
  * {@link /pet}
  */
 export async function addPet(
-  data: AddPetData,
+  { body }: AddPetRequestConfig,
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -27,12 +27,12 @@ export async function addPet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: getAddPetUrl().url.toString(),
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

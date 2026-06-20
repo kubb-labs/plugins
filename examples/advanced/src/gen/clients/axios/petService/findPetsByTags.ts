@@ -1,13 +1,6 @@
 import client from '../../../../axios-client.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type {
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsStatus200,
-  FindPetsByTagsStatus400,
-} from '../../../models/ts/pet/FindPetsByTags.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags.ts'
 import { findPetsByTagsResponseSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
 
 export function getFindPetsByTagsUrl() {
@@ -21,16 +14,7 @@ export function getFindPetsByTagsUrl() {
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags(
-  {
-    headers,
-    params,
-  }: {
-    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
-    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
-  },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTags({ query, headers }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
@@ -38,7 +22,7 @@ export async function findPetsByTags(
   const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
     method: 'GET',
     url: getFindPetsByTagsUrl().url.toString(),
-    params,
+    query,
     ...requestConfig,
     headers: { ...mappedHeaders, ...requestConfig.headers },
   })

@@ -1,11 +1,14 @@
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse } from '../../models/ts/store/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponse } from '../../models/ts/store/PlaceOrderPatch.ts'
 
-export function placeOrderPatch(data?: PlaceOrderPatchData, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderPatchResponse> {
+export function placeOrderPatch(
+  { body }: PlaceOrderPatchRequestConfig,
+  options: Partial<Cypress.RequestOptions> = {},
+): Cypress.Chainable<PlaceOrderPatchResponse> {
   return cy
     .request<PlaceOrderPatchResponse>({
       method: 'PATCH',
       url: `/store/order`,
-      body: data,
+      body,
       ...options,
     })
     .then((res) => res.body)

@@ -41,17 +41,13 @@ export type GetPetByIdStatus404 = any;
 export type GetPetByIdRequestConfig = {
     body?: never;
     /**
-     * @type object | undefined
+     * @type object
     */
-    path?: {
+    path: {
         petId: GetPetByIdPathPetId;
     };
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: `/pet/${string}`;
 };
 
 /**

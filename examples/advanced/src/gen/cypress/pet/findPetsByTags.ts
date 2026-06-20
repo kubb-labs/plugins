@@ -1,21 +1,14 @@
-import type {
-  FindPetsByTagsQueryTags,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsResponse,
-} from '../../models/ts/pet/FindPetsByTags.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse } from '../../models/ts/pet/FindPetsByTags.ts'
 
 export function findPetsByTags(
-  headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE },
-  params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize },
+  { query, headers }: FindPetsByTagsRequestConfig,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByTagsResponse> {
   return cy
     .request<FindPetsByTagsResponse>({
       method: 'GET',
       url: `/pet/findByTags`,
-      qs: params,
+      qs: query,
       headers: headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined,
       ...options,
     })

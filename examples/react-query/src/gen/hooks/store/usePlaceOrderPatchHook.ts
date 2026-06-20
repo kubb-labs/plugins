@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
@@ -18,7 +18,7 @@ export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as con
  * {@link /store/order}
  */
 export async function placeOrderPatchHook(
-  data?: PlaceOrderPatchData,
+  { body }: PlaceOrderPatchRequestConfig,
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -26,12 +26,12 @@ export async function placeOrderPatchHook(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -46,10 +46,10 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>({
+  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>({
     mutationKey,
-    mutationFn: async ({ data }) => {
-      return placeOrderPatchHook(data, config)
+    mutationFn: async ({ body }) => {
+      return placeOrderPatchHook({ body }, config)
     },
   })
 }
@@ -61,7 +61,7 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
  */
 export function usePlaceOrderPatchHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext> & {
+    mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext> & {
       client?: QueryClient
     }
     client?: Partial<RequestConfig<PlaceOrderPatchData>> & {
@@ -77,17 +77,17 @@ export function usePlaceOrderPatchHook<TContext>(
   const baseOptions = placeOrderPatchMutationOptionsHook(config) as UseMutationOptions<
     PlaceOrderPatchStatus200,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    { data?: PlaceOrderPatchData },
+    PlaceOrderPatchRequestConfig,
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'usePlaceOrderPatchHook', operationId: 'placeOrderPatch' }) as UseMutationOptions<
     PlaceOrderPatchStatus200,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
-    { data?: PlaceOrderPatchData },
+    PlaceOrderPatchRequestConfig,
     TContext
   >
 
-  return useMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>(
+  return useMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -95,5 +95,5 @@ export function usePlaceOrderPatchHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, { data?: PlaceOrderPatchData }, TContext>
+  ) as UseMutationResult<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>
 }

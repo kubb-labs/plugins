@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-import type { DeletePetPathPetId, DeletePetResponse } from './DeletePet'
+import type { DeletePetRequestConfig, DeletePetResponse } from './DeletePet'
 
-export function deletePet(petId: DeletePetPathPetId, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
+export function deletePet({ path }: DeletePetRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<DeletePetResponse> {
   return cy
     .request<DeletePetResponse>({
       method: 'DELETE',
-      url: `/pets/${petId}`,
+      url: `/pets/${path.petId}`,
       ...options,
     })
     .then((res) => res.body)

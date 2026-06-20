@@ -247,13 +247,6 @@ export type Options = OutputOptions & {
    */
   arrayType?: 'generic' | 'array'
   /**
-   * Rename properties inside `PathParams`, `QueryParams`, and `HeaderParams` types.
-   * Response and request body types are not affected.
-   *
-   * @note Every plugin that touches operation parameters must use the same value.
-   */
-  paramsCasing?: 'camelcase'
-  /**
    * Override how names and file paths are built for generated symbols.
    * Methods you omit fall back to the default `resolverTs`. `this` is bound to the
    * full resolver, so `this.default(name, 'function')` delegates to the built-in
@@ -322,7 +315,6 @@ type ResolvedOptions = {
   optionalType: NonNullable<Options['optionalType']>
   arrayType: NonNullable<Options['arrayType']>
   syntaxType: NonNullable<Options['syntaxType']>
-  paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
 

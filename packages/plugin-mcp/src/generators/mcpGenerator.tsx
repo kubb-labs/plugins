@@ -18,7 +18,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { resolver, driver, root } = ctx
-    const { output, client, paramsCasing, group } = ctx.options
+    const { output, client, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
 
@@ -28,7 +28,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing, responseStatusNames: 'error' })
+    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', responseStatusNames: 'error' })
 
     const meta = {
       name: resolver.resolveHandlerName(node),
@@ -75,14 +75,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
           </>
         )}
 
-        <McpHandler
-          name={meta.name}
-          node={node}
-          resolver={tsResolver}
-          baseURL={client.baseURL}
-          dataReturnType={client.dataReturnType || 'data'}
-          paramsCasing={paramsCasing}
-        />
+        <McpHandler name={meta.name} node={node} resolver={tsResolver} baseURL={client.baseURL} dataReturnType={client.dataReturnType || 'data'} />
       </File>
     )
   },

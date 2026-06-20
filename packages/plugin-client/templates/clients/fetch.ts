@@ -17,8 +17,8 @@ export type RequestConfig<TData = unknown> = {
   baseURL?: string
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
-  params?: unknown
-  data?: TData | FormData
+  query?: unknown
+  body?: TData | FormData
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
   headers?: HeadersInit
@@ -157,7 +157,7 @@ export const client = async <TData, _TError = unknown, TVariables = unknown>(
 
   const config = mergeConfig(getConfig(), paramsConfig)
 
-  Object.entries(config.params || {}).forEach(([key, value]) => {
+  Object.entries(config.query || {}).forEach(([key, value]) => {
     if (value !== undefined) {
       normalizedParams.append(key, value === null ? 'null' : value.toString())
     }
@@ -165,7 +165,7 @@ export const client = async <TData, _TError = unknown, TVariables = unknown>(
 
   let targetUrl = [config.baseURL, config.url].filter(Boolean).join('')
 
-  if (config.params) {
+  if (config.query) {
     targetUrl += `?${normalizedParams}`
   }
 
@@ -177,7 +177,7 @@ export const client = async <TData, _TError = unknown, TVariables = unknown>(
   const response = await globalThis.fetch(targetUrl, {
     credentials: config.credentials || 'same-origin',
     method: config.method?.toUpperCase(),
-    body: serializeBody(config.data, headers['Content-Type'] ?? headers['content-type']),
+    body: serializeBody(config.body, headers['Content-Type'] ?? headers['content-type']),
     signal: config.signal,
     headers,
   })

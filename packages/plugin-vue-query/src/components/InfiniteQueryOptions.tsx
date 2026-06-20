@@ -6,9 +6,8 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildStatusUnionType, buildVueClientCallArgs, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
-import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -17,9 +16,6 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
@@ -40,10 +36,7 @@ export function InfiniteQueryOptions({
   previousParam,
   node,
   tsResolver,
-  paramsCasing,
-  paramsType,
   dataReturnType,
-  pathParamsType,
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
@@ -81,16 +74,12 @@ export function InfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
-  const enabledText = enabledNames.length ? `enabled: () => ${enabledNames.map((n) => `!!toValue(${n})`).join(' && ')},` : ''
-
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
+  const clientCallArgs = buildVueClientCallArgs(node)
 
   const hasNewParams = nextParam != null || previousParam != null
 
@@ -122,8 +111,8 @@ export function InfiniteQueryOptions({
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName
-      ? `params = {
-      ...(params ?? {}),
+      ? `query = {
+      ...(query ?? {}),
       ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
     } as ${queryParamsTypeName}`
       : ''
@@ -134,11 +123,11 @@ export function InfiniteQueryOptions({
         <Function name={name} export params={paramsSignature}>
           {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal, pageParam }) => {
     ${infiniteOverrideParams}
-    return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
+    return ${clientName}(${clientCallArgs})
   },
   ${queryOptionsArr.join(',\n  ')}
 })
@@ -153,10 +142,10 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       <Function name={name} export params={paramsSignature}>
         {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal }) => {
-    return ${clientName}(${addToValueCalls(clientCallStr, enabledNames)})
+    return ${clientName}(${clientCallArgs})
   },
   ${queryOptionsArr.join(',\n  ')}
 })
@@ -164,28 +153,4 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       </Function>
     </File.Source>
   )
-}
-
-function addToValueCalls(callStr: string, enabledNames: ReadonlyArray<string> = []): string {
-  const optional = new Set(enabledNames)
-  // Step 1: Transform shorthand object params like { petId } → { petId: toValue(petId) }
-  // Params that drive the `enabled` guard are optional, so assert non-null: toValue(petId!)
-  let result = callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
-    if (inner.includes(':') || inner.includes('...')) return match
-    const keys = inner
-      .split(',')
-      .map((k: string) => k.trim())
-      .filter(Boolean)
-    const wrapped = keys.map((k: string) => `${k}: toValue(${optional.has(k) ? `${k}!` : k})`).join(', ')
-    return `{ ${wrapped} }`
-  })
-
-  // Step 2: Handle standalone identifiers like `data, params`
-  result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => {
-    if (name === 'config' || name === 'signal' || name === 'undefined') return match
-    if (match.includes('toValue(')) return match
-    return `toValue(${optional.has(name) ? `${name}!` : name})`
-  })
-
-  return result
 }

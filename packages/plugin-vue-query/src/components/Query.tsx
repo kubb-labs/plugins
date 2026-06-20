@@ -1,12 +1,11 @@
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
-import { getEnabledParamNames, markParamsOptional } from '@internals/tanstack-query'
-import { buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames, wrapWithMaybeRefOrGetter } from '../utils.ts'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
+import { buildStatusUnionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -17,9 +16,6 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
 }
 
@@ -29,14 +25,11 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsType: PluginVueQuery['resolvedOptions']['paramsType']
-    paramsCasing: PluginVueQuery['resolvedOptions']['paramsCasing']
-    pathParamsType: PluginVueQuery['resolvedOptions']['pathParamsType']
     dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
   },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver } = options
+  const { dataReturnType, resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
@@ -54,30 +47,13 @@ function buildQueryParamsNode(
     default: '{}',
   })
 
-  // Vue-query wraps operation params with MaybeRefOrGetter
-  const baseParams = createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver,
-    extraParams: [optionsParam],
-  })
+  // Vue-query wraps each grouped operation param with MaybeRefOrGetter
+  const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper: maybeRefOrGetter })
 
-  return wrapWithMaybeRefOrGetter(baseParams, (name) => name === 'options')
+  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
-export function Query({
-  name,
-  queryKeyTypeName,
-  queryOptionsName,
-  queryKeyName,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
-  dataReturnType,
-  node,
-  tsResolver,
-}: Props): KubbReactNode {
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -87,17 +63,13 @@ export function Query({
   const returnType = `UseQueryReturnType<${['TData', TError].join(', ')}> & { queryKey: TQueryKey }`
   const generics = [`TData = ${TData}`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
 
-  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
 
-  const queryOptionsParamsNode = getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver })
+  const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = markParamsOptional(
-    buildQueryParamsNode(node, { paramsType, paramsCasing, pathParamsType, dataReturnType, resolver: tsResolver }),
-    enabledNames,
-  )
+  const paramsNode = buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (
@@ -108,15 +80,15 @@ export function Query({
        const { client: queryClient, ...resolvedOptions } = queryConfig
        const queryKey = (resolvedOptions && 'queryKey' in resolvedOptions ? toValue(resolvedOptions.queryKey) : undefined) ?? ${queryKeyName}(${queryKeyParamsCall})
 
-       const query = useQuery({
+       const queryResult = useQuery({
         ...${queryOptionsName}(${queryOptionsParamsCall}),
         ...resolvedOptions,
         queryKey
        } as unknown as UseQueryOptions<${TData}, ${TError}, TData, ${TData}, TQueryKey>, toValue(queryClient)) as ${returnType}
 
-       query.queryKey = queryKey as TQueryKey
+       queryResult.queryKey = queryKey as TQueryKey
 
-       return query
+       return queryResult
        `}
       </Function>
     </File.Source>

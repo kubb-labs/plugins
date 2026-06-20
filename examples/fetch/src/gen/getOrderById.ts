@@ -4,11 +4,11 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/store/order/${orderId}` as const }
+function getGetOrderByIdUrl(path: GetOrderByIdRequestConfig['path']) {
+  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/store/order/${path.orderId}` as const }
 
   return res
 }
@@ -18,12 +18,12 @@ function getGetOrderByIdUrl(orderId: GetOrderByIdPathOrderId) {
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById(orderId: GetOrderByIdPathOrderId, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
     method: 'GET',
-    url: getGetOrderByIdUrl(orderId).url.toString(),
+    url: getGetOrderByIdUrl(path).url.toString(),
     ...requestConfig,
   })
 

@@ -28,9 +28,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
     clientType: 'function',
   },
   parser: 'zod',
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -109,8 +106,8 @@ describe('suspenseQueryGenerator operation', () => {
       node: findByTagsNode,
       options: { suspense: {}, client: { dataReturnType: 'data' as const, importPath: 'axios' as const } },
     },
-    { name: 'findByTagsObject', node: findByTagsNode, options: { suspense: {}, paramsType: 'object' as const, pathParamsType: 'object' as const } },
-    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { suspense: {}, paramsCasing: 'camelcase' as const } },
+    { name: 'findByTagsObject', node: findByTagsNode, options: { suspense: {} } },
+    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { suspense: {} } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

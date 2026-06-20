@@ -5,7 +5,7 @@
 
 import client from 'axios'
 import useSWRMutation from 'swr/mutation'
-import type { UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormPathPetId, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -17,25 +17,24 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  petId: UpdatePetWithFormPathPetId,
-  data?: UpdatePetWithFormData,
+  { path, body }: UpdatePetWithFormRequestConfig,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
-    url: `/pet/${petId}`,
-    data: requestData,
+    url: `/pet/${path.petId}`,
+    body: requestBody,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export type UpdatePetWithFormMutationArg = { petId: UpdatePetWithFormPathPetId; data?: UpdatePetWithFormData }
+export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
 
 /**
  * {@link /pet/:petId}
@@ -57,8 +56,8 @@ export function useUpdatePetWithForm(
 
   return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, data } }) => {
-      return updatePetWithForm(petId, data, config)
+    async (_url, { arg: { path, body } }) => {
+      return updatePetWithForm({ path, body }, config)
     },
     mutationOptions,
   )

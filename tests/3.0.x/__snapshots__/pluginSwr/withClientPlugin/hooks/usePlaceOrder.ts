@@ -4,7 +4,7 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../clients/placeOrder.ts'
@@ -13,7 +13,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
 export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 
-export type PlaceOrderMutationArg = { data?: PlaceOrderData }
+export type PlaceOrderMutationArg = PlaceOrderRequestConfig
 
 /**
  * @description Place a new order in the store
@@ -30,8 +30,8 @@ export function usePlaceOrder(options: {
 
   return useSWRMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return placeOrder(data, config)
+    async (_url, { arg: { body } }) => {
+      return placeOrder({ body }, config)
     },
     mutationOptions
   )

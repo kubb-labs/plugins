@@ -4,7 +4,7 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { DeletePetResponse, DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../types/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deletePet } from '../clients/deletePet.ts'
@@ -13,7 +13,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 
-export type DeletePetMutationArg = { petId: DeletePetPathPetId, headers?: { api_key?: DeletePetHeaderApiKey } }
+export type DeletePetMutationArg = DeletePetRequestConfig
 
 /**
  * @description delete a pet
@@ -30,8 +30,8 @@ export function useDeletePet(options: {
 
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, headers } }) => {
-      return deletePet(petId, headers, config)
+    async (_url, { arg: { path, headers } }) => {
+      return deletePet({ path, headers }, config)
     },
     mutationOptions
   )

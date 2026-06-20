@@ -56,14 +56,10 @@ export type UpdatePetData = UpdatePetJsonData | UpdatePetXmlData | UpdatePetForm
  * @type object
  */
 export type UpdatePetRequestConfig = {
-  data?: UpdatePetData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/pet'
+  body: UpdatePetData
+  path?: never
+  query?: never
+  headers?: never
 }
 
 /**

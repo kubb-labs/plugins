@@ -1,13 +1,11 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetItemPathItemId, GetItemStatus200 } from './GetItem'
+import type { GetItemRequestConfig, GetItemStatus200 } from './GetItem'
 import { client } from './.kubb/client'
 
-export function getGetItemUrl({ itemId }: { itemId: GetItemPathItemId }) {
-  const item_id = itemId
-
-  const res = { method: 'GET', url: `/v1/items/${item_id}` as const }
+export function getGetItemUrl(path: GetItemRequestConfig['path']) {
+  const res = { method: 'GET', url: `/v1/items/${path.itemId}` as const }
 
   return res
 }
@@ -15,14 +13,10 @@ export function getGetItemUrl({ itemId }: { itemId: GetItemPathItemId }) {
 /**
  * {@link /v1/items/:item_id}
  */
-export async function getItem({ itemId }: { itemId: GetItemPathItemId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getItem({ path }: GetItemRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<GetItemStatus200, ResponseErrorConfig<Error>, unknown>({
-    method: 'GET',
-    url: getGetItemUrl({ itemId }).url.toString(),
-    ...requestConfig,
-  })
+  const res = await request<GetItemStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getGetItemUrl(path).url.toString(), ...requestConfig })
 
   return res.data
 }

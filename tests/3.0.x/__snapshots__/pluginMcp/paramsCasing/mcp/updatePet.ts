@@ -8,13 +8,11 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /pets/:pet_id}
  */
 export async function updatePetHandler({ petId, data, params }: { petId: UpdatePetPathPetId; data: UpdatePetData; params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const pet_id = petId
-
   const mappedParams = params ? { "include_deleted": params.includeDeleted, "request_source": params.requestSource } : undefined
 
-  const requestData = data
+  const requestBody = data
 
-  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${pet_id}`, params: mappedParams, data: requestData }, request)
+  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${petId}`, query: mappedParams, body: requestBody }, request)
 
   return {
     content: [

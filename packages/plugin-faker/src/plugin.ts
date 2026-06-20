@@ -47,7 +47,6 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
     mapper = {},
     dateParser = 'faker',
     regexGenerator = 'faker',
-    paramsCasing,
     printer,
     resolver: userResolver,
     macros: userMacros,
@@ -72,7 +71,6 @@ export const pluginFaker = definePlugin<PluginFaker>((options) => {
           mapper,
           dateParser,
           regexGenerator,
-          paramsCasing,
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverFaker, ...userResolver } : resolverFaker)

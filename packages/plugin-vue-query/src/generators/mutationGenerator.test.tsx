@@ -30,9 +30,6 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
     importPath: undefined,
   },
   parser: 'zod',
-  paramsType: 'inline',
-  paramsCasing: undefined,
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -126,9 +123,7 @@ describe('mutationGenerator operation', () => {
       },
     },
     { name: 'updatePetById', node: updatePetWithFormNode, options: {} },
-    { name: 'updatePetByIdPathParamsObject', node: updatePetWithFormNode, options: { pathParamsType: 'object' as const } },
     { name: 'deletePet', node: deletePetNode, options: {} },
-    { name: 'deletePetObject', node: deletePetNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

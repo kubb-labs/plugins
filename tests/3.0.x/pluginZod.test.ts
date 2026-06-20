@@ -156,7 +156,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginZod({
           output: { path: './zod', barrel: false },
-          paramsCasing: 'camelcase',
         }),
       ],
     },

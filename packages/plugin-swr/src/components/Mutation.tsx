@@ -1,9 +1,9 @@
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
 import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 
@@ -15,35 +15,15 @@ type Props = {
   mutationArgTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-  paramsType: PluginSwr['resolvedOptions']['paramsType']
-  pathParamsType: PluginSwr['resolvedOptions']['pathParamsType']
   dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
-const keysPrinter = functionPrinter({ mode: 'call' })
-
-function createMutationArgParams(
-  node: ast.OperationNode,
-  options: {
-    paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
-    resolver: ResolverTs
-  },
-): ast.FunctionParametersNode {
-  return createOperationParams(node, {
-    paramsType: 'inline',
-    pathParamsType: 'inline',
-    paramsCasing: options.paramsCasing,
-    resolver: options.resolver,
-  })
-}
 
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
-    paramsCasing: PluginSwr['resolvedOptions']['paramsCasing']
     dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
     mutationKeyTypeName: string
     mutationArgTypeName: string
@@ -78,9 +58,6 @@ export function Mutation({
   mutationKeyName,
   mutationKeyTypeName,
   mutationArgTypeName,
-  paramsCasing,
-  paramsType,
-  pathParamsType,
   dataReturnType,
   node,
   tsResolver,
@@ -91,15 +68,16 @@ export function Mutation({
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const mutationArgParamsNode = createMutationArgParams(node, { paramsCasing, resolver: tsResolver })
-  const hasMutationParams = mutationArgParamsNode.params.length > 0
-  const argTypeBody = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
-  const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
+  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
+  const hasMutationParams = groupedParam !== null
+  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const argTypeBody = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : ''
+  const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
+  const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
 
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 
   const paramsNode = buildMutationParamsNode(node, {
-    paramsCasing,
     dataReturnType,
     mutationKeyTypeName,
     mutationArgTypeName,
@@ -107,26 +85,11 @@ export function Mutation({
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  const clientCallParamsNode = createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver: tsResolver,
-    extraParams: [
-      ast.factory.createFunctionParameter({
-        name: 'config',
-        type: buildRequestConfigType(node, tsResolver),
-        default: '{}',
-      }),
-    ],
-  })
-  const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
-
   return (
     <>
       <File.Source name={mutationArgTypeName} isExportable isIndexable isTypeOnly>
         <Type name={mutationArgTypeName} export>
-          {hasMutationParams ? `{ ${argTypeBody} }` : 'never'}
+          {hasMutationParams ? argTypeBody : 'never'}
         </Type>
       </File.Source>
       <File.Source name={name} isExportable isIndexable>
@@ -137,7 +100,7 @@ export function Mutation({
 
         return useSWRMutation<${generics.join(', ')}>(
           shouldFetch ? mutationKey : null,
-          async (_url${hasMutationParams ? `, { arg: { ${argKeysStr} } }` : ''}) => {
+          async (_url${hasMutationParams ? `, { arg: ${argBindingStr} }` : ''}) => {
             return ${clientName}(${clientCallStr})
           },
           mutationOptions

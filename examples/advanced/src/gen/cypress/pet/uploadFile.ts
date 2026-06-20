@@ -1,17 +1,15 @@
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileResponse } from '../../models/ts/pet/UploadFile.ts'
+import type { UploadFileRequestConfig, UploadFileResponse } from '../../models/ts/pet/UploadFile.ts'
 
 export function uploadFile(
-  petId: UploadFilePathPetId,
-  data: UploadFileData,
-  params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  { path, query, body }: UploadFileRequestConfig,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UploadFileResponse> {
   return cy
     .request<UploadFileResponse>({
       method: 'POST',
-      url: `/pet/${petId}/uploadImage`,
-      qs: params,
-      body: data,
+      url: `/pet/${path.petId}/uploadImage`,
+      qs: query,
+      body,
       ...options,
     })
     .then((res) => res.body)

@@ -36,13 +36,13 @@ export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey
   const { client: queryClient, ...resolvedOptions } = queryConfig
   const queryKey = resolvedOptions?.queryKey ?? getInventorySuspenseQueryKey()
 
-  const query = useSuspenseQuery({
+  const queryResult = useSuspenseQuery({
    ...getInventorySuspenseQueryOptions(config),
    ...resolvedOptions,
    queryKey,
   } as unknown as UseSuspenseQueryOptions, queryClient) as UseSuspenseQueryResult<TData, ResponseErrorConfig<Error>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return query
+  return queryResult
 }

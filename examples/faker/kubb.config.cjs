@@ -39,7 +39,6 @@ module.exports = defineConfig(() => {
             },
           ],
           dataReturnType: 'full',
-          pathParamsType: 'object',
         }),
       ],
     },

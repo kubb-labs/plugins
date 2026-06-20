@@ -101,7 +101,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
   },
   operation(node, ctx) {
     const { adapter, config, resolver, root } = ctx
-    const { output, group, paramsCasing, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
+    const { output, group, dateParser, regexGenerator, mapper, seed, locale, printer } = ctx.options
     const pluginTs = ctx.driver.getPlugin(pluginTsName)
 
     if (!pluginTs) {
@@ -110,7 +110,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
 
     const tsResolver = ctx.driver.getResolver(pluginTsName)
 
-    const params = caseParams(node.parameters, paramsCasing)
+    const params = caseParams(node.parameters, 'camelcase')
     const paramEntries = params.map((param) => ({
       param,
       name: resolveParamNameByLocation(resolver, node, param),

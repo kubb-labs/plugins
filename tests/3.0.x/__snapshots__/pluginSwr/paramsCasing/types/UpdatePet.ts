@@ -37,23 +37,19 @@ export type UpdatePetData = PetUpdate;
 export type UpdatePetRequestConfig = {
     body: UpdatePetData;
     /**
-     * @type object | undefined
+     * @type object
     */
-    path?: {
-        pet_id: UpdatePetPathPetId;
+    path: {
+        petId: UpdatePetPathPetId;
     };
     /**
      * @type object | undefined
     */
     query?: {
-        include_deleted?: UpdatePetQueryIncludeDeleted;
-        request_source?: UpdatePetQueryRequestSource;
+        includeDeleted?: UpdatePetQueryIncludeDeleted;
+        requestSource?: UpdatePetQueryRequestSource;
     };
     headers?: never;
-    /**
-     * @type string
-    */
-    url: `/pets/${string}`;
 };
 
 /**

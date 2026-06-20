@@ -58,10 +58,6 @@ describe('buildData', () => {
           path?: never;
           query?: never;
           headers?: never;
-          /**
-           * @type string
-          */
-          url: "/pets";
       }"
     `)
   })
@@ -80,10 +76,6 @@ describe('buildData', () => {
           path?: never;
           query?: never;
           headers?: never;
-          /**
-           * @type string
-          */
-          url: "/pets";
       }"
     `)
   })
@@ -100,17 +92,13 @@ describe('buildData', () => {
       "{
           body?: never;
           /**
-           * @type object | undefined
+           * @type object
           */
-          path?: {
+          path: {
               petId: ShowPetByIdPathPetId;
           };
           query?: never;
           headers?: never;
-          /**
-           * @type string
-          */
-          url: \`/pets/\${string}\`;
       }"
     `)
   })
@@ -133,10 +121,6 @@ describe('buildData', () => {
               limit?: ListPetsQueryLimit;
           };
           headers?: never;
-          /**
-           * @type string
-          */
-          url: "/pets";
       }"
     `)
   })
@@ -166,10 +150,6 @@ describe('buildData', () => {
               limit?: ListPetsQueryLimit;
           };
           headers?: never;
-          /**
-           * @type string
-          */
-          url: "/pets";
       }"
     `)
   })

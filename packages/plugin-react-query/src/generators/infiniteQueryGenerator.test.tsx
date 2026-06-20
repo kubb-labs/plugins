@@ -28,9 +28,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
     clientType: 'function',
   },
   parser: 'zod',
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -124,9 +121,9 @@ describe('infiniteQueryGenerator operation', () => {
     {
       name: 'findByTagsObject',
       node: findByTagsNode,
-      options: { infinite: infiniteConfig, paramsType: 'object' as const, pathParamsType: 'object' as const },
+      options: { infinite: infiniteConfig },
     },
-    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { infinite: infiniteConfig, paramsCasing: 'camelcase' as const } },
+    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { infinite: infiniteConfig } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginReactQuery['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

@@ -4,12 +4,12 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileData, UploadFileStatus200 } from './models.ts'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 import { buildFormData } from './.kubb/config.ts'
 
-function getUploadFileUrl(petId: UploadFilePathPetId) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${petId}/uploadImage` as const }
+function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
+  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}/uploadImage` as const }
 
   return res
 }
@@ -19,21 +19,19 @@ function getUploadFileUrl(petId: UploadFilePathPetId) {
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  petId: UploadFilePathPetId,
-  data: UploadFileData,
-  params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata },
+  { path, query, body }: UploadFileRequestConfig,
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
-  const formData = buildFormData(requestData)
+  const requestBody = body
+  const formData = buildFormData(requestBody)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
     method: 'POST',
-    url: getUploadFileUrl(petId).url.toString(),
-    params,
-    data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    url: getUploadFileUrl(path).url.toString(),
+    query,
+    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
     contentType,
     ...requestConfig,
   })

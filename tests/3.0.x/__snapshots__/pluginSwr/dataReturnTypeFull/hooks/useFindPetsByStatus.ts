@@ -5,11 +5,11 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const findPetsByStatusQueryKey = (params?: { status?: FindPetsByStatusQueryStatus }) => [{ url: '/pet/findByStatus' }, ...(params ? [params] : [])] as const
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
@@ -18,18 +18,18 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByStatusStatus200 | FindPetsByStatusStatus400, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, params, ...requestConfig })
+  const res = await request<FindPetsByStatusStatus200 | FindPetsByStatusStatus400, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, query, ...requestConfig })
 
   return res as ({ status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string })
 }
 
-export function findPetsByStatusQueryOptions(params?: { status?: FindPetsByStatusQueryStatus }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return findPetsByStatus(params, config)
+      return findPetsByStatus({ query }, config)
     },
   }
 }
@@ -39,7 +39,7 @@ export function findPetsByStatusQueryOptions(params?: { status?: FindPetsByStatu
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatus(params?: { status?: FindPetsByStatusQueryStatus }, options: {
+export function useFindPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, options: {
   query?: SWRConfiguration<({ status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string }), ResponseErrorConfig<FindPetsByStatusStatus400>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,
@@ -47,12 +47,12 @@ export function useFindPetsByStatus(params?: { status?: FindPetsByStatusQuerySta
 } = {}) {
   const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-  const queryKey = findPetsByStatusQueryKey(params)
+  const queryKey = findPetsByStatusQueryKey({ query })
 
   return useSWR<({ status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string }), ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
-     ...findPetsByStatusQueryOptions(params, config),
+     ...findPetsByStatusQueryOptions({ query }, config),
      ...(immutable ? {
          revalidateIfStale: false,
          revalidateOnFocus: false,

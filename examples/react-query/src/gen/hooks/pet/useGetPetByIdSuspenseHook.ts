@@ -4,14 +4,13 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { GetPetByIdPathPetId, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../models/GetPetById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getPetByIdSuspenseQueryKey = ({ pet_id }: { pet_id?: GetPetByIdPathPetId } = {}) =>
-  ['v5', { url: '/pet/:pet_id', params: { pet_id: pet_id } }] as const
+export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => ['v5', { url: '/pet/:pet_id', params: path }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
@@ -20,24 +19,24 @@ type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
  * @summary Find pet by ID
  * {@link /pet/:pet_id}
  */
-export async function getPetByIdSuspenseHook({ pet_id }: { pet_id: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetByIdSuspenseHook({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
     method: 'GET',
-    url: `/pet/${pet_id}`,
+    url: `/pet/${path.petId}`,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function getPetByIdSuspenseQueryOptionsHook({ pet_id }: { pet_id: GetPetByIdPathPetId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const queryKey = getPetByIdSuspenseQueryKey({ pet_id })
+export function getPetByIdSuspenseQueryOptionsHook({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = getPetByIdSuspenseQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetByIdSuspenseHook({ pet_id }, { ...config, signal: config.signal ?? signal })
+      return getPetByIdSuspenseHook({ path }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -48,7 +47,7 @@ export function getPetByIdSuspenseQueryOptionsHook({ pet_id }: { pet_id: GetPetB
  * {@link /pet/:pet_id}
  */
 export function useGetPetByIdSuspenseHook<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>(
-  { pet_id }: { pet_id: GetPetByIdPathPetId },
+  { path }: GetPetByIdRequestConfig,
   options: {
     query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -58,12 +57,12 @@ export function useGetPetByIdSuspenseHook<TData = GetPetByIdStatus200, TQueryKey
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey({ pet_id })
+  const queryKey = resolvedOptions?.queryKey ?? getPetByIdSuspenseQueryKey({ path })
   const customOptions = useCustomHookOptions({ hookName: 'useGetPetByIdSuspenseHook', operationId: 'get_pet_by_id' })
 
-  const query = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
-      ...getPetByIdSuspenseQueryOptionsHook({ pet_id }, config),
+      ...getPetByIdSuspenseQueryOptionsHook({ path }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,
@@ -71,7 +70,7 @@ export function useGetPetByIdSuspenseHook<TData = GetPetByIdStatus200, TQueryKey
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return query
+  return queryResult
 }

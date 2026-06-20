@@ -4,10 +4,10 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const addPetQueryKey = (data?: AddPetData) => [{ url: '/pet' }, ...(data ? [data] : [])] as const
+export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
 
 type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
 
@@ -16,20 +16,20 @@ type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: `/pet`, body: requestBody, contentType, ...requestConfig })
 
   return res.data
 }
 
-export function addPetQueryOptions(data?: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export function addPetQueryOptions({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return addPet(data!, config)
+      return addPet({ body }, config)
     },
   }
 }

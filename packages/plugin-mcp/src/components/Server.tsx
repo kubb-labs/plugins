@@ -3,7 +3,6 @@ import { ast } from '@kubb/core'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { PluginMcp } from '../types.ts'
 import type { ZodParam } from '../utils.ts'
 import { zodExprFromSchemaNode, zodGroupExpr } from '../utils.ts'
 
@@ -20,10 +19,6 @@ type Props = {
    * Semantic version string passed to `new McpServer({ version })`.
    */
   serverVersion: string
-  /**
-   * How to style your params.
-   */
-  paramsCasing?: PluginMcp['resolvedOptions']['paramsCasing']
   /**
    * Operations to register as MCP tools, each carrying its handler,
    * zod schema, and AST node metadata.
@@ -57,10 +52,10 @@ type Props = {
 
 const keysPrinter = functionPrinter({ mode: 'call' })
 
-export function Server({ name, serverName, serverVersion, paramsCasing, operations }: Props): KubbReactNode {
+export function Server({ name, serverName, serverVersion, operations }: Props): KubbReactNode {
   const registrations = operations
     .map(({ tool, mcp, zod, node }) => {
-      const { path: pathParams } = getOperationParameters(node, { paramsCasing })
+      const { path: pathParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
       const pathEntries: Array<{ key: string; value: string }> = []
       const otherEntries: Array<{ key: string; value: string }> = []

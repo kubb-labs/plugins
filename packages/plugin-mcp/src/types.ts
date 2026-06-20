@@ -33,14 +33,7 @@ export type Options = OutputOptions & {
    * HTTP client used by each MCP handler to call the underlying API. Mirrors a
    * subset of `pluginClient` options.
    */
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL' | 'paramsCasing'>
-  /**
-   * Rename parameter properties in the generated handlers. The HTTP layer still
-   * uses the original spec names; Kubb writes the mapping for you.
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
+  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -70,8 +63,7 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL' | 'paramsCasing'>
-  paramsCasing: Options['paramsCasing']
+  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
   resolver: ResolverMcp
 }
 

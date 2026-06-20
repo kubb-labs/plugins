@@ -11,8 +11,8 @@ export type RequestConfig<TData = unknown> = {
   baseURL?: string
   url?: string
   method: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE'
-  params?: unknown
-  data?: TData | FormData
+  query?: unknown
+  body?: TData | FormData
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
   headers?: AxiosRequestConfig['headers']
@@ -41,10 +41,12 @@ export const client = async <TData, TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>,
   _request?: unknown,
 ): Promise<ResponseConfig<TData>> => {
-  const { contentType, headers, ...axiosConfig } = config
+  const { contentType, headers, query, body, ...axiosConfig } = config
   const promise = axiosInstance
     .request<TVariables, ResponseConfig<TData>>({
       ...axiosConfig,
+      params: query,
+      data: body,
       headers: {
         ...(contentType && contentType !== 'multipart/form-data' ? { 'Content-Type': contentType } : {}),
         ...headers,

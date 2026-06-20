@@ -4,7 +4,7 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from './models.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
 function getPlaceOrderPatchUrl() {
@@ -19,7 +19,7 @@ function getPlaceOrderPatchUrl() {
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  data?: PlaceOrderPatchData,
+  { body }: PlaceOrderPatchRequestConfig,
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -27,12 +27,12 @@ export async function placeOrderPatch(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: getPlaceOrderPatchUrl().url.toString(),
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })

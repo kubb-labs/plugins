@@ -27,7 +27,7 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  return resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first' })
+  return [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false })]
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {
@@ -51,7 +51,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, paramsCasing, paramsType, pathParamsType, parser, importPath } = ctx.options
+    const { output, group, dataReturnType, parser, importPath } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
@@ -221,16 +221,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
                   return <File.Import key={filePath} name={importNames} root={file.path} path={zodFile.path} />
                 })}
 
-              <StaticClassClient
-                name={name}
-                operations={ops}
-                baseURL={baseURL}
-                dataReturnType={dataReturnType}
-                pathParamsType={pathParamsType}
-                paramsCasing={paramsCasing}
-                paramsType={paramsType}
-                parser={parser}
-              />
+              <StaticClassClient name={name} operations={ops} baseURL={baseURL} dataReturnType={dataReturnType} parser={parser} />
             </File>
           )
         })}

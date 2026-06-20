@@ -38,10 +38,6 @@ export type FindArtifactsRequestConfig = {
     sort?: FindArtifactsQuerySort
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/artifacts'
 }
 
 /**

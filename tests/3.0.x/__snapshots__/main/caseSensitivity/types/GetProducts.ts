@@ -29,10 +29,6 @@ export type GetProductsRequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: "/products";
 };
 
 /**

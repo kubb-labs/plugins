@@ -1,5 +1,5 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetStatus400 } from '../../../models/ts/pet/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetStatus400 } from '../../../models/ts/pet/DeletePet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { deletePet } from '../../axios/petService/deletePet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -11,12 +11,12 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Req
   return mutationOptions<
     { status: 400; data: DeletePetStatus400; statusText: string },
     ResponseErrorConfig<DeletePetStatus400>,
-    { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
+    DeletePetRequestConfig,
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ petId, headers }) => {
-      return deletePet({ petId, headers }, config)
+    mutationFn: async ({ path, headers }) => {
+      return deletePet({ path, headers }, config)
     },
   })
 }
@@ -31,7 +31,7 @@ export function useDeletePet<TContext>(
     mutation?: UseMutationOptions<
       { status: 400; data: DeletePetStatus400; statusText: string },
       ResponseErrorConfig<DeletePetStatus400>,
-      { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
+      DeletePetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -44,16 +44,11 @@ export function useDeletePet<TContext>(
   const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<
     { status: 400; data: DeletePetStatus400; statusText: string },
     ResponseErrorConfig<DeletePetStatus400>,
-    { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
+    DeletePetRequestConfig,
     TContext
   >
 
-  return useMutation<
-    { status: 400; data: DeletePetStatus400; statusText: string },
-    ResponseErrorConfig<DeletePetStatus400>,
-    { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
-    TContext
-  >(
+  return useMutation<{ status: 400; data: DeletePetStatus400; statusText: string }, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
@@ -63,7 +58,7 @@ export function useDeletePet<TContext>(
   ) as UseMutationResult<
     { status: 400; data: DeletePetStatus400; statusText: string },
     ResponseErrorConfig<DeletePetStatus400>,
-    { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
+    DeletePetRequestConfig,
     TContext
   >
 }

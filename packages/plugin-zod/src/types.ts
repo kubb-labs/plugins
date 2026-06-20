@@ -171,12 +171,6 @@ export type Options = OutputOptions & {
    */
   wrapOutput?: (arg: { output: string; schema: ast.SchemaNode }) => string | undefined
   /**
-   * Rename properties inside path/query/header schemas. Body schemas are unaffected.
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
-  /**
    * Override how schema and operation names are built. Methods you omit fall back
    * to the default `resolverZod`.
    */
@@ -209,7 +203,6 @@ type ResolvedOptions = {
   regexType: NonNullable<Options['regexType']>
   mini: NonNullable<Options['mini']>
   wrapOutput: Options['wrapOutput']
-  paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
 

@@ -39,9 +39,9 @@ export type UpdatePetData = {
 export type UpdatePetRequestConfig = {
   body: UpdatePetData
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: UpdatePetPathPetId
   }
   /**
@@ -52,10 +52,6 @@ export type UpdatePetRequestConfig = {
     requestSource?: UpdatePetQueryRequestSource
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pets/${string}`
 }
 
 /**

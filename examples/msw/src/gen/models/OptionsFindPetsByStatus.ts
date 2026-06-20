@@ -14,14 +14,10 @@ export type OptionsFindPetsByStatusStatus200 = Pet[]
  * @type object
  */
 export type OptionsFindPetsByStatusRequestConfig = {
-  data?: never
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByStatus'
+  body?: never
+  path?: never
+  query?: never
+  headers?: never
 }
 
 /**

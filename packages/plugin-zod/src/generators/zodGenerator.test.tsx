@@ -32,7 +32,6 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   regexType: 'literal',
   mini: false,
   wrapOutput: undefined,
-  paramsCasing: undefined,
   output: { path: '.' },
   exclude: [],
   include: undefined,
@@ -686,26 +685,9 @@ describe('zodGenerator — Operation — group', () => {
   })
 })
 
-describe('zodGenerator — paramsCasing', () => {
-  test('paramsCasing undefined — snake_case params kept as-is', async () => {
-    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, paramsCasing: undefined }
-    const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
-    const driver = createMockedPluginDriver({ name: 'paramsCasing undefined' })
-
-    await renderGeneratorOperation(zodGenerator, operationWithSnakeCaseParams, {
-      config: testConfig,
-      adapter: createMockedAdapter({ resolvedOptions: { dateType: 'string' } }),
-      driver,
-      plugin,
-      options,
-      resolver: resolverZod,
-    })
-
-    await matchFiles(driver.fileManager.files, 'paramsCasing undefined')
-  })
-
-  test('paramsCasing camelcase — snake_case params converted to camelCase', async () => {
-    const options: PluginZod['resolvedOptions'] = { ...defaultOptions, paramsCasing: 'camelcase' }
+describe('zodGenerator — params casing', () => {
+  test('snake_case params are always converted to camelCase', async () => {
+    const options: PluginZod['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginZod>({ name: 'plugin-zod', options, resolver: resolverZod })
     const driver = createMockedPluginDriver({ name: 'paramsCasing camelcase' })
 

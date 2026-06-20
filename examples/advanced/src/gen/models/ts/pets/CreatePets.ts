@@ -50,30 +50,26 @@ export type CreatePetsData = {
  * @type object
  */
 export type CreatePetsRequestConfig = {
-  data?: CreatePetsData
+  body: CreatePetsData
   /**
    * @type object
    */
-  pathParams: {
+  path: {
     uuid: CreatePetsPathUuid
   }
   /**
    * @type object | undefined
    */
-  queryParams?: {
+  query?: {
     boolParam?: CreatePetsQueryBoolParam
     offset?: CreatePetsQueryOffset
   }
   /**
-   * @type object | undefined
+   * @type object
    */
-  headerParams?: {
+  headers: {
     xEXAMPLE: CreatePetsHeaderXEXAMPLE
   }
-  /**
-   * @type string
-   */
-  url: `/pets/${string}`
 }
 
 /**

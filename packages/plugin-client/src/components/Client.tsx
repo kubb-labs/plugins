@@ -1,24 +1,29 @@
 import {
   buildOperationComments,
   buildParamsMapping,
-  buildRequestConfigType,
+  buildRequestParamsSignature,
   getContentTypeInfo,
   getOperationParameters,
   getResponseType,
   resolveSuccessNames,
 } from '@internals/shared'
-import { isValidVarName, Url } from '@internals/utils'
-import { createOperationParams, stringify } from '@kubb/ast/utils'
+import { Url } from '@internals/utils'
+import { stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { createFunctionParams } from '../functionParams.ts'
 import type { PluginClient } from '../types.ts'
-import { buildStatusUnionType, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
-import { buildUrlParamsNode } from './Url.tsx'
+import {
+  buildBodyParamDescriptor,
+  buildQueryParamDescriptor,
+  buildStatusUnionType,
+  resolveQueryParamsParser,
+  resolveRequestParser,
+  resolveResponseParser,
+} from '../utils.ts'
 
 type Props = {
   name: string
@@ -30,52 +35,11 @@ type Props = {
 
   baseURL: string | null | undefined
   dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['pathParamsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   node: ast.OperationNode
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
   children?: KubbReactNode
-}
-
-type GetParamsProps = {
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['paramsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
-  node: ast.OperationNode
-  tsResolver: ResolverTs
-  isConfigurable: boolean
-}
-
-const declarationPrinter = functionPrinter({ mode: 'declaration' })
-
-export function buildClientParamsNode({
-  paramsType,
-  paramsCasing,
-  pathParamsType,
-  node,
-  tsResolver,
-  isConfigurable,
-}: GetParamsProps): ast.FunctionParametersNode {
-  return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver: tsResolver,
-    extraParams: [
-      ...(isConfigurable
-        ? [
-            ast.factory.createFunctionParameter({
-              name: 'config',
-              type: buildRequestConfigType(node, tsResolver),
-              default: '{}',
-            }),
-          ]
-        : []),
-    ],
-  })
 }
 
 export function Client({
@@ -86,9 +50,6 @@ export function Client({
   baseURL,
   dataReturnType,
   parser,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
   node,
   tsResolver,
   zodResolver,
@@ -101,12 +62,11 @@ export function Client({
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const responseType = getResponseType(node)
 
-  const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
-  const { path: casedPathParams, query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing })
+  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
-  const pathParamsMapping = paramsCasing && !urlName ? buildParamsMapping(originalPathParams, casedPathParams) : null
-  const queryParamsMapping = paramsCasing ? buildParamsMapping(originalQueryParams, casedQueryParams) : null
-  const headerParamsMapping = paramsCasing ? buildParamsMapping(originalHeaderParams, casedHeaderParams) : null
+  const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
+  const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)
 
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const successNames = resolveSuccessNames(node, tsResolver)
@@ -141,25 +101,8 @@ export function Client({
   // z.input<> matches what the user provides before zod transforms/defaults are applied, keeping it compatible with the TS model types
   const requestGenericType = parser === 'zod' && zodRequestName ? `z.input<typeof ${zodRequestName}>` : requestName || 'unknown'
   const generics = [genericsResponseName, TError, requestGenericType].filter(Boolean)
-  const paramsNode = buildClientParamsNode({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
-    node,
-    tsResolver,
-    isConfigurable,
-  })
-  const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-
-  const urlParamsNode = buildUrlParamsNode({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
-    node,
-    tsResolver,
-  })
-  const callPrinter = functionPrinter({ mode: 'call' })
-  const urlParamsCall = callPrinter.print(urlParamsNode) ?? ''
+  const { signature: paramsSignature, groups } = buildRequestParamsSignature(node, tsResolver, { isConfigurable })
+  const urlParamsCall = groups.path ? 'path' : ''
 
   const clientParams = createFunctionParams({
     config: {
@@ -169,7 +112,7 @@ export function Client({
           value: stringify(node.method.toUpperCase()),
         },
         url: {
-          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toTemplateString(node.path),
+          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toGroupedTemplateString(node.path),
         },
         baseURL:
           baseURL && !urlName
@@ -177,17 +120,8 @@ export function Client({
                 value: `\`${baseURL}\``,
               }
             : null,
-        params: queryParamsName ? (zodQueryParamsName ? { value: 'requestParams' } : queryParamsMapping ? { value: 'mappedParams' } : {}) : null,
-        data: requestName
-          ? {
-              value:
-                isMultipleContentTypes && hasFormData
-                  ? "contentType === 'multipart/form-data' ? formData as FormData : requestData"
-                  : isFormData
-                    ? 'formData as FormData'
-                    : 'requestData',
-            }
-          : null,
+        query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
+        body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
         contentType: isConfigurable && isMultipleContentTypes ? {} : null,
         responseType: responseType ? { value: stringify(responseType) } : null,
         requestConfig: isConfigurable
@@ -240,16 +174,10 @@ export function Client({
             ? `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = config`
             : ''}
           <br />
-          {pathParamsMapping &&
-            Object.entries(pathParamsMapping)
-              .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
-              .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
-              .join('\n')}
-          {pathParamsMapping && <br />}
           {queryParamsMapping && queryParamsName && (
             <>
-              {`const mappedParams = params ? { ${Object.entries(queryParamsMapping)
-                .map(([originalName, camelCaseName]) => `"${originalName}": params.${camelCaseName}`)
+              {`const mappedParams = query ? { ${Object.entries(queryParamsMapping)
+                .map(([originalName, camelCaseName]) => `"${originalName}": query.${camelCaseName}`)
                 .join(', ')} } : undefined`}
               <br />
             </>
@@ -262,9 +190,9 @@ export function Client({
               <br />
             </>
           )}
-          {requestParser === 'zod' && zodRequestName ? `const requestData = ${zodRequestName}.parse(data)` : requestName && 'const requestData = data'}
-          {zodQueryParamsName && `const requestParams = ${zodQueryParamsName}.parse(params)`}
-          {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestData)'}
+          {requestParser === 'zod' && zodRequestName ? `const requestBody = ${zodRequestName}.parse(body)` : requestName && 'const requestBody = body'}
+          {zodQueryParamsName && `const requestParams = ${zodQueryParamsName}.parse(query)`}
+          {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestBody)'}
           <br />
           {isConfigurable
             ? `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`

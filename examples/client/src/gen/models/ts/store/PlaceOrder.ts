@@ -36,14 +36,10 @@ export type PlaceOrderData = PlaceOrderJsonData | PlaceOrderXmlData | PlaceOrder
  * @type object
  */
 export type PlaceOrderRequestConfig = {
-  data?: PlaceOrderData
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/store/order'
+  body: PlaceOrderData
+  path?: never
+  query?: never
+  headers?: never
 }
 
 /**

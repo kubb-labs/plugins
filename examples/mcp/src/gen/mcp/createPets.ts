@@ -14,13 +14,15 @@ export async function createPetsHandler(
     data,
     headers,
     params,
-  }: { uuid: CreatePetsPathUuid; data: CreatePetsData; headers: { 'X-EXAMPLE': CreatePetsHeaderXEXAMPLE }; params?: { offset?: CreatePetsQueryOffset } },
+  }: { uuid: CreatePetsPathUuid; data: CreatePetsData; headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }; params?: { offset?: CreatePetsQueryOffset } },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestData = data
+  const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
+
+  const requestBody = data
 
   const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>(
-    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, params, data: requestData, headers: { ...headers } },
+    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, query: params, body: requestBody, headers: { ...mappedHeaders } },
     request,
   )
 

@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreatePetData, CreatePetResponse, CreatePetStatus200 } from './CreatePet'
+import type { CreatePetRequestConfig, CreatePetData, CreatePetResponse, CreatePetStatus200 } from './CreatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,17 +16,17 @@ export type CreatePetMutationKey = ReturnType<typeof createPetMutationKey>
 /**
  * {@link /pet}
  */
-export async function createPet(data?: CreatePetData, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
+export async function createPet({ body }: CreatePetRequestConfig, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
-  const res = await request<CreatePetStatus200, ResponseErrorConfig<Error>, CreatePetData>({ method: 'POST', url: `/pet`, data: requestData, ...requestConfig })
+  const res = await request<CreatePetStatus200, ResponseErrorConfig<Error>, CreatePetData>({ method: 'POST', url: `/pet`, body: requestBody, ...requestConfig })
 
   return res.data
 }
 
-export type CreatePetMutationArg = { data?: CreatePetData }
+export type CreatePetMutationArg = CreatePetRequestConfig
 
 /**
  * {@link /pet}
@@ -45,8 +45,8 @@ export function useCreatePet(
 
   return useSWRMutation<CreatePetResponse, ResponseErrorConfig<Error>, CreatePetMutationKey | null, CreatePetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return createPet(data, config)
+    async (_url, { arg: { body } }) => {
+      return createPet({ body }, config)
     },
     mutationOptions,
   )

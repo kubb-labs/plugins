@@ -4,10 +4,9 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import type { MaybeRefOrGetter } from 'vue'
 import type { z } from 'zod'
 import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
@@ -19,12 +18,12 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet(data: AddPetData, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = addPetDataSchema.parse(data)
+  const requestBody = addPetDataSchema.parse(body)
 
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({ method: 'POST', url: `/pet`, data: requestData, contentType, ...requestConfig })
+  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({ method: 'POST', url: `/pet`, body: requestBody, contentType, ...requestConfig })
 
   return addPetResponseSchema.parse(res.data)
 }
@@ -35,16 +34,16 @@ export async function addPet(data: AddPetData, config: Partial<RequestConfig<Add
  * {@link /pet}
  */
 export function useAddPet<TContext>(options: {
-  mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: MaybeRefOrGetter<AddPetData>}, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, {data: AddPetData}, TContext>({
-    mutationFn: async({ data }) => {
-      return addPet(data, config)
+  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
+    mutationFn: async({ body }) => {
+      return addPet({ body }, config)
     },
     mutationKey,
     ...mutationOptions

@@ -42,17 +42,13 @@ export type UpdateUserData = UpdateUserJsonData | UpdateUserXmlData | UpdateUser
 export type UpdateUserRequestConfig = {
   body: UpdateUserData
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     username: UpdateUserPathUsername
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
 }
 
 /**

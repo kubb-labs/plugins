@@ -24,9 +24,6 @@ const testConfig: Config = {
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
   dataReturnType: 'data',
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   client: 'axios',
   clientType: 'function',
   importPath: undefined,
@@ -270,26 +267,17 @@ describe('clientGenerator operation', () => {
     { name: 'multiStatusWithZodFull', node: multiStatusNode, options: { parser: 'zod' as const, dataReturnType: 'full' as const } },
     { name: 'updatePetByIdWithZodRequest', node: updatePetByIdNode, options: { parser: { request: 'zod' } as const } },
     { name: 'importPath', node: findByTagsNode, options: { importPath: 'axios' as const } },
-    { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
-    { name: 'deletePetObject', node: deletePetNode, options: { pathParamsType: 'object' as const } },
     { name: 'updatePetByIdClean', node: updatePetByIdNode, options: { urlType: false as const } },
     { name: 'uploadFile', node: uploadFileNode, options: {} },
     { name: 'findByTagsWithBaseURL', node: findByTagsNode, options: {}, baseURL: 'https://petstore3.swagger.io/api/v3' },
-    { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
-    { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const, pathParamsType: 'inline' as const } },
+    { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     { name: 'requiredOneOfRequestBody', node: requiredOneOfRequestBodyNode, options: {} },
     { name: 'multiContentType', node: multiContentTypeNode, options: {} },
     { name: 'downloadFileBlob', node: downloadFileNode, options: {} },
-    { name: 'dashedPathParams', node: dashedPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'object' as const } },
-    { name: 'dashedPathParamsInline', node: dashedPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const } },
-    { name: 'underscoredPathParams', node: underscoredPathParamsNode, options: { paramsCasing: 'camelcase' as const, pathParamsType: 'object' as const } },
-    {
-      name: 'underscoredPathParamsInline',
-      node: underscoredPathParamsNode,
-      options: { paramsCasing: 'camelcase' as const, pathParamsType: 'inline' as const },
-    },
+    { name: 'dashedPathParams', node: dashedPathParamsNode, options: {} },
+    { name: 'underscoredPathParams', node: underscoredPathParamsNode, options: {} },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginClient['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {

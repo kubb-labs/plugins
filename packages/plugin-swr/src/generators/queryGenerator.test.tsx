@@ -30,9 +30,6 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
     clientType: 'function',
   },
   parser: false,
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -117,10 +114,7 @@ describe('queryGenerator operation', () => {
     { name: 'findByTagsFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
     { name: 'clientImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
-    { name: 'getPetByIdObject', node: getPetByIdNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
-    { name: 'getPetByIdCamelCase', node: getPetByIdNode, options: { paramsCasing: 'camelcase' as const } },
-    { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const } },
-    { name: 'findByStatusInline', node: findByStatusNode, options: { paramsType: 'inline' as const } },
+    { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginSwr['resolvedOptions']> }>
 

@@ -3,20 +3,16 @@
 "@kubb/plugin-vue-query": patch
 ---
 
-Make `enabled`-guarded params optional in generated query signatures (type-only).
+Require the spec-required params in generated query signatures and drop the auto `enabled` guard.
 
-Query and infinite-query options emit an `enabled` guard derived from the required
-path/query params (`enabled: !!petId`), but those params stayed required in the
-type, so callers could never pass `undefined` to reach the disabled state the guard
-already implements (kubb-labs/plugins#60).
+Query and infinite-query options used to emit an `enabled` guard derived from the required params (`enabled: !!path`) while keeping those params optional. The guard turned truthy as soon as a caller passed the params, so it never narrowed the types and never reached a state the caller could not already see in the signature.
 
-Those params are now optional in the generated `queryKey`, `queryOptions`, and hook
-signatures, and the `queryFn` calls the client with a non-null assertion (`petId!`).
-The `enabled` guard is unchanged, and since `?`/`!` are erased at compile time the
-emitted runtime is identical — this is a type-only change. Suspense hooks (which
-cannot be disabled) keep their params required.
+The grouped `path`, `query`, and `headers` options are now required in the generated `queryKey`, `queryOptions`, and hook signatures whenever the operation marks them required, and no `enabled` guard is generated. The query key types only the groups it reads, so a required `headers` on the operation no longer forces it onto the key. Pass TanStack Query's own `enabled` (or `skipToken`) through the hook options for conditional and dependent queries.
 
 ```ts
-// now type-checks; the query stays disabled until petId is defined
-useGetPetById({ petId: route.params.petId })
+// petId is required, so the call needs it up front
+const { data } = useGetPetById({ path: { petId } })
+
+// keep a query disabled until an input exists
+useGetPetById({ path: { petId } }, { query: { enabled: !!petId } })
 ```

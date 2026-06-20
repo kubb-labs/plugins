@@ -1,44 +1,106 @@
-import { getOperationParameters } from '@internals/shared'
+import { getOperationParameters, getRequestGroupOptionality } from '@internals/shared'
 import { ast } from '@kubb/core'
-import { buildGroupParam, caseParams, createOperationParams, resolveGroupType, resolveParamType } from '@kubb/ast/utils'
 import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
-import type { ParamsCasing, ParamsType, PathParamsType } from './types.ts'
 
 /**
- * Returns the `TypeLiteral` members of a destructured group parameter, or `null`
- * for a plain named parameter.
+ * The grouped request options, ordered for both the destructured signature and the
+ * call passed to the underlying client.
  */
-function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: string; type: ast.TypeExpression; optional?: boolean }> | null {
-  if (typeof param.name === 'string') return null
-  return param.type && typeof param.type !== 'string' && param.type.kind === 'TypeLiteral' ? param.type.members : []
+const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
+
+type RequestGroupKey = (typeof requestGroupOrder)[number]
+
+/**
+ * Builds the grouped `{ path, query, body, headers }` parameter that mirrors the client
+ * function signature. Only the groups the operation carries are emitted, typed from the
+ * operation's `RequestConfig`. `keys` narrows the emitted groups, used by the query key which
+ * never carries `headers`.
+ *
+ * By default the whole group is typed as the single `RequestConfig` reference. When
+ * `memberTypeWrapper` is set, each group is emitted as its own member typed from the matching
+ * `RequestConfig['<group>']` slice and wrapped, used by vue-query to apply
+ * `MaybeRefOrGetter` per group.
+ */
+export function buildGroupedRequestParam(
+  node: ast.OperationNode,
+  options: {
+    resolver: ResolverTs
+    keys?: ReadonlyArray<RequestGroupKey>
+    memberTypeWrapper?: (type: string) => string
+  },
+): ast.FunctionParameterNode | null {
+  const { resolver, keys = requestGroupOrder, memberTypeWrapper } = options
+  const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
+  const names = keys.filter((key) => groups[key])
+
+  if (names.length === 0) {
+    return null
+  }
+
+  const requiredByGroup: Record<RequestGroupKey, boolean> = {
+    path: hasRequiredPath,
+    query: hasRequiredQuery,
+    body: groups.body,
+    headers: hasRequiredHeader,
+  }
+
+  // The grouped object can default to `{}` only when none of the emitted groups is required. The
+  // query key narrows `keys`, so optionality is computed over the emitted groups, not all of them.
+  const isOptional = names.every((name) => !requiredByGroup[name])
+
+  // Drop the groups this binding never destructures (the query key omits `headers`), so a group
+  // that is required elsewhere does not leak into a binding that does not carry it.
+  const requestConfigName = resolver.resolveRequestConfigName(node)
+  const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key))
+  const requestConfigType = omittedKeys.length > 0 ? `Omit<${requestConfigName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : requestConfigName
+
+  if (memberTypeWrapper) {
+    const members = names.map((name) => ({
+      name,
+      type: memberTypeWrapper(`${requestConfigType}['${name}']`),
+      optional: !requiredByGroup[name],
+    }))
+
+    return {
+      kind: 'FunctionParameter',
+      name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
+      type: ast.factory.createTypeLiteral({ members }),
+      optional: false,
+      ...(isOptional ? { default: '{}' } : {}),
+    }
+  }
+
+  return {
+    kind: 'FunctionParameter',
+    name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
+    type: requestConfigType,
+    optional: false,
+    ...(isOptional ? { default: '{}' } : {}),
+  }
 }
 
 /**
- * Builds the shared `(…params, config = {})` parameter list for a TanStack
- * query-options function. The trailing `config` parameter is typed as a partial
- * `RequestConfig` with an optional `client`. Framework plugins wrap the result
- * when needed, for example vue-query applies `MaybeRefOrGetter`.
+ * Builds the shared `({ path, query, body, headers }, config = {})` parameter list for a
+ * TanStack query-options function. The leading parameter mirrors the client signature, and the
+ * trailing `config` parameter is typed as a partial `RequestConfig` with an optional `client`.
+ * Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
  */
 export function buildQueryOptionsParams(
   node: ast.OperationNode,
-  options: { paramsType: ParamsType; paramsCasing: ParamsCasing; pathParamsType: PathParamsType; resolver: ResolverTs },
+  options: { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string },
 ): ast.FunctionParametersNode {
-  const { paramsType, paramsCasing, pathParamsType, resolver } = options
+  const { resolver, memberTypeWrapper } = options
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
 
-  return createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver,
-    extraParams: [
-      ast.factory.createFunctionParameter({
-        name: 'config',
-        type: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
-        default: '{}',
-      }),
-    ],
+  const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper })
+
+  const configParam = ast.factory.createFunctionParameter({
+    name: 'config',
+    type: requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }',
+    default: '{}',
   })
+
+  return ast.factory.createFunctionParameters({ params: [groupedParam, configParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
 export function transformName(name: string, type: string, transformers?: { name?: (name: string, type?: string) => string }): string {
@@ -123,7 +185,7 @@ export function resolveQueryParamsParser(parser: ParserOption): 'zod' | null {
  *
  * Returns an empty array when no resolver is provided or `parser` is falsy.
  */
-export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined, parser: ParserOption): string[] {
+export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined, parser: ParserOption): Array<string> {
   if (!zodResolver || !parser) return []
   const { query: queryParams } = getOperationParameters(node)
   return [
@@ -134,120 +196,13 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
 }
 
 /**
- * Build QueryKey params: pathParams + data + queryParams (NO headers, NO config).
+ * Build QueryKey params as the grouped `{ path, query, body }` object (NO headers, NO config),
+ * typed from the operation's `RequestConfig` minus `url`. The query key transformer reads the
+ * grouped `path`/`query`/`body` bindings.
  */
-export function buildQueryKeyParams(
-  node: ast.OperationNode,
-  options: {
-    pathParamsType: 'object' | 'inline'
-    paramsCasing: 'camelcase' | undefined
-    resolver: PluginTs['resolver']
-  },
-): ast.FunctionParametersNode {
-  const { pathParamsType, paramsCasing, resolver } = options
+export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): ast.FunctionParametersNode {
+  const { resolver } = options
+  const groupedParam = buildGroupedRequestParam(node, { resolver, keys: ['path', 'query', 'body'] })
 
-  const casedParams = caseParams(node.parameters, paramsCasing)
-  const pathParams = casedParams.filter((p) => p.in === 'path')
-  const queryParams = casedParams.filter((p) => p.in === 'query')
-
-  const queryGroupType = resolveGroupType({ node, params: queryParams, group: 'query', resolver })
-
-  const bodyType = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
-  const bodyRequired = node.requestBody?.required ?? false
-
-  const params: Array<ast.FunctionParameterNode> = []
-
-  // Path params
-  if (pathParams.length) {
-    const pathChildren = pathParams.map((p) => ({ name: p.name, type: resolveParamType({ node, param: p, resolver }), optional: !p.required }))
-    if (pathParamsType === 'object') {
-      params.push(ast.factory.createFunctionParameter({ properties: pathChildren, default: pathChildren.every((c) => c.optional) ? '{}' : undefined }))
-    } else {
-      params.push(...pathChildren.map((child) => ast.factory.createFunctionParameter(child)))
-    }
-  }
-
-  // Request body
-  if (bodyType) {
-    params.push(ast.factory.createFunctionParameter({ name: 'data', type: bodyType, optional: !bodyRequired }))
-  }
-
-  // Query params
-  params.push(...buildGroupParam({ name: 'params', node, params: queryParams, groupType: queryGroupType, resolver, wrapType: (type) => type }))
-
-  return ast.factory.createFunctionParameters({ params })
-}
-
-/**
- * Collect the names of the required params (no default) that drive the `enabled`
- * guard. These are exactly the params that should be made optional in the
- * generated signatures so callers can pass `undefined` to reach the disabled state.
- */
-export function getEnabledParamNames(paramsNode: ast.FunctionParametersNode): string[] {
-  const required: string[] = []
-  for (const param of paramsNode.params) {
-    const members = groupMembers(param)
-    if (members) {
-      for (const member of members) {
-        if (!member.optional) required.push(member.name)
-      }
-    } else if (typeof param.name === 'string' && !param.optional && param.default === undefined) {
-      required.push(param.name)
-    }
-  }
-  return required
-}
-
-/**
- * Return a copy of `paramsNode` with the named params marked optional.
- *
- * Used to align signatures with the `enabled` guard: the guard already disables
- * the query while a param is falsy, so the param should accept `undefined`. The
- * change is type-only — the `queryFn` keeps calling the client with a non-null
- * assertion (see `injectNonNullAssertions`), so the emitted runtime is unchanged.
- */
-export function markParamsOptional(paramsNode: ast.FunctionParametersNode, names: ReadonlyArray<string>): ast.FunctionParametersNode {
-  if (names.length === 0) return paramsNode
-  const nameSet = new Set(names)
-  const params = paramsNode.params.map((param) => {
-    const members = groupMembers(param)
-    if (members) {
-      const next = members.map((member) => (nameSet.has(member.name) ? { ...member, optional: true } : member))
-      return { ...param, type: ast.factory.createTypeLiteral({ members: next }) }
-    }
-    return typeof param.name === 'string' && nameSet.has(param.name)
-      ? ast.factory.createFunctionParameter({ name: param.name, type: param.type, rest: param.rest, optional: true })
-      : param
-  })
-  return ast.factory.createFunctionParameters({ params })
-}
-
-/**
- * Add a non-null assertion (`!`) to the named params inside a printed client-call
- * string. Bridges the type gap created by `markParamsOptional` while keeping the
- * runtime identical (the `!` is erased at compile time).
- *
- * Handles destructured shorthand groups (`{ petId }` → `{ petId: petId! }`) and
- * standalone identifiers (`params` → `params!`).
- */
-export function injectNonNullAssertions(callStr: string, names: ReadonlyArray<string>): string {
-  if (names.length === 0) return callStr
-  const nameSet = new Set(names)
-
-  // Step 1: destructured shorthand group `{ petId }` → `{ petId: petId! }`
-  let result = callStr.replace(/\{\s*([\w,\s]+)\s*\}(?=\s*,)/g, (match, inner: string) => {
-    if (inner.includes(':') || inner.includes('...')) return match
-    const keys = inner
-      .split(',')
-      .map((k: string) => k.trim())
-      .filter(Boolean)
-    if (!keys.some((k) => nameSet.has(k))) return match
-    const rebuilt = keys.map((k) => (nameSet.has(k) ? `${k}: ${k}!` : k)).join(', ')
-    return `{ ${rebuilt} }`
-  })
-
-  // Step 2: standalone identifiers like `params`, `data`
-  result = result.replace(/(?<![{.:?])\b(\w+)\b(?=\s*,)/g, (match, name: string) => (nameSet.has(name) ? `${name}!` : match))
-
-  return result
+  return ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }

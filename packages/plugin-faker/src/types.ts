@@ -128,12 +128,6 @@ export type Options = OutputOptions & {
    */
   seed?: number | Array<number>
   /**
-   * Rename properties inside path/query/header mocks. Body mocks are unaffected.
-   *
-   * @note Must match the value of `paramsCasing` on `@kubb/plugin-ts`.
-   */
-  paramsCasing?: 'camelcase'
-  /**
    * Override the naming of generated factory helpers. Common use: append `Mock` or
    * `Factory` so helpers do not clash with imported types.
    */
@@ -162,7 +156,6 @@ type ResolvedOptions = {
   mapper: NonNullable<Options['mapper']>
   seed: NonNullable<Options['seed']> | undefined
   locale: Options['locale']
-  paramsCasing: Options['paramsCasing']
   printer: Options['printer']
 }
 

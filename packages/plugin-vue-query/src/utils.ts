@@ -1,3 +1,6 @@
+import { getRequestGroups } from '@internals/shared'
+import type { ast } from '@kubb/core'
+
 export { buildQueryKeyParams, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
 export {
   buildOperationComments as getComments,
@@ -9,28 +12,25 @@ export {
   resolveSuccessNames,
 } from '@internals/shared'
 
-import { ast } from '@kubb/core'
-import { renderType } from '@kubb/plugin-ts'
+/**
+ * Wraps a type string in `MaybeRefOrGetter<…>` so a vue-query signature accepts refs or getters.
+ */
+export function maybeRefOrGetter(type: string): string {
+  return `MaybeRefOrGetter<${type}>`
+}
+
+const requestGroupOrder = ['path', 'query', 'body', 'headers'] as const
 
 /**
- * Wraps each parameter type in `MaybeRefOrGetter<…>` so a vue-query signature
- * accepts refs or getters. Group members are wrapped individually; `skip` opts a
- * plain parameter out by name.
+ * Builds the argument list for the generated client call inside a vue-query `queryFn`. Each grouped
+ * option the operation carries is unwrapped with `toValue()` (refs and getters resolve to their
+ * value), and the trailing `config` forwards the abort `signal`. Building the call from the
+ * operation's groups keeps it independent of how the parameter binding prints.
  */
-export function wrapWithMaybeRefOrGetter(paramsNode: ast.FunctionParametersNode, skip?: (name: string) => boolean): ast.FunctionParametersNode {
-  const wrappedParams = paramsNode.params.map((param) => {
-    if (typeof param.name !== 'string') {
-      const type = param.type
-      if (type && typeof type !== 'string' && type.kind === 'TypeLiteral') {
-        return {
-          ...param,
-          type: ast.factory.createTypeLiteral({ members: type.members.map((member) => ({ ...member, type: `MaybeRefOrGetter<${renderType(member.type)}>` })) }),
-        }
-      }
-      return param
-    }
-    if (skip?.(param.name)) return param
-    return { ...param, type: param.type ? `MaybeRefOrGetter<${renderType(param.type)}>` : param.type }
-  })
-  return ast.factory.createFunctionParameters({ params: wrappedParams })
+export function buildVueClientCallArgs(node: ast.OperationNode): string {
+  const groups = getRequestGroups(node)
+  const names = requestGroupOrder.filter((key) => groups[key])
+  const groupedArg = names.length > 0 ? `{ ${names.map((name) => `${name}: toValue(${name})`).join(', ')} }` : null
+
+  return [groupedArg, '{ ...config, signal: config.signal ?? signal }'].filter(Boolean).join(', ')
 }

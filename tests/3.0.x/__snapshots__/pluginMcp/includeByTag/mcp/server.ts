@@ -56,7 +56,7 @@ export function getServer() {
   server.registerTool("deletePet", {
     title: "Deletes a pet",
     description: "delete a pet",
-    inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ "api_key": deletePetHeaderApiKeySchema }) },
+    inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ "apiKey": deletePetHeaderApiKeySchema }) },
   }, async ({ petId, headers }, request) => {
     return deletePetHandler({ petId, headers }, request)
   })

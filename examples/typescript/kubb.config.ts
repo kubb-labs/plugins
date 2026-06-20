@@ -206,7 +206,6 @@ export default defineConfig([
       pluginTs({
         output: { path: 'models' },
         enum: { type: 'inlineLiteral' },
-        paramsCasing: 'camelcase',
         group: { type: 'tag' },
       }),
     ],

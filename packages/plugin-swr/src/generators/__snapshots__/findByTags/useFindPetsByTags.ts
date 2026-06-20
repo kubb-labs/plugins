@@ -5,36 +5,30 @@
 
 import useSWR from 'swr'
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsResponse, FindPetsByTagsQueryTags, FindPetsByTagsQueryStatus, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
-export const findPetsByTagsQueryKey = (params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus }) =>
-  [{ url: '/pet/findByTags' }, ...(params ? [params] : [])] as const
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
+  [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags(
-  params: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, params, ...requestConfig })
+  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
 
   return res.data
 }
 
-export function findPetsByTagsQueryOptions(
-  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export function findPetsByTagsQueryOptions({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return findPetsByTags(params!, config)
+      return findPetsByTags({ query }, config)
     },
   }
 }
@@ -43,7 +37,7 @@ export function findPetsByTagsQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags(
-  params?: { tags: FindPetsByTagsQueryTags; status?: FindPetsByTagsQueryStatus },
+  { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }
@@ -53,10 +47,10 @@ export function useFindPetsByTags(
 ) {
   const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-  const queryKey = findPetsByTagsQueryKey(params)
+  const queryKey = findPetsByTagsQueryKey({ query })
 
-  return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsQueryKey | null>(shouldFetch && !!params ? queryKey : null, {
-    ...findPetsByTagsQueryOptions(params, config),
+  return useSWR<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsQueryKey | null>(shouldFetch ? queryKey : null, {
+    ...findPetsByTagsQueryOptions({ query }, config),
     ...(immutable
       ? {
           revalidateIfStale: false,

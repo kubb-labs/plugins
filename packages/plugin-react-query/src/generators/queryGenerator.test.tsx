@@ -30,9 +30,6 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
     clientType: 'function',
   },
   parser: 'zod',
-  paramsCasing: undefined,
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -141,10 +138,7 @@ describe('queryGenerator operation', () => {
     { name: 'findByTagsFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
     { name: 'clientPostImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
-    { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { paramsCasing: 'camelcase' as const } },
-    { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
-    { name: 'findByStatusAllOptional', node: findByStatusNode, options: { paramsType: 'object' as const } },
-    { name: 'findByStatusAllOptionalInline', node: findByStatusNode, options: { paramsType: 'inline' as const } },
+    { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
       name: 'createUsersWithListInputAsQuery',
       node: createUsersWithListInputNode,

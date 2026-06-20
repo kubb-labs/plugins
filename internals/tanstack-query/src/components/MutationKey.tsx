@@ -8,8 +8,6 @@ import type { Transformer } from '../types.ts'
 type Props = {
   name: string
   node: ast.OperationNode
-  paramsCasing: 'camelcase' | undefined
-  pathParamsType: 'object' | 'inline'
   transformer: Transformer | null | undefined
 }
 
@@ -20,10 +18,10 @@ export const mutationKeyTransformer: Transformer = ({ node }) => {
   return [`{ url: '${Url.toPath(node.path)}' }`]
 }
 
-export function MutationKey({ name, paramsCasing, node, transformer }: Props): KubbReactNode {
+export function MutationKey({ name, node, transformer }: Props): KubbReactNode {
   const paramsNode = ast.factory.createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = (transformer ?? mutationKeyTransformer)({ node, casing: paramsCasing })
+  const keys = (transformer ?? mutationKeyTransformer)({ node, casing: 'camelcase' })
 
   return (
     <File.Source name={name} isExportable isIndexable>

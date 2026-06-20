@@ -12,8 +12,8 @@ declare const AXIOS_HEADERS: string
 export type RequestConfig<TData = unknown> = {
   url?: string
   method: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE'
-  params?: unknown
-  data?: TData
+  query?: unknown
+  body?: TData
   responseType?: 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream'
   signal?: AbortSignal
   headers?: AxiosRequestConfig['headers']
@@ -44,9 +44,12 @@ export const client = async <TData, TError = unknown, TVariables = unknown>(
   config: RequestConfig<TVariables>,
   request?: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<ResponseConfig<TData>> => {
-  const promise = axiosInstance.request<TVariables, ResponseConfig<TData>>({ signal: request?.signal, ...config }).catch((e: AxiosError<TError>) => {
-    throw e
-  })
+  const { query, body, ...axiosConfig } = config
+  const promise = axiosInstance
+    .request<TVariables, ResponseConfig<TData>>({ signal: request?.signal, ...axiosConfig, params: query, data: body })
+    .catch((e: AxiosError<TError>) => {
+      throw e
+    })
 
   return promise
 }

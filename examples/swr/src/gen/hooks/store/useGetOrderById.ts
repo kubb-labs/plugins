@@ -6,8 +6,8 @@
 import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
 import type {
+  GetOrderByIdRequestConfig,
   GetOrderByIdResponse,
-  GetOrderByIdPathOrderId,
   GetOrderByIdStatus200,
   GetOrderByIdStatus400,
   GetOrderByIdStatus404,
@@ -15,8 +15,7 @@ import type {
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const getOrderByIdQueryKey = ({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}) =>
-  [{ url: '/store/order/:orderId', params: { orderId: orderId } }] as const
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
@@ -25,22 +24,22 @@ type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
     method: 'GET',
-    url: `/store/order/${orderId}`,
+    url: `/store/order/${path.orderId}`,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function getOrderByIdQueryOptions({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdQueryOptions({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
-      return getOrderById({ orderId: orderId! }, config)
+      return getOrderById({ path }, config)
     },
   }
 }
@@ -51,7 +50,7 @@ export function getOrderByIdQueryOptions({ orderId }: { orderId?: GetOrderByIdPa
  * {@link /store/order/:orderId}
  */
 export function useGetOrderById(
-  { orderId }: { orderId?: GetOrderByIdPathOrderId } = {},
+  { path }: GetOrderByIdRequestConfig,
   options: {
     query?: SWRConfiguration<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>
     client?: Partial<RequestConfig> & { client?: Client }
@@ -61,12 +60,12 @@ export function useGetOrderById(
 ) {
   const { query: queryOptions, client: config = {}, shouldFetch = true, immutable } = options ?? {}
 
-  const queryKey = getOrderByIdQueryKey({ orderId })
+  const queryKey = getOrderByIdQueryKey({ path })
 
   return useSWR<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdQueryKey | null>(
-    shouldFetch && !!orderId ? queryKey : null,
+    shouldFetch ? queryKey : null,
     {
-      ...getOrderByIdQueryOptions({ orderId }, config),
+      ...getOrderByIdQueryOptions({ path }, config),
       ...(immutable
         ? {
             revalidateIfStale: false,

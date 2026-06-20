@@ -5,7 +5,7 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/PlaceOrder.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -19,7 +19,7 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
  * {@link /store/order}
  */
 export async function placeOrder(
-  data?: PlaceOrderData,
+  { body }: PlaceOrderRequestConfig,
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -27,12 +27,12 @@ export async function placeOrder(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
     method: 'POST',
     url: `/store/order`,
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -40,7 +40,7 @@ export async function placeOrder(
   return res.data
 }
 
-export type PlaceOrderMutationArg = { data?: PlaceOrderData }
+export type PlaceOrderMutationArg = PlaceOrderRequestConfig
 
 /**
  * @description Place a new order in the store
@@ -64,8 +64,8 @@ export function usePlaceOrder(
 
   return useSWRMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return placeOrder(data, config)
+    async (_url, { arg: { body } }) => {
+      return placeOrder({ body }, config)
     },
     mutationOptions,
   )

@@ -18,7 +18,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { config, resolver, plugin, driver, root } = ctx
-    const { output, paramsCasing, group } = ctx.options
+    const { output, group } = ctx.options
 
     const pluginZod = driver.getPlugin(pluginZodName)
 
@@ -44,7 +44,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     }
 
     const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
+      const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
 
       const mcpFile = resolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
@@ -119,13 +119,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
           <File.Import name={['StdioServerTransport']} path={'@modelcontextprotocol/sdk/server/stdio'} />
 
           {imports}
-          <Server
-            name={name}
-            serverName={ctx.meta.title ?? 'server'}
-            serverVersion={ctx.meta.version ?? '0.0.0'}
-            paramsCasing={paramsCasing}
-            operations={operationsMapped}
-          />
+          <Server name={name} serverName={ctx.meta.title ?? 'server'} serverVersion={ctx.meta.version ?? '0.0.0'} operations={operationsMapped} />
         </File>
 
         <File baseName={jsonFile.baseName} path={jsonFile.path} meta={jsonFile.meta}>

@@ -5,7 +5,7 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
+import type { AddPetRequestConfig, AddPetData, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -19,7 +19,7 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
  * {@link /pet}
  */
 export async function addPet(
-  data: AddPetData,
+  { body }: AddPetRequestConfig,
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -27,12 +27,12 @@ export async function addPet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
     method: 'POST',
     url: `/pet`,
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -40,7 +40,7 @@ export async function addPet(
   return res.data
 }
 
-export type AddPetMutationArg = { data: AddPetData }
+export type AddPetMutationArg = AddPetRequestConfig
 
 /**
  * @description Add a new pet to the store
@@ -64,8 +64,8 @@ export function useAddPet(
 
   return useSWRMutation<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetMutationKey | null, AddPetMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return addPet(data, config)
+    async (_url, { arg: { body } }) => {
+      return addPet({ body }, config)
     },
     mutationOptions,
   )

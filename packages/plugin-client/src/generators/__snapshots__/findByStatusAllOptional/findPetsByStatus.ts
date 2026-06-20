@@ -1,7 +1,7 @@
 /* eslint-disable no-alert, no-console */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusStatus200 } from './FindPetsByStatus'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200 } from './FindPetsByStatus'
 import { client } from './.kubb/client'
 
 export function getFindPetsByStatusUrl() {
@@ -13,16 +13,13 @@ export function getFindPetsByStatusUrl() {
 /**
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus(
-  { params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, unknown>({
     method: 'GET',
     url: getFindPetsByStatusUrl().url.toString(),
-    params,
+    query,
     ...requestConfig,
   })
 

@@ -37,10 +37,6 @@ export type GetPreferencesUnitsRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/preferences/units/'
 }
 
 /**

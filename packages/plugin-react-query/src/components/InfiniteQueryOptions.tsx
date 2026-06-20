@@ -7,7 +7,6 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
-import { getEnabledParamNames, injectNonNullAssertions, markParamsOptional } from '@internals/tanstack-query'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -16,9 +15,6 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
@@ -39,10 +35,7 @@ export function InfiniteQueryOptions({
   previousParam,
   node,
   tsResolver,
-  paramsCasing,
-  paramsType,
   dataReturnType,
-  pathParamsType,
   queryParam,
   queryKeyName,
 }: Props): KubbReactNode {
@@ -80,16 +73,13 @@ export function InfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const queryKeyParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
+  const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const enabledNames = getEnabledParamNames(queryKeyParamsNode)
-  const enabledText = enabledNames.length ? `enabled: !!(${enabledNames.join(' && ')}),` : ''
-
-  const paramsNode = markParamsOptional(getQueryOptionsParams(node, { paramsType, paramsCasing, pathParamsType, resolver: tsResolver }), enabledNames)
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = injectNonNullAssertions(rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }'), enabledNames)
+  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
 
   const hasNewParams = nextParam != null || previousParam != null
 
@@ -121,8 +111,8 @@ export function InfiniteQueryOptions({
 
   const infiniteOverrideParams =
     queryParam && queryParamsTypeName
-      ? `params = {
-      ...(params ?? {}),
+      ? `query = {
+      ...(query ?? {}),
       ['${queryParam}']: pageParam as unknown as ${queryParamsTypeName}['${queryParam}'],
     } as ${queryParamsTypeName}`
       : ''
@@ -133,7 +123,7 @@ export function InfiniteQueryOptions({
         <Function name={name} export params={paramsSignature}>
           {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal, pageParam }) => {
     ${infiniteOverrideParams}
@@ -152,7 +142,7 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
       <Function name={name} export params={paramsSignature}>
         {`
 const queryKey = ${queryKeyName}(${queryKeyParamsCall})
-return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({${enabledText ? `\n  ${enabledText}` : ''}
+return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, typeof queryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal }) => {
     return ${clientName}(${clientCallStr})

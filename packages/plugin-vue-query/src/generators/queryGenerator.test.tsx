@@ -32,9 +32,6 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
     importPath: undefined,
   },
   parser: 'zod',
-  paramsType: 'inline',
-  paramsCasing: undefined,
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {
@@ -108,7 +105,6 @@ describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
-    { name: 'findByTagsPathParamsObject', node: findByTagsNode, options: { pathParamsType: 'object' as const } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
     {
       name: 'findByTagsWithCustomQueryKey',
@@ -137,7 +133,6 @@ describe('queryGenerator operation', () => {
         },
       },
     },
-    { name: 'findByTagsObject', node: findByTagsNode, options: { paramsType: 'object' as const, pathParamsType: 'object' as const } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginVueQuery['resolvedOptions']>; baseURL?: string }>
 
   test.each(testData)('$name', async (props) => {

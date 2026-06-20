@@ -1,5 +1,5 @@
 import { buildOperationComments, buildTransformedParamsMapping, getOperationParameters } from '@internals/shared'
-import { camelCase, isValidVarName, Url } from '@internals/utils'
+import { camelCase, Url } from '@internals/utils'
 import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -32,10 +32,6 @@ type Props = {
    * @default 'data'
    */
   dataReturnType: PluginMcp['resolvedOptions']['client']['dataReturnType']
-  /**
-   * How to style your params.
-   */
-  paramsCasing?: PluginMcp['resolvedOptions']['paramsCasing']
 }
 
 /**
@@ -50,13 +46,13 @@ function buildRemappingCode(mapping: Record<string, string>, varName: string, so
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function McpHandler({ name, node, resolver, baseURL, dataReturnType, paramsCasing }: Props): KubbReactNode {
+export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
-  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing })
-  const { path: originalPathParams, query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
+  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
 
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const responseName = resolver.resolveResponseName(node)
@@ -71,16 +67,15 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
     paramsType: 'object',
     pathParamsType: 'inline',
     resolver,
-    paramsCasing,
+    paramsCasing: 'camelcase',
   })
   const baseParamsSignature = declarationPrinter.print(paramsNode) ?? ''
   const paramsSignature = baseParamsSignature
     ? `${baseParamsSignature}, request: RequestHandlerExtra<ServerRequest, ServerNotification>`
     : 'request: RequestHandlerExtra<ServerRequest, ServerNotification>'
 
-  const pathParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalPathParams, camelCase) : null
-  const queryParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalQueryParams, camelCase) : null
-  const headerParamsMapping = paramsCasing ? buildTransformedParamsMapping(originalHeaderParams, camelCase) : null
+  const queryParamsMapping = buildTransformedParamsMapping(originalQueryParams, camelCase)
+  const headerParamsMapping = buildTransformedParamsMapping(originalHeaderParams, camelCase)
 
   const contentTypeHeader =
     contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null
@@ -88,10 +83,10 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
 
   const fetchConfig: Array<string> = []
   fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
-  fetchConfig.push(`url: ${Url.toTemplateString(node.path)}`)
+  fetchConfig.push(`url: ${Url.toTemplateString(node.path, { casing: 'camelcase' })}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
-  if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'params: mappedParams' : 'params')
-  if (requestName) fetchConfig.push(`data: ${isFormData ? 'formData as FormData' : 'requestData'}`)
+  if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'query: mappedParams' : 'query: params')
+  if (requestName) fetchConfig.push(`body: ${isFormData ? 'formData as FormData' : 'requestBody'}`)
   if (headers.length) fetchConfig.push(`headers: { ${headers.join(', ')} }`)
 
   const payload = dataReturnType === 'data' ? 'res.data' : 'res'
@@ -120,17 +115,6 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
         {''}
         <br />
         <br />
-        {pathParamsMapping &&
-          Object.entries(pathParamsMapping)
-            .filter(([originalName, camelCaseName]) => originalName !== camelCaseName && isValidVarName(originalName))
-            .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
-            .join('\n')}
-        {pathParamsMapping && (
-          <>
-            <br />
-            <br />
-          </>
-        )}
         {queryParamsMapping && queryParams.length > 0 && (
           <>
             {buildRemappingCode(queryParamsMapping, 'mappedParams', 'params')}
@@ -145,9 +129,9 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType, para
             <br />
           </>
         )}
-        {requestName && 'const requestData = data'}
+        {requestName && 'const requestBody = data'}
         <br />
-        {isFormData && requestName && 'const formData = buildFormData(requestData)'}
+        {isFormData && requestName && 'const formData = buildFormData(requestBody)'}
         <br />
         {`const res = await client<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
         <br />

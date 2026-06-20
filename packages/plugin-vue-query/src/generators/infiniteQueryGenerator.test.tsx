@@ -30,9 +30,6 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
     importPath: undefined,
   },
   parser: 'zod',
-  paramsType: 'inline',
-  paramsCasing: undefined,
-  pathParamsType: 'inline',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
   query: {

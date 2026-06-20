@@ -4,7 +4,7 @@
 */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { UpdatePetRequestConfig, UpdatePetData, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -14,26 +14,24 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet(petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export async function updatePet({ path, query, body }: UpdatePetRequestConfig, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
-  const pet_id = petId
+  const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
 
-  const mappedParams = params ? { "include_deleted": params.includeDeleted, "request_source": params.requestSource } : undefined
+  const requestBody = body
 
-  const requestData = data
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${pet_id}`, params: mappedParams, data: requestData, ...requestConfig })
+  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${path.petId}`, query: mappedParams, body: requestBody, ...requestConfig })
 
   return res.data
 }
 
 export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const mutationKey = updatePetMutationKey()
-  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>({
+  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     mutationKey,
-    mutationFn: async({ petId, data, params }) => {
-      return updatePet(petId, data, params, config)
+    mutationFn: async({ path, query, body }) => {
+      return updatePet({ path, query, body }, config)
     },
   })
 }
@@ -42,18 +40,18 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
  * {@link /pets/:pet_id}
  */
 export function useUpdatePet<TContext>(options: {
-  mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
-  const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>
+  const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>
 
-  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>({
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     ...baseOptions,
     mutationKey,
     ...mutationOptions,
-  }, queryClient) as UseMutationResult<UpdatePetStatus200, ResponseErrorConfig<Error>, {petId: UpdatePetPathPetId, data: UpdatePetData, params?: { includeDeleted?: UpdatePetQueryIncludeDeleted; requestSource?: UpdatePetQueryRequestSource }}, TContext>
+  }, queryClient) as UseMutationResult<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>
 }

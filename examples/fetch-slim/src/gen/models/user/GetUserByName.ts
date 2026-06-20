@@ -39,17 +39,13 @@ export type GetUserByNameStatus404 = any
 export type GetUserByNameRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     username: GetUserByNamePathUsername
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
 }
 
 /**

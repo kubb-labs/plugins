@@ -55,9 +55,9 @@ export type UploadFileData = UploadFileJsonData | UploadFileFormData
 export type UploadFileRequestConfig = {
   body: UploadFileData
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     petId: UploadFilePathPetId
   }
   /**
@@ -67,10 +67,6 @@ export type UploadFileRequestConfig = {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
 }
 
 /**

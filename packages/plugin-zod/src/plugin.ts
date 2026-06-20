@@ -51,7 +51,6 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
     coercion = false,
     inferred = false,
     wrapOutput = undefined,
-    paramsCasing,
     printer,
     resolver: userResolver,
     macros: userMacros,
@@ -79,7 +78,6 @@ export const pluginZod = definePlugin<PluginZod>((options) => {
           regexType,
           mini,
           wrapOutput,
-          paramsCasing,
           printer,
         })
         ctx.setResolver(userResolver ? { ...resolverZod, ...userResolver } : resolverZod)

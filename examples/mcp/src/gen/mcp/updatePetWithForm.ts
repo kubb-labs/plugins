@@ -19,7 +19,7 @@ export async function updatePetWithFormHandler(
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
   const res = await client<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>(
-    { method: 'POST', url: `/pet/${petId}`, baseURL: `https://petstore.swagger.io/v2`, params },
+    { method: 'POST', url: `/pet/${petId}`, baseURL: `https://petstore.swagger.io/v2`, query: params },
     request,
   )
 

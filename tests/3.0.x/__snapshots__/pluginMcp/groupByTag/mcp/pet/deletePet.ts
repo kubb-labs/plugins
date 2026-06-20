@@ -9,8 +9,10 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePetHandler({ petId, headers }: { petId: DeletePetPathPetId; headers?: { api_key?: DeletePetHeaderApiKey } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await client<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, headers: { ...headers } }, request)
+export async function deletePetHandler({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+  const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
+
+  const res = await client<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, headers: { ...mappedHeaders } }, request)
 
   return {
     content: [

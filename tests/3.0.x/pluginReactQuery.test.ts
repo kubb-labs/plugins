@@ -40,48 +40,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── paramsType ─────────────────────────────────────────────────────────
-  {
-    name: 'paramsTypeObject',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginReactQuery({
-          output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
-          paramsType: 'object',
-        }),
-      ],
-    },
-  },
-
-  // ─── pathParamsType ─────────────────────────────────────────────────────
-  {
-    name: 'pathParamsTypeObject',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
-      storage: fsStorage(),
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginReactQuery({
-          output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
-          pathParamsType: 'object',
-        }),
-      ],
-    },
-  },
-
   // ─── suspense ───────────────────────────────────────────────────────────
   {
     name: 'suspense',
@@ -212,7 +170,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginReactQuery({
           output: { path: './hooks', barrel: false },
           client: { importPath: '@kubb/plugin-client/clients/axios' },
-          paramsCasing: 'camelcase',
         }),
       ],
     },

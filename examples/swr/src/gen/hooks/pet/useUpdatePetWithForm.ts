@@ -5,13 +5,7 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type {
-  UpdatePetWithFormResponse,
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormStatus405,
-} from '../../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/UpdatePetWithForm.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -23,27 +17,20 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm(
-  { petId }: { petId: UpdatePetWithFormPathPetId },
-  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
-    url: `/pet/${petId}`,
-    params,
+    url: `/pet/${path.petId}`,
+    query,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export type UpdatePetWithFormMutationArg = {
-  petId: UpdatePetWithFormPathPetId
-  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }
-}
+export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
 
 /**
  * @summary Updates a pet in the store with form data
@@ -71,8 +58,8 @@ export function useUpdatePetWithForm(
     UpdatePetWithFormMutationArg
   >(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { petId, params } }) => {
-      return updatePetWithForm({ petId }, params, config)
+    async (_url, { arg: { path, query } }) => {
+      return updatePetWithForm({ path, query }, config)
     },
     mutationOptions,
   )

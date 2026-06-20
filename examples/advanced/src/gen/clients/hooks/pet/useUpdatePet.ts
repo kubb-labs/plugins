@@ -1,5 +1,6 @@
 import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type {
+  UpdatePetRequestConfig,
   UpdatePetData,
   UpdatePetStatus200,
   UpdatePetStatus202,
@@ -27,12 +28,12 @@ export function updatePetMutationOptions<TContext = unknown>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
+    UpdatePetRequestConfig,
     TContext
   >({
     mutationKey,
-    mutationFn: async ({ data }) => {
-      return updatePet({ data }, config)
+    mutationFn: async ({ body }) => {
+      return updatePet({ body }, config)
     },
   })
 }
@@ -51,7 +52,7 @@ export function useUpdatePet<TContext>(
       | { status: 404; data: UpdatePetStatus404; statusText: string }
       | { status: 405; data: UpdatePetStatus405; statusText: string },
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      { data: UpdatePetData },
+      UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetData>> & {
@@ -71,7 +72,7 @@ export function useUpdatePet<TContext>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
+    UpdatePetRequestConfig,
     TContext
   >
 
@@ -82,7 +83,7 @@ export function useUpdatePet<TContext>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
+    UpdatePetRequestConfig,
     TContext
   >(
     {
@@ -98,7 +99,7 @@ export function useUpdatePet<TContext>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    { data: UpdatePetData },
+    UpdatePetRequestConfig,
     TContext
   >
 }

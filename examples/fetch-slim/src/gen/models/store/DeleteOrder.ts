@@ -27,17 +27,13 @@ export type DeleteOrderStatus404 = any
 export type DeleteOrderRequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
+  path: {
     orderId: DeleteOrderPathOrderId
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**

@@ -9,14 +9,10 @@ export type GetInventoryStatus200 = {
  * @type object
  */
 export type GetInventoryRequestConfig = {
-  data?: never
-  pathParams?: never
-  queryParams?: never
-  headerParams?: never
-  /**
-   * @type string
-   */
-  url: '/store/inventory'
+  body?: never
+  path?: never
+  query?: never
+  headers?: never
 }
 
 /**

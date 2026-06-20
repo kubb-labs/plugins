@@ -1,9 +1,9 @@
-import { createOperationParams } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
+import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 import { buildRequestConfigType, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
@@ -13,15 +13,11 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  paramsCasing: PluginReactQuery['resolvedOptions']['paramsCasing']
-  paramsType: PluginReactQuery['resolvedOptions']['paramsType']
-  pathParamsType: PluginReactQuery['resolvedOptions']['pathParamsType']
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
-const keysPrinter = functionPrinter({ mode: 'call' })
 
 export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
   return ast.factory.createFunctionParameters({
@@ -35,17 +31,7 @@ export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver:
   })
 }
 
-export function MutationOptions({
-  name,
-  clientName,
-  dataReturnType,
-  node,
-  tsResolver,
-  paramsCasing,
-  paramsType,
-  pathParamsType,
-  mutationKeyName,
-}: Props): KubbReactNode {
+export function MutationOptions({ name, clientName, dataReturnType, node, tsResolver, mutationKeyName }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
@@ -55,40 +41,22 @@ export function MutationOptions({
   const configParamsNode = buildMutationConfigParamsNode(node, tsResolver)
   const paramsSignature = declarationPrinter.print(configParamsNode) ?? ''
 
-  const mutationArgParamsNode = createOperationParams(node, {
-    paramsType: 'inline',
-    pathParamsType: 'inline',
-    paramsCasing,
-    resolver: tsResolver,
-  })
-  const hasMutationParams = mutationArgParamsNode.params.length > 0
+  const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
+  const hasMutationParams = groupedParam !== null
 
-  const TRequest = hasMutationParams ? (declarationPrinter.print(mutationArgParamsNode) ?? '') : ''
-  const argKeysStr = hasMutationParams ? (keysPrinter.print(mutationArgParamsNode) ?? '') : ''
-
-  const clientCallParamsNode = createOperationParams(node, {
-    paramsType,
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver: tsResolver,
-    extraParams: [
-      ast.factory.createFunctionParameter({
-        name: 'config',
-        type: buildRequestConfigType(node, tsResolver),
-        default: '{}',
-      }),
-    ],
-  })
-  const clientCallStr = callPrinter.print(clientCallParamsNode) ?? ''
+  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const TRequest = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : 'undefined'
+  const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
+  const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
 
   return (
     <File.Source name={name} isExportable isIndexable>
       <Function name={name} export params={paramsSignature} generics={['TContext = unknown']}>
         {`
       const mutationKey = ${mutationKeyName}()
-      return mutationOptions<${TData}, ${TError}, ${TRequest ? `{${TRequest}}` : 'undefined'}, TContext>({
+      return mutationOptions<${TData}, ${TError}, ${TRequest}, TContext>({
         mutationKey,
-        mutationFn: async(${hasMutationParams ? `{ ${argKeysStr} }` : '_'}) => {
+        mutationFn: async(${argBindingStr}) => {
           return ${clientName}(${clientCallStr})
         },
       })

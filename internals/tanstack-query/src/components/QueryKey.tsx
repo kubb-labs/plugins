@@ -6,37 +6,33 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Transformer } from '../types.ts'
-import { buildQueryKeyParams, getEnabledParamNames, markParamsOptional } from '../utils.ts'
+import { buildQueryKeyParams } from '../utils.ts'
 
 type Props = {
   name: string
   typeName: string
   node: ast.OperationNode
   tsResolver: PluginTs['resolver']
-  paramsCasing: 'camelcase' | undefined
-  pathParamsType: 'object' | 'inline'
   transformer: Transformer | null | undefined
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export const queryKeyTransformer: Transformer = ({ node, casing }) => {
+export const queryKeyTransformer: Transformer = ({ node }) => {
   if (!node.path) return []
+  const hasPathParams = getOperationParameters(node).path.length > 0
   const hasQueryParams = getOperationParameters(node).query.length > 0
   const hasRequestBody = !!node.requestBody?.content?.[0]?.schema
 
-  return [
-    Url.toObject(node.path, { type: 'path', stringify: true, casing }),
-    hasQueryParams ? '...(params ? [params] : [])' : null,
-    hasRequestBody ? '...(data ? [data] : [])' : null,
-  ].filter(Boolean) as Array<string>
+  const urlObject = hasPathParams ? `{ url: '${Url.toPath(node.path)}', params: path }` : `{ url: '${Url.toPath(node.path)}' }`
+
+  return [urlObject, hasQueryParams ? '...(query ? [query] : [])' : null, hasRequestBody ? '...(body ? [body] : [])' : null].filter(Boolean) as Array<string>
 }
 
-export function QueryKey({ name, node, tsResolver, paramsCasing, pathParamsType, typeName, transformer }: Props): KubbReactNode {
-  const baseParamsNode = buildQueryKeyParams(node, { pathParamsType, paramsCasing, resolver: tsResolver })
-  const paramsNode = markParamsOptional(baseParamsNode, getEnabledParamNames(baseParamsNode))
+export function QueryKey({ name, node, tsResolver, typeName, transformer }: Props): KubbReactNode {
+  const paramsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const keys = (transformer ?? queryKeyTransformer)({ node, casing: paramsCasing })
+  const keys = (transformer ?? queryKeyTransformer)({ node, casing: 'camelcase' })
 
   return (
     <>

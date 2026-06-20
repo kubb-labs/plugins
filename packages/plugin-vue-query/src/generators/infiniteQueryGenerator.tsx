@@ -21,7 +21,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
+    const { output, query, mutation, infinite, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -63,11 +63,22 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
       }),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, {
-      paramsCasing,
-      exclude: [queryKeyTypeName],
-      order: 'body-response-first',
-    })
+    const rawQueryParams = getOperationParameters(node).query
+    const queryParamsTypeName =
+      rawQueryParams.length > 0 && tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
+        ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
+        : null
+
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      queryParamsTypeName,
+      ...resolveOperationTypeNames(node, tsResolver, {
+        paramsCasing: 'camelcase',
+        exclude: [queryKeyTypeName],
+        order: 'body-response-first',
+        includeParams: false,
+      }),
+    ].filter((name): name is string => Boolean(name))
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
@@ -128,24 +139,13 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <QueryKey
-          name={queryKeyName}
-          typeName={queryKeyTypeName}
-          node={node}
-          tsResolver={tsResolver}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          transformer={ctx.options.queryKey}
-        />
+        <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 
         {!shouldUseClientPlugin && (
           <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
             dataReturnType={clientOptions.dataReturnType || 'data'}
-            paramsCasing={clientOptions.paramsCasing || paramsCasing}
-            paramsType={paramsType}
-            pathParamsType={pathParamsType}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -162,9 +162,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           queryKeyName={queryKeyName}
           node={node}
           tsResolver={tsResolver}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
@@ -183,9 +180,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           queryKeyTypeName={queryKeyTypeName}
           node={node}
           tsResolver={tsResolver}
-          paramsCasing={paramsCasing}
-          paramsType={paramsType}
-          pathParamsType={pathParamsType}
           dataReturnType={clientOptions.dataReturnType || 'data'}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}

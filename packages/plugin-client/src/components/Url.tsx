@@ -1,12 +1,10 @@
-import { buildParamsMapping, getOperationParameters } from '@internals/shared'
-import { isValidVarName, Url as UrlHelper } from '@internals/utils'
-import { createOperationParams } from '@kubb/ast/utils'
+import { getOperationParameters } from '@internals/shared'
+import { Url as UrlHelper } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { PluginClient } from '../types.ts'
 
 type Props = {
   name: string
@@ -14,75 +12,44 @@ type Props = {
   isIndexable?: boolean
 
   baseURL: string | null | undefined
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['pathParamsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
   tsResolver: ResolverTs
 }
 
 type GetParamsProps = {
-  paramsCasing: PluginClient['resolvedOptions']['paramsCasing']
-  paramsType: PluginClient['resolvedOptions']['paramsType']
-  pathParamsType: PluginClient['resolvedOptions']['pathParamsType']
   node: ast.OperationNode
   tsResolver: ResolverTs
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function buildUrlParamsNode({ paramsType, paramsCasing, pathParamsType, node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
-  // Build a URL-only node with only path params (no body, query, header)
-  const urlNode: ast.OperationNode = {
-    ...node,
-    parameters: node.parameters.filter((p) => p.in === 'path'),
-    requestBody: undefined,
+function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
+  const { path: pathParams } = getOperationParameters(node)
+
+  if (pathParams.length === 0) {
+    return ast.factory.createFunctionParameters({ params: [] })
   }
 
-  return createOperationParams(urlNode, {
-    paramsType: paramsType === 'object' ? 'object' : 'inline',
-    pathParamsType: paramsType === 'object' ? 'object' : pathParamsType === 'object' ? 'object' : 'inline',
-    paramsCasing,
-    resolver: tsResolver,
+  return ast.factory.createFunctionParameters({
+    params: [ast.factory.createFunctionParameter({ name: 'path', type: `${tsResolver.resolveRequestConfigName(node)}['path']` })],
   })
 }
 
-export function Url({
-  name,
-  isExportable = true,
-  isIndexable = true,
-  baseURL,
-  paramsType,
-  paramsCasing,
-  pathParamsType,
-  node,
-  tsResolver,
-}: Props): KubbReactNode {
+export function Url({ name, isExportable = true, isIndexable = true, baseURL, node, tsResolver }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const paramsNode = buildUrlParamsNode({
-    paramsType,
-    paramsCasing,
-    pathParamsType,
     node,
     tsResolver,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
-  const { path: originalPathParams } = getOperationParameters(node)
-  const { path: casedPathParams } = getOperationParameters(node, { paramsCasing })
-  const pathParamsMapping = paramsCasing ? buildParamsMapping(originalPathParams, casedPathParams) : null
-
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>
       <Function name={name} export={isExportable} params={paramsSignature}>
-        {pathParamsMapping &&
-          Object.entries(pathParamsMapping)
-            .filter(([originalName, camelCaseName]) => isValidVarName(originalName) && originalName !== camelCaseName)
-            .map(([originalName, camelCaseName]) => `const ${originalName} = ${camelCaseName}`)
-            .join('\n')}
-        {pathParamsMapping && Object.keys(pathParamsMapping).length > 0 && <br />}
-        <Const name={'res'}>{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toTemplateString(node.path, { prefix: baseURL })} as const }`}</Const>
+        <Const
+          name={'res'}
+        >{`{ method: '${node.method.toUpperCase()}', url: ${UrlHelper.toGroupedTemplateString(node.path, { prefix: baseURL })} as const }`}</Const>
         <br />
         return res
       </Function>

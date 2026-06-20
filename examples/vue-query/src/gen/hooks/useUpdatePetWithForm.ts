@@ -4,16 +4,9 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type {
-  UpdatePetWithFormResponse,
-  UpdatePetWithFormPathPetId,
-  UpdatePetWithFormQueryName,
-  UpdatePetWithFormQueryStatus,
-  UpdatePetWithFormStatus405,
-} from '../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../models/UpdatePetWithForm.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import type { MaybeRefOrGetter } from 'vue'
 import { useMutation } from '@tanstack/vue-query'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
@@ -22,17 +15,13 @@ export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as co
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm(
-  { petId }: { petId: UpdatePetWithFormPathPetId },
-  params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
     method: 'POST',
-    url: `/pet/${petId}`,
-    params,
+    url: `/pet/${path.petId}`,
+    query,
     ...requestConfig,
   })
 
@@ -45,15 +34,9 @@ export async function updatePetWithForm(
  */
 export function useUpdatePetWithForm<TContext>(
   options: {
-    mutation?: MutationObserverOptions<
-      UpdatePetWithFormResponse,
-      ResponseErrorConfig<UpdatePetWithFormStatus405>,
-      {
-        petId: MaybeRefOrGetter<UpdatePetWithFormPathPetId>
-        params?: MaybeRefOrGetter<{ name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus }>
-      },
-      TContext
-    > & { client?: QueryClient }
+    mutation?: MutationObserverOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
@@ -61,15 +44,10 @@ export function useUpdatePetWithForm<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updatePetWithFormMutationKey()
 
-  return useMutation<
-    UpdatePetWithFormResponse,
-    ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    { petId: UpdatePetWithFormPathPetId; params?: { name?: UpdatePetWithFormQueryName; status?: UpdatePetWithFormQueryStatus } },
-    TContext
-  >(
+  return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>(
     {
-      mutationFn: async ({ petId, params }) => {
-        return updatePetWithForm({ petId }, params, config)
+      mutationFn: async ({ path, query }) => {
+        return updatePetWithForm({ path, query }, config)
       },
       mutationKey,
       ...mutationOptions,

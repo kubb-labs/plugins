@@ -4,11 +4,11 @@
  */
 
 import client from '@kubb/plugin-client/clients/fetch'
-import type { DeletePetPathPetId, DeletePetHeaderApiKey, DeletePetResponse, DeletePetStatus400 } from './models.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from './models.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
 
-function getDeletePetUrl(petId: DeletePetPathPetId) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/pet/${petId}` as const }
+function getDeletePetUrl(path: DeletePetRequestConfig['path']) {
+  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}` as const }
 
   return res
 }
@@ -18,18 +18,16 @@ function getDeletePetUrl(petId: DeletePetPathPetId) {
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet(
-  petId: DeletePetPathPetId,
-  headers?: { api_key?: DeletePetHeaderApiKey },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
+
+  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
   const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
     method: 'DELETE',
-    url: getDeletePetUrl(petId).url.toString(),
+    url: getDeletePetUrl(path).url.toString(),
     ...requestConfig,
-    headers: { ...headers, ...requestConfig.headers },
+    headers: { ...mappedHeaders, ...requestConfig.headers },
   })
 
   return res.data

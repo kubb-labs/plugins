@@ -19,17 +19,13 @@ export type GetEnterpriseConfigurationsIdV20250Status200 = object
 export type GetEnterpriseConfigurationsIdV20250RequestConfig = {
   body?: never
   /**
-   * @type object | undefined
+   * @type object
    */
-  path?: {
-    enterprise_id: GetEnterpriseConfigurationsIdV20250PathEnterpriseId
+  path: {
+    enterpriseId: GetEnterpriseConfigurationsIdV20250PathEnterpriseId
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/enterprise_configurations/${string}`
 }
 
 /**

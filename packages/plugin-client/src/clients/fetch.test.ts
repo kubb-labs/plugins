@@ -28,7 +28,7 @@ describe('fetch client', () => {
       await client({
         url: '/upload',
         method: 'POST',
-        data: formData,
+        body: formData,
       })
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -60,7 +60,7 @@ describe('fetch client', () => {
       await client({
         url: '/api/users',
         method: 'POST',
-        data,
+        body: data,
       })
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -97,7 +97,7 @@ describe('fetch client', () => {
       await client({
         url: '/upload-multiple',
         method: 'POST',
-        data: formData,
+        body: formData,
       })
 
       const callArgs = mockFetch.mock.calls[0]
@@ -120,7 +120,7 @@ describe('fetch client', () => {
       await client({
         url: '/upload',
         method: 'POST',
-        data: formData,
+        body: formData,
       })
 
       const callArgs = mockFetch.mock.calls[0]
@@ -165,7 +165,7 @@ describe('fetch client', () => {
       await client({
         url: '/api/search',
         method: 'GET',
-        params: { q: 'test', page: 1 },
+        query: { q: 'test', page: 1 },
       })
 
       expect(mockFetch).toHaveBeenCalledWith('/api/search?q=test&page=1', expect.any(Object))
@@ -250,7 +250,7 @@ describe('fetch client', () => {
       await client({
         url: '/api/users',
         method: 'POST',
-        data: { name: 'John' },
+        body: { name: 'John' },
         contentType: 'application/json',
       })
 
@@ -274,7 +274,7 @@ describe('fetch client', () => {
       await client({
         url: '/api/upload',
         method: 'POST',
-        data: new FormData(),
+        body: new FormData(),
         contentType: 'multipart/form-data',
       })
 
@@ -350,7 +350,7 @@ describe('fetch client', () => {
       await client({
         url: '/api/form',
         method: 'POST',
-        data: { name: 'John', age: 30 },
+        body: { name: 'John', age: 30 },
         contentType: 'application/x-www-form-urlencoded',
       })
 

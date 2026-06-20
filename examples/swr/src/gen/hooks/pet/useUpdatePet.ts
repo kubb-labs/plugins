@@ -6,6 +6,7 @@
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
 import type {
+  UpdatePetRequestConfig,
   UpdatePetData,
   UpdatePetResponse,
   UpdatePetStatus200,
@@ -26,7 +27,7 @@ export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
  * {@link /pet}
  */
 export async function updatePet(
-  data: UpdatePetData,
+  { body }: UpdatePetRequestConfig,
   config: Partial<RequestConfig<UpdatePetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -34,12 +35,12 @@ export async function updatePet(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
     method: 'PUT',
     url: `/pet`,
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -47,7 +48,7 @@ export async function updatePet(
   return res.data
 }
 
-export type UpdatePetMutationArg = { data: UpdatePetData }
+export type UpdatePetMutationArg = UpdatePetRequestConfig
 
 /**
  * @description Update an existing pet by Id
@@ -79,8 +80,8 @@ export function useUpdatePet(
     UpdatePetMutationArg
   >(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return updatePet(data, config)
+    async (_url, { arg: { body } }) => {
+      return updatePet({ body }, config)
     },
     mutationOptions,
   )

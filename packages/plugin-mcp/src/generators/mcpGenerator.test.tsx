@@ -32,7 +32,6 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
     baseURL: '',
     dataReturnType: 'data',
   },
-  paramsCasing: undefined,
   group: null,
   resolver: resolverMcp,
 }

@@ -20,7 +20,7 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, paramsCasing, paramsType, pathParamsType, parser, client: clientOptions, group } = ctx.options
+    const { output, query, mutation, parser, client: clientOptions, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -51,7 +51,10 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
       ),
     }
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing, order: 'body-response-first' })
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', order: 'body-response-first', includeParams: false }),
+    ]
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : undefined
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : undefined
@@ -117,23 +120,13 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <MutationKey
-          name={mutationKeyName}
-          typeName={mutationKeyTypeName}
-          node={node}
-          pathParamsType={pathParamsType}
-          paramsCasing={paramsCasing}
-          transformer={ctx.options.mutationKey}
-        />
+        <MutationKey name={mutationKeyName} typeName={mutationKeyTypeName} node={node} transformer={ctx.options.mutationKey} />
 
         {!shouldUseClientPlugin && (
           <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
             dataReturnType={clientOptions.dataReturnType || 'data'}
-            paramsCasing={clientOptions.paramsCasing || paramsCasing}
-            paramsType={paramsType}
-            pathParamsType={pathParamsType}
             parser={parser}
             node={node}
             tsResolver={tsResolver}
@@ -154,9 +147,6 @@ export const mutationGenerator = defineGenerator<PluginSwr>({
               node={node}
               tsResolver={tsResolver}
               dataReturnType={clientOptions.dataReturnType || 'data'}
-              paramsCasing={paramsCasing}
-              paramsType={paramsType}
-              pathParamsType={pathParamsType}
             />
           </>
         )}

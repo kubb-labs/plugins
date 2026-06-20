@@ -30,9 +30,6 @@ const defaultOptions: PluginCypress['resolvedOptions'] = {
   baseURL: undefined,
   group: null,
   dataReturnType: 'data',
-  paramsCasing: 'camelcase',
-  paramsType: 'inline',
-  pathParamsType: 'inline',
   resolver: resolverCypress,
 }
 
@@ -198,118 +195,7 @@ describe('cypressGenerator — dataReturnType', () => {
   })
 })
 
-describe('cypressGenerator — paramsType', () => {
-  const node = ast.factory.createOperation({
-    operationId: 'updatePet',
-    method: 'PUT',
-    path: '/pets/{petId}',
-    tags: ['pets'],
-    parameters: [
-      ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
-      ast.factory.createParameter({ name: 'status', in: 'query', schema: ast.factory.createSchema({ type: 'string' }) }),
-    ],
-    requestBody: {
-      content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
-    },
-    responses: [
-      ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Updated pet' }),
-    ],
-  })
-
-  test('inline — separate arguments per param group', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'inline' }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'paramsType inline',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'paramsType inline')
-  })
-
-  test('object — all params merged into single object', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'object' }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'paramsType object',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'paramsType object')
-  })
-})
-
-describe('cypressGenerator — pathParamsType', () => {
-  const node = ast.factory.createOperation({
-    operationId: 'showPetById',
-    method: 'GET',
-    path: '/pets/{petId}',
-    tags: ['pets'],
-    parameters: [
-      ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true }),
-      ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) }),
-    ],
-    responses: [
-      ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Expected response' }),
-    ],
-  })
-
-  test('inline — each path param as individual argument', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'inline', pathParamsType: 'inline' }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'pathParamsType inline',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'pathParamsType inline')
-  })
-
-  test('object — path params grouped into destructured object', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsType: 'inline', pathParamsType: 'object' }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'pathParamsType object',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'pathParamsType object')
-  })
-})
-
-describe('cypressGenerator — paramsCasing', () => {
+describe('cypressGenerator — params casing', () => {
   const node = ast.factory.createOperation({
     operationId: 'getPets',
     method: 'GET',
@@ -325,8 +211,8 @@ describe('cypressGenerator — paramsCasing', () => {
     ],
   })
 
-  test('camelcase — query param name is camelCased', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsCasing: 'camelcase' }
+  test('query param name is always camelCased', async () => {
+    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
       name: 'paramsCasing camelcase',
@@ -343,28 +229,9 @@ describe('cypressGenerator — paramsCasing', () => {
     })
     await matchFiles(driver.fileManager.files, 'paramsCasing camelcase')
   })
-
-  test('undefined — query param name is unchanged', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsCasing: undefined }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'paramsCasing undefined',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'paramsCasing undefined')
-  })
 })
 
-describe('cypressGenerator — paramsCasing headers', () => {
+describe('cypressGenerator — params casing headers', () => {
   const nodeWithHeaders = ast.factory.createOperation({
     operationId: 'getPets',
     method: 'GET',
@@ -383,8 +250,8 @@ describe('cypressGenerator — paramsCasing headers', () => {
     ],
   })
 
-  test('camelcase — header and query param names are camelCased and remapped', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, paramsCasing: 'camelcase' }
+  test('header and query param names are always camelCased and remapped', async () => {
+    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions }
     const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
     const driver = createMockedPluginDriver({
       name: 'paramsCasing camelcase headers',

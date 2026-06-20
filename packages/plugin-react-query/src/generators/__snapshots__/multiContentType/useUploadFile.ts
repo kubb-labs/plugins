@@ -4,7 +4,7 @@
  */
 
 import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UploadFileData, UploadFileResponse, UploadFilePathPetId, UploadFileStatus200 } from './UploadFile'
+import type { UploadFileRequestConfig, UploadFileData, UploadFileResponse, UploadFileStatus200 } from './UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import type { z } from 'zod'
 import { client } from './.kubb/client'
@@ -18,19 +18,18 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * {@link /pet/:petId/uploadImage}
  */
 export async function uploadFile(
-  petId: UploadFilePathPetId,
-  data?: UploadFileData,
+  { path, body }: UploadFileRequestConfig,
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = UploadFileData.parse(data)
-  const formData = buildFormData(requestData)
+  const requestBody = UploadFileData.parse(body)
+  const formData = buildFormData(requestBody)
 
   const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof UploadFileData>>({
     method: 'POST',
-    url: `/pet/${petId}/uploadImage`,
-    data: contentType === 'multipart/form-data' ? (formData as FormData) : requestData,
+    url: `/pet/${path.petId}/uploadImage`,
+    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
     contentType,
     ...requestConfig,
   })
@@ -42,10 +41,10 @@ export function uploadFileMutationOptions<TContext = unknown>(
   config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext>({
+  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationKey,
-    mutationFn: async ({ petId, data }) => {
-      return uploadFile(petId, data, config)
+    mutationFn: async ({ path, body }) => {
+      return uploadFile({ path, body }, config)
     },
   })
 }
@@ -55,9 +54,7 @@ export function uploadFileMutationOptions<TContext = unknown>(
  */
 export function useUploadFile<TContext>(
   options: {
-    mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' }
   } = {},
 ) {
@@ -68,16 +65,16 @@ export function useUploadFile<TContext>(
   const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
     UploadFileStatus200,
     ResponseErrorConfig<Error>,
-    { petId: UploadFilePathPetId; data?: UploadFileData },
+    UploadFileRequestConfig,
     TContext
   >
 
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext>(
+  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<UploadFileStatus200, ResponseErrorConfig<Error>, { petId: UploadFilePathPetId; data?: UploadFileData }, TContext>
+  ) as UseMutationResult<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 }

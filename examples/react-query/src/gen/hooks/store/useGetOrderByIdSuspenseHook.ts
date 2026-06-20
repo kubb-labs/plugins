@@ -4,14 +4,14 @@
  */
 
 import client from '@kubb/plugin-client/clients/axios'
-import type { GetOrderByIdPathOrderId, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getOrderByIdSuspenseQueryKey = ({ orderId }: { orderId?: GetOrderByIdPathOrderId } = {}) =>
-  ['v5', { url: '/store/order/:orderId', params: { orderId: orderId } }] as const
+export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) =>
+  ['v5', { url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
@@ -20,27 +20,24 @@ type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryK
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderByIdSuspenseHook({ orderId }: { orderId: GetOrderByIdPathOrderId }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderByIdSuspenseHook({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
     method: 'GET',
-    url: `/store/order/${orderId}`,
+    url: `/store/order/${path.orderId}`,
     ...requestConfig,
   })
 
   return res.data
 }
 
-export function getOrderByIdSuspenseQueryOptionsHook(
-  { orderId }: { orderId: GetOrderByIdPathOrderId },
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-  const queryKey = getOrderByIdSuspenseQueryKey({ orderId })
+export function getOrderByIdSuspenseQueryOptionsHook({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  const queryKey = getOrderByIdSuspenseQueryKey({ path })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getOrderByIdSuspenseHook({ orderId }, { ...config, signal: config.signal ?? signal })
+      return getOrderByIdSuspenseHook({ path }, { ...config, signal: config.signal ?? signal })
     },
   })
 }
@@ -51,7 +48,7 @@ export function getOrderByIdSuspenseQueryOptionsHook(
  * {@link /store/order/:orderId}
  */
 export function useGetOrderByIdSuspenseHook<TData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdSuspenseQueryKey>(
-  { orderId }: { orderId: GetOrderByIdPathOrderId },
+  { path }: GetOrderByIdRequestConfig,
   options: {
     query?: Partial<UseSuspenseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryKey>> & {
       client?: QueryClient
@@ -61,12 +58,12 @@ export function useGetOrderByIdSuspenseHook<TData = GetOrderByIdStatus200, TQuer
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig
-  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey({ orderId })
+  const queryKey = resolvedOptions?.queryKey ?? getOrderByIdSuspenseQueryKey({ path })
   const customOptions = useCustomHookOptions({ hookName: 'useGetOrderByIdSuspenseHook', operationId: 'getOrderById' })
 
-  const query = useSuspenseQuery(
+  const queryResult = useSuspenseQuery(
     {
-      ...getOrderByIdSuspenseQueryOptionsHook({ orderId }, config),
+      ...getOrderByIdSuspenseQueryOptionsHook({ path }, config),
       ...customOptions,
       ...resolvedOptions,
       queryKey,
@@ -74,7 +71,7 @@ export function useGetOrderByIdSuspenseHook<TData = GetOrderByIdStatus200, TQuer
     queryClient,
   ) as UseSuspenseQueryResult<TData, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>> & { queryKey: TQueryKey }
 
-  query.queryKey = queryKey as TQueryKey
+  queryResult.queryKey = queryKey as TQueryKey
 
-  return query
+  return queryResult
 }

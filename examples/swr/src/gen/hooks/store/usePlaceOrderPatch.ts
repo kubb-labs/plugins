@@ -5,7 +5,13 @@
 
 import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { PlaceOrderPatchData, PlaceOrderPatchResponse, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
+import type {
+  PlaceOrderPatchRequestConfig,
+  PlaceOrderPatchData,
+  PlaceOrderPatchResponse,
+  PlaceOrderPatchStatus200,
+  PlaceOrderPatchStatus405,
+} from '../../models/PlaceOrderPatch.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 
@@ -19,7 +25,7 @@ export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutati
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  data?: PlaceOrderPatchData,
+  { body }: PlaceOrderPatchRequestConfig,
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -27,12 +33,12 @@ export async function placeOrderPatch(
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
-  const requestData = data
+  const requestBody = body
 
   const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
     method: 'PATCH',
     url: `/store/order`,
-    data: requestData,
+    body: requestBody,
     contentType,
     ...requestConfig,
   })
@@ -40,7 +46,7 @@ export async function placeOrderPatch(
   return res.data
 }
 
-export type PlaceOrderPatchMutationArg = { data?: PlaceOrderPatchData }
+export type PlaceOrderPatchMutationArg = PlaceOrderPatchRequestConfig
 
 /**
  * @description Place a new order in the store with patch
@@ -67,8 +73,8 @@ export function usePlaceOrderPatch(
 
   return useSWRMutation<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
     shouldFetch ? mutationKey : null,
-    async (_url, { arg: { data } }) => {
-      return placeOrderPatch(data, config)
+    async (_url, { arg: { body } }) => {
+      return placeOrderPatch({ body }, config)
     },
     mutationOptions,
   )
