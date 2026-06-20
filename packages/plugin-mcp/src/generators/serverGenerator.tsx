@@ -44,7 +44,7 @@ export const serverGenerator = defineGenerator<PluginMcp>({
     }
 
     const operationsMapped = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+      const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node)
 
       const mcpFile = resolver.resolveFile(
         { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },

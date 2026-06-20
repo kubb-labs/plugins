@@ -185,7 +185,7 @@ export function resolveQueryParamsParser(parser: ParserOption): 'zod' | null {
  */
 export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodSchemaNameResolverLike | null | undefined, parser: ParserOption): Array<string> {
   if (!zodResolver || !parser) return []
-  const { query: queryParams } = getOperationParameters(node)
+  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   return [
     resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
     resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,

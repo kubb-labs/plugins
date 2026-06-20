@@ -84,7 +84,7 @@ export function SuspenseInfiniteQuery({
           ? 'boolean'
           : 'unknown'
 
-  const rawQueryParams = getOperationParameters(node).query
+  const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
   const queryParamsTypeName =
     rawQueryParams.length > 0
       ? (() => {

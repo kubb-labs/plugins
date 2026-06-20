@@ -55,7 +55,7 @@ const keysPrinter = functionPrinter({ mode: 'call' })
 export function Server({ name, serverName, serverVersion, operations }: Props): KubbReactNode {
   const registrations = operations
     .map(({ tool, mcp, zod, node }) => {
-      const { path: pathParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+      const { path: pathParams } = getOperationParameters(node)
 
       const pathEntries: Array<{ key: string; value: string }> = []
       const otherEntries: Array<{ key: string; value: string }> = []

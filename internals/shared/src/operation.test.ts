@@ -207,7 +207,7 @@ describe('getOperationParameters', () => {
       ],
     })
 
-    const grouped = getOperationParameters(node, { paramsCasing: 'camelcase' })
+    const grouped = getOperationParameters(node)
 
     expect(grouped.path.map((param) => param.name)).toStrictEqual(['petId'])
     expect(grouped.query.map((param) => param.name)).toStrictEqual(['pageSize'])
@@ -236,7 +236,7 @@ describe('resolveOperationTypeNames', () => {
       ],
     })
 
-    expect(resolveOperationTypeNames(node, resolver, { paramsCasing: 'camelcase', exclude: ['Status200'] })).toStrictEqual([
+    expect(resolveOperationTypeNames(node, resolver, { exclude: ['Status200'] })).toStrictEqual([
       'petIdPathParams',
       'pageSizeQueryParams',
       'xApiKeyHeaderParams',

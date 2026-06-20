@@ -51,8 +51,8 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Pr
   const contentType = node.requestBody?.content?.[0]?.contentType
   const isFormData = contentType === 'multipart/form-data'
 
-  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
-  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
+  const { query: queryParams, header: headerParams } = getOperationParameters(node)
+  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node, { paramsCasing: 'original' })
 
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const responseName = resolver.resolveResponseName(node)
