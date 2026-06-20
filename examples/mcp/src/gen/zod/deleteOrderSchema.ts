@@ -11,4 +11,4 @@ export const deleteOrderStatus400Schema = z.any()
 
 export const deleteOrderStatus404Schema = z.any()
 
-export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
+export const deleteOrderResponseSchema = z.unknown()

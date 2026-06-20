@@ -1,4 +1,4 @@
-import { caseParams, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getSuccessResponses, resolveContentTypeVariants } from '@internals/shared'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
@@ -251,16 +251,18 @@ export const zodGenerator = defineGenerator<PluginZod>({
     })
 
     const responsesWithSchema = node.responses.filter((res) => res.content?.some((entry) => entry.schema))
+    // Validate success (2xx) bodies only. Error bodies are surfaced unparsed, typed by plugin-ts (#369).
+    const successResponsesWithSchema = getSuccessResponses(responsesWithSchema)
     const responseUnionSchema =
       responsesWithSchema.length > 0
         ? (() => {
             const responseUnionName = resolver.resolveResponseName(node)
 
-            // Collect all import names from response schemas to detect naming collisions.
-            // When a response is a $ref to a component schema whose resolved name matches
-            // the response union name, skip generation to avoid redeclaration errors.
+            // Collect import names from the success response schemas to detect naming collisions.
+            // When a 2xx response is a $ref to a component schema whose resolved name matches the
+            // response union name, skip generation to avoid redeclaration errors.
             const importedNames = new Set(
-              responsesWithSchema.flatMap((res) =>
+              successResponsesWithSchema.flatMap((res) =>
                 (res.content ?? []).flatMap((entry) =>
                   entry.schema
                     ? adapter
@@ -278,9 +280,16 @@ export const zodGenerator = defineGenerator<PluginZod>({
               return null
             }
 
-            const members = responsesWithSchema.map((res) =>
+            const members = successResponsesWithSchema.map((res) =>
               ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
             )
+
+            // No documented 2xx schema: fall back to an unknown schema so the response name still
+            // resolves for consumers that parse success bodies.
+            if (members.length === 0) {
+              return renderSchemaEntry({ schema: ast.factory.createSchema({ type: 'unknown' }), name: responseUnionName })
+            }
+
             const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
 
             return renderSchemaEntry({

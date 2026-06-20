@@ -18,7 +18,7 @@ export const addPetStatus405Schema = z.object({
   message: z.optional(z.string()),
 })
 
-export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetDataSchemaJson = addPetRequestSchema
 
