@@ -49,6 +49,52 @@ export type OperationTypeNameResolver = RequestConfigResolver &
     resolveHeaderParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
   }
 
+/**
+ * Resolver interface for building operation parameters.
+ *
+ * `ResolverTs` from `@kubb/plugin-ts` satisfies this interface and can be passed directly.
+ */
+export type OperationParamsResolver = {
+  /**
+   * Resolves the type name for an individual parameter.
+   *
+   * @example Individual path parameter name
+   * `resolver.resolveParamName(node, param) // → 'DeletePetPathPetId'`
+   */
+  resolveParamName(node: ast.OperationNode, param: ast.ParameterNode): string
+  /**
+   * Resolves the request body type name.
+   *
+   * @example Request body type name
+   * `resolver.resolveDataName(node) // → 'CreatePetData'`
+   */
+  resolveDataName(node: ast.OperationNode): string
+  /**
+   * Resolves the grouped path parameters type name.
+   * When the return value equals `resolveParamName`, no indexed access is emitted.
+   *
+   * @example Grouped path params type name
+   * `resolver.resolvePathParamsName(node, param) // → 'DeletePetPathParams'`
+   */
+  resolvePathParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+  /**
+   * Resolves the grouped query parameters type name.
+   * When the return value equals `resolveParamName`, an inline struct type is emitted instead.
+   *
+   * @example Grouped query params type name
+   * `resolver.resolveQueryParamsName(node, param) // → 'FindPetsByStatusQueryParams'`
+   */
+  resolveQueryParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+  /**
+   * Resolves the grouped header parameters type name.
+   * When the return value equals `resolveParamName`, an inline struct type is emitted instead.
+   *
+   * @example Grouped header params type name
+   * `resolver.resolveHeaderParamsName(node, param) // → 'DeletePetHeaderParams'`
+   */
+  resolveHeaderParamsName(node: ast.OperationNode, param: ast.ParameterNode): string
+}
+
 export type OperationCommentLink = 'pathTemplate' | 'urlPath' | false | ((node: ast.OperationNode) => string | undefined)
 
 export type BuildOperationCommentsOptions = {

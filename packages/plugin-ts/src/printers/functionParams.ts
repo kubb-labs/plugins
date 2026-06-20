@@ -176,7 +176,7 @@ export function createIndexedAccessType(props: Omit<IndexedAccessTypeNode, 'kind
  * ```
  */
 export function createObjectBindingPattern(props: Omit<ObjectBindingPatternNode, 'kind'>): ObjectBindingPatternNode {
-  return { kind: 'ObjectBindingPattern', elements: props.elements }
+  return { kind: 'ObjectBindingPattern', ...props }
 }
 
 /**

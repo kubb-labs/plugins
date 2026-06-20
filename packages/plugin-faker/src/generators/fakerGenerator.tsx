@@ -1,7 +1,6 @@
-import { getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
-import { caseParams } from '@kubb/ast/utils'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Faker } from '../components/Faker.tsx'

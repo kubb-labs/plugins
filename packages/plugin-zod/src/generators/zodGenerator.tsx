@@ -1,6 +1,5 @@
-import { resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, resolveContentTypeVariants } from '@internals/shared'
 import type { Adapter } from '@kubb/core'
-import { caseParams } from '@kubb/ast/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
