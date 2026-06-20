@@ -178,13 +178,17 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
     })
 }
 
-export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
+export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver, options?: { slim?: boolean }): string {
+  const slim = options?.slim ?? false
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
-  const configType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  const configProps = ['client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null].filter(Boolean).join('; ')
+  const baseConfigType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
+  // On the slim path the request groups come from the grouped params, so `config` drops the
+  // data-shape keys to stay assignable to the slim `Options` (which omits them from `RequestConfig`).
+  const configType = slim ? `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>` : baseConfigType
+  const configProps = [slim ? null : 'client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null].filter(Boolean).join('; ')
 
-  return `${configType} & { ${configProps} }`
+  return configProps ? `${configType} & { ${configProps} }` : configType
 }
 
 /**
@@ -193,10 +197,13 @@ export function buildRequestConfigType(node: ast.OperationNode, resolver: Reques
  * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
  * content type for.
  */
-export function buildClientOptionType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
+export function buildClientOptionType(node: ast.OperationNode, resolver: RequestConfigResolver, options?: { slim?: boolean }): string {
+  const slim = options?.slim ?? false
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+  const base = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
 
-  return requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'
+  if (slim) return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
+  return `${base} & { client?: Client }`
 }
 
 export type RequestGroups = {
