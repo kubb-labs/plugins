@@ -1101,7 +1101,7 @@ describe('pathParamsType: inlineSpread', () => {
       resolver: makeResolver({}),
     })
 
-    const restParam = params.params.find((p) => p.kind === 'FunctionParameter' && (p as { rest?: boolean }).rest)
+    const restParam = params.params.find((p) => p.kind === 'FunctionParameter' && p.rest)
     expect(restParam).toBeUndefined()
   })
 })

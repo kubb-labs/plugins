@@ -1,4 +1,4 @@
-import { ast } from '@kubb/core'
+import type { ast } from '@kubb/core'
 import { createFunctionParameter, createFunctionParameters, functionPrinter, type ResolverTs } from '@kubb/plugin-ts'
 import { buildRequestResultGenerics } from './generics.ts'
 
