@@ -23,7 +23,7 @@ export const addPetStatus405Schema = z.any()
 
 export type AddPetStatus405SchemaType = z.infer<typeof addPetStatus405Schema>
 
-export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+export const addPetResponseSchema = addPetStatus200Schema
 
 export type AddPetResponseSchemaType = z.infer<typeof addPetResponseSchema>
 

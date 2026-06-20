@@ -21,7 +21,7 @@ export const addPetStatusDefaultSchema = z.union([addPetStatusDefaultSchemaJson,
 
 export type AddPetStatusDefaultSchemaType = z.infer<typeof addPetStatusDefaultSchema>
 
-export const addPetResponseSchema = z.union([addPetStatus405Schema, addPetStatusDefaultSchema])
+export const addPetResponseSchema = z.unknown()
 
 export type AddPetResponseSchemaType = z.infer<typeof addPetResponseSchema>
 

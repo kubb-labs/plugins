@@ -11,4 +11,4 @@ export const deletePetPathPetIdSchema = z.coerce.bigint().describe('Pet id to de
 
 export const deletePetStatus400Schema = z.any()
 
-export const deletePetResponseSchema = deletePetStatus400Schema
+export const deletePetResponseSchema = z.unknown()

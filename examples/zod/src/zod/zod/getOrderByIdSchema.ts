@@ -30,6 +30,6 @@ export const getOrderByIdStatus404Schema = z.any()
 
 export type GetOrderByIdStatus404SchemaType = z.infer<typeof getOrderByIdStatus404Schema>
 
-export const getOrderByIdResponseSchema = z.union([getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
+export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 
 export type GetOrderByIdResponseSchemaType = z.infer<typeof getOrderByIdResponseSchema>
