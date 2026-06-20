@@ -19,6 +19,7 @@ type Props = {
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -29,9 +30,10 @@ function buildInfiniteQueryParamsNode(
   options: {
     dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
+    slim?: boolean
   },
 ): ast.FunctionParametersNode {
-  const { dataReturnType, resolver } = options
+  const { dataReturnType, resolver, slim } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
@@ -43,7 +45,7 @@ function buildInfiniteQueryParamsNode(
     name: 'options',
     type: `{
   query?: Partial<UseInfiniteQueryOptions<${[TData, TError, 'TQueryData', 'TQueryKey', 'TQueryData'].join(', ')}>> & { client?: QueryClient },
-  client?: ${buildClientOptionType(node, resolver)}
+  client?: ${buildClientOptionType(node, resolver, { slim })}
 }`,
     default: '{}',
   })
@@ -53,7 +55,16 @@ function buildInfiniteQueryParamsNode(
   return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
-export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver }: Props): KubbReactNode {
+export function InfiniteQuery({
+  name,
+  queryKeyTypeName,
+  queryOptionsName,
+  queryKeyName,
+  dataReturnType,
+  node,
+  tsResolver,
+  slim = false,
+}: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -69,7 +80,7 @@ export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryK
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildInfiniteQueryParamsNode(node, { dataReturnType, resolver: tsResolver })
+  const paramsNode = buildInfiniteQueryParamsNode(node, { dataReturnType, resolver: tsResolver, slim })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

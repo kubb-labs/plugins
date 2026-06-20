@@ -35,3 +35,25 @@ export function buildVueClientCallArgs(node: ast.OperationNode): string {
 
   return [groupedArg, '{ ...config, signal: config.signal ?? signal }'].filter(Boolean).join(', ')
 }
+
+/**
+ * Builds the call to a slim client `<op>` function inside a vue-query composable body. The slim
+ * function takes a single grouped options object, so `config` is spread first, then the operation's
+ * request groups are unwrapped with `toValue()` (matching {@link buildVueClientCallArgs}), then the
+ * abort `signal` for queries, with `throwOnError: true` pinned last so a caller's config can't flip
+ * the query's error semantics. Mutations omit the `signal`.
+ */
+export function buildVueSlimClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean }): string {
+  const { clientName, signal = false } = options
+  const groups = getRequestGroups(node)
+  const names = requestGroupOrder.filter((key) => groups[key])
+
+  const args = [
+    '...config',
+    ...names.map((name) => `${name}: toValue(${name})`),
+    signal ? 'signal: config.signal ?? signal' : null,
+    'throwOnError: true',
+  ].filter((part): part is string => part !== null)
+
+  return `${clientName}({ ${args.join(', ')} })`
+}

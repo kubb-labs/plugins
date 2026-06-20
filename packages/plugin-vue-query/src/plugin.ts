@@ -7,6 +7,7 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
 import { queryKeyTransformer } from '@internals/tanstack-query'
+import { resolveClient } from '@internals/tanstack-query'
 import { infiniteQueryGenerator, mutationGenerator, queryGenerator } from './generators'
 import { resolverVueQuery } from './resolvers/resolverVueQuery.ts'
 import type { PluginVueQuery } from './types.ts'
@@ -59,8 +60,9 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
     macros: userMacros,
   } = options
 
-  const clientName = client?.client ?? 'axios'
-  const clientImportPath = client?.importPath
+  const clientObject = client && typeof client === 'object' ? client : undefined
+  const clientName = clientObject?.client ?? 'axios'
+  const clientImportPath = clientObject?.importPath
 
   const selectedGenerators = [queryGenerator, infiniteQueryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> =>
     Boolean(generator),
@@ -76,15 +78,23 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverVueQuery, ...userResolver } : resolverVueQuery
 
+        const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
+        const resolvedClient = resolveClient({ client, pluginNames })
+        if (resolvedClient.kind === 'error') {
+          throw new Error(resolvedClient.message)
+        }
+        const slimClient = resolvedClient.kind === 'slim' ? { pluginName: resolvedClient.pluginName } : null
+
         ctx.setOptions({
           output,
           client: {
-            baseURL: client?.baseURL,
+            baseURL: clientObject?.baseURL,
             client: clientName,
-            clientType: client?.clientType ?? 'function',
+            clientType: clientObject?.clientType ?? 'function',
             importPath: clientImportPath,
-            dataReturnType: client?.dataReturnType ?? 'data',
+            dataReturnType: clientObject?.dataReturnType ?? 'data',
           },
+          slimClient,
           queryKey,
           query:
             query === false
@@ -132,7 +142,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const hasClientPlugin = !!ctx.config.plugins?.some((p) => (p as { name?: string }).name === pluginClientName)
 
-        if (!hasClientPlugin && !clientImportPath) {
+        if (!slimClient && !hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
@@ -148,7 +158,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
           })
         }
 
-        if (!hasClientPlugin) {
+        if (!slimClient && !hasClientPlugin) {
           ctx.injectFile({
             baseName: 'config.ts',
             path: path.resolve(root, '.kubb/config.ts'),
