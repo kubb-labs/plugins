@@ -8,7 +8,7 @@ import { functionPrinter, renderType } from './functionPrinter.ts'
  * express (a reference type, or an untyped binding).
  */
 function group(elements: Array<{ name: string; propertyName?: string }>, type?: ast.TypeExpression, default_?: string): ast.FunctionParameterNode {
-  return { kind: 'FunctionParameter', name: ast.factory.createObjectBindingPattern({ elements }), type, default: default_, optional: false }
+  return ast.factory.createFunctionParameter({ name: ast.factory.createObjectBindingPattern({ elements }), type, default: default_, optional: false })
 }
 
 describe('renderType', () => {

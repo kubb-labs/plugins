@@ -83,7 +83,10 @@ export function Server({ name, serverName, serverVersion, operations }: Props): 
       const paramsNode = entries.length
         ? ast.factory.createFunctionParameters({
             params: [
-              { kind: 'FunctionParameter', name: ast.factory.createObjectBindingPattern({ elements: entries.map((e) => ({ name: e.key })) }), optional: false },
+              ast.factory.createFunctionParameter({
+                name: ast.factory.createObjectBindingPattern({ elements: entries.map((e) => ({ name: e.key })) }),
+                optional: false,
+              }),
             ],
           })
         : null

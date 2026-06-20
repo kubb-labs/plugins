@@ -61,22 +61,20 @@ export function buildGroupedRequestParam(
       optional: !requiredByGroup[name],
     }))
 
-    return {
-      kind: 'FunctionParameter',
+    return ast.factory.createFunctionParameter({
       name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
       type: ast.factory.createTypeLiteral({ members }),
       optional: false,
       ...(isOptional ? { default: '{}' } : {}),
-    }
+    })
   }
 
-  return {
-    kind: 'FunctionParameter',
+  return ast.factory.createFunctionParameter({
     name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
     type: requestConfigType,
     optional: false,
     ...(isOptional ? { default: '{}' } : {}),
-  }
+  })
 }
 
 /**
