@@ -1,4 +1,5 @@
 export {
+  buildClientOptionType,
   buildOperationComments,
   buildRequestConfigType,
   buildRequestParamsSignature,

@@ -13,7 +13,7 @@ import { buildJSDoc, stringify } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import { createFunctionParams, type ParamLeaf } from './functionParams.ts'
+import { buildClientRequestArgs, type CallArg } from './callArgs.ts'
 import type { PluginClient } from './types.ts'
 
 /**
@@ -29,7 +29,7 @@ export function buildQueryParamDescriptor({
   queryParamsName: string | null
   zodQueryParamsName?: string | null
   queryParamsMapping?: Record<string, string> | null
-}): ParamLeaf | null {
+}): CallArg | null {
   if (!queryParamsName) return null
   if (zodQueryParamsName) return { value: 'requestParams' }
   if (queryParamsMapping) return { value: 'mappedParams' }
@@ -51,7 +51,7 @@ export function buildBodyParamDescriptor({
   isFormData: boolean
   isMultipleContentTypes: boolean
   hasFormData: boolean
-}): ParamLeaf | null {
+}): CallArg | null {
   if (!requestName) return null
   if (isMultipleContentTypes && hasFormData) {
     return { value: "contentType === 'multipart/form-data' ? formData as FormData : requestBody" }
@@ -181,41 +181,22 @@ function buildClassClientParams({
   headers: Array<string>
   zodQueryParamsName?: string | null
   queryParamsMapping?: Record<string, string> | null
-}) {
+}): string {
   const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const responseType = getResponseType(node)
 
-  return createFunctionParams({
-    config: {
-      mode: 'object',
-      children: {
-        requestConfig: {
-          mode: 'inlineSpread',
-        },
-        method: {
-          value: JSON.stringify(ast.isHttpOperationNode(node) ? node.method.toUpperCase() : ''),
-        },
-        url: {
-          value: url,
-        },
-        baseURL: baseURL
-          ? {
-              value: JSON.stringify(baseURL),
-            }
-          : null,
-        query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
-        body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
-        contentType: isMultipleContentTypes ? {} : null,
-        responseType: responseType ? { value: JSON.stringify(responseType) } : null,
-        headers: headers.length
-          ? {
-              value: `{ ${headers.join(', ')}, ...requestConfig.headers }`,
-            }
-          : null,
-      },
-    },
+  return buildClientRequestArgs({
+    method: JSON.stringify(ast.isHttpOperationNode(node) ? node.method.toUpperCase() : ''),
+    url,
+    baseURL: baseURL ? JSON.stringify(baseURL) : null,
+    query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
+    body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
+    contentType: isMultipleContentTypes,
+    responseType: responseType ? JSON.stringify(responseType) : null,
+    headers: headers.length ? `{ ${headers.join(', ')}, ...requestConfig.headers }` : null,
+    requestConfigPlacement: 'first',
   })
 }
 
@@ -354,7 +335,7 @@ export function buildClassMethod({
     requestDataLine,
     queryParamsLine,
     formDataLine,
-    `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`,
+    `const res = await request<${generics.join(', ')}>(${clientParams})`,
     returnStatement,
   ]
     .filter(Boolean)

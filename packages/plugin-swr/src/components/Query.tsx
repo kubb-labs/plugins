@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
-import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
+import { buildClientOptionType, buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -30,7 +30,6 @@ function buildQueryParamsNode(
 ): ast.FunctionParametersNode {
   const { dataReturnType, resolver } = options
   const responseName = resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
@@ -40,7 +39,7 @@ function buildQueryParamsNode(
     name: 'options',
     type: `{
   query?: SWRConfiguration<${[TData, TError].join(', ')}>,
-  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'},
+  client?: ${buildClientOptionType(node, resolver)},
   shouldFetch?: boolean,
   immutable?: boolean
 }`,

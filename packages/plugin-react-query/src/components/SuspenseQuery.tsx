@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildClientOptionType, buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -32,7 +32,6 @@ function buildSuspenseQueryParamsNode(
   const { dataReturnType, resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
@@ -42,7 +41,7 @@ function buildSuspenseQueryParamsNode(
     name: 'options',
     type: `{
   query?: Partial<UseSuspenseQueryOptions<${[TData, TError, 'TData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
-  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
+  client?: ${buildClientOptionType(node, resolver)}
 }`,
     default: '{}',
   })

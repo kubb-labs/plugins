@@ -14,7 +14,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { createFunctionParams } from '../functionParams.ts'
+import { buildClientRequestArgs } from '../callArgs.ts'
 import type { PluginClient } from '../types.ts'
 import {
   buildBodyParamDescriptor,
@@ -104,38 +104,16 @@ export function Client({
   const { signature: paramsSignature, groups } = buildRequestParamsSignature(node, tsResolver, { isConfigurable })
   const urlParamsCall = groups.path ? 'path' : ''
 
-  const clientParams = createFunctionParams({
-    config: {
-      mode: 'object',
-      children: {
-        method: {
-          value: stringify(node.method.toUpperCase()),
-        },
-        url: {
-          value: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toGroupedTemplateString(node.path),
-        },
-        baseURL:
-          baseURL && !urlName
-            ? {
-                value: `\`${baseURL}\``,
-              }
-            : null,
-        query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
-        body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
-        contentType: isConfigurable && isMultipleContentTypes ? {} : null,
-        responseType: responseType ? { value: stringify(responseType) } : null,
-        requestConfig: isConfigurable
-          ? {
-              mode: 'inlineSpread',
-            }
-          : null,
-        headers: headers.length
-          ? {
-              value: isConfigurable ? `{ ${headers.join(', ')}, ...requestConfig.headers }` : `{ ${headers.join(', ')} }`,
-            }
-          : null,
-      },
-    },
+  const clientParams = buildClientRequestArgs({
+    method: stringify(node.method.toUpperCase()),
+    url: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toGroupedTemplateString(node.path),
+    baseURL: baseURL && !urlName ? `\`${baseURL}\`` : null,
+    query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
+    body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
+    contentType: isConfigurable && isMultipleContentTypes,
+    responseType: responseType ? stringify(responseType) : null,
+    headers: headers.length ? (isConfigurable ? `{ ${headers.join(', ')}, ...requestConfig.headers }` : `{ ${headers.join(', ')} }`) : null,
+    requestConfigPlacement: isConfigurable ? 'last' : null,
   })
 
   const statusUnionType = dataReturnType === 'full' ? buildStatusUnionType(node, tsResolver) : null
@@ -195,8 +173,8 @@ export function Client({
           {(isFormData || (isMultipleContentTypes && hasFormData)) && requestName && 'const formData = buildFormData(requestBody)'}
           <br />
           {isConfigurable
-            ? `const res = await request<${generics.join(', ')}>(${clientParams.toCall()})`
-            : `const res = await client<${generics.join(', ')}>(${clientParams.toCall()})`}
+            ? `const res = await request<${generics.join(', ')}>(${clientParams})`
+            : `const res = await client<${generics.join(', ')}>(${clientParams})`}
           <br />
           {childrenElement}
         </Function>

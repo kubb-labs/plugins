@@ -6,7 +6,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import type { Infinite, PluginReactQuery } from '../types.ts'
-import { buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildClientOptionType, buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -34,13 +34,12 @@ function buildSuspenseInfiniteQueryParamsNode(
   },
 ): ast.FunctionParametersNode {
   const { resolver, pageParamGeneric } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
 
   const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
-  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
+  client?: ${buildClientOptionType(node, resolver)}
 }`,
     default: '{}',
   })
