@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 
-import { ast, definePlugin } from '@kubb/core'
+import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { classClientGenerator } from './generators/classClientGenerator.tsx'
@@ -10,7 +10,7 @@ import { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 import { operationsGenerator } from './generators/operationsGenerator.ts'
 import { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
 import { resolverClient } from './resolvers/resolverClient.ts'
-import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from './templates.ts'
+import { contractAxiosClientTemplatePath, contractFetchClientTemplatePath } from './templates.ts'
 import type { PluginClient } from './types.ts'
 import { isParserEnabled } from './utils.ts'
 
@@ -53,7 +53,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     include,
     override = [],
     urlType = false,
-    dataReturnType = 'data',
     operations = false,
     clientType = options.sdk ? 'class' : 'function',
     parser = false,
@@ -94,7 +93,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           override,
           group: groupConfig,
           parser,
-          dataReturnType,
           importPath: resolvedImportPath,
           baseURL,
           urlType,
@@ -111,38 +109,19 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
 
-        // Only emit the bundled client when no `importPath` is set. Any `importPath` (a relative
-        // module or a package such as `@kubb/plugin-client/clients/axios`) makes the generated
-        // code import the client from there, so no `.kubb/client.ts` is written.
+        // Only emit the bundled client when no `importPath` is set. Any `importPath` makes the
+        // generated code import the client from there, so no `.kubb/client.ts` is written. The
+        // bundled runtime is the shared `RequestResult` contract, the same template plugin-fetch
+        // and plugin-axios inject, so the contract serializes form-data in its own runtime and no
+        // separate `config.ts` is needed.
         if (!resolvedImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
-            sources: [
-              ast.factory.createSource({
-                name: 'client',
-                nodes: [],
-                isExportable: true,
-                isIndexable: true,
-              }),
-            ],
+            copy: client === 'fetch' ? contractFetchClientTemplatePath : contractAxiosClientTemplatePath,
+            footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
           })
         }
-
-        ctx.injectFile({
-          baseName: 'config.ts',
-          path: path.resolve(root, '.kubb/config.ts'),
-          copy: configTemplatePath,
-          sources: [
-            ast.factory.createSource({
-              name: 'config',
-              nodes: [],
-              isExportable: false,
-              isIndexable: false,
-            }),
-          ],
-        })
       },
     },
   }

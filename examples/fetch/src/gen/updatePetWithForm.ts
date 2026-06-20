@@ -3,29 +3,18 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['path']) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function updatePetWithForm<ThrowOnError extends boolean = true>(
+  options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
+): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
-    method: 'POST',
-    url: getUpdatePetWithFormUrl(path).url.toString(),
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
 }

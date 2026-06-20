@@ -3,30 +3,19 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getFindPetsByStatusUrl() {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/findByStatus` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByStatus<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-    method: 'GET',
-    url: getFindPetsByStatusUrl().url.toString(),
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/findByStatus', ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }

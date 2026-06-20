@@ -3,29 +3,19 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getGetOrderByIdUrl(path: GetOrderByIdRequestConfig['path']) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/store/order/${path.orderId}` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getOrderById<ThrowOnError extends boolean = true>(
+  options: Options<GetOrderByIdRequestConfig, ThrowOnError>,
+): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
-    method: 'GET',
-    url: getGetOrderByIdUrl(path).url.toString(),
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'GET', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>
 }

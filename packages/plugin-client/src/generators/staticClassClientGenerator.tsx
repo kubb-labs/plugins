@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { getOperationParameters, operationFileEntry } from '@internals/shared'
 import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -27,7 +27,7 @@ type Controller = {
 }
 
 function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs): Array<string> {
-  return [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false })]
+  return [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponsesName(node)]
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {
@@ -51,8 +51,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
   renderer: jsxRenderer,
   operations(nodes, ctx) {
     const { config, driver, resolver, root } = ctx
-    const { output, group, dataReturnType, parser, importPath } = ctx.options
-    const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
+    const { output, group, parser, importPath } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -168,7 +167,9 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
           const { zodImportsByFile, zodFilesByPath } = isParserEnabled(parser)
             ? collectZodImports(ops)
             : { zodImportsByFile: new Map<string, Set<string>>(), zodFilesByPath: new Map<string, ast.FileNode>() }
-          const hasFormData = ops.some((op) => op.node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false)
+
+          const clientPath = importPath ?? path.resolve(root, '.kubb/client.ts')
+          const clientImportProps = importPath ? { path: clientPath } : { root: file.path, path: clientPath }
 
           return (
             <File
@@ -179,26 +180,8 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
               banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
               footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })}
             >
-              {importPath ? (
-                <>
-                  <File.Import name={'client'} path={importPath} />
-                  <File.Import name={['mergeConfig']} path={importPath} />
-                  <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={importPath} isTypeOnly />
-                </>
-              ) : (
-                <>
-                  <File.Import name={['client']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
-                  <File.Import name={['mergeConfig']} root={file.path} path={path.resolve(root, '.kubb/client.ts')} />
-                  <File.Import
-                    name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
-                    root={file.path}
-                    path={path.resolve(root, '.kubb/client.ts')}
-                    isTypeOnly
-                  />
-                </>
-              )}
-
-              {hasFormData && <File.Import name={['buildFormData']} root={file.path} path={path.resolve(root, '.kubb/config.ts')} />}
+              <File.Import name={['client']} {...clientImportProps} />
+              <File.Import name={['ClientInstance', 'Options', 'RequestConfig', 'RequestResult']} {...clientImportProps} isTypeOnly />
 
               {parser === 'zod' && zodResolver && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && (
                 <File.Import name={['z']} path="zod" isTypeOnly />
@@ -221,7 +204,7 @@ export const staticClassClientGenerator = defineGenerator<PluginClient>({
                   return <File.Import key={filePath} name={importNames} root={file.path} path={zodFile.path} />
                 })}
 
-              <StaticClassClient name={name} operations={ops} baseURL={baseURL} dataReturnType={dataReturnType} parser={parser} />
+              <StaticClassClient name={name} operations={ops} parser={parser} />
             </File>
           )
         })}

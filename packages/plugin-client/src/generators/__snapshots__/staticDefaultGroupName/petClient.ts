@@ -3,54 +3,42 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetRequestConfig, DeletePetStatus200 } from './DeletePet'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200 } from './FindPetsByTags'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
-import { client, mergeConfig } from './.kubb/client'
+import type { ClientInstance, Options, RequestConfig, RequestResult } from './.kubb/client'
+import type { DeletePetRequestConfig, DeletePetResponses } from './DeletePet'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from './FindPetsByTags'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from './UpdatePetWithForm'
+import { client } from './.kubb/client'
 
 export class PetClient {
-  static #config: Partial<RequestConfig> & { client?: Client } = {}
+  static #config: Partial<RequestConfig> & { client?: ClientInstance } = {}
 
   /**
    * {@link /pet/findByTags}
    */
-  static async findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/pet/findByTags`, query })
-    return res.data
+  static async findPetsByTags<ThrowOnError extends boolean = true>(
+    options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
   }
 
   /**
    * {@link /pet/:petId}
    */
-  static async updatePetWithForm(
-    { path, body }: UpdatePetWithFormRequestConfig,
-    config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
-  ) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/pet/${path.petId}`,
-      body: requestBody,
-    })
-    return res.data
+  static async updatePetWithForm<ThrowOnError extends boolean = true>(
+    options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
   }
 
   /**
    * {@link /pet/:petId}
    */
-  static async deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
-    const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({
-      ...requestConfig,
-      method: 'DELETE',
-      url: `/pet/${path.petId}`,
-      headers: { ...mappedHeaders, ...requestConfig.headers },
-    })
-    return res.data
+  static async deletePet<ThrowOnError extends boolean = true>(
+    options: Options<DeletePetRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
   }
 }

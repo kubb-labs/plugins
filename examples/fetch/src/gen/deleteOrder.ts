@@ -3,29 +3,19 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getDeleteOrderUrl(path: DeleteOrderRequestConfig['path']) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/store/order/${path.orderId}` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { DeleteOrderRequestConfig, DeleteOrderResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function deleteOrder({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function deleteOrder<ThrowOnError extends boolean = true>(
+  options: Options<DeleteOrderRequestConfig, ThrowOnError>,
+): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
-    method: 'DELETE',
-    url: getDeleteOrderUrl(path).url.toString(),
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'DELETE', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<DeleteOrderResponses, ThrowOnError>>
 }

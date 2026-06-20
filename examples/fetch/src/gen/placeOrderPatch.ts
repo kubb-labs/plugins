@@ -3,39 +3,19 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getPlaceOrderPatchUrl() {
-  const res = { method: 'PATCH', url: `https://petstore3.swagger.io/api/v3/store/order` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @description Place a new order in the store with patch
  * @summary Place an order for a pet with patch
  * {@link /store/order}
  */
-export async function placeOrderPatch(
-  { body }: PlaceOrderPatchRequestConfig,
-  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function placeOrderPatch<ThrowOnError extends boolean = true>(
+  options: Options<PlaceOrderPatchRequestConfig, ThrowOnError>,
+): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
-    method: 'PATCH',
-    url: getPlaceOrderPatchUrl().url.toString(),
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'PATCH', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>
 }

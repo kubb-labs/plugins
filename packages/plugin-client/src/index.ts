@@ -1,10 +1,18 @@
-export { Client } from './components/Client.tsx'
+export { Operation } from '@internals/client'
 export { classClientGenerator } from './generators/classClientGenerator.tsx'
 export { clientGenerator } from './generators/clientGenerator.tsx'
 export { groupedClientGenerator } from './generators/groupedClientGenerator.tsx'
 export { operationsGenerator } from './generators/operationsGenerator.ts'
 export { staticClassClientGenerator } from './generators/staticClassClientGenerator.tsx'
+export { LegacyClient } from './legacy/LegacyClient.tsx'
 export { default, pluginClient, pluginClientName } from './plugin.ts'
 export { resolverClient } from './resolvers/resolverClient.ts'
+export {
+  axiosClientTemplatePath,
+  configTemplatePath,
+  contractAxiosClientTemplatePath,
+  contractFetchClientTemplatePath,
+  fetchClientTemplatePath,
+} from './templates.ts'
 export { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from './utils.ts'
 export type { ClientImportPath, PluginClient, ResolverClient } from './types.ts'

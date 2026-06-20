@@ -1,18 +1,21 @@
 import path from 'node:path'
-import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { Operation, resolveRequestParser, resolveResponseParser } from '@internals/client'
+import { operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { Client } from '../components/Client'
 import { Url } from '../components/Url.tsx'
 import type { PluginClient } from '../types'
-import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../utils.ts'
+import { isParserEnabled } from '../utils.ts'
 
 /**
- * Built-in operation generator for `@kubb/plugin-client`. Emits one async
- * function per OpenAPI operation, plus the matching URL helper. Used when
- * `clientType: 'function'` (the default).
+ * Built-in operation generator for `@kubb/plugin-client` when `clientType: 'function'` (the
+ * default). Emits one async function per OpenAPI operation using the shared `Operation` component,
+ * so the output is the `RequestResult` contract identical to plugin-fetch: a grouped `options`
+ * object and a `Promise<RequestResult<...>>` return. The optional `get<Operation>Url` helper is
+ * still exported when `urlType: 'export'`, but the function body forwards a literal `url` and never
+ * references it.
  */
 export const clientGenerator = defineGenerator<PluginClient>({
   name: 'client',
@@ -20,33 +23,27 @@ export const clientGenerator = defineGenerator<PluginClient>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, urlType, dataReturnType, parser, importPath, group } = ctx.options
+    const { output, urlType, parser, importPath, group } = ctx.options
     const baseURL = ctx.options.baseURL ?? ctx.meta.baseURL
 
     const pluginTs = driver.getPlugin(pluginTsName)
-
-    if (!pluginTs) {
-      return null
-    }
+    if (!pluginTs) return null
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
+    const parserEnabled = isParserEnabled(parser)
+    const pluginZod = parserEnabled ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    const { query: queryParams } = getOperationParameters(node)
-
-    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
+    const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
+    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponsesName(node)]
 
     const importedZodNames = zodResolver
       ? [
           resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
-          resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
-          resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
+          resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null,
         ].filter((name): name is string => Boolean(name))
       : []
-
-    const zodRequestName = zodResolver && parser === 'zod' && node.requestBody?.content?.[0]?.schema ? (zodResolver.resolveDataName?.(node) ?? null) : null
 
     const meta = {
       name: resolver.resolveName(node.operationId),
@@ -67,7 +64,10 @@ export const clientGenerator = defineGenerator<PluginClient>({
           : null,
     } as const
 
-    const hasFormData = node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') ?? false
+    // Without `importPath` the contract runtime is bundled into `.kubb/client.ts`. Any `importPath`
+    // opts out: the generated code imports `client`, `Options`, and `RequestResult` from there.
+    const clientPath = importPath ?? path.resolve(root, '.kubb/client.ts')
+    const clientImportProps = importPath ? { path: clientPath } : { root: meta.file.path, path: clientPath }
 
     return (
       <File
@@ -77,45 +77,27 @@ export const clientGenerator = defineGenerator<PluginClient>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {importPath ? (
-          <>
-            <File.Import name={'client'} path={importPath} />
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={importPath} isTypeOnly />
-          </>
-        ) : (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
-            <File.Import
-              name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
-              root={meta.file.path}
-              path={path.resolve(root, '.kubb/client.ts')}
-              isTypeOnly
-            />
-          </>
-        )}
-
-        {hasFormData && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
-
-        {zodRequestName && <File.Import name={['z']} path="zod" isTypeOnly />}
-
-        {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames as Array<string>} root={meta.file.path} path={meta.fileZod.path} />}
+        <File.Import name={['client']} {...clientImportProps} />
+        <File.Import name={['Options', 'RequestResult']} {...clientImportProps} isTypeOnly />
 
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
 
-        <Url name={meta.urlName} baseURL={baseURL} node={node} tsResolver={tsResolver} isIndexable={urlType === 'export'} isExportable={urlType === 'export'} />
+        {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
 
-        <Client
-          name={meta.name}
-          urlName={meta.urlName}
-          baseURL={baseURL}
-          dataReturnType={dataReturnType}
-          node={node}
-          tsResolver={tsResolver}
-          zodResolver={zodResolver}
-          parser={parser}
-        />
+        {urlType === 'export' && (
+          <Url
+            name={meta.urlName}
+            baseURL={baseURL}
+            node={node}
+            tsResolver={tsResolver}
+            isIndexable={urlType === 'export'}
+            isExportable={urlType === 'export'}
+          />
+        )}
+
+        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />
       </File>
     )
   },

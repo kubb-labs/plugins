@@ -3,39 +3,19 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { UpdatePetRequestConfig, UpdatePetData, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getUpdatePetUrl() {
-  const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/pet` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { UpdatePetRequestConfig, UpdatePetResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @description Update an existing pet by Id
  * @summary Update an existing pet
  * {@link /pet}
  */
-export async function updatePet(
-  { body }: UpdatePetRequestConfig,
-  config: Partial<RequestConfig<UpdatePetData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function updatePet<ThrowOnError extends boolean = true>(
+  options: Options<UpdatePetRequestConfig, ThrowOnError>,
+): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
-    method: 'PUT',
-    url: getUpdatePetUrl().url.toString(),
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'PUT', url: '/pet', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

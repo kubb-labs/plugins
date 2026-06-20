@@ -1,29 +1,20 @@
 /* eslint-disable no-alert, no-console */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../../../models/ts/pet/AddPet.ts'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../../models/ts/pet/DeletePet.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.ts'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById.ts'
-import type {
-  UpdatePetRequestConfig,
-  UpdatePetData,
-  UpdatePetStatus200,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../../../models/ts/pet/UpdatePet.ts'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../../models/ts/pet/UpdatePetWithForm.ts'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../../../models/ts/pet/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { buildFormData } from '../../../.kubb/config.ts'
-import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
+import type { ClientInstance, Options, RequestConfig, RequestResult } from '../../../.kubb/client.ts'
+import type { AddPetRequestConfig, AddPetResponses } from '../../../models/ts/pet/AddPet.ts'
+import type { DeletePetRequestConfig, DeletePetResponses } from '../../../models/ts/pet/DeletePet.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../../models/ts/pet/GetPetById.ts'
+import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../../models/ts/pet/UpdatePet.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../../models/ts/pet/UpdatePetWithForm.ts'
+import type { UploadFileRequestConfig, UploadFileResponses } from '../../../models/ts/pet/UploadFile.ts'
+import { client } from '../../../.kubb/client.ts'
 
 export class pet {
-  #config: Partial<RequestConfig> & { client?: Client }
+  #config: Partial<RequestConfig> & { client?: ClientInstance }
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
     this.#config = config
   }
 
@@ -32,23 +23,11 @@ export class pet {
    * @summary Update an existing pet
    * {@link /pet}
    */
-  async updatePet(
-    { body }: UpdatePetRequestConfig,
-    config: Partial<RequestConfig<UpdatePetData>> & {
-      client?: Client
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-    } = {},
-  ) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
-      ...requestConfig,
-      method: 'PUT',
-      url: `/pet`,
-      body: requestBody,
-      contentType,
-    })
-    return res.data
+  async updatePet<ThrowOnError extends boolean = true>(
+    options: Options<UpdatePetRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'PUT', url: '/pet', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
   }
 
   /**
@@ -56,23 +35,11 @@ export class pet {
    * @summary Add a new pet to the store
    * {@link /pet}
    */
-  async addPet(
-    { body }: AddPetRequestConfig,
-    config: Partial<RequestConfig<AddPetData>> & {
-      client?: Client
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-    } = {},
-  ) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/pet`,
-      body: requestBody,
-      contentType,
-    })
-    return res.data
+  async addPet<ThrowOnError extends boolean = true>(
+    options: Options<AddPetRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
   }
 
   /**
@@ -80,15 +47,11 @@ export class pet {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-  async findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-      ...requestConfig,
-      method: 'GET',
-      url: `/pet/findByStatus`,
-      query,
-    })
-    return res.data
+  async findPetsByStatus<ThrowOnError extends boolean = true>(
+    options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/pet/findByStatus', ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
   }
 
   /**
@@ -96,15 +59,11 @@ export class pet {
    * @summary Finds Pets by tags
    * {@link /pet/findByTags}
    */
-  async findPetsByTags({ query }: FindPetsByTagsRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
-      ...requestConfig,
-      method: 'GET',
-      url: `/pet/findByTags`,
-      query,
-    })
-    return res.data
+  async findPetsByTags<ThrowOnError extends boolean = true>(
+    options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
   }
 
   /**
@@ -112,29 +71,22 @@ export class pet {
    * @summary Find pet by ID
    * {@link /pet/:petId}
    */
-  async getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
-      ...requestConfig,
-      method: 'GET',
-      url: `/pet/${path.petId}`,
-    })
-    return res.data
+  async getPetById<ThrowOnError extends boolean = true>(
+    options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }
 
   /**
    * @summary Updates a pet in the store with form data
    * {@link /pet/:petId}
    */
-  async updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/pet/${path.petId}`,
-      query,
-    })
-    return res.data
+  async updatePetWithForm<ThrowOnError extends boolean = true>(
+    options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
   }
 
   /**
@@ -142,37 +94,21 @@ export class pet {
    * @summary Deletes a pet
    * {@link /pet/:petId}
    */
-  async deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
-    const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
-      ...requestConfig,
-      method: 'DELETE',
-      url: `/pet/${path.petId}`,
-      headers: { ...mappedHeaders, ...requestConfig.headers },
-    })
-    return res.data
+  async deletePet<ThrowOnError extends boolean = true>(
+    options: Options<DeletePetRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
   }
 
   /**
    * @summary uploads an image
    * {@link /pet/:petId/uploadImage}
    */
-  async uploadFile(
-    { path, query, body }: UploadFileRequestConfig,
-    config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
-  ) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const formData = buildFormData(requestBody)
-    const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/pet/${path.petId}/uploadImage`,
-      query,
-      body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
-      contentType,
-    })
-    return res.data
+  async uploadFile<ThrowOnError extends boolean = true>(
+    options: Options<UploadFileRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
   }
 }

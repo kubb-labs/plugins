@@ -21,7 +21,6 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
-  dataReturnType: 'data',
   client: 'axios',
   clientType: 'class',
   importPath: undefined,

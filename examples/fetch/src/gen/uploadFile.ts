@@ -3,38 +3,18 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from './models.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { buildFormData } from './.kubb/config.ts'
-
-function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}/uploadImage` as const }
-
-  return res
-}
+import type { Options, RequestResult } from './.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileResponses } from './models.ts'
+import { client } from './.kubb/client.ts'
 
 /**
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(
-  { path, query, body }: UploadFileRequestConfig,
-  config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function uploadFile<ThrowOnError extends boolean = true>(
+  options: Options<UploadFileRequestConfig, ThrowOnError>,
+): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-  const formData = buildFormData(requestBody)
-
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
-    method: 'POST',
-    url: getUploadFileUrl(path).url.toString(),
-    query,
-    body: contentType === 'multipart/form-data' ? (formData as FormData) : requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }

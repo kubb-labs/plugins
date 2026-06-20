@@ -1,3 +1,4 @@
+export * from './.kubb/client.ts'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,

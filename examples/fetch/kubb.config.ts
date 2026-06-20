@@ -30,7 +30,6 @@ export default defineConfig(() => {
           path: '.',
         },
         client: 'fetch',
-        importPath: '@kubb/plugin-client/clients/fetch',
       }),
     ],
   }

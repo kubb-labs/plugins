@@ -1,29 +1,18 @@
 /* eslint-disable no-alert, no-console */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.js'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-
-function getFindPetsByStatusUrl() {
-  const res = { method: 'GET', url: `/pet/findByStatus` as const }
-
-  return res
-}
+import type { Options, RequestResult } from '../../../.kubb/client.js'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.js'
+import { client } from '../../../.kubb/client.js'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByStatus<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-    method: 'GET',
-    url: getFindPetsByStatusUrl().url.toString(),
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/findByStatus', ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }
