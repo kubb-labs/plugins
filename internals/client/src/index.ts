@@ -10,7 +10,7 @@ export {
 export { buildReturnStatement } from './builders/returnStatement.ts'
 export { buildSecurityMetadata, type SecurityRequirement } from './builders/security.ts'
 export { buildGroupedOptionsSignature, type GroupedOptionsSignature } from './builders/signature.ts'
-export { buildValidatorHooks, type ValidatorHooks } from './builders/validator.ts'
+export { buildParserHooks, type ParserHooks } from './builders/validator.ts'
 export { Operation } from './components/Operation.tsx'
 export { defaultMacros } from './macros.ts'
 export { resolveOptions } from './options.ts'

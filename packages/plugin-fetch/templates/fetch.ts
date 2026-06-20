@@ -47,10 +47,10 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
 export type BodySerializer = (body: unknown, contentType?: string) => BodyInit | undefined
 
 /**
- * Validates a value before it is sent or after it is received, returning the (optionally
- * transformed) value. Used to wire zod parsing through `requestValidator` / `responseValidator`.
+ * Parses a value before it is sent or after it is received, returning the parsed (and optionally
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
  */
-export type Validator<T = unknown> = (value: T) => T | Promise<T>
+export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
 /**
  * A single OpenAPI security requirement: scheme name to the scopes it needs.
@@ -95,8 +95,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  requestValidator?: Validator
-  responseValidator?: Validator
+  parser?: { request?: Parser; response?: Parser }
   security?: Array<SecurityRequirement>
   schemes?: Record<string, SecurityScheme>
   auth?: AuthCallback
@@ -367,9 +366,9 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runValidator<T>(validator: Validator | undefined, value: T): Promise<T> {
-  if (!validator) return value
-  return (await validator(value)) as T
+async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
+  if (!parser) return value
+  return (await parser(value)) as T
 }
 
 /**
@@ -409,7 +408,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     })
 
     const rawBody = requestConfig.body
-    const validatedBody = await runValidator(requestConfig.requestValidator, rawBody)
+    const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
     const search = querySerializer(query)
     const pathParams = requestConfig.path ?? {}
     const interpolatedUrl = [config.baseURL, requestConfig.baseURL, requestConfig.url]
@@ -447,7 +446,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       throw error
     }
 
-    const data = isSuccess ? await runValidator(requestConfig.responseValidator, result.data) : undefined
+    const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
 
     return {
       data,
