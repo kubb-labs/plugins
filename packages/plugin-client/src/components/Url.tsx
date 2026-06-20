@@ -24,7 +24,7 @@ type GetParamsProps = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
 function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
-  const { path: pathParams } = getOperationParameters(node)
+  const { path: pathParams } = getOperationParameters(node, { paramsCasing: 'original' })
 
   if (pathParams.length === 0) {
     return ast.factory.createFunctionParameters({ params: [] })

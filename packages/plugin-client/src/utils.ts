@@ -182,7 +182,7 @@ function buildClassClientParams({
   zodQueryParamsName?: string | null
   queryParamsMapping?: Record<string, string> | null
 }) {
-  const { query: queryParams } = getOperationParameters(node)
+  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
   const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
   const responseType = getResponseType(node)
@@ -258,7 +258,7 @@ function buildQueryParamsLine({
   zodResolver?: ResolverZod | null
 }): string {
   if (resolveQueryParamsParser(parser) !== 'zod' || !zodResolver) return ''
-  const { query: queryParams } = getOperationParameters(node)
+  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   if (queryParams.length === 0) return ''
   const zodQueryParamsName = zodResolver.resolveQueryParamsName?.(node, queryParams[0]!)
   if (!zodQueryParamsName) return ''
@@ -300,8 +300,8 @@ export function buildClassMethod({
   if (!ast.isHttpOperationNode(node)) return ''
   const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
-  const { query: queryParams, header: headerParams } = getOperationParameters(node)
-  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'original' })
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node)
 
   const queryParamsMapping = buildParamsMapping(queryParams, casedQueryParams)
   const headerParamsMapping = buildParamsMapping(headerParams, casedHeaderParams)

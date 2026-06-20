@@ -55,7 +55,6 @@ export const queryGenerator = defineGenerator<PluginVueQuery>({
     const importedTypeNames = [
       tsResolver.resolveRequestConfigName(node),
       ...resolveOperationTypeNames(node, tsResolver, {
-        paramsCasing: 'camelcase',
         exclude: [queryKeyTypeName],
         order: 'body-response-first',
         includeParams: false,

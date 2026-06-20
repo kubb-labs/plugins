@@ -28,7 +28,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', responseStatusNames: 'error' })
+    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { responseStatusNames: 'error' })
 
     const meta = {
       name: resolver.resolveHandlerName(node),

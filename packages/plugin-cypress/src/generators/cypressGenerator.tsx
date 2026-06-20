@@ -26,10 +26,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = [
-      tsResolver.resolveRequestConfigName(node),
-      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', includeParams: false }),
-    ]
+    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
 
     const meta = {
       name: resolver.resolveName(node.operationId),

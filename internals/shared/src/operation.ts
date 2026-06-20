@@ -64,7 +64,7 @@ type ResponseLike = {
 export type OperationParameterGroups = Record<ast.ParameterNode['in'], Array<ast.ParameterNode>>
 
 export type ResolveOperationTypeNameOptions = {
-  paramsCasing?: 'camelcase'
+  paramsCasing?: 'camelcase' | 'original'
   responseStatusNames?: boolean | 'error'
   exclude?: ReadonlyArray<string | undefined>
   order?: 'params-first' | 'body-response-first'
@@ -286,8 +286,8 @@ export function buildOperationComments(node: ast.OperationNode, options: BuildOp
   return filteredComments.flatMap((text) => text.split(/\r?\n/).map((line) => line.trim())).filter((comment): comment is string => Boolean(comment))
 }
 
-export function getOperationParameters(node: ast.OperationNode, options: { paramsCasing?: 'camelcase' } = {}): OperationParameterGroups {
-  const params = caseParams(node.parameters, options.paramsCasing)
+export function getOperationParameters(node: ast.OperationNode, options: { paramsCasing?: 'camelcase' | 'original' } = {}): OperationParameterGroups {
+  const params = caseParams(node.parameters, options.paramsCasing === 'original' ? undefined : 'camelcase')
 
   return {
     path: params.filter((param) => param.in === 'path'),

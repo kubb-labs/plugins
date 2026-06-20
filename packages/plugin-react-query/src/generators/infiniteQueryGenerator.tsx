@@ -39,7 +39,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
     // Validate queryParam exists in operation's query parameters
     const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
+    const queryParamKeys = getOperationParameters(node, { paramsCasing: 'original' }).query.map((p) => p.name)
     const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
     // cursorParam validation against response schema keys is skipped in v5 (complex schema inspection)
     const hasCursorParam = !infiniteOptions.cursorParam || true
@@ -63,7 +63,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       }),
     }
 
-    const rawQueryParams = getOperationParameters(node).query
+    const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
     const queryParamsTypeName =
       rawQueryParams.length > 0 && tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
         ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
@@ -73,7 +73,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       tsResolver.resolveRequestConfigName(node),
       queryParamsTypeName,
       ...resolveOperationTypeNames(node, tsResolver, {
-        paramsCasing: 'camelcase',
         exclude: [queryKeyTypeName],
         order: 'body-response-first',
         includeParams: false,
