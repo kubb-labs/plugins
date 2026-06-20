@@ -214,6 +214,28 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
+  examples/axios-slim:
+    dependencies:
+      '@kubb/adapter-oas':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
+      '@kubb/plugin-axios':
+        specifier: workspace:*
+        version: link:../../packages/plugin-axios
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../../packages/plugin-ts
+      axios:
+        specifier: ^1.18.0
+        version: 1.18.0
+      kubb:
+        specifier: 'catalog:'
+        version: 5.0.0-beta.71(openapi-types@12.1.3)(typescript@6.0.3)
+    devDependencies:
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
+
   examples/client:
     dependencies:
       '@kubb/adapter-oas':
@@ -729,6 +751,40 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.19.21
+
+  packages/plugin-axios:
+    dependencies:
+      '@internals/client':
+        specifier: workspace:*
+        version: link:../../internals/client
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
+      '@kubb/ast':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.71
+      '@kubb/core':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
+      '@kubb/plugin-ts':
+        specifier: workspace:*
+        version: link:../plugin-ts
+      '@kubb/plugin-zod':
+        specifier: workspace:*
+        version: link:../plugin-zod
+      '@kubb/renderer-jsx':
+        specifier: 'catalog:'
+        version: 5.0.0-beta.71
+    devDependencies:
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
+      axios:
+        specifier: ^1.18.0
+        version: 1.18.0
+      typescript:
+        specifier: 'catalog:'
+        version: 6.0.3
 
   packages/plugin-client:
     dependencies:
