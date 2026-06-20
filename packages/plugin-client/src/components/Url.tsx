@@ -23,7 +23,7 @@ type GetParamsProps = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
+function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
   const { path: pathParams } = getOperationParameters(node)
 
   if (pathParams.length === 0) {

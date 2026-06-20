@@ -109,7 +109,7 @@ export { buildStatusUnionType }
  * `headerSpread` is the expression spread into the headers object, swapped to
  * `...mappedHeaders` when the wire names need remapping to camelCase.
  */
-export function buildHeaders(contentType: string, hasHeaderParams: boolean, headerSpread = '...headers'): Array<string> {
+function buildHeaders(contentType: string, hasHeaderParams: boolean, headerSpread = '...headers'): Array<string> {
   return [
     contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
     hasHeaderParams ? headerSpread : null,
@@ -124,7 +124,7 @@ export function buildHeaders(contentType: string, hasHeaderParams: boolean, head
  * status types. When `parser` is `'zod'` and a request body schema exists, the request type
  * uses `z.input<typeof schema>` to match what the user provides before zod transforms/defaults are applied.
  */
-export function buildGenerics(
+function buildGenerics(
   node: ast.OperationNode,
   tsResolver: ResolverTs,
   options: {
@@ -159,7 +159,7 @@ export function buildGenerics(
  * Builds the parameters object for a class-based client method.
  * Includes URL, method, base URL, headers, and request/response data.
  */
-export function buildClassClientParams({
+function buildClassClientParams({
   node,
   url,
   baseURL,
@@ -223,7 +223,7 @@ export function buildClassClientParams({
  * Builds the request data parsing line for client methods.
  * Applies Zod validation when `parser.request === 'zod'`, otherwise assigns data directly.
  */
-export function buildRequestDataLine({
+function buildRequestDataLine({
   parser,
   node,
   zodResolver,
@@ -248,7 +248,7 @@ export function buildRequestDataLine({
  * Returns an empty string when no query params exist or query-params parsing is not enabled.
  * Only the object form `parser: { request: 'zod' }` triggers this. `parser: 'zod'` does not.
  */
-export function buildQueryParamsLine({
+function buildQueryParamsLine({
   parser,
   node,
   zodResolver,
@@ -269,7 +269,7 @@ export function buildQueryParamsLine({
  * Builds the form data conversion line for file upload requests.
  * Returns empty string if not applicable.
  */
-export function buildFormDataLine(isFormData: boolean, hasRequest: boolean): string {
+function buildFormDataLine(isFormData: boolean, hasRequest: boolean): string {
   return isFormData && hasRequest ? 'const formData = buildFormData(requestBody)' : ''
 }
 
@@ -370,7 +370,7 @@ export function buildClassMethod({
  * When `dataReturnType` is `'full'`, casts the response to the status-discriminated union type.
  * When `parser.response` is `'zod'`, pipes the response body through the Zod schema before returning.
  */
-export function buildReturnStatement({
+function buildReturnStatement({
   dataReturnType,
   parser,
   node,
