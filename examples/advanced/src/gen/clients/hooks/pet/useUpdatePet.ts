@@ -28,7 +28,7 @@ export function updatePetMutationOptions<TContext = unknown>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >({
     mutationKey,
@@ -52,7 +52,7 @@ export function useUpdatePet<TContext>(
       | { status: 404; data: UpdatePetStatus404; statusText: string }
       | { status: 405; data: UpdatePetStatus405; statusText: string },
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      Omit<UpdatePetRequestConfig, 'url'>,
+      UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetData>> & {
@@ -72,7 +72,7 @@ export function useUpdatePet<TContext>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >
 
@@ -83,7 +83,7 @@ export function useUpdatePet<TContext>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >(
     {
@@ -99,7 +99,7 @@ export function useUpdatePet<TContext>(
     | { status: 404; data: UpdatePetStatus404; statusText: string }
     | { status: 405; data: UpdatePetStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >
 }

@@ -19,7 +19,7 @@ export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
@@ -29,7 +29,7 @@ export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 
   return deletePetResponseSchema.parse(res.data)
 }
 
-export type DeletePetMutationArg = Omit<DeletePetRequestConfig, 'url'>
+export type DeletePetMutationArg = DeletePetRequestConfig
 
 /**
  * @description delete a pet

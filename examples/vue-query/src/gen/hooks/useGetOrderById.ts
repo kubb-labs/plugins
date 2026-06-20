@@ -11,7 +11,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>['path']> }) =>
+export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'headers'>['path']> }) =>
   [{ url: '/store/order/:orderId', params: path }] as const
 
 export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
@@ -21,7 +21,7 @@ export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
@@ -34,7 +34,7 @@ export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'ur
 }
 
 export function getOrderByIdQueryOptions(
-  { path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'url'>['path']> },
+  { path }: { path: MaybeRefOrGetter<GetOrderByIdRequestConfig['path']> },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
@@ -52,7 +52,7 @@ export function getOrderByIdQueryOptions(
  * {@link /store/order/:orderId}
  */
 export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetOrderByIdStatus200, TQueryKey extends QueryKey = GetOrderByIdQueryKey>(
-  { path }: { path: MaybeRefOrGetter<Omit<GetOrderByIdRequestConfig, 'url'>['path']> },
+  { path }: { path: MaybeRefOrGetter<GetOrderByIdRequestConfig['path']> },
   options: {
     query?: Partial<
       UseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>

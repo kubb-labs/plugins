@@ -37,10 +37,6 @@ export type PlaceOrderPatchRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**

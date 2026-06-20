@@ -13,7 +13,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
 
-export type DeletePetMutationArg = Omit<DeletePetRequestConfig, 'url'>
+export type DeletePetMutationArg = DeletePetRequestConfig
 
 /**
  * @description delete a pet

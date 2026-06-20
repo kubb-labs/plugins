@@ -9,7 +9,7 @@ import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400,
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
@@ -18,7 +18,7 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${path.petId}`, ...requestConfig })
@@ -26,7 +26,7 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
   return res as ({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string })
 }
 
-export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return getPetById({ path }, config)
@@ -39,7 +39,7 @@ export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, '
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, options: {
+export function useGetPetById({ path }: GetPetByIdRequestConfig, options: {
   query?: SWRConfiguration<({ status: 200; data: GetPetByIdStatus200; statusText: string } | { status: 400; data: GetPetByIdStatus400; statusText: string } | { status: 404; data: GetPetByIdStatus404; statusText: string }), ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
   client?: Partial<RequestConfig> & { client?: Client },
   shouldFetch?: boolean,

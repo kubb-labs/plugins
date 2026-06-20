@@ -19,7 +19,7 @@ function getPlaceOrderPatchUrl() {
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  { body }: Omit<PlaceOrderPatchRequestConfig, 'url'>,
+  { body }: PlaceOrderPatchRequestConfig,
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'

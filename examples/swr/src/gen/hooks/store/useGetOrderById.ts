@@ -15,7 +15,7 @@ import type {
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 
-export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
+export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
@@ -24,7 +24,7 @@ type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
  * @summary Find purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
@@ -36,7 +36,7 @@ export async function getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'ur
   return res.data
 }
 
-export function getOrderByIdQueryOptions({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdQueryOptions({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return getOrderById({ path }, config)
@@ -50,7 +50,7 @@ export function getOrderByIdQueryOptions({ path }: Omit<GetOrderByIdRequestConfi
  * {@link /store/order/:orderId}
  */
 export function useGetOrderById(
-  { path }: Omit<GetOrderByIdRequestConfig, 'url'>,
+  { path }: GetOrderByIdRequestConfig,
   options: {
     query?: SWRConfiguration<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>
     client?: Partial<RequestConfig> & { client?: Client }

@@ -25,7 +25,7 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export async function updatePetHook(
-  { body }: Omit<UpdatePetRequestConfig, 'url'>,
+  { body }: UpdatePetRequestConfig,
   config: Partial<RequestConfig<UpdatePetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -56,7 +56,7 @@ export function updatePetMutationOptionsHook<TContext = unknown>(
   return mutationOptions<
     UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >({
     mutationKey,
@@ -76,7 +76,7 @@ export function useUpdatePetHook<TContext>(
     mutation?: UseMutationOptions<
       UpdatePetStatus200,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      Omit<UpdatePetRequestConfig, 'url'>,
+      UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetData>> & {
@@ -92,22 +92,17 @@ export function useUpdatePetHook<TContext>(
   const baseOptions = updatePetMutationOptionsHook(config) as UseMutationOptions<
     UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useUpdatePetHook', operationId: 'updatePet' }) as UseMutationOptions<
     UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >
 
-  return useMutation<
-    UpdatePetStatus200,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
-    TContext
-  >(
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetRequestConfig, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -118,7 +113,7 @@ export function useUpdatePetHook<TContext>(
   ) as UseMutationResult<
     UpdatePetStatus200,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
+    UpdatePetRequestConfig,
     TContext
   >
 }

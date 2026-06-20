@@ -5,10 +5,7 @@
 
 import type { GetOrderByIdRequestConfig, GetOrderByIdResponse } from '../models.ts'
 
-export function getOrderById(
-  { path }: Omit<GetOrderByIdRequestConfig, 'url'>,
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<GetOrderByIdResponse> {
+export function getOrderById({ path }: GetOrderByIdRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetOrderByIdResponse> {
   return cy
     .request<GetOrderByIdResponse>({
       method: 'GET',

@@ -34,10 +34,6 @@ export type DeleteOrderRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**

@@ -26,10 +26,6 @@ export type CustomGetItemRequestConfig = {
     };
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: `/items/${string}`;
 };
 
 /**

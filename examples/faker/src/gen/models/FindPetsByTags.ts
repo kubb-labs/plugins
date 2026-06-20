@@ -41,10 +41,6 @@ export type FindPetsByTagsRequestConfig = {
     tags?: FindPetsByTagsQueryTags
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
 }
 
 /**

@@ -14,7 +14,7 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet({ path, query, body }: Omit<UpdatePetRequestConfig, 'url'>, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export async function updatePet({ path, query, body }: UpdatePetRequestConfig, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
@@ -28,7 +28,7 @@ export async function updatePet({ path, query, body }: Omit<UpdatePetRequestConf
 
 export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const mutationKey = updatePetMutationKey()
-  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, Omit<UpdatePetRequestConfig, 'url'>, TContext>({
+  return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async({ path, query, body }) => {
       return updatePet({ path, query, body }, config)
@@ -40,18 +40,18 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
  * {@link /pets/:pet_id}
  */
 export function useUpdatePet<TContext>(options: {
-  mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, Omit<UpdatePetRequestConfig, 'url'>, TContext> & { client?: QueryClient },
+  mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
-  const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, Omit<UpdatePetRequestConfig, 'url'>, TContext>
+  const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>
 
-  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, Omit<UpdatePetRequestConfig, 'url'>, TContext>({
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     ...baseOptions,
     mutationKey,
     ...mutationOptions,
-  }, queryClient) as UseMutationResult<UpdatePetStatus200, ResponseErrorConfig<Error>, Omit<UpdatePetRequestConfig, 'url'>, TContext>
+  }, queryClient) as UseMutationResult<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>
 }

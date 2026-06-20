@@ -15,7 +15,7 @@ export function getCreatePetsUrl(path: CreatePetsRequestConfig['path']) {
  * {@link /pets/:uuid}
  */
 export async function createPets(
-  { path, query, body, headers }: Omit<CreatePetsRequestConfig, 'url'>,
+  { path, query, body, headers }: CreatePetsRequestConfig,
   config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config

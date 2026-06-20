@@ -41,7 +41,7 @@ export class store {
    * {@link /store/order}
    */
   async placeOrder(
-    { body }: Omit<PlaceOrderRequestConfig, 'url'>,
+    { body }: PlaceOrderRequestConfig,
     config: Partial<RequestConfig<PlaceOrderData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -65,7 +65,7 @@ export class store {
    * {@link /store/order}
    */
   async placeOrderPatch(
-    { body }: Omit<PlaceOrderPatchRequestConfig, 'url'>,
+    { body }: PlaceOrderPatchRequestConfig,
     config: Partial<RequestConfig<PlaceOrderPatchData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -88,7 +88,7 @@ export class store {
    * @summary Find purchase order by ID
    * {@link /store/order/:orderId}
    */
-  async getOrderById({ path }: Omit<GetOrderByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
       ...requestConfig,
@@ -103,7 +103,7 @@ export class store {
    * @summary Delete purchase order by ID
    * {@link /store/order/:orderId}
    */
-  async deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async deleteOrder({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
       ...requestConfig,

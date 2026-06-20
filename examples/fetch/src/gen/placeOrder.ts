@@ -19,7 +19,7 @@ function getPlaceOrderUrl() {
  * {@link /store/order}
  */
 export async function placeOrder(
-  { body }: Omit<PlaceOrderRequestConfig, 'url'>,
+  { body }: PlaceOrderRequestConfig,
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'

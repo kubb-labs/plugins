@@ -11,7 +11,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Req
   return mutationOptions<
     { status: 400; data: DeletePetStatus400; statusText: string },
     ResponseErrorConfig<DeletePetStatus400>,
-    Omit<DeletePetRequestConfig, 'url'>,
+    DeletePetRequestConfig,
     TContext
   >({
     mutationKey,
@@ -31,7 +31,7 @@ export function useDeletePet<TContext>(
     mutation?: UseMutationOptions<
       { status: 400; data: DeletePetStatus400; statusText: string },
       ResponseErrorConfig<DeletePetStatus400>,
-      Omit<DeletePetRequestConfig, 'url'>,
+      DeletePetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -44,16 +44,11 @@ export function useDeletePet<TContext>(
   const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<
     { status: 400; data: DeletePetStatus400; statusText: string },
     ResponseErrorConfig<DeletePetStatus400>,
-    Omit<DeletePetRequestConfig, 'url'>,
+    DeletePetRequestConfig,
     TContext
   >
 
-  return useMutation<
-    { status: 400; data: DeletePetStatus400; statusText: string },
-    ResponseErrorConfig<DeletePetStatus400>,
-    Omit<DeletePetRequestConfig, 'url'>,
-    TContext
-  >(
+  return useMutation<{ status: 400; data: DeletePetStatus400; statusText: string }, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
@@ -63,7 +58,7 @@ export function useDeletePet<TContext>(
   ) as UseMutationResult<
     { status: 400; data: DeletePetStatus400; statusText: string },
     ResponseErrorConfig<DeletePetStatus400>,
-    Omit<DeletePetRequestConfig, 'url'>,
+    DeletePetRequestConfig,
     TContext
   >
 }

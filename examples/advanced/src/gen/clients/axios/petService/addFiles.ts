@@ -15,7 +15,7 @@ export function getAddFilesUrl() {
  * {@link /pet/files}
  */
 export async function addFiles(
-  { body }: Omit<AddFilesRequestConfig, 'url'>,
+  { body }: AddFilesRequestConfig,
   config: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config

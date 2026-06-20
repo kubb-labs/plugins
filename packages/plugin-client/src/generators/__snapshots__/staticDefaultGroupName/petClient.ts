@@ -15,7 +15,7 @@ export class PetClient {
   /**
    * {@link /pet/findByTags}
    */
-  static async findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  static async findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/pet/findByTags`, query })
     return res.data
@@ -25,7 +25,7 @@ export class PetClient {
    * {@link /pet/:petId}
    */
   static async updatePetWithForm(
-    { path, body }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+    { path, body }: UpdatePetWithFormRequestConfig,
     config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
   ) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
@@ -42,7 +42,7 @@ export class PetClient {
   /**
    * {@link /pet/:petId}
    */
-  static async deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  static async deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
     const res = await request<DeletePetStatus200, ResponseErrorConfig<Error>, unknown>({

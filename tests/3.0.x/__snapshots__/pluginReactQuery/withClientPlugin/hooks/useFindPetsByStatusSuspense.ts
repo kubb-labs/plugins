@@ -9,11 +9,11 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
+export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
-export function findPetsByStatusSuspenseQueryOptions({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusSuspenseQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByStatusSuspenseQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
    queryKey,
@@ -28,7 +28,7 @@ export function findPetsByStatusSuspenseQueryOptions({ query }: Omit<FindPetsByS
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusSuspenseQueryKey>({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}, options: {
+export function useFindPetsByStatusSuspense<TData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusSuspenseQueryKey>({ query }: FindPetsByStatusRequestConfig = {}, options: {
   query?: Partial<UseSuspenseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {

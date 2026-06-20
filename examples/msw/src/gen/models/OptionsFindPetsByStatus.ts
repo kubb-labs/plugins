@@ -18,10 +18,6 @@ export type OptionsFindPetsByStatusRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByStatus'
 }
 
 /**

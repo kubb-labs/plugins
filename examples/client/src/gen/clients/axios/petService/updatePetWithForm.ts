@@ -14,10 +14,7 @@ function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['path']) {
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({

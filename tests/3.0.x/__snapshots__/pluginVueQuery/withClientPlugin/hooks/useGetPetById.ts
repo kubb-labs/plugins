@@ -11,11 +11,11 @@ import { getPetById } from '../clients/getPetById.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url' | 'headers'>['path']> }) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'headers'>['path']> }) => [{ url: '/pet/:petId', params: path }] as const
 
 export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
-export function getPetByIdQueryOptions({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url'>['path']> }, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ path }: { path: MaybeRefOrGetter<GetPetByIdRequestConfig['path']> }, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200>({
    queryKey,
@@ -30,7 +30,7 @@ export function getPetByIdQueryOptions({ path }: { path: MaybeRefOrGetter<Omit<G
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url'>['path']> }, options: {
+export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>({ path }: { path: MaybeRefOrGetter<GetPetByIdRequestConfig['path']> }, options: {
   query?: Partial<UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {

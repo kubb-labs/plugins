@@ -32,10 +32,6 @@ export type DeleteUserRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
 }
 
 /**

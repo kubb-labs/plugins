@@ -10,14 +10,14 @@ import { client } from './.kubb/client'
 import { GetPetByIdResponse } from './GetPetById'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 /**
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({
@@ -29,7 +29,7 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
   return GetPetByIdResponse.parse(res.data)
 }
 
-export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
@@ -43,7 +43,7 @@ export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, '
  * {@link /pet/:petId}
  */
 export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
-  { path }: Omit<GetPetByIdRequestConfig, 'url'>,
+  { path }: GetPetByIdRequestConfig,
   options: {
     query?: Partial<QueryObserverOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

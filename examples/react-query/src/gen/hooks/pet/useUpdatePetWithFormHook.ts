@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
-export const updatePetWithFormQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>) =>
+export const updatePetWithFormQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'headers'>) =>
   ['v5', { url: '/pet/:pet_id', params: path }, ...(query ? [query] : [])] as const
 
 type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
@@ -19,10 +19,7 @@ type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
  * @summary Updates a pet in the store with form data
  * {@link /pet/:pet_id}
  */
-export async function updatePetWithFormHook(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function updatePetWithFormHook({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
@@ -35,10 +32,7 @@ export async function updatePetWithFormHook(
   return res.data
 }
 
-export function updatePetWithFormQueryOptionsHook(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export function updatePetWithFormQueryOptionsHook({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = updatePetWithFormQueryKey({ path, query })
   return queryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormResponse, typeof queryKey>({
     queryKey,
@@ -57,7 +51,7 @@ export function useUpdatePetWithFormHook<
   TQueryData = UpdatePetWithFormResponse,
   TQueryKey extends QueryKey = UpdatePetWithFormQueryKey,
 >(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, query }: UpdatePetWithFormRequestConfig,
   options: {
     query?: Partial<QueryObserverOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

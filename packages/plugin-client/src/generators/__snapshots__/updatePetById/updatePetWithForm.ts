@@ -14,7 +14,7 @@ export function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['pa
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  { path, body }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, body }: UpdatePetWithFormRequestConfig,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config

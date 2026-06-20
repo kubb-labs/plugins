@@ -18,7 +18,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export async function addPetHook(
-  { body }: Omit<AddPetRequestConfig, 'url'>,
+  { body }: AddPetRequestConfig,
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -46,7 +46,7 @@ export function addPetMutationOptionsHook<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = addPetMutationKey()
-  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, Omit<AddPetRequestConfig, 'url'>, TContext>({
+  return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       return addPetHook({ body }, config)
@@ -61,7 +61,7 @@ export function addPetMutationOptionsHook<TContext = unknown>(
  */
 export function useAddPetHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, Omit<AddPetRequestConfig, 'url'>, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig<AddPetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -75,17 +75,17 @@ export function useAddPetHook<TContext>(
   const baseOptions = addPetMutationOptionsHook(config) as UseMutationOptions<
     AddPetStatus200,
     ResponseErrorConfig<AddPetStatus405>,
-    Omit<AddPetRequestConfig, 'url'>,
+    AddPetRequestConfig,
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useAddPetHook', operationId: 'addPet' }) as UseMutationOptions<
     AddPetStatus200,
     ResponseErrorConfig<AddPetStatus405>,
-    Omit<AddPetRequestConfig, 'url'>,
+    AddPetRequestConfig,
     TContext
   >
 
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, Omit<AddPetRequestConfig, 'url'>, TContext>(
+  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -93,5 +93,5 @@ export function useAddPetHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, Omit<AddPetRequestConfig, 'url'>, TContext>
+  ) as UseMutationResult<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>
 }

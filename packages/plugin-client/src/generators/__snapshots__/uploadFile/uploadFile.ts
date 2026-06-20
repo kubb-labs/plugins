@@ -14,10 +14,7 @@ export function getUploadFileUrl(path: UploadFileRequestConfig['path']) {
 /**
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile(
-  { path, body }: Omit<UploadFileRequestConfig, 'url'>,
-  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
-) {
+export async function uploadFile({ path, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestBody = body

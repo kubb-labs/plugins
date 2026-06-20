@@ -1,7 +1,7 @@
 import type { CreatePetsRequestConfig, CreatePetsResponse } from '../../models/ts/pets/CreatePets.ts'
 
 export function createPets(
-  { path, query, body, headers }: Omit<CreatePetsRequestConfig, 'url'>,
+  { path, query, body, headers }: CreatePetsRequestConfig,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<CreatePetsResponse> {
   return cy

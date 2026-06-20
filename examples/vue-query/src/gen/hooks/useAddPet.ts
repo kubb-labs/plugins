@@ -17,7 +17,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export async function addPet(
-  { body }: Omit<AddPetRequestConfig, 'url'>,
+  { body }: AddPetRequestConfig,
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -45,9 +45,7 @@ export async function addPet(
  */
 export function useAddPet<TContext>(
   options: {
-    mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, Omit<AddPetRequestConfig, 'url'>, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig<AddPetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -58,7 +56,7 @@ export function useAddPet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? addPetMutationKey()
 
-  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, Omit<AddPetRequestConfig, 'url'>, TContext>(
+  return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
         return addPet({ body }, config)

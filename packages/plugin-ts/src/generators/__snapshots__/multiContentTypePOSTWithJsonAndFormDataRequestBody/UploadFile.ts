@@ -48,10 +48,6 @@ export type UploadFileRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
 }
 
 /**

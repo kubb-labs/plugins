@@ -450,10 +450,6 @@ export interface UpdatePetRequestConfig {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**
@@ -519,10 +515,6 @@ export interface AddPetRequestConfig {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**
@@ -574,10 +566,6 @@ export interface FindPetsByStatusRequestConfig {
     status?: FindPetsByStatusQueryStatus
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByStatus'
 }
 
 /**
@@ -643,10 +631,6 @@ export interface FindPetsByTagsRequestConfig {
     pageSize?: FindPetsByTagsQueryPageSize
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
 }
 
 /**
@@ -699,10 +683,6 @@ export interface GetPetByIdRequestConfig {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -763,10 +743,6 @@ export interface UpdatePetWithFormRequestConfig {
     status?: UpdatePetWithFormQueryStatus
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -822,10 +798,6 @@ export interface DeletePetRequestConfig {
   headers?: {
     apiKey?: DeletePetHeaderApiKey
   }
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -885,10 +857,6 @@ export interface UploadFileRequestConfig {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
 }
 
 /**
@@ -918,10 +886,6 @@ export interface GetInventoryRequestConfig {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/inventory'
 }
 
 /**
@@ -972,10 +936,6 @@ export interface PlaceOrderRequestConfig {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**
@@ -1026,10 +986,6 @@ export interface PlaceOrderPatchRequestConfig {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**
@@ -1088,10 +1044,6 @@ export interface GetOrderByIdRequestConfig {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**
@@ -1139,10 +1091,6 @@ export interface DeleteOrderRequestConfig {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**

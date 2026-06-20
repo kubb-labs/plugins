@@ -47,10 +47,6 @@ export type GetThingsRequestConfig = {
     skip?: GetThingsQuerySkip
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pets/${string}`
 }
 
 /**

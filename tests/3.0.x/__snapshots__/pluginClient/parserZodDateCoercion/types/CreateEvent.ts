@@ -29,10 +29,6 @@ export type CreateEventRequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: "/events";
 };
 
 /**

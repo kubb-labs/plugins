@@ -10,7 +10,7 @@ import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 
-export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>) =>
+export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
@@ -18,7 +18,7 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -26,7 +26,7 @@ export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig
   return FindPetsByTagsResponse.parse(res.data)
 }
 
-export function findPetsByTagsQueryOptions({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsQueryOptions({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return findPetsByTags({ query }, config)
@@ -38,7 +38,7 @@ export function findPetsByTagsQueryOptions({ query }: Omit<FindPetsByTagsRequest
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTags(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
+  { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }

@@ -16,7 +16,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestBody = body
@@ -32,14 +32,14 @@ export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>,
  * {@link /store/order}
  */
 export function usePlaceOrder<TContext>(options: {
-  mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, Omit<PlaceOrderRequestConfig, 'url'>, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
 
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, Omit<PlaceOrderRequestConfig, 'url'>, TContext>({
+  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>({
     mutationFn: async({ body }) => {
       return placeOrder({ body }, config)
     },

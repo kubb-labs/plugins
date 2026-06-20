@@ -68,10 +68,6 @@ export type UpdatePetRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**

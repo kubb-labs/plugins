@@ -18,7 +18,7 @@ export type DeleteOrderMutationKey = ReturnType<typeof deleteOrderMutationKey>
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteOrder({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
@@ -30,7 +30,7 @@ export async function deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'
   return res.data
 }
 
-export type DeleteOrderMutationArg = Omit<DeleteOrderRequestConfig, 'url'>
+export type DeleteOrderMutationArg = DeleteOrderRequestConfig
 
 /**
  * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors

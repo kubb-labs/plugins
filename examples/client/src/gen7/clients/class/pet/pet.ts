@@ -33,7 +33,7 @@ export class pet {
    * {@link /pet}
    */
   async updatePet(
-    { body }: Omit<UpdatePetRequestConfig, 'url'>,
+    { body }: UpdatePetRequestConfig,
     config: Partial<RequestConfig<UpdatePetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -57,7 +57,7 @@ export class pet {
    * {@link /pet}
    */
   async addPet(
-    { body }: Omit<AddPetRequestConfig, 'url'>,
+    { body }: AddPetRequestConfig,
     config: Partial<RequestConfig<AddPetData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -80,7 +80,7 @@ export class pet {
    * @summary Finds Pets by status
    * {@link /pet/findByStatus}
    */
-  async findPetsByStatus({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
       ...requestConfig,
@@ -96,7 +96,7 @@ export class pet {
    * @summary Finds Pets by tags
    * {@link /pet/findByTags}
    */
-  async findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async findPetsByTags({ query }: FindPetsByTagsRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
       ...requestConfig,
@@ -112,7 +112,7 @@ export class pet {
    * @summary Find pet by ID
    * {@link /pet/:petId}
    */
-  async getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
       ...requestConfig,
@@ -126,7 +126,7 @@ export class pet {
    * @summary Updates a pet in the store with form data
    * {@link /pet/:petId}
    */
-  async updatePetWithForm({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
       ...requestConfig,
@@ -142,7 +142,7 @@ export class pet {
    * @summary Deletes a pet
    * {@link /pet/:petId}
    */
-  async deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+  async deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
     const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
     const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
     const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
@@ -159,7 +159,7 @@ export class pet {
    * {@link /pet/:petId/uploadImage}
    */
   async uploadFile(
-    { path, query, body }: Omit<UploadFileRequestConfig, 'url'>,
+    { path, query, body }: UploadFileRequestConfig,
     config: Partial<RequestConfig<UploadFileData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
   ) {
     const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)

@@ -17,7 +17,7 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function deleteOrderHook({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteOrderHook({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
@@ -31,12 +31,7 @@ export async function deleteOrderHook({ path }: Omit<DeleteOrderRequestConfig, '
 
 export function deleteOrderMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = deleteOrderMutationKey()
-  return mutationOptions<
-    DeleteOrderResponse,
-    ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-    Omit<DeleteOrderRequestConfig, 'url'>,
-    TContext
-  >({
+  return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
       return deleteOrderHook({ path }, config)
@@ -51,12 +46,9 @@ export function deleteOrderMutationOptionsHook<TContext = unknown>(config: Parti
  */
 export function useDeleteOrderHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      DeleteOrderResponse,
-      ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-      Omit<DeleteOrderRequestConfig, 'url'>,
-      TContext
-    > & { client?: QueryClient }
+    mutation?: UseMutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext> & {
+      client?: QueryClient
+    }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
@@ -67,17 +59,17 @@ export function useDeleteOrderHook<TContext>(
   const baseOptions = deleteOrderMutationOptionsHook(config) as UseMutationOptions<
     DeleteOrderResponse,
     ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-    Omit<DeleteOrderRequestConfig, 'url'>,
+    DeleteOrderRequestConfig,
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'useDeleteOrderHook', operationId: 'deleteOrder' }) as UseMutationOptions<
     DeleteOrderResponse,
     ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-    Omit<DeleteOrderRequestConfig, 'url'>,
+    DeleteOrderRequestConfig,
     TContext
   >
 
-  return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, Omit<DeleteOrderRequestConfig, 'url'>, TContext>(
+  return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -85,5 +77,5 @@ export function useDeleteOrderHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, Omit<DeleteOrderRequestConfig, 'url'>, TContext>
+  ) as UseMutationResult<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>
 }

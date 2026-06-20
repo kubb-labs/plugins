@@ -24,7 +24,7 @@ export const updatePetMutationKey = () => [{ url: '/pet' }] as const
  * {@link /pet}
  */
 export async function updatePet(
-  { body }: Omit<UpdatePetRequestConfig, 'url'>,
+  { body }: UpdatePetRequestConfig,
   config: Partial<RequestConfig<UpdatePetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -55,7 +55,7 @@ export function useUpdatePet<TContext>(
     mutation?: MutationObserverOptions<
       UpdatePetStatus200,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-      Omit<UpdatePetRequestConfig, 'url'>,
+      UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<UpdatePetData>> & {
@@ -68,12 +68,7 @@ export function useUpdatePet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? updatePetMutationKey()
 
-  return useMutation<
-    UpdatePetStatus200,
-    ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
-    Omit<UpdatePetRequestConfig, 'url'>,
-    TContext
-  >(
+  return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
         return updatePet({ body }, config)

@@ -13,7 +13,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
 export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
 
-export type PlaceOrderMutationArg = Omit<PlaceOrderRequestConfig, 'url'>
+export type PlaceOrderMutationArg = PlaceOrderRequestConfig
 
 /**
  * @description Place a new order in the store

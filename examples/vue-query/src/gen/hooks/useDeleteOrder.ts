@@ -16,7 +16,7 @@ export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] a
  * @summary Delete purchase order by ID
  * {@link /store/order/:orderId}
  */
-export async function deleteOrder({ path }: Omit<DeleteOrderRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deleteOrder({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
@@ -38,7 +38,7 @@ export function useDeleteOrder<TContext>(
     mutation?: MutationObserverOptions<
       DeleteOrderResponse,
       ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>,
-      Omit<DeleteOrderRequestConfig, 'url'>,
+      DeleteOrderRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -48,7 +48,7 @@ export function useDeleteOrder<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? deleteOrderMutationKey()
 
-  return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, Omit<DeleteOrderRequestConfig, 'url'>, TContext>(
+  return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>(
     {
       mutationFn: async ({ path }) => {
         return deleteOrder({ path }, config)

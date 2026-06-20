@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
+export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
 
@@ -15,7 +15,7 @@ type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestBody = body
@@ -25,7 +25,7 @@ export async function uploadFile({ path, query, body }: Omit<UploadFileRequestCo
   return res.data
 }
 
-export function uploadFileQueryOptions({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileQueryOptions({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return uploadFile({ path, query, body }, config)

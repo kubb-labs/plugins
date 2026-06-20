@@ -10,7 +10,7 @@ import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>) =>
+export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
@@ -18,10 +18,7 @@ type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSu
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsSuspenseInfinite(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export async function findPetsByTagsSuspenseInfinite({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -29,10 +26,7 @@ export async function findPetsByTagsSuspenseInfinite(
   return FindPetsByTagsResponse.parse(res.data)
 }
 
-export function findPetsByTagsSuspenseInfiniteQueryOptions(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export function findPetsByTagsSuspenseInfiniteQueryOptions({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey({ query })
   return infiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, InfiniteData<FindPetsByTagsStatus200>, typeof queryKey, number>({
     queryKey,
@@ -55,7 +49,7 @@ export function useFindPetsByTagsSuspenseInfinite<
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
   TPageParam = number,
 >(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
+  { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

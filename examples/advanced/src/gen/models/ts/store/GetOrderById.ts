@@ -43,10 +43,6 @@ export type GetOrderByIdRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**

@@ -10,7 +10,7 @@ import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>) =>
+export const findPetsByTagsSuspenseQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQueryKey>
@@ -18,7 +18,7 @@ type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQu
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsSuspense({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTagsSuspense({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -26,10 +26,7 @@ export async function findPetsByTagsSuspense({ query }: Omit<FindPetsByTagsReque
   return FindPetsByTagsResponse.parse(res.data)
 }
 
-export function findPetsByTagsSuspenseQueryOptions(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export function findPetsByTagsSuspenseQueryOptions({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByTagsSuspenseQueryKey({ query })
   return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, typeof queryKey>({
     queryKey,
@@ -43,7 +40,7 @@ export function findPetsByTagsSuspenseQueryOptions(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsSuspenseQueryKey>(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'>,
+  { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'url' | 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
+export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
 
 type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
 
@@ -16,7 +16,7 @@ type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet({ body }: Omit<AddPetRequestConfig, 'url'>, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function addPet({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestBody = body
@@ -26,7 +26,7 @@ export async function addPet({ body }: Omit<AddPetRequestConfig, 'url'>, config:
   return res.data
 }
 
-export function addPetQueryOptions({ body }: Omit<AddPetRequestConfig, 'url'>, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
+export function addPetQueryOptions({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return addPet({ body }, config)

@@ -9,7 +9,7 @@ import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsB
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
-export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'> = {}) =>
+export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
@@ -17,7 +17,7 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 /**
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus({ query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<Error>, unknown>({
@@ -30,10 +30,7 @@ export async function findPetsByStatus({ query }: Omit<FindPetsByStatusRequestCo
   return res.data
 }
 
-export function findPetsByStatusQueryOptions(
-  { query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return findPetsByStatus({ query }, config)
@@ -45,7 +42,7 @@ export function findPetsByStatusQueryOptions(
  * {@link /pet/findByStatus}
  */
 export function useFindPetsByStatus(
-  { query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {},
+  { query }: FindPetsByStatusRequestConfig = {},
   options: {
     query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<Error>>
     client?: Partial<RequestConfig> & { client?: Client }

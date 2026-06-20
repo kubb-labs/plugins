@@ -19,7 +19,7 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
  * {@link /store/order}
  */
 export async function placeOrder(
-  { body }: Omit<PlaceOrderRequestConfig, 'url'>,
+  { body }: PlaceOrderRequestConfig,
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -40,7 +40,7 @@ export async function placeOrder(
   return res.data
 }
 
-export type PlaceOrderMutationArg = Omit<PlaceOrderRequestConfig, 'url'>
+export type PlaceOrderMutationArg = PlaceOrderRequestConfig
 
 /**
  * @description Place a new order in the store

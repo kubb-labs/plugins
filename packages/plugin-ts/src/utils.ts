@@ -122,11 +122,6 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
             ? ast.factory.createSchema({ ...buildParams(node, { params: headerParams, resolver }), optional: !hasRequiredHeader })
             : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
-      ast.factory.createProperty({
-        name: 'url',
-        required: true,
-        schema: ast.factory.createSchema({ type: 'url', path: node.path }),
-      }),
     ],
   })
 }

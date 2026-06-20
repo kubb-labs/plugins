@@ -4,12 +4,12 @@ import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPets
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { findPetsByStatus } from '../../axios/petService/findPetsByStatus.ts'
 
-export const findPetsByStatusQueryKey = ({ path }: Omit<FindPetsByStatusRequestConfig, 'url' | 'headers'>) =>
+export const findPetsByStatusQueryKey = ({ path }: Omit<FindPetsByStatusRequestConfig, 'headers'>) =>
   [{ url: '/pet/findByStatus/:step_id', params: path }] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ path }: Omit<FindPetsByStatusRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ path }: FindPetsByStatusRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = findPetsByStatusQueryKey({ path })
   return queryOptions<
     { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
@@ -34,7 +34,7 @@ export function useFindPetsByStatus<
   TQueryData = { status: 200; data: FindPetsByStatusStatus200; statusText: string } | { status: 400; data: FindPetsByStatusStatus400; statusText: string },
   TQueryKey extends QueryKey = FindPetsByStatusQueryKey,
 >(
-  { path }: Omit<FindPetsByStatusRequestConfig, 'url'>,
+  { path }: FindPetsByStatusRequestConfig,
   options: {
     query?: Partial<
       QueryObserverOptions<

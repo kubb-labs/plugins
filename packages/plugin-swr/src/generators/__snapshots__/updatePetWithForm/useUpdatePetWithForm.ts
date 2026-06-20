@@ -17,7 +17,7 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  { path, body }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, body }: UpdatePetWithFormRequestConfig,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -34,7 +34,7 @@ export async function updatePetWithForm(
   return res.data
 }
 
-export type UpdatePetWithFormMutationArg = Omit<UpdatePetWithFormRequestConfig, 'url'>
+export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
 
 /**
  * {@link /pet/:petId}

@@ -5,7 +5,7 @@
 
 import type { GetPetsRequestConfig, GetPetsResponse } from './GetPets'
 
-export function getPets({ query }: Omit<GetPetsRequestConfig, 'url'> = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
+export function getPets({ query }: GetPetsRequestConfig = {}, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetPetsResponse> {
   return cy
     .request<GetPetsResponse>({
       method: 'GET',

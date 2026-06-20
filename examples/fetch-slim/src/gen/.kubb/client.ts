@@ -27,7 +27,7 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
  * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
  */
-export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown; url: string }
+export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
 
 export type HeaderValue = string | number | boolean | null | undefined | object
 export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
@@ -104,13 +104,13 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
 
 /**
  * The grouped options object passed to every generated function: the request config minus the
- * data-shaped keys, plus the per-operation `<Name>Request` (minus its literal `url`).
+ * data-shaped keys and the literal `url`, plus the per-operation `<Name>Request`.
  */
 export type Options<TData extends DataShape, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = Omit<
   RequestConfig<unknown, TRequest, TResponse>,
-  keyof DataShape
+  keyof DataShape | 'url'
 > &
-  Omit<TData, 'url'> & {
+  TData & {
     client?: ClientInstance<TRequest, TResponse>
     throwOnError?: ThrowOnError
   }

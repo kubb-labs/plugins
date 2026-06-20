@@ -33,10 +33,6 @@ export type CreateOrderRequestConfig = {
     path?: never;
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: "/orders";
 };
 
 /**

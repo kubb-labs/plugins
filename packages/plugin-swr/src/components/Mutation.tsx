@@ -71,7 +71,7 @@ export function Mutation({
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
   const hasMutationParams = groupedParam !== null
   const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-  const argTypeBody = hasMutationParams ? `Omit<${tsResolver.resolveRequestConfigName(node)}, 'url'>` : ''
+  const argTypeBody = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
   const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
 

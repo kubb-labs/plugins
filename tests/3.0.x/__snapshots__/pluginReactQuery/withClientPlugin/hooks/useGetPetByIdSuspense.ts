@@ -9,11 +9,11 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { getPetById } from '../clients/getPetById.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
-export function getPetByIdSuspenseQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdSuspenseQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const queryKey = getPetByIdSuspenseQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
    queryKey,
@@ -28,7 +28,7 @@ export function getPetByIdSuspenseQueryOptions({ path }: Omit<GetPetByIdRequestC
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>({ path }: Omit<GetPetByIdRequestConfig, 'url'>, options: {
+export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>({ path }: GetPetByIdRequestConfig, options: {
   query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & { client?: QueryClient },
   client?: Partial<RequestConfig> & { client?: Client }
 } = {}) {

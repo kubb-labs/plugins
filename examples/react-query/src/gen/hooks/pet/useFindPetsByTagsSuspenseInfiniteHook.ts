@@ -10,7 +10,7 @@ import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptio
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
-export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'> = {}) =>
+export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
   ['v5', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
@@ -21,7 +21,7 @@ type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSu
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsSuspenseInfiniteHook(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: FindPetsByTagsRequestConfig = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -37,7 +37,7 @@ export async function findPetsByTagsSuspenseInfiniteHook(
 }
 
 export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: FindPetsByTagsRequestConfig = {},
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey({ query })
@@ -70,7 +70,7 @@ export function useFindPetsByTagsSuspenseInfiniteHook<
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
   TPageParam = number,
 >(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: FindPetsByTagsRequestConfig = {},
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

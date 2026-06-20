@@ -16,7 +16,7 @@ export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet({ path, query, body }: Omit<UpdatePetRequestConfig, 'url'>, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export async function updatePet({ path, query, body }: UpdatePetRequestConfig, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
@@ -28,7 +28,7 @@ export async function updatePet({ path, query, body }: Omit<UpdatePetRequestConf
   return res.data
 }
 
-export type UpdatePetMutationArg = Omit<UpdatePetRequestConfig, 'url'>
+export type UpdatePetMutationArg = UpdatePetRequestConfig
 
 /**
  * {@link /pets/:pet_id}

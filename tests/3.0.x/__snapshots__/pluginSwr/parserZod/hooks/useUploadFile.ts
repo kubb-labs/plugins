@@ -19,7 +19,7 @@ export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestBody = uploadFileDataSchema.parse(body)
@@ -29,7 +29,7 @@ export async function uploadFile({ path, query, body }: Omit<UploadFileRequestCo
   return uploadFileResponseSchema.parse(res.data)
 }
 
-export type UploadFileMutationArg = Omit<UploadFileRequestConfig, 'url'>
+export type UploadFileMutationArg = UploadFileRequestConfig
 
 /**
  * @summary uploads an image

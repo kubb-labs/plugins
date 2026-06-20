@@ -55,10 +55,6 @@ export type FindPetsByTagsRequestConfig = {
     pageSize?: FindPetsByTagsQueryPageSize
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
 }
 
 /**

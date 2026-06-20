@@ -18,7 +18,7 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestBody = body
@@ -28,7 +28,7 @@ export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>,
   return res.data
 }
 
-export type PlaceOrderMutationArg = Omit<PlaceOrderRequestConfig, 'url'>
+export type PlaceOrderMutationArg = PlaceOrderRequestConfig
 
 /**
  * @description Place a new order in the store
