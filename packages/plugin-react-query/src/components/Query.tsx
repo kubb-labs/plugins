@@ -53,7 +53,17 @@ function buildQueryParamsNode(
   return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver, customOptions, slim = false }: Props): KubbReactNode {
+export function Query({
+  name,
+  queryKeyTypeName,
+  queryOptionsName,
+  queryKeyName,
+  dataReturnType,
+  node,
+  tsResolver,
+  customOptions,
+  slim = false,
+}: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
