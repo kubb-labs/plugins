@@ -34,12 +34,9 @@ export const clientGenerator = defineGenerator<PluginClient>({
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
 
-    const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+    const { query: queryParams } = getOperationParameters(node)
 
-    const importedTypeNames = [
-      tsResolver.resolveRequestConfigName(node),
-      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', includeParams: false }),
-    ]
+    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
 
     const importedZodNames = zodResolver
       ? [

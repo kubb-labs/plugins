@@ -31,7 +31,7 @@ function resolveTypeImportNames(node: ast.OperationNode, tsResolver: ResolverTs)
 }
 
 function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod, parser: PluginClient['resolvedOptions']['parser']): Array<string> {
-  const { query: queryParams } = getOperationParameters(node)
+  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const names: Array<string | null | undefined> = [
     resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
     resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,

@@ -62,8 +62,8 @@ export function Client({
   const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
   const responseType = getResponseType(node)
 
-  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node)
-  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node, { paramsCasing: 'camelcase' })
+  const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node, { paramsCasing: 'original' })
+  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node)
 
   const queryParamsMapping = buildParamsMapping(originalQueryParams, casedQueryParams)
   const headerParamsMapping = buildParamsMapping(originalHeaderParams, casedHeaderParams)

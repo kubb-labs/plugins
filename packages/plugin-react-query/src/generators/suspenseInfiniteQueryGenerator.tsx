@@ -40,7 +40,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
 
     // Validate queryParam exists in operation's query parameters
     const normalizeKey = (key: string) => key.replace(/\?$/, '')
-    const queryParamKeys = getOperationParameters(node).query.map((p) => p.name)
+    const queryParamKeys = getOperationParameters(node, { paramsCasing: 'original' }).query.map((p) => p.name)
     const hasQueryParam = infiniteOptions.queryParam ? queryParamKeys.some((k) => normalizeKey(k) === infiniteOptions.queryParam) : false
     const hasCursorParam = !infiniteOptions.cursorParam || true
 
@@ -63,7 +63,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       }),
     }
 
-    const rawQueryParams = getOperationParameters(node).query
+    const rawQueryParams = getOperationParameters(node, { paramsCasing: 'original' }).query
     const queryParamsTypeName =
       rawQueryParams.length > 0 && tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!) !== tsResolver.resolveParamName(node, rawQueryParams[0]!)
         ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
@@ -72,7 +72,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const importedTypeNames = [
       tsResolver.resolveRequestConfigName(node),
       queryParamsTypeName,
-      ...resolveOperationTypeNames(node, tsResolver, { paramsCasing: 'camelcase', order: 'body-response-first', includeParams: false }),
+      ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
     ].filter((name): name is string => Boolean(name))
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null

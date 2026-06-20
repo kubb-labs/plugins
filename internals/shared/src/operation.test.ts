@@ -207,12 +207,29 @@ describe('getOperationParameters', () => {
       ],
     })
 
-    const grouped = getOperationParameters(node, { paramsCasing: 'camelcase' })
+    const grouped = getOperationParameters(node)
 
     expect(grouped.path.map((param) => param.name)).toStrictEqual(['petId'])
     expect(grouped.query.map((param) => param.name)).toStrictEqual(['pageSize'])
     expect(grouped.header.map((param) => param.name)).toStrictEqual(['xApiKey'])
     expect(grouped.cookie.map((param) => param.name)).toStrictEqual(['sessionId'])
+  })
+
+  test('keeps the original spec names with paramsCasing: original', () => {
+    const node = ast.factory.createOperation({
+      operationId: 'showPet',
+      method: 'GET',
+      path: '/pets/{pet-id}',
+      parameters: [
+        ast.factory.createParameter({ name: 'pet-id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }) }),
+        ast.factory.createParameter({ name: 'page-size', in: 'query', schema: ast.factory.createSchema({ type: 'number' }) }),
+      ],
+    })
+
+    const grouped = getOperationParameters(node, { paramsCasing: 'original' })
+
+    expect(grouped.path.map((param) => param.name)).toStrictEqual(['pet-id'])
+    expect(grouped.query.map((param) => param.name)).toStrictEqual(['page-size'])
   })
 })
 
@@ -236,7 +253,7 @@ describe('resolveOperationTypeNames', () => {
       ],
     })
 
-    expect(resolveOperationTypeNames(node, resolver, { paramsCasing: 'camelcase', exclude: ['Status200'] })).toStrictEqual([
+    expect(resolveOperationTypeNames(node, resolver, { exclude: ['Status200'] })).toStrictEqual([
       'petIdPathParams',
       'pageSizeQueryParams',
       'xApiKeyHeaderParams',
