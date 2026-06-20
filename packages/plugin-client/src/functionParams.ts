@@ -30,22 +30,21 @@ function groupEntries(group: ParamGroup): Array<[string, ParamLeaf]> {
 
 /**
  * Assembles a destructured group parameter from a binding pattern and an optional
- * type literal. Built directly because `createFunctionParameter({ properties })`
- * requires every member to carry a type, while these groups also hold untyped,
- * value-only call entries.
+ * type literal. It passes the binding pattern as the parameter name rather than
+ * `createFunctionParameter({ properties })`, since that form requires every member to
+ * carry a type, while these groups also hold untyped, value-only call entries.
  */
 function createGroupParam(
   elements: Array<{ name: string }>,
   members: Array<{ name: string; type: string; optional?: boolean }>,
   default_?: string,
 ): ast.FunctionParameterNode {
-  return {
-    kind: 'FunctionParameter',
+  return ast.factory.createFunctionParameter({
     name: ast.factory.createObjectBindingPattern({ elements }),
     type: members.length ? ast.factory.createTypeLiteral({ members }) : undefined,
     default: default_,
     optional: false,
-  }
+  })
 }
 
 function createDeclarationLeaf(name: string, spec: ParamLeaf): ast.FunctionParameterNode {
