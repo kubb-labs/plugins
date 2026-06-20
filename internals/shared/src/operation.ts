@@ -187,6 +187,18 @@ export function buildRequestConfigType(node: ast.OperationNode, resolver: Reques
   return `${configType} & { ${configProps} }`
 }
 
+/**
+ * Builds the `client?:` option type shared by the generated query hooks (`useQuery`,
+ * `useInfiniteQuery`, `useSWR`, ...). Unlike {@link buildRequestConfigType}, it never adds a
+ * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
+ * content type for.
+ */
+export function buildClientOptionType(node: ast.OperationNode, resolver: RequestConfigResolver): string {
+  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+
+  return requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'
+}
+
 export type RequestGroups = {
   path: boolean
   query: boolean

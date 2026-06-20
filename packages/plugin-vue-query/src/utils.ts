@@ -3,6 +3,7 @@ import type { ast } from '@kubb/core'
 
 export { buildQueryKeyParams, resolveOperationOverrides, resolveZodSchemaNames } from '@internals/tanstack-query'
 export {
+  buildClientOptionType,
   buildOperationComments as getComments,
   buildRequestConfigType,
   buildStatusUnionType,

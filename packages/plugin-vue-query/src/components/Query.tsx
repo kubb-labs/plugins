@@ -5,7 +5,7 @@ import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginVueQuery } from '../types.ts'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import { buildStatusUnionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildClientOptionType, buildStatusUnionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -32,7 +32,6 @@ function buildQueryParamsNode(
   const { dataReturnType, resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
   const errorNames = resolveErrorNames(node, resolver)
 
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
@@ -42,7 +41,7 @@ function buildQueryParamsNode(
     name: 'options',
     type: `{
   query?: Partial<UseQueryOptions<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
-  client?: ${requestName ? `Partial<RequestConfig<${requestName}>> & { client?: Client }` : 'Partial<RequestConfig> & { client?: Client }'}
+  client?: ${buildClientOptionType(node, resolver)}
 }`,
     default: '{}',
   })
