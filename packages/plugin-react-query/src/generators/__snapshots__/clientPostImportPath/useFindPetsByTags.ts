@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import client from 'axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
+import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 

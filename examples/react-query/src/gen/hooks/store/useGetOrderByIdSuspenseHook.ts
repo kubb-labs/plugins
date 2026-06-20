@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { getOrderById } from '../../clients/store/getOrderById.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) =>
@@ -15,29 +15,16 @@ export const getOrderByIdSuspenseQueryKey = ({ path }: Omit<GetOrderByIdRequestC
 
 type GetOrderByIdSuspenseQueryKey = ReturnType<typeof getOrderByIdSuspenseQueryKey>
 
-/**
- * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
- * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
- */
-export async function getOrderByIdSuspenseHook({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
-    method: 'GET',
-    url: `/store/order/${path.orderId}`,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
-export function getOrderByIdSuspenseQueryOptionsHook({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdSuspenseQueryOptionsHook(
+  { path }: GetOrderByIdRequestConfig,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   const queryKey = getOrderByIdSuspenseQueryKey({ path })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getOrderByIdSuspenseHook({ path }, { ...config, signal: config.signal ?? signal })
+      const { data } = await getOrderById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -53,7 +40,7 @@ export function useGetOrderByIdSuspenseHook<TData = GetOrderByIdStatus200, TQuer
     query?: Partial<UseSuspenseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

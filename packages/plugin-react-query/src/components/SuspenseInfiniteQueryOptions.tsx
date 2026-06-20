@@ -6,7 +6,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { Infinite, PluginReactQuery } from '../types.ts'
+import type { DataReturnType, Infinite } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -16,7 +16,7 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   slim?: boolean
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
@@ -76,7 +76,7 @@ export function SuspenseInfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver, slim })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')

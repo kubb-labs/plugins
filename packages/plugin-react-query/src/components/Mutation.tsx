@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import type { PluginReactQuery } from '../types.ts'
+import type { DataReturnType, PluginReactQuery } from '../types.ts'
 import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildMutationConfigParamsNode } from './MutationOptions.tsx'
 
@@ -15,7 +15,7 @@ type Props = {
   mutationKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
   slim?: boolean
 }
@@ -31,7 +31,7 @@ function resolveMutationRequestType(node: ast.OperationNode, resolver: ResolverT
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+    dataReturnType: DataReturnType
     resolver: ResolverTs
     slim?: boolean
   },

@@ -1,5 +1,6 @@
 import { adapterOas } from '@kubb/adapter-oas'
 import { Url } from '@kubb/core'
+import { pluginClient } from '@kubb/plugin-client'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
@@ -40,10 +41,13 @@ export const config = {
         },
       },
     }),
+    // A registered contract client. pluginReactQuery auto-detects it (no `client` option needed) and
+    // the hooks call its generated `<op>` functions, which return the shared `RequestResult` contract.
+    pluginClient({
+      output: { path: './clients', barrel: { type: 'named' } },
+      group: { type: 'path' },
+    }),
     pluginReactQuery({
-      client: {
-        importPath: '@kubb/plugin-client/clients/axios',
-      },
       resolver: {
         resolveQueryName(node) {
           return hookName(`use${capitalize(this.resolveName(node.operationId))}`)
@@ -118,10 +122,6 @@ export const config = {
           type: 'operationId',
           pattern: 'findPetsByTags',
           options: {
-            client: {
-              importPath: '@kubb/plugin-client/clients/axios',
-              dataReturnType: 'full',
-            },
             infinite: {
               queryParam: 'pageSize',
               initialPageParam: 0,

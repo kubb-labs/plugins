@@ -8,12 +8,12 @@ export {
   buildQueryKeyParams,
   buildQueryOptionsParams,
   buildSlimClientCall,
+  resolveClientOperation,
   resolveOperationOverrides,
   resolveQueryParamsParser,
   resolveRequestParser,
   resolveResponseParser,
-  resolveSlimOperation,
   resolveZodSchemaNames,
   transformName,
 } from './utils.ts'
-export type { SlimOperation } from './utils.ts'
+export type { ClientOperation } from './utils.ts'

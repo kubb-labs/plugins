@@ -3,52 +3,17 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type {
-  UpdatePetRequestConfig,
-  UpdatePetData,
-  UpdatePetStatus200,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../../models/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { UpdatePetRequestConfig, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/UpdatePet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { updatePet } from '../../clients/pet/updatePet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
-/**
- * @description Update an existing pet by Id
- * @summary Update an existing pet
- * {@link /pet}
- */
-export async function updatePetHook(
-  { body }: UpdatePetRequestConfig,
-  config: Partial<RequestConfig<UpdatePetData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
-    method: 'PUT',
-    url: `/pet`,
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function updatePetMutationOptionsHook<TContext = unknown>(
-  config: Partial<RequestConfig<UpdatePetData>> & {
-    client?: Client
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
@@ -61,7 +26,8 @@ export function updatePetMutationOptionsHook<TContext = unknown>(
   >({
     mutationKey,
     mutationFn: async ({ body }) => {
-      return updatePetHook({ body }, config)
+      const { data } = await updatePet({ ...config, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -79,8 +45,7 @@ export function useUpdatePetHook<TContext>(
       UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},

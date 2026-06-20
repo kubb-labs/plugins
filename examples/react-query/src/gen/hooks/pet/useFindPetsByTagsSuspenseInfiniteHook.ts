@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/FindPetsByTags.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { InfiniteData, QueryKey, QueryClient, UseSuspenseInfiniteQueryOptions, UseSuspenseInfiniteQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { findPetsByTags } from '../../clients/pet/findPetsByTags.ts'
 import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
 export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
@@ -15,45 +15,25 @@ export const findPetsByTagsSuspenseInfiniteQueryKey = ({ query }: Omit<FindPetsB
 
 type FindPetsByTagsSuspenseInfiniteQueryKey = ReturnType<typeof findPetsByTagsSuspenseInfiniteQueryKey>
 
-/**
- * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
- * @summary Finds Pets by tags
- * {@link /pet/findByTags}
- */
-export async function findPetsByTagsSuspenseInfiniteHook(
-  { query }: FindPetsByTagsRequestConfig = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
-) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByTags`,
-    query,
-    ...requestConfig,
-  })
-
-  return res as { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }
-}
-
 export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(
   { query }: FindPetsByTagsRequestConfig = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsSuspenseInfiniteQueryKey({ query })
   return infiniteQueryOptions<
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+    FindPetsByTagsStatus200,
     ResponseErrorConfig<FindPetsByTagsStatus400>,
-    InfiniteData<{ status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string }>,
+    InfiniteData<FindPetsByTagsStatus200>,
     typeof queryKey,
     number
   >({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsSuspenseInfiniteHook({ query }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByTags({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
     initialPageParam: 0,
-    getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1),
+    getNextPageParam: (lastPage, _allPages, lastPageParam) => (Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1),
     getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => (firstPageParam <= 1 ? undefined : firstPageParam - 1),
   })
 }
@@ -64,7 +44,7 @@ export function findPetsByTagsSuspenseInfiniteQueryOptionsHook(
  * {@link /pet/findByTags}
  */
 export function useFindPetsByTagsSuspenseInfiniteHook<
-  TQueryFnData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
+  TQueryFnData = FindPetsByTagsStatus200,
   TError = ResponseErrorConfig<FindPetsByTagsStatus400>,
   TData = InfiniteData<TQueryFnData>,
   TQueryKey extends QueryKey = FindPetsByTagsSuspenseInfiniteQueryKey,
@@ -73,7 +53,7 @@ export function useFindPetsByTagsSuspenseInfiniteHook<
   { query }: FindPetsByTagsRequestConfig = {},
   options: {
     query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, TPageParam>> & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

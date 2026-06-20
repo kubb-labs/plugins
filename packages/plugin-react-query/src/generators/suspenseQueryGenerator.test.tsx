@@ -22,12 +22,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -101,11 +96,15 @@ describe('suspenseQueryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: { suspense: {} } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { suspense: {}, parser: 'zod' as const } },
-    { name: 'findByTagsFull', node: findByTagsNode, options: { suspense: {}, client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
+    {
+      name: 'findByTagsFull',
+      node: findByTagsNode,
+      options: { suspense: {}, client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } },
+    },
     {
       name: 'clientPostImportPath',
       node: findByTagsNode,
-      options: { suspense: {}, client: { dataReturnType: 'data' as const, importPath: 'axios' as const } },
+      options: { suspense: {}, client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
     },
     { name: 'findByTagsObject', node: findByTagsNode, options: { suspense: {} } },
     { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { suspense: {} } },

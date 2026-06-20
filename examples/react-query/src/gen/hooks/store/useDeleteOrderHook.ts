@@ -3,38 +3,22 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../models/DeleteOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { deleteOrder } from '../../clients/store/deleteOrder.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
-/**
- * @description For valid response try integer IDs with value < 1000. Anything above 1000 or nonintegers will generate API errors
- * @summary Delete purchase order by ID
- * {@link /store/order/:orderId}
- */
-export async function deleteOrderHook({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
-    method: 'DELETE',
-    url: `/store/order/${path.orderId}`,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
-export function deleteOrderMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deleteOrderMutationOptionsHook<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deleteOrderMutationKey()
   return mutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path }) => {
-      return deleteOrderHook({ path }, config)
+      const { data } = await deleteOrder({ ...config, path, throwOnError: true })
+      return data
     },
   })
 }
@@ -49,7 +33,7 @@ export function useDeleteOrderHook<TContext>(
     mutation?: UseMutationOptions<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

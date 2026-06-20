@@ -3,45 +3,22 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../../models/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileStatus200 } from '../../models/UploadFile.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { uploadFile } from '../../clients/pet/uploadFile.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-/**
- * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
- */
-export async function uploadFileHook(
-  { path, query, body }: UploadFileRequestConfig,
-  config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {},
-) {
-  const { client: request = client, ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({
-    method: 'POST',
-    url: `/pet/${path.petId}/uploadImage`,
-    query,
-    body: requestBody,
-    ...requestConfig,
-    headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers },
-  })
-
-  return res.data
-}
-
-export function uploadFileMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileMutationOptionsHook<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
-      return uploadFileHook({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -53,7 +30,7 @@ export function uploadFileMutationOptionsHook<TContext = unknown>(config: Partia
 export function useUploadFileHook<TContext>(
   options: {
     mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<UploadFileData>> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

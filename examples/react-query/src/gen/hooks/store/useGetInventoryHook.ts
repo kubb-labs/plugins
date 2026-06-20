@@ -3,34 +3,22 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { GetInventoryStatus200 } from '../../models/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import { getInventory } from '../../clients/store/getInventory.ts'
 import { queryOptions } from '@tanstack/react-query'
 
 export const getInventoryQueryKey = () => ['v5', { url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export async function getInventoryHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
-
-  return res.data
-}
-
-export function getInventoryQueryOptionsHook(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventoryQueryOptionsHook(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventoryQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getInventoryHook({ ...config, signal: config.signal ?? signal })
+      const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }

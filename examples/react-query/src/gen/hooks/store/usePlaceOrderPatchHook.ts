@@ -3,45 +3,17 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchData, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchStatus200, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { placeOrderPatch } from '../../clients/store/placeOrderPatch.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
-/**
- * @description Place a new order in the store with patch
- * @summary Place an order for a pet with patch
- * {@link /store/order}
- */
-export async function placeOrderPatchHook(
-  { body }: PlaceOrderPatchRequestConfig,
-  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
-    method: 'PATCH',
-    url: `/store/order`,
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
-  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
-    client?: Client
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
@@ -49,7 +21,8 @@ export function placeOrderPatchMutationOptionsHook<TContext = unknown>(
   return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      return placeOrderPatchHook({ body }, config)
+      const { data } = await placeOrderPatch({ ...config, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -64,8 +37,7 @@ export function usePlaceOrderPatchHook<TContext>(
     mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<PlaceOrderPatchData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},

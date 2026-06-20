@@ -3,41 +3,22 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { deletePet } from '../../clients/pet/deletePet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:pet_id' }] as const
 
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:pet_id}
- */
-export async function deletePetHook({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
-
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
-    method: 'DELETE',
-    url: `/pet/${path.petId}`,
-    ...requestConfig,
-    headers: { ...mappedHeaders, ...requestConfig.headers },
-  })
-
-  return res.data
-}
-
-export function deletePetMutationOptionsHook<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deletePetMutationOptionsHook<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
-      return deletePetHook({ path, headers }, config)
+      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
+      return data
     },
   })
 }
@@ -50,7 +31,7 @@ export function deletePetMutationOptionsHook<TContext = unknown>(config: Partial
 export function useDeletePetHook<TContext>(
   options: {
     mutation?: UseMutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

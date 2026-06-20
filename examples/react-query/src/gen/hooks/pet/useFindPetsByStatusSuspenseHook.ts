@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../models/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { findPetsByStatus } from '../../clients/pet/findPetsByStatus.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
@@ -15,33 +15,16 @@ export const findPetsByStatusSuspenseQueryKey = ({ query }: Omit<FindPetsByStatu
 
 type FindPetsByStatusSuspenseQueryKey = ReturnType<typeof findPetsByStatusSuspenseQueryKey>
 
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export async function findPetsByStatusSuspenseHook({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByStatus`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function findPetsByStatusSuspenseQueryOptionsHook(
   { query }: FindPetsByStatusRequestConfig = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusSuspenseQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatusSuspenseHook({ query }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByStatus({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -57,7 +40,7 @@ export function useFindPetsByStatusSuspenseHook<TData = FindPetsByStatusStatus20
     query?: Partial<UseSuspenseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

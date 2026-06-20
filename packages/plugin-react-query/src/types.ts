@@ -1,6 +1,6 @@
 import type { ClientSelector, Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
+import type { PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -128,6 +128,12 @@ export type ResolverReactQuery = Resolver & {
 type Suspense = object
 
 /**
+ * Shape of the value the legacy data-returning client returns. `'data'` returns the response body;
+ * `'full'` returns a status-discriminated union. Contract clients always return `'data'`.
+ */
+export type DataReturnType = 'data' | 'full'
+
+/**
  * Builds the `queryKey` used by each generated query hook.
  *
  * @note String values are inlined verbatim into generated code. Wrap literal
@@ -232,15 +238,18 @@ type CustomOptions = {
  */
 export type Options = OutputOptions & {
   /**
-   * Selects the HTTP client the generated hooks call.
+   * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
+   * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
    *
-   * - `'fetch'` / `'axios'` calls the slim `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When
-   *   exactly one slim plugin is registered it is auto-detected, so the string is only needed to
-   *   disambiguate two slim plugins or to override.
-   * - The object form is **deprecated** — it keeps the legacy inline / plugin-client generation. Prefer
-   *   registering a slim plugin and configuring the client (baseURL, transport, ...) there.
+   * - `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
+   *   single client plugin (plugin-fetch, plugin-axios, or plugin-client) is registered it is
+   *   auto-detected, so the string is only needed to disambiguate several client plugins.
+   * - `'legacy'` keeps the old data-returning inline client (`return clientName(params, config)`),
+   *   bundling its runtime into `.kubb/client.ts`. Kept for migration; prefer a contract client.
+   *
+   * When unset and no client plugin is registered, the hooks emit their own inline contract client.
    */
-  client?: ClientSelector | (ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>)
+  client?: ClientSelector
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -307,18 +316,29 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
+/**
+ * The resolved client strategy for the generated hooks, computed once during setup.
+ *
+ * - `contract` — the hooks import and call a registered contract client plugin's `<op>`.
+ * - `contract-inline` — the hooks emit their own inline contract client and inject the matching
+ *   contract runtime (`'fetch'` / `'axios'` picks the bundled template).
+ * - `legacy` — the old data-returning inline client. `dataReturnType` shapes its return value.
+ */
+export type ResolvedClient =
+  | { kind: 'contract'; pluginName: string }
+  | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
+  | { kind: 'legacy'; client: 'fetch' | 'axios'; dataReturnType: DataReturnType; baseURL: string | undefined }
+
 type ResolvedOptions = {
   output: Output
   group: Group | null
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
   /**
-   * Set when the hooks call a slim client plugin's generated functions instead of the legacy inline /
-   * plugin-client path. Names the resolved slim plugin (`plugin-fetch` / `plugin-axios`).
+   * The resolved client strategy the generators branch on (contract, inline contract, or legacy).
    */
-  slimClient: { pluginName: string } | null
+  client: ResolvedClient
   parser: NonNullable<Options['parser']>
   /**
    * Only used for infinite

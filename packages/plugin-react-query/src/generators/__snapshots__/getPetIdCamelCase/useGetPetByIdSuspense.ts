@@ -3,8 +3,8 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { GetPetByIdRequestConfig, GetPetByIdResponses, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { client } from './.kubb/client'
 import { GetPetByIdResponse } from './GetPetById'
@@ -17,24 +17,26 @@ type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 /**
  * {@link /pet/:petId}
  */
-export async function getPetByIdSuspense({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getPetByIdSuspense<ThrowOnError extends boolean = true>(
+  options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/${path.petId}`,
-    ...requestConfig,
-  })
-
-  return GetPetByIdResponse.parse(res.data)
+  return request({ method: 'GET', url: '/pet/{petId}', parser: { response: (data: unknown) => GetPetByIdResponse.parse(data) }, ...config }) as Promise<
+    RequestResult<GetPetByIdResponses, ThrowOnError>
+  >
 }
 
-export function getPetByIdSuspenseQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdSuspenseQueryOptions(
+  { path }: GetPetByIdRequestConfig,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   const queryKey = getPetByIdSuspenseQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, GetPetByIdStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getPetByIdSuspense({ path }, { ...config, signal: config.signal ?? signal })
+      const { data } = await getPetByIdSuspense({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -46,7 +48,7 @@ export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey ext
   { path }: GetPetByIdRequestConfig,
   options: {
     query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

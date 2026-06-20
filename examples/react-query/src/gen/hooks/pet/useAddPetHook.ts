@@ -3,45 +3,17 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { AddPetRequestConfig, AddPetStatus200, AddPetStatus405 } from '../../models/AddPet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
+import { addPet } from '../../clients/pet/addPet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-/**
- * @description Add a new pet to the store
- * @summary Add a new pet to the store
- * {@link /pet}
- */
-export async function addPetHook(
-  { body }: AddPetRequestConfig,
-  config: Partial<RequestConfig<AddPetData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({
-    method: 'POST',
-    url: `/pet`,
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function addPetMutationOptionsHook<TContext = unknown>(
-  config: Partial<RequestConfig<AddPetData>> & {
-    client?: Client
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
@@ -49,7 +21,8 @@ export function addPetMutationOptionsHook<TContext = unknown>(
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      return addPetHook({ body }, config)
+      const { data } = await addPet({ ...config, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -62,8 +35,7 @@ export function addPetMutationOptionsHook<TContext = unknown>(
 export function useAddPetHook<TContext>(
   options: {
     mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig<AddPetData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},

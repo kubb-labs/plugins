@@ -236,36 +236,38 @@ export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver
 }
 
 /**
- * The resolved slim `<op>` for one operation: the generated function name, the file it lives in, and
- * the slim runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig` come from).
+ * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,
+ * and the contract runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig`
+ * come from).
  */
-export type SlimOperation = { name: string; path: string; clientPath: string }
+export type ClientOperation = { name: string; path: string; clientPath: string }
 
-type SlimResolver = {
+type ClientResolver = {
   resolveName: (name: string) => string
   resolveFile: (entry: ReturnType<typeof operationFileEntry>, options: { root: string; output: Output; group?: Group }) => { path: string }
 }
 
 /**
- * Resolves the slim client `<op>` a query/mutation hook imports, by looking up the registered slim
- * plugin's resolver and output. Returns `null` when no slim plugin is in play (the legacy path). The
- * slim plugin injects `.kubb/client.ts` at the global output root, the same path the hooks read
- * `RequestConfig` / `ResponseErrorConfig` from.
+ * Resolves the contract client `<op>` a query/mutation hook imports, by looking up the registered
+ * contract client plugin's resolver and output. Works for any contract client plugin (plugin-fetch,
+ * plugin-axios, plugin-client). Returns `null` when no contract plugin is in play (the inline /
+ * legacy paths). The plugin injects `.kubb/client.ts` at the global output root, the same path the
+ * hooks read `RequestConfig` / `ResponseErrorConfig` from.
  */
-export function resolveSlimOperation(options: {
-  slimClient: { pluginName: string } | null
+export function resolveClientOperation(options: {
+  clientPlugin: { pluginName: string } | null
   driver: { getPlugin: (name: string) => unknown; getResolver: (name: string) => unknown }
   node: ast.OperationNode
   root: string
   output: Output
-}): SlimOperation | null {
-  const { slimClient, driver, node, root, output } = options
-  if (!slimClient) return null
+}): ClientOperation | null {
+  const { clientPlugin, driver, node, root, output } = options
+  if (!clientPlugin) return null
 
-  const resolver = driver.getResolver(slimClient.pluginName) as SlimResolver | null | undefined
+  const resolver = driver.getResolver(clientPlugin.pluginName) as ClientResolver | null | undefined
   if (!resolver) return null
 
-  const plugin = driver.getPlugin(slimClient.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
+  const plugin = driver.getPlugin(clientPlugin.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
   const file = resolver.resolveFile(operationFileEntry(node, node.operationId), {
     root,
     output: plugin?.options?.output ?? output,

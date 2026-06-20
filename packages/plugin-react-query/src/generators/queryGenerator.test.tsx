@@ -24,12 +24,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -136,8 +131,8 @@ describe('queryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: {} },
     { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
-    { name: 'findByTagsFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
-    { name: 'clientPostImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    { name: 'findByTagsFull', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } } },
+    { name: 'clientPostImportPath', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } } },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
