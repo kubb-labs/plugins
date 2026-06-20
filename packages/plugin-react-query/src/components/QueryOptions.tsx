@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildQueryOptionsParams } from '@internals/tanstack-query'
+import { buildQueryOptionsParams, buildSlimClientCall } from '@internals/tanstack-query'
 import type { PluginReactQuery } from '../types.ts'
 import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 
@@ -14,16 +14,17 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function getQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs }): ast.FunctionParametersNode {
+export function getQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs; slim?: boolean }): ast.FunctionParametersNode {
   return buildQueryOptionsParams(node, options)
 }
 
-export function QueryOptions({ name, clientName, dataReturnType, node, tsResolver, queryKeyName }: Props): KubbReactNode {
+export function QueryOptions({ name, clientName, dataReturnType, node, tsResolver, queryKeyName, slim = false }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -34,10 +35,14 @@ export function QueryOptions({ name, clientName, dataReturnType, node, tsResolve
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver, slim })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const rawParamsCall = callPrinter.print(paramsNode) ?? ''
   const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
+  const queryFnBody = slim
+    ? `const { data } = await ${buildSlimClientCall(node, { clientName, signal: true })}
+          return data`
+    : `return ${clientName}(${clientCallStr})`
 
   return (
     <File.Source name={name} isExportable isIndexable>
@@ -47,7 +52,7 @@ export function QueryOptions({ name, clientName, dataReturnType, node, tsResolve
       return queryOptions<${TData}, ${TError}, ${TData}, typeof queryKey>({
        queryKey,
        queryFn: async ({ signal }) => {
-          return ${clientName}(${clientCallStr})
+          ${queryFnBody}
        },
       })
 `}

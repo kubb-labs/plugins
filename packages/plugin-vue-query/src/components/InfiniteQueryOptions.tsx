@@ -6,7 +6,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Infinite, PluginVueQuery } from '../types.ts'
-import { buildStatusUnionType, buildVueClientCallArgs, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildStatusUnionType, buildVueClientCallArgs, buildVueSlimClientCall, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -22,6 +22,7 @@ type Props = {
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
   queryParam: Infinite['queryParam']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -39,6 +40,7 @@ export function InfiniteQueryOptions({
   dataReturnType,
   queryParam,
   queryKeyName,
+  slim = false,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
@@ -77,9 +79,13 @@ export function InfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver, slim })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const clientCallArgs = buildVueClientCallArgs(node)
+  const queryFnBody = slim
+    ? `const { data } = await ${buildVueSlimClientCall(node, { clientName, signal: true })}
+    return data`
+    : `return ${clientName}(${clientCallArgs})`
 
   const hasNewParams = nextParam != null || previousParam != null
 
@@ -127,7 +133,7 @@ return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${que
   queryKey,
   queryFn: async ({ signal, pageParam }) => {
     ${infiniteOverrideParams}
-    return ${clientName}(${clientCallArgs})
+    ${queryFnBody}
   },
   ${queryOptionsArr.join(',\n  ')}
 })
@@ -145,7 +151,7 @@ const queryKey = ${queryKeyName}(${queryKeyParamsCall})
 return infiniteQueryOptions<${queryFnDataType}, ${errorType}, InfiniteData<${queryFnDataType}>, QueryKey, ${pageParamType}>({
   queryKey,
   queryFn: async ({ signal }) => {
-    return ${clientName}(${clientCallArgs})
+    ${queryFnBody}
   },
   ${queryOptionsArr.join(',\n  ')}
 })

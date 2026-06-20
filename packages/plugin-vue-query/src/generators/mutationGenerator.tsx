@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
-import { resolveZodSchemaNames } from '@internals/tanstack-query'
+import { resolveSlimOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
 import { Client, isParserEnabled, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -20,7 +20,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, parser, client: clientOptions, group } = ctx.options
+    const { output, query, mutation, parser, client: clientOptions, group, slimClient } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -82,6 +82,9 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
     const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientName) : clientName
 
+    const slim = resolveSlimOperation({ slimClient, driver, node, root, output })
+    const isSlim = slim !== null
+
     return (
       <File
         baseName={meta.file.baseName}
@@ -91,29 +94,36 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
-        {clientOptions.importPath ? (
-          <>
-            {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
-          </>
-        ) : (
-          <>
-            {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
-            <File.Import
-              name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
-              root={meta.file.path}
-              path={path.resolve(root, '.kubb/client.ts')}
-              isTypeOnly
-            />
-          </>
-        )}
+        {!isSlim &&
+          (clientOptions.importPath ? (
+            <>
+              {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
+              <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
+            </>
+          ) : (
+            <>
+              {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
+              <File.Import
+                name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
+                root={meta.file.path}
+                path={path.resolve(root, '.kubb/client.ts')}
+                isTypeOnly
+              />
+            </>
+          ))}
         <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />
-        {shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
-        {!shouldUseClientPlugin && node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
+        {!isSlim && shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
+        {!isSlim && !shouldUseClientPlugin && node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
           <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
         )}
-        {!shouldUseClientPlugin && parser === 'zod' && zodResolver && node.requestBody?.content?.[0]?.schema && (
+        {!isSlim && !shouldUseClientPlugin && parser === 'zod' && zodResolver && node.requestBody?.content?.[0]?.schema && (
           <File.Import name={['z']} path="zod" isTypeOnly />
+        )}
+        {slim && (
+          <>
+            <File.Import name={[slim.name]} root={meta.file.path} path={slim.path} />
+            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={slim.clientPath} isTypeOnly />
+          </>
         )}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
@@ -121,7 +131,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
         <MutationKey name={mutationKeyName} node={node} transformer={ctx.options.mutationKey} />
 
-        {!shouldUseClientPlugin && (
+        {!isSlim && !shouldUseClientPlugin && (
           <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
@@ -139,12 +149,13 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
             <File.Import name={['MutationObserverOptions', 'QueryClient']} path={importPath} isTypeOnly />
             <Mutation
               name={mutationHookName}
-              clientName={resolvedClientName}
+              clientName={slim ? slim.name : resolvedClientName}
               typeName={mutationTypeName}
               node={node}
               tsResolver={tsResolver}
               dataReturnType={clientOptions.dataReturnType || 'data'}
               mutationKeyName={mutationKeyName}
+              slim={isSlim}
             />
           </>
         )}

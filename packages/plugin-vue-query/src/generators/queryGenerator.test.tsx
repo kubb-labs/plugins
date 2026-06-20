@@ -31,6 +31,7 @@ const defaultOptions: PluginVueQuery['resolvedOptions'] = {
     clientType: 'function',
     importPath: undefined,
   },
+  slimClient: null,
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,

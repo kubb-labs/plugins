@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildGroupedRequestParam } from '@internals/tanstack-query'
+import { buildGroupedRequestParam, buildSlimClientCall } from '@internals/tanstack-query'
 import type { PluginSwr } from '../types.ts'
 import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 
@@ -16,6 +16,7 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -28,9 +29,10 @@ function buildMutationParamsNode(
     mutationKeyTypeName: string
     mutationArgTypeName: string
     resolver: ResolverTs
+    slim?: boolean
   },
 ): ast.FunctionParametersNode {
-  const { dataReturnType, mutationKeyTypeName, mutationArgTypeName, resolver } = options
+  const { dataReturnType, mutationKeyTypeName, mutationArgTypeName, resolver, slim = false } = options
   const responseName = resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
 
@@ -43,7 +45,7 @@ function buildMutationParamsNode(
         name: 'options',
         type: `{
   mutation?: SWRMutationConfiguration<${TData}, ${TError}, ${mutationKeyTypeName} | null, ${mutationArgTypeName}> & { throwOnError?: boolean },
-  client?: ${buildRequestConfigType(node, resolver)},
+  client?: ${buildRequestConfigType(node, resolver, { slim })},
   shouldFetch?: boolean,
 }`,
         default: '{}',
@@ -61,6 +63,7 @@ export function Mutation({
   dataReturnType,
   node,
   tsResolver,
+  slim = false,
 }: Props): KubbReactNode {
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -74,6 +77,10 @@ export function Mutation({
   const argTypeBody = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
   const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
+  const mutationFnBody = slim
+    ? `const { data } = await ${buildSlimClientCall(node, { clientName, signal: false })}
+            return data`
+    : `return ${clientName}(${clientCallStr})`
 
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 
@@ -82,6 +89,7 @@ export function Mutation({
     mutationKeyTypeName,
     mutationArgTypeName,
     resolver: tsResolver,
+    slim,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
@@ -101,7 +109,7 @@ export function Mutation({
         return useSWRMutation<${generics.join(', ')}>(
           shouldFetch ? mutationKey : null,
           async (_url${hasMutationParams ? `, { arg: ${argBindingStr} }` : ''}) => {
-            return ${clientName}(${clientCallStr})
+            ${mutationFnBody}
           },
           mutationOptions
         )
