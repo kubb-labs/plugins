@@ -10,7 +10,7 @@ export const placeOrderStatus200Schema = orderSchema
 
 export const placeOrderStatus405Schema = z.any()
 
-export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
+export const placeOrderResponseSchema = placeOrderStatus200Schema
 
 export const placeOrderDataSchemaJson = z.optional(orderSchema)
 

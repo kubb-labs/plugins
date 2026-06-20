@@ -13,4 +13,4 @@ export const updatePetWithFormQueryStatusSchema = z.string().optional().describe
 
 export const updatePetWithFormStatus405Schema = z.any()
 
-export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema
+export const updatePetWithFormResponseSchema = z.unknown()

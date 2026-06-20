@@ -3,7 +3,6 @@
 * Do not edit manually.
 */
 
-import * as z from 'zod'
 import { errorSchema } from './errorSchema.ts'
 import { eventInputSchema, eventSchema } from './eventSchema.ts'
 
@@ -11,6 +10,6 @@ export const createEventStatus201Schema = eventSchema
 
 export const createEventStatus400Schema = errorSchema
 
-export const createEventResponseSchema = z.union([createEventStatus201Schema, createEventStatus400Schema])
+export const createEventResponseSchema = createEventStatus201Schema
 
 export const createEventDataSchema = eventInputSchema

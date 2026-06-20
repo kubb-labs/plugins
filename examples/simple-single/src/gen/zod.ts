@@ -116,7 +116,7 @@ export const updatePetStatus404Schema = z.any()
 
 export const updatePetStatus405Schema = z.any()
 
-export const updatePetResponseSchema = z.union([updatePetStatus200Schema, updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
+export const updatePetResponseSchema = updatePetStatus200Schema
 
 export const updatePetDataSchemaJson = petSchema.describe('Update an existent pet in the store')
 
@@ -137,7 +137,7 @@ export const addPetStatus405Schema = z.object({
   message: z.string().optional(),
 })
 
-export const addPetResponseSchema = z.union([addPetStatus200Schema, addPetStatus405Schema])
+export const addPetResponseSchema = addPetStatus200Schema
 
 export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
@@ -160,7 +160,7 @@ export const findPetsByStatusStatus200Schema = z.union([findPetsByStatusStatus20
 
 export const findPetsByStatusStatus400Schema = z.any()
 
-export const findPetsByStatusResponseSchema = z.union([findPetsByStatusStatus200Schema, findPetsByStatusStatus400Schema])
+export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 
 export const findPetsByTagsQueryTagsSchema = z.array(z.string()).optional().describe('Tags to filter by')
 
@@ -176,7 +176,7 @@ export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200Sch
 
 export const findPetsByTagsStatus400Schema = z.any()
 
-export const findPetsByTagsResponseSchema = z.union([findPetsByTagsStatus200Schema, findPetsByTagsStatus400Schema])
+export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 
 export const getPetByIdPathPetIdSchema = z.bigint().describe('ID of pet to return')
 
@@ -190,7 +190,7 @@ export const getPetByIdStatus400Schema = z.any()
 
 export const getPetByIdStatus404Schema = z.any()
 
-export const getPetByIdResponseSchema = z.union([getPetByIdStatus200Schema, getPetByIdStatus400Schema, getPetByIdStatus404Schema])
+export const getPetByIdResponseSchema = getPetByIdStatus200Schema
 
 export const updatePetWithFormPathPetIdSchema = z.bigint().describe('ID of pet that needs to be updated')
 
@@ -200,7 +200,7 @@ export const updatePetWithFormQueryStatusSchema = z.string().optional().describe
 
 export const updatePetWithFormStatus405Schema = z.any()
 
-export const updatePetWithFormResponseSchema = updatePetWithFormStatus405Schema
+export const updatePetWithFormResponseSchema = z.unknown()
 
 export const deletePetHeaderApiKeySchema = z.string().optional()
 
@@ -208,7 +208,7 @@ export const deletePetPathPetIdSchema = z.bigint().describe('Pet id to delete')
 
 export const deletePetStatus400Schema = z.any()
 
-export const deletePetResponseSchema = deletePetStatus400Schema
+export const deletePetResponseSchema = z.unknown()
 
 export const uploadFilePathPetIdSchema = z.bigint().describe('ID of pet to update')
 
@@ -228,7 +228,7 @@ export const placeOrderStatus200Schema = orderSchema
 
 export const placeOrderStatus405Schema = z.any()
 
-export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
+export const placeOrderResponseSchema = placeOrderStatus200Schema
 
 export const placeOrderDataSchemaJson = orderSchema.optional()
 
@@ -242,7 +242,7 @@ export const placeOrderPatchStatus200Schema = orderSchema
 
 export const placeOrderPatchStatus405Schema = z.any()
 
-export const placeOrderPatchResponseSchema = z.union([placeOrderPatchStatus200Schema, placeOrderPatchStatus405Schema])
+export const placeOrderPatchResponseSchema = placeOrderPatchStatus200Schema
 
 export const placeOrderPatchDataSchemaJson = orderSchema.optional()
 
@@ -264,7 +264,7 @@ export const getOrderByIdStatus400Schema = z.any()
 
 export const getOrderByIdStatus404Schema = z.any()
 
-export const getOrderByIdResponseSchema = z.union([getOrderByIdStatus200Schema, getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
+export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 
 export const deleteOrderPathOrderIdSchema = z.bigint().describe('ID of the order that needs to be deleted')
 
@@ -272,4 +272,4 @@ export const deleteOrderStatus400Schema = z.any()
 
 export const deleteOrderStatus404Schema = z.any()
 
-export const deleteOrderResponseSchema = z.union([deleteOrderStatus400Schema, deleteOrderStatus404Schema])
+export const deleteOrderResponseSchema = z.unknown()

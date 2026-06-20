@@ -14,7 +14,7 @@ export const placeOrderStatus405Schema = z.any()
 
 export type PlaceOrderStatus405SchemaType = z.infer<typeof placeOrderStatus405Schema>
 
-export const placeOrderResponseSchema = z.union([placeOrderStatus200Schema, placeOrderStatus405Schema])
+export const placeOrderResponseSchema = placeOrderStatus200Schema
 
 export type PlaceOrderResponseSchemaType = z.infer<typeof placeOrderResponseSchema>
 
