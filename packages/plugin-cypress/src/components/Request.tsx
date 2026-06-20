@@ -4,7 +4,6 @@ import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { PluginCypress } from '../types.ts'
 
 type Props = {
   /**
@@ -20,10 +19,9 @@ type Props = {
    */
   resolver: ResolverTs
   baseURL: string | null | undefined
-  dataReturnType: PluginCypress['resolvedOptions']['dataReturnType']
 }
 
-export function Request({ baseURL = '', name, dataReturnType, resolver, node }: Props): KubbReactNode {
+export function Request({ baseURL = '', name, resolver, node }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node, { paramsCasing: 'original' })
@@ -36,7 +34,7 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node }: 
   const paramsSignature = [signature, 'options: Partial<Cypress.RequestOptions> = {}'].filter(Boolean).join(', ')
 
   const responseType = resolver.resolveResponseName(node)
-  const returnType = dataReturnType === 'data' ? `Cypress.Chainable<${responseType}>` : `Cypress.Chainable<Cypress.Response<${responseType}>>`
+  const returnType = `Cypress.Chainable<${responseType}>`
 
   // Reference the path object straight in the URL with camelCase placeholders.
   const urlTemplate = Url.toGroupedTemplateString(node.path, { prefix: baseURL })
@@ -75,14 +73,9 @@ export function Request({ baseURL = '', name, dataReturnType, resolver, node }: 
 
   requestOptions.push('...options')
 
-  const requestCall =
-    dataReturnType === 'data'
-      ? `return cy.request<${responseType}>({
+  const requestCall = `return cy.request<${responseType}>({
   ${requestOptions.join(',\n  ')}
 }).then((res) => res.body)`
-      : `return cy.request<${responseType}>({
-  ${requestOptions.join(',\n  ')}
-})`
 
   return (
     <File.Source name={name} isIndexable isExportable>

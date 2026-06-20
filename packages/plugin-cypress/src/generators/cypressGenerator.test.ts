@@ -29,7 +29,6 @@ const defaultOptions: PluginCypress['resolvedOptions'] = {
   override: [],
   baseURL: undefined,
   group: null,
-  dataReturnType: 'data',
   resolver: resolverCypress,
 }
 
@@ -137,61 +136,6 @@ describe('cypressGenerator — Operation', () => {
     })
 
     await matchFiles(driver.fileManager.files, props.name)
-  })
-})
-
-describe('cypressGenerator — dataReturnType', () => {
-  const node = ast.factory.createOperation({
-    operationId: 'getPets',
-    method: 'GET',
-    path: '/pets',
-    tags: ['pets'],
-    parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
-    responses: [
-      ast.factory.createResponse({
-        statusCode: '200',
-        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-        description: 'A paged array of pets',
-      }),
-    ],
-  })
-
-  test('data — returns res.body', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, dataReturnType: 'data' }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'dataReturnType data',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'dataReturnType data')
-  })
-
-  test('full — returns entire Chainable', async () => {
-    const options: PluginCypress['resolvedOptions'] = { ...defaultOptions, dataReturnType: 'full' }
-    const plugin = createMockedPlugin<PluginCypress>({ name: 'plugin-cypress', options, resolver: resolverCypress })
-    const driver = createMockedPluginDriver({
-      name: 'dataReturnType full',
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
-
-    await renderGeneratorOperation(cypressGenerator, node, {
-      config: testConfig,
-      adapter: createMockedAdapter(),
-      driver,
-      plugin,
-      options,
-      resolver: resolverCypress,
-    })
-    await matchFiles(driver.fileManager.files, 'dataReturnType full')
   })
 })
 
