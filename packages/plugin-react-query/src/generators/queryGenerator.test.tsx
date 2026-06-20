@@ -29,6 +29,7 @@ const defaultOptions: PluginReactQuery['resolvedOptions'] = {
     client: 'axios',
     clientType: 'function',
   },
+  slimClient: null,
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,

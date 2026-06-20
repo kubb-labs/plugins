@@ -29,6 +29,7 @@ const defaultOptions: PluginSwr['resolvedOptions'] = {
     client: 'axios',
     clientType: 'function',
   },
+  slimClient: null,
   parser: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,

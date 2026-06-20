@@ -17,6 +17,7 @@ type Props = {
   node: ast.OperationNode
   tsResolver: ResolverTs
   dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -27,9 +28,10 @@ function buildQueryParamsNode(
   options: {
     dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
+    slim?: boolean
   },
 ): FunctionParametersNode {
-  const { dataReturnType, resolver } = options
+  const { dataReturnType, resolver, slim } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
@@ -41,7 +43,7 @@ function buildQueryParamsNode(
     name: 'options',
     type: `{
   query?: Partial<UseQueryOptions<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
-  client?: ${buildClientOptionType(node, resolver)}
+  client?: ${buildClientOptionType(node, resolver, { slim })}
 }`,
     default: '{}',
   })
@@ -52,7 +54,7 @@ function buildQueryParamsNode(
   return createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
 
-export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver }: Props): KubbReactNode {
+export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, dataReturnType, node, tsResolver, slim = false }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -68,7 +70,7 @@ export function Query({ name, queryKeyTypeName, queryOptionsName, queryKeyName, 
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver })
+  const paramsNode = buildQueryParamsNode(node, { dataReturnType, resolver: tsResolver, slim })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

@@ -1,0 +1,38 @@
+{
+  "name": "vue-query-slim-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Slim Vue Query PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/vue-query-slim"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
+    "test": "vitest",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-fetch": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
+    "@kubb/plugin-vue-query": "workspace:*",
+    "@tanstack/vue-query": "^5.101.0",
+    "kubb": "catalog:",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.30.1"
+}

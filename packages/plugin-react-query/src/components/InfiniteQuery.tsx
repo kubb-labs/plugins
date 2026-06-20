@@ -20,6 +20,7 @@ type Props = {
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -31,15 +32,16 @@ function buildInfiniteQueryParamsNode(
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
     pageParamGeneric: string
+    slim?: boolean
   },
 ): FunctionParametersNode {
-  const { resolver, pageParamGeneric } = options
+  const { resolver, pageParamGeneric, slim } = options
 
   const optionsParam = createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<InfiniteQueryObserverOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
-  client?: ${buildClientOptionType(node, resolver)}
+  client?: ${buildClientOptionType(node, resolver, { slim })}
 }`,
     default: '{}',
   })
@@ -60,6 +62,7 @@ export function InfiniteQuery({
   initialPageParam,
   queryParam,
   customOptions,
+  slim = false,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
@@ -115,6 +118,7 @@ export function InfiniteQuery({
     dataReturnType,
     resolver: tsResolver,
     pageParamGeneric: 'TPageParam',
+    slim,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 

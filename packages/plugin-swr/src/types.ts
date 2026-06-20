@@ -1,4 +1,4 @@
-import type { Transformer } from '@internals/tanstack-query'
+import type { ClientSelector, Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
@@ -108,7 +108,16 @@ type Mutation = {
  * @default { path: 'hooks', barrel: { type: 'named' } }
  */
 export type Options = OutputOptions & {
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>
+  /**
+   * Selects the HTTP client the generated hooks call.
+   *
+   * - `'fetch'` / `'axios'` calls the slim `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When
+   *   exactly one slim plugin is registered it is auto-detected, so the string is only needed to
+   *   disambiguate two slim plugins or to override.
+   * - The object form is **deprecated** — it keeps the legacy inline / plugin-client generation. Prefer
+   *   registering a slim plugin and configuring the client (baseURL, transport, ...) there.
+   */
+  client?: ClientSelector | (ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>)
   /**
    * Tags, operations, or paths to exclude from generation.
    */
@@ -152,6 +161,11 @@ type ResolvedOptions = {
   include: Options['include']
   override: NonNullable<Options['override']>
   client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
+  /**
+   * Set when the hooks call a slim client plugin's generated functions instead of the legacy inline /
+   * plugin-client path. Names the resolved slim plugin (`plugin-fetch` / `plugin-axios`).
+   */
+  slimClient: { pluginName: string } | null
   parser: NonNullable<Options['parser']>
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false

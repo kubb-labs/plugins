@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
-import { resolveZodSchemaNames } from '@internals/tanstack-query'
+import { resolveSlimOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
 import { Client, isParserEnabled, pluginClientName } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -21,7 +21,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, parser, client: clientOptions, group, customOptions } = ctx.options
+    const { output, query, mutation, infinite, parser, client: clientOptions, group, customOptions, slimClient } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -105,6 +105,9 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
     const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientBaseName) : clientBaseName
 
+    const slim = resolveSlimOperation({ slimClient, driver, node, root, output })
+    const isSlim = slim !== null
+
     return (
       <File
         baseName={meta.file.baseName}
@@ -114,24 +117,31 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
-        {clientOptions.importPath ? (
+        {!isSlim &&
+          (clientOptions.importPath ? (
+            <>
+              {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
+              <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
+            </>
+          ) : (
+            <>
+              {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
+              <File.Import
+                name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
+                root={meta.file.path}
+                path={path.resolve(root, '.kubb/client.ts')}
+                isTypeOnly
+              />
+            </>
+          ))}
+        {!isSlim && shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
+        {!isSlim && !shouldUseClientPlugin && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
+        {slim && (
           <>
-            {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
-          </>
-        ) : (
-          <>
-            {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
-            <File.Import
-              name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
-              root={meta.file.path}
-              path={path.resolve(root, '.kubb/client.ts')}
-              isTypeOnly
-            />
+            <File.Import name={[slim.name]} root={meta.file.path} path={slim.path} />
+            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={slim.clientPath} isTypeOnly />
           </>
         )}
-        {shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
-        {!shouldUseClientPlugin && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
@@ -139,7 +149,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 
-        {!shouldUseClientPlugin && (
+        {!isSlim && !shouldUseClientPlugin && (
           <Client
             name={resolvedClientName}
             baseURL={clientOptions.baseURL}
@@ -156,11 +166,12 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
         <InfiniteQueryOptions
           name={queryOptionsName}
-          clientName={resolvedClientName}
+          clientName={slim ? slim.name : resolvedClientName}
           queryKeyName={queryKeyName}
           node={node}
           tsResolver={tsResolver}
           dataReturnType={clientOptions.dataReturnType || 'data'}
+          slim={isSlim}
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
@@ -182,6 +193,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
           customOptions={customOptions}
+          slim={isSlim}
         />
       </File>
     )

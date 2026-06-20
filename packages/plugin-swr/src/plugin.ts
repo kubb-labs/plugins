@@ -5,7 +5,7 @@ import { isParserEnabled, pluginClientName } from '@kubb/plugin-client'
 import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from '@kubb/plugin-client/templates'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
+import { mutationKeyTransformer, queryKeyTransformer, resolveClient } from '@internals/tanstack-query'
 import { mutationGenerator, queryGenerator } from './generators'
 import { resolverSwr } from './resolvers/resolverSwr.ts'
 import type { PluginSwr } from './types.ts'
@@ -29,8 +29,9 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
     macros: userMacros,
   } = options
 
-  const clientName = client?.client ?? 'axios'
-  const clientImportPath = client?.importPath
+  const clientObject = client && typeof client === 'object' ? client : undefined
+  const clientName = clientObject?.client ?? 'axios'
+  const clientImportPath = clientObject?.importPath
 
   const selectedGenerators = [queryGenerator, mutationGenerator].filter((generator): generator is NonNullable<typeof generator> => Boolean(generator))
 
@@ -44,15 +45,23 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverSwr, ...userResolver } : resolverSwr
 
+        const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
+        const resolvedClient = resolveClient({ client, pluginNames })
+        if (resolvedClient.kind === 'error') {
+          throw new Error(resolvedClient.message)
+        }
+        const slimClient = resolvedClient.kind === 'slim' ? { pluginName: resolvedClient.pluginName } : null
+
         ctx.setOptions({
           output,
           client: {
-            baseURL: client?.baseURL,
+            baseURL: clientObject?.baseURL,
             client: clientName,
-            clientType: client?.clientType ?? 'function',
+            clientType: clientObject?.clientType ?? 'function',
             importPath: clientImportPath,
-            dataReturnType: client?.dataReturnType ?? 'data',
+            dataReturnType: clientObject?.dataReturnType ?? 'data',
           },
+          slimClient,
           queryKey,
           query:
             query === false
@@ -90,7 +99,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const hasClientPlugin = !!ctx.config.plugins?.some((p) => (p as { name?: string }).name === pluginClientName)
 
-        if (!hasClientPlugin && !clientImportPath) {
+        if (!slimClient && !hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
@@ -106,7 +115,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
           })
         }
 
-        if (!hasClientPlugin) {
+        if (!slimClient && !hasClientPlugin) {
           ctx.injectFile({
             baseName: 'config.ts',
             path: path.resolve(root, '.kubb/config.ts'),

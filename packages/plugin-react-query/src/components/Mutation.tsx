@@ -17,6 +17,7 @@ type Props = {
   tsResolver: ResolverTs
   dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
+  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -32,9 +33,10 @@ function buildMutationParamsNode(
   options: {
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
+    slim?: boolean
   },
 ): FunctionParametersNode {
-  const { dataReturnType, resolver } = options
+  const { dataReturnType, resolver, slim } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
@@ -51,7 +53,7 @@ function buildMutationParamsNode(
         name: 'options',
         type: `{
   mutation?: UseMutationOptions<${generics}> & { client?: QueryClient },
-  client?: ${buildRequestConfigType(node, resolver)},
+  client?: ${buildRequestConfigType(node, resolver, { slim })},
 }`,
         default: '{}',
       }),
@@ -59,7 +61,7 @@ function buildMutationParamsNode(
   })
 }
 
-export function Mutation({ name, mutationOptionsName, dataReturnType, node, tsResolver, mutationKeyName, customOptions }: Props): KubbReactNode {
+export function Mutation({ name, mutationOptionsName, dataReturnType, node, tsResolver, mutationKeyName, customOptions, slim = false }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
@@ -74,7 +76,7 @@ export function Mutation({ name, mutationOptionsName, dataReturnType, node, tsRe
   const mutationOptionsConfigNode = buildMutationConfigParamsNode(node, tsResolver)
   const mutationOptionsParamsCall = callPrinter.print(mutationOptionsConfigNode) ?? ''
 
-  const paramsNode = buildMutationParamsNode(node, { dataReturnType, resolver: tsResolver })
+  const paramsNode = buildMutationParamsNode(node, { dataReturnType, resolver: tsResolver, slim })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

@@ -1,3 +1,4 @@
+import type { ClientSelector } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
 
@@ -157,10 +158,15 @@ export type Infinite = {
  */
 export type Options = OutputOptions & {
   /**
-   * HTTP client used inside every generated composable. Mirrors a subset of
-   * `pluginClient` options.
+   * Selects the HTTP client the generated composables call.
+   *
+   * - `'fetch'` / `'axios'` calls the slim `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When
+   *   exactly one slim plugin is registered it is auto-detected, so the string is only needed to
+   *   disambiguate two slim plugins or to override.
+   * - The object form is **deprecated** — it keeps the legacy inline / plugin-client generation. Prefer
+   *   registering a slim plugin and configuring the client (baseURL, transport, ...) there.
    */
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>
+  client?: ClientSelector | (ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>)
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -220,6 +226,11 @@ type ResolvedOptions = {
   include: Options['include']
   override: NonNullable<Options['override']>
   client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
+  /**
+   * Set when the composables call a slim client plugin's generated functions instead of the legacy
+   * inline / plugin-client path. Names the resolved slim plugin (`plugin-fetch` / `plugin-axios`).
+   */
+  slimClient: { pluginName: string } | null
   parser: NonNullable<Options['parser']>
   /**
    * Only used for infinite
