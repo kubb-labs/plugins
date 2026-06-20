@@ -30,10 +30,6 @@ export type GetItemRequestConfig = {
     };
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: `/items/${string}`;
 };
 
 /**

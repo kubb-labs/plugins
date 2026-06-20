@@ -260,7 +260,7 @@ export function buildRequestParamsSignature(
 
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
 
-  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: Omit<${resolver.resolveRequestConfigName(node)}, 'url'>${isOptional ? ' = {}' : ''}` : null
+  const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.resolveRequestConfigName(node)}${isOptional ? ' = {}' : ''}` : null
   const configParam = isConfigurable ? `config: ${buildRequestConfigType(node, resolver)} = {}` : null
 
   return {

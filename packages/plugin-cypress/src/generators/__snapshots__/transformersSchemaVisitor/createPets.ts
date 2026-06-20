@@ -5,10 +5,7 @@
 
 import type { CreatePetsRequestConfig, CreatePetsResponse } from './CreatePets'
 
-export function createPets(
-  { body }: Omit<CreatePetsRequestConfig, 'url'>,
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<CreatePetsResponse> {
+export function createPets({ body }: CreatePetsRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<CreatePetsResponse> {
   return cy
     .request<CreatePetsResponse>({
       method: 'POST',

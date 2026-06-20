@@ -22,7 +22,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 
 function resolveMutationRequestType(node: ast.OperationNode, resolver: ResolverTs): string {
   const groupedParam = buildGroupedRequestParam(node, { resolver })
-  return groupedParam ? `Omit<${resolver.resolveRequestConfigName(node)}, 'url'>` : 'undefined'
+  return groupedParam ? resolver.resolveRequestConfigName(node) : 'undefined'
 }
 
 function buildMutationParamsNode(

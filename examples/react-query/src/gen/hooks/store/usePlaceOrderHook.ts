@@ -18,7 +18,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  * {@link /store/order}
  */
 export async function placeOrderHook(
-  { body }: Omit<PlaceOrderRequestConfig, 'url'>,
+  { body }: PlaceOrderRequestConfig,
   config: Partial<RequestConfig<PlaceOrderData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -46,7 +46,7 @@ export function placeOrderMutationOptionsHook<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderMutationKey()
-  return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, Omit<PlaceOrderRequestConfig, 'url'>, TContext>({
+  return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       return placeOrderHook({ body }, config)
@@ -61,9 +61,7 @@ export function placeOrderMutationOptionsHook<TContext = unknown>(
  */
 export function usePlaceOrderHook<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, Omit<PlaceOrderRequestConfig, 'url'>, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig<PlaceOrderData>> & {
       client?: Client
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -77,17 +75,17 @@ export function usePlaceOrderHook<TContext>(
   const baseOptions = placeOrderMutationOptionsHook(config) as UseMutationOptions<
     PlaceOrderStatus200,
     ResponseErrorConfig<PlaceOrderStatus405>,
-    Omit<PlaceOrderRequestConfig, 'url'>,
+    PlaceOrderRequestConfig,
     TContext
   >
   const customOptions = useCustomHookOptions({ hookName: 'usePlaceOrderHook', operationId: 'placeOrder' }) as UseMutationOptions<
     PlaceOrderStatus200,
     ResponseErrorConfig<PlaceOrderStatus405>,
-    Omit<PlaceOrderRequestConfig, 'url'>,
+    PlaceOrderRequestConfig,
     TContext
   >
 
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, Omit<PlaceOrderRequestConfig, 'url'>, TContext>(
+  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
     {
       ...baseOptions,
       ...customOptions,
@@ -95,5 +93,5 @@ export function usePlaceOrderHook<TContext>(
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, Omit<PlaceOrderRequestConfig, 'url'>, TContext>
+  ) as UseMutationResult<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>
 }

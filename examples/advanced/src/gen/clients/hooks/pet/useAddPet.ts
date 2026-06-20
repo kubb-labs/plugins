@@ -16,7 +16,7 @@ export function addPetMutationOptions<TContext = unknown>(
   return mutationOptions<
     { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
     ResponseErrorConfig<AddPetStatus405>,
-    Omit<AddPetRequestConfig, 'url'>,
+    AddPetRequestConfig,
     TContext
   >({
     mutationKey,
@@ -36,7 +36,7 @@ export function useAddPet<TContext>(
     mutation?: UseMutationOptions<
       { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
       ResponseErrorConfig<AddPetStatus405>,
-      Omit<AddPetRequestConfig, 'url'>,
+      AddPetRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<AddPetData>> & {
@@ -52,14 +52,14 @@ export function useAddPet<TContext>(
   const baseOptions = addPetMutationOptions(config) as UseMutationOptions<
     { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
     ResponseErrorConfig<AddPetStatus405>,
-    Omit<AddPetRequestConfig, 'url'>,
+    AddPetRequestConfig,
     TContext
   >
 
   return useMutation<
     { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
     ResponseErrorConfig<AddPetStatus405>,
-    Omit<AddPetRequestConfig, 'url'>,
+    AddPetRequestConfig,
     TContext
   >(
     {
@@ -71,7 +71,7 @@ export function useAddPet<TContext>(
   ) as UseMutationResult<
     { status: 405; data: AddPetStatus405; statusText: string } | { status: number; data: AddPetStatusDefault; statusText: string },
     ResponseErrorConfig<AddPetStatus405>,
-    Omit<AddPetRequestConfig, 'url'>,
+    AddPetRequestConfig,
     TContext
   >
 }

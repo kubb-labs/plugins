@@ -6,7 +6,7 @@
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse } from '../../models.ts'
 
 export function findPetsByTags(
-  { query }: Omit<FindPetsByTagsRequestConfig, 'url'> = {},
+  { query }: FindPetsByTagsRequestConfig = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByTagsResponse> {
   return cy

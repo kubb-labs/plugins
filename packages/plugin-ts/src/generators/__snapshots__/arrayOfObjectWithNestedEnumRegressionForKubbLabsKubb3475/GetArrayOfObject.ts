@@ -32,10 +32,6 @@ export type GetArrayOfObjectRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/array-of-object'
 }
 
 /**

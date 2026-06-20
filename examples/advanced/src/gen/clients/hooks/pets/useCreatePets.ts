@@ -11,7 +11,7 @@ export function createPetsMutationOptions<TContext = unknown>(config: Partial<Re
   return mutationOptions<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    Omit<CreatePetsRequestConfig, 'url'>,
+    CreatePetsRequestConfig,
     TContext
   >({
     mutationKey,
@@ -30,7 +30,7 @@ export function useCreatePets<TContext>(
     mutation?: UseMutationOptions<
       { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
       ResponseErrorConfig<Error>,
-      Omit<CreatePetsRequestConfig, 'url'>,
+      CreatePetsRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig<CreatePetsData>> & { client?: Client }
@@ -43,14 +43,14 @@ export function useCreatePets<TContext>(
   const baseOptions = createPetsMutationOptions(config) as UseMutationOptions<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    Omit<CreatePetsRequestConfig, 'url'>,
+    CreatePetsRequestConfig,
     TContext
   >
 
   return useMutation<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    Omit<CreatePetsRequestConfig, 'url'>,
+    CreatePetsRequestConfig,
     TContext
   >(
     {
@@ -62,7 +62,7 @@ export function useCreatePets<TContext>(
   ) as UseMutationResult<
     { status: 201; data: CreatePetsStatus201; statusText: string } | { status: number; data: CreatePetsStatusDefault; statusText: string },
     ResponseErrorConfig<Error>,
-    Omit<CreatePetsRequestConfig, 'url'>,
+    CreatePetsRequestConfig,
     TContext
   >
 }

@@ -13,7 +13,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
 
-export type UploadFileMutationArg = Omit<UploadFileRequestConfig, 'url'>
+export type UploadFileMutationArg = UploadFileRequestConfig
 
 /**
  * @summary uploads an image

@@ -9,14 +9,14 @@ import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus200, 
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
-export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'url' | 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
+export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
 
 /**
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400>, unknown>({
@@ -28,7 +28,7 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
   return res.data
 }
 
-export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return getPetById({ path }, config)
@@ -40,7 +40,7 @@ export function getPetByIdQueryOptions({ path }: Omit<GetPetByIdRequestConfig, '
  * {@link /pet/:petId}
  */
 export function useGetPetById(
-  { path }: Omit<GetPetByIdRequestConfig, 'url'>,
+  { path }: GetPetByIdRequestConfig,
   options: {
     query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400>>
     client?: Partial<RequestConfig> & { client?: Client }

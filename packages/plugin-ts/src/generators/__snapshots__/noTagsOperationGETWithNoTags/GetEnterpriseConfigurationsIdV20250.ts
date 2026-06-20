@@ -26,10 +26,6 @@ export type GetEnterpriseConfigurationsIdV20250RequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/enterprise_configurations/${string}`
 }
 
 /**

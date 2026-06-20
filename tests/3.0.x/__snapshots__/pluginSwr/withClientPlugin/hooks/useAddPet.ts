@@ -13,7 +13,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
 export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
 
-export type AddPetMutationArg = Omit<AddPetRequestConfig, 'url'>
+export type AddPetMutationArg = AddPetRequestConfig
 
 /**
  * @description Add a new pet to the store

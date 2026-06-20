@@ -35,10 +35,6 @@ export type CreateUsersWithListInputRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/user/createWithList'
 }
 
 /**

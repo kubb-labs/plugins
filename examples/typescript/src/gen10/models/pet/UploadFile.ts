@@ -49,10 +49,6 @@ export type UploadFileRequestConfig = {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
 }
 
 /**

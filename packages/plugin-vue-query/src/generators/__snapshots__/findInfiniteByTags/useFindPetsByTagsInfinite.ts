@@ -12,7 +12,7 @@ import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { infiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsInfiniteQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>['query']> }) =>
+export const findPetsByTagsInfiniteQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'headers'>['query']> }) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInfiniteQueryKey>
@@ -20,7 +20,7 @@ export type FindPetsByTagsInfiniteQueryKey = ReturnType<typeof findPetsByTagsInf
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsInfinite({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTagsInfinite({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -29,7 +29,7 @@ export async function findPetsByTagsInfinite({ query }: Omit<FindPetsByTagsReque
 }
 
 export function findPetsByTagsInfiniteQueryOptions(
-  { query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> },
+  { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsInfiniteQueryKey({ query })
@@ -52,7 +52,7 @@ export function useFindPetsByTagsInfinite<
   TQueryData = FindPetsByTagsStatus200,
   TQueryKey extends QueryKey = FindPetsByTagsInfiniteQueryKey,
 >(
-  { query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> },
+  { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
   options: {
     query?: Partial<UseInfiniteQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TQueryData, TQueryKey, TQueryData>> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }

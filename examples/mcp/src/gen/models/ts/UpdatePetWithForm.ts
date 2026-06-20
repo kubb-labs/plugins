@@ -47,10 +47,6 @@ export type UpdatePetWithFormRequestConfig = {
     status?: UpdatePetWithFormQueryStatus
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**

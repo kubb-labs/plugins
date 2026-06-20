@@ -13,10 +13,6 @@ export type GetInventoryRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/inventory'
 }
 
 /**

@@ -17,9 +17,9 @@ export const updatePetWithFormQueryKey = ({
   body,
   query,
 }: {
-  path: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>['path']>
-  body: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>['body']>
-  query?: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>['query']>
+  path: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'headers'>['path']>
+  body: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'headers'>['body']>
+  query?: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'headers'>['query']>
 }) => [{ url: '/pet/:petId', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
@@ -28,7 +28,7 @@ export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQuery
  * {@link /pet/:petId}
  */
 export async function updatePetWithForm(
-  { path, query, body }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, query, body }: UpdatePetWithFormRequestConfig,
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -52,9 +52,9 @@ export function updatePetWithFormQueryOptions(
     body,
     query,
   }: {
-    path: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['path']>
-    body: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['body']>
-    query?: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['query']>
+    path: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['path']>
+    body: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['body']>
+    query?: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['query']>
   },
   config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
 ) {
@@ -80,9 +80,9 @@ export function useUpdatePetWithForm<
     body,
     query,
   }: {
-    path: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['path']>
-    body: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['body']>
-    query?: MaybeRefOrGetter<Omit<UpdatePetWithFormRequestConfig, 'url'>['query']>
+    path: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['path']>
+    body: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['body']>
+    query?: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['query']>
   },
   options: {
     query?: Partial<UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }

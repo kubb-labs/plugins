@@ -13,7 +13,7 @@ export function getGetOrganizationUrl(path: GetOrganizationRequestConfig['path']
 /**
  * {@link /organizations/:organization-id}
  */
-export async function getOrganization({ path }: Omit<GetOrganizationRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getOrganization({ path }: GetOrganizationRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetOrganizationStatus200, ResponseErrorConfig<Error>, unknown>({

@@ -11,7 +11,7 @@ export function updatePetWithFormMutationOptions<TContext = unknown>(config: Par
   return mutationOptions<
     { status: 405; data: UpdatePetWithFormStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    Omit<UpdatePetWithFormRequestConfig, 'url'>,
+    UpdatePetWithFormRequestConfig,
     TContext
   >({
     mutationKey,
@@ -30,7 +30,7 @@ export function useUpdatePetWithForm<TContext>(
     mutation?: UseMutationOptions<
       { status: 405; data: UpdatePetWithFormStatus405; statusText: string },
       ResponseErrorConfig<UpdatePetWithFormStatus405>,
-      Omit<UpdatePetWithFormRequestConfig, 'url'>,
+      UpdatePetWithFormRequestConfig,
       TContext
     > & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
@@ -43,14 +43,14 @@ export function useUpdatePetWithForm<TContext>(
   const baseOptions = updatePetWithFormMutationOptions(config) as UseMutationOptions<
     { status: 405; data: UpdatePetWithFormStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    Omit<UpdatePetWithFormRequestConfig, 'url'>,
+    UpdatePetWithFormRequestConfig,
     TContext
   >
 
   return useMutation<
     { status: 405; data: UpdatePetWithFormStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    Omit<UpdatePetWithFormRequestConfig, 'url'>,
+    UpdatePetWithFormRequestConfig,
     TContext
   >(
     {
@@ -62,7 +62,7 @@ export function useUpdatePetWithForm<TContext>(
   ) as UseMutationResult<
     { status: 405; data: UpdatePetWithFormStatus405; statusText: string },
     ResponseErrorConfig<UpdatePetWithFormStatus405>,
-    Omit<UpdatePetWithFormRequestConfig, 'url'>,
+    UpdatePetWithFormRequestConfig,
     TContext
   >
 }

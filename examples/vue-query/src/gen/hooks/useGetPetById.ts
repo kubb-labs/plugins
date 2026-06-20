@@ -11,7 +11,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
-export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url' | 'headers'>['path']> }) =>
+export const getPetByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'headers'>['path']> }) =>
   [{ url: '/pet/:petId', params: path }] as const
 
 export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
@@ -21,7 +21,7 @@ export type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({
@@ -34,7 +34,7 @@ export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>,
 }
 
 export function getPetByIdQueryOptions(
-  { path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url'>['path']> },
+  { path }: { path: MaybeRefOrGetter<GetPetByIdRequestConfig['path']> },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = getPetByIdQueryKey({ path })
@@ -52,7 +52,7 @@ export function getPetByIdQueryOptions(
  * {@link /pet/:petId}
  */
 export function useGetPetById<TData = GetPetByIdStatus200, TQueryData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdQueryKey>(
-  { path }: { path: MaybeRefOrGetter<Omit<GetPetByIdRequestConfig, 'url'>['path']> },
+  { path }: { path: MaybeRefOrGetter<GetPetByIdRequestConfig['path']> },
   options: {
     query?: Partial<UseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient

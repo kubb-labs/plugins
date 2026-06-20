@@ -6,7 +6,7 @@
 import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponse } from '../models.ts'
 
 export function placeOrderPatch(
-  { body }: Omit<PlaceOrderPatchRequestConfig, 'url'>,
+  { body }: PlaceOrderPatchRequestConfig,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<PlaceOrderPatchResponse> {
   return cy

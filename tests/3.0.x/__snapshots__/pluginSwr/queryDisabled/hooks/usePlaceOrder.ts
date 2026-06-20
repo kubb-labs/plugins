@@ -7,7 +7,7 @@ import client from '@kubb/plugin-client/clients/axios'
 import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 
-export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'url' | 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
+export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 
 type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
 
@@ -16,7 +16,7 @@ type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const { client: request = client, contentType = 'application/json', ...requestConfig } = config
 
   const requestBody = body
@@ -26,7 +26,7 @@ export async function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>,
   return res.data
 }
 
-export function placeOrderQueryOptions({ body }: Omit<PlaceOrderRequestConfig, 'url'>, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
   return {
     fetcher: async () => {
       return placeOrder({ body }, config)

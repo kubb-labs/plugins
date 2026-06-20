@@ -439,10 +439,6 @@ export type UpdatePetRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**
@@ -508,10 +504,6 @@ export type AddPetRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**
@@ -565,10 +557,6 @@ export type FindPetsByStatusRequestConfig = {
       }
     | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet/findByStatus'
 }
 
 /**
@@ -636,10 +624,6 @@ export type FindPetsByTagsRequestConfig = {
       }
     | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
 }
 
 /**
@@ -692,10 +676,6 @@ export type GetPetByIdRequestConfig = {
   }
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -758,10 +738,6 @@ export type UpdatePetWithFormRequestConfig = {
       }
     | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -819,10 +795,6 @@ export type DeletePetRequestConfig = {
         apiKey: DeletePetHeaderApiKey | undefined
       }
     | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -884,10 +856,6 @@ export type UploadFileRequestConfig = {
       }
     | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
 }
 
 /**
@@ -917,10 +885,6 @@ export type GetInventoryRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/store/inventory'
 }
 
 /**
@@ -971,10 +935,6 @@ export type PlaceOrderRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**
@@ -1025,10 +985,6 @@ export type PlaceOrderPatchRequestConfig = {
   path: never | undefined
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**
@@ -1087,10 +1043,6 @@ export type GetOrderByIdRequestConfig = {
   }
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**
@@ -1138,10 +1090,6 @@ export type DeleteOrderRequestConfig = {
   }
   query: never | undefined
   headers: never | undefined
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**

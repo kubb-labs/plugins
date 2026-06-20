@@ -6,7 +6,7 @@
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse } from '../../models.ts'
 
 export function findPetsByStatus(
-  { query }: Omit<FindPetsByStatusRequestConfig, 'url'> = {},
+  { query }: FindPetsByStatusRequestConfig = {},
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<FindPetsByStatusResponse> {
   return cy

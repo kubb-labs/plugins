@@ -36,10 +36,6 @@ export type DeletePetRequestConfig = {
   headers?: {
     apiKey?: DeletePetHeaderApiKey
   }
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**

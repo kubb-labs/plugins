@@ -46,10 +46,6 @@ export type LoginUserRequestConfig = {
     password?: LoginUserQueryPassword
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/user/login'
 }
 
 /**

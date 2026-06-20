@@ -46,10 +46,6 @@ export type GetUserByNameRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/user/${string}`
 }
 
 /**

@@ -26,10 +26,6 @@ export type DeletePetRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pets/${string}`
 }
 
 /**

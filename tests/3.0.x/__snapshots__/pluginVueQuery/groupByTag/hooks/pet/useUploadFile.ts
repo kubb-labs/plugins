@@ -15,7 +15,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ path, query, body }: Omit<UploadFileRequestConfig, 'url'>, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export async function uploadFile({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestBody = body
@@ -30,14 +30,14 @@ export async function uploadFile({ path, query, body }: Omit<UploadFileRequestCo
  * {@link /pet/:petId/uploadImage}
  */
 export function useUploadFile<TContext>(options: {
-  mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, Omit<UploadFileRequestConfig, 'url'>, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient },
   client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, Omit<UploadFileRequestConfig, 'url'>, TContext>({
+  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationFn: async({ path, query, body }) => {
       return uploadFile({ path, query, body }, config)
     },

@@ -5,7 +5,7 @@
 
 import type { GetConfigIdV20250RequestConfig, GetConfigIdV20250Response } from '../../types/GetConfigIdV20250.ts'
 
-export function getConfigIdV20250({ path }: Omit<GetConfigIdV20250RequestConfig, 'url'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
+export function getConfigIdV20250({ path }: GetConfigIdV20250RequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<GetConfigIdV20250Response> {
   return cy.request<GetConfigIdV20250Response>({
     method: 'GET',
     url: `/config/${path.configId}`,

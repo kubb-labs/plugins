@@ -15,7 +15,7 @@ export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 /**
  * {@link /pet/:petId}
  */
-export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
@@ -32,7 +32,7 @@ export async function deletePet({ path, headers }: Omit<DeletePetRequestConfig, 
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
   const mutationKey = deletePetMutationKey()
-  return mutationOptions<DeletePetStatus200, ResponseErrorConfig<Error>, Omit<DeletePetRequestConfig, 'url'>, TContext>({
+  return mutationOptions<DeletePetStatus200, ResponseErrorConfig<Error>, DeletePetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path, headers }) => {
       return deletePet({ path, headers }, config)
@@ -45,7 +45,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Req
  */
 export function useDeletePet<TContext>(
   options: {
-    mutation?: UseMutationOptions<DeletePetStatus200, ResponseErrorConfig<Error>, Omit<DeletePetRequestConfig, 'url'>, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<DeletePetStatus200, ResponseErrorConfig<Error>, DeletePetRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<RequestConfig> & { client?: Client }
   } = {},
 ) {
@@ -53,19 +53,14 @@ export function useDeletePet<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? deletePetMutationKey()
 
-  const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<
-    DeletePetStatus200,
-    ResponseErrorConfig<Error>,
-    Omit<DeletePetRequestConfig, 'url'>,
-    TContext
-  >
+  const baseOptions = deletePetMutationOptions(config) as UseMutationOptions<DeletePetStatus200, ResponseErrorConfig<Error>, DeletePetRequestConfig, TContext>
 
-  return useMutation<DeletePetStatus200, ResponseErrorConfig<Error>, Omit<DeletePetRequestConfig, 'url'>, TContext>(
+  return useMutation<DeletePetStatus200, ResponseErrorConfig<Error>, DeletePetRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<DeletePetStatus200, ResponseErrorConfig<Error>, Omit<DeletePetRequestConfig, 'url'>, TContext>
+  ) as UseMutationResult<DeletePetStatus200, ResponseErrorConfig<Error>, DeletePetRequestConfig, TContext>
 }

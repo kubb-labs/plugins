@@ -45,7 +45,7 @@ export function MutationOptions({ name, clientName, dataReturnType, node, tsReso
   const hasMutationParams = groupedParam !== null
 
   const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
-  const TRequest = hasMutationParams ? `Omit<${tsResolver.resolveRequestConfigName(node)}, 'url'>` : 'undefined'
+  const TRequest = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
   const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
 

@@ -50,10 +50,6 @@ export type UpdatePetRequestConfig = {
         requestSource?: UpdatePetQueryRequestSource;
     };
     headers?: never;
-    /**
-     * @type string
-    */
-    url: `/pets/${string}`;
 };
 
 /**

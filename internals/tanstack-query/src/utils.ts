@@ -13,12 +13,12 @@ type RequestGroupKey = (typeof requestGroupOrder)[number]
 /**
  * Builds the grouped `{ path, query, body, headers }` parameter that mirrors the client
  * function signature. Only the groups the operation carries are emitted, typed from the
- * operation's `RequestConfig` (minus `url`). `keys` narrows the emitted groups, used by the
- * query key which never carries `headers`.
+ * operation's `RequestConfig`. `keys` narrows the emitted groups, used by the query key which
+ * never carries `headers`.
  *
- * By default the whole group is typed as the single `Omit<RequestConfig, 'url'>` reference. When
+ * By default the whole group is typed as the single `RequestConfig` reference. When
  * `memberTypeWrapper` is set, each group is emitted as its own member typed from the matching
- * `Omit<RequestConfig, 'url'>['<group>']` slice and wrapped, used by vue-query to apply
+ * `RequestConfig['<group>']` slice and wrapped, used by vue-query to apply
  * `MaybeRefOrGetter` per group.
  */
 export function buildGroupedRequestParam(
@@ -48,10 +48,11 @@ export function buildGroupedRequestParam(
   // query key narrows `keys`, so optionality is computed over the emitted groups, not all of them.
   const isOptional = names.every((name) => !requiredByGroup[name])
 
-  // Drop both `url` and the groups this binding never destructures (the query key omits `headers`),
-  // so a group that is required elsewhere does not leak into a binding that does not carry it.
+  // Drop the groups this binding never destructures (the query key omits `headers`), so a group
+  // that is required elsewhere does not leak into a binding that does not carry it.
+  const requestConfigName = resolver.resolveRequestConfigName(node)
   const omittedKeys = requestGroupOrder.filter((key) => !keys.includes(key))
-  const requestConfigType = `Omit<${resolver.resolveRequestConfigName(node)}, ${['url', ...omittedKeys].map((key) => `'${key}'`).join(' | ')}>`
+  const requestConfigType = omittedKeys.length > 0 ? `Omit<${requestConfigName}, ${omittedKeys.map((key) => `'${key}'`).join(' | ')}>` : requestConfigName
 
   if (memberTypeWrapper) {
     const members = names.map((name) => ({

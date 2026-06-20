@@ -28,10 +28,6 @@ export type GetConfigIdV20250RequestConfig = {
     };
     query?: never;
     headers?: never;
-    /**
-     * @type string
-    */
-    url: `/config/${string}`;
 };
 
 /**

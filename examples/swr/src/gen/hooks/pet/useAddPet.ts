@@ -19,7 +19,7 @@ export type AddPetMutationKey = ReturnType<typeof addPetMutationKey>
  * {@link /pet}
  */
 export async function addPet(
-  { body }: Omit<AddPetRequestConfig, 'url'>,
+  { body }: AddPetRequestConfig,
   config: Partial<RequestConfig<AddPetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -40,7 +40,7 @@ export async function addPet(
   return res.data
 }
 
-export type AddPetMutationArg = Omit<AddPetRequestConfig, 'url'>
+export type AddPetMutationArg = AddPetRequestConfig
 
 /**
  * @description Add a new pet to the store

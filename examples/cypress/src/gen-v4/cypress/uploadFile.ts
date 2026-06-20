@@ -6,7 +6,7 @@
 import type { UploadFileRequestConfig, UploadFileResponse } from '../models.ts'
 
 export function uploadFile(
-  { path, query, body }: Omit<UploadFileRequestConfig, 'url'>,
+  { path, query, body }: UploadFileRequestConfig,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UploadFileResponse> {
   return cy

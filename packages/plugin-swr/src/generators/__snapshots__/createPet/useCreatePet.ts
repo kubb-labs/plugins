@@ -16,7 +16,7 @@ export type CreatePetMutationKey = ReturnType<typeof createPetMutationKey>
 /**
  * {@link /pet}
  */
-export async function createPet({ body }: Omit<CreatePetRequestConfig, 'url'>, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
+export async function createPet({ body }: CreatePetRequestConfig, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const requestBody = body
@@ -26,7 +26,7 @@ export async function createPet({ body }: Omit<CreatePetRequestConfig, 'url'>, c
   return res.data
 }
 
-export type CreatePetMutationArg = Omit<CreatePetRequestConfig, 'url'>
+export type CreatePetMutationArg = CreatePetRequestConfig
 
 /**
  * {@link /pet}

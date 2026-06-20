@@ -13,7 +13,7 @@ export function getDownloadFileUrl(path: DownloadFileRequestConfig['path']) {
 /**
  * {@link /files/:fileId}
  */
-export async function downloadFile({ path }: Omit<DownloadFileRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function downloadFile({ path }: DownloadFileRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<DownloadFileStatus200, ResponseErrorConfig<Error>, unknown>({

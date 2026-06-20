@@ -1,7 +1,7 @@
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse } from '../../models/ts/pet/UpdatePetWithForm.ts'
 
 export function updatePetWithForm(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, query }: UpdatePetWithFormRequestConfig,
   options: Partial<Cypress.RequestOptions> = {},
 ): Cypress.Chainable<UpdatePetWithFormResponse> {
   return cy

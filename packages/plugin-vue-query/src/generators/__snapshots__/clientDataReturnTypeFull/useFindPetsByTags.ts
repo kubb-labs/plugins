@@ -12,7 +12,7 @@ import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
-export const findPetsByTagsQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url' | 'headers'>['query']> }) =>
+export const findPetsByTagsQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'headers'>['query']> }) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
@@ -20,7 +20,7 @@ export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
@@ -29,7 +29,7 @@ export async function findPetsByTags({ query }: Omit<FindPetsByTagsRequestConfig
 }
 
 export function findPetsByTagsQueryOptions(
-  { query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> },
+  { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
@@ -53,7 +53,7 @@ export function useFindPetsByTags<
   TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string },
   TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
 >(
-  { query }: { query: MaybeRefOrGetter<Omit<FindPetsByTagsRequestConfig, 'url'>['query']> },
+  { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },
   options: {
     query?: Partial<
       UseQueryOptions<{ status: 200; data: FindPetsByTagsStatus200; statusText: string }, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>

@@ -14,7 +14,7 @@ export function getFindPetsByStatusUrl(path: FindPetsByStatusRequestConfig['path
  * @summary Finds Pets by status
  * {@link /pet/findByStatus/:step_id}
  */
-export async function findPetsByStatus({ path }: Omit<FindPetsByStatusRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function findPetsByStatus({ path }: FindPetsByStatusRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<FindPetsByStatusStatus200 | FindPetsByStatusStatus400, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({

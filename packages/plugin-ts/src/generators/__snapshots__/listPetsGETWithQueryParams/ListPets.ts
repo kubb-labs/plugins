@@ -31,10 +31,6 @@ export type ListPetsRequestConfig = {
     limit?: ListPetsQueryLimit
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pets'
 }
 
 /**

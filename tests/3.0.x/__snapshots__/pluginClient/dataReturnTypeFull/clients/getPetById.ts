@@ -18,7 +18,7 @@ function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: Omit<GetPetByIdRequestConfig, 'url'>, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
   const { client: request = client, ...requestConfig } = config
 
   const res = await request<GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl(path).url.toString(), ...requestConfig })

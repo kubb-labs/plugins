@@ -25,7 +25,7 @@ export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutati
  * {@link /store/order}
  */
 export async function placeOrderPatch(
-  { body }: Omit<PlaceOrderPatchRequestConfig, 'url'>,
+  { body }: PlaceOrderPatchRequestConfig,
   config: Partial<RequestConfig<PlaceOrderPatchData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -46,7 +46,7 @@ export async function placeOrderPatch(
   return res.data
 }
 
-export type PlaceOrderPatchMutationArg = Omit<PlaceOrderPatchRequestConfig, 'url'>
+export type PlaceOrderPatchMutationArg = PlaceOrderPatchRequestConfig
 
 /**
  * @description Place a new order in the store with patch

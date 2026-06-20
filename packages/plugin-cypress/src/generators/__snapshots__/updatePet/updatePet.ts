@@ -5,10 +5,7 @@
 
 import type { UpdatePetRequestConfig, UpdatePetResponse } from './UpdatePet'
 
-export function updatePet(
-  { path, body }: Omit<UpdatePetRequestConfig, 'url'>,
-  options: Partial<Cypress.RequestOptions> = {},
-): Cypress.Chainable<UpdatePetResponse> {
+export function updatePet({ path, body }: UpdatePetRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UpdatePetResponse> {
   return cy
     .request<UpdatePetResponse>({
       method: 'PUT',

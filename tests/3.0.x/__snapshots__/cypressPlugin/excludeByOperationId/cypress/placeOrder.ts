@@ -5,7 +5,7 @@
 
 import type { PlaceOrderRequestConfig, PlaceOrderResponse } from '../types/PlaceOrder.ts'
 
-export function placeOrder({ body }: Omit<PlaceOrderRequestConfig, 'url'>, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
+export function placeOrder({ body }: PlaceOrderRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<PlaceOrderResponse> {
   return cy.request<PlaceOrderResponse>({
     method: 'POST',
     url: `/store/order`,

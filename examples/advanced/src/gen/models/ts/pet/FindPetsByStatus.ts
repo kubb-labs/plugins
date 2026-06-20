@@ -35,10 +35,6 @@ export type FindPetsByStatusRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/findByStatus/${string}`
 }
 
 /**

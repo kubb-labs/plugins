@@ -61,10 +61,6 @@ export type FindPetsByTagsRequestConfig = {
   headers: {
     xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE
   }
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
 }
 
 /**

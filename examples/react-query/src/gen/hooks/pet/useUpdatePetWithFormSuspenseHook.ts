@@ -10,7 +10,7 @@ import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryRe
 import { useCustomHookOptions } from '../../../useCustomHookOptions.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
-export const updatePetWithFormSuspenseQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'url' | 'headers'>) =>
+export const updatePetWithFormSuspenseQueryKey = ({ path, query }: Omit<UpdatePetWithFormRequestConfig, 'headers'>) =>
   ['v5', { url: '/pet/:pet_id', params: path }, ...(query ? [query] : [])] as const
 
 type UpdatePetWithFormSuspenseQueryKey = ReturnType<typeof updatePetWithFormSuspenseQueryKey>
@@ -20,7 +20,7 @@ type UpdatePetWithFormSuspenseQueryKey = ReturnType<typeof updatePetWithFormSusp
  * {@link /pet/:pet_id}
  */
 export async function updatePetWithFormSuspenseHook(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, query }: UpdatePetWithFormRequestConfig,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const { client: request = client, ...requestConfig } = config
@@ -36,7 +36,7 @@ export async function updatePetWithFormSuspenseHook(
 }
 
 export function updatePetWithFormSuspenseQueryOptionsHook(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, query }: UpdatePetWithFormRequestConfig,
   config: Partial<RequestConfig> & { client?: Client } = {},
 ) {
   const queryKey = updatePetWithFormSuspenseQueryKey({ path, query })
@@ -53,7 +53,7 @@ export function updatePetWithFormSuspenseQueryOptionsHook(
  * {@link /pet/:pet_id}
  */
 export function useUpdatePetWithFormSuspenseHook<TData = UpdatePetWithFormResponse, TQueryKey extends QueryKey = UpdatePetWithFormSuspenseQueryKey>(
-  { path, query }: Omit<UpdatePetWithFormRequestConfig, 'url'>,
+  { path, query }: UpdatePetWithFormRequestConfig,
   options: {
     query?: Partial<UseSuspenseQueryOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, TData, TQueryKey>> & {
       client?: QueryClient

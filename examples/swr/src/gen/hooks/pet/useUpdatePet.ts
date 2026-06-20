@@ -27,7 +27,7 @@ export type UpdatePetMutationKey = ReturnType<typeof updatePetMutationKey>
  * {@link /pet}
  */
 export async function updatePet(
-  { body }: Omit<UpdatePetRequestConfig, 'url'>,
+  { body }: UpdatePetRequestConfig,
   config: Partial<RequestConfig<UpdatePetData>> & {
     client?: Client
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
@@ -48,7 +48,7 @@ export async function updatePet(
   return res.data
 }
 
-export type UpdatePetMutationArg = Omit<UpdatePetRequestConfig, 'url'>
+export type UpdatePetMutationArg = UpdatePetRequestConfig
 
 /**
  * @description Update an existing pet by Id

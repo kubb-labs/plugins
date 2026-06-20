@@ -283,10 +283,6 @@ export type UpdatePetRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**
@@ -360,10 +356,6 @@ export type AddPetRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet'
 }
 
 /**
@@ -415,10 +407,6 @@ export type FindPetsByStatusRequestConfig = {
     status?: FindPetsByStatusQueryStatus
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByStatus'
 }
 
 /**
@@ -484,10 +472,6 @@ export type FindPetsByTagsRequestConfig = {
     pageSize?: FindPetsByTagsQueryPageSize
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/pet/findByTags'
 }
 
 /**
@@ -546,10 +530,6 @@ export type GetPetByIdRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -610,10 +590,6 @@ export type UpdatePetWithFormRequestConfig = {
     status?: UpdatePetWithFormQueryStatus
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -664,10 +640,6 @@ export type DeletePetRequestConfig = {
   headers?: {
     apiKey?: DeletePetHeaderApiKey
   }
-  /**
-   * @type string
-   */
-  url: `/pet/${string}`
 }
 
 /**
@@ -744,10 +716,6 @@ export type UploadFileRequestConfig = {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/pet/${string}/uploadImage`
 }
 
 /**
@@ -777,10 +745,6 @@ export type GetInventoryRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/inventory'
 }
 
 /**
@@ -830,10 +794,6 @@ export type PlaceOrderRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**
@@ -884,10 +844,6 @@ export type PlaceOrderPatchRequestConfig = {
   path?: never
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: '/store/order'
 }
 
 /**
@@ -946,10 +902,6 @@ export type GetOrderByIdRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**
@@ -997,10 +949,6 @@ export type DeleteOrderRequestConfig = {
   }
   query?: never
   headers?: never
-  /**
-   * @type string
-   */
-  url: `/store/order/${string}`
 }
 
 /**

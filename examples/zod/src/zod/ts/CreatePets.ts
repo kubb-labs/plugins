@@ -79,10 +79,6 @@ export type CreatePetsRequestConfig = {
   headers: {
     xEXAMPLE: CreatePetsHeaderXEXAMPLE
   }
-  /**
-   * @type string
-   */
-  url: `/pets/${string}`
 }
 
 /**
