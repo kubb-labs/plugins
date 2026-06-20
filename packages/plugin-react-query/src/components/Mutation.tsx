@@ -1,6 +1,6 @@
-import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
@@ -33,7 +33,7 @@ function buildMutationParamsNode(
     dataReturnType: PluginReactQuery['resolvedOptions']['client']['dataReturnType']
     resolver: ResolverTs
   },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { dataReturnType, resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
@@ -45,9 +45,9 @@ function buildMutationParamsNode(
   const TRequest = resolveMutationRequestType(node, resolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
-  return ast.factory.createFunctionParameters({
+  return createFunctionParameters({
     params: [
-      ast.factory.createFunctionParameter({
+      createFunctionParameter({
         name: 'options',
         type: `{
   mutation?: UseMutationOptions<${generics}> & { client?: QueryClient },

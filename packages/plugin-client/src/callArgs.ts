@@ -1,5 +1,4 @@
-import { ast } from '@kubb/core'
-import { functionPrinter } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, functionPrinter } from '@kubb/plugin-ts'
 
 const callPrinter = functionPrinter({ mode: 'call' })
 
@@ -16,8 +15,8 @@ export type CallArg = {
 /**
  * Renders the client call-arguments object literal, for example `{ method: 'GET', url, ...requestConfig }`.
  * Entries keep their insertion order and `null` entries are dropped, so callers express a conditional
- * argument by passing `null`. The object is built with `ast.factory` and printed through the shared
- * plugin-ts `functionPrinter`, matching how every other generated function call is rendered.
+ * argument by passing `null`. The object is built with the `@kubb/plugin-ts` factory helpers and
+ * printed through the shared `functionPrinter`, matching how every other generated function call is rendered.
  */
 export function buildClientCallArgs(args: Record<string, CallArg | null | undefined>): string {
   const elements = Object.entries(args)
@@ -28,8 +27,8 @@ export function buildClientCallArgs(args: Record<string, CallArg | null | undefi
 
   return (
     callPrinter.print(
-      ast.factory.createFunctionParameters({
-        params: [ast.factory.createFunctionParameter({ name: ast.factory.createObjectBindingPattern({ elements }) })],
+      createFunctionParameters({
+        params: [createFunctionParameter({ name: createObjectBindingPattern({ elements }) })],
       }),
     ) ?? ''
   )

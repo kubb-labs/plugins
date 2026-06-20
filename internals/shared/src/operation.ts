@@ -1,6 +1,6 @@
 import { Url } from '@internals/utils'
 import { ast, type ResolverFileParams } from '@kubb/core'
-import { caseParams } from '@kubb/ast/utils'
+import { caseParams } from './params.ts'
 
 /**
  * Builds the `ResolverFileParams` every operation generator passes to

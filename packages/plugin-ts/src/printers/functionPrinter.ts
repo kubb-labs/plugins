@@ -1,8 +1,9 @@
-import { ast } from '@kubb/core'
 import { PARAM_RANK } from '../constants.ts'
+import { isIndexedAccessType, isTypeLiteral } from './functionParams.ts'
+import type { FunctionParameterNode, FunctionParametersNode, ObjectBindingPatternNode, TypeExpression } from './functionParams.ts'
 
 /**
- * Renders a {@link ast.TypeExpression} to its TypeScript source.
+ * Renders a {@link TypeExpression} to its TypeScript source.
  *
  * - a `string` is a type reference, returned as-is
  * - an `IndexedAccessType` becomes `objectType['indexType']`
@@ -11,7 +12,7 @@ import { PARAM_RANK } from '../constants.ts'
  * `transformType` is applied once to the fully rendered type, matching how the
  * printer wrapped reference types before the `ts.factory` model.
  */
-export function renderType(type: ast.TypeExpression, transformType?: (type: string) => string): string {
+export function renderType(type: TypeExpression, transformType?: (type: string) => string): string {
   const rendered = renderTypeExpression(type)
   return transformType ? transformType(rendered) : rendered
 }
@@ -24,9 +25,9 @@ function renderKey(name: string): string {
   return /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name) ? name : JSON.stringify(name)
 }
 
-function renderTypeExpression(type: ast.TypeExpression): string {
+function renderTypeExpression(type: TypeExpression): string {
   if (typeof type === 'string') return type
-  if (ast.indexedAccessTypeDef.is(type)) return `${type.target}['${type.key}']`
+  if (isIndexedAccessType(type)) return `${type.target}['${type.key}']`
 
   const parts = type.members.map((member) => {
     const value = renderTypeExpression(member.type)
@@ -55,12 +56,12 @@ export type FunctionPrinterOptions = {
   transformType?: (type: string) => string
 }
 
-function groupMembers(param: ast.FunctionParameterNode): ReadonlyArray<{ name: string; optional?: boolean }> | null {
+function groupMembers(param: FunctionParameterNode): ReadonlyArray<{ name: string; optional?: boolean }> | null {
   if (typeof param.name === 'string') return null
-  return param.type && ast.typeLiteralDef.is(param.type) ? param.type.members : []
+  return param.type && isTypeLiteral(param.type) ? param.type.members : []
 }
 
-function rank(param: ast.FunctionParameterNode): number {
+function rank(param: FunctionParameterNode): number {
   if (param.rest) return PARAM_RANK.rest
   if (param.default) return PARAM_RANK.withDefault
   const members = groupMembers(param)
@@ -68,7 +69,7 @@ function rank(param: ast.FunctionParameterNode): number {
   return param.optional ? PARAM_RANK.optional : PARAM_RANK.required
 }
 
-function sortParams(params: ReadonlyArray<ast.FunctionParameterNode>): Array<ast.FunctionParameterNode> {
+function sortParams(params: ReadonlyArray<FunctionParameterNode>): Array<FunctionParameterNode> {
   // `toSorted` is a stable sort, so equal-rank params keep their declared order.
   return params.toSorted((a, b) => rank(a) - rank(b))
 }
@@ -77,10 +78,10 @@ function sortParams(params: ReadonlyArray<ast.FunctionParameterNode>): Array<ast
  * Orders a destructured group's binding elements and type members together,
  * required fields first, matching how grouped children were sorted before.
  */
-type GroupMember = { name: string; propertyName?: string; type?: ast.TypeExpression; optional?: boolean }
+type GroupMember = { name: string; propertyName?: string; type?: TypeExpression; optional?: boolean }
 
-function sortedGroupMembers(name: ast.ObjectBindingPatternNode, type: ast.TypeExpression | undefined): Array<GroupMember> {
-  const members = type && ast.typeLiteralDef.is(type) ? type.members : []
+function sortedGroupMembers(name: ObjectBindingPatternNode, type: TypeExpression | undefined): Array<GroupMember> {
+  const members = type && isTypeLiteral(type) ? type.members : []
   const memberRank = (optional?: boolean) => (optional ? PARAM_RANK.optional : PARAM_RANK.required)
   return name.elements
     .map((element, index) => ({
@@ -106,9 +107,9 @@ function renderBindingMember(member: GroupMember, transformName?: (name: string)
  * rendered from the already-sorted members so its key order matches the binding;
  * a reference type is rendered as-is.
  */
-function renderGroupType(type: ast.TypeExpression | undefined, sorted: Array<GroupMember>, transformType?: (type: string) => string): string | undefined {
+function renderGroupType(type: TypeExpression | undefined, sorted: Array<GroupMember>, transformType?: (type: string) => string): string | undefined {
   if (!type) return undefined
-  if (!ast.typeLiteralDef.is(type)) return renderType(type)
+  if (!isTypeLiteral(type)) return renderType(type)
 
   const typed = sorted.filter((member) => member.type !== undefined)
   if (!typed.length) return undefined
@@ -120,13 +121,13 @@ function renderGroupType(type: ast.TypeExpression | undefined, sorted: Array<Gro
   return `{ ${parts.join('; ')} }`
 }
 
-function printParameter(node: ast.FunctionParameterNode, options: FunctionPrinterOptions): string {
+function printParameter(node: FunctionParameterNode, options: FunctionPrinterOptions): string {
   const { mode, transformName, transformType } = options
   const isGroup = typeof node.name !== 'string'
 
   if (mode === 'call') {
     if (isGroup) {
-      const keys = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
+      const keys = sortedGroupMembers(node.name as ObjectBindingPatternNode, node.type)
         .map((member) => renderBindingMember(member))
         .join(', ')
       return `{ ${keys} }`
@@ -136,7 +137,7 @@ function printParameter(node: ast.FunctionParameterNode, options: FunctionPrinte
   }
 
   if (isGroup) {
-    const sorted = sortedGroupMembers(node.name as ast.ObjectBindingPatternNode, node.type)
+    const sorted = sortedGroupMembers(node.name as ObjectBindingPatternNode, node.type)
     const binding = `{ ${sorted.map((member) => renderBindingMember(member, transformName)).join(', ')} }`
     const allOptional = sorted.every((member) => member.optional)
     const type = renderGroupType(node.type, sorted, transformType)
@@ -182,7 +183,7 @@ export function functionPrinter(options: FunctionPrinterOptions) {
   return {
     name: 'functionParameters' as const,
     options,
-    print(node: ast.FunctionParametersNode): string {
+    print(node: FunctionParametersNode): string {
       return sortParams(node.params)
         .map((p) => printParameter(p, options))
         .filter(Boolean)

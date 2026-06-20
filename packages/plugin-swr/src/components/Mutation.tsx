@@ -1,6 +1,6 @@
-import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
@@ -29,7 +29,7 @@ function buildMutationParamsNode(
     mutationArgTypeName: string
     resolver: ResolverTs
   },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { dataReturnType, mutationKeyTypeName, mutationArgTypeName, resolver } = options
   const responseName = resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
@@ -37,9 +37,9 @@ function buildMutationParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  return ast.factory.createFunctionParameters({
+  return createFunctionParameters({
     params: [
-      ast.factory.createFunctionParameter({
+      createFunctionParameter({
         name: 'options',
         type: `{
   mutation?: SWRMutationConfiguration<${TData}, ${TError}, ${mutationKeyTypeName} | null, ${mutationArgTypeName}> & { throwOnError?: boolean },
@@ -70,7 +70,7 @@ export function Mutation({
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
   const hasMutationParams = groupedParam !== null
-  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
   const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')

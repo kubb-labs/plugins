@@ -1,6 +1,6 @@
-import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
@@ -19,10 +19,10 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs): ast.FunctionParametersNode {
-  return ast.factory.createFunctionParameters({
+export function buildMutationConfigParamsNode(node: ast.OperationNode, resolver: ResolverTs): FunctionParametersNode {
+  return createFunctionParameters({
     params: [
-      ast.factory.createFunctionParameter({
+      createFunctionParameter({
         name: 'config',
         type: buildRequestConfigType(node, resolver),
         default: '{}',
@@ -44,7 +44,7 @@ export function MutationOptions({ name, clientName, dataReturnType, node, tsReso
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
   const hasMutationParams = groupedParam !== null
 
-  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const TRequest = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : 'undefined'
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : '_'
   const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
