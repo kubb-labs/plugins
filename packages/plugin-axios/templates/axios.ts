@@ -149,8 +149,8 @@ export type CallResult<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>
 export type InterceptorFn<T> = (value: T) => T | Promise<T>
 
 /**
- * A single interceptor channel — request, response, or error — with the `use` / `eject` / `update`
- * API shared with the fetch and ky runtimes, delegating to axios's native interceptor managers.
+ * A single interceptor channel (request, response, or error) exposing the `use` / `eject` / `update`
+ * API shared with the fetch and ky runtimes, backed by axios's native interceptor managers.
  */
 export type InterceptorChannel<T> = {
   use: (fn: InterceptorFn<T>) => number
@@ -159,8 +159,8 @@ export type InterceptorChannel<T> = {
 }
 
 /**
- * The three interceptor channels every client instance exposes. They wrap axios's native
- * `interceptors.request` / `interceptors.response`; the `error` channel maps onto the response
+ * The three interceptor channels every client instance exposes, wrapping axios's native
+ * `interceptors.request` / `interceptors.response`. The `error` channel maps onto the response
  * manager's rejection handler.
  */
 export type Interceptors = {
@@ -341,11 +341,13 @@ function createInterceptorChannel<T>(register: (fn: InterceptorFn<T>) => number,
 }
 
 /**
- * Builds the shared client core bound to an axios instance. The transport is the instance itself
- * (defaulting to `axios.create()`), interceptors delegate to its native managers, `querySerializer` /
- * `bodySerializer` map onto `paramsSerializer` / `transformRequest`, and `throwOnError` rides
- * `validateStatus`: with it on, axios rejects non-2xx and the error is normalized to `ResponseError`;
- * with it off, an internal `validateStatus: () => true` resolves every status into `{ data, error }`.
+ * Builds the shared client core bound to an axios instance (defaulting to `axios.create()`). The
+ * interceptor channels delegate to the instance's native managers, and `querySerializer` /
+ * `bodySerializer` map onto `paramsSerializer` / `transformRequest`.
+ *
+ * `throwOnError` rides `validateStatus`. With it on, axios rejects a non-2xx status and the runtime
+ * normalizes the error to `ResponseError`. With it off, an internal `validateStatus: () => true`
+ * resolves every status into `{ data, error, request, response }`.
  */
 export function createClientCore<TRequest = AxiosRequestConfig, TResponse = AxiosResponse>(options: ClientConfig = {}): ClientInstance<TRequest, TResponse> {
   let config: ClientConfig = { ...options }
