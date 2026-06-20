@@ -4,19 +4,19 @@ import type { ParserOptions } from '../types.ts'
 import { buildZodResponseParse, resolveRequestParser, resolveResponseParser } from './parser.ts'
 
 /**
- * The per-call validator expressions a generated function wires into its request config. Both run
- * through the runtime's `requestValidator` / `responseValidator` hooks rather than inline parse
- * calls, and the response validator only ever sees success (2xx) bodies.
+ * The per-call parser expressions a generated function wires into its request config. Both run
+ * through the runtime's `parser.request` / `parser.response` hooks rather than inline parse calls,
+ * and the response parser only ever sees success (2xx) bodies.
  */
-export type ValidatorHooks = {
+export type ParserHooks = {
   /**
-   * Expression for the `requestValidator` field, or `null` when request parsing is off.
+   * Expression for the `parser.request` hook, or `null` when request parsing is off.
    */
-  requestValidator: string | null
+  request: string | null
   /**
-   * Expression for the `responseValidator` field, or `null` when response parsing is off.
+   * Expression for the `parser.response` hook, or `null` when response parsing is off.
    */
-  responseValidator: string | null
+  response: string | null
   /**
    * Zod schema names the generated file imports from the zod plugin output.
    */
@@ -24,11 +24,11 @@ export type ValidatorHooks = {
 }
 
 /**
- * Builds the validator-hook expressions for one operation. Request validation runs before the send;
- * response validation runs on the success body only. Returns `null` expressions when the matching
+ * Builds the parser-hook expressions for one operation. Request parsing runs before the send;
+ * response parsing runs on the success body only. Returns `null` expressions when the matching
  * parser direction is disabled or the schema is absent.
  */
-export function buildValidatorHooks({
+export function buildParserHooks({
   node,
   parser,
   zodResolver,
@@ -36,17 +36,17 @@ export function buildValidatorHooks({
   node: ast.OperationNode
   parser: ParserOptions | undefined
   zodResolver: ResolverZod | null | undefined
-}): ValidatorHooks {
+}): ParserHooks {
   const importedZodNames: Array<string> = []
 
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const zodRequestName = zodResolver && resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null
-  const requestValidator = zodRequestName ? `(data: unknown) => ${zodRequestName}.parse(data)` : null
+  const request = zodRequestName ? `(data: unknown) => ${zodRequestName}.parse(data)` : null
   if (zodRequestName) importedZodNames.push(zodRequestName)
 
   const responseParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodResponseParse(node, zodResolver) : null
-  const responseValidator = responseParse ? `(data: unknown) => ${responseParse.expression}.parse(data)` : null
+  const response = responseParse ? `(data: unknown) => ${responseParse.expression}.parse(data)` : null
   if (responseParse) importedZodNames.push(...responseParse.importNames)
 
-  return { requestValidator, responseValidator, importedZodNames }
+  return { request, response, importedZodNames }
 }

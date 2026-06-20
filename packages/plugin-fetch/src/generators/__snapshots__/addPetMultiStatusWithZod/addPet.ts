@@ -13,7 +13,7 @@ export function addPet<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet', responseValidator: (data: unknown) => AddPetResponse.parse(data), ...config }) as Promise<
+  return request({ method: 'POST', url: '/pet', parser: { response: (data: unknown) => AddPetResponse.parse(data) }, ...config }) as Promise<
     RequestResult<AddPetResponses, ThrowOnError>
   >
 }

@@ -7,7 +7,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { buildSecurityMetadata, type SecurityRequirement } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
-import { buildValidatorHooks } from '../builders/validator.ts'
+import { buildParserHooks } from '../builders/validator.ts'
 import type { ParserOptions } from '../types.ts'
 
 type Props = {
@@ -48,15 +48,17 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
   if (!ast.isHttpOperationNode(node)) return null
 
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
-  const validators = buildValidatorHooks({ node, parser, zodResolver })
+  const parsers = buildParserHooks({ node, parser, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
+
+  const parserEntries = [parsers.request ? `request: ${parsers.request}` : null, parsers.response ? `response: ${parsers.response}` : null].filter(Boolean)
+  const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
-    validators.requestValidator ? `requestValidator: ${validators.requestValidator}` : null,
-    validators.responseValidator ? `responseValidator: ${validators.responseValidator}` : null,
+    parserLiteral,
     '...config',
   ]
     .filter(Boolean)

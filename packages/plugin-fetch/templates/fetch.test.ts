@@ -132,21 +132,21 @@ describe('createClientCore', () => {
     expect(result.data).toStrictEqual({ from: 'override' })
   })
 
-  test('runs the request validator before the send and the response validator on success', async () => {
+  test('runs the request parser before the send and the response parser on success', async () => {
     const { client, calls } = createClient({ data: { raw: true }, status: 200 })
-    const requestValidator = vi.fn((body: unknown) => ({ ...(body as object), validated: true }))
-    const responseValidator = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, requestValidator, responseValidator })) as CallResult<string, string>
-    expect(requestValidator).toHaveBeenCalledTimes(1)
+    const request = vi.fn((body: unknown) => ({ ...(body as object), validated: true }))
+    const response = vi.fn(() => ({ parsed: true }))
+    const result = (await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, parser: { request, response } })) as CallResult<string, string>
+    expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.body).toBe('{"name":"odie","validated":true}')
     expect(result.data).toStrictEqual({ parsed: true })
   })
 
-  test('skips the response validator on a non-2xx body', async () => {
+  test('skips the response parser on a non-2xx body', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
-    const responseValidator = vi.fn((value: unknown) => value)
-    await client({ method: 'POST', url: '/pet', throwOnError: false, responseValidator })
-    expect(responseValidator).not.toHaveBeenCalled()
+    const response = vi.fn((value: unknown) => value)
+    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response } })
+    expect(response).not.toHaveBeenCalled()
   })
 
   test('runs request and response interceptors', async () => {
