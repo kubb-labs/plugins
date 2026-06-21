@@ -9,11 +9,10 @@
  *   owns the `<op>` functions and the hooks import and call them.
  * - `contract-inline` — no client plugin is registered, so the query plugin emits its own inline
  *   contract client and injects the matching contract runtime.
- * - `legacy` — the old data-returning inline client, kept for `client: 'legacy'`.
  *
- * The `client` string selects explicitly (`'fetch'` / `'axios'` / `'legacy'`); when it is unset a
- * lone registered contract client plugin is picked up automatically, otherwise the plugin falls back
- * to `contract-inline`.
+ * The `client` string selects explicitly (`'fetch'` / `'axios'`); when it is unset a lone registered
+ * contract client plugin is picked up automatically, otherwise the plugin falls back to
+ * `contract-inline`.
  */
 
 // Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` / `pluginClientName`
@@ -23,26 +22,19 @@ const pluginAxiosName = 'plugin-axios'
 const pluginClientName = 'plugin-client'
 
 /**
- * The client selector accepted by a query plugin's `client` option.
- *
- * - `'fetch'` / `'axios'` call a registered contract client plugin.
- * - `'legacy'` keeps the old data-returning inline client.
+ * The client selector accepted by a query plugin's `client` option. Both call a registered contract
+ * client plugin.
  */
-export type ClientSelector = 'fetch' | 'axios' | 'legacy'
+export type ClientSelector = 'fetch' | 'axios'
 
 /**
  * The outcome of {@link resolveClient}.
  *
  * - `contract` names the contract client plugin whose `<op>` functions the hooks import.
  * - `contract-inline` tells the query plugin to emit its own inline contract client.
- * - `legacy` keeps the old data-returning inline client.
  * - `error` carries a setup diagnostic.
  */
-export type ResolveClientResult =
-  | { kind: 'contract'; pluginName: string }
-  | { kind: 'contract-inline' }
-  | { kind: 'legacy' }
-  | { kind: 'error'; message: string }
+export type ResolveClientResult = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline' } | { kind: 'error'; message: string }
 
 const selectorToPlugin: Record<'fetch' | 'axios', string> = {
   fetch: pluginFetchName,
@@ -70,10 +62,6 @@ const contractPlugins = [pluginFetchName, pluginAxiosName, pluginClientName] as 
 export function resolveClient(options: { client: ClientSelector | undefined; pluginNames: ReadonlyArray<string> }): ResolveClientResult {
   const { client, pluginNames } = options
   const has = (name: string) => pluginNames.includes(name)
-
-  if (client === 'legacy') {
-    return { kind: 'legacy' }
-  }
 
   if (client === 'fetch' || client === 'axios') {
     const pluginName = selectorToPlugin[client]

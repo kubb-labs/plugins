@@ -10,7 +10,7 @@ import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, Plu
 export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
 
 /**
- * The resolver shared by the slim client plugins. Functions and files use camelCase; URL helpers get
+ * The resolver shared by the client plugins. Functions and files use camelCase; URL helpers get
  * a `get<Operation>Url` name.
  */
 export type ResolverClient = Resolver & {
@@ -28,7 +28,7 @@ export type ResolverClient = Resolver & {
 }
 
 /**
- * The slim, shared options surface for the client plugins. Deliberately small: there is one
+ * The shared options surface for the client plugins. Deliberately small: there is one
  * response contract and one grouped options object, so the knobs that drove plugin-client's
  * combinatorial code paths are gone. Each plugin extends this with its own `transport` field.
  */
@@ -66,7 +66,7 @@ export type Options = OutputOptions & {
 }
 
 /**
- * The resolved slim options after defaults are applied.
+ * The resolved options after defaults are applied.
  */
 export type ResolvedOptions = {
   output: Output
@@ -80,8 +80,8 @@ export type ResolvedOptions = {
 }
 
 /**
- * The plugin factory type shared by the slim client plugins. Each concrete plugin (plugin-fetch,
+ * The plugin factory type shared by the client plugins. Each concrete plugin (plugin-fetch,
  * plugin-axios, plugin-ky) declares its own name and registers itself; this base ties the shared
  * builders, resolver, and components to one option/resolver shape.
  */
-export type PluginSlimClient = PluginFactoryOptions<'plugin-slim-client', Options, ResolvedOptions, ResolverClient>
+export type PluginContractClient = PluginFactoryOptions<'plugin-contract-client', Options, ResolvedOptions, ResolverClient>

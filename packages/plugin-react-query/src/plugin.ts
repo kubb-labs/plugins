@@ -1,14 +1,8 @@
 import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
-import { ast, definePlugin } from '@kubb/core'
+import { definePlugin } from '@kubb/core'
 import { isParserEnabled } from '@kubb/plugin-client'
-import {
-  axiosClientTemplatePath,
-  configTemplatePath,
-  contractAxiosClientTemplatePath,
-  contractFetchClientTemplatePath,
-  fetchClientTemplatePath,
-} from '@kubb/plugin-client/templates'
+import { contractAxiosClientTemplatePath, contractFetchClientTemplatePath } from '@kubb/plugin-client/templates'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer, queryKeyTransformer, resolveClient } from '@internals/tanstack-query'
@@ -101,14 +95,10 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
           throw new Error(resolvedClient.message)
         }
 
-        // `contract` calls a registered plugin's op; `contract-inline` and `legacy` bundle their own
-        // runtime, defaulting to axios (the historical default) since no client plugin is in play.
+        // `contract` calls a registered plugin's op; `contract-inline` bundles its own runtime,
+        // defaulting to axios (the historical default) since no client plugin is in play.
         const resolvedClientDescriptor: PluginReactQuery['resolvedOptions']['client'] =
-          resolvedClient.kind === 'contract'
-            ? { kind: 'contract', pluginName: resolvedClient.pluginName }
-            : resolvedClient.kind === 'contract-inline'
-              ? { kind: 'contract-inline', client: 'axios' }
-              : { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined }
+          resolvedClient.kind === 'contract' ? { kind: 'contract', pluginName: resolvedClient.pluginName } : { kind: 'contract-inline', client: 'axios' }
 
         ctx.setOptions({
           output,
@@ -163,42 +153,12 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
 
         // `contract-inline` bundles the shared `RequestResult` contract runtime, identical to what
         // plugin-fetch / plugin-axios inject, so the inline op serializes form-data in its own runtime
-        // and needs no `config.ts`. `legacy` bundles the old data-returning runtime plus `config.ts`.
+        // and needs no `config.ts`.
         if (resolvedClientDescriptor.kind === 'contract-inline') {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
             copy: resolvedClientDescriptor.client === 'fetch' ? contractFetchClientTemplatePath : contractAxiosClientTemplatePath,
-          })
-        }
-
-        if (resolvedClientDescriptor.kind === 'legacy') {
-          ctx.injectFile({
-            baseName: 'client.ts',
-            path: path.resolve(root, '.kubb/client.ts'),
-            copy: resolvedClientDescriptor.client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
-            sources: [
-              ast.factory.createSource({
-                name: 'client',
-                nodes: [],
-                isExportable: true,
-                isIndexable: true,
-              }),
-            ],
-          })
-
-          ctx.injectFile({
-            baseName: 'config.ts',
-            path: path.resolve(root, '.kubb/config.ts'),
-            copy: configTemplatePath,
-            sources: [
-              ast.factory.createSource({
-                name: 'config',
-                nodes: [],
-                isExportable: false,
-                isIndexable: false,
-              }),
-            ],
           })
         }
       },

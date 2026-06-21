@@ -108,14 +108,9 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: { ...suspenseInfiniteConfig } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { ...suspenseInfiniteConfig, parser: 'zod' as const } },
     {
-      name: 'findByTagsFull',
-      node: findByTagsNode,
-      options: { ...suspenseInfiniteConfig, client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } },
-    },
-    {
       name: 'clientPostImportPath',
       node: findByTagsNode,
-      options: { ...suspenseInfiniteConfig, client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+      options: { ...suspenseInfiniteConfig, client: { kind: 'contract-inline', client: 'axios' } },
     },
     {
       name: 'findByTagsObject',

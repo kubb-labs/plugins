@@ -1,13 +1,13 @@
 import { getOperationParameters } from '@internals/shared'
-import { buildSlimClientCall } from '@internals/tanstack-query'
+import { buildClientCall } from '@internals/tanstack-query'
 import { getNestedAccessor } from '@kubb/ast/utils'
 import type { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { DataReturnType, Infinite } from '../types.ts'
-import { buildQueryKeyParams, buildStatusUnionType, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import type { Infinite } from '../types.ts'
+import { buildQueryKeyParams, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -16,8 +16,6 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: DataReturnType
-  slim?: boolean
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
@@ -37,14 +35,12 @@ export function SuspenseInfiniteQueryOptions({
   previousParam,
   node,
   tsResolver,
-  dataReturnType,
   queryParam,
   queryKeyName,
-  slim = false,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const queryFnDataType = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
+  const queryFnDataType = responseName
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
@@ -76,14 +72,10 @@ export function SuspenseInfiniteQueryOptions({
   const queryParamType = queryParam && queryParamsTypeName ? `${queryParamsTypeName}['${queryParam}']` : null
   const pageParamType = queryParamType ? (isInitialPageParamDefined ? `NonNullable<${queryParamType}>` : queryParamType) : fallbackPageParamType
 
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver, slim })
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const rawParamsCall = callPrinter.print(paramsNode) ?? ''
-  const clientCallStr = rawParamsCall.replace(/\bconfig\b(?=[^,]*$)/, '{ ...config, signal: config.signal ?? signal }')
-  const queryFnBody = slim
-    ? `const { data } = await ${buildSlimClientCall(node, { clientName, signal: true })}
+  const queryFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: true })}
     return data`
-    : `return ${clientName}(${clientCallStr})`
 
   const queryKeyParamsNode = buildQueryKeyParams(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
@@ -103,9 +95,7 @@ export function SuspenseInfiniteQueryOptions({
       return [`getNextPageParam: (lastPage) => lastPage['${cursorParam}']`, `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`] as const
     }
     return [
-      dataReturnType === 'full'
-        ? 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1'
-        : 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
+      'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
       'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1',
     ] as const
   })()

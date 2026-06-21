@@ -19,7 +19,6 @@ export {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
-  buildStatusUnionType,
 } from './operation.ts'
 export { createGroupConfig } from './group.ts'
 export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'

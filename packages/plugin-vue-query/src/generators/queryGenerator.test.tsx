@@ -117,16 +117,6 @@ describe('queryGenerator operation', () => {
       },
     },
     {
-      name: 'clientGetImportPath',
-      node: findByTagsNode,
-      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
-    },
-    {
-      name: 'clientDataReturnTypeFull',
-      node: findByTagsNode,
-      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } },
-    },
-    {
       name: 'postAsQuery',
       node: updatePetWithFormNode,
       options: {

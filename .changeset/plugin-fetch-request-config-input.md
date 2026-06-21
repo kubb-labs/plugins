@@ -3,7 +3,7 @@
 "@kubb/plugin-fetch": minor
 ---
 
-Use the generated `<Operation>RequestConfig` type directly as the slim-client function input.
+Use the generated `<Operation>RequestConfig` type directly as the client function input.
 
 `@kubb/plugin-ts` now emits the request-config type with the same field names the runtime client uses — `body`, `path`, `query`, `headers`, `url` — instead of `data`, `pathParams`, `queryParams`, `headerParams`, `url`. `body` is required when the operation has a request body.
 

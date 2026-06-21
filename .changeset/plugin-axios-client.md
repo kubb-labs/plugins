@@ -2,7 +2,7 @@
 "@kubb/plugin-axios": minor
 ---
 
-Add `@kubb/plugin-axios`, a slim HTTP client plugin pinned to axios. Each operation becomes one async function that takes a single grouped `options` object and returns the shared `RequestResult` contract, with a per-call `throwOnError` flag (default `true`):
+Add `@kubb/plugin-axios`, an HTTP client plugin pinned to axios. Each operation becomes one async function that takes a single grouped `options` object and returns the shared `RequestResult` contract, with a per-call `throwOnError` flag (default `true`):
 
 - `throwOnError: true` (default): a non-2xx status throws `ResponseError` (normalized from the rejected axios error) and `data` is always defined.
 - `throwOnError: false`: maps to an internal `validateStatus: () => true` (a user-provided `validateStatus` wins) and returns errors as values, discriminated by `error`.

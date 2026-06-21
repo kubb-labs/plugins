@@ -58,12 +58,6 @@ export type ResolverSwr = Resolver & {
 }
 
 /**
- * Shape of the value the legacy data-returning client returns. `'data'` returns the response body;
- * `'full'` returns a status-discriminated union. Contract clients always return `'data'`.
- */
-export type DataReturnType = 'data' | 'full'
-
-/**
  * Customize the queryKey.
  */
 type QueryKey = Transformer
@@ -121,8 +115,6 @@ export type Options = OutputOptions & {
    * - `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
    *   single client plugin (plugin-fetch, plugin-axios, or plugin-client) is registered it is
    *   auto-detected, so the string is only needed to disambiguate several client plugins.
-   * - `'legacy'` keeps the old data-returning inline client (`return clientName(params, config)`),
-   *   bundling its runtime into `.kubb/client.ts`. Kept for migration; prefer a contract client.
    *
    * When unset and no client plugin is registered, the hooks emit their own inline contract client.
    */
@@ -169,12 +161,8 @@ export type Options = OutputOptions & {
  * - `contract` — the hooks import and call a registered contract client plugin's `<op>`.
  * - `contract-inline` — the hooks emit their own inline contract client and inject the matching
  *   contract runtime (`'fetch'` / `'axios'` picks the bundled template).
- * - `legacy` — the old data-returning inline client. `dataReturnType` shapes its return value.
  */
-export type ResolvedClient =
-  | { kind: 'contract'; pluginName: string }
-  | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
-  | { kind: 'legacy'; client: 'fetch' | 'axios'; dataReturnType: DataReturnType; baseURL: string | undefined }
+export type ResolvedClient = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
 
 type ResolvedOptions = {
   output: Output
@@ -183,7 +171,7 @@ type ResolvedOptions = {
   include: Options['include']
   override: NonNullable<Options['override']>
   /**
-   * The resolved client strategy the generators branch on (contract, inline contract, or legacy).
+   * The resolved client strategy the generators branch on (contract or inline contract).
    */
   client: ResolvedClient
   parser: NonNullable<Options['parser']>

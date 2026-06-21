@@ -3,7 +3,7 @@ import { Operation } from '@internals/client'
 import { resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isParserEnabled, LegacyClient } from '@kubb/plugin-client'
+import { isParserEnabled } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -68,11 +68,9 @@ export const queryGenerator = defineGenerator<PluginSwr>({
       : undefined
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
 
-    // A registered contract client plugin owns the `<op>`; contract-inline and legacy render their
-    // own client into this file. `contract` covers both contract and contract-inline bodies.
+    // A registered contract client plugin owns the `<op>`; contract-inline renders its own client into this file.
     const contractOp =
       client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const contract = client.kind === 'contract' || client.kind === 'contract-inline'
     const clientPath = path.resolve(root, '.kubb/client.ts')
     const calledClientName = contractOp ? contractOp.name : clientName
 
@@ -101,14 +99,6 @@ export const queryGenerator = defineGenerator<PluginSwr>({
           </>
         )}
 
-        {client.kind === 'legacy' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-            <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
-          </>
-        )}
-
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
         )}
@@ -117,19 +107,7 @@ export const queryGenerator = defineGenerator<PluginSwr>({
 
         {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
-        {client.kind === 'legacy' && (
-          <LegacyClient
-            name={clientName}
-            baseURL={client.baseURL}
-            dataReturnType={client.dataReturnType}
-            parser={parser}
-            node={node}
-            tsResolver={tsResolver}
-            zodResolver={zodResolver}
-          />
-        )}
-
-        <QueryOptions name={queryOptionsName} clientName={calledClientName} node={node} tsResolver={tsResolver} slim={contract} />
+        <QueryOptions name={queryOptionsName} clientName={calledClientName} node={node} tsResolver={tsResolver} />
 
         {query && (
           <>
@@ -142,8 +120,6 @@ export const queryGenerator = defineGenerator<PluginSwr>({
               queryKeyTypeName={queryKeyTypeName}
               node={node}
               tsResolver={tsResolver}
-              dataReturnType={client.kind === 'legacy' ? client.dataReturnType : 'data'}
-              slim={contract}
             />
           </>
         )}

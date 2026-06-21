@@ -145,7 +145,7 @@ describe('mutationGenerator operation', () => {
     {
       name: 'clientPostImportPath',
       node: updatePetByIdNode,
-      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+      options: { client: { kind: 'contract-inline', client: 'axios' } },
     },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },

@@ -178,17 +178,14 @@ export function resolveContentTypeVariants(entries: Array<ContentVariantInput>, 
     })
 }
 
-export function buildRequestConfigType(node: ast.OperationNode, resolver: RequestConfigResolver, options?: { slim?: boolean }): string {
-  const slim = options?.slim ?? false
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
+export function buildRequestConfigType(node: ast.OperationNode): string {
   const { isMultipleContentTypes, contentTypeUnion } = getContentTypeInfo(node)
-  const baseConfigType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  // On the slim path the request groups come from the grouped params, so `config` drops the
-  // data-shape keys to stay assignable to the slim `Options` (which omits them from `RequestConfig`).
-  const configType = slim ? `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>` : baseConfigType
-  const configProps = [slim ? null : 'client?: Client', isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null].filter(Boolean).join('; ')
+  // The request groups come from the grouped params, so `config` drops the data-shape keys to stay
+  // assignable to `Options`, which omits them from `RequestConfig`.
+  const configType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
+  const contentTypeProp = isMultipleContentTypes ? `contentType?: ${contentTypeUnion}` : null
 
-  return configProps ? `${configType} & { ${configProps} }` : configType
+  return contentTypeProp ? `${configType} & { ${contentTypeProp} }` : configType
 }
 
 /**
@@ -197,13 +194,8 @@ export function buildRequestConfigType(node: ast.OperationNode, resolver: Reques
  * `contentType?:` member: query hooks wrap GET operations, which carry no request body to select a
  * content type for.
  */
-export function buildClientOptionType(node: ast.OperationNode, resolver: RequestConfigResolver, options?: { slim?: boolean }): string {
-  const slim = options?.slim ?? false
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
-  const base = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-
-  if (slim) return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
-  return `${base} & { client?: Client }`
+export function buildClientOptionType(): string {
+  return `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
 }
 
 export type RequestGroups = {
@@ -280,7 +272,7 @@ export function buildRequestParamsSignature(
   const names = (['path', 'query', 'body', 'headers'] as const).filter((key) => groups[key])
 
   const firstParam = names.length > 0 ? `{ ${names.join(', ')} }: ${resolver.resolveRequestConfigName(node)}${isOptional ? ' = {}' : ''}` : null
-  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node, resolver)} = {}` : null
+  const configParam = isConfigurable ? `config: ${buildRequestConfigType(node)} = {}` : null
 
   return {
     signature: [firstParam, configParam].filter(Boolean).join(', '),
@@ -360,21 +352,6 @@ export function resolveSuccessNames(node: ast.OperationNode, resolver: ResponseS
 
 export function resolveStatusCodeNames(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string[] {
   return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
-}
-
-/**
- * Builds the discriminated union type string for `dataReturnType: 'full'` return shapes.
- * Each member is `{ status: N; data: StatusNType; statusText: string }`.
- */
-export function buildStatusUnionType(node: ast.OperationNode, resolver: ResponseStatusNameResolver): string {
-  const members = node.responses.map((r) => {
-    const typeName = resolver.resolveResponseStatusName(node, r.statusCode)
-    const statusCode = Number.parseInt(r.statusCode, 10)
-    const statusLiteral = Number.isNaN(statusCode) ? 'number' : String(statusCode)
-    return `{ status: ${statusLiteral}; data: ${typeName}; statusText: string }`
-  })
-  if (members.length === 1) return members[0]!
-  return `(${members.join(' | ')})`
 }
 
 const typeNamesByResolver = new WeakMap<OperationTypeNameResolver, Map<string, string[]>>()

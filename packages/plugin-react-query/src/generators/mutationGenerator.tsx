@@ -3,7 +3,7 @@ import { Operation } from '@internals/client'
 import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isParserEnabled, LegacyClient } from '@kubb/plugin-client'
+import { isParserEnabled } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -73,10 +73,8 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
 
     const contractOp =
       client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const contract = client.kind === 'contract' || client.kind === 'contract-inline'
     const clientPath = path.resolve(root, '.kubb/client.ts')
     const calledClientName = contractOp ? contractOp.name : clientName
-    const dataReturnType = client.kind === 'legacy' ? client.dataReturnType : 'data'
 
     return (
       <File
@@ -103,17 +101,6 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
           </>
         )}
 
-        {client.kind === 'legacy' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-            {node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
-              <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
-            )}
-            {parser === 'zod' && zodResolver && node.requestBody?.content?.[0]?.schema && <File.Import name={['z']} path="zod" isTypeOnly />}
-          </>
-        )}
-
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
@@ -123,29 +110,9 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
 
         {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
-        {client.kind === 'legacy' && (
-          <LegacyClient
-            name={clientName}
-            baseURL={client.baseURL}
-            dataReturnType={dataReturnType}
-            parser={parser}
-            node={node}
-            tsResolver={tsResolver}
-            zodResolver={zodResolver}
-          />
-        )}
-
         <File.Import name={['mutationOptions']} path={importPath} />
 
-        <MutationOptions
-          name={mutationOptionsName}
-          clientName={calledClientName}
-          mutationKeyName={mutationKeyName}
-          node={node}
-          tsResolver={tsResolver}
-          dataReturnType={dataReturnType}
-          slim={contract}
-        />
+        <MutationOptions name={mutationOptionsName} clientName={calledClientName} mutationKeyName={mutationKeyName} node={node} tsResolver={tsResolver} />
 
         {mutation && (
           <>
@@ -158,9 +125,7 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
               mutationKeyName={mutationKeyName}
               node={node}
               tsResolver={tsResolver}
-              dataReturnType={dataReturnType}
               customOptions={customOptions}
-              slim={contract}
             />
           </>
         )}

@@ -106,11 +106,6 @@ describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
     {
-      name: 'clientPostImportPath',
-      node: updatePetWithFormNode,
-      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
-    },
-    {
       name: 'updatePetByIdWithCustomMutationKey',
       node: updatePetWithFormNode,
       options: {

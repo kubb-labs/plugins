@@ -107,8 +107,6 @@ const findByStatusNode = ast.factory.createOperation({
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
-    { name: 'findByTagsFull', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } } },
-    { name: 'findByTagsLegacy', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } } },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },

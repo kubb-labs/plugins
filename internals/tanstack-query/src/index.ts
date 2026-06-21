@@ -7,7 +7,7 @@ export {
   buildGroupedRequestParam,
   buildQueryKeyParams,
   buildQueryOptionsParams,
-  buildSlimClientCall,
+  buildClientCall,
   resolveClientOperation,
   resolveOperationOverrides,
   resolveQueryParamsParser,

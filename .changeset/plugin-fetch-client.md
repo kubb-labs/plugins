@@ -2,7 +2,7 @@
 "@kubb/plugin-fetch": minor
 ---
 
-Add `@kubb/plugin-fetch`, a slim HTTP client plugin pinned to the Fetch API. Each operation becomes one async function that takes a single grouped `options` object and returns the shared `RequestResult` contract, with a per-call `throwOnError` flag (default `true`):
+Add `@kubb/plugin-fetch`, an HTTP client plugin pinned to the Fetch API. Each operation becomes one async function that takes a single grouped `options` object and returns the shared `RequestResult` contract, with a per-call `throwOnError` flag (default `true`):
 
 - `throwOnError: true` (default): a non-2xx status throws `ResponseError` and `data` is always defined.
 - `throwOnError: false`: errors are returned as values, discriminated by `error`.

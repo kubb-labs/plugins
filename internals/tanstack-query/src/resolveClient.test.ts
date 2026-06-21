@@ -16,10 +16,6 @@ describe('resolveClient', () => {
     if (result.kind === 'error') expect(result.message).toContain('@kubb/plugin-fetch')
   })
 
-  test("client: 'legacy' selects the legacy data-returning path", () => {
-    expect(resolveClient({ client: 'legacy', pluginNames: ['plugin-ts'] })).toStrictEqual({ kind: 'legacy' })
-  })
-
   test('a registered plugin-client is a contract client', () => {
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-client'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-client' })
   })
@@ -39,7 +35,7 @@ describe('resolveClient', () => {
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts'] })).toStrictEqual({ kind: 'contract-inline' })
   })
 
-  test('plugin-client alongside a slim plugin is ambiguous when client is unset', () => {
+  test('plugin-client alongside another client plugin is ambiguous when client is unset', () => {
     const result = resolveClient({ client: undefined, pluginNames: ['plugin-client', 'plugin-fetch'] })
     expect(result.kind).toBe('error')
     if (result.kind === 'error') expect(result.message).toContain("client: 'fetch' | 'axios'")

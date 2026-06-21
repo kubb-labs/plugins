@@ -3,7 +3,7 @@ import { Operation } from '@internals/client'
 import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isParserEnabled, LegacyClient } from '@kubb/plugin-client'
+import { isParserEnabled } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -95,10 +95,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
 
     const contractOp =
       client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const contract = client.kind === 'contract' || client.kind === 'contract-inline'
     const clientPath = path.resolve(root, '.kubb/client.ts')
     const calledClientName = contractOp ? contractOp.name : clientName
-    const dataReturnType = client.kind === 'legacy' ? client.dataReturnType : 'data'
 
     return (
       <File
@@ -125,14 +123,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           </>
         )}
 
-        {client.kind === 'legacy' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-            <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
-          </>
-        )}
-
         <File.Import name={['toValue']} path="vue" />
         <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />
 
@@ -144,18 +134,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
 
         {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
-        {client.kind === 'legacy' && (
-          <LegacyClient
-            name={clientName}
-            baseURL={client.baseURL}
-            dataReturnType={dataReturnType}
-            parser={parser}
-            node={node}
-            tsResolver={tsResolver}
-            zodResolver={zodResolver}
-          />
-        )}
-
         <File.Import name={['InfiniteData']} isTypeOnly path={importPath} />
         <File.Import name={['infiniteQueryOptions']} path={importPath} />
 
@@ -165,13 +143,11 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           queryKeyName={queryKeyName}
           node={node}
           tsResolver={tsResolver}
-          dataReturnType={dataReturnType}
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
-          slim={contract}
         />
 
         <File.Import name={['useInfiniteQuery']} path={importPath} />
@@ -184,10 +160,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginVueQuery>({
           queryKeyTypeName={queryKeyTypeName}
           node={node}
           tsResolver={tsResolver}
-          dataReturnType={dataReturnType}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
-          slim={contract}
         />
       </File>
     )

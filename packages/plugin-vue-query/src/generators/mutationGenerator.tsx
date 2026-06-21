@@ -3,7 +3,7 @@ import { Operation } from '@internals/client'
 import { getRequestGroups, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { isParserEnabled, LegacyClient } from '@kubb/plugin-client'
+import { isParserEnabled } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -72,10 +72,8 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
     const contractOp =
       client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const contract = client.kind === 'contract' || client.kind === 'contract-inline'
     const clientPath = path.resolve(root, '.kubb/client.ts')
     const calledClientName = contractOp ? contractOp.name : clientName
-    const dataReturnType = client.kind === 'legacy' ? client.dataReturnType : 'data'
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
     const groups = getRequestGroups(node)
@@ -106,18 +104,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
           </>
         )}
 
-        {client.kind === 'legacy' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-            {node.requestBody?.content?.some((e) => e.contentType === 'multipart/form-data') && (
-              <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
-            )}
-            {parser === 'zod' && zodResolver && node.requestBody?.content?.[0]?.schema && <File.Import name={['z']} path="zod" isTypeOnly />}
-          </>
-        )}
-
-        {contract && hasRequestGroups && <File.Import name={['toValue']} path="vue" />}
+        {hasRequestGroups && <File.Import name={['toValue']} path="vue" />}
         <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />
 
         {meta.fileTs && importedTypeNames.length > 0 && (
@@ -127,18 +114,6 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
         <MutationKey name={mutationKeyName} node={node} transformer={ctx.options.mutationKey} />
 
         {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
-
-        {client.kind === 'legacy' && (
-          <LegacyClient
-            name={clientName}
-            baseURL={client.baseURL}
-            dataReturnType={dataReturnType}
-            parser={parser}
-            node={node}
-            tsResolver={tsResolver}
-            zodResolver={zodResolver}
-          />
-        )}
 
         {mutation && (
           <>
@@ -150,9 +125,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
               typeName={mutationTypeName}
               node={node}
               tsResolver={tsResolver}
-              dataReturnType={dataReturnType}
               mutationKeyName={mutationKeyName}
-              slim={contract}
             />
           </>
         )}

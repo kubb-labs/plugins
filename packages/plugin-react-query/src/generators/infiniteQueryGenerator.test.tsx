@@ -105,14 +105,9 @@ describe('infiniteQueryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: { infinite: infiniteConfig } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { infinite: infiniteConfig, parser: 'zod' as const } },
     {
-      name: 'findByTagsFull',
-      node: findByTagsNode,
-      options: { infinite: infiniteConfig, client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } },
-    },
-    {
       name: 'clientPostImportPath',
       node: findByTagsNode,
-      options: { infinite: infiniteConfig, client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+      options: { infinite: infiniteConfig, client: { kind: 'contract-inline', client: 'axios' } },
     },
     {
       name: 'findByTagsObject',

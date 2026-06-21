@@ -5,8 +5,8 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import type { DataReturnType, Infinite, PluginReactQuery } from '../types.ts'
-import { buildClientOptionType, buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import type { Infinite, PluginReactQuery } from '../types.ts'
+import { buildClientOptionType, buildQueryKeyParams, getComments, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
 type Props = {
@@ -16,11 +16,9 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: DataReturnType
   customOptions: PluginReactQuery['resolvedOptions']['customOptions']
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
-  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -29,19 +27,17 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildSuspenseInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: DataReturnType
     resolver: ResolverTs
     pageParamGeneric: string
-    slim?: boolean
   },
 ): ast.FunctionParametersNode {
-  const { resolver, pageParamGeneric, slim } = options
+  const { resolver, pageParamGeneric } = options
 
   const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
-  client?: ${buildClientOptionType(node, resolver, { slim })}
+  client?: ${buildClientOptionType()}
 }`,
     default: '{}',
   })
@@ -56,19 +52,17 @@ export function SuspenseInfiniteQuery({
   queryKeyTypeName,
   queryOptionsName,
   queryKeyName,
-  dataReturnType,
   node,
   tsResolver,
   customOptions,
   initialPageParam,
   queryParam,
-  slim = false,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const responseType = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
+  const responseType = responseName
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const isInitialPageParamDefined = initialPageParam !== undefined && initialPageParam !== null
@@ -115,10 +109,8 @@ export function SuspenseInfiniteQuery({
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
   const paramsNode = buildSuspenseInfiniteQueryParamsNode(node, {
-    dataReturnType,
     resolver: tsResolver,
     pageParamGeneric: 'TPageParam',
-    slim,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 

@@ -3,9 +3,9 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { DataReturnType, Infinite } from '../types.ts'
+import type { Infinite } from '../types.ts'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import { buildClientOptionType, buildStatusUnionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import { buildClientOptionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -16,10 +16,8 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: DataReturnType
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
-  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -28,24 +26,22 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: DataReturnType
     resolver: ResolverTs
-    slim?: boolean
   },
 ): ast.FunctionParametersNode {
-  const { dataReturnType, resolver, slim } = options
+  const { resolver } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
 
-  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
+  const TData = responseName
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const optionsParam = ast.factory.createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<UseInfiniteQueryOptions<${[TData, TError, 'TQueryData', 'TQueryKey', 'TQueryData'].join(', ')}>> & { client?: QueryClient },
-  client?: ${buildClientOptionType(node, resolver, { slim })}
+  client?: ${buildClientOptionType()}
 }`,
     default: '{}',
   })
@@ -55,21 +51,12 @@ function buildInfiniteQueryParamsNode(
   return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
 }
 
-export function InfiniteQuery({
-  name,
-  queryKeyTypeName,
-  queryOptionsName,
-  queryKeyName,
-  dataReturnType,
-  node,
-  tsResolver,
-  slim = false,
-}: Props): KubbReactNode {
+export function InfiniteQuery({ name, queryKeyTypeName, queryOptionsName, queryKeyName, node, tsResolver }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
+  const TData = responseName
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
   const returnType = `UseInfiniteQueryReturnType<${['TData', TError].join(', ')}> & { queryKey: TQueryKey }`
   const generics = [`TData = InfiniteData<${TData}>`, `TQueryData = ${TData}`, `TQueryKey extends QueryKey = ${queryKeyTypeName}`]
@@ -80,7 +67,7 @@ export function InfiniteQuery({
   const queryOptionsParamsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const queryOptionsParamsCall = callPrinter.print(queryOptionsParamsNode) ?? ''
 
-  const paramsNode = buildInfiniteQueryParamsNode(node, { dataReturnType, resolver: tsResolver, slim })
+  const paramsNode = buildInfiniteQueryParamsNode(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 
   return (

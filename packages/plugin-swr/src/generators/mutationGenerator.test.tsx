@@ -124,11 +124,6 @@ describe('mutationGenerator operation', () => {
     { name: 'createPet', node: createPetNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
     {
-      name: 'updatePetWithFormLegacy',
-      node: updatePetWithFormNode,
-      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
-    },
-    {
       name: 'getAsMutation',
       node: findByTagsNode,
       options: { mutation: { importPath: 'swr/mutation', methods: ['get'] }, query: { importPath: 'swr', methods: [] } },

@@ -97,14 +97,9 @@ describe('suspenseQueryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: { suspense: {} } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { suspense: {}, parser: 'zod' as const } },
     {
-      name: 'findByTagsFull',
-      node: findByTagsNode,
-      options: { suspense: {}, client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } },
-    },
-    {
       name: 'clientPostImportPath',
       node: findByTagsNode,
-      options: { suspense: {}, client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+      options: { suspense: {}, client: { kind: 'contract-inline', client: 'axios' } },
     },
     { name: 'findByTagsObject', node: findByTagsNode, options: { suspense: {} } },
     { name: 'getPetIdCamelCase', node: getPetByIdNode, options: { suspense: {} } },

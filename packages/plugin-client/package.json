@@ -22,7 +22,6 @@
   },
   "files": [
     "dist",
-    "templates",
     "*.d.ts",
     "*.d.cts",
     "!/**/**.test.**",
@@ -64,8 +63,7 @@
       "import": "./dist/templates.js",
       "require": "./dist/templates.cjs"
     },
-    "./package.json": "./package.json",
-    "./templates/*": "./templates/*"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
