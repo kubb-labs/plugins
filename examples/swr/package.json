@@ -13,24 +13,23 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "clean": "node -e \"require('node:fs').rmSync('./src/gen', {recursive:true,force:true})\"",
+    "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
     "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
     "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-swr": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
-    "axios": "^1.18.0",
     "kubb": "catalog:",
     "react": "^19.2.7",
-    "swr": "^2.4.1",
-    "typescript": "catalog:"
+    "swr": "^2.4.1"
   },
   "devDependencies": {
-    "@types/react": "catalog:"
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=22",

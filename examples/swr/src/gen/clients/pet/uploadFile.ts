@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponses } from '../../models/UploadFile.ts'
+import type { UploadFileRequestConfig, UploadFileResponses } from '../../models/pet/UploadFile.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

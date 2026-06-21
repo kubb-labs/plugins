@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../models/GetOrderById.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../models/store/GetOrderById.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

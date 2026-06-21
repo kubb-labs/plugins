@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../models/PlaceOrderPatch.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../models/store/PlaceOrderPatch.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

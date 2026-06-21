@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../models/FindPetsByStatus.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../models/pet/FindPetsByStatus.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

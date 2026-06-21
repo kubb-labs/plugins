@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deletePet } from '../../clients/pet/deletePet.ts'
 

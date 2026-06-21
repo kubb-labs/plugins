@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetInventoryRequestConfig, GetInventoryResponses } from '../../models/GetInventory.ts'
+import type { GetInventoryRequestConfig, GetInventoryResponses } from '../../models/store/GetInventory.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

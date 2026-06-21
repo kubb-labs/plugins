@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { GetInventoryResponse } from '../../models/GetInventory.ts'
+import type { GetInventoryResponse } from '../../models/store/GetInventory.ts'
 import type { SWRConfiguration } from 'swr'
 import { getInventory } from '../../clients/store/getInventory.ts'
 

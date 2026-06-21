@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../models/UpdatePet.ts'
+import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../models/pet/UpdatePet.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

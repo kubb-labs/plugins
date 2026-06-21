@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

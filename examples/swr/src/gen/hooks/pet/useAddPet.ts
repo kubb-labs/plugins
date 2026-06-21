@@ -5,7 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponse, AddPetStatus405 } from '../../models/AddPet.ts'
+import type { AddPetRequestConfig, AddPetResponse, AddPetStatus405 } from '../../models/pet/AddPet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { addPet } from '../../clients/pet/addPet.ts'
 

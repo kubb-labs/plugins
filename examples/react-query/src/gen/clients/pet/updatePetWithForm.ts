@@ -4,17 +4,17 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../models/UpdatePetWithForm.ts'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../models/pet/UpdatePetWithForm.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
  * @summary Updates a pet in the store with form data
- * {@link /pet/:pet_id}
+ * {@link /pet/:petId}
  */
 export function updatePetWithForm<ThrowOnError extends boolean = true>(
   options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
 }

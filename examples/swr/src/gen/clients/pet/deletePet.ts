@@ -4,7 +4,7 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponses } from '../../models/DeletePet.ts'
+import type { DeletePetRequestConfig, DeletePetResponses } from '../../models/pet/DeletePet.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**

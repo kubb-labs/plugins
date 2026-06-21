@@ -2,7 +2,7 @@
   "name": "react-query-pet-store",
   "version": "0.0.0",
   "private": true,
-  "description": "ReactQuery PetStore example",
+  "description": "React Query PetStore example",
   "license": "MIT",
   "author": "stijnvanhulle",
   "repository": {
@@ -13,34 +13,23 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "build": "vite build",
     "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
-    "dev": "vite",
-    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
     "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/core": "catalog:",
-    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@tanstack/react-query": "^5.101.0",
-    "@tanstack/react-query-devtools": "^5.101.0",
-    "axios": "^1.18.0",
     "kubb": "catalog:",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "unplugin-kubb": "catalog:"
+    "react": "^19.2.7"
   },
   "devDependencies": {
     "@types/react": "catalog:",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.2",
-    "msw": "^2.14.6",
-    "typescript": "catalog:",
-    "vite": "^8.0.16"
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=22",

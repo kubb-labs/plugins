@@ -1,14 +1,14 @@
 {
-  "name": "axios-slim-pet-store",
+  "name": "axios-pet-store",
   "version": "0.0.0",
   "private": true,
-  "description": "Slim Axios PetStore example",
+  "description": "Axios PetStore example",
   "license": "MIT",
   "author": "stijnvanhulle",
   "repository": {
     "type": "git",
     "url": "https://github.com/kubb-labs/plugins.git",
-    "directory": "examples/axios-slim"
+    "directory": "examples/axios"
   },
   "type": "module",
   "sideEffects": false,

@@ -4,18 +4,18 @@
  */
 
 import type { Options, RequestResult } from '../../.kubb/client.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../models/GetPetById.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../models/pet/GetPetById.ts'
 import { client } from '../../.kubb/client.ts'
 
 /**
  * @description Returns a single pet
  * @summary Find pet by ID
- * {@link /pet/:pet_id}
+ * {@link /pet/:petId}
  */
 export function getPetById<ThrowOnError extends boolean = true>(
   options: Options<GetPetByIdRequestConfig, ThrowOnError>,
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/{pet_id}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }

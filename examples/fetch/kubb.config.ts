@@ -1,7 +1,6 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginTs } from '@kubb/plugin-ts'
-
 import { defineConfig } from 'kubb'
 
 export default defineConfig(() => {
@@ -11,7 +10,7 @@ export default defineConfig(() => {
       path: './petStore.yaml',
     },
     hooks: {
-      done: ['npm run typecheck', 'oxfmt ./', 'oxlint --fix ./src'],
+      done: ['npm run typecheck'],
     },
     output: {
       path: './src/gen',
@@ -20,16 +19,15 @@ export default defineConfig(() => {
       format: false,
       lint: false,
     },
-    adapter: adapterOas({ server: { index: 0 }, enums: 'root' }),
+    adapter: adapterOas({ serverIndex: 0 }),
     plugins: [
       pluginTs({
-        output: { path: 'models.ts', mode: 'file' },
+        output: { path: 'models', barrel: { type: 'named' } },
+        group: { type: 'tag' },
       }),
-      pluginClient({
-        output: {
-          path: '.',
-        },
-        client: 'fetch',
+      pluginFetch({
+        output: { path: './clients', barrel: { type: 'named' } },
+        group: { type: 'tag' },
       }),
     ],
   }

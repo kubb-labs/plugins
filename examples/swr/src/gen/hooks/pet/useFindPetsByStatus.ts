@@ -5,7 +5,7 @@
 
 import useSWR from 'swr'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/FindPetsByStatus.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus.ts'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from '../../clients/pet/findPetsByStatus.ts'
 

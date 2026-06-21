@@ -3,8 +3,21 @@
  * Do not edit manually.
  */
 
-import type { OrderHttpStatusEnumKey } from './OrderHttpStatusEnum.ts'
-import type { OrderStatusEnumKey } from './OrderStatusEnum.ts'
+export const orderStatusEnum = {
+  placed: 'placed',
+  approved: 'approved',
+  delivered: 'delivered',
+} as const
+
+export type OrderStatusEnumKey = (typeof orderStatusEnum)[keyof typeof orderStatusEnum]
+
+export const orderHttpStatusEnum = {
+  '200': 200,
+  '400': 400,
+  '500': 500,
+} as const
+
+export type OrderHttpStatusEnumKey = (typeof orderHttpStatusEnum)[keyof typeof orderHttpStatusEnum]
 
 /**
  * @type object
@@ -40,11 +53,13 @@ export type Order = {
   /**
    * @description Order Status
    * @example approved
+   * @type string | undefined
    */
   status?: OrderStatusEnumKey
   /**
-   * @description HTTP Status\'s and item of this
+   * @description HTTP Status
    * @example 200
+   * @type number | undefined
    */
   http_status?: OrderHttpStatusEnumKey
   /**

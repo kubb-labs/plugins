@@ -10,6 +10,7 @@
     "url": "https://github.com/kubb-labs/plugins.git",
     "directory": "examples/fetch"
   },
+  "type": "module",
   "sideEffects": false,
   "scripts": {
     "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
@@ -19,12 +20,11 @@
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "kubb": "catalog:"
   },
   "devDependencies": {
-    "react": "^19.2.7",
     "typescript": "catalog:"
   },
   "engines": {
