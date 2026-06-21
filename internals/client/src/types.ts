@@ -11,8 +11,8 @@ export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' 
 
 /**
  * How the class-based SDK groups operations.
- * - `'tag'` — one class per tag, optionally composed into a root client.
- * - `'flat'` — one class with every operation as a direct method.
+ * - `'tag'`: one class per tag, optionally composed into a root client.
+ * - `'flat'`: one class with every operation as a direct method.
  */
 export type Mode = 'tag' | 'flat'
 
@@ -92,7 +92,7 @@ export type Options = OutputOptions & {
    * // const api = new PetClient({ baseURL: 'https://api.example.com' })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
-   * @example A composed root SDK instantiating every tag client from one config
+   * @example Composed root that instantiates every tag client from one config
    * ```ts
    * pluginFetch({ sdk: { name: 'petStore' } })
    * // class PetStore {
@@ -103,7 +103,7 @@ export type Options = OutputOptions & {
    * // const api = new PetStore({ baseURL })
    * // await api.pet.getPetById({ path: { petId: 1 } })
    * ```
-   * @example A flat single SDK with every operation as a direct method
+   * @example Flat class with every operation as a direct method
    * ```ts
    * pluginFetch({ sdk: { name: 'petStore', mode: 'flat' } })
    * // const api = new PetStore({ baseURL })
@@ -113,15 +113,15 @@ export type Options = OutputOptions & {
   sdk?: {
     /**
      * How the SDK groups operations.
-     * - `'tag'` — one class per tag. With `name`, a composed root instantiates every tag client.
-     * - `'flat'` — one class named by `name`, with every operation as a direct method.
+     * - `'tag'`: one class per tag. With `name`, a composed root instantiates every tag client.
+     * - `'flat'`: one class named by `name`, with every operation as a direct method.
      *
      * @default 'tag'
      */
     mode?: Mode
     /**
      * Name of the generated entry point, also the file name. With `mode: 'tag'` it emits a
-     * composed root class that instantiates every tag client from one shared config; with
+     * composed root class that instantiates every tag client from one shared config. With
      * `mode: 'flat'` it names the single class.
      */
     name?: string

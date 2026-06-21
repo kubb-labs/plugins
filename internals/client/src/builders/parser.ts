@@ -44,7 +44,7 @@ export function resolveResponseParser(parser: ParserOptions | undefined): 'zod' 
  */
 export type ZodResponseParse = {
   /**
-   * Expression the generated code calls `.parse(data)` on — the success-only response schema name.
+   * The success-only response schema name that the generated code calls `.parse(data)` on.
    */
   expression: string
   /**
