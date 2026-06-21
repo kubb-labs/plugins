@@ -129,7 +129,7 @@ export function getResponseType(node: ast.OperationNode): ResponseType | undefin
  * Maps a content type to the PascalCase suffix used to name per-content-type variants
  * (e.g. `application/json` → `Json`, `application/xml` → `Xml`, `multipart/form-data` → `FormData`).
  */
-export function getContentTypeSuffix(contentType: string): string {
+function getContentTypeSuffix(contentType: string): string {
   const baseType = contentType.split(';')[0]!.trim()
   if (baseType === 'application/json') return 'Json'
   if (baseType === 'multipart/form-data') return 'FormData'
