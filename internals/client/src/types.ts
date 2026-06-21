@@ -46,7 +46,8 @@ export type ResolverClient = Resolver & {
    */
   resolveGroupName(this: ResolverClient, name: string): string
   /**
-   * Resolves the SDK facade property name for a client class.
+   * Resolves the namespace alias used for a tag client in the `'function'` shape aggregation
+   * (`export * as <alias> from './<tag>'`).
    */
   resolveClientPropertyName(this: ResolverClient, name: string): string
 }
@@ -80,28 +81,29 @@ export type Options = OutputOptions & {
    */
   parser?: ParserOptions
   /**
-   * Configures the generated SDK: its shape and, optionally, a single facade class composing
-   * every tag-based client into one entry point.
+   * Configures the generated SDK: its shape and, optionally, a single entry-point module that
+   * aggregates every tag-based client.
    *
-   * @example Class-per-tag clients
-   * `sdk: { shape: 'class' }`
-   * @example A single facade composing every tag client
+   * @example Instance class per tag
    * ```ts
-   * pluginFetch({
-   *   sdk: { shape: 'class', name: 'PetStoreSDK' },
-   * })
-   * // class PetStoreSDK {
-   * //   readonly petClient: PetClient
-   * //   readonly storeClient: StoreClient
-   * //   constructor(config = {}) { ... }
-   * // }
+   * pluginFetch({ sdk: { shape: 'class' } })
+   * // const api = new PetClient({ baseURL: 'https://api.example.com' })
+   * // await api.getPetById({ path: { petId: 1 } })
+   * ```
+   * @example An aggregation entry point re-exporting every tag client
+   * ```ts
+   * pluginFetch({ sdk: { shape: 'class', name: 'petStore' } })
+   * // petStore.ts
+   * // export { PetClient } from './petClient'
+   * // export { StoreClient } from './storeClient'
    * ```
    */
   sdk?: {
     /**
      * Shape of the generated client.
      * - `'function'` — one standalone async function per operation.
-     * - `'class'` — one class per tag with instance methods.
+     * - `'class'` — one instance class per tag. The constructor takes a client config and builds its
+     *   own client, so each environment is a separate instance.
      *
      * Defaults to `'class'` when `name` is set, otherwise `'function'`.
      *
@@ -109,8 +111,9 @@ export type Options = OutputOptions & {
      */
     shape?: Shape
     /**
-     * Name of the generated SDK facade class that composes every tag-based client. Also the file
-     * name. Only emitted for the `'class'` shape.
+     * Name of the generated aggregation entry point, also the file name. For the `'class'` shape it
+     * barrels every tag client (`export { PetClient } from './petClient'`); for the `'function'`
+     * shape it emits a tree-shakeable `export * as <tag>` namespace per tag.
      */
     name?: string
   }

@@ -3,19 +3,25 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult } from '../.kubb/client.ts'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from '../.kubb/client.ts'
 import type { GetInventoryRequestConfig, GetInventoryResponses } from '../types/GetInventory.ts'
 import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
-import { client } from '../.kubb/client.ts'
+import { createClient } from '../.kubb/client.ts'
 
 export class StoreClient {
+  private readonly client: ClientInstance
+
+  constructor(config: ClientConfig = {}) {
+    this.client = createClient(config)
+  }
+
 /**
    * @description Returns a map of status codes to quantities
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-    public static getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
-    const { client: request = client, ...config } = options
+    public getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
   }
@@ -25,8 +31,8 @@ export class StoreClient {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-    public static placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-    const { client: request = client, ...config } = options
+    public placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+    const { client: request = this.client, ...config } = options
 
     return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
   }
