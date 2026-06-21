@@ -10,6 +10,7 @@ import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../builders/parser.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
+import { SdkFacade } from '../components/SdkFacade.tsx'
 import type { Options, ParserOptions, ResolvedOptions, ResolverClient } from '../types.ts'
 
 /**
@@ -125,8 +126,8 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * Builds the SDK generator for a client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`).
  *
  * - `sdk.shape: 'class'` emits one instance class per tag whose constructor takes a client config and
- *   builds its own client, so each environment is a separate instance. When `sdk.name` is set, an
- *   entry-point barrel re-exports every generated class.
+ *   builds its own client, so each environment is a separate instance. When `sdk.name` is set, a
+ *   composed root class instantiates every tag client from one shared config.
  * - `sdk.shape: 'function'` keeps the standalone functions (emitted by the plugin's own operation
  *   generator) and, when `sdk.name` is set, emits a tree-shakeable `export * as <tag> from './<tag>'`
  *   entry point.
@@ -195,14 +196,18 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       if (!sdk.name) return <>{classFiles}</>
 
       const sdkFile = resolver.resolveFile({ name: sdk.name, extname: '.ts' }, { root, output, group: group ?? undefined })
+      const facadeName = resolver.resolveClassName(sdk.name)
+      const members = controllers.map(({ name }) => ({ className: name, propName: resolver.resolveClientPropertyName(name) }))
 
       return (
         <>
           {classFiles}
           <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
+            <File.Import name={['ClientConfig']} root={sdkFile.path} path={clientPath} isTypeOnly />
             {controllers.map(({ name, file }) => (
-              <File.Export key={name} name={[name]} path={toModuleSpecifier(sdkFile.path, file.path)} />
+              <File.Import key={name} name={[name]} root={sdkFile.path} path={file.path} />
             ))}
+            <SdkFacade name={facadeName} members={members} />
           </File>
         </>
       )

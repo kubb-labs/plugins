@@ -1,4 +1,15 @@
 /* eslint-disable no-alert, no-console */
 
-export { PetClient } from './petClient'
-export { StoreClient } from './storeClient'
+import type { ClientConfig } from './.kubb/client'
+import { PetClient } from './petClient'
+import { StoreClient } from './storeClient'
+
+export class PetStore {
+  readonly petClient: PetClient
+  readonly storeClient: StoreClient
+
+  constructor(config: ClientConfig = {}) {
+    this.petClient = new PetClient(config)
+    this.storeClient = new StoreClient(config)
+  }
+}
