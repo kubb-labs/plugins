@@ -27,10 +27,8 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  client: {
-    client: 'axios',
-    baseURL: '',
-  },
+  client: { kind: 'contract-inline', client: 'axios' },
+  baseURL: undefined,
   group: null,
   resolver: resolverMcp,
 }

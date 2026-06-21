@@ -1,7 +1,7 @@
-import type { GetPetByIdPathPetId } from '../../models/ts/pet/GetPetById.ts'
+import type { GetPetByIdRequestConfig } from '../../models/ts/pet/GetPetById.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../../.kubb/client.ts'
+import { getPetById } from '../../clients/axios/petService/getPetById.ts'
 
 /**
  * @description Returns a single pet
@@ -9,10 +9,10 @@ import { client } from '../../.kubb/client.ts'
  * {@link /pet/:petId:search}
  */
 export async function getPetByIdHandler(
-  { petId }: { petId: GetPetByIdPathPetId },
+  { path }: GetPetByIdRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await client({ method: 'GET', url: `/pet/${petId}:search`, baseURL: `https://petstore.swagger.io/v2` })
+  const res = await getPetById({ path })
 
   return {
     content: [

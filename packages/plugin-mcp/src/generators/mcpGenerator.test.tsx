@@ -27,10 +27,8 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  client: {
-    client: 'axios',
-    baseURL: '',
-  },
+  client: { kind: 'contract-inline', client: 'axios' },
+  baseURL: undefined,
   group: null,
   resolver: resolverMcp,
 }
@@ -76,28 +74,6 @@ describe('mcpGenerator — Operation', () => {
           }),
         ],
       }),
-    },
-    {
-      name: 'getPetsTemplateString',
-      node: ast.factory.createOperation({
-        operationId: 'getPets',
-        method: 'GET',
-        path: '/pets',
-        tags: ['pets'],
-        parameters: [ast.factory.createParameter({ name: 'limit', in: 'query', schema: ast.factory.createSchema({ type: 'integer' }) })],
-        responses: [
-          ast.factory.createResponse({
-            statusCode: '200',
-            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
-            description: 'A paged array of pets',
-          }),
-        ],
-      }),
-      options: {
-        client: {
-          baseURL: '${123456}',
-        },
-      },
     },
     {
       name: 'createPet',
@@ -148,7 +124,7 @@ describe('mcpGenerator — Operation', () => {
   test.each(operations)('$name', async (props) => {
     const options: PluginMcp['resolvedOptions'] = {
       ...defaultOptions,
-      ...('options' in props ? props.options : {}),
+      ...(('options' in props ? (props as { options?: Partial<PluginMcp['resolvedOptions']> }).options : undefined) ?? {}),
     }
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options, resolver: resolverMcp })
     const driver = createMockedPluginDriver({

@@ -147,9 +147,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      client: {
-        baseURL: 'https://petstore.swagger.io/v2',
-      },
     }),
     pluginFaker({
       output: {

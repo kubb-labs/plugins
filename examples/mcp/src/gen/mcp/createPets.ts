@@ -1,33 +1,17 @@
-import type { CreatePetsData, CreatePetsHeaderXEXAMPLE, CreatePetsPathUuid, CreatePetsQueryOffset } from '../models/ts/CreatePets.js'
+import type { CreatePetsRequestConfig } from '../models/ts/CreatePets.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { createPets } from '../clients/createPets.js'
 
 /**
  * @summary Create a pet
  * {@link /pets/:uuid}
  */
 export async function createPetsHandler(
-  {
-    uuid,
-    data,
-    headers,
-    params,
-  }: { uuid: CreatePetsPathUuid; data: CreatePetsData; headers: { xEXAMPLE: CreatePetsHeaderXEXAMPLE }; params?: { offset?: CreatePetsQueryOffset } },
+  { path, query, body, headers }: CreatePetsRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
-
-  const requestBody = data
-
-  const res = await client({
-    method: 'POST',
-    url: `/pets/${uuid}`,
-    baseURL: `https://petstore.swagger.io/v2`,
-    query: params,
-    body: requestBody,
-    headers: { ...mappedHeaders },
-  })
+  const res = await createPets({ path, query, headers, body })
 
   return {
     content: [

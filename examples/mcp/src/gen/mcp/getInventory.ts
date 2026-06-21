@@ -1,6 +1,6 @@
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { getInventory } from '../clients/getInventory.js'
 
 /**
  * @description Returns a map of status codes to quantities
@@ -8,7 +8,7 @@ import { client } from '../.kubb/client.js'
  * {@link /store/inventory}
  */
 export async function getInventoryHandler(request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await client({ method: 'GET', url: `/store/inventory`, baseURL: `https://petstore.swagger.io/v2` })
+  const res = await getInventory({})
 
   return {
     content: [

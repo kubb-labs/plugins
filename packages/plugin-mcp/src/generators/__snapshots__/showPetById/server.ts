@@ -7,6 +7,7 @@ import { showPetByIdHandler } from './showPetById'
 import { showPetByIdPathPetIdSchema, showPetByIdStatus200Schema } from './showPetByIdSchema'
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio'
+import { z } from 'zod'
 
 export function getServer() {
   const server = new McpServer({
@@ -19,10 +20,10 @@ export function getServer() {
     {
       description: 'Make a GET request to /pets/{petId}',
       outputSchema: { data: showPetByIdStatus200Schema },
-      inputSchema: { petId: showPetByIdPathPetIdSchema },
+      inputSchema: { path: z.object({ petId: showPetByIdPathPetIdSchema }) },
     },
-    async ({ petId }, request) => {
-      return showPetByIdHandler({ petId }, request)
+    async ({ path }, request) => {
+      return showPetByIdHandler({ path }, request)
     },
   )
 

@@ -6,7 +6,8 @@ import { axiosClientTemplatePath } from '@kubb/plugin-axios'
 import { fetchClientTemplatePath } from '@kubb/plugin-fetch'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
-import { mutationKeyTransformer, queryKeyTransformer, resolveClient } from '@internals/tanstack-query'
+import { resolveClient } from '@internals/client'
+import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
 import {
   customHookOptionsFileGenerator,
   hookOptionsGenerator,

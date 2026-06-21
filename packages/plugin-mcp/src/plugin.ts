@@ -1,9 +1,10 @@
 import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 
+import { resolveClient } from '@internals/client'
 import { ast, definePlugin } from '@kubb/core'
-import { axiosClientTemplatePath, pluginAxiosName } from '@kubb/plugin-axios'
-import { fetchClientTemplatePath, pluginFetchName } from '@kubb/plugin-fetch'
+import { axiosClientTemplatePath } from '@kubb/plugin-axios'
+import { fetchClientTemplatePath } from '@kubb/plugin-fetch'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
@@ -20,7 +21,9 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
 /**
  * Generates a Model Context Protocol (MCP) server from an OpenAPI spec. Every
  * operation becomes a typed MCP tool that AI assistants (Claude Desktop, Claude
- * Code, MCP-compatible clients) can call directly.
+ * Code, MCP-compatible clients) can call directly. Each handler calls a contract
+ * client `<op>` from `@kubb/plugin-axios` / `@kubb/plugin-fetch`, or emits its own
+ * inline contract client when none is registered.
  *
  * @example
  * ```ts
@@ -37,7 +40,7 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  *     pluginZod(),
  *     pluginMcp({
  *       output: { path: './mcp' },
- *       client: { baseURL: 'https://petstore.swagger.io/v2' },
+ *       baseURL: 'https://petstore.swagger.io/v2',
  *     }),
  *   ],
  * })
@@ -51,12 +54,10 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     include,
     override = [],
     client,
+    baseURL,
     resolver: userResolver,
     macros: userMacros,
   } = options
-
-  const clientName = client?.client ?? 'axios'
-  const clientImportPath = client?.importPath
 
   const groupConfig = createGroupConfig(group)
 
@@ -68,17 +69,25 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
       'kubb:plugin:setup'(ctx) {
         const resolver = userResolver ? { ...resolverMcp, ...userResolver } : resolverMcp
 
+        const pluginNames = (ctx.config.plugins ?? []).map((p) => (p as { name?: string }).name).filter((name): name is string => Boolean(name))
+        const resolvedClient = resolveClient({ client, pluginNames })
+        if (resolvedClient.kind === 'error') {
+          throw new Error(resolvedClient.message)
+        }
+
+        // `contract` calls a registered plugin's op; `contract-inline` bundles its own runtime,
+        // defaulting to axios (the historical default) since no client plugin is in play.
+        const resolvedClientDescriptor: PluginMcp['resolvedOptions']['client'] =
+          resolvedClient.kind === 'contract' ? { kind: 'contract', pluginName: resolvedClient.pluginName } : { kind: 'contract-inline', client: 'axios' }
+
         ctx.setOptions({
           output,
           exclude,
           include,
           override,
           group: groupConfig,
-          client: {
-            client: clientName,
-            importPath: clientImportPath,
-            baseURL: client?.baseURL,
-          },
+          client: resolvedClientDescriptor,
+          baseURL,
           resolver,
         })
         ctx.setResolver(resolver)
@@ -89,17 +98,16 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
         ctx.addGenerator(serverGenerator)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
-        const hasClientPlugin = ctx.config.plugins?.some((p) => p.name === pluginAxiosName || p.name === pluginFetchName)
 
-        // Without a registered client plugin or an `importPath`, bundle the shared `RequestResult`
-        // contract runtime as `.kubb/client.ts` — the same template plugin-fetch and plugin-axios
-        // inject. The contract serializes form-data in its own runtime, so no separate `config.ts`
-        // is needed.
-        if (!hasClientPlugin && !clientImportPath) {
+        // `contract-inline` bundles the shared `RequestResult` contract runtime, identical to what
+        // plugin-fetch / plugin-axios inject, so the inline op serializes form-data in its own
+        // runtime and needs no `config.ts`.
+        if (resolvedClientDescriptor.kind === 'contract-inline') {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: clientName === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
+            copy: resolvedClientDescriptor.client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
+            footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
             sources: [
               ast.factory.createSource({
                 name: 'client',

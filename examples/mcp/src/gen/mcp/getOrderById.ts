@@ -1,7 +1,7 @@
-import type { GetOrderByIdPathOrderId } from '../models/ts/GetOrderById.js'
+import type { GetOrderByIdRequestConfig } from '../models/ts/GetOrderById.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { getOrderById } from '../clients/getOrderById.js'
 
 /**
  * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
@@ -9,10 +9,10 @@ import { client } from '../.kubb/client.js'
  * {@link /store/order/:orderId}
  */
 export async function getOrderByIdHandler(
-  { orderId }: { orderId: GetOrderByIdPathOrderId },
+  { path }: GetOrderByIdRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await client({ method: 'GET', url: `/store/order/${orderId}`, baseURL: `https://petstore.swagger.io/v2` })
+  const res = await getOrderById({ path })
 
   return {
     content: [

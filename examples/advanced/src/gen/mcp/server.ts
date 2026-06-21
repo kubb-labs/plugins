@@ -53,14 +53,14 @@ export function getServer() {
       description: 'Make a POST request to /pets/{uuid}',
       outputSchema: { data: createPetsStatus201Schema },
       inputSchema: {
-        uuid: createPetsPathUuidSchema,
-        data: createPetsDataSchema,
+        path: z.object({ uuid: createPetsPathUuidSchema }),
+        query: z.object({ boolParam: createPetsQueryBoolParamSchema, offset: createPetsQueryOffsetSchema }),
         headers: z.object({ xEXAMPLE: createPetsHeaderXEXAMPLESchema }),
-        params: z.object({ boolParam: createPetsQueryBoolParamSchema, offset: createPetsQueryOffsetSchema }),
+        body: createPetsDataSchema,
       },
     },
-    async ({ uuid, data, headers, params }, request) => {
-      return createPetsHandler({ uuid, data, headers, params }, request)
+    async ({ path, query, headers, body }, request) => {
+      return createPetsHandler({ path, query, headers, body }, request)
     },
   )
 
@@ -70,10 +70,10 @@ export function getServer() {
       title: 'Update an existing pet',
       description: 'Update an existing pet by Id',
       outputSchema: { data: updatePetStatus200Schema },
-      inputSchema: { data: updatePetDataSchema },
+      inputSchema: { body: updatePetDataSchema },
     },
-    async ({ data }, request) => {
-      return updatePetHandler({ data }, request)
+    async ({ body }, request) => {
+      return updatePetHandler({ body }, request)
     },
   )
 
@@ -82,10 +82,10 @@ export function getServer() {
     {
       title: 'Add a new pet to the store',
       description: 'Add a new pet to the store',
-      inputSchema: { data: addPetDataSchema },
+      inputSchema: { body: addPetDataSchema },
     },
-    async ({ data }, request) => {
-      return addPetHandler({ data }, request)
+    async ({ body }, request) => {
+      return addPetHandler({ body }, request)
     },
   )
 
@@ -95,10 +95,10 @@ export function getServer() {
       title: 'Finds Pets by status',
       description: 'Multiple status values can be provided with comma separated strings',
       outputSchema: { data: findPetsByStatusStatus200Schema },
-      inputSchema: { stepId: findPetsByStatusPathStepIdSchema },
+      inputSchema: { path: z.object({ stepId: findPetsByStatusPathStepIdSchema }) },
     },
-    async ({ stepId }, request) => {
-      return findPetsByStatusHandler({ stepId }, request)
+    async ({ path }, request) => {
+      return findPetsByStatusHandler({ path }, request)
     },
   )
 
@@ -109,12 +109,12 @@ export function getServer() {
       description: 'Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.',
       outputSchema: { data: findPetsByTagsStatus200Schema },
       inputSchema: {
+        query: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
         headers: z.object({ xEXAMPLE: findPetsByTagsHeaderXEXAMPLESchema }),
-        params: z.object({ tags: findPetsByTagsQueryTagsSchema, page: findPetsByTagsQueryPageSchema, pageSize: findPetsByTagsQueryPageSizeSchema }),
       },
     },
-    async ({ headers, params }, request) => {
-      return findPetsByTagsHandler({ headers, params }, request)
+    async ({ query, headers }, request) => {
+      return findPetsByTagsHandler({ query, headers }, request)
     },
   )
 
@@ -124,10 +124,10 @@ export function getServer() {
       title: 'Find pet by ID',
       description: 'Returns a single pet',
       outputSchema: { data: getPetByIdStatus200Schema },
-      inputSchema: { petId: getPetByIdPathPetIdSchema },
+      inputSchema: { path: z.object({ petId: getPetByIdPathPetIdSchema }) },
     },
-    async ({ petId }, request) => {
-      return getPetByIdHandler({ petId }, request)
+    async ({ path }, request) => {
+      return getPetByIdHandler({ path }, request)
     },
   )
 
@@ -137,12 +137,12 @@ export function getServer() {
       title: 'Updates a pet in the store with form data',
       description: 'Make a POST request to /pet/{petId}:search',
       inputSchema: {
-        petId: updatePetWithFormPathPetIdSchema,
-        params: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
+        path: z.object({ petId: updatePetWithFormPathPetIdSchema }),
+        query: z.object({ name: updatePetWithFormQueryNameSchema, status: updatePetWithFormQueryStatusSchema }),
       },
     },
-    async ({ petId, params }, request) => {
-      return updatePetWithFormHandler({ petId, params }, request)
+    async ({ path, query }, request) => {
+      return updatePetWithFormHandler({ path, query }, request)
     },
   )
 
@@ -151,10 +151,10 @@ export function getServer() {
     {
       title: 'Deletes a pet',
       description: 'delete a pet',
-      inputSchema: { petId: deletePetPathPetIdSchema, headers: z.object({ apiKey: deletePetHeaderApiKeySchema }) },
+      inputSchema: { path: z.object({ petId: deletePetPathPetIdSchema }), headers: z.object({ apiKey: deletePetHeaderApiKeySchema }) },
     },
-    async ({ petId, headers }, request) => {
-      return deletePetHandler({ petId, headers }, request)
+    async ({ path, headers }, request) => {
+      return deletePetHandler({ path, headers }, request)
     },
   )
 
@@ -164,10 +164,10 @@ export function getServer() {
       title: 'Place an file for a pet',
       description: 'Place a new file in the store',
       outputSchema: { data: addFilesStatus200Schema },
-      inputSchema: { data: addFilesDataSchema },
+      inputSchema: { body: addFilesDataSchema },
     },
-    async ({ data }, request) => {
-      return addFilesHandler({ data }, request)
+    async ({ body }, request) => {
+      return addFilesHandler({ body }, request)
     },
   )
 
@@ -178,13 +178,13 @@ export function getServer() {
       description: 'Make a POST request to /pet/{petId}/uploadImage',
       outputSchema: { data: uploadFileStatus200Schema },
       inputSchema: {
-        petId: uploadFilePathPetIdSchema,
-        data: uploadFileDataSchema,
-        params: z.object({ additionalMetadata: uploadFileQueryAdditionalMetadataSchema }),
+        path: z.object({ petId: uploadFilePathPetIdSchema }),
+        query: z.object({ additionalMetadata: uploadFileQueryAdditionalMetadataSchema }),
+        body: uploadFileDataSchema,
       },
     },
-    async ({ petId, data, params }, request) => {
-      return uploadFileHandler({ petId, data, params }, request)
+    async ({ path, query, body }, request) => {
+      return uploadFileHandler({ path, query, body }, request)
     },
   )
 

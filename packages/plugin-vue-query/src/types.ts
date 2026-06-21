@@ -1,4 +1,4 @@
-import type { ClientSelector } from '@internals/tanstack-query'
+import type { ClientSelector } from '@internals/client'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { Options as ClientOptions } from '@internals/client'
 
