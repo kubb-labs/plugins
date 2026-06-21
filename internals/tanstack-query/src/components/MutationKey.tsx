@@ -1,6 +1,6 @@
 import { Url } from '@internals/utils'
-import { ast } from '@kubb/core'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import { createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { Transformer } from '../types.ts'
@@ -19,7 +19,7 @@ export const mutationKeyTransformer: Transformer = ({ node }) => {
 }
 
 export function MutationKey({ name, node, transformer }: Props): KubbReactNode {
-  const paramsNode = ast.factory.createFunctionParameters({ params: [] })
+  const paramsNode = createFunctionParameters({ params: [] })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
   const keys = (transformer ?? mutationKeyTransformer)({ node, casing: 'camelcase' })
 

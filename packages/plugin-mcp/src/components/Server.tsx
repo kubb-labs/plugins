@@ -1,6 +1,6 @@
 import { getOperationParameters } from '@internals/shared'
-import { ast } from '@kubb/core'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { ZodParam } from '../utils.ts'
@@ -81,10 +81,10 @@ export function Server({ name, serverName, serverVersion, operations }: Props): 
       const entries = [...pathEntries, ...otherEntries]
 
       const paramsNode = entries.length
-        ? ast.factory.createFunctionParameters({
+        ? createFunctionParameters({
             params: [
-              ast.factory.createFunctionParameter({
-                name: ast.factory.createObjectBindingPattern({ elements: entries.map((e) => ({ name: e.key })) }),
+              createFunctionParameter({
+                name: createObjectBindingPattern({ elements: entries.map((e) => ({ name: e.key })) }),
                 optional: false,
               }),
             ],

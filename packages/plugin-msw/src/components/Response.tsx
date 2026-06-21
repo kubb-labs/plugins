@@ -1,5 +1,5 @@
-import { ast } from '@kubb/core'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { getContentType, hasResponseSchema } from '../utils.ts'
@@ -19,9 +19,9 @@ export function Response({ name, typeName, response }: Props): KubbReactNode {
   const headers = [contentType ? `'Content-Type': '${contentType}'` : null].filter(Boolean)
 
   const params = declarationPrinter.print(
-    ast.factory.createFunctionParameters({
+    createFunctionParameters({
       params: [
-        ast.factory.createFunctionParameter({
+        createFunctionParameter({
           name: 'data',
           type: typeName,
           optional: !hasResponseSchema(response),

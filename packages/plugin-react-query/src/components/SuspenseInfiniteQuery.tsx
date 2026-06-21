@@ -1,7 +1,7 @@
 import { getOperationParameters } from '@internals/shared'
-import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import type { FunctionParameterNode, FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
@@ -30,10 +30,10 @@ function buildSuspenseInfiniteQueryParamsNode(
     resolver: ResolverTs
     pageParamGeneric: string
   },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { resolver, pageParamGeneric } = options
 
-  const optionsParam = ast.factory.createFunctionParameter({
+  const optionsParam = createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<UseSuspenseInfiniteQueryOptions<TQueryFnData, TError, TData, TQueryKey, ${pageParamGeneric}>> & { client?: QueryClient },
@@ -44,7 +44,7 @@ function buildSuspenseInfiniteQueryParamsNode(
 
   const groupedParam = buildGroupedRequestParam(node, { resolver })
 
-  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
+  return createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
 
 export function SuspenseInfiniteQuery({

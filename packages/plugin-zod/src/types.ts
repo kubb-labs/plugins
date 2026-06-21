@@ -1,3 +1,4 @@
+import type { OperationParamsResolver } from '@internals/shared'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterZodNodes } from './printers/printerZod.ts'
 import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
@@ -6,7 +7,7 @@ import type { PrinterZodMiniNodes } from './printers/printerZodMini.ts'
  * Resolver for Zod that provides naming methods for schema types.
  */
 export type ResolverZod = Resolver &
-  ast.OperationParamsResolver & {
+  OperationParamsResolver & {
     /**
      * Resolves a camelCase schema function name with a `Schema` suffix.
      */

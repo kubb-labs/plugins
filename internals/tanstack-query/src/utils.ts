@@ -1,8 +1,8 @@
 import path from 'node:path'
 import { getOperationParameters, getRequestGroupOptionality, operationFileEntry } from '@internals/shared'
-import { ast } from '@kubb/core'
-import type { Group, Output } from '@kubb/core'
-import type { PluginTs, ResolverTs } from '@kubb/plugin-ts'
+import type { ast, Group, Output } from '@kubb/core'
+import { createFunctionParameter, createFunctionParameters, createObjectBindingPattern, createTypeLiteral } from '@kubb/plugin-ts'
+import type { FunctionParameterNode, FunctionParametersNode, PluginTs, ResolverTs } from '@kubb/plugin-ts'
 
 /**
  * The grouped request options, ordered for both the destructured signature and the
@@ -30,7 +30,7 @@ export function buildGroupedRequestParam(
     keys?: ReadonlyArray<RequestGroupKey>
     memberTypeWrapper?: (type: string) => string
   },
-): ast.FunctionParameterNode | null {
+): FunctionParameterNode | null {
   const { resolver, keys = requestGroupOrder, memberTypeWrapper } = options
   const { groups, hasRequiredPath, hasRequiredQuery, hasRequiredHeader } = getRequestGroupOptionality(node)
   const names = keys.filter((key) => groups[key])
@@ -63,16 +63,16 @@ export function buildGroupedRequestParam(
       optional: !requiredByGroup[name],
     }))
 
-    return ast.factory.createFunctionParameter({
-      name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
-      type: ast.factory.createTypeLiteral({ members }),
+    return createFunctionParameter({
+      name: createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
+      type: createTypeLiteral({ members }),
       optional: false,
       ...(isOptional ? { default: '{}' } : {}),
     })
   }
 
-  return ast.factory.createFunctionParameter({
-    name: ast.factory.createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
+  return createFunctionParameter({
+    name: createObjectBindingPattern({ elements: names.map((name) => ({ name })) }),
     type: requestConfigType,
     optional: false,
     ...(isOptional ? { default: '{}' } : {}),
@@ -88,18 +88,18 @@ export function buildGroupedRequestParam(
 export function buildQueryOptionsParams(
   node: ast.OperationNode,
   options: { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { resolver, memberTypeWrapper } = options
 
   const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper })
 
-  const configParam = ast.factory.createFunctionParameter({
+  const configParam = createFunctionParameter({
     name: 'config',
     type: `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`,
     default: '{}',
   })
 
-  return ast.factory.createFunctionParameters({ params: [groupedParam, configParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
+  return createFunctionParameters({ params: [groupedParam, configParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
 
 /**
@@ -221,11 +221,11 @@ export function resolveZodSchemaNames(node: ast.OperationNode, zodResolver: ZodS
  * typed from the operation's `RequestConfig` minus `url`. The query key transformer reads the
  * grouped `path`/`query`/`body` bindings.
  */
-export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): ast.FunctionParametersNode {
+export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver: PluginTs['resolver'] }): FunctionParametersNode {
   const { resolver } = options
   const groupedParam = buildGroupedRequestParam(node, { resolver, keys: ['path', 'query', 'body'] })
 
-  return ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  return createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
 }
 
 /**

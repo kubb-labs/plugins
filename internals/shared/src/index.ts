@@ -19,6 +19,22 @@ export {
   resolveOperationTypeNames,
   resolveResponseTypes,
   resolveSuccessNames,
+  type BuildOperationCommentsOptions,
+  type ContentTypeInfo,
+  type ContentVariant,
+  type ContentVariantInput,
+  type OperationCommentLink,
+  type OperationParameterGroups,
+  type OperationParamsResolver,
+  type OperationTypeNameResolver,
+  type RequestConfigResolver,
+  type RequestConfigNameResolver,
+  type RequestGroupOptionality,
+  type RequestGroups,
+  type ResponseNameResolver,
+  type ResponseStatusNameResolver,
+  type ResponseType,
+  type ResolveOperationTypeNameOptions,
 } from './operation.ts'
 export { createGroupConfig } from './group.ts'
-export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'
+export { buildParamsMapping, buildTransformedParamsMapping, caseParams } from './params.ts'
