@@ -32,7 +32,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── sdk class (one static class per tag) ───────────────────────────────
+  // ─── sdk class (one instance class per tag) ─────────────────────────────
   {
     name: 'sdkClass',
     config: {
@@ -75,7 +75,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { strategy: 'single', name: 'PetStore' } }),
+        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { mode: 'single', name: 'PetStore' } }),
       ],
     },
   },

@@ -14,7 +14,7 @@ export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' 
  * - `'tag'` — one class per tag, optionally composed into a root client.
  * - `'single'` — one flat class with every operation as a direct method.
  */
-export type Strategy = 'tag' | 'single'
+export type Mode = 'tag' | 'single'
 
 /**
  * The resolver shared by the client plugins. Functions and files use camelCase; URL helpers get
@@ -105,7 +105,7 @@ export type Options = OutputOptions & {
    * ```
    * @example A flat single SDK with every operation as a direct method
    * ```ts
-   * pluginFetch({ sdk: { name: 'petStore', strategy: 'single' } })
+   * pluginFetch({ sdk: { name: 'petStore', mode: 'single' } })
    * // const api = new PetStore({ baseURL })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
@@ -118,11 +118,11 @@ export type Options = OutputOptions & {
      *
      * @default 'tag'
      */
-    strategy?: Strategy
+    mode?: Mode
     /**
-     * Name of the generated entry point, also the file name. With `strategy: 'tag'` it emits a
-     * composed root class that instantiates every tag client from one shared config; with
-     * `strategy: 'single'` it names the flat class.
+     * Name of the generated entry point, also the file name. With `mode: 'tag'` it emits a composed
+     * root class that instantiates every tag client from one shared config; with `mode: 'single'` it
+     * names the flat class.
      */
     name?: string
   }
@@ -149,7 +149,7 @@ export type ResolvedOptions = {
   parser: NonNullable<Options['parser']>
   sdk:
     | {
-        strategy: Strategy
+        mode: Mode
         name: string | undefined
       }
     | undefined
