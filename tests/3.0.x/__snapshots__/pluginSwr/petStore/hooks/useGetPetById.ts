@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdResponses, GetPetByIdResponse, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
 import type { SWRConfiguration } from 'swr'
+import { client } from '../.kubb/client.ts'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
@@ -18,18 +18,17 @@ type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: `/pet/${path.petId}`, ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }
 
-export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getPetById({ path }, config)
+      const { data } = await getPetById({ ...config, path, throwOnError: true })
+      return data
     },
   }
 }
@@ -41,7 +40,7 @@ export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config
  */
 export function useGetPetById({ path }: GetPetByIdRequestConfig, options: {
   query?: SWRConfiguration<GetPetByIdResponse, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>>,
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

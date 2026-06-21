@@ -3,13 +3,12 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse } from '../types/UploadFile.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import type { z } from 'zod'
-import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
+import { client } from '../.kubb/client.ts'
+import { uploadFileResponseSchema } from '../zod/uploadFileSchema.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -19,14 +18,10 @@ export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = uploadFileDataSchema.parse(body)
-
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof uploadFileDataSchema>>({ method: 'POST', url: `/pet/${path.petId}/uploadImage`, query, body: requestBody, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
-
-  return uploadFileResponseSchema.parse(res.data)
+  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', parser: { response: (data: unknown) => uploadFileResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }
 
 export type UploadFileMutationArg = UploadFileRequestConfig
@@ -37,7 +32,7 @@ export type UploadFileMutationArg = UploadFileRequestConfig
  */
 export function useUploadFile(options: {
   mutation?: SWRMutationConfiguration<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -46,7 +41,8 @@ export function useUploadFile(options: {
   return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body } }) => {
-      return uploadFile({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return data
     },
     mutationOptions
   )

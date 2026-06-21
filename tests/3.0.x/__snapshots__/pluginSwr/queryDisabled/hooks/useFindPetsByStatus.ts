@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses, FindPetsByStatusResponse } from '../types/FindPetsByStatus.ts'
+import { client } from '../.kubb/client.ts'
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
@@ -16,18 +16,17 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError>): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, query, ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/findByStatus', ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }
 
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return findPetsByStatus({ query }, config)
+      const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })
+      return data
     },
   }
 }

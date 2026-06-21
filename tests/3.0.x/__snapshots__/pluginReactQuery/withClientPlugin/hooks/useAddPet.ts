@@ -3,20 +3,21 @@
 * Do not edit manually.
 */
 
-import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { AddPetRequestConfig, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addPet } from '../clients/addPet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
-export function addPetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
+export function addPetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const mutationKey = addPetMutationKey()
   return mutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async({ body }) => {
-      return addPet({ body }, config)
+      const { data } = await addPet({ ...config, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -28,7 +29,7 @@ export function addPetMutationOptions<TContext = unknown>(config: Partial<Reques
  */
 export function useAddPet<TContext>(options: {
   mutation?: UseMutationOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

@@ -3,27 +3,17 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetRequestConfig, DeletePetStatus400 } from '../types/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-
-function getDeletePetUrl(path: DeletePetRequestConfig['path']) {
-  const res = { method: 'DELETE', url: `/pet/${path.petId}` as const }
-
-  return res
-}
+import type { DeletePetRequestConfig, DeletePetResponses } from '../types/DeletePet.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * @description delete a pet
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
-
-  const res = await request<DeletePetStatus400, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: getDeletePetUrl(path).url.toString(), ...requestConfig, headers: { ...mappedHeaders, ...requestConfig.headers } })
-
-  return res as { status: 400; data: DeletePetStatus400; statusText: string }
+  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
 }

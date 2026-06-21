@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
@@ -15,12 +15,13 @@ export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<O
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusRequestConfig['query']> } = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusRequestConfig['query']> } = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = findPetsByStatusQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return findPetsByStatus({ query: toValue(query) }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+      return data
    },
   })
 }
@@ -32,7 +33,7 @@ export function findPetsByStatusQueryOptions({ query }: { query?: MaybeRefOrGett
  */
 export function useFindPetsByStatus<TData = FindPetsByStatusStatus200, TQueryData = FindPetsByStatusStatus200, TQueryKey extends QueryKey = FindPetsByStatusQueryKey>({ query }: { query?: MaybeRefOrGetter<FindPetsByStatusRequestConfig['query']> } = {}, options: {
   query?: Partial<UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
-  client?: Partial<RequestConfig> & { client?: Client }
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

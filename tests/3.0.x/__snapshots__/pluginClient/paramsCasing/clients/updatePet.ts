@@ -3,27 +3,15 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { UpdatePetRequestConfig, UpdatePetData, UpdatePetStatus200 } from '../types/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-
-function getUpdatePetUrl(path: UpdatePetRequestConfig['path']) {
-  const res = { method: 'POST', url: `/pets/${path.petId}` as const }
-
-  return res
-}
+import type { UpdatePetRequestConfig, UpdatePetResponses } from '../types/UpdatePet.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet({ path, query, body }: UpdatePetRequestConfig, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetRequestConfig, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
-
-  const requestBody = body
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: getUpdatePetUrl(path).url.toString(), query: mappedParams, body: requestBody, ...requestConfig })
-
-  return res.data
+  return request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }

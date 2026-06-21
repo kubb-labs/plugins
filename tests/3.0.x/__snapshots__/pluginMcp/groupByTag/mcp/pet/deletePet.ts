@@ -1,6 +1,5 @@
 import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { DeletePetHeaderApiKey, DeletePetPathPetId } from '../../types/DeletePet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
@@ -12,7 +11,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
 export async function deletePetHandler({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
   const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
 
-  const res = await client<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: "DELETE", url: `/pet/${petId}`, headers: { ...mappedHeaders } }, request)
+  const res = await client({ method: "DELETE", url: `/pet/${petId}`, headers: { ...mappedHeaders } })
 
   return {
     content: [

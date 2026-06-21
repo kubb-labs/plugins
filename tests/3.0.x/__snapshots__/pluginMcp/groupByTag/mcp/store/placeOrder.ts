@@ -1,6 +1,5 @@
 import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../types/PlaceOrder.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { PlaceOrderData } from '../../types/PlaceOrder.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
@@ -12,7 +11,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
 export async function placeOrderHandler({ data }: { data?: PlaceOrderData } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: "POST", url: `/store/order`, body: requestBody }, request)
+  const res = await client({ method: "POST", url: `/store/order`, body: requestBody })
 
   return {
     content: [

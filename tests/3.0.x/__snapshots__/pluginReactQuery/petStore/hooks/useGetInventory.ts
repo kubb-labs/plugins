@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { GetInventoryRequestConfig, GetInventoryResponses, GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
@@ -18,20 +18,19 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
 }
 
-export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventoryQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return getInventory({ ...config, signal: config.signal ?? signal })
+      const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return data
    },
   })
 }
@@ -43,7 +42,7 @@ export function getInventoryQueryOptions(config: Partial<RequestConfig> & { clie
  */
 export function useGetInventory<TData = GetInventoryStatus200, TQueryData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventoryQueryKey>(options: {
   query?: Partial<QueryObserverOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient },
-  client?: Partial<RequestConfig> & { client?: Client }
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

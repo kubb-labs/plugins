@@ -1,6 +1,5 @@
 import client from '@kubb/plugin-client/clients/axios'
-import type { FindPetsByStatusQueryStatus, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { FindPetsByStatusQueryStatus } from '../types/FindPetsByStatus.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
@@ -10,7 +9,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
  * {@link /pet/findByStatus}
  */
 export async function findPetsByStatusHandler({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await client<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: "GET", url: `/pet/findByStatus`, query: params }, request)
+  const res = await client({ method: "GET", url: `/pet/findByStatus`, query: params })
 
   return {
     content: [

@@ -3,20 +3,21 @@
 * Do not edit manually.
 */
 
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../clients/uploadFile.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
-export function uploadFileMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = uploadFileMutationKey()
   return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationKey,
     mutationFn: async({ path, query, body }) => {
-      return uploadFile({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -27,7 +28,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Re
  */
 export function useUploadFile<TContext>(options: {
   mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

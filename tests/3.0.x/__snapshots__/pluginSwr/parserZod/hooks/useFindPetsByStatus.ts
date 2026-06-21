@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
 import type { SWRConfiguration } from 'swr'
+import { client } from '../.kubb/client.ts'
 import { findPetsByStatusResponseSchema } from '../zod/findPetsByStatusSchema.ts'
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) => [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
@@ -19,18 +19,17 @@ type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError>): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({ method: 'GET', url: `/pet/findByStatus`, query, ...requestConfig })
-
-  return findPetsByStatusResponseSchema.parse(res.data)
+  return request({ method: 'GET', url: '/pet/findByStatus', parser: { response: (data: unknown) => findPetsByStatusResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }
 
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return findPetsByStatus({ query }, config)
+      const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })
+      return data
     },
   }
 }
@@ -42,7 +41,7 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestC
  */
 export function useFindPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, options: {
   query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>>,
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

@@ -3,16 +3,15 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import { mergeConfig } from '@kubb/plugin-client/clients/axios'
+import type { GetInventoryRequestConfig, GetInventoryResponses } from '../types/GetInventory.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
+import type { ClientInstance, Options, RequestConfig, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 export class StoreClient {
-  #config: Partial<RequestConfig> & { client?: Client }
+  #config: Partial<RequestConfig> & { client?: ClientInstance }
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
     this.#config = config
   }
 
@@ -21,10 +20,9 @@ export class StoreClient {
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-  async getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: "GET", url: `/store/inventory` })
-    return res.data
+  async getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
   }
 
 /**
@@ -32,10 +30,8 @@ export class StoreClient {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-  async placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ ...requestConfig, method: "POST", url: `/store/order`, body: requestBody, contentType })
-    return res.data
+  async placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
   }
 }

@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../clients/placeOrder.ts'
 
@@ -22,7 +22,7 @@ export type PlaceOrderMutationArg = PlaceOrderRequestConfig
  */
 export function usePlaceOrder(options: {
   mutation?: SWRMutationConfiguration<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -31,7 +31,8 @@ export function usePlaceOrder(options: {
   return useSWRMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      return placeOrder({ body }, config)
+      const { data } = await placeOrder({ ...config, body, throwOnError: true })
+      return data
     },
     mutationOptions
   )

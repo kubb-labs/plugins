@@ -3,13 +3,12 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponses, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import type { z } from 'zod'
-import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
+import { client } from '../.kubb/client.ts'
+import { placeOrderResponseSchema } from '../zod/placeOrderSchema.ts'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -20,14 +19,10 @@ export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = placeOrderDataSchema.parse(body)
-
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.input<typeof placeOrderDataSchema>>({ method: 'POST', url: `/store/order`, body: requestBody, contentType, ...requestConfig })
-
-  return placeOrderResponseSchema.parse(res.data)
+  return request({ method: 'POST', url: '/store/order', parser: { response: (data: unknown) => placeOrderResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
 }
 
 export type PlaceOrderMutationArg = PlaceOrderRequestConfig
@@ -39,7 +34,7 @@ export type PlaceOrderMutationArg = PlaceOrderRequestConfig
  */
 export function usePlaceOrder(options: {
   mutation?: SWRMutationConfiguration<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -48,7 +43,8 @@ export function usePlaceOrder(options: {
   return useSWRMutation<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderMutationKey | null, PlaceOrderMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      return placeOrder({ body }, config)
+      const { data } = await placeOrder({ ...config, body, throwOnError: true })
+      return data
     },
     mutationOptions
   )

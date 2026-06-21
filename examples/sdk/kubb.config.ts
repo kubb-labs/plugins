@@ -29,7 +29,6 @@ export default defineConfig({
         barrel: { type: 'all', nested: true },
       },
       client: 'fetch',
-      importPath: '@kubb/plugin-client/clients/fetch',
       group: { type: 'tag' },
       sdk: { className: 'PetStoreSDK' },
     }),

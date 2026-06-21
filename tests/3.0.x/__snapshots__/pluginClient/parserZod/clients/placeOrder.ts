@@ -3,29 +3,18 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { z } from 'zod'
-import { placeOrderResponseSchema, placeOrderDataSchema } from '../zod/placeOrderSchema.ts'
-
-function getPlaceOrderUrl() {
-  const res = { method: 'POST', url: `/store/order` as const }
-
-  return res
-}
+import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { placeOrderResponseSchema } from '../zod/placeOrderSchema.ts'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * @description Place a new order in the store
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = placeOrderDataSchema.parse(body)
-
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, z.input<typeof placeOrderDataSchema>>({ method: 'POST', url: getPlaceOrderUrl().url.toString(), body: requestBody, contentType, ...requestConfig })
-
-  return placeOrderResponseSchema.parse(res.data)
+  return request({ method: 'POST', url: '/store/order', parser: { response: (data: unknown) => placeOrderResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
 }

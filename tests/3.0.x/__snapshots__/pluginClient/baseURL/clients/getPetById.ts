@@ -3,25 +3,17 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-
-function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
-  const res = { method: 'GET', url: `https://api.example.com/v1/pet/${path.petId}` as const }
-
-  return res
-}
+import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../types/GetPetById.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * @description Returns a single pet
  * @summary Find pet by ID
  * {@link /pet/:petId}
  */
-export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, unknown>({ method: 'GET', url: getGetPetByIdUrl(path).url.toString(), ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }

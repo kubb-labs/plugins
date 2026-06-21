@@ -3,20 +3,21 @@
 * Do not edit manually.
 */
 
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { deletePet } from '../clients/deletePet.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
-export function deletePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deletePetMutationKey()
   return mutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async({ path, headers }) => {
-      return deletePet({ path, headers }, config)
+      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
+      return data
     },
   })
 }
@@ -28,7 +29,7 @@ export function deletePetMutationOptions<TContext = unknown>(config: Partial<Req
  */
 export function useDeletePet<TContext>(options: {
   mutation?: UseMutationOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

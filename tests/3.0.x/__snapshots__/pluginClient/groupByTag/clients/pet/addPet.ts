@@ -3,27 +3,17 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../../types/AddPet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-
-function getAddPetUrl() {
-  const res = { method: 'POST', url: `/pet` as const }
-
-  return res
-}
+import type { AddPetRequestConfig, AddPetResponses } from '../../types/AddPet.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * @description Add a new pet to the store
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: 'POST', url: getAddPetUrl().url.toString(), body: requestBody, contentType, ...requestConfig })
-
-  return res.data
+  return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
 }

@@ -3,11 +3,11 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { GetInventoryRequestConfig, GetInventoryResponses, GetInventoryResponse } from '../types/GetInventory.ts'
 import type { SWRConfiguration } from 'swr'
+import { client } from '../.kubb/client.ts'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -18,18 +18,17 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
-
-  return res as { status: 200; data: GetInventoryStatus200; statusText: string }
+  return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
 }
 
-export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getInventory(config)
+      const { data } = await getInventory({ ...config, throwOnError: true })
+      return data
     },
   }
 }
@@ -40,8 +39,8 @@ export function getInventoryQueryOptions(config: Partial<RequestConfig> & { clie
  * {@link /store/inventory}
  */
 export function useGetInventory(options: {
-  query?: SWRConfiguration<{ status: 200; data: GetInventoryStatus200; statusText: string }, ResponseErrorConfig<Error>>,
-  client?: Partial<RequestConfig> & { client?: Client },
+  query?: SWRConfiguration<GetInventoryResponse, ResponseErrorConfig<Error>>,
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {
@@ -49,7 +48,7 @@ export function useGetInventory(options: {
 
   const queryKey = getInventoryQueryKey()
 
-  return useSWR<{ status: 200; data: GetInventoryStatus200; statusText: string }, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(
+  return useSWR<GetInventoryResponse, ResponseErrorConfig<Error>, GetInventoryQueryKey | null>(
    shouldFetch ? queryKey : null,
    {
      ...getInventoryQueryOptions(config),
