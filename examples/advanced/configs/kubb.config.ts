@@ -121,7 +121,6 @@ export default defineConfig({
       client: 'axios',
       operations: true,
       baseURL: 'https://petstore3.swagger.io/api/v3',
-      urlType: 'export',
       override: [
         {
           type: 'contentType',

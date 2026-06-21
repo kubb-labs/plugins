@@ -3,12 +3,6 @@ import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from 
 import { client } from '../../../.kubb/client.ts'
 import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
-export function getUpdatePetWithFormUrl(path: UpdatePetWithFormRequestConfig['path']) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
-
-  return res
-}
-
 /**
  * @summary Updates a pet in the store with form data
  * {@link /pet/:petId:search}

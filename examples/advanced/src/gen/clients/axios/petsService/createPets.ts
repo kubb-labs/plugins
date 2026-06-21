@@ -3,12 +3,6 @@ import type { CreatePetsRequestConfig, CreatePetsResponses } from '../../../mode
 import { client } from '../../../.kubb/client.ts'
 import { createPetsResponseSchema } from '../../../zod/pets/createPetsSchema.ts'
 
-export function getCreatePetsUrl(path: CreatePetsRequestConfig['path']) {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${path.uuid}` as const }
-
-  return res
-}
-
 /**
  * @summary Create a pet
  * {@link /pets/:uuid}

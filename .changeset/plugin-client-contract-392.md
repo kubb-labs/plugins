@@ -18,3 +18,4 @@ Migrate the client plugins to the shared `RequestResult` contract and remove `da
 - Query plugins: the deprecated `client` object is removed. Use `client: 'fetch' | 'axios'` with the matching slim plugin registered, or `client: 'legacy'` for the previous inline data-returning client.
 - `@kubb/plugin-cypress`: every helper now yields the response body (`Cypress.Chainable<T>`); the `'full'` `Cypress.Response` variant is gone.
 - `@kubb/plugin-mcp`: handlers call the contract client and read `res.data`; form-data follows the contract runtime's serializer (the `buildFormData` helper is gone).
+- `@kubb/plugin-client`: the `urlType` option and its `get<Operation>Url` URL helpers are removed, along with the `resolveUrlName` resolver method.

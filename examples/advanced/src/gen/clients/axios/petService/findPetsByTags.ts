@@ -3,12 +3,6 @@ import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from '../..
 import { client } from '../../../.kubb/client.ts'
 import { findPetsByTagsResponseSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
 
-export function getFindPetsByTagsUrl() {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/findByTags` as const }
-
-  return res
-}
-
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
  * @summary Finds Pets by tags

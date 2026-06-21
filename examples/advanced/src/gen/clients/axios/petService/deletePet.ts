@@ -3,12 +3,6 @@ import type { DeletePetRequestConfig, DeletePetResponses } from '../../../models
 import { client } from '../../../.kubb/client.ts'
 import { deletePetResponseSchema } from '../../../zod/pet/deletePetSchema.ts'
 
-export function getDeletePetUrl(path: DeletePetRequestConfig['path']) {
-  const res = { method: 'DELETE', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
-
-  return res
-}
-
 /**
  * @description delete a pet
  * @summary Deletes a pet

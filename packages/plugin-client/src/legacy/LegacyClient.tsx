@@ -31,7 +31,6 @@ type DataReturnType = 'data' | 'full'
 
 type Props = {
   name: string
-  urlName?: string
   isExportable?: boolean
   isIndexable?: boolean
   isConfigurable?: boolean
@@ -57,7 +56,6 @@ export function LegacyClient({
   node,
   tsResolver,
   zodResolver,
-  urlName,
   children,
   isConfigurable = true,
 }: Props): KubbReactNode {
@@ -105,13 +103,12 @@ export function LegacyClient({
   // z.input<> matches what the user provides before zod transforms/defaults are applied, keeping it compatible with the TS model types
   const requestGenericType = parser === 'zod' && zodRequestName ? `z.input<typeof ${zodRequestName}>` : requestName || 'unknown'
   const generics = [genericsResponseName, TError, requestGenericType].filter(Boolean)
-  const { signature: paramsSignature, groups } = buildRequestParamsSignature(node, tsResolver, { isConfigurable })
-  const urlParamsCall = groups.path ? 'path' : ''
+  const { signature: paramsSignature } = buildRequestParamsSignature(node, tsResolver, { isConfigurable })
 
   const clientParams = buildClientRequestArgs({
     method: stringify(node.method.toUpperCase()),
-    url: urlName ? `${urlName}(${urlParamsCall}).url.toString()` : Url.toGroupedTemplateString(node.path),
-    baseURL: baseURL && !urlName ? `\`${baseURL}\`` : null,
+    url: Url.toGroupedTemplateString(node.path),
+    baseURL: baseURL ? `\`${baseURL}\`` : null,
     query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
     body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
     contentType: isConfigurable && isMultipleContentTypes,

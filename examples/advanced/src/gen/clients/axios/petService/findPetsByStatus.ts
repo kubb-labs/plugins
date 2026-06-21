@@ -3,12 +3,6 @@ import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '.
 import { client } from '../../../.kubb/client.ts'
 import { findPetsByStatusResponseSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
-export function getFindPetsByStatusUrl(path: FindPetsByStatusRequestConfig['path']) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/findByStatus/${path.stepId}` as const }
-
-  return res
-}
-
 /**
  * @description Multiple status values can be provided with comma separated strings
  * @summary Finds Pets by status

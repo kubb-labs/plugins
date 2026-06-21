@@ -25,13 +25,6 @@ export type ResolverClient = Resolver & {
    * Resolves the output file name for a generated client module.
    */
   resolvePathName(this: ResolverClient, name: string, type?: 'file' | 'function' | 'type' | 'const'): string
-  /**
-   * Resolves the URL helper function name for an operation.
-   *
-   * @example
-   * `resolver.resolveUrlName(node) // -> 'getShowPetByIdUrl'`
-   */
-  resolveUrlName(this: ResolverClient, node: ast.OperationNode): string
 }
 
 /**

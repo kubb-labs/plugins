@@ -32,7 +32,6 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   include: undefined,
   override: [],
   group: null,
-  urlType: 'export',
   sdk: undefined,
   baseURL: undefined,
   resolver: resolverClient,

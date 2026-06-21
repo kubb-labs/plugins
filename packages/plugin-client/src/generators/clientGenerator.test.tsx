@@ -35,7 +35,6 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   include: undefined,
   override: [],
   group: null,
-  urlType: false,
   sdk: undefined,
   baseURL: undefined,
   resolver: resolverClient,
@@ -116,8 +115,6 @@ describe('clientGenerator operation', () => {
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
-    { name: 'findPetsByTagsWithUrlType', node: findByTagsNode, options: { urlType: 'export' as const } },
-    { name: 'getPetByIdWithUrlType', node: getPetByIdNode, options: { urlType: 'export' as const } },
     { name: 'findPetsByTagsImportPath', node: findByTagsNode, options: { importPath: '@kubb/plugin-client/clients/fetch' as const } },
   ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginClient['resolvedOptions']> }>
 

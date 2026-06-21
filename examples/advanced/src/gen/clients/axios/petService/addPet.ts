@@ -3,12 +3,6 @@ import type { AddPetRequestConfig, AddPetResponses } from '../../../models/ts/pe
 import { client } from '../../../.kubb/client.ts'
 import { addPetResponseSchema } from '../../../zod/pet/addPetSchema.ts'
 
-export function getAddPetUrl() {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet` as const }
-
-  return res
-}
-
 /**
  * @description Add a new pet to the store
  * @summary Add a new pet to the store

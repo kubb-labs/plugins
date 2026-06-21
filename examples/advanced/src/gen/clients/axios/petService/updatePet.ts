@@ -3,12 +3,6 @@ import type { UpdatePetRequestConfig, UpdatePetResponses } from '../../../models
 import { client } from '../../../.kubb/client.ts'
 import { updatePetResponseSchema } from '../../../zod/pet/updatePetSchema.ts'
 
-export function getUpdatePetUrl() {
-  const res = { method: 'PUT', url: `https://petstore3.swagger.io/api/v3/pet` as const }
-
-  return res
-}
-
 /**
  * @description Update an existing pet by Id
  * @summary Update an existing pet

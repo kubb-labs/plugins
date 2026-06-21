@@ -2,12 +2,6 @@ import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { AddFilesRequestConfig, AddFilesResponses } from '../../../models/ts/pet/AddFiles.ts'
 import { client } from '../../../.kubb/client.ts'
 
-export function getAddFilesUrl() {
-  const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pet/files` as const }
-
-  return res
-}
-
 /**
  * @description Place a new file in the store
  * @summary Place an file for a pet

@@ -3,12 +3,6 @@ import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../../mode
 import { client } from '../../../.kubb/client.ts'
 import { getPetByIdResponseSchema } from '../../../zod/pet/getPetByIdSchema.ts'
 
-export function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
-  const res = { method: 'GET', url: `https://petstore3.swagger.io/api/v3/pet/${path.petId}:search` as const }
-
-  return res
-}
-
 /**
  * @description Returns a single pet
  * @summary Find pet by ID

@@ -52,7 +52,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
     exclude = [],
     include,
     override = [],
-    urlType = false,
     operations = false,
     clientType = options.sdk ? 'class' : 'function',
     parser = false,
@@ -95,7 +94,6 @@ export const pluginClient = definePlugin<PluginClient>((options) => {
           parser,
           importPath: resolvedImportPath,
           baseURL,
-          urlType,
           sdk,
           resolver,
         })
