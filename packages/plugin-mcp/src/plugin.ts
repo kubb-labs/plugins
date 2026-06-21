@@ -70,7 +70,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           throw new Error(resolvedClient.message)
         }
 
-        // The handlers always call a registered client plugin's op; the client runtime lives in
+        // The handlers always call a registered client plugin's op. The client runtime lives in
         // plugin-axios / plugin-fetch, so nothing is bundled here.
         const resolvedClientDescriptor: PluginMcp['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
 

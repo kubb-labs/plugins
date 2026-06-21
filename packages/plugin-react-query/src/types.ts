@@ -240,7 +240,7 @@ export type Options = OutputOptions & {
    * single client plugin (plugin-fetch or plugin-axios) is registered it is
    * auto-detected, so the string is only needed to disambiguate several client plugins.
    *
-   * A client plugin must be registered; the hooks always call its `<op>`.
+   * A client plugin must be registered. The hooks always call its `<op>`.
    */
   client?: ClientSelector
   /**

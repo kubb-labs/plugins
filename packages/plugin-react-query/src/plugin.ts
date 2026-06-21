@@ -93,7 +93,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
           throw new Error(resolvedClient.message)
         }
 
-        // The hooks always call a registered client plugin's op; the client runtime lives in
+        // The hooks always call a registered client plugin's op. The client runtime lives in
         // plugin-axios / plugin-fetch, so nothing is bundled here.
         const resolvedClientDescriptor: PluginReactQuery['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
 
