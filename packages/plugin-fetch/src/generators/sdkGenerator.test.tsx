@@ -27,7 +27,7 @@ const defaultOptions: PluginFetch['resolvedOptions'] = {
   group: null,
   baseURL: undefined,
   parser: false,
-  sdk: { strategy: 'tag', name: undefined },
+  sdk: { mode: 'tag', name: undefined },
   resolver: resolverClient,
 }
 
@@ -78,8 +78,8 @@ const operationNodes: Array<ast.OperationNode> = [
 describe('sdkGenerator operations', () => {
   const testData = [
     { name: 'sdkClass', options: {} as Partial<PluginFetch['resolvedOptions']> },
-    { name: 'sdkClassWithName', options: { sdk: { strategy: 'tag', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
-    { name: 'sdkSingle', options: { sdk: { strategy: 'single', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
+    { name: 'sdkClassWithName', options: { sdk: { mode: 'tag', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
+    { name: 'sdkSingle', options: { sdk: { mode: 'single', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

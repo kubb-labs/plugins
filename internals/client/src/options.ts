@@ -27,7 +27,7 @@ export function resolveOptions(options: Options): ResolvedOptions {
     group: createGroupConfig(group),
     baseURL,
     parser,
-    sdk: sdk ? { strategy: sdk.strategy ?? 'tag', name: sdk.name } : undefined,
+    sdk: sdk ? { mode: sdk.mode ?? 'tag', name: sdk.name } : undefined,
     resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
   }
 }
