@@ -23,9 +23,10 @@ type Props = {
 }
 
 /**
- * Renders one class per tag with a `public static` method per operation. Each method is
- * self-contained — identical to the standalone function — so callers reach an operation as
- * `PetClient.getPetById(...)` without instantiating the class.
+ * Renders one instance class per tag with one method per operation. The constructor takes a client
+ * config object and builds its own client through `createClient`, so each environment is a separate
+ * instance: `const api = new PetClient({ baseURL }); api.getPetById(...)`. A per-call `client` option
+ * still overrides the instance client for a one-off call.
  */
 export function SdkClient({ name, isExportable = true, isIndexable = true, operations, parser, children }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver }) =>
@@ -38,7 +39,9 @@ export function SdkClient({ name, isExportable = true, isIndexable = true, opera
     }),
   )
 
-  const classCode = `export class ${name} {\n${methods.join('\n\n')}\n}`
+  const constructor = ['  private readonly client: ClientInstance', '', '  constructor(config: ClientConfig = {}) {', '    this.client = createClient(config)', '  }'].join('\n')
+
+  const classCode = `export class ${name} {\n${constructor}\n\n${methods.join('\n\n')}\n}`
 
   return (
     <File.Source name={name} isExportable={isExportable} isIndexable={isIndexable}>

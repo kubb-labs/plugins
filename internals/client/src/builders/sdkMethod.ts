@@ -12,7 +12,7 @@ import { buildParserHooks } from './validator.ts'
 /**
  * Builds the call config literal forwarded to the contract client, mirroring the shared `Operation`
  * component: `{ method, url, parser?, ...config }`. The `...config` spread carries every per-call
- * field (including `throwOnError`), so the static method stays a thin wrapper over the contract.
+ * field (including `throwOnError`), so the method stays a thin wrapper over the contract.
  */
 function buildCallConfig({
   node,
@@ -31,10 +31,10 @@ function buildCallConfig({
 }
 
 /**
- * Builds a single `public static` method for a generated SDK class. The body is identical to the
- * standalone `Operation` function: it forwards the single grouped `options` object to the contract
- * client and returns the `RequestResult`. Methods are self-contained, so the class needs no
- * constructor or shared state and stays tree-shakeable per call.
+ * Builds a single instance method for a generated SDK class. The body forwards the single grouped
+ * `options` object to the instance's own client (`this.client`, built once in the constructor) and
+ * returns the `RequestResult`. A per-call `options.client` still overrides the instance client, so
+ * one operation can be routed to a different environment without a new instance.
  */
 export function buildSdkMethod({
   node,
@@ -57,7 +57,7 @@ export function buildSdkMethod({
   const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const methodBody = ['const { client: request = client, ...config } = options', '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
+  const methodBody = ['const { client: request = this.client, ...config } = options', '', returnStatement].map((line) => (line ? `    ${line}` : '')).join('\n')
 
-  return `${jsdoc}  public static ${name}${generics}(${signature.paramsSignature}): ${signature.returnType} {\n${methodBody}\n  }`
+  return `${jsdoc}  public ${name}${generics}(${signature.paramsSignature}): ${signature.returnType} {\n${methodBody}\n  }`
 }

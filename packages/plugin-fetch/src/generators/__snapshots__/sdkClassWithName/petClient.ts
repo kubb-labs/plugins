@@ -1,18 +1,24 @@
 /* eslint-disable no-alert, no-console */
 
-import type { Options, RequestResult } from './.kubb/client'
+import type { ClientConfig, ClientInstance, Options, RequestResult } from './.kubb/client'
 import type { DeletePetRequestConfig, DeletePetResponses } from './DeletePet'
 import type { GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById'
-import { client } from './.kubb/client'
+import { createClient } from './.kubb/client'
 
 export class PetClient {
+  private readonly client: ClientInstance
+
+  constructor(config: ClientConfig = {}) {
+    this.client = createClient(config)
+  }
+
   /**
    * {@link /pet/:petId}
    */
-  public static getPetById<ThrowOnError extends boolean = true>(
+  public getPetById<ThrowOnError extends boolean = true>(
     options: Options<GetPetByIdRequestConfig, ThrowOnError>,
   ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-    const { client: request = client, ...config } = options
+    const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }
@@ -20,10 +26,10 @@ export class PetClient {
   /**
    * {@link /pet/:petId}
    */
-  public static deletePet<ThrowOnError extends boolean = true>(
+  public deletePet<ThrowOnError extends boolean = true>(
     options: Options<DeletePetRequestConfig, ThrowOnError>,
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
-    const { client: request = client, ...config } = options
+    const { client: request = this.client, ...config } = options
 
     return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
   }

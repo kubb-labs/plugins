@@ -124,8 +124,9 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
 /**
  * Builds the SDK generator for a client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`).
  *
- * - `sdk.shape: 'class'` emits one class per tag with a `public static` method per operation. When
- *   `sdk.name` is set, an entry-point barrel re-exports every generated class.
+ * - `sdk.shape: 'class'` emits one instance class per tag whose constructor takes a client config and
+ *   builds its own client, so each environment is a separate instance. When `sdk.name` is set, an
+ *   entry-point barrel re-exports every generated class.
  * - `sdk.shape: 'function'` keeps the standalone functions (emitted by the plugin's own operation
  *   generator) and, when `sdk.name` is set, emits a tree-shakeable `export * as <tag> from './<tag>'`
  *   entry point.
@@ -172,8 +173,8 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
 
         return (
           <File key={file.path} baseName={file.baseName} path={file.path} meta={file.meta} banner={banner(file)} footer={footer(file)}>
-            <File.Import name={['client']} root={file.path} path={clientPath} />
-            <File.Import name={['Options', 'RequestResult']} root={file.path} path={clientPath} isTypeOnly />
+            <File.Import name={['createClient']} root={file.path} path={clientPath} />
+            <File.Import name={['ClientConfig', 'ClientInstance', 'Options', 'RequestResult']} root={file.path} path={clientPath} isTypeOnly />
 
             {parser === 'zod' && ops.some((op) => op.node.requestBody?.content?.[0]?.schema != null) && <File.Import name={['z']} path="zod" isTypeOnly />}
 
