@@ -1,8 +1,7 @@
-import client from '../../../../axios-client.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { CreatePetsRequestConfig, CreatePetsData, CreatePetsStatus201, CreatePetsStatusDefault } from '../../../models/ts/pets/CreatePets.ts'
-import type { z } from 'zod'
-import { createPetsResponseSchema, createPetsDataSchema } from '../../../zod/pets/createPetsSchema.ts'
+import type { Options, RequestResult } from '../../../.kubb/client.ts'
+import type { CreatePetsRequestConfig, CreatePetsResponses } from '../../../models/ts/pets/CreatePets.ts'
+import { client } from '../../../.kubb/client.ts'
+import { createPetsResponseSchema } from '../../../zod/pets/createPetsSchema.ts'
 
 export function getCreatePetsUrl(path: CreatePetsRequestConfig['path']) {
   const res = { method: 'POST', url: `https://petstore3.swagger.io/api/v3/pets/${path.uuid}` as const }
@@ -14,28 +13,12 @@ export function getCreatePetsUrl(path: CreatePetsRequestConfig['path']) {
  * @summary Create a pet
  * {@link /pets/:uuid}
  */
-export async function createPets(
-  { path, query, body, headers }: CreatePetsRequestConfig,
-  config: Partial<RequestConfig<CreatePetsData>> & { client?: Client } = {},
-) {
-  const { client: request = client, ...requestConfig } = config
+export function createPets<ThrowOnError extends boolean = true>(
+  options: Options<CreatePetsRequestConfig, ThrowOnError>,
+): Promise<RequestResult<CreatePetsResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedParams = query ? { bool_param: query.boolParam, offset: query.offset } : undefined
-
-  const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
-
-  const requestBody = createPetsDataSchema.parse(body)
-
-  const res = await request<CreatePetsStatus201 | CreatePetsStatusDefault, ResponseErrorConfig<Error>, z.input<typeof createPetsDataSchema>>({
-    method: 'POST',
-    url: getCreatePetsUrl(path).url.toString(),
-    query: mappedParams,
-    body: requestBody,
-    ...requestConfig,
-    headers: { ...mappedHeaders, ...requestConfig.headers },
-  })
-
-  return { ...res, data: createPetsResponseSchema.parse(res.data) } as
-    | { status: 201; data: CreatePetsStatus201; statusText: string }
-    | { status: number; data: CreatePetsStatusDefault; statusText: string }
+  return request({ method: 'POST', url: '/pets/{uuid}', parser: { response: (data: unknown) => createPetsResponseSchema.parse(data) }, ...config }) as Promise<
+    RequestResult<CreatePetsResponses, ThrowOnError>
+  >
 }

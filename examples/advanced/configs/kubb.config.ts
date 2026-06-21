@@ -98,10 +98,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      client: {
-        dataReturnType: 'full',
-        importPath: '../../../../axios-client.ts',
-      },
       query: {
         importPath: '../../../../tanstack-query-hook',
       },
@@ -122,10 +118,9 @@ export default defineConfig({
       // bundle: true,
       parser: 'zod',
       group: { type: 'tag', name: ({ group }) => `${group}Service` },
-      importPath: '../../../../axios-client.ts',
+      client: 'axios',
       operations: true,
       baseURL: 'https://petstore3.swagger.io/api/v3',
-      dataReturnType: 'full',
       urlType: 'export',
       override: [
         {
@@ -157,7 +152,6 @@ export default defineConfig({
       ],
       group: { type: 'tag' },
       client: {
-        importPath: '../../../axios-client.ts',
         baseURL: 'https://petstore.swagger.io/v2',
       },
     }),

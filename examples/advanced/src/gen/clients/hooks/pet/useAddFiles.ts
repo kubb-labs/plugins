@@ -1,5 +1,5 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { AddFilesRequestConfig, AddFilesData, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/pet/AddFiles.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
+import type { AddFilesRequestConfig, AddFilesStatus200, AddFilesStatus405 } from '../../../models/ts/pet/AddFiles.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { addFiles } from '../../axios/petService/addFiles.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -7,18 +7,14 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const addFilesMutationKey = () => [{ url: '/pet/files' }] as const
 
 export function addFilesMutationOptions<TContext = unknown>(
-  config: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const mutationKey = addFilesMutationKey()
-  return mutationOptions<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
-    ResponseErrorConfig<AddFilesStatus405>,
-    AddFilesRequestConfig,
-    TContext
-  >({
+  return mutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
-      return addFiles({ body }, config)
+      const { data } = await addFiles({ ...config, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -30,13 +26,8 @@ export function addFilesMutationOptions<TContext = unknown>(
  */
 export function useAddFiles<TContext>(
   options: {
-    mutation?: UseMutationOptions<
-      { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
-      ResponseErrorConfig<AddFilesStatus405>,
-      AddFilesRequestConfig,
-      TContext
-    > & { client?: QueryClient }
-    client?: Partial<RequestConfig<AddFilesData>> & { client?: Client; contentType?: 'application/json' | 'multipart/form-data' }
+    mutation?: UseMutationOptions<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesRequestConfig, TContext> & { client?: QueryClient }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' }
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -44,28 +35,18 @@ export function useAddFiles<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? addFilesMutationKey()
 
   const baseOptions = addFilesMutationOptions(config) as UseMutationOptions<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
+    AddFilesStatus200,
     ResponseErrorConfig<AddFilesStatus405>,
     AddFilesRequestConfig,
     TContext
   >
 
-  return useMutation<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
-    ResponseErrorConfig<AddFilesStatus405>,
-    AddFilesRequestConfig,
-    TContext
-  >(
+  return useMutation<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<
-    { status: 200; data: AddFilesStatus200; statusText: string } | { status: 405; data: AddFilesStatus405; statusText: string },
-    ResponseErrorConfig<AddFilesStatus405>,
-    AddFilesRequestConfig,
-    TContext
-  >
+  ) as UseMutationResult<AddFilesStatus200, ResponseErrorConfig<AddFilesStatus405>, AddFilesRequestConfig, TContext>
 }

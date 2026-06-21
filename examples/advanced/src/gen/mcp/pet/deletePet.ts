@@ -1,8 +1,7 @@
-import client from '../../../axios-client.ts'
-import type { ResponseErrorConfig } from '../../../axios-client.ts'
-import type { DeletePetHeaderApiKey, DeletePetPathPetId, DeletePetResponse, DeletePetStatus400 } from '../../models/ts/pet/DeletePet.ts'
+import type { DeletePetHeaderApiKey, DeletePetPathPetId } from '../../models/ts/pet/DeletePet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../../.kubb/client.ts'
 
 /**
  * @description delete a pet
@@ -15,10 +14,7 @@ export async function deletePetHandler(
 ): Promise<Promise<CallToolResult>> {
   const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
 
-  const res = await client<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>(
-    { method: 'DELETE', url: `/pet/${petId}:search`, baseURL: `https://petstore.swagger.io/v2`, headers: { ...mappedHeaders } },
-    request,
-  )
+  const res = await client({ method: 'DELETE', url: `/pet/${petId}:search`, baseURL: `https://petstore.swagger.io/v2`, headers: { ...mappedHeaders } })
 
   return {
     content: [

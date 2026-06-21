@@ -1,15 +1,13 @@
-import client from '../../../axios-client.ts'
-import type { ResponseErrorConfig } from '../../../axios-client.ts'
 import type {
   CreatePetsData,
   CreatePetsHeaderXEXAMPLE,
   CreatePetsPathUuid,
   CreatePetsQueryBoolParam,
   CreatePetsQueryOffset,
-  CreatePetsResponse,
 } from '../../models/ts/pets/CreatePets.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../../.kubb/client.ts'
 
 /**
  * @summary Create a pet
@@ -35,10 +33,14 @@ export async function createPetsHandler(
 
   const requestBody = data
 
-  const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>(
-    { method: 'POST', url: `/pets/${uuid}`, baseURL: `https://petstore.swagger.io/v2`, query: mappedParams, body: requestBody, headers: { ...mappedHeaders } },
-    request,
-  )
+  const res = await client({
+    method: 'POST',
+    url: `/pets/${uuid}`,
+    baseURL: `https://petstore.swagger.io/v2`,
+    query: mappedParams,
+    body: requestBody,
+    headers: { ...mappedHeaders },
+  })
 
   return {
     content: [

@@ -1,6 +1,6 @@
-import client from '../../../../axios-client.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../../../models/ts/pet/FindPetsByStatus.ts'
+import type { Options, RequestResult } from '../../../.kubb/client.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.ts'
+import { client } from '../../../.kubb/client.ts'
 import { findPetsByStatusResponseSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
 export function getFindPetsByStatusUrl(path: FindPetsByStatusRequestConfig['path']) {
@@ -14,16 +14,15 @@ export function getFindPetsByStatusUrl(path: FindPetsByStatusRequestConfig['path
  * @summary Finds Pets by status
  * {@link /pet/findByStatus/:step_id}
  */
-export async function findPetsByStatus({ path }: FindPetsByStatusRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByStatus<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByStatusRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByStatusStatus200 | FindPetsByStatusStatus400, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
+  return request({
     method: 'GET',
-    url: getFindPetsByStatusUrl(path).url.toString(),
-    ...requestConfig,
-  })
-
-  return { ...res, data: findPetsByStatusResponseSchema.parse(res.data) } as
-    | { status: 200; data: FindPetsByStatusStatus200; statusText: string }
-    | { status: 400; data: FindPetsByStatusStatus400; statusText: string }
+    url: '/pet/findByStatus/{step_id}',
+    parser: { response: (data: unknown) => findPetsByStatusResponseSchema.parse(data) },
+    ...config,
+  }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }

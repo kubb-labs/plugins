@@ -456,3 +456,4 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 export const client = createClientCore()
 
 export const createClient = (config?: Parameters<typeof client.createClient>[0]) => client.createClient(config)
+client.setConfig({ baseURL: 'https://petstore3.swagger.io/api/v3' })

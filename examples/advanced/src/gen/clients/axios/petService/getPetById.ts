@@ -1,6 +1,6 @@
-import client from '../../../../axios-client.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../../../models/ts/pet/GetPetById.ts'
+import type { Options, RequestResult } from '../../../.kubb/client.ts'
+import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../../models/ts/pet/GetPetById.ts'
+import { client } from '../../../.kubb/client.ts'
 import { getPetByIdResponseSchema } from '../../../zod/pet/getPetByIdSchema.ts'
 
 export function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
@@ -14,17 +14,15 @@ export function getGetPetByIdUrl(path: GetPetByIdRequestConfig['path']) {
  * @summary Find pet by ID
  * {@link /pet/:petId:search}
  */
-export async function getPetById({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getPetById<ThrowOnError extends boolean = true>(
+  options: Options<GetPetByIdRequestConfig, ThrowOnError>,
+): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<
-    GetPetByIdStatus200 | GetPetByIdStatus400 | GetPetByIdStatus404,
-    ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>,
-    unknown
-  >({ method: 'GET', url: getGetPetByIdUrl(path).url.toString(), ...requestConfig })
-
-  return { ...res, data: getPetByIdResponseSchema.parse(res.data) } as
-    | { status: 200; data: GetPetByIdStatus200; statusText: string }
-    | { status: 400; data: GetPetByIdStatus400; statusText: string }
-    | { status: 404; data: GetPetByIdStatus404; statusText: string }
+  return request({
+    method: 'GET',
+    url: '/pet/{petId}:search',
+    parser: { response: (data: unknown) => getPetByIdResponseSchema.parse(data) },
+    ...config,
+  }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }

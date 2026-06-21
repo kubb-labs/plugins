@@ -1,6 +1,6 @@
-import client from '../../../../axios-client.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags.ts'
+import type { Options, RequestResult } from '../../../.kubb/client.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags.ts'
+import { client } from '../../../.kubb/client.ts'
 import { findPetsByTagsResponseSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
 
 export function getFindPetsByTagsUrl() {
@@ -14,20 +14,15 @@ export function getFindPetsByTagsUrl() {
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags({ query, headers }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByTags<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
-
-  const res = await request<FindPetsByTagsStatus200 | FindPetsByTagsStatus400, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
+  return request({
     method: 'GET',
-    url: getFindPetsByTagsUrl().url.toString(),
-    query,
-    ...requestConfig,
-    headers: { ...mappedHeaders, ...requestConfig.headers },
-  })
-
-  return { ...res, data: findPetsByTagsResponseSchema.parse(res.data) } as
-    | { status: 200; data: FindPetsByTagsStatus200; statusText: string }
-    | { status: 400; data: FindPetsByTagsStatus400; statusText: string }
+    url: '/pet/findByTags',
+    parser: { response: (data: unknown) => findPetsByTagsResponseSchema.parse(data) },
+    ...config,
+  }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }

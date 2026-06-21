@@ -39,26 +39,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
-  // ─── dataReturnType ─────────────────────────────────────────────────────
-  {
-    name: 'dataReturnTypeFull',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginClient({
-          output: { path: './clients', barrel: false },
-          importPath: '@kubb/plugin-client/clients/axios',
-          dataReturnType: 'full',
-        }),
-      ],
-    },
-  },
-
   // ─── operations ─────────────────────────────────────────────────────────
   {
     name: 'operations',

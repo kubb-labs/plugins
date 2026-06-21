@@ -1,15 +1,12 @@
-import client from '../../../axios-client.ts'
-import type { ResponseErrorConfig } from '../../../axios-client.ts'
 import type {
   FindPetsByTagsHeaderXEXAMPLE,
   FindPetsByTagsQueryPage,
   FindPetsByTagsQueryPageSize,
   FindPetsByTagsQueryTags,
-  FindPetsByTagsResponse,
-  FindPetsByTagsStatus400,
 } from '../../models/ts/pet/FindPetsByTags.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../../.kubb/client.ts'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -28,10 +25,7 @@ export async function findPetsByTagsHandler(
 ): Promise<Promise<CallToolResult>> {
   const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
 
-  const res = await client<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>(
-    { method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, query: params, headers: { ...mappedHeaders } },
-    request,
-  )
+  const res = await client({ method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, query: params, headers: { ...mappedHeaders } })
 
   return {
     content: [
