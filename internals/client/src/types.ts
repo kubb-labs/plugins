@@ -17,6 +17,13 @@ export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' 
 export type Shape = 'function' | 'class'
 
 /**
+ * How the `'class'` shape groups operations.
+ * - `'tag'` — one class per tag, optionally composed into a root client.
+ * - `'single'` — one flat class with every operation as a direct method.
+ */
+export type Strategy = 'tag' | 'single'
+
+/**
  * The resolver shared by the client plugins. Functions and files use camelCase; URL helpers get
  * a `get<Operation>Url` name.
  */
@@ -94,12 +101,18 @@ export type Options = OutputOptions & {
    * ```ts
    * pluginFetch({ sdk: { shape: 'class', name: 'petStore' } })
    * // class PetStore {
-   * //   readonly petClient: PetClient
-   * //   readonly storeClient: StoreClient
+   * //   readonly pet: PetClient
+   * //   readonly store: StoreClient
    * //   constructor(config = {}) { ... }
    * // }
    * // const api = new PetStore({ baseURL })
-   * // await api.petClient.getPetById({ path: { petId: 1 } })
+   * // await api.pet.getPetById({ path: { petId: 1 } })
+   * ```
+   * @example A flat single SDK with every operation as a direct method
+   * ```ts
+   * pluginFetch({ sdk: { shape: 'class', name: 'petStore', strategy: 'single' } })
+   * // const api = new PetStore({ baseURL })
+   * // await api.getPetById({ path: { petId: 1 } })
    * ```
    */
   sdk?: {
@@ -115,9 +128,18 @@ export type Options = OutputOptions & {
      */
     shape?: Shape
     /**
-     * Name of the generated aggregation entry point, also the file name. For the `'class'` shape it
-     * emits a composed root class that instantiates every tag client from one shared config; for the
-     * `'function'` shape it emits a tree-shakeable `export * as <tag>` namespace per tag.
+     * How the `'class'` shape groups operations.
+     * - `'tag'` — one class per tag. With `name`, a composed root instantiates every tag client.
+     * - `'single'` — one flat class named by `name`, with every operation as a direct method.
+     *
+     * @default 'tag'
+     */
+    strategy?: Strategy
+    /**
+     * Name of the generated aggregation entry point, also the file name. For the `'class'` shape with
+     * `strategy: 'tag'` it emits a composed root class that instantiates every tag client from one
+     * shared config; with `strategy: 'single'` it names the flat class. For the `'function'` shape it
+     * emits a tree-shakeable `export * as <tag>` namespace per tag.
      */
     name?: string
   }
@@ -144,6 +166,7 @@ export type ResolvedOptions = {
   parser: NonNullable<Options['parser']>
   sdk: {
     shape: Shape
+    strategy: Strategy
     name: string | undefined
   }
   resolver: ResolverClient

@@ -33,6 +33,7 @@ type OperationData = {
 
 type Controller = {
   name: string
+  tag: string | undefined
   file: ast.FileNode
   operations: Array<OperationData>
 }
@@ -99,7 +100,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
     if (previous) {
       previous.operations.push(operationData)
     } else {
-      acc.push({ name, file, operations: [operationData] })
+      acc.push({ name, tag, file, operations: [operationData] })
     }
 
     return acc
@@ -125,9 +126,11 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
 /**
  * Builds the SDK generator for a client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`).
  *
- * - `sdk.shape: 'class'` emits one instance class per tag whose constructor takes a client config and
- *   builds its own client, so each environment is a separate instance. When `sdk.name` is set, a
- *   composed root class instantiates every tag client from one shared config.
+ * - `sdk.shape: 'class'` emits instance classes whose constructor takes a client config and builds
+ *   their own client, so each environment is a separate instance. With `sdk.strategy: 'tag'` (the
+ *   default) it emits one class per tag and, when `sdk.name` is set, a composed root that instantiates
+ *   every tag client. With `sdk.strategy: 'single'` it emits one flat class named by `sdk.name`, with
+ *   every operation as a direct method.
  * - `sdk.shape: 'function'` keeps the standalone functions (emitted by the plugin's own operation
  *   generator) and, when `sdk.name` is set, emits a tree-shakeable `export * as <tag> from './<tag>'`
  *   entry point.
@@ -163,7 +166,7 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
         )
       }
 
-      const classFiles = controllers.map(({ name, file, operations: ops }) => {
+      const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({
           file: op.typeFile,
           names: resolveTypeImportNames(op.node, op.tsResolver),
@@ -188,16 +191,28 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
                 <File.Import key={filePath} name={Array.from(set)} root={file.path} path={zodFilesByPath.get(filePath)!.path} />
               ))}
 
-            <SdkClient name={name} operations={ops} parser={parser} />
+            <SdkClient name={className} operations={ops} parser={parser} />
           </File>
         )
-      })
+      }
+
+      // `single` collapses every operation into one flat class named by `sdk.name`, so callers reach
+      // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
+      if (sdk.strategy === 'single') {
+        const flatName = resolver.resolveClassName(sdk.name ?? 'sdk')
+        const flatFile = resolver.resolveFile({ name: sdk.name ?? 'sdk', extname: '.ts' }, { root, output, group: group ?? undefined })
+        const allOps = controllers.flatMap((controller) => controller.operations)
+
+        return renderClassFile(flatName, flatFile, allOps)
+      }
+
+      const classFiles = controllers.map(({ name, file, operations: ops }) => renderClassFile(name, file, ops))
 
       if (!sdk.name) return <>{classFiles}</>
 
       const sdkFile = resolver.resolveFile({ name: sdk.name, extname: '.ts' }, { root, output, group: group ?? undefined })
       const facadeName = resolver.resolveClassName(sdk.name)
-      const members = controllers.map(({ name }) => ({ className: name, propName: resolver.resolveClientPropertyName(name) }))
+      const members = controllers.map(({ name, tag }) => ({ className: name, propName: resolver.resolveClientPropertyName(tag ?? name) }))
 
       return (
         <>
