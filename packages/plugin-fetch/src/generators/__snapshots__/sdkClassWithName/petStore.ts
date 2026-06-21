@@ -5,11 +5,11 @@ import { PetClient } from './petClient'
 import { StoreClient } from './storeClient'
 
 export class PetStore {
-  readonly petClient: PetClient
-  readonly storeClient: StoreClient
+  readonly pet: PetClient
+  readonly store: StoreClient
 
   constructor(config: ClientConfig = {}) {
-    this.petClient = new PetClient(config)
-    this.storeClient = new StoreClient(config)
+    this.pet = new PetClient(config)
+    this.store = new StoreClient(config)
   }
 }

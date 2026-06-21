@@ -64,6 +64,22 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
     },
   },
 
+  // ─── sdk single (one flat class, every operation a direct method) ────────
+  {
+    name: 'sdkSingle',
+    config: {
+      root: __dirname,
+      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs],
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false }, sdk: { shape: 'class', strategy: 'single', name: 'PetStore' } }),
+      ],
+    },
+  },
+
   // ─── sdk function with `export * as` aggregation namespace ───────────────
   {
     name: 'sdkFunctionWithName',

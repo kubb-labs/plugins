@@ -20,6 +20,7 @@ export function resolveOptions(options: Options): ResolvedOptions {
   } = options
 
   const shape = sdk?.shape ?? (sdk?.name ? 'class' : 'function')
+  const strategy = sdk?.strategy ?? 'tag'
 
   return {
     output,
@@ -29,7 +30,7 @@ export function resolveOptions(options: Options): ResolvedOptions {
     group: createGroupConfig(group),
     baseURL,
     parser,
-    sdk: { shape, name: sdk?.name },
+    sdk: { shape, strategy, name: sdk?.name },
     resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
   }
 }
