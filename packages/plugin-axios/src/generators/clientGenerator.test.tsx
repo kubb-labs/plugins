@@ -28,7 +28,7 @@ const defaultOptions: PluginAxios['resolvedOptions'] = {
   group: null,
   baseURL: undefined,
   parser: false,
-  sdk: { shape: 'function', strategy: 'tag', name: undefined },
+  sdk: undefined,
   resolver: resolverClient,
 }
 

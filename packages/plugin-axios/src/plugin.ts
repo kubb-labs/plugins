@@ -39,10 +39,9 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
   const resolved = resolveOptions(options)
   const { baseURL } = resolved
 
-  // `class` swaps the per-operation functions for one instance class per tag. `function` keeps the
-  // functions and, when an `sdk.name` is set, adds the `export * as` aggregation entry point.
-  const selectedGenerators =
-    resolved.sdk.shape === 'class' ? [createSdkGenerator<PluginAxios>()] : [clientGenerator, ...(resolved.sdk.name ? [createSdkGenerator<PluginAxios>()] : [])]
+  // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
+  // functions (which query plugins consume) stay.
+  const selectedGenerators = resolved.sdk ? [createSdkGenerator<PluginAxios>()] : [clientGenerator]
 
   return {
     name: pluginAxiosName,

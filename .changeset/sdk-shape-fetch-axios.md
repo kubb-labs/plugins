@@ -3,18 +3,17 @@
 "@kubb/plugin-axios": minor
 ---
 
-Add an `sdk` option to `pluginFetch` and `pluginAxios`, bringing them closer to `pluginClient`.
+Add an `sdk` option to `pluginFetch` and `pluginAxios` that generates a class-based SDK. Leave `sdk` unset to keep the standalone per-operation functions, which is the default and what query plugins consume.
 
-`sdk` controls the shape of the generated client and an optional aggregation entry point:
+Each tag client is an instance class whose constructor takes a client config and builds its own client, so every environment is a separate instance. A per-call `client` option still overrides the instance client for a one-off call.
 
-- `sdk: { shape: 'class' }` emits one instance class per tag. The constructor takes a client config and builds its own client, so each environment is a separate instance. A per-call `client` option still overrides the instance client for a one-off call.
-- `sdk: { shape: 'function' }` (the default) keeps the per-operation functions.
-- `sdk: { name: 'petStore' }` adds an entry point: for `class` it emits a composed root class that instantiates every tag client from one shared config, and for `function` it emits a tree-shakeable `export * as petClient from './pet'`. Setting `name` without a `shape` defaults to `class`.
-- `sdk: { strategy: 'single' }` collapses the `class` shape into one flat class named by `name`, with every operation as a direct method. The default `strategy: 'tag'` keeps the per-tag classes.
+- `sdk: {}` emits one class per tag.
+- `sdk: { name: 'petStore' }` adds a composed root class that instantiates every tag client from one shared config, exposed under each tag.
+- `sdk: { name: 'petStore', strategy: 'single' }` collapses everything into one flat class named by `name`, with every operation as a direct method. The default `strategy: 'tag'` keeps the per-tag classes.
 
 ```ts
 pluginFetch({
-  sdk: { shape: 'class', name: 'petStore' },
+  sdk: { name: 'petStore' },
 })
 
 const api = new PetStore({ baseURL: 'https://api.example.com' })
@@ -23,7 +22,7 @@ await api.pet.getPetById({ path: { petId: 1 } })
 
 ```ts
 pluginFetch({
-  sdk: { shape: 'class', name: 'petStore', strategy: 'single' },
+  sdk: { name: 'petStore', strategy: 'single' },
 })
 
 const api = new PetStore({ baseURL: 'https://api.example.com' })

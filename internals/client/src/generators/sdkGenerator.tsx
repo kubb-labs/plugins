@@ -1,6 +1,6 @@
 import path from 'node:path'
 import { getOperationParameters, operationFileEntry } from '@internals/shared'
-import { camelCase, getRelativePath } from '@internals/utils'
+import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import type { Generator, PluginFactoryOptions } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
@@ -50,11 +50,6 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
     resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
   ]
   return names.filter((n): n is string => Boolean(n))
-}
-
-/** Turns an absolute file path into a relative module specifier (no extension) from `fromFile`. */
-function toModuleSpecifier(fromFile: string, toFile: string): string {
-  return getRelativePath(path.dirname(fromFile), toFile).replace(/\.tsx?$/, '')
 }
 
 /**
@@ -124,16 +119,15 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
 }
 
 /**
- * Builds the SDK generator for a client plugin (`@kubb/plugin-fetch`, `@kubb/plugin-axios`).
+ * Builds the class-based SDK generator for a client plugin (`@kubb/plugin-fetch`,
+ * `@kubb/plugin-axios`). Only registered when `sdk` is set; otherwise the plugin keeps its
+ * standalone per-operation functions.
  *
- * - `sdk.shape: 'class'` emits instance classes whose constructor takes a client config and builds
- *   their own client, so each environment is a separate instance. With `sdk.strategy: 'tag'` (the
- *   default) it emits one class per tag and, when `sdk.name` is set, a composed root that instantiates
- *   every tag client. With `sdk.strategy: 'single'` it emits one flat class named by `sdk.name`, with
- *   every operation as a direct method.
- * - `sdk.shape: 'function'` keeps the standalone functions (emitted by the plugin's own operation
- *   generator) and, when `sdk.name` is set, emits a tree-shakeable `export * as <tag> from './<tag>'`
- *   entry point.
+ * Every tag client is an instance class whose constructor takes a client config and builds its own
+ * client, so each environment is a separate instance. With `sdk.strategy: 'tag'` (the default) it
+ * emits one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag
+ * client. With `sdk.strategy: 'single'` it emits one flat class named by `sdk.name`, with every
+ * operation as a direct method.
  */
 export function createSdkGenerator<TFactory extends ContractClientFactory>(): Generator<TFactory> {
   return defineGenerator<TFactory>({
@@ -144,27 +138,13 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
       const { output, group, parser, sdk } = ctx.options
 
       const pluginTs = ctx.driver.getPlugin(pluginTsName)
-      if (!pluginTs) return null
+      if (!pluginTs || !sdk) return null
 
       const controllers = buildControllers(nodes, ctx)
       const clientPath = path.resolve(root, '.kubb/client.ts')
 
       const banner = (file: ast.FileNode) => resolver.resolveBanner(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
       const footer = (file: ast.FileNode) => resolver.resolveFooter(ctx.meta, { output, config, file: { path: file.path, baseName: file.baseName } })
-
-      if (sdk.shape === 'function') {
-        if (!sdk.name) return null
-
-        const sdkFile = resolver.resolveFile({ name: sdk.name, extname: '.ts' }, { root, output, group: group ?? undefined })
-
-        return (
-          <File key={sdkFile.path} baseName={sdkFile.baseName} path={sdkFile.path} meta={sdkFile.meta} banner={banner(sdkFile)} footer={footer(sdkFile)}>
-            {controllers.map(({ name, file }) => (
-              <File.Export key={name} name={resolver.resolveClientPropertyName(name)} path={toModuleSpecifier(sdkFile.path, path.dirname(file.path))} asAlias />
-            ))}
-          </File>
-        )
-      }
 
       const renderClassFile = (className: string, file: ast.FileNode, ops: Array<OperationData>) => {
         const { namesByPath: typeNamesByPath, filesByPath: typeFilesByPath } = collectImportsByFile(ops, (op) => ({

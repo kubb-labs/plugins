@@ -39,10 +39,9 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
   const resolved = resolveOptions(options)
   const { baseURL } = resolved
 
-  // `class` swaps the per-operation functions for one instance class per tag. `function` keeps the
-  // functions and, when an `sdk.name` is set, adds the `export * as` aggregation entry point.
-  const selectedGenerators =
-    resolved.sdk.shape === 'class' ? [createSdkGenerator<PluginFetch>()] : [clientGenerator, ...(resolved.sdk.name ? [createSdkGenerator<PluginFetch>()] : [])]
+  // `sdk` swaps the per-operation functions for the class-based SDK; left unset, the standalone
+  // functions (which query plugins consume) stay.
+  const selectedGenerators = resolved.sdk ? [createSdkGenerator<PluginFetch>()] : [clientGenerator]
 
   return {
     name: pluginFetchName,

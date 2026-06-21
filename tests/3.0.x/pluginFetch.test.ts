@@ -43,12 +43,12 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { shape: 'class' } }),
+        pluginFetch({ output: { path: './clients', barrel: false }, sdk: {} }),
       ],
     },
   },
 
-  // ─── sdk class with aggregation barrel ──────────────────────────────────
+  // ─── sdk class with composed root ───────────────────────────────────────
   {
     name: 'sdkClassWithName',
     config: {
@@ -59,7 +59,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { shape: 'class', name: 'PetStore' } }),
+        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { name: 'PetStore' } }),
       ],
     },
   },
@@ -75,27 +75,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { shape: 'class', strategy: 'single', name: 'PetStore' } }),
-      ],
-    },
-  },
-
-  // ─── sdk function with `export * as` aggregation namespace ───────────────
-  {
-    name: 'sdkFunctionWithName',
-    config: {
-      root: __dirname,
-      input: { path: '../../schemas/3.0.x/petStore.yaml' },
-      output: { path: './gen', barrel: false },
-      adapter: adapterOas({ validate: false, enums: 'root' }),
-      parsers: [parserTs],
-      plugins: [
-        pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({
-          output: { path: './clients', barrel: false },
-          sdk: { shape: 'function', name: 'petStore' },
-          group: { type: 'tag', name: ({ group }) => `${group}Client` },
-        }),
+        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { strategy: 'single', name: 'PetStore' } }),
       ],
     },
   },
@@ -153,7 +133,7 @@ describe(`plugin-fetch options ${version}`, () => {
         plugins: [
           pluginBarrel(),
           pluginTs({ output: { path: './types', barrel: { type: 'named' } } }),
-          pluginFetch({ output: { path: './clients', barrel: { type: 'named' } }, sdk: { shape: 'class' } }),
+          pluginFetch({ output: { path: './clients', barrel: { type: 'named' } }, sdk: {} }),
         ],
       } as Config,
       { hooks: new AsyncEventEmitter<KubbHooks>() },
