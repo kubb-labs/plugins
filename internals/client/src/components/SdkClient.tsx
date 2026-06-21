@@ -39,7 +39,13 @@ export function SdkClient({ name, isExportable = true, isIndexable = true, opera
     }),
   )
 
-  const constructor = ['  private readonly client: ClientInstance', '', '  constructor(config: ClientConfig = {}) {', '    this.client = createClient(config)', '  }'].join('\n')
+  const constructor = [
+    '  private readonly client: ClientInstance',
+    '',
+    '  constructor(config: ClientConfig = {}) {',
+    '    this.client = createClient(config)',
+    '  }',
+  ].join('\n')
 
   const classCode = `export class ${name} {\n${constructor}\n\n${methods.join('\n\n')}\n}`
 
