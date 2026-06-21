@@ -1,6 +1,5 @@
 ---
 "@kubb/plugin-ts": minor
-"@kubb/plugin-client": patch
 "@kubb/plugin-faker": patch
 "@kubb/plugin-mcp": patch
 "@kubb/plugin-msw": patch

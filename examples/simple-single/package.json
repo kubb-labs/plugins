@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-react-query": "workspace:*",
     "@kubb/plugin-redoc": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",

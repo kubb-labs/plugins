@@ -40,7 +40,8 @@ Kubb spans a few repositories. Knowing where code lives saves time:
 plugins/
 ├── packages/                # The plugins themselves
 │   ├── plugin-ts/           # TypeScript types and interfaces
-│   ├── plugin-client/       # API client (axios, fetch, or a custom client)
+│   ├── plugin-axios/        # Type-safe HTTP client based on axios
+│   ├── plugin-fetch/        # Type-safe HTTP client based on the Fetch API
 │   ├── plugin-react-query/  # TanStack Query hooks for React
 │   ├── plugin-vue-query/    # TanStack Query hooks for Vue
 │   ├── plugin-swr/          # SWR hooks

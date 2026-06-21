@@ -1,7 +1,7 @@
-import client from '@kubb/plugin-client/clients/axios'
 import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../types/UploadFile.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../../.kubb/client.ts'
 
 /**
  * @summary uploads an image

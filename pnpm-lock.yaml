@@ -131,9 +131,9 @@ importers:
       '@faker-js/faker':
         specifier: ^10.4.0
         version: 10.4.0
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../../packages/plugin-client
+        version: link:../../packages/plugin-axios
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress
@@ -233,43 +233,6 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
-  examples/client:
-    dependencies:
-      '@kubb/adapter-oas':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/core':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/parser-ts':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../../packages/plugin-ts
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71
-      axios:
-        specifier: ^1.18.0
-        version: 1.18.0
-      kubb:
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71(openapi-types@12.1.3)(typescript@6.0.3)
-    devDependencies:
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.2.17
-      react:
-        specifier: ^19.2.7
-        version: 19.2.7
-      typescript:
-        specifier: 'catalog:'
-        version: 6.0.3
-
   examples/cypress:
     dependencies:
       '@kubb/plugin-cypress':
@@ -300,9 +263,6 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -347,9 +307,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../../packages/plugin-client
+        version: link:../../packages/plugin-axios
       '@kubb/plugin-mcp':
         specifier: workspace:*
         version: link:../../packages/plugin-mcp
@@ -384,9 +344,6 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -452,9 +409,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/plugin-client':
+      '@kubb/plugin-fetch':
         specifier: workspace:*
-        version: link:../../packages/plugin-client
+        version: link:../../packages/plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -471,9 +428,6 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
       '@kubb/plugin-react-query':
         specifier: workspace:*
         version: link:../../packages/plugin-react-query
@@ -585,9 +539,6 @@ importers:
 
   examples/zod:
     dependencies:
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../../packages/plugin-ts
@@ -719,43 +670,6 @@ importers:
         specifier: 'catalog:'
         version: 6.0.3
 
-  packages/plugin-client:
-    dependencies:
-      '@internals/client':
-        specifier: workspace:*
-        version: link:../../internals/client
-      '@kubb/ast':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71
-      '@kubb/core':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-axios':
-        specifier: workspace:*
-        version: link:../plugin-axios
-      '@kubb/plugin-fetch':
-        specifier: workspace:*
-        version: link:../plugin-fetch
-      '@kubb/plugin-ts':
-        specifier: workspace:*
-        version: link:../plugin-ts
-      '@kubb/plugin-zod':
-        specifier: workspace:*
-        version: link:../plugin-zod
-      '@kubb/renderer-jsx':
-        specifier: 'catalog:'
-        version: 5.0.0-beta.71
-    devDependencies:
-      '@internals/shared':
-        specifier: workspace:*
-        version: link:../../internals/shared
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
-      axios:
-        specifier: ^1.18.0
-        version: 1.18.0
-
   packages/plugin-cypress:
     dependencies:
       '@kubb/ast':
@@ -839,9 +753,12 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../plugin-client
+        version: link:../plugin-axios
+      '@kubb/plugin-fetch':
+        specifier: workspace:*
+        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -886,15 +803,21 @@ importers:
 
   packages/plugin-react-query:
     dependencies:
+      '@internals/client':
+        specifier: workspace:*
+        version: link:../../internals/client
       '@kubb/ast':
         specifier: 'catalog:'
         version: 5.0.0-beta.71
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../plugin-client
+        version: link:../plugin-axios
+      '@kubb/plugin-fetch':
+        specifier: workspace:*
+        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -930,15 +853,21 @@ importers:
 
   packages/plugin-swr:
     dependencies:
+      '@internals/client':
+        specifier: workspace:*
+        version: link:../../internals/client
       '@kubb/ast':
         specifier: 'catalog:'
         version: 5.0.0-beta.71
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../plugin-client
+        version: link:../plugin-axios
+      '@kubb/plugin-fetch':
+        specifier: workspace:*
+        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -986,15 +915,21 @@ importers:
 
   packages/plugin-vue-query:
     dependencies:
+      '@internals/client':
+        specifier: workspace:*
+        version: link:../../internals/client
       '@kubb/ast':
         specifier: 'catalog:'
         version: 5.0.0-beta.71
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../plugin-client
+        version: link:../plugin-axios
+      '@kubb/plugin-fetch':
+        specifier: workspace:*
+        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -1051,9 +986,6 @@ importers:
       '@kubb/plugin-axios':
         specifier: workspace:*
         version: link:../../packages/plugin-axios
-      '@kubb/plugin-client':
-        specifier: workspace:*
-        version: link:../../packages/plugin-client
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress
@@ -1103,9 +1035,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../../packages/plugin-client
+        version: link:../../packages/plugin-axios
       '@kubb/plugin-cypress':
         specifier: workspace:*
         version: link:../../packages/plugin-cypress
@@ -1173,9 +1105,9 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-client':
+      '@kubb/plugin-axios':
         specifier: workspace:*
-        version: link:../../packages/plugin-client
+        version: link:../../packages/plugin-axios
       '@kubb/plugin-faker':
         specifier: workspace:*
         version: link:../../packages/plugin-faker
@@ -5209,7 +5141,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.9(@types/node@25.6.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(msw@2.14.6(@types/node@25.6.2)(typescript@6.0.3))(vite@8.0.16(@types/node@25.6.2)(jiti@2.7.0)(yaml@2.9.0))
+      vitest: 4.1.9(@types/node@22.20.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(msw@2.14.6(@types/node@22.20.0)(typescript@6.0.3))(vite@8.0.16(@types/node@22.20.0)(jiti@2.7.0)(yaml@2.9.0))
 
   '@vitest/expect@4.1.9':
     dependencies:
@@ -5265,7 +5197,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vitest: 4.1.9(@types/node@25.6.2)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(msw@2.14.6(@types/node@25.6.2)(typescript@6.0.3))(vite@8.0.16(@types/node@25.6.2)(jiti@2.7.0)(yaml@2.9.0))
+      vitest: 4.1.9(@types/node@22.20.0)(@vitest/coverage-v8@4.1.9)(@vitest/ui@4.1.9)(msw@2.14.6(@types/node@22.20.0)(typescript@6.0.3))(vite@8.0.16(@types/node@22.20.0)(jiti@2.7.0)(yaml@2.9.0))
 
   '@vitest/utils@4.1.9':
     dependencies:

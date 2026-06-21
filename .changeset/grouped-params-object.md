@@ -1,6 +1,5 @@
 ---
 "@kubb/plugin-ts": minor
-"@kubb/plugin-client": minor
 "@kubb/plugin-react-query": minor
 "@kubb/plugin-vue-query": minor
 "@kubb/plugin-swr": minor

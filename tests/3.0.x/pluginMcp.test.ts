@@ -34,7 +34,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },
@@ -55,7 +54,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },
@@ -76,7 +74,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -99,7 +96,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -121,7 +117,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           group: { type: 'tag' },
         }),
       ],

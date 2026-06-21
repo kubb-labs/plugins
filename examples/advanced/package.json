@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@faker-js/faker": "^10.4.0",
-    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-axios": "workspace:*",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-mcp": "workspace:*",

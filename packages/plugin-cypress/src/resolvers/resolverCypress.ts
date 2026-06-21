@@ -5,7 +5,7 @@ import type { PluginCypress } from '../types.ts'
 /**
  * Default resolver used by `@kubb/plugin-cypress`. Decides the names and file
  * paths for every generated `cy.request()` wrapper. Functions and files use
- * camelCase, matching the convention from `@kubb/plugin-client`.
+ * camelCase, matching the convention from `@kubb/plugin-axios` and `@kubb/plugin-fetch`.
  *
  * @example Resolve a helper name
  * ```ts

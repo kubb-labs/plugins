@@ -242,9 +242,9 @@ type ClientResolver = {
 
 /**
  * Resolves the contract client `<op>` a query/mutation hook imports, by looking up the registered
- * contract client plugin's resolver and output. Works for any contract client plugin (plugin-fetch,
- * plugin-axios, plugin-client). Returns `null` when no contract plugin is in play (the inline /
- * legacy paths). The plugin injects `.kubb/client.ts` at the global output root, the same path the
+ * contract client plugin's resolver and output. Works for any contract client plugin (plugin-fetch
+ * or plugin-axios). Returns `null` when no contract plugin is in play (the inline path). The plugin
+ * injects `.kubb/client.ts` at the global output root, the same path the
  * hooks read `RequestConfig` / `ResponseErrorConfig` from.
  */
 export function resolveClientOperation(options: {

@@ -1,6 +1,5 @@
 ---
 "@kubb/plugin-ts": major
-"@kubb/plugin-client": major
 "@kubb/plugin-faker": major
 "@kubb/plugin-zod": major
 "@kubb/plugin-msw": major

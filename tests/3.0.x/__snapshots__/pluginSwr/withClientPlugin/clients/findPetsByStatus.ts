@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
+import type { Options, RequestResult } from '../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
-import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
-import { client } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 /**
  * @description Multiple status values can be provided with comma separated strings

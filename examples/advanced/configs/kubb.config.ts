@@ -1,5 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMcp } from '@kubb/plugin-mcp'
@@ -105,7 +105,7 @@ export default defineConfig({
       suspense: false,
       parser: 'zod',
     }),
-    pluginClient({
+    pluginAxios({
       output: {
         path: './clients/axios',
       },
@@ -115,11 +115,8 @@ export default defineConfig({
           pattern: 'store',
         },
       ],
-      // bundle: true,
       parser: 'zod',
       group: { type: 'tag', name: ({ group }) => `${group}Service` },
-      client: 'axios',
-      operations: true,
       baseURL: 'https://petstore3.swagger.io/api/v3',
       override: [
         {

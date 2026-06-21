@@ -1,5 +1,4 @@
 ---
-"@kubb/plugin-client": major
 "@kubb/plugin-cypress": major
 "@kubb/plugin-faker": major
 "@kubb/plugin-fetch": major

@@ -1,6 +1,6 @@
-import client from '@kubb/plugin-client/clients/axios'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../../.kubb/client.ts'
 
 /**
  * @description Returns a map of status codes to quantities

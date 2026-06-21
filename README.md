@@ -39,7 +39,8 @@ Maintained by the Kubb team. Kubb v5 OpenAPI configs use [`@kubb/adapter-oas`](h
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [`@kubb/plugin-client`](./packages/plugin-client) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-client.svg)](https://npmx.dev/package/@kubb/plugin-client) | API client generation ([Axios](https://github.com/axios/axios), Fetch) |
+| [`@kubb/plugin-axios`](./packages/plugin-axios) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-axios.svg)](https://npmx.dev/package/@kubb/plugin-axios) | Type-safe HTTP client based on [Axios](https://github.com/axios/axios) |
+| [`@kubb/plugin-fetch`](./packages/plugin-fetch) | [![npm version](https://img.shields.io/npm/v/@kubb/plugin-fetch.svg)](https://npmx.dev/package/@kubb/plugin-fetch) | Type-safe HTTP client based on the Fetch API |
 
 ### Zod
 

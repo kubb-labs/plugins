@@ -1,7 +1,7 @@
-import client from '@kubb/plugin-client/clients/axios'
 import type { AddPetData } from '../types/AddPet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.ts'
 
 /**
  * @description Add a new pet to the store

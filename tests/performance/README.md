@@ -33,7 +33,7 @@ Tests performance of TypeScript type generation from an OpenAPI specification.
 - `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
 
-### Multiple Plugins Generation (plugin-ts + plugin-client)
+### Multiple Plugins Generation (plugin-ts + plugin-axios)
 
 Tests performance with multiple code generators running simultaneously.
 
@@ -41,7 +41,7 @@ Tests performance with multiple code generators running simultaneously.
 
 - `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
-- `plugin-client` - API client generator
+- `plugin-axios` - axios HTTP client generator
 
 ### Comprehensive Plugin Suite
 
@@ -51,7 +51,7 @@ Tests performance with a full suite of generators including validation and mocki
 
 - `adapter-oas` - OpenAPI specification adapter
 - `plugin-ts` - TypeScript types generator
-- `plugin-client` - API client generator
+- `plugin-axios` - axios HTTP client generator
 - `plugin-zod` - Zod validation schemas
 - `plugin-faker` - Mock data generators
 
@@ -71,7 +71,7 @@ Example output:
 ✓ test/performance/main.bench.ts
     name                                                          hz      min     max     mean      p75     p99
   · single plugin generation (plugin-ts)                     19.0873  38.1352  136.95  52.3908  55.1142  113.74
-  · multiple plugins generation (plugin-ts + plugin-client)   9.4499  85.0752  315.47   105.82   112.78  315.47
+  · multiple plugins generation (plugin-ts + plugin-axios)   9.4499  85.0752  315.47   105.82   112.78  315.47
   · comprehensive plugin suite generation                     4.9581   171.37  256.42   201.69   221.47  256.42
 ```
 
