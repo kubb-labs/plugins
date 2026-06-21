@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildQueryOptionsParams } from '@internals/tanstack-query'
-import type { PluginVueQuery } from '../types.ts'
+import type { DataReturnType } from '../types.ts'
 import { buildStatusUnionType, buildVueClientCallArgs, buildVueSlimClientCall, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 
@@ -14,7 +14,7 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   slim?: boolean
 }
 

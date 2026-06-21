@@ -5,7 +5,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { Infinite, PluginVueQuery } from '../types.ts'
+import type { DataReturnType, Infinite } from '../types.ts'
 import { buildStatusUnionType, buildVueClientCallArgs, buildVueSlimClientCall, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
@@ -16,7 +16,7 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']

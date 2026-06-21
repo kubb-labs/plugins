@@ -23,13 +23,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-    importPath: undefined,
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -111,7 +105,11 @@ const deletePetNode = ast.factory.createOperation({
 describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
-    { name: 'clientPostImportPath', node: updatePetWithFormNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    {
+      name: 'clientPostImportPath',
+      node: updatePetWithFormNode,
+      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+    },
     {
       name: 'updatePetByIdWithCustomMutationKey',
       node: updatePetWithFormNode,

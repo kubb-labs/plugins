@@ -3,33 +3,14 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../models/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import { deletePet } from '../clients/deletePet.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:petId}
- */
-export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
-
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
-    method: 'DELETE',
-    url: `/pet/${path.petId}`,
-    ...requestConfig,
-    headers: { ...mappedHeaders, ...requestConfig.headers },
-  })
-
-  return res.data
-}
 
 /**
  * @description delete a pet
@@ -39,7 +20,7 @@ export async function deletePet({ path, headers }: DeletePetRequestConfig, confi
 export function useDeletePet<TContext>(
   options: {
     mutation?: MutationObserverOptions<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -49,7 +30,8 @@ export function useDeletePet<TContext>(
   return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>(
     {
       mutationFn: async ({ path, headers }) => {
-        return deletePet({ path, headers }, config)
+        const { data } = await deletePet({ ...config, path: toValue(path), headers: toValue(headers), throwOnError: true })
+        return data
       },
       mutationKey,
       ...mutationOptions,

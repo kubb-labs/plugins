@@ -3,47 +3,14 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type {
-  UpdatePetRequestConfig,
-  UpdatePetData,
-  UpdatePetStatus200,
-  UpdatePetStatus400,
-  UpdatePetStatus404,
-  UpdatePetStatus405,
-} from '../models/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UpdatePetRequestConfig, UpdatePetStatus200, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../models/UpdatePet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import { updatePet } from '../clients/updatePet.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
-
-/**
- * @description Update an existing pet by Id
- * @summary Update an existing pet
- * {@link /pet}
- */
-export async function updatePet(
-  { body }: UpdatePetRequestConfig,
-  config: Partial<RequestConfig<UpdatePetData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetData>({
-    method: 'PUT',
-    url: `/pet`,
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
-}
 
 /**
  * @description Update an existing pet by Id
@@ -58,8 +25,7 @@ export function useUpdatePet<TContext>(
       UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},
@@ -71,7 +37,8 @@ export function useUpdatePet<TContext>(
   return useMutation<UpdatePetStatus200, ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>, UpdatePetRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
-        return updatePet({ body }, config)
+        const { data } = await updatePet({ ...config, body: toValue(body), throwOnError: true })
+        return data
       },
       mutationKey,
       ...mutationOptions,

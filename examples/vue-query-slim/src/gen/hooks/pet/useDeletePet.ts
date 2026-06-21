@@ -8,6 +8,7 @@ import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } fr
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { deletePet } from '../../clients/pet/deletePet.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -29,7 +30,7 @@ export function useDeletePet<TContext>(
   return useMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetRequestConfig, TContext>(
     {
       mutationFn: async ({ path, headers }) => {
-        const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
+        const { data } = await deletePet({ ...config, path: toValue(path), headers: toValue(headers), throwOnError: true })
         return data
       },
       mutationKey,

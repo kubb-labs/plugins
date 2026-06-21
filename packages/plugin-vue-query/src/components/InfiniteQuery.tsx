@@ -3,7 +3,7 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { Infinite, PluginVueQuery } from '../types.ts'
+import type { DataReturnType, Infinite } from '../types.ts'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
 import { buildClientOptionType, buildStatusUnionType, getComments, maybeRefOrGetter, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
@@ -16,7 +16,7 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   initialPageParam: Infinite['initialPageParam']
   queryParam?: Infinite['queryParam']
   slim?: boolean
@@ -28,7 +28,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildInfiniteQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
+    dataReturnType: DataReturnType
     resolver: ResolverTs
     slim?: boolean
   },

@@ -8,6 +8,7 @@ import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputSta
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { createUsersWithListInput } from '../../clients/user/createUsersWithListInput.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
@@ -31,7 +32,7 @@ export function useCreateUsersWithListInput<TContext>(
   return useMutation<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
-        const { data } = await createUsersWithListInput({ ...config, body, throwOnError: true })
+        const { data } = await createUsersWithListInput({ ...config, body: toValue(body), throwOnError: true })
         return data
       },
       mutationKey,

@@ -8,6 +8,7 @@ import type { DeleteUserRequestConfig, DeleteUserResponse, DeleteUserStatus400, 
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { deleteUser } from '../../clients/user/deleteUser.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const deleteUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -34,7 +35,7 @@ export function useDeleteUser<TContext>(
   return useMutation<DeleteUserResponse, ResponseErrorConfig<DeleteUserStatus400 | DeleteUserStatus404>, DeleteUserRequestConfig, TContext>(
     {
       mutationFn: async ({ path }) => {
-        const { data } = await deleteUser({ ...config, path, throwOnError: true })
+        const { data } = await deleteUser({ ...config, path: toValue(path), throwOnError: true })
         return data
       },
       mutationKey,

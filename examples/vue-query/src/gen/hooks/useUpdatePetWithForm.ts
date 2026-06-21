@@ -3,30 +3,14 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../models/UpdatePetWithForm.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import { updatePetWithForm } from '../clients/updatePetWithForm.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-/**
- * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
- */
-export async function updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
-    method: 'POST',
-    url: `/pet/${path.petId}`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
 
 /**
  * @summary Updates a pet in the store with form data
@@ -37,7 +21,7 @@ export function useUpdatePetWithForm<TContext>(
     mutation?: MutationObserverOptions<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}
@@ -47,7 +31,8 @@ export function useUpdatePetWithForm<TContext>(
   return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>(
     {
       mutationFn: async ({ path, query }) => {
-        return updatePetWithForm({ path, query }, config)
+        const { data } = await updatePetWithForm({ ...config, path: toValue(path), query: toValue(query), throwOnError: true })
+        return data
       },
       mutationKey,
       ...mutationOptions,

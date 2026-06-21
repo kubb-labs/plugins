@@ -3,40 +3,14 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../models/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderStatus200, PlaceOrderStatus405 } from '../models/PlaceOrder.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import { placeOrder } from '../clients/placeOrder.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
-
-/**
- * @description Place a new order in the store
- * @summary Place an order for a pet
- * {@link /store/order}
- */
-export async function placeOrder(
-  { body }: PlaceOrderRequestConfig,
-  config: Partial<RequestConfig<PlaceOrderData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
-    method: 'POST',
-    url: `/store/order`,
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
-}
 
 /**
  * @description Place a new order in the store
@@ -48,8 +22,7 @@ export function usePlaceOrder<TContext>(
     mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig<PlaceOrderData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},
@@ -61,7 +34,8 @@ export function usePlaceOrder<TContext>(
   return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
-        return placeOrder({ body }, config)
+        const { data } = await placeOrder({ ...config, body: toValue(body), throwOnError: true })
+        return data
       },
       mutationKey,
       ...mutationOptions,

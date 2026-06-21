@@ -3,11 +3,10 @@
  * Do not edit manually.
  */
 
-import client from 'axios'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
-import type { z } from 'zod'
+import { client } from './.kubb/client'
 import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
 import { useMutation } from '@tanstack/vue-query'
 
@@ -22,9 +21,9 @@ export async function updatePetWithForm(
 ) {
   const { client: request = client, ...requestConfig } = config
 
-  const requestBody = UpdatePetWithFormData.parse(body)
+  const requestBody = body
 
-  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, z.input<typeof UpdatePetWithFormData>>({
+  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
     method: 'POST',
     url: `/pet/${path.petId}`,
     body: requestBody,

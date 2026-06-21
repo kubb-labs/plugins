@@ -8,6 +8,7 @@ import type { PlaceOrderRequestConfig, PlaceOrderStatus200, PlaceOrderStatus405 
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { placeOrder } from '../../clients/store/placeOrder.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
@@ -33,7 +34,7 @@ export function usePlaceOrder<TContext>(
   return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
-        const { data } = await placeOrder({ ...config, body, throwOnError: true })
+        const { data } = await placeOrder({ ...config, body: toValue(body), throwOnError: true })
         return data
       },
       mutationKey,

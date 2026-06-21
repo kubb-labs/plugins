@@ -8,6 +8,7 @@ import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus40
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { deleteOrder } from '../../clients/store/deleteOrder.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const deleteOrderMutationKey = () => [{ url: '/store/order/:orderId' }] as const
 
@@ -34,7 +35,7 @@ export function useDeleteOrder<TContext>(
   return useMutation<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, DeleteOrderRequestConfig, TContext>(
     {
       mutationFn: async ({ path }) => {
-        const { data } = await deleteOrder({ ...config, path, throwOnError: true })
+        const { data } = await deleteOrder({ ...config, path: toValue(path), throwOnError: true })
         return data
       },
       mutationKey,

@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { pluginClient } from '@kubb/plugin-client'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginVueQuery } from '@kubb/plugin-vue-query'
 import vue from '@vitejs/plugin-vue'
@@ -27,12 +28,16 @@ export default defineConfig({
               path: 'models',
             },
           }),
+          // A registered contract client. pluginVueQuery auto-detects it (no `client` option needed) and
+          // the composables call its generated `<op>` functions, which return the shared `RequestResult` contract.
+          pluginClient({
+            output: {
+              path: './clients',
+            },
+          }),
           pluginVueQuery({
             output: {
               path: './hooks',
-            },
-            client: {
-              importPath: '@kubb/plugin-client/clients/axios',
             },
           }),
         ],

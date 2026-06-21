@@ -8,6 +8,7 @@ import type { UpdateUserRequestConfig, UpdateUserResponse } from '../../models/u
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { updateUser } from '../../clients/user/updateUser.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 
@@ -31,7 +32,7 @@ export function useUpdateUser<TContext>(
   return useMutation<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserRequestConfig, TContext>(
     {
       mutationFn: async ({ path, body }) => {
-        const { data } = await updateUser({ ...config, path, body, throwOnError: true })
+        const { data } = await updateUser({ ...config, path: toValue(path), body: toValue(body), throwOnError: true })
         return data
       },
       mutationKey,

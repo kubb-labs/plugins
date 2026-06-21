@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../models/FindPetsByTags.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import { findPetsByTags } from '../clients/findPetsByTags.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -16,33 +16,16 @@ export const findPetsByTagsQueryKey = ({ query }: { query?: MaybeRefOrGetter<Omi
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
-/**
- * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
- * @summary Finds Pets by tags
- * {@link /pet/findByTags}
- */
-export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByTags`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function findPetsByTagsQueryOptions(
   { query }: { query?: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> } = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByTagsQueryKey({ query })
   return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags({ query: toValue(query) }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByTags({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -58,7 +41,7 @@ export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = 
     query?: Partial<UseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

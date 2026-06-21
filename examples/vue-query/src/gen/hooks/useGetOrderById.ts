@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../models/GetOrderById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import { getOrderById } from '../clients/getOrderById.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -16,32 +16,16 @@ export const getOrderByIdQueryKey = ({ path }: { path: MaybeRefOrGetter<Omit<Get
 
 export type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
-/**
- * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
- * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
- */
-export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
-    method: 'GET',
-    url: `/store/order/${path.orderId}`,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function getOrderByIdQueryOptions(
   { path }: { path: MaybeRefOrGetter<GetOrderByIdRequestConfig['path']> },
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = getOrderByIdQueryKey({ path })
   return queryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, GetOrderByIdStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return getOrderById({ path: toValue(path) }, { ...config, signal: config.signal ?? signal })
+      const { data } = await getOrderById({ ...config, path: toValue(path), signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -57,7 +41,7 @@ export function useGetOrderById<TData = GetOrderByIdStatus200, TQueryData = GetO
     query?: Partial<
       UseQueryOptions<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, TData, TQueryData, TQueryKey>
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

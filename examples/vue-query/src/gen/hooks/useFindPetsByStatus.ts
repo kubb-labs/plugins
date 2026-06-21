@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusStatus200, FindPetsByStatusStatus400 } from '../models/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
 import type { MaybeRefOrGetter } from 'vue'
+import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
@@ -16,33 +16,16 @@ export const findPetsByStatusQueryKey = ({ query }: { query?: MaybeRefOrGetter<O
 
 export type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByStatus`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
 export function findPetsByStatusQueryOptions(
   { query }: { query?: MaybeRefOrGetter<FindPetsByStatusRequestConfig['query']> } = {},
-  config: Partial<RequestConfig> & { client?: Client } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = findPetsByStatusQueryKey({ query })
   return queryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, FindPetsByStatusStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByStatus({ query: toValue(query) }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByStatus({ ...config, query: toValue(query), signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -62,7 +45,7 @@ export function useFindPetsByStatus<
     query?: Partial<UseQueryOptions<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, TData, TQueryData, TQueryKey>> & {
       client?: QueryClient
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

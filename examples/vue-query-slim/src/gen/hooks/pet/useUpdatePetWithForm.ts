@@ -8,6 +8,7 @@ import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdateP
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { updatePetWithForm } from '../../clients/pet/updatePetWithForm.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
@@ -30,7 +31,7 @@ export function useUpdatePetWithForm<TContext>(
   return useMutation<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, UpdatePetWithFormRequestConfig, TContext>(
     {
       mutationFn: async ({ path, query }) => {
-        const { data } = await updatePetWithForm({ ...config, path, query, throwOnError: true })
+        const { data } = await updatePetWithForm({ ...config, path: toValue(path), query: toValue(query), throwOnError: true })
         return data
       },
       mutationKey,

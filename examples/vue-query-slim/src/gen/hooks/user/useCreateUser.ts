@@ -8,6 +8,7 @@ import type { CreateUserRequestConfig, CreateUserResponse } from '../../models/u
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { createUser } from '../../clients/user/createUser.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
@@ -31,7 +32,7 @@ export function useCreateUser<TContext>(
   return useMutation<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
-        const { data } = await createUser({ ...config, body, throwOnError: true })
+        const { data } = await createUser({ ...config, body: toValue(body), throwOnError: true })
         return data
       },
       mutationKey,

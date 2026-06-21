@@ -23,13 +23,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-    importPath: undefined,
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,

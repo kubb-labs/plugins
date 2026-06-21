@@ -3,12 +3,12 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
 import { client } from './.kubb/client'
-import { UpdatePetWithFormResponse, UpdatePetWithFormData } from './UpdatePetWithForm'
+import { UpdatePetWithFormResponse } from './UpdatePetWithForm'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
@@ -27,23 +27,14 @@ export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQuery
 /**
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm(
-  { path, query, body }: UpdatePetWithFormRequestConfig,
-  config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
-) {
-  const { client: request = client, ...requestConfig } = config
+export function updatePetWithForm<ThrowOnError extends boolean = true>(
+  options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
+): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = UpdatePetWithFormData.parse(body)
-
-  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, z.input<typeof UpdatePetWithFormData>>({
-    method: 'POST',
-    url: `/pet/${path.petId}`,
-    query,
-    body: requestBody,
-    ...requestConfig,
-  })
-
-  return UpdatePetWithFormResponse.parse(res.data)
+  return request({ method: 'POST', url: '/pet/{petId}', parser: { response: (data: unknown) => UpdatePetWithFormResponse.parse(data) }, ...config }) as Promise<
+    RequestResult<UpdatePetWithFormResponses, ThrowOnError>
+  >
 }
 
 export function updatePetWithFormQueryOptions(
@@ -56,13 +47,21 @@ export function updatePetWithFormQueryOptions(
     body: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['body']>
     query?: MaybeRefOrGetter<UpdatePetWithFormRequestConfig['query']>
   },
-  config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
 ) {
   const queryKey = updatePetWithFormQueryKey({ path, body, query })
   return queryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormStatus200>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return updatePetWithForm({ path: toValue(path), query: toValue(query), body: toValue(body) }, { ...config, signal: config.signal ?? signal })
+      const { data } = await updatePetWithForm({
+        ...config,
+        path: toValue(path),
+        query: toValue(query),
+        body: toValue(body),
+        signal: config.signal ?? signal,
+        throwOnError: true,
+      })
+      return data
     },
   })
 }
@@ -86,7 +85,7 @@ export function useUpdatePetWithForm<
   },
   options: {
     query?: Partial<UseQueryOptions<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, TData, TQueryData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
