@@ -54,9 +54,7 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     return (
       <File baseName={meta.file.baseName} path={meta.file.path} meta={meta.file.meta}>
-        {meta.fileTs && requestConfigName && (
-          <File.Import name={[requestConfigName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {meta.fileTs && requestConfigName && <File.Import name={[requestConfigName]} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <File.Import name={['CallToolResult', 'ServerNotification', 'ServerRequest']} path={'@modelcontextprotocol/sdk/types'} isTypeOnly />
         <File.Import name={['RequestHandlerExtra']} path={'@modelcontextprotocol/sdk/shared/protocol'} isTypeOnly />
 
