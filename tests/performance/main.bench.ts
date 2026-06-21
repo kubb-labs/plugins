@@ -2,7 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, createKubb, type Plugin } from '@kubb/core'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -57,7 +57,7 @@ describe('Plugin Generation Performance', () => {
   )
 
   bench(
-    'multiple plugins generation (plugin-ts + plugin-client)',
+    'multiple plugins generation (plugin-ts + plugin-axios)',
     async () => {
       const config = defineConfig({
         root: '.',
@@ -78,7 +78,7 @@ describe('Plugin Generation Performance', () => {
             },
             enum: { type: 'asConst' },
           }),
-          pluginClient({
+          pluginAxios({
             output: {
               path: 'clients',
             },
@@ -116,7 +116,7 @@ describe('Plugin Generation Performance', () => {
             },
             enum: { type: 'asConst' },
           }),
-          pluginClient({
+          pluginAxios({
             output: {
               path: 'clients',
             },

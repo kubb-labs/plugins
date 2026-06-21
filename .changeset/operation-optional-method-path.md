@@ -1,5 +1,4 @@
 ---
-"@kubb/plugin-client": patch
 "@kubb/plugin-cypress": patch
 "@kubb/plugin-mcp": patch
 "@kubb/plugin-msw": patch

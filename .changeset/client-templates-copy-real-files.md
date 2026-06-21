@@ -1,7 +1,6 @@
 ---
 "@kubb/plugin-react-query": patch
 "@kubb/plugin-vue-query": patch
-"@kubb/plugin-client": patch
 "@kubb/plugin-swr": patch
 "@kubb/plugin-mcp": patch
 ---

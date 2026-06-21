@@ -1,5 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginTs } from '@kubb/plugin-ts'
 import { defineConfig } from 'kubb'
 
@@ -23,14 +23,13 @@ export default defineConfig({
       output: { path: 'models' },
       group: { type: 'tag' },
     }),
-    pluginClient({
+    pluginFetch({
       output: {
         path: './sdk',
         barrel: { type: 'all', nested: true },
       },
-      client: 'fetch',
       group: { type: 'tag' },
-      sdk: { className: 'PetStoreSDK' },
+      sdk: { name: 'petStoreSDK' },
     }),
   ],
 })

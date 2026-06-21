@@ -16,10 +16,6 @@ describe('resolveClient', () => {
     if (result.kind === 'error') expect(result.message).toContain('@kubb/plugin-fetch')
   })
 
-  test('a registered plugin-client is a contract client', () => {
-    expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-client'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-client' })
-  })
-
   test('auto-detects a lone contract client plugin when client is unset', () => {
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-fetch'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-fetch' })
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts', 'plugin-axios'] })).toStrictEqual({ kind: 'contract', pluginName: 'plugin-axios' })
@@ -33,11 +29,5 @@ describe('resolveClient', () => {
 
   test('no client plugin falls back to the inline contract client', () => {
     expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts'] })).toStrictEqual({ kind: 'contract-inline' })
-  })
-
-  test('plugin-client alongside another client plugin is ambiguous when client is unset', () => {
-    const result = resolveClient({ client: undefined, pluginNames: ['plugin-client', 'plugin-fetch'] })
-    expect(result.kind).toBe('error')
-    if (result.kind === 'error') expect(result.message).toContain("client: 'fetch' | 'axios'")
   })
 })

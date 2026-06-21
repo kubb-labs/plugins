@@ -1,5 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -32,7 +32,7 @@ export default defineConfig(() => {
       pluginZod({}),
       // A registered contract client. pluginMcp detects it and its handlers call the injected
       // `.kubb/client.ts` contract runtime, which returns the shared `RequestResult` shape.
-      pluginClient({
+      pluginAxios({
         output: { path: './clients', barrel: { type: 'named' } },
       }),
       pluginMcp({

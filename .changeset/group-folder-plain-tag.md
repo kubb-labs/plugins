@@ -2,7 +2,6 @@
 "@kubb/plugin-ts": minor
 "@kubb/plugin-zod": minor
 "@kubb/plugin-faker": minor
-"@kubb/plugin-client": minor
 "@kubb/plugin-react-query": minor
 "@kubb/plugin-vue-query": minor
 "@kubb/plugin-msw": minor

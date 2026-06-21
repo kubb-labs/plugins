@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
+import type { Options, RequestResult } from '../.kubb/client.ts'
 import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../types/PlaceOrder.ts'
-import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
-import { client } from '@kubb/plugin-client/clients/axios'
+import { client } from '../.kubb/client.ts'
 
 /**
  * @description Place a new order in the store

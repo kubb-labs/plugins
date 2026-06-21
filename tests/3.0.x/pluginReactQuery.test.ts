@@ -6,7 +6,7 @@ import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, type Config, createKubb, Diagnostics, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -241,7 +241,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginClient({ output: { path: './clients', barrel: false }, importPath: '@kubb/plugin-client/clients/axios' }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginReactQuery({
           output: { path: './hooks', barrel: false },
         }),

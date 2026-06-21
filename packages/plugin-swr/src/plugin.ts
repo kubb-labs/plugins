@@ -1,8 +1,9 @@
 import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
-import { isParserEnabled } from '@kubb/plugin-client'
-import { contractAxiosClientTemplatePath, contractFetchClientTemplatePath } from '@kubb/plugin-client/templates'
+import { isParserEnabled } from '@internals/client'
+import { axiosClientTemplatePath } from '@kubb/plugin-axios'
+import { fetchClientTemplatePath } from '@kubb/plugin-fetch'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer, queryKeyTransformer, resolveClient } from '@internals/tanstack-query'
@@ -98,7 +99,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: resolvedClientDescriptor.client === 'fetch' ? contractFetchClientTemplatePath : contractAxiosClientTemplatePath,
+            copy: resolvedClientDescriptor.client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
           })
         }
       },

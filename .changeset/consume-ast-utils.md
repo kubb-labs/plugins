@@ -1,5 +1,4 @@
 ---
-"@kubb/plugin-client": patch
 "@kubb/plugin-faker": patch
 "@kubb/plugin-react-query": patch
 "@kubb/plugin-ts": patch

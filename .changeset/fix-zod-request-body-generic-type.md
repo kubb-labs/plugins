@@ -1,5 +1,4 @@
 ---
-"@kubb/plugin-client": patch
 "@kubb/plugin-react-query": patch
 "@kubb/plugin-swr": patch
 "@kubb/plugin-vue-query": patch

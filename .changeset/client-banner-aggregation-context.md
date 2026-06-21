@@ -1,5 +1,4 @@
 ---
-"@kubb/plugin-client": minor
 "@kubb/plugin-ts": minor
 "@kubb/plugin-zod": minor
 "@kubb/plugin-faker": minor

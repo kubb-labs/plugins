@@ -67,9 +67,11 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@internals/client": "workspace:*",
     "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:",
-    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-axios": "workspace:*",
+    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"

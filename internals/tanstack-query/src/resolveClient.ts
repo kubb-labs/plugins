@@ -5,8 +5,8 @@
  * Every client plugin now speaks the `RequestResult` contract, so the resolver picks between three
  * generation strategies:
  *
- * - `contract` — a registered contract client plugin (plugin-fetch, plugin-axios, or plugin-client)
- *   owns the `<op>` functions and the hooks import and call them.
+ * - `contract` — a registered contract client plugin (plugin-fetch or plugin-axios) owns the `<op>`
+ *   functions and the hooks import and call them.
  * - `contract-inline` — no client plugin is registered, so the query plugin emits its own inline
  *   contract client and injects the matching contract runtime.
  *
@@ -15,11 +15,10 @@
  * `contract-inline`.
  */
 
-// Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` / `pluginClientName`
-// consts the plugins export, kept as literals so this internal needs no plugin install deps.
+// Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` consts the plugins
+// export, kept as literals so this internal needs no plugin install deps.
 const pluginFetchName = 'plugin-fetch'
 const pluginAxiosName = 'plugin-axios'
-const pluginClientName = 'plugin-client'
 
 /**
  * The client selector accepted by a query plugin's `client` option. Both call a registered contract
@@ -42,7 +41,7 @@ const selectorToPlugin: Record<'fetch' | 'axios', string> = {
 }
 
 // Every contract client plugin, in auto-detect priority order.
-const contractPlugins = [pluginFetchName, pluginAxiosName, pluginClientName] as const
+const contractPlugins = [pluginFetchName, pluginAxiosName] as const
 
 /**
  * Applies the `client` resolution rules. See the module comment for the strategy shape.

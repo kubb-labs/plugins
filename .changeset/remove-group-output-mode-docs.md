@@ -1,6 +1,5 @@
 ---
 "@kubb/plugin-ts": patch
-"@kubb/plugin-client": patch
 "@kubb/plugin-zod": patch
 "@kubb/plugin-faker": patch
 "@kubb/plugin-msw": patch

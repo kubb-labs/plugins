@@ -21,7 +21,6 @@
     "@kubb/core": "catalog:",
     "@kubb/parser-ts": "catalog:",
     "@kubb/plugin-axios": "workspace:*",
-    "@kubb/plugin-client": "workspace:*",
     "@kubb/plugin-cypress": "workspace:*",
     "@kubb/plugin-faker": "workspace:*",
     "@kubb/plugin-fetch": "workspace:*",

@@ -1,6 +1,6 @@
 import type { ClientSelector } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { PluginClient } from '@kubb/plugin-client'
+import type { Options as ClientOptions } from '@internals/client'
 
 export type Transformer = (props: { node: ast.OperationNode; casing: 'camelcase' | undefined }) => Array<unknown>
 
@@ -162,7 +162,7 @@ export type Options = OutputOptions & {
    * contract, so the composables call a contract `<op>` that takes one grouped `options` object.
    *
    * - `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
-   *   single client plugin (plugin-fetch, plugin-axios, or plugin-client) is registered it is
+   *   single client plugin (plugin-fetch or plugin-axios) is registered it is
    *   auto-detected, so the string is only needed to disambiguate several client plugins.
    *
    * When unset and no client plugin is registered, the composables emit their own inline contract client.
@@ -209,7 +209,7 @@ export type Options = OutputOptions & {
    * - `'client'` — no validation.
    * - `'zod'` — pipes responses through schemas from `@kubb/plugin-zod`.
    */
-  parser?: PluginClient['options']['parser']
+  parser?: ClientOptions['parser']
   /**
    * Override how composable names and file paths are built.
    */

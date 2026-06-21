@@ -1,5 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
-import { pluginClient } from '@kubb/plugin-client'
+import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginCypress } from '@kubb/plugin-cypress'
 import { pluginFaker } from '@kubb/plugin-faker'
 import { pluginMsw } from '@kubb/plugin-msw'
@@ -70,7 +70,7 @@ const baseConfig = {
       },
       group: { type: 'tag' },
     }),
-    pluginClient({
+    pluginAxios({
       output: {
         path: './clients/axios',
       },

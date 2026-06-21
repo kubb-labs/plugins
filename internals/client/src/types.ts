@@ -54,8 +54,8 @@ export type ResolverClient = Resolver & {
 
 /**
  * The shared options surface for the client plugins. Deliberately small: there is one
- * response contract and one grouped options object, so the knobs that drove plugin-client's
- * combinatorial code paths are gone. Each plugin extends this with its own `transport` field.
+ * response contract and one grouped options object. Each plugin extends this with its own
+ * `transport` field.
  */
 export type Options = OutputOptions & {
   /**

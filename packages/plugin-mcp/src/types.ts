@@ -1,5 +1,27 @@
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
+
+/**
+ * HTTP client each MCP handler uses to call the underlying API. When no client plugin
+ * (`@kubb/plugin-axios` or `@kubb/plugin-fetch`) is registered, the runtime named here is bundled
+ * into `.kubb/client.ts`. Set `importPath` to import a custom client module instead.
+ */
+export type McpClient = {
+  /**
+   * HTTP client runtime bundled into `.kubb/client.ts` when no client plugin is registered.
+   *
+   * @default 'axios'
+   */
+  client?: 'axios' | 'fetch'
+  /**
+   * Path to a custom client module. When set, handlers import their client from here and nothing
+   * is bundled.
+   */
+  importPath?: string
+  /**
+   * Base URL prepended to every request.
+   */
+  baseURL?: string
+}
 
 /**
  * Resolver for MCP that provides naming methods for handler functions.
@@ -30,10 +52,9 @@ export type ResolverMcp = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * HTTP client used by each MCP handler to call the underlying API. Mirrors a
-   * subset of `pluginClient` options.
+   * HTTP client used by each MCP handler to call the underlying API.
    */
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'baseURL'>
+  client?: McpClient
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -63,7 +84,7 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'importPath' | 'baseURL'>
+  client: McpClient
   resolver: ResolverMcp
 }
 

@@ -2,8 +2,8 @@ import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 
 import { ast, definePlugin } from '@kubb/core'
-import { pluginClientName } from '@kubb/plugin-client'
-import { contractAxiosClientTemplatePath, contractFetchClientTemplatePath } from '@kubb/plugin-client/templates'
+import { axiosClientTemplatePath, pluginAxiosName } from '@kubb/plugin-axios'
+import { fetchClientTemplatePath, pluginFetchName } from '@kubb/plugin-fetch'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
@@ -26,7 +26,6 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  * ```ts
  * import { defineConfig } from 'kubb'
  * import { pluginTs } from '@kubb/plugin-ts'
- * import { pluginClient } from '@kubb/plugin-client'
  * import { pluginZod } from '@kubb/plugin-zod'
  * import { pluginMcp } from '@kubb/plugin-mcp'
  *
@@ -35,7 +34,6 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  *   output: { path: './src/gen' },
  *   plugins: [
  *     pluginTs(),
- *     pluginClient(),
  *     pluginZod(),
  *     pluginMcp({
  *       output: { path: './mcp' },
@@ -78,7 +76,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           group: groupConfig,
           client: {
             client: clientName,
-            clientType: client?.clientType ?? 'function',
             importPath: clientImportPath,
             baseURL: client?.baseURL,
           },
@@ -92,7 +89,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
         ctx.addGenerator(serverGenerator)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
-        const hasClientPlugin = ctx.config.plugins?.some((p) => p.name === pluginClientName)
+        const hasClientPlugin = ctx.config.plugins?.some((p) => p.name === pluginAxiosName || p.name === pluginFetchName)
 
         // Without a registered client plugin or an `importPath`, bundle the shared `RequestResult`
         // contract runtime as `.kubb/client.ts` — the same template plugin-fetch and plugin-axios
@@ -102,7 +99,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: clientName === 'fetch' ? contractFetchClientTemplatePath : contractAxiosClientTemplatePath,
+            copy: clientName === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'client',
