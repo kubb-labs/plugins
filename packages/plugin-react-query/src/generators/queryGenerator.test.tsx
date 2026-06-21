@@ -132,7 +132,11 @@ describe('queryGenerator operation', () => {
     { name: 'findByTagsTemplateString', node: findByTagsNode, options: {}, baseURL: '${123456}' },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
     { name: 'findByTagsFull', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } } },
-    { name: 'clientPostImportPath', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } } },
+    {
+      name: 'clientPostImportPath',
+      node: findByTagsNode,
+      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+    },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     {
