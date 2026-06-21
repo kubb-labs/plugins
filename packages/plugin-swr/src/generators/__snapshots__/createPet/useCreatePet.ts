@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreatePetRequestConfig, CreatePetData, CreatePetResponse, CreatePetStatus200 } from './CreatePet'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { CreatePetRequestConfig, CreatePetResponses, CreatePetResponse } from './CreatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,14 +16,12 @@ export type CreatePetMutationKey = ReturnType<typeof createPetMutationKey>
 /**
  * {@link /pet}
  */
-export async function createPet({ body }: CreatePetRequestConfig, config: Partial<RequestConfig<CreatePetData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function createPet<ThrowOnError extends boolean = true>(
+  options: Options<CreatePetRequestConfig, ThrowOnError>,
+): Promise<RequestResult<CreatePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<CreatePetStatus200, ResponseErrorConfig<Error>, CreatePetData>({ method: 'POST', url: `/pet`, body: requestBody, ...requestConfig })
-
-  return res.data
+  return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<CreatePetResponses, ThrowOnError>>
 }
 
 export type CreatePetMutationArg = CreatePetRequestConfig
@@ -36,7 +34,7 @@ export function useCreatePet(
     mutation?: SWRMutationConfiguration<CreatePetResponse, ResponseErrorConfig<Error>, CreatePetMutationKey | null, CreatePetMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<RequestConfig<CreatePetData>> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -46,7 +44,8 @@ export function useCreatePet(
   return useSWRMutation<CreatePetResponse, ResponseErrorConfig<Error>, CreatePetMutationKey | null, CreatePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      return createPet({ body }, config)
+      const { data } = await createPet({ ...config, body, throwOnError: true })
+      return data
     },
     mutationOptions,
   )

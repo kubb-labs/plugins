@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from 'axios'
 import useSWR from 'swr'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
-import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import type { SWRConfiguration } from 'swr'
+import { client } from './.kubb/client'
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const

@@ -3,11 +3,11 @@
  * Do not edit manually.
  */
 
-import client from 'axios'
 import useSWRMutation from 'swr/mutation'
+import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
-import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { client } from './.kubb/client'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 

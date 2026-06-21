@@ -1,0 +1,39 @@
+{
+  "name": "swr-legacy-pet-store",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Legacy data-returning SWR PetStore example",
+  "license": "MIT",
+  "author": "stijnvanhulle",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kubb-labs/plugins.git",
+    "directory": "examples/swr-legacy"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('./src/gen', {recursive:true,force:true})\"",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
+    "test": "vitest",
+    "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@kubb/adapter-oas": "catalog:",
+    "@kubb/plugin-swr": "workspace:*",
+    "@kubb/plugin-ts": "workspace:*",
+    "axios": "^1.18.0",
+    "kubb": "catalog:",
+    "react": "^19.2.7",
+    "swr": "^2.4.1"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.0.0"
+  },
+  "packageManager": "pnpm@10.30.1"
+}

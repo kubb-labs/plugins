@@ -3,48 +3,15 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type {
-  PlaceOrderPatchRequestConfig,
-  PlaceOrderPatchData,
-  PlaceOrderPatchResponse,
-  PlaceOrderPatchStatus200,
-  PlaceOrderPatchStatus405,
-} from '../../models/PlaceOrderPatch.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponse, PlaceOrderPatchStatus405 } from '../../models/PlaceOrderPatch.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { placeOrderPatch } from '../../clients/store/placeOrderPatch.ts'
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
 
 export type PlaceOrderPatchMutationKey = ReturnType<typeof placeOrderPatchMutationKey>
-
-/**
- * @description Place a new order in the store with patch
- * @summary Place an order for a pet with patch
- * {@link /store/order}
- */
-export async function placeOrderPatch(
-  { body }: PlaceOrderPatchRequestConfig,
-  config: Partial<RequestConfig<PlaceOrderPatchData>> & {
-    client?: Client
-    contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-  } = {},
-) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
-
-  const requestBody = body
-
-  const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
-    method: 'PATCH',
-    url: `/store/order`,
-    body: requestBody,
-    contentType,
-    ...requestConfig,
-  })
-
-  return res.data
-}
 
 export type PlaceOrderPatchMutationArg = PlaceOrderPatchRequestConfig
 
@@ -61,8 +28,7 @@ export function usePlaceOrderPatch(
       PlaceOrderPatchMutationKey | null,
       PlaceOrderPatchMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<RequestConfig<PlaceOrderPatchData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
     shouldFetch?: boolean
@@ -74,7 +40,8 @@ export function usePlaceOrderPatch(
   return useSWRMutation<PlaceOrderPatchResponse, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchMutationKey | null, PlaceOrderPatchMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { body } }) => {
-      return placeOrderPatch({ body }, config)
+      const { data } = await placeOrderPatch({ ...config, body, throwOnError: true })
+      return data
     },
     mutationOptions,
   )

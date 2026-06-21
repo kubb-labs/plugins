@@ -3,32 +3,15 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse, UpdatePetWithFormStatus405 } from '../../models/UpdatePetWithForm.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { updatePetWithForm } from '../../clients/pet/updatePetWithForm.ts'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
-
-/**
- * @summary Updates a pet in the store with form data
- * {@link /pet/:petId}
- */
-export async function updatePetWithForm({ path, query }: UpdatePetWithFormRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<UpdatePetWithFormResponse, ResponseErrorConfig<UpdatePetWithFormStatus405>, unknown>({
-    method: 'POST',
-    url: `/pet/${path.petId}`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
 
 export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
 
@@ -44,7 +27,7 @@ export function useUpdatePetWithForm(
       UpdatePetWithFormMutationKey | null,
       UpdatePetWithFormMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -59,7 +42,8 @@ export function useUpdatePetWithForm(
   >(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query } }) => {
-      return updatePetWithForm({ path, query }, config)
+      const { data } = await updatePetWithForm({ ...config, path, query, throwOnError: true })
+      return data
     },
     mutationOptions,
   )

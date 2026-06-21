@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam, buildSlimClientCall } from '@internals/tanstack-query'
-import type { PluginSwr } from '../types.ts'
+import type { DataReturnType } from '../types.ts'
 import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
   mutationArgTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   slim?: boolean
 }
 
@@ -25,7 +25,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
+    dataReturnType: DataReturnType
     mutationKeyTypeName: string
     mutationArgTypeName: string
     resolver: ResolverTs

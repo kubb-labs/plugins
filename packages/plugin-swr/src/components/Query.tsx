@@ -4,7 +4,7 @@ import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam } from '@internals/tanstack-query'
-import type { PluginSwr } from '../types.ts'
+import type { DataReturnType } from '../types.ts'
 import { buildClientOptionType, buildQueryKeyParams, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -15,7 +15,7 @@ type Props = {
   queryKeyTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
+  dataReturnType: DataReturnType
   slim?: boolean
 }
 
@@ -25,7 +25,7 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildQueryParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
+    dataReturnType: DataReturnType
     resolver: ResolverTs
     slim?: boolean
   },

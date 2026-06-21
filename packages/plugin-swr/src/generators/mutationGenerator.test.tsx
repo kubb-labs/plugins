@@ -22,12 +22,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -128,7 +123,11 @@ describe('mutationGenerator operation', () => {
     { name: 'updatePetWithForm', node: updatePetWithFormNode, options: {} },
     { name: 'createPet', node: createPetNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
-    { name: 'clientImportPath', node: updatePetWithFormNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    {
+      name: 'updatePetWithFormLegacy',
+      node: updatePetWithFormNode,
+      options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } },
+    },
     {
       name: 'getAsMutation',
       node: findByTagsNode,

@@ -3,43 +3,24 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type {
-  GetOrderByIdRequestConfig,
-  GetOrderByIdResponse,
-  GetOrderByIdStatus200,
-  GetOrderByIdStatus400,
-  GetOrderByIdStatus404,
-} from '../../models/GetOrderById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdResponse, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../models/GetOrderById.ts'
 import type { SWRConfiguration } from 'swr'
+import { getOrderById } from '../../clients/store/getOrderById.ts'
 
 export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const
 
 type GetOrderByIdQueryKey = ReturnType<typeof getOrderByIdQueryKey>
 
-/**
- * @description For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.
- * @summary Find purchase order by ID
- * {@link /store/order/:orderId}
- */
-export async function getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
-    method: 'GET',
-    url: `/store/order/${path.orderId}`,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
-export function getOrderByIdQueryOptions({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getOrderByIdQueryOptions(
+  { path }: GetOrderByIdRequestConfig,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   return {
     fetcher: async () => {
-      return getOrderById({ path }, config)
+      const { data } = await getOrderById({ ...config, path, throwOnError: true })
+      return data
     },
   }
 }
@@ -53,7 +34,7 @@ export function useGetOrderById(
   { path }: GetOrderByIdRequestConfig,
   options: {
     query?: SWRConfiguration<GetOrderByIdResponse, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>>
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

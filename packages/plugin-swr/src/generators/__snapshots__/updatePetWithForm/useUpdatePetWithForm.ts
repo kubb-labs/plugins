@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormData, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses, UpdatePetWithFormResponse } from './UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,22 +16,12 @@ export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMu
 /**
  * {@link /pet/:petId}
  */
-export async function updatePetWithForm(
-  { path, body }: UpdatePetWithFormRequestConfig,
-  config: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client } = {},
-) {
-  const { client: request = client, ...requestConfig } = config
+export function updatePetWithForm<ThrowOnError extends boolean = true>(
+  options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
+): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<UpdatePetWithFormStatus200, ResponseErrorConfig<Error>, UpdatePetWithFormData>({
-    method: 'POST',
-    url: `/pet/${path.petId}`,
-    body: requestBody,
-    ...requestConfig,
-  })
-
-  return res.data
+  return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
 }
 
 export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
@@ -47,7 +37,7 @@ export function useUpdatePetWithForm(
       UpdatePetWithFormMutationKey | null,
       UpdatePetWithFormMutationArg
     > & { throwOnError?: boolean }
-    client?: Partial<RequestConfig<UpdatePetWithFormData>> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -57,7 +47,8 @@ export function useUpdatePetWithForm(
   return useSWRMutation<UpdatePetWithFormResponse, ResponseErrorConfig<Error>, UpdatePetWithFormMutationKey | null, UpdatePetWithFormMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, body } }) => {
-      return updatePetWithForm({ path, body }, config)
+      const { data } = await updatePetWithForm({ ...config, path, body, throwOnError: true })
+      return data
     },
     mutationOptions,
   )

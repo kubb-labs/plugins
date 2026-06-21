@@ -4,8 +4,8 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses, FindPetsByTagsResponse } from './FindPetsByTags'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { client } from './.kubb/client'
 
@@ -16,12 +16,12 @@ export type FindPetsByTagsMutationKey = ReturnType<typeof findPetsByTagsMutation
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByTags<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }
 
 export type FindPetsByTagsMutationArg = FindPetsByTagsRequestConfig
@@ -34,7 +34,7 @@ export function useFindPetsByTags(
     mutation?: SWRMutationConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -44,7 +44,8 @@ export function useFindPetsByTags(
   return useSWRMutation<FindPetsByTagsResponse, ResponseErrorConfig<Error>, FindPetsByTagsMutationKey | null, FindPetsByTagsMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { query } }) => {
-      return findPetsByTags({ query }, config)
+      const { data } = await findPetsByTags({ ...config, query, throwOnError: true })
+      return data
     },
     mutationOptions,
   )

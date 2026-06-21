@@ -24,12 +24,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginSwr['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: false,
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -112,8 +107,8 @@ const findByStatusNode = ast.factory.createOperation({
 describe('queryGenerator operation', () => {
   const testData = [
     { name: 'findByTags', node: findByTagsNode, options: {} },
-    { name: 'findByTagsFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
-    { name: 'clientImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    { name: 'findByTagsFull', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'full', baseURL: undefined } } },
+    { name: 'findByTagsLegacy', node: findByTagsNode, options: { client: { kind: 'legacy', client: 'axios', dataReturnType: 'data', baseURL: undefined } } },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
     { name: 'findByStatusAllOptional', node: findByStatusNode, options: {} },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { parser: 'zod' as const } },
