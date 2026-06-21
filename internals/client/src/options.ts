@@ -19,9 +19,6 @@ export function resolveOptions(options: Options): ResolvedOptions {
     resolver: userResolver,
   } = options
 
-  const shape = sdk?.shape ?? (sdk?.name ? 'class' : 'function')
-  const strategy = sdk?.strategy ?? 'tag'
-
   return {
     output,
     exclude,
@@ -30,7 +27,7 @@ export function resolveOptions(options: Options): ResolvedOptions {
     group: createGroupConfig(group),
     baseURL,
     parser,
-    sdk: { shape, strategy, name: sdk?.name },
+    sdk: sdk ? { strategy: sdk.strategy ?? 'tag', name: sdk.name } : undefined,
     resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
   }
 }

@@ -10,14 +10,7 @@ import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, Plu
 export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
 
 /**
- * Selects the generated client shape.
- * - `'function'` — one standalone async function per operation.
- * - `'class'` — one class per tag with instance methods.
- */
-export type Shape = 'function' | 'class'
-
-/**
- * How the `'class'` shape groups operations.
+ * How the class-based SDK groups operations.
  * - `'tag'` — one class per tag, optionally composed into a root client.
  * - `'single'` — one flat class with every operation as a direct method.
  */
@@ -53,8 +46,8 @@ export type ResolverClient = Resolver & {
    */
   resolveGroupName(this: ResolverClient, name: string): string
   /**
-   * Resolves the namespace alias used for a tag client in the `'function'` shape aggregation
-   * (`export * as <alias> from './<tag>'`).
+   * Resolves the property name a tag client is exposed under on the composed root SDK
+   * (`new PetStore(config).pet`).
    */
   resolveClientPropertyName(this: ResolverClient, name: string): string
 }
@@ -88,18 +81,20 @@ export type Options = OutputOptions & {
    */
   parser?: ParserOptions
   /**
-   * Configures the generated SDK: its shape and, optionally, a single entry-point module that
-   * aggregates every tag-based client.
+   * Generates a class-based SDK instead of the standalone functions. Each tag client is an instance
+   * class whose constructor takes a client config and builds its own client, so every environment is
+   * a separate instance. Leave `sdk` unset to keep the standalone per-operation functions (the
+   * default), which is also what query plugins consume.
    *
    * @example Instance class per tag
    * ```ts
-   * pluginFetch({ sdk: { shape: 'class' } })
+   * pluginFetch({ sdk: {} })
    * // const api = new PetClient({ baseURL: 'https://api.example.com' })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
    * @example A composed root SDK instantiating every tag client from one config
    * ```ts
-   * pluginFetch({ sdk: { shape: 'class', name: 'petStore' } })
+   * pluginFetch({ sdk: { name: 'petStore' } })
    * // class PetStore {
    * //   readonly pet: PetClient
    * //   readonly store: StoreClient
@@ -110,25 +105,14 @@ export type Options = OutputOptions & {
    * ```
    * @example A flat single SDK with every operation as a direct method
    * ```ts
-   * pluginFetch({ sdk: { shape: 'class', name: 'petStore', strategy: 'single' } })
+   * pluginFetch({ sdk: { name: 'petStore', strategy: 'single' } })
    * // const api = new PetStore({ baseURL })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
    */
   sdk?: {
     /**
-     * Shape of the generated client.
-     * - `'function'` — one standalone async function per operation.
-     * - `'class'` — one instance class per tag. The constructor takes a client config and builds its
-     *   own client, so each environment is a separate instance.
-     *
-     * Defaults to `'class'` when `name` is set, otherwise `'function'`.
-     *
-     * @note Only `'function'` is compatible with query plugins.
-     */
-    shape?: Shape
-    /**
-     * How the `'class'` shape groups operations.
+     * How the SDK groups operations.
      * - `'tag'` — one class per tag. With `name`, a composed root instantiates every tag client.
      * - `'single'` — one flat class named by `name`, with every operation as a direct method.
      *
@@ -136,10 +120,9 @@ export type Options = OutputOptions & {
      */
     strategy?: Strategy
     /**
-     * Name of the generated aggregation entry point, also the file name. For the `'class'` shape with
-     * `strategy: 'tag'` it emits a composed root class that instantiates every tag client from one
-     * shared config; with `strategy: 'single'` it names the flat class. For the `'function'` shape it
-     * emits a tree-shakeable `export * as <tag>` namespace per tag.
+     * Name of the generated entry point, also the file name. With `strategy: 'tag'` it emits a
+     * composed root class that instantiates every tag client from one shared config; with
+     * `strategy: 'single'` it names the flat class.
      */
     name?: string
   }
@@ -164,11 +147,12 @@ export type ResolvedOptions = {
   group: Group | null
   baseURL: Options['baseURL']
   parser: NonNullable<Options['parser']>
-  sdk: {
-    shape: Shape
-    strategy: Strategy
-    name: string | undefined
-  }
+  sdk:
+    | {
+        strategy: Strategy
+        name: string | undefined
+      }
+    | undefined
   resolver: ResolverClient
 }
 

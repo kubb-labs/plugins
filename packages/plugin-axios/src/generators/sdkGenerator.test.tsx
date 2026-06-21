@@ -27,7 +27,7 @@ const defaultOptions: PluginAxios['resolvedOptions'] = {
   group: null,
   baseURL: undefined,
   parser: false,
-  sdk: { shape: 'class', strategy: 'tag', name: undefined },
+  sdk: { strategy: 'tag', name: undefined },
   resolver: resolverClient,
 }
 
@@ -78,15 +78,8 @@ const operationNodes: Array<ast.OperationNode> = [
 describe('sdkGenerator operations', () => {
   const testData = [
     { name: 'sdkClass', options: {} as Partial<PluginAxios['resolvedOptions']> },
-    { name: 'sdkClassWithName', options: { sdk: { shape: 'class', strategy: 'tag', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
-    { name: 'sdkSingle', options: { sdk: { shape: 'class', strategy: 'single', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
-    {
-      name: 'sdkFunctionWithName',
-      options: {
-        sdk: { shape: 'function', strategy: 'tag', name: 'petStore' },
-        group: { type: 'tag' as const, name: ({ group }: { group: string }) => `${group}Client` },
-      } as Partial<PluginAxios['resolvedOptions']>,
-    },
+    { name: 'sdkClassWithName', options: { sdk: { strategy: 'tag', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
+    { name: 'sdkSingle', options: { sdk: { strategy: 'single', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginAxios['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {
