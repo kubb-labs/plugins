@@ -124,9 +124,9 @@ function collectImportsByFile(ops: Array<OperationData>, pick: (op: OperationDat
  * standalone per-operation functions.
  *
  * Every tag client is an instance class whose constructor takes a client config and builds its own
- * client, so each environment is a separate instance. With `sdk.mode: 'tag'` (the default) it emits
- * one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag client.
- * With `sdk.mode: 'single'` it emits one flat class named by `sdk.name`, with every operation as a
+ * client, so each environment is a separate instance. With `sdk.mode: 'tag'` (the default) it
+ * emits one class per tag and, when `sdk.name` is set, a composed root that instantiates every tag
+ * client. With `sdk.mode: 'flat'` it emits one class named by `sdk.name`, with every operation as a
  * direct method.
  */
 export function createSdkGenerator<TFactory extends ContractClientFactory>(): Generator<TFactory> {
@@ -176,9 +176,9 @@ export function createSdkGenerator<TFactory extends ContractClientFactory>(): Ge
         )
       }
 
-      // `single` collapses every operation into one flat class named by `sdk.name`, so callers reach
+      // `flat` collapses every operation into one class named by `sdk.name`, so callers reach
       // an operation as `new PetStore(config).getPetById(...)` without a per-tag sub-client.
-      if (sdk.mode === 'single') {
+      if (sdk.mode === 'flat') {
         const flatName = resolver.resolveClassName(sdk.name ?? 'sdk')
         const flatFile = resolver.resolveFile({ name: sdk.name ?? 'sdk', extname: '.ts' }, { root, output, group: group ?? undefined })
         const allOps = controllers.flatMap((controller) => controller.operations)

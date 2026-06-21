@@ -79,7 +79,7 @@ describe('sdkGenerator operations', () => {
   const testData = [
     { name: 'sdkClass', options: {} as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkClassWithName', options: { sdk: { mode: 'tag', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
-    { name: 'sdkSingle', options: { sdk: { mode: 'single', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
+    { name: 'sdkSingle', options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

@@ -12,9 +12,9 @@ export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' 
 /**
  * How the class-based SDK groups operations.
  * - `'tag'` — one class per tag, optionally composed into a root client.
- * - `'single'` — one flat class with every operation as a direct method.
+ * - `'flat'` — one class with every operation as a direct method.
  */
-export type Mode = 'tag' | 'single'
+export type Mode = 'tag' | 'flat'
 
 /**
  * The resolver shared by the client plugins. Functions and files use camelCase; URL helpers get
@@ -105,7 +105,7 @@ export type Options = OutputOptions & {
    * ```
    * @example A flat single SDK with every operation as a direct method
    * ```ts
-   * pluginFetch({ sdk: { name: 'petStore', mode: 'single' } })
+   * pluginFetch({ sdk: { name: 'petStore', mode: 'flat' } })
    * // const api = new PetStore({ baseURL })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
@@ -114,15 +114,15 @@ export type Options = OutputOptions & {
     /**
      * How the SDK groups operations.
      * - `'tag'` — one class per tag. With `name`, a composed root instantiates every tag client.
-     * - `'single'` — one flat class named by `name`, with every operation as a direct method.
+     * - `'flat'` — one class named by `name`, with every operation as a direct method.
      *
      * @default 'tag'
      */
     mode?: Mode
     /**
-     * Name of the generated entry point, also the file name. With `mode: 'tag'` it emits a composed
-     * root class that instantiates every tag client from one shared config; with `mode: 'single'` it
-     * names the flat class.
+     * Name of the generated entry point, also the file name. With `mode: 'tag'` it emits a
+     * composed root class that instantiates every tag client from one shared config; with
+     * `mode: 'flat'` it names the single class.
      */
     name?: string
   }

@@ -75,7 +75,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginAxios({ output: { path: './clients', barrel: false }, sdk: { mode: 'single', name: 'PetStore' } }),
+        pluginAxios({ output: { path: './clients', barrel: false }, sdk: { mode: 'flat', name: 'PetStore' } }),
       ],
     },
   },
