@@ -1,6 +1,5 @@
 import client from '@kubb/plugin-client/clients/axios'
-import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource, UpdatePetResponse } from '../types/UpdatePet.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { UpdatePetData, UpdatePetPathPetId, UpdatePetQueryIncludeDeleted, UpdatePetQueryRequestSource } from '../types/UpdatePet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
@@ -12,7 +11,7 @@ export async function updatePetHandler({ petId, data, params }: { petId: UpdateP
 
   const requestBody = data
 
-  const res = await client<UpdatePetResponse, ResponseErrorConfig<Error>, UpdatePetData>({ method: "POST", url: `/pets/${petId}`, query: mappedParams, body: requestBody }, request)
+  const res = await client({ method: "POST", url: `/pets/${petId}`, query: mappedParams, body: requestBody })
 
   return {
     content: [

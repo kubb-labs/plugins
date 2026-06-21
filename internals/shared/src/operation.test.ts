@@ -81,7 +81,7 @@ describe('getContentTypeInfo', () => {
 })
 
 describe('buildRequestConfigType', () => {
-  test('adds the request data type and content type option when needed', () => {
+  test('adds the content type option when an operation has multiple content types', () => {
     const node = ast.factory.createOperation({
       operationId: 'createPet',
       method: 'POST',
@@ -94,15 +94,15 @@ describe('buildRequestConfigType', () => {
       },
     })
 
-    expect(buildRequestConfigType(node, resolver)).toBe(
-      'Partial<RequestConfig<createPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" }',
+    expect(buildRequestConfigType(node)).toBe(
+      `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" }`,
     )
   })
 
   test('uses the untyped request config when no request schema exists', () => {
     const node = ast.factory.createOperation({ operationId: 'listPets', method: 'GET', path: '/pets' })
 
-    expect(buildRequestConfigType(node, resolver)).toBe('Partial<RequestConfig> & { client?: Client }')
+    expect(buildRequestConfigType(node)).toBe(`Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`)
   })
 })
 

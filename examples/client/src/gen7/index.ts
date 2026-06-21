@@ -1,3 +1,4 @@
+export * from './.kubb/client.ts'
 export type { AddPetRequest } from './models/ts/AddPetRequest.ts'
 export type { AddPetRequestStatusEnumKey } from './models/ts/AddPetRequestStatusEnum.ts'
 export type { ApiResponse } from './models/ts/ApiResponse.ts'

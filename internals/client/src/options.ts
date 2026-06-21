@@ -3,7 +3,7 @@ import { resolverClient } from './resolver.ts'
 import type { Options, ResolvedOptions } from './types.ts'
 
 /**
- * Applies the slim client defaults to user options. Mirrors the destructuring defaults the plugins
+ * Applies the client defaults to user options. Mirrors the destructuring defaults the plugins
  * use, so a documented default and the resolved value never drift.
  */
 export function resolveOptions(options: Options): ResolvedOptions {

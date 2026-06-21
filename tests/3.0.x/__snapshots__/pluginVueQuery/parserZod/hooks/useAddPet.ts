@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { AddPetRequestConfig, AddPetResponses, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import type { z } from 'zod'
-import { addPetResponseSchema, addPetDataSchema } from '../zod/addPetSchema.ts'
+import { client } from '../.kubb/client.ts'
+import { addPetResponseSchema } from '../zod/addPetSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -18,14 +18,10 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  * @summary Add a new pet to the store
  * {@link /pet}
  */
-export async function addPet({ body }: AddPetRequestConfig, config: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = addPetDataSchema.parse(body)
-
-  const res = await request<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, z.input<typeof addPetDataSchema>>({ method: 'POST', url: `/pet`, body: requestBody, contentType, ...requestConfig })
-
-  return addPetResponseSchema.parse(res.data)
+  return request({ method: 'POST', url: '/pet', parser: { response: (data: unknown) => addPetResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
 }
 
 /**
@@ -35,7 +31,7 @@ export async function addPet({ body }: AddPetRequestConfig, config: Partial<Requ
  */
 export function useAddPet<TContext>(options: {
   mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
@@ -43,7 +39,8 @@ export function useAddPet<TContext>(options: {
 
   return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
     mutationFn: async({ body }) => {
-      return addPet({ body }, config)
+      const { data } = await addPet({ ...config, body: toValue(body), throwOnError: true })
+      return data
     },
     mutationKey,
     ...mutationOptions

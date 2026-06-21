@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../types/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 import { findPetsByStatus } from '../clients/findPetsByStatus.ts'
 
@@ -13,10 +13,11 @@ export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequest
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return findPetsByStatus({ query }, config)
+      const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })
+      return data
     },
   }
 }
@@ -28,7 +29,7 @@ export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestC
  */
 export function useFindPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, options: {
   query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>>,
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

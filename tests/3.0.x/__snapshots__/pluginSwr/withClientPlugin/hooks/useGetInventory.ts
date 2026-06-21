@@ -4,8 +4,8 @@
 */
 
 import useSWR from 'swr'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetInventoryResponse } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRConfiguration } from 'swr'
 import { getInventory } from '../clients/getInventory.ts'
 
@@ -13,10 +13,11 @@ export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getInventory(config)
+      const { data } = await getInventory({ ...config, throwOnError: true })
+      return data
     },
   }
 }
@@ -28,7 +29,7 @@ export function getInventoryQueryOptions(config: Partial<RequestConfig> & { clie
  */
 export function useGetInventory(options: {
   query?: SWRConfiguration<GetInventoryResponse, ResponseErrorConfig<Error>>,
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
   immutable?: boolean
 } = {}) {

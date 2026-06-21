@@ -3,26 +3,18 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { GetInventoryRequestConfig, GetInventoryResponses } from '../types/GetInventory.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
 import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
-
-function getGetInventoryUrl() {
-  const res = { method: 'GET', url: `/store/inventory` as const }
-
-  return res
-}
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * @description Returns a map of status codes to quantities
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: getGetInventoryUrl().url.toString(), ...requestConfig })
-
-  return getInventoryResponseSchema.parse(res.data)
+  return request({ method: 'GET', url: '/store/inventory', parser: { response: (data: unknown) => getInventoryResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
 }

@@ -18,30 +18,26 @@ type Props = {
   isExportable?: boolean
   isIndexable?: boolean
   operations: Array<OperationData>
-  baseURL: string | null | undefined
-  dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   children?: KubbReactNode
 }
 
-export function ClassClient({ name, isExportable = true, isIndexable = true, operations, baseURL, dataReturnType, parser, children }: Props): KubbReactNode {
+export function ClassClient({ name, isExportable = true, isIndexable = true, operations, parser, children }: Props): KubbReactNode {
   const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver }) =>
     buildClassMethod({
       node,
       name: methodName,
       tsResolver,
       zodResolver,
-      baseURL,
-      dataReturnType,
       parser,
       isStatic: false,
     }),
   )
 
   const classCode = `export class ${name} {
-  #config: Partial<RequestConfig> & { client?: Client }
+  #config: Partial<RequestConfig> & { client?: ClientInstance }
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
     this.#config = config
   }
 

@@ -3,44 +3,25 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type {
-  FindPetsByStatusRequestConfig,
-  FindPetsByStatusResponse,
-  FindPetsByStatusStatus200,
-  FindPetsByStatusStatus400,
-} from '../../models/FindPetsByStatus.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../../models/pet/FindPetsByStatus.ts'
 import type { SWRConfiguration } from 'swr'
+import { findPetsByStatus } from '../../clients/pet/findPetsByStatus.ts'
 
 export const findPetsByStatusQueryKey = ({ query }: Omit<FindPetsByStatusRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByStatus' }, ...(query ? [query] : [])] as const
 
 type FindPetsByStatusQueryKey = ReturnType<typeof findPetsByStatusQueryKey>
 
-/**
- * @description Multiple status values can be provided with comma separated strings
- * @summary Finds Pets by status
- * {@link /pet/findByStatus}
- */
-export async function findPetsByStatus({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<FindPetsByStatusStatus200, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByStatus`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
-export function findPetsByStatusQueryOptions({ query }: FindPetsByStatusRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByStatusQueryOptions(
+  { query }: FindPetsByStatusRequestConfig = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   return {
     fetcher: async () => {
-      return findPetsByStatus({ query }, config)
+      const { data } = await findPetsByStatus({ ...config, query, throwOnError: true })
+      return data
     },
   }
 }
@@ -54,7 +35,7 @@ export function useFindPetsByStatus(
   { query }: FindPetsByStatusRequestConfig = {},
   options: {
     query?: SWRConfiguration<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>>
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

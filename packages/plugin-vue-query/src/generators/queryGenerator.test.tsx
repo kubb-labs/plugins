@@ -25,13 +25,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginVueQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-    importPath: undefined,
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -122,8 +116,6 @@ describe('queryGenerator operation', () => {
         },
       },
     },
-    { name: 'clientGetImportPath', node: findByTagsNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
-    { name: 'clientDataReturnTypeFull', node: findByTagsNode, options: { client: { dataReturnType: 'full' as const, client: 'axios' as const } } },
     {
       name: 'postAsQuery',
       node: updatePetWithFormNode,

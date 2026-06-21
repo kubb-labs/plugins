@@ -3,11 +3,12 @@
 * Do not edit manually.
 */
 
-import type { AddPetRequestConfig, AddPetData, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { AddPetRequestConfig, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { addPet } from '../clients/addPet.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
 
@@ -18,7 +19,7 @@ export const addPetMutationKey = () => [{ url: '/pet' }] as const
  */
 export function useAddPet<TContext>(options: {
   mutation?: MutationObserverOptions<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<AddPetData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" },
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
@@ -26,7 +27,8 @@ export function useAddPet<TContext>(options: {
 
   return useMutation<AddPetStatus200, ResponseErrorConfig<AddPetStatus405>, AddPetRequestConfig, TContext>({
     mutationFn: async({ body }) => {
-      return addPet({ body }, config)
+      const { data } = await addPet({ ...config, body: toValue(body), throwOnError: true })
+      return data
     },
     mutationKey,
     ...mutationOptions

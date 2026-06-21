@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponses, PlaceOrderResponse } from '../types/PlaceOrder.ts'
+import { client } from '../.kubb/client.ts'
 
 export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 
@@ -16,20 +16,17 @@ type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
  * @summary Place an order for a pet
  * {@link /store/order}
  */
-export async function placeOrder({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client; contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
-  const { client: request = client, contentType = 'application/json', ...requestConfig } = config
+export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({ method: 'POST', url: `/store/order`, body: requestBody, contentType, ...requestConfig })
-
-  return res.data
+  return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
 }
 
-export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<RequestConfig<PlaceOrderData>> & { client?: Client } = {}) {
+export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return placeOrder({ body }, config)
+      const { data } = await placeOrder({ ...config, body, throwOnError: true })
+      return data
     },
   }
 }

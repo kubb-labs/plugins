@@ -33,7 +33,7 @@ export type Options = OutputOptions & {
    * HTTP client used by each MCP handler to call the underlying API. Mirrors a
    * subset of `pluginClient` options.
    */
-  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>
+  client?: ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'baseURL'>
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -63,7 +63,7 @@ type ResolvedOptions = {
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
+  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'importPath' | 'baseURL'>
   resolver: ResolverMcp
 }
 

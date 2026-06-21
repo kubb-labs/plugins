@@ -1,8 +1,9 @@
 import path from 'node:path'
+import { Operation } from '@internals/client'
 import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
-import { resolveSlimOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
+import { resolveClientOperation, resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
-import { Client, isParserEnabled, pluginClientName } from '@kubb/plugin-client'
+import { isParserEnabled } from '@kubb/plugin-client'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -21,7 +22,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, driver, resolver, root } = ctx
-    const { output, query, mutation, infinite, suspense, parser, client: clientOptions, group, customOptions, slimClient } = ctx.options
+    const { output, query, mutation, infinite, suspense, parser, client, group, customOptions } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
     if (!pluginTs) return null
@@ -52,7 +53,7 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
     const queryOptionsName = resolver.resolveSuspenseInfiniteQueryOptionsName(node)
     const queryKeyName = resolver.resolveSuspenseInfiniteQueryKeyName(node)
     const queryKeyTypeName = resolver.resolveSuspenseInfiniteQueryKeyTypeName(node)
-    const clientBaseName = resolver.resolveSuspenseInfiniteClientName(node)
+    const clientName = resolver.resolveSuspenseInfiniteClientName(node)
 
     const meta = {
       file: resolver.resolveFile(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
@@ -69,9 +70,11 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
         : null
 
+    // The inline contract client references the plugin-ts `<Name>Responses` aggregate (the others do not).
     const importedTypeNames = [
       tsResolver.resolveRequestConfigName(node),
       queryParamsTypeName,
+      client.kind === 'contract-inline' ? tsResolver.resolveResponsesName(node) : null,
       ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
     ].filter((name): name is string => Boolean(name))
 
@@ -86,23 +89,10 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
       : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
 
-    const clientPlugin = driver.getPlugin(pluginClientName)
-    const hasClientPlugin = clientPlugin?.name === pluginClientName
-    const shouldUseClientPlugin = hasClientPlugin && clientOptions.clientType !== 'class'
-    const clientResolver = shouldUseClientPlugin ? driver.getResolver(pluginClientName) : null
-
-    const clientFile = shouldUseClientPlugin
-      ? clientResolver?.resolveFile(operationFileEntry(node, node.operationId), {
-          root,
-          output: clientPlugin?.options?.output ?? output,
-          group: clientPlugin?.options?.group ?? undefined,
-        })
-      : null
-
-    const resolvedClientName = shouldUseClientPlugin ? (clientResolver?.resolveName(node.operationId) ?? clientBaseName) : clientBaseName
-
-    const slim = resolveSlimOperation({ slimClient, driver, node, root, output })
-    const isSlim = slim !== null
+    const contractOp =
+      client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
+    const clientPath = path.resolve(root, '.kubb/client.ts')
+    const calledClientName = contractOp ? contractOp.name : clientName
 
     return (
       <File
@@ -113,31 +103,22 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
-        {!isSlim &&
-          (clientOptions.importPath ? (
-            <>
-              {!shouldUseClientPlugin && <File.Import name={'client'} path={clientOptions.importPath} />}
-              <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={clientOptions.importPath} isTypeOnly />
-            </>
-          ) : (
-            <>
-              {!shouldUseClientPlugin && <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />}
-              <File.Import
-                name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
-                root={meta.file.path}
-                path={path.resolve(root, '.kubb/client.ts')}
-                isTypeOnly
-              />
-            </>
-          ))}
-        {!isSlim && shouldUseClientPlugin && clientFile && <File.Import name={[resolvedClientName]} root={meta.file.path} path={clientFile.path} />}
-        {!isSlim && !shouldUseClientPlugin && <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />}
-        {slim && (
+
+        {contractOp && (
           <>
-            <File.Import name={[slim.name]} root={meta.file.path} path={slim.path} />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={slim.clientPath} isTypeOnly />
+            <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
           </>
         )}
+
+        {client.kind === 'contract-inline' && (
+          <>
+            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
+            <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
+            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
+          </>
+        )}
+
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
@@ -145,29 +126,17 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
 
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
 
-        {!isSlim && !shouldUseClientPlugin && (
-          <Client
-            name={resolvedClientName}
-            baseURL={clientOptions.baseURL}
-            dataReturnType={clientOptions.dataReturnType || 'data'}
-            parser={parser}
-            node={node}
-            tsResolver={tsResolver}
-            zodResolver={zodResolver}
-          />
-        )}
+        {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
         <File.Import name={['InfiniteData']} isTypeOnly path={importPath} />
         <File.Import name={['infiniteQueryOptions']} path={importPath} />
 
         <SuspenseInfiniteQueryOptions
           name={queryOptionsName}
-          clientName={slim ? slim.name : resolvedClientName}
+          clientName={calledClientName}
           queryKeyName={queryKeyName}
           node={node}
           tsResolver={tsResolver}
-          dataReturnType={clientOptions.dataReturnType || 'data'}
-          slim={isSlim}
           cursorParam={infiniteOptions.cursorParam}
           nextParam={infiniteOptions.nextParam}
           previousParam={infiniteOptions.previousParam}
@@ -185,11 +154,9 @@ export const suspenseInfiniteQueryGenerator = defineGenerator<PluginReactQuery>(
           queryKeyTypeName={queryKeyTypeName}
           node={node}
           tsResolver={tsResolver}
-          dataReturnType={clientOptions.dataReturnType || 'data'}
           initialPageParam={infiniteOptions.initialPageParam}
           queryParam={infiniteOptions.queryParam}
           customOptions={customOptions}
-          slim={isSlim}
         />
       </File>
     )

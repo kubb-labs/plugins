@@ -3,10 +3,10 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { UpdatePetRequestConfig, UpdatePetData, UpdatePetStatus200 } from '../types/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UpdatePetRequestConfig, UpdatePetResponses, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
+import { client } from '../.kubb/client.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
@@ -14,24 +14,19 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet({ path, query, body }: UpdatePetRequestConfig, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetRequestConfig, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
-
-  const requestBody = body
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${path.petId}`, query: mappedParams, body: requestBody, ...requestConfig })
-
-  return res.data
+  return request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }
 
-export function updatePetMutationOptions<TContext = unknown>(config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
+export function updatePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     mutationKey,
     mutationFn: async({ path, query, body }) => {
-      return updatePet({ path, query, body }, config)
+      const { data } = await updatePet({ ...config, path, query, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -41,7 +36,7 @@ export function updatePetMutationOptions<TContext = unknown>(config: Partial<Req
  */
 export function useUpdatePet<TContext>(options: {
   mutation?: UseMutationOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;

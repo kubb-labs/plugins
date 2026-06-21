@@ -3,13 +3,13 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig } from './.kubb/client'
+import type { ClientInstance, RequestConfig } from './.kubb/client'
 import { PetClient } from './petClient'
 
 export class PetStoreClient {
   readonly petClient: PetClient
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
     this.petClient = new PetClient(config)
   }
 }

@@ -22,12 +22,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -147,7 +142,11 @@ const multiContentTypeNode = ast.factory.createOperation({
 describe('mutationGenerator operation', () => {
   const testData = [
     { name: 'getAsMutation', node: findByTagsNode, options: { mutation: { importPath: 'custom-swr/mutation', methods: ['get'] } } },
-    { name: 'clientPostImportPath', node: updatePetByIdNode, options: { client: { dataReturnType: 'data' as const, importPath: 'axios' as const } } },
+    {
+      name: 'clientPostImportPath',
+      node: updatePetByIdNode,
+      options: { client: { kind: 'contract-inline', client: 'axios' } },
+    },
     { name: 'updatePetById', node: updatePetByIdNode, options: {} },
     { name: 'deletePet', node: deletePetNode, options: {} },
     { name: 'multiContentType', node: multiContentTypeNode, options: {} },

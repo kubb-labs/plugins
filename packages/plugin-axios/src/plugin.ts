@@ -14,7 +14,7 @@ import type { PluginAxios } from './types.ts'
 export const pluginAxiosName = 'plugin-axios' satisfies PluginAxios['name']
 
 /**
- * Generates a slim, type-safe HTTP client pinned to axios. Each operation becomes one async function
+ * Generates a type-safe HTTP client pinned to axios. Each operation becomes one async function
  * that takes a single grouped `options` object and returns the shared `RequestResult` contract. The
  * runtime is always bundled into `.kubb/client.ts`, so generated code never imports from
  * `@kubb/plugin-axios` and the only runtime dependency is `axios`.

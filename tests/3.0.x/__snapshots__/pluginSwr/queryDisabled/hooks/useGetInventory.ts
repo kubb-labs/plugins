@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
+import type { GetInventoryRequestConfig, GetInventoryResponses, GetInventoryResponse } from '../types/GetInventory.ts'
+import { client } from '../.kubb/client.ts'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
@@ -16,18 +16,17 @@ type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
  * @summary Returns pet inventories by status
  * {@link /store/inventory}
  */
-export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
 }
 
-export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getInventory(config)
+      const { data } = await getInventory({ ...config, throwOnError: true })
+      return data
     },
   }
 }

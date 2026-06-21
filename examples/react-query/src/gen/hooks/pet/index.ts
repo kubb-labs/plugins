@@ -1,44 +1,11 @@
-export { addPetHook, addPetMutationKey, addPetMutationOptionsHook, useAddPetHook } from './useAddPetHook.ts'
-export { deletePetHook, deletePetMutationKey, deletePetMutationOptionsHook, useDeletePetHook } from './useDeletePetHook.ts'
-export { findPetsByStatusHook, findPetsByStatusQueryKey, findPetsByStatusQueryOptionsHook, useFindPetsByStatusHook } from './useFindPetsByStatusHook.ts'
-export {
-  findPetsByStatusSuspenseHook,
-  findPetsByStatusSuspenseQueryKey,
-  findPetsByStatusSuspenseQueryOptionsHook,
-  useFindPetsByStatusSuspenseHook,
-} from './useFindPetsByStatusSuspenseHook.ts'
-export { findPetsByTagsHook, findPetsByTagsQueryKey, findPetsByTagsQueryOptionsHook, useFindPetsByTagsHook } from './useFindPetsByTagsHook.ts'
-export {
-  findPetsByTagsInfiniteHook,
-  findPetsByTagsInfiniteQueryKey,
-  findPetsByTagsInfiniteQueryOptionsHook,
-  useFindPetsByTagsInfiniteHook,
-} from './useFindPetsByTagsInfiniteHook.ts'
-export {
-  findPetsByTagsSuspenseHook,
-  findPetsByTagsSuspenseQueryKey,
-  findPetsByTagsSuspenseQueryOptionsHook,
-  useFindPetsByTagsSuspenseHook,
-} from './useFindPetsByTagsSuspenseHook.ts'
-export {
-  findPetsByTagsSuspenseInfiniteHook,
-  findPetsByTagsSuspenseInfiniteQueryKey,
-  findPetsByTagsSuspenseInfiniteQueryOptionsHook,
-  useFindPetsByTagsSuspenseInfiniteHook,
-} from './useFindPetsByTagsSuspenseInfiniteHook.ts'
-export { getPetByIdHook, getPetByIdQueryKey, getPetByIdQueryOptionsHook, useGetPetByIdHook } from './useGetPetByIdHook.ts'
-export {
-  getPetByIdSuspenseHook,
-  getPetByIdSuspenseQueryKey,
-  getPetByIdSuspenseQueryOptionsHook,
-  useGetPetByIdSuspenseHook,
-} from './useGetPetByIdSuspenseHook.ts'
-export { updatePetHook, updatePetMutationKey, updatePetMutationOptionsHook, useUpdatePetHook } from './useUpdatePetHook.ts'
-export { updatePetWithFormHook, updatePetWithFormQueryKey, updatePetWithFormQueryOptionsHook, useUpdatePetWithFormHook } from './useUpdatePetWithFormHook.ts'
-export {
-  updatePetWithFormSuspenseHook,
-  updatePetWithFormSuspenseQueryKey,
-  updatePetWithFormSuspenseQueryOptionsHook,
-  useUpdatePetWithFormSuspenseHook,
-} from './useUpdatePetWithFormSuspenseHook.ts'
-export { uploadFileHook, uploadFileMutationKey, uploadFileMutationOptionsHook, useUploadFileHook } from './useUploadFileHook.ts'
+export { addPetMutationKey, addPetMutationOptions, useAddPet } from './useAddPet.ts'
+export { deletePetMutationKey, deletePetMutationOptions, useDeletePet } from './useDeletePet.ts'
+export { findPetsByStatusQueryKey, findPetsByStatusQueryOptions, useFindPetsByStatus } from './useFindPetsByStatus.ts'
+export { findPetsByStatusSuspenseQueryKey, findPetsByStatusSuspenseQueryOptions, useFindPetsByStatusSuspense } from './useFindPetsByStatusSuspense.ts'
+export { findPetsByTagsQueryKey, findPetsByTagsQueryOptions, useFindPetsByTags } from './useFindPetsByTags.ts'
+export { findPetsByTagsSuspenseQueryKey, findPetsByTagsSuspenseQueryOptions, useFindPetsByTagsSuspense } from './useFindPetsByTagsSuspense.ts'
+export { getPetByIdQueryKey, getPetByIdQueryOptions, useGetPetById } from './useGetPetById.ts'
+export { getPetByIdSuspenseQueryKey, getPetByIdSuspenseQueryOptions, useGetPetByIdSuspense } from './useGetPetByIdSuspense.ts'
+export { updatePetMutationKey, updatePetMutationOptions, useUpdatePet } from './useUpdatePet.ts'
+export { updatePetWithFormMutationKey, updatePetWithFormMutationOptions, useUpdatePetWithForm } from './useUpdatePetWithForm.ts'
+export { uploadFileMutationKey, uploadFileMutationOptions, useUploadFile } from './useUploadFile.ts'

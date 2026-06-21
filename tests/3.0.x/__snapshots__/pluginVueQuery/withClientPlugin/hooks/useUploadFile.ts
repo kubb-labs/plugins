@@ -3,11 +3,12 @@
 * Do not edit manually.
 */
 
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { uploadFile } from '../clients/uploadFile.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -17,7 +18,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  */
 export function useUploadFile<TContext>(options: {
   mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
@@ -25,7 +26,8 @@ export function useUploadFile<TContext>(options: {
 
   return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationFn: async({ path, query, body }) => {
-      return uploadFile({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path: toValue(path), query: toValue(query), body: toValue(body), throwOnError: true })
+      return data
     },
     mutationKey,
     ...mutationOptions

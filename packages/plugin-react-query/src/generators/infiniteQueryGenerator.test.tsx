@@ -22,12 +22,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
-  client: {
-    dataReturnType: 'data',
-    client: 'axios',
-    clientType: 'function',
-  },
-  slimClient: null,
+  client: { kind: 'contract-inline', client: 'axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -110,14 +105,9 @@ describe('infiniteQueryGenerator operation', () => {
     { name: 'findByTags', node: findByTagsNode, options: { infinite: infiniteConfig } },
     { name: 'findByTagsWithZod', node: findByTagsNode, options: { infinite: infiniteConfig, parser: 'zod' as const } },
     {
-      name: 'findByTagsFull',
-      node: findByTagsNode,
-      options: { infinite: infiniteConfig, client: { dataReturnType: 'full' as const, client: 'axios' as const } },
-    },
-    {
       name: 'clientPostImportPath',
       node: findByTagsNode,
-      options: { infinite: infiniteConfig, client: { dataReturnType: 'data' as const, importPath: 'axios' as const } },
+      options: { infinite: infiniteConfig, client: { kind: 'contract-inline', client: 'axios' } },
     },
     {
       name: 'findByTagsObject',

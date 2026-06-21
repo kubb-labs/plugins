@@ -1,8 +1,7 @@
-import client from '../../client.js'
-import type { ResponseErrorConfig } from '../../client.js'
-import type { FindPetsByStatusPathStepId, FindPetsByStatusResponse, FindPetsByStatusStatus400 } from '../models/ts/FindPetsByStatus.js'
+import type { FindPetsByStatusPathStepId } from '../models/ts/FindPetsByStatus.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.js'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -13,10 +12,7 @@ export async function findPetsByStatusHandler(
   { stepId }: { stepId: FindPetsByStatusPathStepId },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await client<FindPetsByStatusResponse, ResponseErrorConfig<FindPetsByStatusStatus400>, unknown>(
-    { method: 'GET', url: `/pet/findByStatus/${stepId}`, baseURL: `https://petstore.swagger.io/v2` },
-    request,
-  )
+  const res = await client({ method: 'GET', url: `/pet/findByStatus/${stepId}`, baseURL: `https://petstore.swagger.io/v2` })
 
   return {
     content: [

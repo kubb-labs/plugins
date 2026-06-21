@@ -3,39 +3,25 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../models/FindPetsByTags.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus400 } from '../../models/pet/FindPetsByTags.ts'
 import type { SWRConfiguration } from 'swr'
+import { findPetsByTags } from '../../clients/pet/findPetsByTags.ts'
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'> = {}) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
-/**
- * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
- * @summary Finds Pets by tags
- * {@link /pet/findByTags}
- */
-export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, unknown>({
-    method: 'GET',
-    url: `/pet/findByTags`,
-    query,
-    ...requestConfig,
-  })
-
-  return res.data
-}
-
-export function findPetsByTagsQueryOptions({ query }: FindPetsByTagsRequestConfig = {}, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsQueryOptions(
+  { query }: FindPetsByTagsRequestConfig = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   return {
     fetcher: async () => {
-      return findPetsByTags({ query }, config)
+      const { data } = await findPetsByTags({ ...config, query, throwOnError: true })
+      return data
     },
   }
 }
@@ -49,7 +35,7 @@ export function useFindPetsByTags(
   { query }: FindPetsByTagsRequestConfig = {},
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<FindPetsByTagsStatus400>>
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

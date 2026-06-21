@@ -1,271 +1,56 @@
 import {
-  buildOperationComments,
-  buildParamsMapping,
-  buildRequestParamsSignature,
-  buildStatusUnionType,
-  getContentTypeInfo,
-  getOperationParameters,
-  getResponseType,
-  resolveSuccessNames,
-} from '@internals/shared'
-import { Url } from '@internals/utils'
-import { buildJSDoc, stringify } from '@kubb/ast/utils'
+  buildGroupedOptionsSignature,
+  buildParserHooks,
+  buildReturnStatement,
+  isParserEnabled,
+  type ParserOptions,
+  resolveQueryParamsParser,
+  resolveRequestParser,
+  resolveResponseParser,
+} from '@internals/client'
+import { buildOperationComments } from '@internals/shared'
+import type { HttpOperationNode } from '@kubb/ast'
+import { buildJSDoc } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
-import { buildClientRequestArgs, type CallArg } from './callArgs.ts'
 import type { PluginClient } from './types.ts'
 
-/**
- * Resolves the `query` entry for a client call: the parsed `requestParams` when zod validates the
- * query, the remapped `mappedParams` when casing renames the wire keys, otherwise the plain `query`
- * binding. Returns `null` when the operation carries no query parameters.
- */
-export function buildQueryParamDescriptor({
-  queryParamsName,
-  zodQueryParamsName,
-  queryParamsMapping,
-}: {
-  queryParamsName: string | null
-  zodQueryParamsName?: string | null
-  queryParamsMapping?: Record<string, string> | null
-}): CallArg | null {
-  if (!queryParamsName) return null
-  if (zodQueryParamsName) return { value: 'requestParams' }
-  if (queryParamsMapping) return { value: 'mappedParams' }
-  return {}
-}
+export { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser }
 
 /**
- * Resolves the `body` entry for a client call: the multipart `FormData` branch when several content
- * types include form data, the single `FormData` cast for a form-data-only operation, otherwise the
- * parsed `requestBody`. Returns `null` when the operation has no request body.
+ * Builds the call config literal forwarded to the contract client, mirroring the shared `Operation`
+ * component: `{ method, url, parser?, ...config }`. The `...config` spread carries every per-call
+ * field (including `throwOnError`), so the class method stays a thin wrapper over the contract.
  */
-export function buildBodyParamDescriptor({
-  requestName,
-  isFormData,
-  isMultipleContentTypes,
-  hasFormData,
-}: {
-  requestName: string | null
-  isFormData: boolean
-  isMultipleContentTypes: boolean
-  hasFormData: boolean
-}): CallArg | null {
-  if (!requestName) return null
-  if (isMultipleContentTypes && hasFormData) {
-    return { value: "contentType === 'multipart/form-data' ? formData as FormData : requestBody" }
-  }
-  if (isFormData) return { value: 'formData as FormData' }
-  return { value: 'requestBody' }
-}
-
-type ParserOption = PluginClient['resolvedOptions']['parser']
-
-/**
- * Returns `true` when any direction of the parser uses Zod (used for dependency checks).
- */
-export function isParserEnabled(parser: ParserOption | undefined | false): boolean {
-  if (!parser) return false
-  if (parser === 'zod') return true
-  return !!(parser.request || parser.response)
-}
-
-/**
- * Returns `'zod'` when request body parsing is enabled, `null` otherwise.
- * The string shorthand `'zod'` also enables request body parsing (existing behavior).
- */
-export function resolveRequestParser(parser: ParserOption | undefined | false): 'zod' | null {
-  if (!parser) return null
-  if (parser === 'zod') return 'zod'
-  return parser.request ?? null
-}
-
-/**
- * Returns `'zod'` when query-parameters parsing is enabled, `null` otherwise.
- * Only the object form `{ request: 'zod' }` enables query-params parsing.
- * The string shorthand `'zod'` does not, preserving its existing behavior.
- */
-export function resolveQueryParamsParser(parser: ParserOption | undefined | false): 'zod' | null {
-  if (!parser || parser === 'zod') return null
-  return parser.request ?? null
-}
-
-/**
- * Returns `'zod'` when response-direction parsing is enabled, `null` otherwise.
- * `parser: 'zod'` (string shorthand) maps to response parsing and returns `'zod'`.
- */
-export function resolveResponseParser(parser: ParserOption | undefined | false): 'zod' | null {
-  if (!parser) return null
-  if (parser === 'zod') return 'zod'
-  return parser.response ?? null
-}
-
-export { buildStatusUnionType }
-
-/**
- * Builds HTTP headers array for a client request.
- * Includes Content-Type (if not default) and spreads header parameters if present.
- * `headerSpread` is the expression spread into the headers object, swapped to
- * `...mappedHeaders` when the wire names need remapping to camelCase.
- */
-function buildHeaders(contentType: string, hasHeaderParams: boolean, headerSpread = '...headers'): Array<string> {
-  return [
-    contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null,
-    hasHeaderParams ? headerSpread : null,
-  ].filter(Boolean) as Array<string>
-}
-
-/**
- * Returns the generic type arguments — response, error, and request body — for a generated
- * client call.
- *
- * When `dataReturnType` is `'full'`, the response generic widens to a union of all documented
- * status types. When `parser` is `'zod'` and a request body schema exists, the request type
- * uses `z.input<typeof schema>` to match what the user provides before zod transforms/defaults are applied.
- */
-function buildGenerics(
-  node: ast.OperationNode,
-  tsResolver: ResolverTs,
-  options: {
-    dataReturnType?: PluginClient['resolvedOptions']['dataReturnType']
-    zodResolver?: ResolverZod | null
-    parser?: PluginClient['resolvedOptions']['parser']
-  } = {},
-): Array<string> {
-  const allStatusNames = node.responses.map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
-  const successNames = resolveSuccessNames(node, tsResolver)
-  const responseName =
-    options.dataReturnType === 'full'
-      ? allStatusNames.length > 0
-        ? allStatusNames.join(' | ')
-        : tsResolver.resolveResponseName(node)
-      : successNames.length > 0
-        ? successNames.join(' | ')
-        : tsResolver.resolveResponseName(node)
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
-  const errorNames = node.responses.filter((r) => Number.parseInt(r.statusCode, 10) >= 400).map((r) => tsResolver.resolveResponseStatusName(node, r.statusCode))
-  const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
-
-  const zodRequestName =
-    options.parser === 'zod' && options.zodResolver && node.requestBody?.content?.[0]?.schema ? (options.zodResolver.resolveDataName?.(node) ?? null) : null
-
-  const requestGenericType = zodRequestName ? `z.input<typeof ${zodRequestName}>` : requestName || 'unknown'
-
-  return [responseName, TError, requestGenericType].filter(Boolean)
-}
-
-/**
- * Builds the parameters object for a class-based client method.
- * Includes URL, method, base URL, headers, and request/response data.
- */
-function buildClassClientParams({
+function buildCallConfig({
   node,
-  url,
-  baseURL,
-  tsResolver,
-  isFormData,
-  isMultipleContentTypes,
-  hasFormData,
-  headers,
-  zodQueryParamsName,
-  queryParamsMapping,
-}: {
-  node: ast.OperationNode
-  url: string
-  baseURL: string | null | undefined
-  tsResolver: ResolverTs
-  isFormData: boolean
-  isMultipleContentTypes: boolean
-  hasFormData: boolean
-  headers: Array<string>
-  zodQueryParamsName?: string | null
-  queryParamsMapping?: Record<string, string> | null
-}): string {
-  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
-  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
-  const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
-  const responseType = getResponseType(node)
-
-  return buildClientRequestArgs({
-    method: JSON.stringify(ast.isHttpOperationNode(node) ? node.method.toUpperCase() : ''),
-    url,
-    baseURL: baseURL ? JSON.stringify(baseURL) : null,
-    query: buildQueryParamDescriptor({ queryParamsName, zodQueryParamsName, queryParamsMapping }),
-    body: buildBodyParamDescriptor({ requestName, isFormData, isMultipleContentTypes, hasFormData }),
-    contentType: isMultipleContentTypes,
-    responseType: responseType ? JSON.stringify(responseType) : null,
-    headers: headers.length ? `{ ${headers.join(', ')}, ...requestConfig.headers }` : null,
-    requestConfigPlacement: 'first',
-  })
-}
-
-/**
- * Builds the request data parsing line for client methods.
- * Applies Zod validation when `parser.request === 'zod'`, otherwise assigns data directly.
- */
-function buildRequestDataLine({
   parser,
-  node,
   zodResolver,
 }: {
-  parser: PluginClient['resolvedOptions']['parser'] | undefined
-  node: ast.OperationNode
+  node: HttpOperationNode
+  parser: ParserOptions | undefined
   zodResolver?: ResolverZod | null
 }): string {
-  const requestParser = resolveRequestParser(parser)
-  const zodRequestName = zodResolver && requestParser === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null
-  if (requestParser === 'zod' && zodRequestName) {
-    return `const requestBody = ${zodRequestName}.parse(body)`
-  }
-  if (node.requestBody?.content?.[0]?.schema) {
-    return 'const requestBody = body'
-  }
-  return ''
+  const parsers = buildParserHooks({ node, parser, zodResolver })
+  const parserEntries = [parsers.request ? `request: ${parsers.request}` : null, parsers.response ? `response: ${parsers.response}` : null].filter(Boolean)
+  const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
+
+  return `{ ${[`method: '${node.method.toUpperCase()}'`, `url: '${node.path}'`, parserLiteral, '...config'].filter(Boolean).join(', ')} }`
 }
 
 /**
- * Builds the query parameters parsing line for client methods.
- * Returns an empty string when no query params exist or query-params parsing is not enabled.
- * Only the object form `parser: { request: 'zod' }` triggers this. `parser: 'zod'` does not.
- */
-function buildQueryParamsLine({
-  parser,
-  node,
-  zodResolver,
-}: {
-  parser: PluginClient['resolvedOptions']['parser'] | undefined
-  node: ast.OperationNode
-  zodResolver?: ResolverZod | null
-}): string {
-  if (resolveQueryParamsParser(parser) !== 'zod' || !zodResolver) return ''
-  const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
-  if (queryParams.length === 0) return ''
-  const zodQueryParamsName = zodResolver.resolveQueryParamsName?.(node, queryParams[0]!)
-  if (!zodQueryParamsName) return ''
-  return `const requestParams = ${zodQueryParamsName}.parse(query)`
-}
-
-/**
- * Builds the form data conversion line for file upload requests.
- * Returns empty string if not applicable.
- */
-function buildFormDataLine(isFormData: boolean, hasRequest: boolean): string {
-  return isFormData && hasRequest ? 'const formData = buildFormData(requestBody)' : ''
-}
-
-/**
- * Builds a single client method for a generated client class. The body is identical for instance
- * and static methods, so `isStatic` only switches the method header (`static async` vs `async`),
- * keeping `ClassClient` and `StaticClassClient` from duplicating the whole builder.
+ * Builds a single contract client method for a generated client class. The body matches the shared
+ * `Operation` function: it forwards a single grouped `options` object (merged with the class's
+ * shared `#config`) to the contract client and returns the `RequestResult`. `isStatic` only switches
+ * the method header (`static async` vs `async`), so `ClassClient` and `StaticClassClient` share one
+ * builder.
  */
 export function buildClassMethod({
   node,
   name,
   tsResolver,
   zodResolver,
-  baseURL,
-  dataReturnType,
   parser,
   isStatic,
 }: {
@@ -273,110 +58,21 @@ export function buildClassMethod({
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
-  baseURL: string | null | undefined
-  dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
   parser: PluginClient['resolvedOptions']['parser'] | undefined
   isStatic: boolean
 }): string {
   if (!ast.isHttpOperationNode(node)) return ''
-  const { defaultContentType: contentType, isMultipleContentTypes, hasFormData } = getContentTypeInfo(node)
-  const isFormData = !isMultipleContentTypes && contentType === 'multipart/form-data'
-  const { query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'original' })
-  const { query: casedQueryParams, header: casedHeaderParams } = getOperationParameters(node)
 
-  const queryParamsMapping = buildParamsMapping(queryParams, casedQueryParams)
-  const headerParamsMapping = buildParamsMapping(headerParams, casedHeaderParams)
-
-  const headerParamsName = headerParams.length > 0 ? tsResolver.resolveHeaderParamsName(node, headerParams[0]!) : null
-  const queryParamsName = queryParams.length > 0 ? tsResolver.resolveQueryParamsName(node, queryParams[0]!) : null
-  const headerSpread = headerParamsMapping ? '...mappedHeaders' : '...headers'
-  const headers = isMultipleContentTypes ? (headerParamsName ? [headerSpread] : []) : buildHeaders(contentType, !!headerParamsName, headerSpread)
-  const generics = buildGenerics(node, tsResolver, { dataReturnType, zodResolver, parser })
-  const { signature: paramsSignature } = buildRequestParamsSignature(node, tsResolver, { isConfigurable: true })
-  const zodQueryParamsName =
-    zodResolver && resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null
-  const clientParams = buildClassClientParams({
-    node,
-    url: Url.toGroupedTemplateString(node.path),
-    baseURL,
-    tsResolver,
-    isFormData,
-    isMultipleContentTypes,
-    hasFormData,
-    headers,
-    zodQueryParamsName,
-    queryParamsMapping,
-  })
+  const signature = buildGroupedOptionsSignature({ node, tsResolver })
+  const callConfig = buildCallConfig({ node, parser, zodResolver })
+  const returnStatement = buildReturnStatement({ node, tsResolver, callConfig })
+  const generics = signature.generics.length ? `<${signature.generics.join(', ')}>` : ''
   const jsdoc = buildJSDoc(buildOperationComments(node, { link: 'urlPath', linkPosition: 'beforeDeprecated', splitLines: true }))
 
-  const mappedParamsLine =
-    queryParamsMapping && queryParamsName
-      ? `const mappedParams = query ? { ${Object.entries(queryParamsMapping)
-          .map(([originalName, camelCaseName]) => `"${originalName}": query.${camelCaseName}`)
-          .join(', ')} } : undefined`
-      : ''
-  const mappedHeadersLine =
-    headerParamsMapping && headerParamsName
-      ? `const mappedHeaders = headers ? { ${Object.entries(headerParamsMapping)
-          .map(([originalName, camelCaseName]) => `"${originalName}": headers.${camelCaseName}`)
-          .join(', ')} } : undefined`
-      : ''
-
-  const requestDataLine = buildRequestDataLine({ parser, node, zodResolver })
-  const queryParamsLine = buildQueryParamsLine({ parser, node, zodResolver })
-  const formDataLine = buildFormDataLine(isFormData || (isMultipleContentTypes && hasFormData), !!node.requestBody?.content?.[0]?.schema)
-  const returnStatement = buildReturnStatement({ dataReturnType, parser, node, zodResolver, tsResolver })
-
-  const methodBody = [
-    `const { client: request = client, ${isMultipleContentTypes ? `contentType = ${stringify(contentType)}, ` : ''}...requestConfig } = mergeConfig(this.#config, config)`,
-    '',
-    mappedParamsLine,
-    mappedHeadersLine,
-    requestDataLine,
-    queryParamsLine,
-    formDataLine,
-    `const res = await request<${generics.join(', ')}>(${clientParams})`,
-    returnStatement,
-  ]
-    .filter(Boolean)
+  const methodBody = ['const { client: request = client, ...config } = { ...this.#config, ...options }', returnStatement]
     .map((line) => `    ${line}`)
     .join('\n')
 
   const header = isStatic ? '  static async ' : 'async '
-  return `${jsdoc}${header}${name}(${paramsSignature}) {\n${methodBody}\n  }`
-}
-
-/**
- * Builds the return statement for a client method.
- * When `dataReturnType` is `'full'`, casts the response to the status-discriminated union type.
- * When `parser.response` is `'zod'`, pipes the response body through the Zod schema before returning.
- */
-function buildReturnStatement({
-  dataReturnType,
-  parser,
-  node,
-  zodResolver,
-  tsResolver,
-}: {
-  dataReturnType: PluginClient['resolvedOptions']['dataReturnType']
-  parser: PluginClient['resolvedOptions']['parser'] | undefined
-  node: ast.OperationNode
-  zodResolver?: ResolverZod | null
-  tsResolver?: ResolverTs | null
-}): string {
-  const responseParser = resolveResponseParser(parser)
-  const zodResponseName = zodResolver && responseParser === 'zod' ? zodResolver.resolveResponseName?.(node) : null
-
-  if (dataReturnType === 'full' && tsResolver) {
-    const unionType = buildStatusUnionType(node, tsResolver)
-    if (responseParser === 'zod' && zodResponseName) {
-      return `return {...res, data: ${zodResponseName}.parse(res.data)} as ${unionType}`
-    }
-    return `return res as ${unionType}`
-  }
-
-  if (dataReturnType === 'data' && responseParser === 'zod' && zodResponseName) {
-    return `return ${zodResponseName}.parse(res.data)`
-  }
-  return 'return res.data'
+  return `${jsdoc}${header}${name}${generics}(${signature.paramsSignature}): ${signature.returnType} {\n${methodBody}\n  }`
 }

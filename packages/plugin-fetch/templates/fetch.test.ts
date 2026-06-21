@@ -109,7 +109,7 @@ describe('createClientCore', () => {
   test('returns the success shape with data and an undefined error', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult<string, string>
-    expect(result).toStrictEqual({ data: { id: 1 }, error: undefined, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 200, data: { id: 1 }, error: undefined, request: 'REQ', response: 'RES' })
   })
 
   test('throws a ResponseError for a non-2xx status by default', async () => {
@@ -121,7 +121,7 @@ describe('createClientCore', () => {
   test('surfaces a non-2xx body as an error value when throwOnError is false', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const result = (await client({ method: 'POST', url: '/pet', throwOnError: false })) as CallResult<string, string>
-    expect(result).toStrictEqual({ data: undefined, error: { message: 'invalid' }, request: 'REQ', response: 'RES' })
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, request: 'REQ', response: 'RES' })
   })
 
   test('resolves the per-call transport over the default', async () => {

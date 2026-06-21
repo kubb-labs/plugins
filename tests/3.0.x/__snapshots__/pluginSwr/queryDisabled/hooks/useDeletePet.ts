@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
+import type { DeletePetRequestConfig, DeletePetResponses, DeletePetResponse } from '../types/DeletePet.ts'
+import { client } from '../.kubb/client.ts'
 
 export const deletePetQueryKey = ({ path }: Omit<DeletePetRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
@@ -16,20 +16,17 @@ type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
-
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({ method: 'DELETE', url: `/pet/${path.petId}`, ...requestConfig, headers: { ...mappedHeaders, ...requestConfig.headers } })
-
-  return res.data
+  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
 }
 
-export function deletePetQueryOptions({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function deletePetQueryOptions({ path, headers }: DeletePetRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return deletePet({ path, headers }, config)
+      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
+      return data
     },
   }
 }

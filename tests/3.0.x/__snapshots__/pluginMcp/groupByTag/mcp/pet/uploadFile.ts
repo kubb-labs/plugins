@@ -1,6 +1,5 @@
 import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileResponse } from '../../types/UploadFile.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata } from '../../types/UploadFile.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
@@ -11,7 +10,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
 export async function uploadFileHandler({ petId, data, params }: { petId: UploadFilePathPetId; data?: UploadFileData; params?: { additionalMetadata?: UploadFileQueryAdditionalMetadata } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileData>({ method: "POST", url: `/pet/${petId}/uploadImage`, query: params, body: requestBody, headers: { 'Content-Type': 'application/octet-stream' } }, request)
+  const res = await client({ method: "POST", url: `/pet/${petId}/uploadImage`, query: params, body: requestBody, contentType: 'application/octet-stream' })
 
   return {
     content: [

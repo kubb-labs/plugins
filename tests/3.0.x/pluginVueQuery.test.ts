@@ -34,7 +34,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },
@@ -54,7 +53,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           infinite: {
             queryParam: 'page',
             initialPageParam: 0,
@@ -79,7 +77,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginZod({ output: { path: './zod', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           parser: 'zod',
         }),
       ],
@@ -100,7 +97,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           mutation: false,
         }),
       ],
@@ -121,7 +117,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },
@@ -141,7 +136,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           exclude: [
             { type: 'operationId', pattern: 'addPet' },
             { type: 'operationId', pattern: 'deletePet' },
@@ -163,7 +157,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           include: [{ type: 'tag', pattern: 'pet' }],
         }),
       ],
@@ -184,7 +177,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
           group: { type: 'tag' },
         }),
       ],
@@ -206,7 +198,6 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginClient({ output: { path: './clients', barrel: false }, importPath: '@kubb/plugin-client/clients/axios' }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
-          client: { importPath: '@kubb/plugin-client/clients/axios' },
         }),
       ],
     },

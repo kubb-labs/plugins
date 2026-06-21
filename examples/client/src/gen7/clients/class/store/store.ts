@@ -1,23 +1,17 @@
 /* eslint-disable no-alert, no-console */
 
-import client from '@kubb/plugin-client/clients/fetch'
-import type { DeleteOrderRequestConfig, DeleteOrderResponse, DeleteOrderStatus400, DeleteOrderStatus404 } from '../../../models/ts/store/DeleteOrder.ts'
-import type { GetInventoryStatus200 } from '../../../models/ts/store/GetInventory.ts'
-import type { GetOrderByIdRequestConfig, GetOrderByIdStatus200, GetOrderByIdStatus400, GetOrderByIdStatus404 } from '../../../models/ts/store/GetOrderById.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderData, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../../models/ts/store/PlaceOrder.ts'
-import type {
-  PlaceOrderPatchRequestConfig,
-  PlaceOrderPatchData,
-  PlaceOrderPatchStatus200,
-  PlaceOrderPatchStatus405,
-} from '../../../models/ts/store/PlaceOrderPatch.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/fetch'
-import { mergeConfig } from '@kubb/plugin-client/clients/fetch'
+import type { ClientInstance, Options, RequestConfig, RequestResult } from '../../../.kubb/client.ts'
+import type { DeleteOrderRequestConfig, DeleteOrderResponses } from '../../../models/ts/store/DeleteOrder.ts'
+import type { GetInventoryRequestConfig, GetInventoryResponses } from '../../../models/ts/store/GetInventory.ts'
+import type { GetOrderByIdRequestConfig, GetOrderByIdResponses } from '../../../models/ts/store/GetOrderById.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponses } from '../../../models/ts/store/PlaceOrder.ts'
+import type { PlaceOrderPatchRequestConfig, PlaceOrderPatchResponses } from '../../../models/ts/store/PlaceOrderPatch.ts'
+import { client } from '../../../.kubb/client.ts'
 
 export class store {
-  #config: Partial<RequestConfig> & { client?: Client }
+  #config: Partial<RequestConfig> & { client?: ClientInstance }
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
     this.#config = config
   }
 
@@ -26,10 +20,11 @@ export class store {
    * @summary Returns pet inventories by status
    * {@link /store/inventory}
    */
-  async getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ ...requestConfig, method: 'GET', url: `/store/inventory` })
-    return res.data
+  async getInventory<ThrowOnError extends boolean = true>(
+    options: Options<GetInventoryRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
   }
 
   /**
@@ -37,23 +32,11 @@ export class store {
    * @summary Place an order for a pet
    * {@link /store/order}
    */
-  async placeOrder(
-    { body }: PlaceOrderRequestConfig,
-    config: Partial<RequestConfig<PlaceOrderData>> & {
-      client?: Client
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-    } = {},
-  ) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const res = await request<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>({
-      ...requestConfig,
-      method: 'POST',
-      url: `/store/order`,
-      body: requestBody,
-      contentType,
-    })
-    return res.data
+  async placeOrder<ThrowOnError extends boolean = true>(
+    options: Options<PlaceOrderRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
   }
 
   /**
@@ -61,23 +44,11 @@ export class store {
    * @summary Place an order for a pet with patch
    * {@link /store/order}
    */
-  async placeOrderPatch(
-    { body }: PlaceOrderPatchRequestConfig,
-    config: Partial<RequestConfig<PlaceOrderPatchData>> & {
-      client?: Client
-      contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
-    } = {},
-  ) {
-    const { client: request = client, contentType = 'application/json', ...requestConfig } = mergeConfig(this.#config, config)
-    const requestBody = body
-    const res = await request<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchData>({
-      ...requestConfig,
-      method: 'PATCH',
-      url: `/store/order`,
-      body: requestBody,
-      contentType,
-    })
-    return res.data
+  async placeOrderPatch<ThrowOnError extends boolean = true>(
+    options: Options<PlaceOrderPatchRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'PATCH', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderPatchResponses, ThrowOnError>>
   }
 
   /**
@@ -85,14 +56,11 @@ export class store {
    * @summary Find purchase order by ID
    * {@link /store/order/:orderId}
    */
-  async getOrderById({ path }: GetOrderByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<GetOrderByIdStatus200, ResponseErrorConfig<GetOrderByIdStatus400 | GetOrderByIdStatus404>, unknown>({
-      ...requestConfig,
-      method: 'GET',
-      url: `/store/order/${path.orderId}`,
-    })
-    return res.data
+  async getOrderById<ThrowOnError extends boolean = true>(
+    options: Options<GetOrderByIdRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'GET', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>
   }
 
   /**
@@ -100,13 +68,10 @@ export class store {
    * @summary Delete purchase order by ID
    * {@link /store/order/:orderId}
    */
-  async deleteOrder({ path }: DeleteOrderRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-    const { client: request = client, ...requestConfig } = mergeConfig(this.#config, config)
-    const res = await request<DeleteOrderResponse, ResponseErrorConfig<DeleteOrderStatus400 | DeleteOrderStatus404>, unknown>({
-      ...requestConfig,
-      method: 'DELETE',
-      url: `/store/order/${path.orderId}`,
-    })
-    return res.data
+  async deleteOrder<ThrowOnError extends boolean = true>(
+    options: Options<DeleteOrderRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<DeleteOrderResponses, ThrowOnError>> {
+    const { client: request = client, ...config } = { ...this.#config, ...options }
+    return request({ method: 'DELETE', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<DeleteOrderResponses, ThrowOnError>>
   }
 }

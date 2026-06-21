@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400, GetPetByIdStatus404 } from '../types/GetPetById.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { getPetById } from '../clients/getPetById.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
@@ -13,12 +13,13 @@ export const getPetByIdSuspenseQueryKey = ({ path }: Omit<GetPetByIdRequestConfi
 
 type GetPetByIdSuspenseQueryKey = ReturnType<typeof getPetByIdSuspenseQueryKey>
 
-export function getPetByIdSuspenseQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getPetByIdSuspenseQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getPetByIdSuspenseQueryKey({ path })
   return queryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, GetPetByIdStatus200, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return getPetById({ path }, { ...config, signal: config.signal ?? signal })
+      const { data } = await getPetById({ ...config, path, signal: config.signal ?? signal, throwOnError: true })
+      return data
    },
   })
 }
@@ -30,7 +31,7 @@ export function getPetByIdSuspenseQueryOptions({ path }: GetPetByIdRequestConfig
  */
 export function useGetPetByIdSuspense<TData = GetPetByIdStatus200, TQueryKey extends QueryKey = GetPetByIdSuspenseQueryKey>({ path }: GetPetByIdRequestConfig, options: {
   query?: Partial<UseSuspenseQueryOptions<GetPetByIdStatus200, ResponseErrorConfig<GetPetByIdStatus400 | GetPetByIdStatus404>, TData, TQueryKey>> & { client?: QueryClient },
-  client?: Partial<RequestConfig> & { client?: Client }
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

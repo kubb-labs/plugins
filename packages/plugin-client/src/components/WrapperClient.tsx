@@ -20,7 +20,7 @@ export function WrapperClient({ name, controllers, isExportable = true, isIndexa
   const classCode = `export class ${name} {
 ${properties}
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
 ${assignments}
   }
 }`

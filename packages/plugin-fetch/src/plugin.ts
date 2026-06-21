@@ -14,7 +14,7 @@ import type { PluginFetch } from './types.ts'
 export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
 
 /**
- * Generates a slim, type-safe HTTP client pinned to the Fetch API. Each operation becomes one async
+ * Generates a type-safe HTTP client pinned to the Fetch API. Each operation becomes one async
  * function that takes a single grouped `options` object and returns the shared `RequestResult`
  * contract. The runtime is always bundled into `.kubb/client.ts`, so generated code never imports
  * from `@kubb/plugin-fetch` and the only runtime dependency is the global `fetch`.

@@ -3,28 +3,17 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { CreateEventRequestConfig, CreateEventData, CreateEventStatus201, CreateEventStatus400 } from '../types/CreateEvent.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
-import type { z } from 'zod'
-import { createEventResponseSchema, createEventDataSchema } from '../zod/createEventSchema.ts'
-
-function getCreateEventUrl() {
-  const res = { method: 'POST', url: `/events` as const }
-
-  return res
-}
+import type { CreateEventRequestConfig, CreateEventResponses } from '../types/CreateEvent.ts'
+import type { Options, RequestResult } from '@kubb/plugin-client/clients/axios'
+import { createEventResponseSchema } from '../zod/createEventSchema.ts'
+import { client } from '@kubb/plugin-client/clients/axios'
 
 /**
  * @summary Create an event
  * {@link /events}
  */
-export async function createEvent({ body }: CreateEventRequestConfig, config: Partial<RequestConfig<CreateEventData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function createEvent<ThrowOnError extends boolean = true>(options: Options<CreateEventRequestConfig, ThrowOnError>): Promise<RequestResult<CreateEventResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = createEventDataSchema.parse(body)
-
-  const res = await request<CreateEventStatus201, ResponseErrorConfig<CreateEventStatus400>, z.input<typeof createEventDataSchema>>({ method: 'POST', url: getCreateEventUrl().url.toString(), body: requestBody, ...requestConfig })
-
-  return createEventResponseSchema.parse(res.data)
+  return request({ method: 'POST', url: '/events', parser: { response: (data: unknown) => createEventResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<CreateEventResponses, ThrowOnError>>
 }

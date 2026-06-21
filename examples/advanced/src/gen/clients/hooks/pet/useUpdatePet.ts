@@ -1,7 +1,6 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
 import type {
   UpdatePetRequestConfig,
-  UpdatePetData,
   UpdatePetStatus200,
   UpdatePetStatus202,
   UpdatePetStatus400,
@@ -15,25 +14,21 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const updatePetMutationKey = () => [{ url: '/pet' }] as const
 
 export function updatePetMutationOptions<TContext = unknown>(
-  config: Partial<RequestConfig<UpdatePetData>> & {
-    client?: Client
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
   const mutationKey = updatePetMutationKey()
   return mutationOptions<
-    | { status: 200; data: UpdatePetStatus200; statusText: string }
-    | { status: 202; data: UpdatePetStatus202; statusText: string }
-    | { status: 400; data: UpdatePetStatus400; statusText: string }
-    | { status: 404; data: UpdatePetStatus404; statusText: string }
-    | { status: 405; data: UpdatePetStatus405; statusText: string },
+    UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     UpdatePetRequestConfig,
     TContext
   >({
     mutationKey,
     mutationFn: async ({ body }) => {
-      return updatePet({ body }, config)
+      const { data } = await updatePet({ ...config, body, throwOnError: true })
+      return data
     },
   })
 }
@@ -46,17 +41,12 @@ export function updatePetMutationOptions<TContext = unknown>(
 export function useUpdatePet<TContext>(
   options: {
     mutation?: UseMutationOptions<
-      | { status: 200; data: UpdatePetStatus200; statusText: string }
-      | { status: 202; data: UpdatePetStatus202; statusText: string }
-      | { status: 400; data: UpdatePetStatus400; statusText: string }
-      | { status: 404; data: UpdatePetStatus404; statusText: string }
-      | { status: 405; data: UpdatePetStatus405; statusText: string },
+      UpdatePetStatus200 | UpdatePetStatus202,
       ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
       UpdatePetRequestConfig,
       TContext
     > & { client?: QueryClient }
-    client?: Partial<RequestConfig<UpdatePetData>> & {
-      client?: Client
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},
@@ -66,22 +56,14 @@ export function useUpdatePet<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? updatePetMutationKey()
 
   const baseOptions = updatePetMutationOptions(config) as UseMutationOptions<
-    | { status: 200; data: UpdatePetStatus200; statusText: string }
-    | { status: 202; data: UpdatePetStatus202; statusText: string }
-    | { status: 400; data: UpdatePetStatus400; statusText: string }
-    | { status: 404; data: UpdatePetStatus404; statusText: string }
-    | { status: 405; data: UpdatePetStatus405; statusText: string },
+    UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     UpdatePetRequestConfig,
     TContext
   >
 
   return useMutation<
-    | { status: 200; data: UpdatePetStatus200; statusText: string }
-    | { status: 202; data: UpdatePetStatus202; statusText: string }
-    | { status: 400; data: UpdatePetStatus400; statusText: string }
-    | { status: 404; data: UpdatePetStatus404; statusText: string }
-    | { status: 405; data: UpdatePetStatus405; statusText: string },
+    UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     UpdatePetRequestConfig,
     TContext
@@ -93,11 +75,7 @@ export function useUpdatePet<TContext>(
     },
     queryClient,
   ) as UseMutationResult<
-    | { status: 200; data: UpdatePetStatus200; statusText: string }
-    | { status: 202; data: UpdatePetStatus202; statusText: string }
-    | { status: 400; data: UpdatePetStatus400; statusText: string }
-    | { status: 404; data: UpdatePetStatus404; statusText: string }
-    | { status: 405; data: UpdatePetStatus405; statusText: string },
+    UpdatePetStatus200 | UpdatePetStatus202,
     ResponseErrorConfig<UpdatePetStatus400 | UpdatePetStatus404 | UpdatePetStatus405>,
     UpdatePetRequestConfig,
     TContext

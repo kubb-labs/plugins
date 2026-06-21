@@ -16,7 +16,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
   operation(node, ctx) {
     if (!ast.isHttpOperationNode(node)) return null
     const { config, resolver, driver, root } = ctx
-    const { output, baseURL, dataReturnType, group } = ctx.options
+    const { output, baseURL, group } = ctx.options
 
     const pluginTs = driver.getPlugin(pluginTsName)
 
@@ -53,7 +53,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
         {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
-        <Request name={meta.name} node={node} resolver={tsResolver} dataReturnType={dataReturnType} baseURL={baseURL} />
+        <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )
   },

@@ -2,10 +2,17 @@
  * Resolves which client a query plugin (react-query, vue-query, swr) should call for an operation,
  * shared by all three so the selection rules and diagnostics stay in one place.
  *
- * The query plugins accept an additive `client` option: the string `'fetch'` / `'axios'` selects a
- * slim client plugin, while the deprecated object form keeps the legacy inline / plugin-client
- * behavior. When `client` is unset the registered plugins are inspected so a lone slim plugin is
- * picked up automatically.
+ * Every client plugin now speaks the `RequestResult` contract, so the resolver picks between three
+ * generation strategies:
+ *
+ * - `contract` — a registered contract client plugin (plugin-fetch, plugin-axios, or plugin-client)
+ *   owns the `<op>` functions and the hooks import and call them.
+ * - `contract-inline` — no client plugin is registered, so the query plugin emits its own inline
+ *   contract client and injects the matching contract runtime.
+ *
+ * The `client` string selects explicitly (`'fetch'` / `'axios'`); when it is unset a lone registered
+ * contract client plugin is picked up automatically, otherwise the plugin falls back to
+ * `contract-inline`.
  */
 
 // Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` / `pluginClientName`
@@ -15,31 +22,44 @@ const pluginAxiosName = 'plugin-axios'
 const pluginClientName = 'plugin-client'
 
 /**
- * The client selector accepted by a query plugin's `client` option (string form).
+ * The client selector accepted by a query plugin's `client` option. Both call a registered contract
+ * client plugin.
  */
 export type ClientSelector = 'fetch' | 'axios'
 
 /**
- * The outcome of {@link resolveClient}. `slim` names the slim plugin whose `<op>` functions the hooks
- * import; `legacy` keeps today's inline / plugin-client generation; `error` carries a setup diagnostic.
+ * The outcome of {@link resolveClient}.
+ *
+ * - `contract` names the contract client plugin whose `<op>` functions the hooks import.
+ * - `contract-inline` tells the query plugin to emit its own inline contract client.
+ * - `error` carries a setup diagnostic.
  */
-export type ResolveClientResult = { kind: 'slim'; pluginName: string } | { kind: 'legacy' } | { kind: 'error'; message: string }
+export type ResolveClientResult = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline' } | { kind: 'error'; message: string }
 
-const selectorToPlugin: Record<ClientSelector, string> = {
+const selectorToPlugin: Record<'fetch' | 'axios', string> = {
   fetch: pluginFetchName,
   axios: pluginAxiosName,
 }
 
+// Every contract client plugin, in auto-detect priority order.
+const contractPlugins = [pluginFetchName, pluginAxiosName, pluginClientName] as const
+
 /**
- * Applies the additive `client` resolution rules. See the module comment for the option shape.
+ * Applies the `client` resolution rules. See the module comment for the strategy shape.
  *
  * @example
  * ```ts
  * resolveClient({ client: 'fetch', pluginNames: ['plugin-ts', 'plugin-fetch'] })
- * // { kind: 'slim', pluginName: 'plugin-fetch' }
+ * // { kind: 'contract', pluginName: 'plugin-fetch' }
+ * ```
+ *
+ * @example
+ * ```ts
+ * resolveClient({ client: undefined, pluginNames: ['plugin-ts'] })
+ * // { kind: 'contract-inline' }
  * ```
  */
-export function resolveClient(options: { client: ClientSelector | object | undefined; pluginNames: ReadonlyArray<string> }): ResolveClientResult {
+export function resolveClient(options: { client: ClientSelector | undefined; pluginNames: ReadonlyArray<string> }): ResolveClientResult {
   const { client, pluginNames } = options
   const has = (name: string) => pluginNames.includes(name)
 
@@ -51,29 +71,21 @@ export function resolveClient(options: { client: ClientSelector | object | undef
         message: `\`client: '${client}'\` is set but \`@kubb/plugin-${client}\` is not registered in \`plugins\`. Add it, or drop \`client\` to use a different client plugin.`,
       }
     }
-    return { kind: 'slim', pluginName }
+    return { kind: 'contract', pluginName }
   }
 
-  // The deprecated object form keeps the legacy inline / plugin-client generation untouched.
-  if (client && typeof client === 'object') {
-    return { kind: 'legacy' }
+  // `client` unset: auto-detect a lone registered contract client plugin, otherwise emit an inline
+  // contract client.
+  const registered = contractPlugins.filter(has)
+  if (registered.length === 1) {
+    return { kind: 'contract', pluginName: registered[0]! }
   }
-
-  // `client` unset: an explicit plugin-client wins, otherwise auto-detect a lone slim plugin.
-  if (has(pluginClientName)) {
-    return { kind: 'legacy' }
-  }
-
-  const slimPlugins = [pluginFetchName, pluginAxiosName].filter(has)
-  if (slimPlugins.length === 1) {
-    return { kind: 'slim', pluginName: slimPlugins[0]! }
-  }
-  if (slimPlugins.length > 1) {
+  if (registered.length > 1) {
     return {
       kind: 'error',
-      message: `Both \`@kubb/plugin-fetch\` and \`@kubb/plugin-axios\` are registered. Set \`client: 'fetch' | 'axios'\` to choose which client the hooks call.`,
+      message: `Multiple client plugins are registered (${registered.map((name) => `\`@kubb/${name}\``).join(', ')}). Set \`client: 'fetch' | 'axios'\` to choose which client the hooks call, or register a single client plugin.`,
     }
   }
 
-  return { kind: 'legacy' }
+  return { kind: 'contract-inline' }
 }

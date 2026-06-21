@@ -1,17 +1,7 @@
-export { deleteOrderHook, deleteOrderMutationKey, deleteOrderMutationOptionsHook, useDeleteOrderHook } from './useDeleteOrderHook.ts'
-export { getInventoryHook, getInventoryQueryKey, getInventoryQueryOptionsHook } from './useGetInventoryHook.ts'
-export {
-  getInventorySuspenseHook,
-  getInventorySuspenseQueryKey,
-  getInventorySuspenseQueryOptionsHook,
-  useGetInventorySuspenseHook,
-} from './useGetInventorySuspenseHook.ts'
-export { getOrderByIdHook, getOrderByIdQueryKey, getOrderByIdQueryOptionsHook, useGetOrderByIdHook } from './useGetOrderByIdHook.ts'
-export {
-  getOrderByIdSuspenseHook,
-  getOrderByIdSuspenseQueryKey,
-  getOrderByIdSuspenseQueryOptionsHook,
-  useGetOrderByIdSuspenseHook,
-} from './useGetOrderByIdSuspenseHook.ts'
-export { placeOrderHook, placeOrderMutationKey, placeOrderMutationOptionsHook, usePlaceOrderHook } from './usePlaceOrderHook.ts'
-export { placeOrderPatchHook, placeOrderPatchMutationKey, placeOrderPatchMutationOptionsHook, usePlaceOrderPatchHook } from './usePlaceOrderPatchHook.ts'
+export { deleteOrderMutationKey, deleteOrderMutationOptions, useDeleteOrder } from './useDeleteOrder.ts'
+export { getInventoryQueryKey, getInventoryQueryOptions, useGetInventory } from './useGetInventory.ts'
+export { getInventorySuspenseQueryKey, getInventorySuspenseQueryOptions, useGetInventorySuspense } from './useGetInventorySuspense.ts'
+export { getOrderByIdQueryKey, getOrderByIdQueryOptions, useGetOrderById } from './useGetOrderById.ts'
+export { getOrderByIdSuspenseQueryKey, getOrderByIdSuspenseQueryOptions, useGetOrderByIdSuspense } from './useGetOrderByIdSuspense.ts'
+export { placeOrderMutationKey, placeOrderMutationOptions, usePlaceOrder } from './usePlaceOrder.ts'
+export { placeOrderPatchMutationKey, placeOrderPatchMutationOptions, usePlaceOrderPatch } from './usePlaceOrderPatch.ts'

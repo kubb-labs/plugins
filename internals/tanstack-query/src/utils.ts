@@ -82,27 +82,20 @@ export function buildGroupedRequestParam(
 /**
  * Builds the shared `({ path, query, body, headers }, config = {})` parameter list for a
  * TanStack query-options function. The leading parameter mirrors the client signature, and the
- * trailing `config` parameter is typed as a partial `RequestConfig`. The legacy path also intersects
- * `& { client?: Client }`; the slim path omits it, since the slim `RequestConfig` already carries
- * `client`. Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
+ * trailing `config` is a partial `RequestConfig` minus the grouped data-shape keys, which are passed
+ * explicitly. Framework plugins wrap the result when needed, for example vue-query applies `MaybeRefOrGetter`.
  */
 export function buildQueryOptionsParams(
   node: ast.OperationNode,
-  options: { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string; slim?: boolean },
+  options: { resolver: ResolverTs; memberTypeWrapper?: (type: string) => string },
 ): FunctionParametersNode {
-  const { resolver, memberTypeWrapper, slim = false } = options
-  const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : undefined
+  const { resolver, memberTypeWrapper } = options
 
   const groupedParam = buildGroupedRequestParam(node, { resolver, memberTypeWrapper })
 
-  const requestConfigType = requestName ? `Partial<RequestConfig<${requestName}>>` : 'Partial<RequestConfig>'
-  // The slim `config` drops the data-shape keys; the request groups are passed explicitly and the
-  // slim `Options` omits them from `RequestConfig`.
-  const slimConfigType = `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`
-
   const configParam = createFunctionParameter({
     name: 'config',
-    type: slim ? slimConfigType : `${requestConfigType} & { client?: Client }`,
+    type: `Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>`,
     default: '{}',
   })
 
@@ -110,18 +103,18 @@ export function buildQueryOptionsParams(
 }
 
 /**
- * Builds the call to a slim client `<op>` function inside a query/mutation hook body. The slim
- * function takes a single grouped options object, so the operation's request groups are passed as
+ * Builds the call to a client `<op>` function inside a query/mutation hook body. The function takes
+ * a single grouped options object, so the operation's request groups are passed as
  * shorthand alongside the spread `config`, with `throwOnError: true` pinned last so a caller's config
  * can't flip the query's error semantics. Queries thread the TanStack `signal`; mutations omit it.
  *
  * @example
  * ```ts
- * buildSlimClientCall(node, { clientName: 'getPetById', signal: true })
+ * buildClientCall(node, { clientName: 'getPetById', signal: true })
  * // getPetById({ path, ...config, signal: config.signal ?? signal, throwOnError: true })
  * ```
  */
-export function buildSlimClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean }): string {
+export function buildClientCall(node: ast.OperationNode, options: { clientName: string; signal?: boolean }): string {
   const { clientName, signal = false } = options
   const { groups } = getRequestGroupOptionality(node)
   const names = requestGroupOrder.filter((key) => groups[key])
@@ -236,36 +229,38 @@ export function buildQueryKeyParams(node: ast.OperationNode, options: { resolver
 }
 
 /**
- * The resolved slim `<op>` for one operation: the generated function name, the file it lives in, and
- * the slim runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig` come from).
+ * The resolved contract `<op>` for one operation: the generated function name, the file it lives in,
+ * and the contract runtime's `.kubb/client.ts` path (where `RequestConfig` / `ResponseErrorConfig`
+ * come from).
  */
-export type SlimOperation = { name: string; path: string; clientPath: string }
+export type ClientOperation = { name: string; path: string; clientPath: string }
 
-type SlimResolver = {
+type ClientResolver = {
   resolveName: (name: string) => string
   resolveFile: (entry: ReturnType<typeof operationFileEntry>, options: { root: string; output: Output; group?: Group }) => { path: string }
 }
 
 /**
- * Resolves the slim client `<op>` a query/mutation hook imports, by looking up the registered slim
- * plugin's resolver and output. Returns `null` when no slim plugin is in play (the legacy path). The
- * slim plugin injects `.kubb/client.ts` at the global output root, the same path the hooks read
- * `RequestConfig` / `ResponseErrorConfig` from.
+ * Resolves the contract client `<op>` a query/mutation hook imports, by looking up the registered
+ * contract client plugin's resolver and output. Works for any contract client plugin (plugin-fetch,
+ * plugin-axios, plugin-client). Returns `null` when no contract plugin is in play (the inline /
+ * legacy paths). The plugin injects `.kubb/client.ts` at the global output root, the same path the
+ * hooks read `RequestConfig` / `ResponseErrorConfig` from.
  */
-export function resolveSlimOperation(options: {
-  slimClient: { pluginName: string } | null
+export function resolveClientOperation(options: {
+  clientPlugin: { pluginName: string } | null
   driver: { getPlugin: (name: string) => unknown; getResolver: (name: string) => unknown }
   node: ast.OperationNode
   root: string
   output: Output
-}): SlimOperation | null {
-  const { slimClient, driver, node, root, output } = options
-  if (!slimClient) return null
+}): ClientOperation | null {
+  const { clientPlugin, driver, node, root, output } = options
+  if (!clientPlugin) return null
 
-  const resolver = driver.getResolver(slimClient.pluginName) as SlimResolver | null | undefined
+  const resolver = driver.getResolver(clientPlugin.pluginName) as ClientResolver | null | undefined
   if (!resolver) return null
 
-  const plugin = driver.getPlugin(slimClient.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
+  const plugin = driver.getPlugin(clientPlugin.pluginName) as { options?: { output?: Output; group?: Group | null } } | null | undefined
   const file = resolver.resolveFile(operationFileEntry(node, node.operationId), {
     root,
     output: plugin?.options?.output ?? output,

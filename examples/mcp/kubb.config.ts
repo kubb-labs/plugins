@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { pluginClient } from '@kubb/plugin-client'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -29,10 +30,14 @@ export default defineConfig(() => {
         output: { path: 'models/ts', barrel: { type: 'named' } },
       }),
       pluginZod({}),
+      // A registered contract client. pluginMcp detects it and its handlers call the injected
+      // `.kubb/client.ts` contract runtime, which returns the shared `RequestResult` shape.
+      pluginClient({
+        output: { path: './clients', barrel: { type: 'named' } },
+      }),
       pluginMcp({
         client: {
           baseURL: 'https://petstore.swagger.io/v2',
-          importPath: '../../client.ts',
         },
       }),
     ],

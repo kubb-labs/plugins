@@ -28,7 +28,10 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { responseStatusNames: 'error' })
+    // The handler only references the grouped params type — the request body data and the path/query
+    // params — so the response and error-status names are left out of the imports.
+    const responseName = tsResolver.resolveResponseName(node)
+    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { responseStatusNames: false }).filter((name) => name !== responseName)
 
     const meta = {
       name: resolver.resolveHandlerName(node),
@@ -53,29 +56,13 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         )}
         <File.Import name={['CallToolResult', 'ServerNotification', 'ServerRequest']} path={'@modelcontextprotocol/sdk/types'} isTypeOnly />
         <File.Import name={['RequestHandlerExtra']} path={'@modelcontextprotocol/sdk/shared/protocol'} isTypeOnly />
-        <File.Import name={['buildFormData']} root={meta.file.path} path={path.resolve(root, '.kubb/config.ts')} />
         {client.importPath ? (
-          <>
-            <File.Import name={['Client', 'RequestConfig', 'ResponseErrorConfig']} path={client.importPath} isTypeOnly />
-            <File.Import name={'client'} path={client.importPath} />
-            {client.dataReturnType === 'full' && <File.Import name={['ResponseConfig']} path={client.importPath} isTypeOnly />}
-          </>
+          <File.Import name={'client'} path={client.importPath} />
         ) : (
-          <>
-            <File.Import
-              name={['Client', 'RequestConfig', 'ResponseErrorConfig']}
-              root={meta.file.path}
-              path={path.resolve(root, '.kubb/client.ts')}
-              isTypeOnly
-            />
-            <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
-            {client.dataReturnType === 'full' && (
-              <File.Import name={['ResponseConfig']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} isTypeOnly />
-            )}
-          </>
+          <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
         )}
 
-        <McpHandler name={meta.name} node={node} resolver={tsResolver} baseURL={client.baseURL} dataReturnType={client.dataReturnType || 'data'} />
+        <McpHandler name={meta.name} node={node} resolver={tsResolver} baseURL={client.baseURL} />
       </File>
     )
   },

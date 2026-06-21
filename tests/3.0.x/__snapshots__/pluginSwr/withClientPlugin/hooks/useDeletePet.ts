@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../types/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { deletePet } from '../clients/deletePet.ts'
 
@@ -22,7 +22,7 @@ export type DeletePetMutationArg = DeletePetRequestConfig
  */
 export function useDeletePet(options: {
   mutation?: SWRMutationConfiguration<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -31,7 +31,8 @@ export function useDeletePet(options: {
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, headers } }) => {
-      return deletePet({ path, headers }, config)
+      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
+      return data
     },
     mutationOptions
   )

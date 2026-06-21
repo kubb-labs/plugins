@@ -33,13 +33,6 @@ export type ResolverClient = Resolver & {
    * Resolves the generated SDK facade property name for a client class.
    */
   resolveClientPropertyName(this: ResolverClient, name: string): string
-  /**
-   * Resolves the URL helper function name for an operation.
-   *
-   * @example Resolving URL helper names
-   * `resolver.resolveUrlName(node) // -> 'getShowPetByIdUrl'`
-   */
-  resolveUrlName(this: ResolverClient, node: ast.OperationNode): string
 }
 
 /**
@@ -66,8 +59,9 @@ export type ClientImportPath =
        * instead of the bundled `client`. Accepts both relative paths and bare module specifiers;
        * the value is used as-is.
        *
-       * @note When combined with a query plugin, the module must export `Client`,
-       * `RequestConfig`, and `ResponseErrorConfig` types.
+       * @note The module must implement the `RequestResult` contract: a `client` value plus the
+       * `Options` and `RequestResult` types (and `ClientInstance` / `RequestConfig` for the class
+       * client types).
        */
       importPath: string
     }
@@ -98,28 +92,10 @@ export type Options = OutputOptions & {
    */
   operations?: boolean
   /**
-   * Whether to also export the URL builder helpers (`get<Operation>Url`).
-   * - `'export'` exposes them via the barrel.
-   * - `false` keeps them private.
-   *
-   * @default false
-   */
-  urlType?: 'export' | false
-  /**
    * Base URL prepended to every request. When omitted, falls back to the adapter's
    * server URL (typically `servers[0].url`).
    */
   baseURL?: string
-  /**
-   * Shape of the value returned by each generated client function.
-   * - `'data'` — only the response body.
-   * - `'full'` — the full response as a discriminated union keyed by HTTP status code.
-   *   Each member is `{ status: N; data: StatusNType; statusText: string }`,
-   *   so narrowing on `res.status` also narrows `res.data` to the matching response type.
-   *
-   * @default 'data'
-   */
-  dataReturnType?: 'data' | 'full'
   /**
    * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
    * - `false` (default): no validation. The response is returned as-is.
@@ -188,10 +164,8 @@ type ResolvedOptions = {
   client: Options['client']
   clientType: NonNullable<Options['clientType']>
   parser: NonNullable<Options['parser']>
-  urlType: NonNullable<Options['urlType']>
   importPath: Options['importPath']
   baseURL: Options['baseURL']
-  dataReturnType: NonNullable<Options['dataReturnType']>
   sdk: Options['sdk']
   resolver: ResolverClient
 }

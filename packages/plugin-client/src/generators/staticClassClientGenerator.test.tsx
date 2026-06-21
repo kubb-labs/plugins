@@ -21,7 +21,6 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginClient['resolvedOptions'] = {
-  dataReturnType: 'data',
   client: 'axios',
   clientType: 'staticClass',
   importPath: undefined,
@@ -33,7 +32,6 @@ const defaultOptions: PluginClient['resolvedOptions'] = {
   include: undefined,
   override: [],
   group: null,
-  urlType: 'export',
   sdk: undefined,
   baseURL: undefined,
   resolver: resolverClient,

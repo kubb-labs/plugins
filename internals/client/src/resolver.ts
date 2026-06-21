@@ -1,20 +1,18 @@
 import { camelCase, ensureValidVarName, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
-import type { PluginSlimClient } from './types.ts'
+import type { PluginContractClient } from './types.ts'
 
 /**
- * Default resolver shared by the slim client plugins. Functions and files use camelCase; URL helpers
- * get a `get<Operation>Url` name.
+ * Default resolver shared by the client plugins. Functions and files use camelCase.
  *
  * @example
  * ```ts
  * resolverClient.resolveName('show pet by id') // 'showPetById'
- * resolverClient.resolveUrlName(operationNode) // 'getShowPetByIdUrl'
  * ```
  */
-export const resolverClient = defineResolver<PluginSlimClient>(() => ({
+export const resolverClient = defineResolver<PluginContractClient>(() => ({
   name: 'default',
-  pluginName: 'plugin-slim-client',
+  pluginName: 'plugin-contract-client',
   default(name, type) {
     if (type === 'file') return toFilePath(name)
     return ensureValidVarName(camelCase(name))
@@ -24,9 +22,5 @@ export const resolverClient = defineResolver<PluginSlimClient>(() => ({
   },
   resolvePathName(name, type) {
     return this.default(name, type)
-  },
-  resolveUrlName(node) {
-    const name = this.resolveName(node.operationId)
-    return `get${name.charAt(0).toUpperCase()}${name.slice(1)}Url`
   },
 }))

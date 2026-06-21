@@ -1,6 +1,6 @@
 import type { ClientSelector, Transformer } from '@internals/tanstack-query'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-import type { ClientImportPath, PluginClient } from '@kubb/plugin-client'
+import type { PluginClient } from '@kubb/plugin-client'
 
 export type { Transformer } from '@internals/tanstack-query'
 
@@ -109,15 +109,16 @@ type Mutation = {
  */
 export type Options = OutputOptions & {
   /**
-   * Selects the HTTP client the generated hooks call.
+   * Selects the HTTP client the generated hooks call. Every client plugin speaks the `RequestResult`
+   * contract, so the hooks call a contract `<op>` that takes one grouped `options` object.
    *
-   * - `'fetch'` / `'axios'` calls the slim `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When
-   *   exactly one slim plugin is registered it is auto-detected, so the string is only needed to
-   *   disambiguate two slim plugins or to override.
-   * - The object form is **deprecated** — it keeps the legacy inline / plugin-client generation. Prefer
-   *   registering a slim plugin and configuring the client (baseURL, transport, ...) there.
+   * - `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
+   *   single client plugin (plugin-fetch, plugin-axios, or plugin-client) is registered it is
+   *   auto-detected, so the string is only needed to disambiguate several client plugins.
+   *
+   * When unset and no client plugin is registered, the hooks emit their own inline contract client.
    */
-  client?: ClientSelector | (ClientImportPath & Pick<PluginClient['options'], 'clientType' | 'dataReturnType' | 'baseURL'>)
+  client?: ClientSelector
   /**
    * Tags, operations, or paths to exclude from generation.
    */
@@ -154,18 +155,25 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
+/**
+ * The resolved client strategy for the generated hooks, computed once during setup.
+ *
+ * - `contract` — the hooks import and call a registered contract client plugin's `<op>`.
+ * - `contract-inline` — the hooks emit their own inline contract client and inject the matching
+ *   contract runtime (`'fetch'` / `'axios'` picks the bundled template).
+ */
+export type ResolvedClient = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
+
 type ResolvedOptions = {
   output: Output
   group: Group | undefined
   exclude: NonNullable<Options['exclude']>
   include: Options['include']
   override: NonNullable<Options['override']>
-  client: Pick<PluginClient['options'], 'client' | 'clientType' | 'dataReturnType' | 'importPath' | 'baseURL'>
   /**
-   * Set when the hooks call a slim client plugin's generated functions instead of the legacy inline /
-   * plugin-client path. Names the resolved slim plugin (`plugin-fetch` / `plugin-axios`).
+   * The resolved client strategy the generators branch on (contract or inline contract).
    */
-  slimClient: { pluginName: string } | null
+  client: ResolvedClient
   parser: NonNullable<Options['parser']>
   queryKey: QueryKey | undefined
   query: NonNullable<Required<Query>> | false

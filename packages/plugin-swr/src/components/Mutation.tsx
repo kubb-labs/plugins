@@ -3,9 +3,8 @@ import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function, Type } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import { buildGroupedRequestParam, buildSlimClientCall } from '@internals/tanstack-query'
-import type { PluginSwr } from '../types.ts'
-import { buildRequestConfigType, buildStatusUnionType, getComments, resolveErrorNames } from '../utils.ts'
+import { buildGroupedRequestParam, buildClientCall } from '@internals/tanstack-query'
+import { buildRequestConfigType, getComments, resolveErrorNames } from '../utils.ts'
 
 type Props = {
   name: string
@@ -15,8 +14,6 @@ type Props = {
   mutationArgTypeName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
-  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -25,18 +22,16 @@ const callPrinter = functionPrinter({ mode: 'call' })
 function buildMutationParamsNode(
   node: ast.OperationNode,
   options: {
-    dataReturnType: PluginSwr['resolvedOptions']['client']['dataReturnType']
     mutationKeyTypeName: string
     mutationArgTypeName: string
     resolver: ResolverTs
-    slim?: boolean
   },
 ): FunctionParametersNode {
-  const { dataReturnType, mutationKeyTypeName, mutationArgTypeName, resolver, slim = false } = options
+  const { mutationKeyTypeName, mutationArgTypeName, resolver } = options
   const responseName = resolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, resolver)
 
-  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
+  const TData = responseName
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   return createFunctionParameters({
@@ -45,7 +40,7 @@ function buildMutationParamsNode(
         name: 'options',
         type: `{
   mutation?: SWRMutationConfiguration<${TData}, ${TError}, ${mutationKeyTypeName} | null, ${mutationArgTypeName}> & { throwOnError?: boolean },
-  client?: ${buildRequestConfigType(node, resolver, { slim })},
+  client?: ${buildRequestConfigType(node)},
   shouldFetch?: boolean,
 }`,
         default: '{}',
@@ -54,21 +49,11 @@ function buildMutationParamsNode(
   })
 }
 
-export function Mutation({
-  name,
-  clientName,
-  mutationKeyName,
-  mutationKeyTypeName,
-  mutationArgTypeName,
-  dataReturnType,
-  node,
-  tsResolver,
-  slim = false,
-}: Props): KubbReactNode {
+export function Mutation({ name, clientName, mutationKeyName, mutationKeyTypeName, mutationArgTypeName, node, tsResolver }: Props): KubbReactNode {
   const responseName = tsResolver.resolveResponseName(node)
   const errorNames = resolveErrorNames(node, tsResolver)
 
-  const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
+  const TData = responseName
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
@@ -76,20 +61,15 @@ export function Mutation({
   const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argTypeBody = hasMutationParams ? tsResolver.resolveRequestConfigName(node) : ''
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
-  const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
-  const mutationFnBody = slim
-    ? `const { data } = await ${buildSlimClientCall(node, { clientName, signal: false })}
+  const mutationFnBody = `const { data } = await ${buildClientCall(node, { clientName, signal: false })}
             return data`
-    : `return ${clientName}(${clientCallStr})`
 
   const generics = [TData, TError, `${mutationKeyTypeName} | null`, mutationArgTypeName]
 
   const paramsNode = buildMutationParamsNode(node, {
-    dataReturnType,
     mutationKeyTypeName,
     mutationArgTypeName,
     resolver: tsResolver,
-    slim,
   })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
 

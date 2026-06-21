@@ -2,7 +2,7 @@
   "name": "vue-query-pet-store",
   "version": "0.0.0",
   "private": true,
-  "description": "VueQuery PetStore example",
+  "description": "Vue Query PetStore example",
   "license": "MIT",
   "author": "stijnvanhulle",
   "repository": {
@@ -13,29 +13,22 @@
   "type": "module",
   "sideEffects": false,
   "scripts": {
-    "build": "vite build",
     "clean": "node -e \"require('node:fs').rmSync('./dist', {recursive:true,force:true})\"",
-    "dev": "vite",
-    "generate": "vite build",
+    "generate": "KUBB_DISABLE_TELEMETRY=1 kubb generate --config kubb.config.ts",
     "test": "vitest",
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
     "@kubb/adapter-oas": "catalog:",
-    "@kubb/plugin-client": "workspace:*",
+    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-vue-query": "workspace:*",
-    "@kubb/plugin-zod": "workspace:*",
     "@tanstack/vue-query": "^5.101.0",
-    "axios": "^1.18.0",
-    "unplugin-kubb": "catalog:",
-    "vue": "^3.5.38"
+    "kubb": "catalog:",
+    "vue": "^3.5.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.7",
-    "msw": "^2.14.6",
-    "typescript": "catalog:",
-    "vite": "^8.0.16"
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=22",

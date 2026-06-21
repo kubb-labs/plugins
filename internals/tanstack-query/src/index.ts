@@ -7,13 +7,13 @@ export {
   buildGroupedRequestParam,
   buildQueryKeyParams,
   buildQueryOptionsParams,
-  buildSlimClientCall,
+  buildClientCall,
+  resolveClientOperation,
   resolveOperationOverrides,
   resolveQueryParamsParser,
   resolveRequestParser,
   resolveResponseParser,
-  resolveSlimOperation,
   resolveZodSchemaNames,
   transformName,
 } from './utils.ts'
-export type { SlimOperation } from './utils.ts'
+export type { ClientOperation } from './utils.ts'

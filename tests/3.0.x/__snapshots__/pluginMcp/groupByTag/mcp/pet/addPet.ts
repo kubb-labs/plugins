@@ -1,6 +1,5 @@
 import client from '@kubb/plugin-client/clients/axios'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../../types/AddPet.ts'
-import type { ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { AddPetData } from '../../types/AddPet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 
@@ -12,7 +11,7 @@ import type { CallToolResult, ServerNotification, ServerRequest } from '@modelco
 export async function addPetHandler({ data }: { data: AddPetData }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>({ method: "POST", url: `/pet`, body: requestBody }, request)
+  const res = await client({ method: "POST", url: `/pet`, body: requestBody })
 
   return {
     content: [

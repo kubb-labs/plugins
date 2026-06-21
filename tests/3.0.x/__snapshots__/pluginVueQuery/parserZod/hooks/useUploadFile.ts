@@ -3,13 +3,13 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import type { z } from 'zod'
-import { uploadFileResponseSchema, uploadFileDataSchema } from '../zod/uploadFileSchema.ts'
+import { client } from '../.kubb/client.ts'
+import { uploadFileResponseSchema } from '../zod/uploadFileSchema.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
@@ -17,14 +17,10 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = uploadFileDataSchema.parse(body)
-
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, z.input<typeof uploadFileDataSchema>>({ method: 'POST', url: `/pet/${path.petId}/uploadImage`, query, body: requestBody, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
-
-  return uploadFileResponseSchema.parse(res.data)
+  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', parser: { response: (data: unknown) => uploadFileResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }
 
 /**
@@ -33,7 +29,7 @@ export async function uploadFile({ path, query, body }: UploadFileRequestConfig,
  */
 export function useUploadFile<TContext>(options: {
   mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
@@ -41,7 +37,8 @@ export function useUploadFile<TContext>(options: {
 
   return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationFn: async({ path, query, body }) => {
-      return uploadFile({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path: toValue(path), query: toValue(query), body: toValue(body), throwOnError: true })
+      return data
     },
     mutationKey,
     ...mutationOptions

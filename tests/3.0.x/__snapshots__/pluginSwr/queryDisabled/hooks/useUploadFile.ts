@@ -3,9 +3,9 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileStatus200 } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse } from '../types/UploadFile.ts'
+import { client } from '../.kubb/client.ts'
 
 export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
@@ -15,20 +15,17 @@ type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
  * @summary uploads an image
  * {@link /pet/:petId/uploadImage}
  */
-export async function uploadFile({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const requestBody = body
-
-  const res = await request<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileData>({ method: 'POST', url: `/pet/${path.petId}/uploadImage`, query, body: requestBody, ...requestConfig, headers: { 'Content-Type': 'application/octet-stream', ...requestConfig.headers } })
-
-  return res.data
+  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }
 
-export function uploadFileQueryOptions({ path, query, body }: UploadFileRequestConfig, config: Partial<RequestConfig<UploadFileData>> & { client?: Client } = {}) {
+export function uploadFileQueryOptions({ path, query, body }: UploadFileRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return uploadFile({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return data
     },
   }
 }

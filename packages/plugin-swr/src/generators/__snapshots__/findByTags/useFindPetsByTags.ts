@@ -4,8 +4,8 @@
  */
 
 import useSWR from 'swr'
-import type { Client, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses, FindPetsByTagsResponse } from './FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
 import { client } from './.kubb/client'
 
@@ -17,18 +17,22 @@ type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTags({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByTags<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
-
-  return res.data
+  return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }
 
-export function findPetsByTagsQueryOptions({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsQueryOptions(
+  { query }: FindPetsByTagsRequestConfig,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   return {
     fetcher: async () => {
-      return findPetsByTags({ query }, config)
+      const { data } = await findPetsByTags({ ...config, query, throwOnError: true })
+      return data
     },
   }
 }
@@ -40,7 +44,7 @@ export function useFindPetsByTags(
   { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: SWRConfiguration<FindPetsByTagsResponse, ResponseErrorConfig<Error>>
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { Client, RequestConfig } from '@kubb/plugin-client/clients/fetch'
+import type { ClientInstance, RequestConfig } from '../.kubb/client.ts'
 import { pet } from './pet/pet.ts'
 import { store } from './store/store.ts'
 
@@ -11,7 +11,7 @@ export class PetStoreSDK {
   readonly pet: pet
   readonly store: store
 
-  constructor(config: Partial<RequestConfig> & { client?: Client } = {}) {
+  constructor(config: Partial<RequestConfig> & { client?: ClientInstance } = {}) {
     this.pet = new pet(config)
     this.store = new store(config)
   }

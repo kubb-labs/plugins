@@ -3,8 +3,8 @@
 * Do not edit manually.
 */
 
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
 import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
 import { getInventory } from '../clients/getInventory.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
@@ -13,12 +13,13 @@ export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] 
 
 type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
 
-export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventorySuspenseQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      return getInventory({ ...config, signal: config.signal ?? signal })
+      const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      return data
    },
   })
 }
@@ -30,7 +31,7 @@ export function getInventorySuspenseQueryOptions(config: Partial<RequestConfig> 
  */
 export function useGetInventorySuspense<TData = GetInventoryStatus200, TQueryKey extends QueryKey = GetInventorySuspenseQueryKey>(options: {
   query?: Partial<UseSuspenseQueryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient },
-  client?: Partial<RequestConfig> & { client?: Client }
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
 } = {}) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...resolvedOptions } = queryConfig

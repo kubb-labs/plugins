@@ -1,5 +1,5 @@
-import type { Client, RequestConfig, ResponseErrorConfig } from '../../../../axios-client.ts'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '../../../../tanstack-query-hook'
+import type { RequestConfig, ResponseErrorConfig } from '../../../.kubb/client.ts'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200, FindPetsByTagsStatus400 } from '../../../models/ts/pet/FindPetsByTags.ts'
 import { queryOptions, useQuery } from '../../../../tanstack-query-hook'
 import { findPetsByTags } from '../../axios/petService/findPetsByTags.ts'
@@ -9,17 +9,16 @@ export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConf
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
 
-export function findPetsByTagsQueryOptions({ query, headers }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsQueryOptions(
+  { query, headers }: FindPetsByTagsRequestConfig,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   const queryKey = findPetsByTagsQueryKey({ query })
-  return queryOptions<
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
-    ResponseErrorConfig<FindPetsByTagsStatus400>,
-    { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
-    typeof queryKey
-  >({
+  return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, FindPetsByTagsStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTags({ query, headers }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByTags({ ...config, query, headers, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -29,23 +28,13 @@ export function findPetsByTagsQueryOptions({ query, headers }: FindPetsByTagsReq
  * @summary Finds Pets by tags
  * {@link /pet/findByTags}
  */
-export function useFindPetsByTags<
-  TData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
-  TQueryData = { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
-  TQueryKey extends QueryKey = FindPetsByTagsQueryKey,
->(
+export function useFindPetsByTags<TData = FindPetsByTagsStatus200, TQueryData = FindPetsByTagsStatus200, TQueryKey extends QueryKey = FindPetsByTagsQueryKey>(
   { query, headers }: FindPetsByTagsRequestConfig,
   options: {
-    query?: Partial<
-      QueryObserverOptions<
-        { status: 200; data: FindPetsByTagsStatus200; statusText: string } | { status: 400; data: FindPetsByTagsStatus400; statusText: string },
-        ResponseErrorConfig<FindPetsByTagsStatus400>,
-        TData,
-        TQueryData,
-        TQueryKey
-      >
-    > & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    query?: Partial<QueryObserverOptions<FindPetsByTagsStatus200, ResponseErrorConfig<FindPetsByTagsStatus400>, TData, TQueryData, TQueryKey>> & {
+      client?: QueryClient
+    }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

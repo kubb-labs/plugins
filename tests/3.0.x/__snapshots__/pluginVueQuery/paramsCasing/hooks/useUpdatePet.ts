@@ -3,27 +3,22 @@
 * Do not edit manually.
 */
 
-import client from '@kubb/plugin-client/clients/axios'
-import type { UpdatePetRequestConfig, UpdatePetData, UpdatePetStatus200 } from '../types/UpdatePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UpdatePetRequestConfig, UpdatePetResponses, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
+import { client } from '../.kubb/client.ts'
 import { useMutation } from '@tanstack/vue-query'
+import { toValue } from 'vue'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
 
 /**
  * {@link /pets/:pet_id}
  */
-export async function updatePet({ path, query, body }: UpdatePetRequestConfig, config: Partial<RequestConfig<UpdatePetData>> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetRequestConfig, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const mappedParams = query ? { "include_deleted": query.includeDeleted, "request_source": query.requestSource } : undefined
-
-  const requestBody = body
-
-  const res = await request<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetData>({ method: 'POST', url: `/pets/${path.petId}`, query: mappedParams, body: requestBody, ...requestConfig })
-
-  return res.data
+  return request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
 }
 
 /**
@@ -31,7 +26,7 @@ export async function updatePet({ path, query, body }: UpdatePetRequestConfig, c
  */
 export function useUpdatePet<TContext>(options: {
   mutation?: MutationObserverOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
-  client?: Partial<RequestConfig<UpdatePetData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
@@ -39,7 +34,8 @@ export function useUpdatePet<TContext>(options: {
 
   return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     mutationFn: async({ path, query, body }) => {
-      return updatePet({ path, query, body }, config)
+      const { data } = await updatePet({ ...config, path: toValue(path), query: toValue(query), body: toValue(body), throwOnError: true })
+      return data
     },
     mutationKey,
     ...mutationOptions

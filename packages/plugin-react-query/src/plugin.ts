@@ -1,8 +1,8 @@
 import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
-import { ast, definePlugin } from '@kubb/core'
-import { isParserEnabled, pluginClientName } from '@kubb/plugin-client'
-import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from '@kubb/plugin-client/templates'
+import { definePlugin } from '@kubb/core'
+import { isParserEnabled } from '@kubb/plugin-client'
+import { contractAxiosClientTemplatePath, contractFetchClientTemplatePath } from '@kubb/plugin-client/templates'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer, queryKeyTransformer, resolveClient } from '@internals/tanstack-query'
@@ -69,10 +69,6 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
     macros: userMacros,
   } = options
 
-  const clientObject = client && typeof client === 'object' ? client : undefined
-  const clientName = clientObject?.client ?? 'axios'
-  const clientImportPath = clientObject?.importPath
-
   const selectedGenerators = [
     queryGenerator,
     suspenseQueryGenerator,
@@ -98,18 +94,15 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
         if (resolvedClient.kind === 'error') {
           throw new Error(resolvedClient.message)
         }
-        const slimClient = resolvedClient.kind === 'slim' ? { pluginName: resolvedClient.pluginName } : null
+
+        // `contract` calls a registered plugin's op; `contract-inline` bundles its own runtime,
+        // defaulting to axios (the historical default) since no client plugin is in play.
+        const resolvedClientDescriptor: PluginReactQuery['resolvedOptions']['client'] =
+          resolvedClient.kind === 'contract' ? { kind: 'contract', pluginName: resolvedClient.pluginName } : { kind: 'contract-inline', client: 'axios' }
 
         ctx.setOptions({
           output,
-          client: {
-            baseURL: clientObject?.baseURL,
-            client: clientName,
-            clientType: clientObject?.clientType ?? 'function',
-            importPath: clientImportPath,
-            dataReturnType: clientObject?.dataReturnType ?? 'data',
-          },
-          slimClient,
+          client: resolvedClientDescriptor,
           queryKey,
           query:
             query === false
@@ -157,37 +150,15 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
         }
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
-        const hasClientPlugin = !!ctx.config.plugins?.some((p) => (p as { name?: string }).name === pluginClientName)
 
-        if (!slimClient && !hasClientPlugin && !clientImportPath) {
+        // `contract-inline` bundles the shared `RequestResult` contract runtime, identical to what
+        // plugin-fetch / plugin-axios inject, so the inline op serializes form-data in its own runtime
+        // and needs no `config.ts`.
+        if (resolvedClientDescriptor.kind === 'contract-inline') {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: clientName === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
-            sources: [
-              ast.factory.createSource({
-                name: 'client',
-                nodes: [],
-                isExportable: true,
-                isIndexable: true,
-              }),
-            ],
-          })
-        }
-
-        if (!slimClient && !hasClientPlugin) {
-          ctx.injectFile({
-            baseName: 'config.ts',
-            path: path.resolve(root, '.kubb/config.ts'),
-            copy: configTemplatePath,
-            sources: [
-              ast.factory.createSource({
-                name: 'config',
-                nodes: [],
-                isExportable: false,
-                isIndexable: false,
-              }),
-            ],
+            copy: resolvedClientDescriptor.client === 'fetch' ? contractFetchClientTemplatePath : contractAxiosClientTemplatePath,
           })
         }
       },

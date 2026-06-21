@@ -3,35 +3,15 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWRMutation from 'swr/mutation'
-import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/DeletePet.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../models/pet/DeletePet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
+import { deletePet } from '../../clients/pet/deletePet.ts'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
-
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:petId}
- */
-export async function deletePet({ path, headers }: DeletePetRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
-
-  const res = await request<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, unknown>({
-    method: 'DELETE',
-    url: `/pet/${path.petId}`,
-    ...requestConfig,
-    headers: { ...mappedHeaders, ...requestConfig.headers },
-  })
-
-  return res.data
-}
 
 export type DeletePetMutationArg = DeletePetRequestConfig
 
@@ -45,7 +25,7 @@ export function useDeletePet(
     mutation?: SWRMutationConfiguration<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg> & {
       throwOnError?: boolean
     }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
   } = {},
 ) {
@@ -55,7 +35,8 @@ export function useDeletePet(
   return useSWRMutation<DeletePetResponse, ResponseErrorConfig<DeletePetStatus400>, DeletePetMutationKey | null, DeletePetMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, headers } }) => {
-      return deletePet({ path, headers }, config)
+      const { data } = await deletePet({ ...config, path, headers, throwOnError: true })
+      return data
     },
     mutationOptions,
   )

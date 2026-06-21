@@ -1,8 +1,7 @@
-import client from '../../client.js'
-import type { ResponseErrorConfig } from '../../client.js'
-import type { AddPetData, AddPetResponse, AddPetStatus405 } from '../models/ts/AddPet.js'
+import type { AddPetData } from '../models/ts/AddPet.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.js'
 
 /**
  * @description Add a new pet to the store
@@ -15,10 +14,7 @@ export async function addPetHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<AddPetResponse, ResponseErrorConfig<AddPetStatus405>, AddPetData>(
-    { method: 'POST', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody },
-    request,
-  )
+  const res = await client({ method: 'POST', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody })
 
   return {
     content: [

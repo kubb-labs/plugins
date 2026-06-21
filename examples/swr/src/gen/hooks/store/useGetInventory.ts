@@ -3,33 +3,21 @@
  * Do not edit manually.
  */
 
-import client from '@kubb/plugin-client/clients/axios'
 import useSWR from 'swr'
-import type { GetInventoryResponse, GetInventoryStatus200 } from '../../models/GetInventory.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { GetInventoryResponse } from '../../models/store/GetInventory.ts'
 import type { SWRConfiguration } from 'swr'
+import { getInventory } from '../../clients/store/getInventory.ts'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
 
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export async function getInventory(config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
-
-  const res = await request<GetInventoryStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/store/inventory`, ...requestConfig })
-
-  return res.data
-}
-
-export function getInventoryQueryOptions(config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {
     fetcher: async () => {
-      return getInventory(config)
+      const { data } = await getInventory({ ...config, throwOnError: true })
+      return data
     },
   }
 }
@@ -42,7 +30,7 @@ export function getInventoryQueryOptions(config: Partial<RequestConfig> & { clie
 export function useGetInventory(
   options: {
     query?: SWRConfiguration<GetInventoryResponse, ResponseErrorConfig<Error>>
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
     shouldFetch?: boolean
     immutable?: boolean
   } = {},

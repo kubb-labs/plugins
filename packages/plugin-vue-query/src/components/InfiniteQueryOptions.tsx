@@ -5,8 +5,8 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { Infinite, PluginVueQuery } from '../types.ts'
-import { buildStatusUnionType, buildVueClientCallArgs, buildVueSlimClientCall, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
+import type { Infinite } from '../types.ts'
+import { buildVueClientCall, resolveErrorNames, resolveSuccessNames } from '../utils.ts'
 import { buildQueryKeyParamsNode } from './QueryKey.tsx'
 import { getQueryOptionsParams } from './QueryOptions.tsx'
 
@@ -16,13 +16,11 @@ type Props = {
   queryKeyName: string
   node: ast.OperationNode
   tsResolver: ResolverTs
-  dataReturnType: PluginVueQuery['resolvedOptions']['client']['dataReturnType']
   initialPageParam: Infinite['initialPageParam']
   cursorParam: Infinite['cursorParam']
   nextParam: Infinite['nextParam']
   previousParam: Infinite['previousParam']
   queryParam: Infinite['queryParam']
-  slim?: boolean
 }
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -37,14 +35,12 @@ export function InfiniteQueryOptions({
   previousParam,
   node,
   tsResolver,
-  dataReturnType,
   queryParam,
   queryKeyName,
-  slim = false,
 }: Props): KubbReactNode {
   const successNames = resolveSuccessNames(node, tsResolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : tsResolver.resolveResponseName(node)
-  const queryFnDataType = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, tsResolver)
+  const queryFnDataType = responseName
   const errorNames = resolveErrorNames(node, tsResolver)
   const errorType = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
@@ -79,13 +75,10 @@ export function InfiniteQueryOptions({
   const queryKeyParamsNode = buildQueryKeyParamsNode(node, { resolver: tsResolver })
   const queryKeyParamsCall = callPrinter.print(queryKeyParamsNode) ?? ''
 
-  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver, slim })
+  const paramsNode = getQueryOptionsParams(node, { resolver: tsResolver })
   const paramsSignature = declarationPrinter.print(paramsNode) ?? ''
-  const clientCallArgs = buildVueClientCallArgs(node)
-  const queryFnBody = slim
-    ? `const { data } = await ${buildVueSlimClientCall(node, { clientName, signal: true })}
+  const queryFnBody = `const { data } = await ${buildVueClientCall(node, { clientName, signal: true })}
     return data`
-    : `return ${clientName}(${clientCallArgs})`
 
   const hasNewParams = nextParam != null || previousParam != null
 
@@ -102,9 +95,7 @@ export function InfiniteQueryOptions({
       return [`getNextPageParam: (lastPage) => lastPage['${cursorParam}']`, `getPreviousPageParam: (firstPage) => firstPage['${cursorParam}']`] as const
     }
     return [
-      dataReturnType === 'full'
-        ? 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage.data) && lastPage.data.length === 0 ? undefined : lastPageParam + 1'
-        : 'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
+      'getNextPageParam: (lastPage, _allPages, lastPageParam) => Array.isArray(lastPage) && lastPage.length === 0 ? undefined : lastPageParam + 1',
       'getPreviousPageParam: (_firstPage, _allPages, firstPageParam) => firstPageParam <= 1 ? undefined : firstPageParam - 1',
     ] as const
   })()

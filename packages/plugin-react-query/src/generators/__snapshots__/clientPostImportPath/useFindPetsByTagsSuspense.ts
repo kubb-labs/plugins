@@ -3,10 +3,10 @@
  * Do not edit manually.
  */
 
-import client from 'axios'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import type { Client, RequestConfig, ResponseErrorConfig } from 'axios'
+import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
@@ -18,20 +18,26 @@ type FindPetsByTagsSuspenseQueryKey = ReturnType<typeof findPetsByTagsSuspenseQu
 /**
  * {@link /pet/findByTags}
  */
-export async function findPetsByTagsSuspense({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
-  const { client: request = client, ...requestConfig } = config
+export function findPetsByTagsSuspense<ThrowOnError extends boolean = true>(
+  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
+): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await request<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, unknown>({ method: 'GET', url: `/pet/findByTags`, query, ...requestConfig })
-
-  return FindPetsByTagsResponse.parse(res.data)
+  return request({ method: 'GET', url: '/pet/findByTags', parser: { response: (data: unknown) => FindPetsByTagsResponse.parse(data) }, ...config }) as Promise<
+    RequestResult<FindPetsByTagsResponses, ThrowOnError>
+  >
 }
 
-export function findPetsByTagsSuspenseQueryOptions({ query }: FindPetsByTagsRequestConfig, config: Partial<RequestConfig> & { client?: Client } = {}) {
+export function findPetsByTagsSuspenseQueryOptions(
+  { query }: FindPetsByTagsRequestConfig,
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+) {
   const queryKey = findPetsByTagsSuspenseQueryKey({ query })
   return queryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, FindPetsByTagsStatus200, typeof queryKey>({
     queryKey,
     queryFn: async ({ signal }) => {
-      return findPetsByTagsSuspense({ query }, { ...config, signal: config.signal ?? signal })
+      const { data } = await findPetsByTagsSuspense({ ...config, query, signal: config.signal ?? signal, throwOnError: true })
+      return data
     },
   })
 }
@@ -43,7 +49,7 @@ export function useFindPetsByTagsSuspense<TData = FindPetsByTagsStatus200, TQuer
   { query }: FindPetsByTagsRequestConfig,
   options: {
     query?: Partial<UseSuspenseQueryOptions<FindPetsByTagsStatus200, ResponseErrorConfig<Error>, TData, TQueryKey>> & { client?: QueryClient }
-    client?: Partial<RequestConfig> & { client?: Client }
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
   const { query: queryConfig = {}, client: config = {} } = options ?? {}

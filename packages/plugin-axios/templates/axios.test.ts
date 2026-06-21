@@ -76,6 +76,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
     const client = createClientCore({ transport: instance })
     const result = (await client({ method: 'GET', url: '/pet/1' })) as CallResult
+    expect(result.status).toBe(200)
     expect(result.data).toStrictEqual({ id: 1 })
     expect(result.error).toBeUndefined()
     expect(result.request).toBeDefined()

@@ -1,8 +1,7 @@
-import client from '../../client.js'
-import type { ResponseErrorConfig } from '../../client.js'
-import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../models/ts/PlaceOrder.js'
+import type { PlaceOrderData } from '../models/ts/PlaceOrder.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.js'
 
 /**
  * @description Place a new order in the store
@@ -15,10 +14,7 @@ export async function placeOrderHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<PlaceOrderResponse, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderData>(
-    { method: 'POST', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody },
-    request,
-  )
+  const res = await client({ method: 'POST', url: `/store/order`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody })
 
   return {
     content: [

@@ -22,7 +22,6 @@
   },
   "files": [
     "dist",
-    "templates",
     "*.d.ts",
     "*.d.cts",
     "!/**/**.test.**",
@@ -64,8 +63,7 @@
       "import": "./dist/templates.js",
       "require": "./dist/templates.cjs"
     },
-    "./package.json": "./package.json",
-    "./templates/*": "./templates/*"
+    "./package.json": "./package.json"
   },
   "publishConfig": {
     "access": "public",
@@ -84,8 +82,11 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
+    "@internals/client": "workspace:*",
     "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:",
+    "@kubb/plugin-axios": "workspace:*",
+    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"

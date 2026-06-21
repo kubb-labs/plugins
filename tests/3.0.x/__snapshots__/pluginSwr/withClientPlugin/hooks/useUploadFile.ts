@@ -4,8 +4,8 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { UploadFileRequestConfig, UploadFileData, UploadFileResponse } from '../types/UploadFile.ts'
-import type { Client, RequestConfig, ResponseErrorConfig } from '@kubb/plugin-client/clients/axios'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileResponse } from '../types/UploadFile.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../clients/uploadFile.ts'
 
@@ -21,7 +21,7 @@ export type UploadFileMutationArg = UploadFileRequestConfig
  */
 export function useUploadFile(options: {
   mutation?: SWRMutationConfiguration<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
-  client?: Partial<RequestConfig<UploadFileData>> & { client?: Client },
+  client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
@@ -30,7 +30,8 @@ export function useUploadFile(options: {
   return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body } }) => {
-      return uploadFile({ path, query, body }, config)
+      const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
+      return data
     },
     mutationOptions
   )

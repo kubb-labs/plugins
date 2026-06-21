@@ -25,14 +25,6 @@ export type ResolverCypress = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * Shape of the value returned from each helper.
-   * - `'data'` — only the response body.
-   * - `'full'` — the full Cypress response object (headers, status, body).
-   *
-   * @default 'data'
-   */
-  dataReturnType?: 'data' | 'full'
-  /**
    * Base URL prepended to every request URL. When omitted, falls back to the
    * adapter's server URL (typically `servers[0].url`).
    */
@@ -66,7 +58,6 @@ type ResolvedOptions = {
   override: Array<Override<ResolvedOptions>>
   group: Group | null
   baseURL: Options['baseURL'] | undefined
-  dataReturnType: NonNullable<Options['dataReturnType']>
   resolver: ResolverCypress
 }
 
