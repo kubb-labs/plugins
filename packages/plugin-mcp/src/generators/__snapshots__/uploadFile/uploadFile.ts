@@ -1,16 +1,18 @@
-import type { ShowPetByIdPathPetId } from './ShowPetById'
+import type { UploadFileData, UploadFilePathPetId } from './UploadFile'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { client } from './.kubb/client'
 
 /**
- * {@link /pets/:petId}
+ * {@link /pets/:petId/upload}
  */
-export async function showPetByIdHandler(
-  { petId }: { petId: ShowPetByIdPathPetId },
+export async function uploadFileHandler(
+  { petId, data }: { petId: UploadFilePathPetId; data?: UploadFileData },
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await client({ method: 'GET', url: `/pets/${petId}` })
+  const requestBody = data
+
+  const res = await client({ method: 'POST', url: `/pets/${petId}/upload`, body: requestBody, contentType: 'multipart/form-data' })
 
   return {
     content: [

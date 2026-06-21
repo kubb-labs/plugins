@@ -30,7 +30,6 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
   client: {
     client: 'axios',
     baseURL: '',
-    dataReturnType: 'data',
   },
   group: null,
   resolver: resolverMcp,

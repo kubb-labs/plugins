@@ -1,8 +1,7 @@
-import client from '../../client.js'
-import type { ResponseErrorConfig } from '../../client.js'
-import type { AddFilesData, AddFilesResponse, AddFilesStatus405 } from '../models/ts/AddFiles.js'
+import type { AddFilesData } from '../models/ts/AddFiles.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
+import { client } from '../.kubb/client.js'
 
 /**
  * @description Place a new file in the store
@@ -15,10 +14,7 @@ export async function addFilesHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<AddFilesResponse, ResponseErrorConfig<AddFilesStatus405>, AddFilesData>(
-    { method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody },
-    request,
-  )
+  const res = await client({ method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody })
 
   return {
     content: [

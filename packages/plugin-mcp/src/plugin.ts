@@ -3,7 +3,7 @@ import { createGroupConfig } from '@internals/shared'
 
 import { ast, definePlugin } from '@kubb/core'
 import { pluginClientName } from '@kubb/plugin-client'
-import { axiosClientTemplatePath, configTemplatePath, fetchClientTemplatePath } from '@kubb/plugin-client/templates'
+import { contractAxiosClientTemplatePath, contractFetchClientTemplatePath } from '@kubb/plugin-client/templates'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
@@ -80,7 +80,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
             client: clientName,
             clientType: client?.clientType ?? 'function',
             importPath: clientImportPath,
-            dataReturnType: client?.dataReturnType ?? 'data',
             baseURL: client?.baseURL,
           },
           resolver,
@@ -95,33 +94,21 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
         const hasClientPlugin = ctx.config.plugins?.some((p) => p.name === pluginClientName)
 
+        // Without a registered client plugin or an `importPath`, bundle the shared `RequestResult`
+        // contract runtime as `.kubb/client.ts` — the same template plugin-fetch and plugin-axios
+        // inject. The contract serializes form-data in its own runtime, so no separate `config.ts`
+        // is needed.
         if (!hasClientPlugin && !clientImportPath) {
           ctx.injectFile({
             baseName: 'client.ts',
             path: path.resolve(root, '.kubb/client.ts'),
-            copy: clientName === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
+            copy: clientName === 'fetch' ? contractFetchClientTemplatePath : contractAxiosClientTemplatePath,
             sources: [
               ast.factory.createSource({
                 name: 'client',
                 nodes: [],
                 isExportable: true,
                 isIndexable: true,
-              }),
-            ],
-          })
-        }
-
-        if (!hasClientPlugin) {
-          ctx.injectFile({
-            baseName: 'config.ts',
-            path: path.resolve(root, '.kubb/config.ts'),
-            copy: configTemplatePath,
-            sources: [
-              ast.factory.createSource({
-                name: 'config',
-                nodes: [],
-                isExportable: false,
-                isIndexable: false,
               }),
             ],
           })

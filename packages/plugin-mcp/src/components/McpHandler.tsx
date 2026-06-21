@@ -6,7 +6,6 @@ import type { ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
-import type { PluginMcp } from '../types.ts'
 
 type Props = {
   /**
@@ -25,13 +24,6 @@ type Props = {
    * Base URL prepended to every generated request URL.
    */
   baseURL: string | null | undefined
-  /**
-   * Return type when calling fetch.
-   * - 'data' returns response data only.
-   * - 'full' returns the full response object.
-   * @default 'data'
-   */
-  dataReturnType: PluginMcp['resolvedOptions']['client']['dataReturnType']
 }
 
 /**
@@ -46,22 +38,14 @@ function buildRemappingCode(mapping: Record<string, string>, varName: string, so
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Props): KubbReactNode {
+export function McpHandler({ name, node, resolver, baseURL }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
   const contentType = node.requestBody?.content?.[0]?.contentType
-  const isFormData = contentType === 'multipart/form-data'
 
   const { query: queryParams, header: headerParams } = getOperationParameters(node)
   const { query: originalQueryParams, header: originalHeaderParams } = getOperationParameters(node, { paramsCasing: 'original' })
 
   const requestName = node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null
-  const responseName = resolver.resolveResponseName(node)
-
-  const errorResponses = node.responses.filter((r) => Number(r.statusCode) >= 400).map((r) => resolver.resolveResponseStatusName(node, r.statusCode))
-  const errorType = errorResponses.length > 0 ? errorResponses.join(' | ') : 'Error'
-
-  const TError = `ResponseErrorConfig<${errorType}>`
-  const generics = [responseName, TError, requestName || 'unknown'].filter(Boolean)
 
   const paramsNode = createOperationParams(node, {
     paramsType: 'object',
@@ -77,24 +61,25 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Pr
   const queryParamsMapping = buildTransformedParamsMapping(originalQueryParams, camelCase)
   const headerParamsMapping = buildTransformedParamsMapping(originalHeaderParams, camelCase)
 
-  const contentTypeHeader =
-    contentType && contentType !== 'application/json' && contentType !== 'multipart/form-data' ? `'Content-Type': '${contentType}'` : null
-  const headers = [headerParams.length ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : null, contentTypeHeader].filter(Boolean)
+  const headers = [headerParams.length ? (headerParamsMapping ? '...mappedHeaders' : '...headers') : null].filter(Boolean)
 
   const fetchConfig: Array<string> = []
   fetchConfig.push(`method: ${JSON.stringify(node.method.toUpperCase())}`)
   fetchConfig.push(`url: ${Url.toTemplateString(node.path, { casing: 'camelcase' })}`)
   if (baseURL) fetchConfig.push(`baseURL: \`${baseURL}\``)
   if (queryParams.length) fetchConfig.push(queryParamsMapping ? 'query: mappedParams' : 'query: params')
-  if (requestName) fetchConfig.push(`body: ${isFormData ? 'formData as FormData' : 'requestBody'}`)
+  if (requestName) fetchConfig.push('body: requestBody')
+  // A non-JSON content type is forwarded on the request config; the contract runtime sets the
+  // matching `Content-Type` header and serializes the body (URLSearchParams for form-urlencoded,
+  // and the multipart boundary is left to the transport).
+  if (requestName && contentType && contentType !== 'application/json') fetchConfig.push(`contentType: '${contentType}'`)
   if (headers.length) fetchConfig.push(`headers: { ${headers.join(', ')} }`)
 
-  const payload = dataReturnType === 'data' ? 'res.data' : 'res'
   const callToolResult = `return {
   content: [
     {
       type: 'text',
-      text: JSON.stringify(${payload})
+      text: JSON.stringify(res.data)
     }
   ],
   structuredContent: { data: res.data }
@@ -131,9 +116,7 @@ export function McpHandler({ name, node, resolver, baseURL, dataReturnType }: Pr
         )}
         {requestName && 'const requestBody = data'}
         <br />
-        {isFormData && requestName && 'const formData = buildFormData(requestBody)'}
-        <br />
-        {`const res = await client<${generics.join(', ')}>({ ${fetchConfig.join(', ')} }, request)`}
+        {`const res = await client({ ${fetchConfig.join(', ')} })`}
         <br />
         {callToolResult}
       </Function>

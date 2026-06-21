@@ -372,6 +372,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
+      '@kubb/plugin-client':
+        specifier: workspace:*
+        version: link:../../packages/plugin-client
       '@kubb/plugin-mcp':
         specifier: workspace:*
         version: link:../../packages/plugin-mcp

@@ -1,5 +1,4 @@
-import type { ResponseErrorConfig } from './.kubb/client'
-import type { CreatePetsData, CreatePetsResponse } from './CreatePets'
+import type { CreatePetsData } from './CreatePets'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { client } from './.kubb/client'
@@ -13,7 +12,7 @@ export async function createPetsHandler(
 ): Promise<Promise<CallToolResult>> {
   const requestBody = data
 
-  const res = await client<CreatePetsResponse, ResponseErrorConfig<Error>, CreatePetsData>({ method: 'POST', url: `/pets`, body: requestBody }, request)
+  const res = await client({ method: 'POST', url: `/pets`, body: requestBody })
 
   return {
     content: [

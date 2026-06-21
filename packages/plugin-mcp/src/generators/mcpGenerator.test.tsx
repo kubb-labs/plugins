@@ -30,7 +30,6 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
   client: {
     client: 'axios',
     baseURL: '',
-    dataReturnType: 'data',
   },
   group: null,
   resolver: resolverMcp,
@@ -113,6 +112,23 @@ describe('mcpGenerator — Operation', () => {
         },
         responses: [
           ast.factory.createResponse({ statusCode: '201', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Null response' }),
+        ],
+      }),
+    },
+    {
+      name: 'uploadFile',
+      node: ast.factory.createOperation({
+        operationId: 'uploadFile',
+        method: 'POST',
+        path: '/pets/{petId}/upload',
+        tags: ['pets'],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        requestBody: {
+          description: 'File to upload',
+          content: [ast.factory.createContent({ contentType: 'multipart/form-data', schema: ast.factory.createSchema({ type: 'object', properties: [] }) })],
+        },
+        responses: [
+          ast.factory.createResponse({ statusCode: '200', schema: ast.factory.createSchema({ type: 'object', properties: [] }), description: 'Uploaded' }),
         ],
       }),
     },
