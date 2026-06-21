@@ -40,6 +40,14 @@ export type ResultUnion<TResponses, TRequest, TResponse> = {
 }[keyof TResponses]
 
 /**
+ * The union of just the success (2xx) status variants. Selected by status code, not by `error`, so an
+ * untyped (`any`) error payload can never widen a success result's `data`.
+ */
+export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
+  [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
+}[Extract<keyof TResponses, SuccessStatusCode>]
+
+/**
  * The shape every generated function returns, discriminated by the top-level `status`. With
  * `throwOnError` (the default) a resolved call always means success, so the result is the union of the
  * 2xx variants and `error` is `undefined`; without it every documented status is a variant, so a
@@ -47,9 +55,9 @@ export type ResultUnion<TResponses, TRequest, TResponse> = {
  * payload. Operations with no typed responses fall back to a `status`/`request`/`response`-only result.
  */
 export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> = ThrowOnError extends true
-  ? [Extract<ResultUnion<TResponses, TRequest, TResponse>, { error: undefined }>] extends [never]
-    ? { status: number; data: undefined; error: undefined; request: TRequest; response: TResponse }
-    : Extract<ResultUnion<TResponses, TRequest, TResponse>, { error: undefined }>
+  ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
+    ? { status: number; data: SuccessOf<TResponses>; error: undefined; request: TRequest; response: TResponse }
+    : SuccessResultUnion<TResponses, TRequest, TResponse>
   : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
     ? { status: number; data: undefined; error: undefined; request: TRequest; response: TResponse }
     : ResultUnion<TResponses, TRequest, TResponse>
