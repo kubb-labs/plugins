@@ -1,7 +1,7 @@
 import { jsStringEscape } from '@kubb/ast/utils'
-import { ast } from '@kubb/core'
+import type { ast } from '@kubb/core'
 import { containsCircularRef } from '@kubb/ast/utils'
-import { functionPrinter } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PrinterFakerFactory } from '../printers/printerFaker.ts'
@@ -58,9 +58,9 @@ export function Faker({ node, description, name, typeName, printer, seed, canOve
   if (!useGenericOverride) {
     const usesData = /\bdata\b/.test(fakerTextWithOverride)
     const dataParamName = usesData ? 'data' : '_data'
-    const params = ast.factory.createFunctionParameters({
+    const params = createFunctionParameters({
       params: [
-        ast.factory.createFunctionParameter({
+        createFunctionParameter({
           name: dataParamName,
           type: dataType,
           optional: true,

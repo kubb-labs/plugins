@@ -1,5 +1,5 @@
-import { ast } from '@kubb/core'
-import { functionPrinter, type ResolverTs } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import { createFunctionParameter, createFunctionParameters, functionPrinter, type ResolverTs } from '@kubb/plugin-ts'
 import { buildRequestResultGenerics } from './generics.ts'
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
@@ -46,8 +46,8 @@ export function buildGroupedOptionsSignature({ node, tsResolver }: { node: ast.O
 
   const paramsSignature =
     declarationPrinter.print(
-      ast.factory.createFunctionParameters({
-        params: [ast.factory.createFunctionParameter({ name: 'options', type: `Options<${requestConfigName}, ThrowOnError>` })],
+      createFunctionParameters({
+        params: [createFunctionParameter({ name: 'options', type: `Options<${requestConfigName}, ThrowOnError>` })],
       }),
     ) ?? ''
 

@@ -31,6 +31,7 @@ export {
   type ContentVariantInput,
   type OperationCommentLink,
   type OperationParameterGroups,
+  type OperationParamsResolver,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
   type RequestConfigNameResolver,
@@ -42,4 +43,4 @@ export {
   type ResolveOperationTypeNameOptions,
 } from './operation.ts'
 export { createGroupConfig } from './group.ts'
-export { buildParamsMapping, buildTransformedParamsMapping } from './params.ts'
+export { buildParamsMapping, buildTransformedParamsMapping, caseParams } from './params.ts'

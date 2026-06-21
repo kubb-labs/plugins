@@ -1,6 +1,5 @@
-import { resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, resolveContentTypeVariants } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
-import { caseParams } from '@kubb/ast/utils'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
 import { ENUM_TYPES_WITH_KEY_SUFFIX } from '../constants.ts'

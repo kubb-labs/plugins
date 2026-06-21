@@ -1,5 +1,5 @@
 import type { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
 import { functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
@@ -16,7 +16,7 @@ type Props = {
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 const callPrinter = functionPrinter({ mode: 'call' })
 
-export function getQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs; slim?: boolean }): ast.FunctionParametersNode {
+export function getQueryOptionsParams(node: ast.OperationNode, options: { resolver: ResolverTs; slim?: boolean }): FunctionParametersNode {
   return buildQueryOptionsParams(node, options)
 }
 

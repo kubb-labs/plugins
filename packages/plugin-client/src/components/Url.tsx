@@ -1,8 +1,8 @@
 import { getOperationParameters } from '@internals/shared'
 import { Url as UrlHelper } from '@internals/utils'
 import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { Const, File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 
@@ -23,15 +23,15 @@ type GetParamsProps = {
 
 const declarationPrinter = functionPrinter({ mode: 'declaration' })
 
-function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): ast.FunctionParametersNode {
+function buildUrlParamsNode({ node, tsResolver }: GetParamsProps): FunctionParametersNode {
   const { path: pathParams } = getOperationParameters(node, { paramsCasing: 'original' })
 
   if (pathParams.length === 0) {
-    return ast.factory.createFunctionParameters({ params: [] })
+    return createFunctionParameters({ params: [] })
   }
 
-  return ast.factory.createFunctionParameters({
-    params: [ast.factory.createFunctionParameter({ name: 'path', type: `${tsResolver.resolveRequestConfigName(node)}['path']` })],
+  return createFunctionParameters({
+    params: [createFunctionParameter({ name: 'path', type: `${tsResolver.resolveRequestConfigName(node)}['path']` })],
   })
 }
 

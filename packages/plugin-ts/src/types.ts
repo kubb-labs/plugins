@@ -1,3 +1,4 @@
+import type { OperationParamsResolver } from '@internals/shared'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterTsNodes } from './printers/printerTs.ts'
 /**
@@ -6,7 +7,7 @@ import type { PrinterTsNodes } from './printers/printerTs.ts'
  * plugin-specific naming helpers for operations, parameters, responses, and schemas.
  */
 export type ResolverTs = Resolver &
-  ast.OperationParamsResolver & {
+  OperationParamsResolver & {
     /**
      * Resolves the name for a given raw name (equivalent to `default(name, 'function')`).
      * Since TypeScript only emits types, this is the canonical naming method.

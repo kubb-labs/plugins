@@ -1,6 +1,6 @@
-import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import type { FunctionParameterNode, FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PluginReactQuery } from '../types.ts'
@@ -30,7 +30,7 @@ function buildQueryParamsNode(
     resolver: ResolverTs
     slim?: boolean
   },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { dataReturnType, resolver, slim } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
@@ -39,7 +39,7 @@ function buildQueryParamsNode(
   const TData = dataReturnType === 'data' ? responseName : buildStatusUnionType(node, resolver)
   const TError = `ResponseErrorConfig<${errorNames.length > 0 ? errorNames.join(' | ') : 'Error'}>`
 
-  const optionsParam = ast.factory.createFunctionParameter({
+  const optionsParam = createFunctionParameter({
     name: 'options',
     type: `{
   query?: Partial<QueryObserverOptions<${[TData, TError, 'TData', 'TQueryData', 'TQueryKey'].join(', ')}>> & { client?: QueryClient },
@@ -50,7 +50,7 @@ function buildQueryParamsNode(
 
   const groupedParam = buildGroupedRequestParam(node, { resolver })
 
-  return ast.factory.createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is ast.FunctionParameterNode => param !== null) })
+  return createFunctionParameters({ params: [groupedParam, optionsParam].filter((param): param is FunctionParameterNode => param !== null) })
 }
 
 export function Query({

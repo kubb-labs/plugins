@@ -1,6 +1,6 @@
-import { ast } from '@kubb/core'
-import type { ResolverTs } from '@kubb/plugin-ts'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import type { FunctionParametersNode, ResolverTs } from '@kubb/plugin-ts'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildGroupedRequestParam, buildSlimClientCall } from '@internals/tanstack-query'
@@ -33,7 +33,7 @@ function buildMutationParamsNode(
     resolver: ResolverTs
     slim?: boolean
   },
-): ast.FunctionParametersNode {
+): FunctionParametersNode {
   const { dataReturnType, resolver, slim } = options
   const successNames = resolveSuccessNames(node, resolver)
   const responseName = successNames.length > 0 ? successNames.join(' | ') : resolver.resolveResponseName(node)
@@ -44,9 +44,9 @@ function buildMutationParamsNode(
 
   const TRequest = resolveMutationRequestType(node, resolver)
 
-  return ast.factory.createFunctionParameters({
+  return createFunctionParameters({
     params: [
-      ast.factory.createFunctionParameter({
+      createFunctionParameter({
         name: 'options',
         type: `{
   mutation?: MutationObserverOptions<${[TData, TError, TRequest, 'TContext'].join(', ')}> & { client?: QueryClient },
@@ -68,7 +68,7 @@ export function Mutation({ name, clientName, dataReturnType, node, tsResolver, m
 
   const groupedParam = buildGroupedRequestParam(node, { resolver: tsResolver })
   const hasMutationParams = groupedParam !== null
-  const groupedParamsNode = ast.factory.createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
+  const groupedParamsNode = createFunctionParameters({ params: groupedParam ? [groupedParam] : [] })
   const argBindingStr = hasMutationParams ? (callPrinter.print(groupedParamsNode) ?? '') : ''
   const clientCallStr = [hasMutationParams ? argBindingStr : null, 'config'].filter(Boolean).join(', ')
   const mutationFnBody = slim
@@ -79,7 +79,7 @@ export function Mutation({ name, clientName, dataReturnType, node, tsResolver, m
   const TRequest = resolveMutationRequestType(node, tsResolver)
   const generics = [TData, TError, TRequest, 'TContext'].join(', ')
 
-  const mutationKeyParamsNode = ast.factory.createFunctionParameters({ params: [] })
+  const mutationKeyParamsNode = createFunctionParameters({ params: [] })
   const mutationKeyParamsCall = callPrinter.print(mutationKeyParamsNode) ?? ''
 
   const paramsNode = buildMutationParamsNode(node, { dataReturnType, resolver: tsResolver, slim })

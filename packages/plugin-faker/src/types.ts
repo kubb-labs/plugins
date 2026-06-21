@@ -1,3 +1,4 @@
+import type { OperationParamsResolver } from '@internals/shared'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
 import type { PrinterFakerNodes } from './printers/printerFaker.ts'
 
@@ -5,7 +6,7 @@ import type { PrinterFakerNodes } from './printers/printerFaker.ts'
  * Resolver for Faker that provides naming methods for mock functions.
  */
 export type ResolverFaker = Resolver &
-  ast.OperationParamsResolver & {
+  OperationParamsResolver & {
     /**
      * Resolves the faker function name for a schema.
      *

@@ -1,7 +1,7 @@
 import { getPrimarySuccessResponse } from '@internals/shared'
 import { Url } from '@internals/utils'
-import { ast } from '@kubb/core'
-import { functionPrinter } from '@kubb/plugin-ts'
+import type { ast } from '@kubb/core'
+import { createFunctionParameter, createFunctionParameters, functionPrinter } from '@kubb/plugin-ts'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { getContentType, getMswMethod, getMswUrl } from '../utils.ts'
@@ -31,9 +31,9 @@ export function MockWithFaker({ baseURL = '', name, fakerName, typeName, request
     : `((info: Parameters<Parameters<typeof http.${method}>[1]>[0]) => Response | Promise<Response>)`
 
   const params = declarationPrinter.print(
-    ast.factory.createFunctionParameters({
+    createFunctionParameters({
       params: [
-        ast.factory.createFunctionParameter({
+        createFunctionParameter({
           name: 'data',
           type: `${typeName} | ${callbackType}`,
           optional: true,
