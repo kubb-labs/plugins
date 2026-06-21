@@ -4,7 +4,5 @@ export {
   buildOperationComments as getComments,
   buildRequestConfigType,
   buildStatusUnionType,
-  getContentTypeInfo,
   resolveErrorNames,
-  resolveStatusCodeNames,
 } from '@internals/shared'
