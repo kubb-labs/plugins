@@ -15,13 +15,49 @@ export type SuccessOf<TResponses> = TResponses[Extract<keyof TResponses, Success
 export type ErrorOf<TResponses> = TResponses[Exclude<keyof TResponses, SuccessStatusCode>]
 
 /**
- * The single shape every generated function returns. With `throwOnError` (the default) a resolved
- * call always means success, so `data` is defined and `error` is `undefined`. Without it the result
- * is discriminated by `error`, so narrowing on `error` narrows `data`.
+ * Converts a response record's string status key to its numeric literal (`'200'` becomes `200`).
+ * Non-numeric keys such as the OpenAPI `default` response stay `number`.
+ */
+export type ToStatusNumber<TStatus> = TStatus extends `${infer TNumber extends number}` ? TNumber : number
+
+/**
+ * One result variant for a single documented status. `status` is the numeric literal at the top
+ * level, so a `switch (result.status)` narrows `data` (a 2xx status) or `error` (everything else) to
+ * that status's payload.
+ */
+export type ResultByStatus<TResponses, TStatus extends keyof TResponses, TRequest, TResponse> = TStatus extends SuccessStatusCode
+  ? { status: ToStatusNumber<TStatus>; data: TResponses[TStatus]; error: undefined; request: TRequest; response: TResponse }
+  : { status: ToStatusNumber<TStatus>; data: undefined; error: TResponses[TStatus]; request: TRequest; response: TResponse }
+
+/**
+ * The union of every documented status' result variant.
+ */
+export type ResultUnion<TResponses, TRequest, TResponse> = {
+  [TStatus in keyof TResponses]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
+}[keyof TResponses]
+
+/**
+ * The union of just the success (2xx) status variants. Selected by status code, not by `error`, so an
+ * untyped (`any`) error payload can never widen a success result's `data`.
+ */
+export type SuccessResultUnion<TResponses, TRequest, TResponse> = {
+  [TStatus in Extract<keyof TResponses, SuccessStatusCode>]: ResultByStatus<TResponses, TStatus, TRequest, TResponse>
+}[Extract<keyof TResponses, SuccessStatusCode>]
+
+/**
+ * The shape every generated function returns, discriminated by the top-level `status`. With
+ * `throwOnError` (the default) a resolved call always means success, so the result is the union of the
+ * 2xx variants and `error` is `undefined`; without it every documented status is a variant, so a
+ * `switch (result.status)` (or narrowing on `error`) narrows `data` and `error` to that status's
+ * payload. Operations with no typed responses fall back to a `status`/`request`/`response`-only result.
  */
 export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequest = Request, TResponse = Response> = ThrowOnError extends true
-  ? { data: SuccessOf<TResponses>; error: undefined; request: TRequest; response: TResponse }
-  : ({ data: SuccessOf<TResponses>; error: undefined } | { data: undefined; error: ErrorOf<TResponses> }) & { request: TRequest; response: TResponse }
+  ? [SuccessResultUnion<TResponses, TRequest, TResponse>] extends [never]
+    ? { status: number; data: SuccessOf<TResponses>; error: undefined; request: TRequest; response: TResponse }
+    : SuccessResultUnion<TResponses, TRequest, TResponse>
+  : [ResultUnion<TResponses, TRequest, TResponse>] extends [never]
+    ? { status: number; data: undefined; error: undefined; request: TRequest; response: TResponse }
+    : ResultUnion<TResponses, TRequest, TResponse>
 
 /**
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
@@ -167,6 +203,7 @@ export type Transport<TRequest = Request, TResponse = Response> = (request: Reso
  * The result a resolved call produces before it is cast to `RequestResult` by the generated wrapper.
  */
 export type CallResult<TRequest = Request, TResponse = Response> = {
+  status: number
   data: unknown
   error: unknown
   request: TRequest
@@ -449,6 +486,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
 
     return {
+      status: result.status,
       data,
       error: isSuccess ? undefined : result.data,
       request: result.request,
