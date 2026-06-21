@@ -3,24 +3,13 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses, PlaceOrderResponse } from '../types/PlaceOrder.ts'
-import { client } from '../.kubb/client.ts'
+import type { RequestConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig } from '../types/PlaceOrder.ts'
+import { placeOrder } from '../clients/placeOrder.ts'
 
 export const placeOrderQueryKey = ({ body }: Omit<PlaceOrderRequestConfig, 'headers'>) => [{ url: '/store/order' }, ...(body ? [body] : [])] as const
 
 type PlaceOrderQueryKey = ReturnType<typeof placeOrderQueryKey>
-
-/**
- * @description Place a new order in the store
- * @summary Place an order for a pet
- * {@link /store/order}
- */
-export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/store/order', ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
-}
 
 export function placeOrderQueryOptions({ body }: PlaceOrderRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {

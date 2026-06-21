@@ -1,19 +1,7 @@
-import type { Options, RequestResult } from './.kubb/client'
-import type { GetPetsRequestConfig, GetPetsResponses } from './GetPets'
+import type { GetPetsRequestConfig } from './GetPets'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from './.kubb/client'
-
-/**
- * {@link /pets}
- */
-export function getPets<ThrowOnError extends boolean = true>(
-  options: Options<GetPetsRequestConfig, ThrowOnError>,
-): Promise<RequestResult<GetPetsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pets', ...config }) as Promise<RequestResult<GetPetsResponses, ThrowOnError>>
-}
+import { getPets } from './clients/getPets'
 
 /**
  * {@link /pets}

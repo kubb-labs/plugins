@@ -3,25 +3,14 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponses, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { client } from '../../.kubb/client.ts'
+import { deletePet } from '../../clients/deletePet.ts'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:petId}
- */
-export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
-}
 
 /**
  * @description delete a pet

@@ -1,5 +1,3 @@
-import path from 'node:path'
-import { Operation } from '@internals/client'
 import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
@@ -40,11 +38,14 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
+    // The registered contract client plugin owns the `<op>` the hook imports and calls.
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
+    if (!contractOp) return null
+
     const queryName = resolver.resolveQueryName(node)
     const queryOptionsName = resolver.resolveQueryOptionsName(node)
     const queryKeyName = resolver.resolveQueryKeyName(node)
     const queryKeyTypeName = resolver.resolveQueryKeyTypeName(node)
-    const clientName = resolver.resolveClientName(node)
 
     const meta = {
       file: resolver.resolveFile(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
@@ -55,10 +56,8 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
       }),
     }
 
-    // The inline contract client references the plugin-ts `<Name>Responses` aggregate (the others do not).
     const importedTypeNames = [
       tsResolver.resolveRequestConfigName(node),
-      client.kind === 'contract-inline' ? tsResolver.resolveResponsesName(node) : null,
       ...resolveOperationTypeNames(node, tsResolver, {
         exclude: [queryKeyTypeName],
         order: 'body-response-first',
@@ -77,12 +76,7 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
       : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
 
-    // A registered contract client plugin owns the `<op>`; contract-inline renders its own client
-    // into this file.
-    const contractOp =
-      client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const clientPath = path.resolve(root, '.kubb/client.ts')
-    const calledClientName = contractOp ? contractOp.name : clientName
+    const calledClientName = contractOp.name
 
     return (
       <File
@@ -94,20 +88,8 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
 
-        {contractOp && (
-          <>
-            <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
-          </>
-        )}
-
-        {client.kind === 'contract-inline' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-          </>
-        )}
+        <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+        <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (
@@ -115,8 +97,6 @@ export const queryGenerator = defineGenerator<PluginReactQuery>({
         )}
 
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
-
-        {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
         <File.Import name={['queryOptions']} path={importPath} />
 

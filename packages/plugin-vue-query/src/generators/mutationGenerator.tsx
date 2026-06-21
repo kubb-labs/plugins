@@ -1,5 +1,3 @@
-import path from 'node:path'
-import { Operation } from '@internals/client'
 import { getRequestGroups, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
@@ -39,10 +37,13 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
 
     const importPath = mutation ? mutation.importPath : '@tanstack/vue-query'
 
+    // The registered contract client plugin owns the `<op>` the composable imports and calls.
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
+    if (!contractOp) return null
+
     const mutationHookName = resolver.resolveMutationName(node)
     const mutationTypeName = resolver.resolveMutationTypeName(node)
     const mutationKeyName = resolver.resolveMutationKeyName(node)
-    const clientName = resolver.resolveClientName(node)
 
     const meta = {
       file: resolver.resolveFile(operationFileEntry(node, mutationHookName), { root, output, group: group ?? undefined }),
@@ -53,10 +54,8 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
       }),
     }
 
-    // The inline contract client references the plugin-ts `<Name>Responses` aggregate (the others do not).
     const importedTypeNames = [
       tsResolver.resolveRequestConfigName(node),
-      client.kind === 'contract-inline' ? tsResolver.resolveResponsesName(node) : null,
       ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
     ].filter((name): name is string => Boolean(name))
 
@@ -71,10 +70,7 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
       : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
 
-    const contractOp =
-      client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const clientPath = path.resolve(root, '.kubb/client.ts')
-    const calledClientName = contractOp ? contractOp.name : clientName
+    const calledClientName = contractOp.name
 
     // The contract body unwraps each request group with `toValue()`, so it needs the runtime import.
     const groups = getRequestGroups(node)
@@ -90,20 +86,8 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
 
-        {contractOp && (
-          <>
-            <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
-          </>
-        )}
-
-        {client.kind === 'contract-inline' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-          </>
-        )}
+        <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+        <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 
         {hasRequestGroups && <File.Import name={['toValue']} path="vue" />}
         <File.Import name={['MaybeRefOrGetter']} path="vue" isTypeOnly />
@@ -113,8 +97,6 @@ export const mutationGenerator = defineGenerator<PluginVueQuery>({
         )}
 
         <MutationKey name={mutationKeyName} node={node} transformer={ctx.options.mutationKey} />
-
-        {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
         {mutation && (
           <>

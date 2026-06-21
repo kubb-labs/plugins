@@ -3,24 +3,13 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponses, DeletePetResponse } from '../types/DeletePet.ts'
-import { client } from '../.kubb/client.ts'
+import type { RequestConfig } from '../.kubb/client.ts'
+import type { DeletePetRequestConfig } from '../types/DeletePet.ts'
+import { deletePet } from '../clients/deletePet.ts'
 
 export const deletePetQueryKey = ({ path }: Omit<DeletePetRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type DeletePetQueryKey = ReturnType<typeof deletePetQueryKey>
-
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:petId}
- */
-export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
-}
 
 export function deletePetQueryOptions({ path, headers }: DeletePetRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {

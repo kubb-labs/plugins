@@ -3,25 +3,13 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses, PlaceOrderResponse, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderStatus200, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { client } from '../.kubb/client.ts'
-import { placeOrderResponseSchema } from '../zod/placeOrderSchema.ts'
+import { placeOrder } from '../clients/placeOrder.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
-
-/**
- * @description Place a new order in the store
- * @summary Place an order for a pet
- * {@link /store/order}
- */
-export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/store/order', parser: { response: (data: unknown) => placeOrderResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
-}
 
 export function placeOrderMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: "application/json" | "application/xml" | "application/x-www-form-urlencoded" } = {}) {
   const mutationKey = placeOrderMutationKey()

@@ -3,24 +3,14 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileStatus200 } from '../types/UploadFile.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { client } from '../.kubb/client.ts'
+import { uploadFile } from '../clients/uploadFile.ts'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
-
-/**
- * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
- */
-export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
-}
 
 /**
  * @summary uploads an image

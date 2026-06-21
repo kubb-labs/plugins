@@ -1,10 +1,7 @@
-import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 
 import { resolveClient } from '@internals/client'
-import { ast, definePlugin } from '@kubb/core'
-import { axiosClientTemplatePath } from '@kubb/plugin-axios'
-import { fetchClientTemplatePath } from '@kubb/plugin-fetch'
+import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mcpGenerator } from './generators/mcpGenerator.tsx'
@@ -22,8 +19,7 @@ export const pluginMcpName = 'plugin-mcp' satisfies PluginMcp['name']
  * Generates a Model Context Protocol (MCP) server from an OpenAPI spec. Every
  * operation becomes a typed MCP tool that AI assistants (Claude Desktop, Claude
  * Code, MCP-compatible clients) can call directly. Each handler calls a contract
- * client `<op>` from `@kubb/plugin-axios` / `@kubb/plugin-fetch`, or emits its own
- * inline contract client when none is registered.
+ * client `<op>` from a registered `@kubb/plugin-axios` or `@kubb/plugin-fetch`.
  *
  * @example
  * ```ts
@@ -54,7 +50,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
     include,
     override = [],
     client,
-    baseURL,
     resolver: userResolver,
     macros: userMacros,
   } = options
@@ -75,10 +70,9 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           throw new Error(resolvedClient.message)
         }
 
-        // `contract` calls a registered plugin's op; `contract-inline` bundles its own runtime,
-        // defaulting to axios (the historical default) since no client plugin is in play.
-        const resolvedClientDescriptor: PluginMcp['resolvedOptions']['client'] =
-          resolvedClient.kind === 'contract' ? { kind: 'contract', pluginName: resolvedClient.pluginName } : { kind: 'contract-inline', client: 'axios' }
+        // The handlers always call a registered client plugin's op; the client runtime lives in
+        // plugin-axios / plugin-fetch, so nothing is bundled here.
+        const resolvedClientDescriptor: PluginMcp['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
 
         ctx.setOptions({
           output,
@@ -87,7 +81,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
           override,
           group: groupConfig,
           client: resolvedClientDescriptor,
-          baseURL,
           resolver,
         })
         ctx.setResolver(resolver)
@@ -96,28 +89,6 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
         }
         ctx.addGenerator(mcpGenerator)
         ctx.addGenerator(serverGenerator)
-
-        const root = path.resolve(ctx.config.root, ctx.config.output.path)
-
-        // `contract-inline` bundles the shared `RequestResult` contract runtime, identical to what
-        // plugin-fetch / plugin-axios inject, so the inline op serializes form-data in its own
-        // runtime and needs no `config.ts`.
-        if (resolvedClientDescriptor.kind === 'contract-inline') {
-          ctx.injectFile({
-            baseName: 'client.ts',
-            path: path.resolve(root, '.kubb/client.ts'),
-            copy: resolvedClientDescriptor.client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
-            footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
-            sources: [
-              ast.factory.createSource({
-                name: 'client',
-                nodes: [],
-                isExportable: true,
-                isIndexable: true,
-              }),
-            ],
-          })
-        }
       },
     },
   }

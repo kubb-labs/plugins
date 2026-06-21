@@ -3,26 +3,14 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponses, AddPetResponse, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { AddPetRequestConfig, AddPetStatus200, AddPetStatus405 } from '../types/AddPet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { client } from '../.kubb/client.ts'
-import { addPetResponseSchema } from '../zod/addPetSchema.ts'
+import { addPet } from '../clients/addPet.ts'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const addPetMutationKey = () => [{ url: '/pet' }] as const
-
-/**
- * @description Add a new pet to the store
- * @summary Add a new pet to the store
- * {@link /pet}
- */
-export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet', parser: { response: (data: unknown) => addPetResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
-}
 
 /**
  * @description Add a new pet to the store

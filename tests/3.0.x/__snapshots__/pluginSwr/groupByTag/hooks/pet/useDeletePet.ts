@@ -4,25 +4,14 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { DeletePetRequestConfig, DeletePetResponses, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { DeletePetRequestConfig, DeletePetResponse, DeletePetStatus400 } from '../../types/DeletePet.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { client } from '../../.kubb/client.ts'
+import { deletePet } from '../../clients/deletePet.ts'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type DeletePetMutationKey = ReturnType<typeof deletePetMutationKey>
-
-/**
- * @description delete a pet
- * @summary Deletes a pet
- * {@link /pet/:petId}
- */
-export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
-}
 
 export type DeletePetMutationArg = DeletePetRequestConfig
 

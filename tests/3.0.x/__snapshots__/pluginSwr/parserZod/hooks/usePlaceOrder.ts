@@ -4,26 +4,14 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderResponses, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderResponse, PlaceOrderStatus405 } from '../types/PlaceOrder.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { client } from '../.kubb/client.ts'
-import { placeOrderResponseSchema } from '../zod/placeOrderSchema.ts'
+import { placeOrder } from '../clients/placeOrder.ts'
 
 export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
 
 export type PlaceOrderMutationKey = ReturnType<typeof placeOrderMutationKey>
-
-/**
- * @description Place a new order in the store
- * @summary Place an order for a pet
- * {@link /store/order}
- */
-export function placeOrder<ThrowOnError extends boolean = true>(options: Options<PlaceOrderRequestConfig, ThrowOnError>): Promise<RequestResult<PlaceOrderResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/store/order', parser: { response: (data: unknown) => placeOrderResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<PlaceOrderResponses, ThrowOnError>>
-}
 
 export type PlaceOrderMutationArg = PlaceOrderRequestConfig
 

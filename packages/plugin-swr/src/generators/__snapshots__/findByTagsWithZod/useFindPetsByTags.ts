@@ -4,29 +4,16 @@
  */
 
 import useSWR from 'swr'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses, FindPetsByTagsResponse } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse } from './FindPetsByTags'
 import type { SWRConfiguration } from 'swr'
-import { client } from './.kubb/client'
 import { FindPetsByTagsResponse } from './FindPetsByTags'
+import { findPetsByTags } from './clients/findPetsByTags'
 
 export const findPetsByTagsQueryKey = ({ query }: Omit<FindPetsByTagsRequestConfig, 'headers'>) =>
   [{ url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
-
-/**
- * {@link /pet/findByTags}
- */
-export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
-): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pet/findByTags', parser: { response: (data: unknown) => FindPetsByTagsResponse.parse(data) }, ...config }) as Promise<
-    RequestResult<FindPetsByTagsResponses, ThrowOnError>
-  >
-}
 
 export function findPetsByTagsQueryOptions(
   { query }: FindPetsByTagsRequestConfig,

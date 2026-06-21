@@ -3,6 +3,7 @@ import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
+import { resolverClient } from '@internals/client'
 import { describe, test } from 'vitest'
 import { matchFiles } from '#mocks'
 import { mutationKeyTransformer, queryKeyTransformer } from '@internals/tanstack-query'
@@ -22,7 +23,7 @@ const testConfig: Config = {
 }
 
 const defaultOptions: PluginReactQuery['resolvedOptions'] = {
-  client: { kind: 'contract-inline', client: 'axios' },
+  client: { kind: 'contract', pluginName: 'plugin-axios' },
   parser: 'zod',
   queryKey: queryKeyTransformer,
   mutationKey: mutationKeyTransformer,
@@ -50,6 +51,27 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+const mockedAxiosPlugin = createMockedPlugin({
+  name: 'plugin-axios',
+  options: { output: { path: './clients' }, group: null } as PluginTs['resolvedOptions'],
+  resolver: resolverClient,
+})
+
+// The generator looks plugins up by name: plugin-ts for the request types, plugin-axios for the
+// contract <op>. The built-in mock is name-agnostic, so dispatch on the name here.
+function createMultiPluginDriver(name: string) {
+  const driver = createMockedPluginDriver({
+    name,
+    plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+  })
+  const byName = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin } as Record<string, { resolver?: unknown }>
+  return {
+    ...driver,
+    getPlugin: (pluginName: string) => byName[pluginName] ?? mockedTsPlugin,
+    getResolver: (pluginName: string) => byName[pluginName]?.resolver ?? resolverTs,
+  } as typeof driver
+}
 
 // Shared operation nodes
 const findByTagsNode = ast.factory.createOperation({
@@ -110,7 +132,7 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
     {
       name: 'clientPostImportPath',
       node: findByTagsNode,
-      options: { ...suspenseInfiniteConfig, client: { kind: 'contract-inline', client: 'axios' } },
+      options: { ...suspenseInfiniteConfig, client: { kind: 'contract', pluginName: 'plugin-axios' } },
     },
     {
       name: 'findByTagsObject',
@@ -126,10 +148,7 @@ describe('suspenseInfiniteQueryGenerator operation', () => {
       ...props.options,
     }
     const plugin = createMockedPlugin<PluginReactQuery>({ name: 'plugin-react-query', options, resolver: resolverReactQuery })
-    const driver = createMockedPluginDriver({
-      name: props.name,
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
+    const driver = createMultiPluginDriver(props.name)
 
     await renderGeneratorOperation(suspenseInfiniteQueryGenerator, props.node, {
       config: testConfig,

@@ -27,7 +27,12 @@ describe('resolveClient', () => {
     if (result.kind === 'error') expect(result.message).toContain("client: 'fetch' | 'axios'")
   })
 
-  test('no client plugin falls back to the inline contract client', () => {
-    expect(resolveClient({ client: undefined, pluginNames: ['plugin-ts'] })).toStrictEqual({ kind: 'contract-inline' })
+  test('no client plugin registered returns a diagnostic asking to add one', () => {
+    const result = resolveClient({ client: undefined, pluginNames: ['plugin-ts'] })
+    expect(result.kind).toBe('error')
+    if (result.kind === 'error') {
+      expect(result.message).toContain('@kubb/plugin-axios')
+      expect(result.message).toContain('@kubb/plugin-fetch')
+    }
   })
 })

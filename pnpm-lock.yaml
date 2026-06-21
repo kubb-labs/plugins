@@ -428,6 +428,9 @@ importers:
       '@kubb/adapter-oas':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)(openapi-types@12.1.3)
+      '@kubb/plugin-fetch':
+        specifier: workspace:*
+        version: link:../../packages/plugin-fetch
       '@kubb/plugin-react-query':
         specifier: workspace:*
         version: link:../../packages/plugin-react-query
@@ -762,12 +765,6 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-axios':
-        specifier: workspace:*
-        version: link:../plugin-axios
-      '@kubb/plugin-fetch':
-        specifier: workspace:*
-        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -814,12 +811,6 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-axios':
-        specifier: workspace:*
-        version: link:../plugin-axios
-      '@kubb/plugin-fetch':
-        specifier: workspace:*
-        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -864,12 +855,6 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-axios':
-        specifier: workspace:*
-        version: link:../plugin-axios
-      '@kubb/plugin-fetch':
-        specifier: workspace:*
-        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts
@@ -926,12 +911,6 @@ importers:
       '@kubb/core':
         specifier: 'catalog:'
         version: 5.0.0-beta.71(@kubb/renderer-jsx@5.0.0-beta.71)
-      '@kubb/plugin-axios':
-        specifier: workspace:*
-        version: link:../plugin-axios
-      '@kubb/plugin-fetch':
-        specifier: workspace:*
-        version: link:../plugin-fetch
       '@kubb/plugin-ts':
         specifier: workspace:*
         version: link:../plugin-ts

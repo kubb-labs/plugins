@@ -1,18 +1,17 @@
 /**
- * Resolves which client a query plugin (react-query, vue-query, swr) should call for an operation,
- * shared by all three so the selection rules and diagnostics stay in one place.
+ * Resolves which client plugin a consumer (react-query, vue-query, swr, mcp) should call for an
+ * operation, shared so the selection rules and diagnostics stay in one place.
  *
- * Every client plugin now speaks the `RequestResult` contract, so the resolver picks between three
- * generation strategies:
+ * Every client runtime lives in a dedicated client plugin, so a consumer always calls a registered
+ * contract client plugin (plugin-fetch or plugin-axios) and never emits its own inline client:
  *
- * - `contract` — a registered contract client plugin (plugin-fetch or plugin-axios) owns the `<op>`
- *   functions and the hooks import and call them.
- * - `contract-inline` — no client plugin is registered, so the query plugin emits its own inline
- *   contract client and injects the matching contract runtime.
+ * - `contract` — a registered contract client plugin owns the `<op>` functions and the consumer
+ *   imports and calls them.
+ * - `error` — no client plugin is registered, several are registered without a selector, or the
+ *   requested one is missing.
  *
  * The `client` string selects explicitly (`'fetch'` / `'axios'`); when it is unset a lone registered
- * contract client plugin is picked up automatically, otherwise the plugin falls back to
- * `contract-inline`.
+ * contract client plugin is picked up automatically.
  */
 
 // Canonical plugin names. They mirror the `pluginFetchName` / `pluginAxiosName` consts the plugins
@@ -21,7 +20,7 @@ const pluginFetchName = 'plugin-fetch'
 const pluginAxiosName = 'plugin-axios'
 
 /**
- * The client selector accepted by a query plugin's `client` option. Both call a registered contract
+ * The client selector accepted by a consumer's `client` option. Both call a registered contract
  * client plugin.
  */
 export type ClientSelector = 'fetch' | 'axios'
@@ -29,11 +28,10 @@ export type ClientSelector = 'fetch' | 'axios'
 /**
  * The outcome of {@link resolveClient}.
  *
- * - `contract` names the contract client plugin whose `<op>` functions the hooks import.
- * - `contract-inline` tells the query plugin to emit its own inline contract client.
+ * - `contract` names the contract client plugin whose `<op>` functions the consumer imports.
  * - `error` carries a setup diagnostic.
  */
-export type ResolveClientResult = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline' } | { kind: 'error'; message: string }
+export type ResolveClientResult = { kind: 'contract'; pluginName: string } | { kind: 'error'; message: string }
 
 const selectorToPlugin: Record<'fetch' | 'axios', string> = {
   fetch: pluginFetchName,
@@ -55,7 +53,7 @@ const contractPlugins = [pluginFetchName, pluginAxiosName] as const
  * @example
  * ```ts
  * resolveClient({ client: undefined, pluginNames: ['plugin-ts'] })
- * // { kind: 'contract-inline' }
+ * // { kind: 'error', message: 'No client plugin is registered…' }
  * ```
  */
 export function resolveClient(options: { client: ClientSelector | undefined; pluginNames: ReadonlyArray<string> }): ResolveClientResult {
@@ -73,8 +71,7 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
     return { kind: 'contract', pluginName }
   }
 
-  // `client` unset: auto-detect a lone registered contract client plugin, otherwise emit an inline
-  // contract client.
+  // `client` unset: auto-detect a lone registered contract client plugin.
   const registered = contractPlugins.filter(has)
   if (registered.length === 1) {
     return { kind: 'contract', pluginName: registered[0]! }
@@ -86,5 +83,8 @@ export function resolveClient(options: { client: ClientSelector | undefined; plu
     }
   }
 
-  return { kind: 'contract-inline' }
+  return {
+    kind: 'error',
+    message: 'No client plugin is registered. Add `@kubb/plugin-axios` or `@kubb/plugin-fetch` to `plugins` so the generated code has an HTTP client to call.',
+  }
 }

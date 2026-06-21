@@ -3,29 +3,15 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses, GetPetByIdResponse, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { GetPetByIdRequestConfig, GetPetByIdStatus200, GetPetByIdStatus400 } from './GetPetById'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { client } from './.kubb/client'
-import { GetPetByIdResponse } from './GetPetById'
+import { getPetById } from './clients/getPetById'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
-
-/**
- * {@link /pet/:petId}
- */
-export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<GetPetByIdRequestConfig, ThrowOnError>,
-): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pet/{petId}', parser: { response: (data: unknown) => GetPetByIdResponse.parse(data) }, ...config }) as Promise<
-    RequestResult<GetPetByIdResponses, ThrowOnError>
-  >
-}
 
 export function getPetByIdQueryOptions(
   { path }: GetPetByIdRequestConfig,

@@ -3,12 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses, UpdatePetWithFormResponse, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormStatus200 } from './UpdatePetWithForm'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from 'custom-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { client } from './.kubb/client'
-import { UpdatePetWithFormResponse } from './UpdatePetWithForm'
+import { updatePetWithForm } from './clients/updatePetWithForm'
 import { queryOptions, useQuery } from 'custom-query'
 import { toValue } from 'vue'
 
@@ -23,19 +22,6 @@ export const updatePetWithFormQueryKey = ({
 }) => [{ url: '/pet/:petId', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 export type UpdatePetWithFormQueryKey = ReturnType<typeof updatePetWithFormQueryKey>
-
-/**
- * {@link /pet/:petId}
- */
-export function updatePetWithForm<ThrowOnError extends boolean = true>(
-  options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
-): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet/{petId}', parser: { response: (data: unknown) => UpdatePetWithFormResponse.parse(data) }, ...config }) as Promise<
-    RequestResult<UpdatePetWithFormResponses, ThrowOnError>
-  >
-}
 
 export function updatePetWithFormQueryOptions(
   {

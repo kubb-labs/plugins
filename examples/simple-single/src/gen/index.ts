@@ -122,59 +122,54 @@ export type {
   UploadFileResponses,
   UploadFileStatus200,
 } from './models'
+export { addPet } from './clients/addPet'
+export { deleteOrder } from './clients/deleteOrder'
+export { deletePet } from './clients/deletePet'
+export { findPetsByStatus } from './clients/findPetsByStatus'
+export { findPetsByTags } from './clients/findPetsByTags'
+export { getInventory } from './clients/getInventory'
+export { getOrderById } from './clients/getOrderById'
+export { getPetById } from './clients/getPetById'
+export { placeOrder } from './clients/placeOrder'
+export { placeOrderPatch } from './clients/placeOrderPatch'
+export { updatePet } from './clients/updatePet'
+export { updatePetWithForm } from './clients/updatePetWithForm'
+export { uploadFile } from './clients/uploadFile'
 export {
-  addPet,
   addPetMutationKey,
   addPetMutationOptions,
-  deleteOrder,
   deleteOrderMutationKey,
   deleteOrderMutationOptions,
-  deletePet,
   deletePetMutationKey,
   deletePetMutationOptions,
-  findPetsByStatus,
   findPetsByStatusQueryKey,
   findPetsByStatusQueryOptions,
-  findPetsByStatusSuspense,
   findPetsByStatusSuspenseQueryKey,
   findPetsByStatusSuspenseQueryOptions,
-  findPetsByTags,
   findPetsByTagsQueryKey,
   findPetsByTagsQueryOptions,
-  findPetsByTagsSuspense,
   findPetsByTagsSuspenseQueryKey,
   findPetsByTagsSuspenseQueryOptions,
-  getInventory,
   getInventoryQueryKey,
   getInventoryQueryOptions,
-  getInventorySuspense,
   getInventorySuspenseQueryKey,
   getInventorySuspenseQueryOptions,
-  getOrderById,
   getOrderByIdQueryKey,
   getOrderByIdQueryOptions,
-  getOrderByIdSuspense,
   getOrderByIdSuspenseQueryKey,
   getOrderByIdSuspenseQueryOptions,
-  getPetById,
   getPetByIdQueryKey,
   getPetByIdQueryOptions,
-  getPetByIdSuspense,
   getPetByIdSuspenseQueryKey,
   getPetByIdSuspenseQueryOptions,
-  placeOrder,
   placeOrderMutationKey,
   placeOrderMutationOptions,
-  placeOrderPatch,
   placeOrderPatchMutationKey,
   placeOrderPatchMutationOptions,
-  updatePet,
   updatePetMutationKey,
   updatePetMutationOptions,
-  updatePetWithForm,
   updatePetWithFormMutationKey,
   updatePetWithFormMutationOptions,
-  uploadFile,
   uploadFileMutationKey,
   uploadFileMutationOptions,
   useAddPet,

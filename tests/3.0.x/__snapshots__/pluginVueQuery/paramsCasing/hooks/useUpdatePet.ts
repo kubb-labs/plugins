@@ -3,23 +3,14 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UpdatePetRequestConfig, UpdatePetResponses, UpdatePetResponse, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UpdatePetRequestConfig, UpdatePetStatus200 } from '../types/UpdatePet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
-import { client } from '../.kubb/client.ts'
+import { updatePet } from '../clients/updatePet.ts'
 import { useMutation } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
-
-/**
- * {@link /pets/:pet_id}
- */
-export function updatePet<ThrowOnError extends boolean = true>(options: Options<UpdatePetRequestConfig, ThrowOnError>): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pets/{pet_id}', ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
-}
 
 /**
  * {@link /pets/:pet_id}

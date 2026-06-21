@@ -1,5 +1,3 @@
-import path from 'node:path'
-import { Operation } from '@internals/client'
 import { getOperationParameters, operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
@@ -50,11 +48,14 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
 
     const importPath = query ? query.importPath : '@tanstack/react-query'
 
+    // The registered contract client plugin owns the `<op>` the hook imports and calls.
+    const contractOp = resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output })
+    if (!contractOp) return null
+
     const queryName = resolver.resolveInfiniteQueryName(node)
     const queryOptionsName = resolver.resolveInfiniteQueryOptionsName(node)
     const queryKeyName = resolver.resolveInfiniteQueryKeyName(node)
     const queryKeyTypeName = resolver.resolveInfiniteQueryKeyTypeName(node)
-    const clientName = resolver.resolveInfiniteClientName(node)
 
     const meta = {
       file: resolver.resolveFile(operationFileEntry(node, queryName), { root, output, group: group ?? undefined }),
@@ -71,11 +72,9 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
         ? tsResolver.resolveQueryParamsName(node, rawQueryParams[0]!)
         : null
 
-    // The inline contract client references the plugin-ts `<Name>Responses` aggregate (the others do not).
     const importedTypeNames = [
       tsResolver.resolveRequestConfigName(node),
       queryParamsTypeName,
-      client.kind === 'contract-inline' ? tsResolver.resolveResponsesName(node) : null,
       ...resolveOperationTypeNames(node, tsResolver, {
         exclude: [queryKeyTypeName],
         order: 'body-response-first',
@@ -94,10 +93,7 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       : null
     const zodSchemaNames = resolveZodSchemaNames(node, zodResolver, parser)
 
-    const contractOp =
-      client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
-    const clientPath = path.resolve(root, '.kubb/client.ts')
-    const calledClientName = contractOp ? contractOp.name : clientName
+    const calledClientName = contractOp.name
 
     return (
       <File
@@ -109,20 +105,8 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
       >
         {fileZod && zodSchemaNames.length > 0 && <File.Import name={zodSchemaNames} root={meta.file.path} path={fileZod.path} />}
 
-        {contractOp && (
-          <>
-            <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
-          </>
-        )}
-
-        {client.kind === 'contract-inline' && (
-          <>
-            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
-            <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
-            <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={clientPath} isTypeOnly />
-          </>
-        )}
+        <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />
+        <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
         {meta.fileTs && importedTypeNames.length > 0 && (
@@ -130,8 +114,6 @@ export const infiniteQueryGenerator = defineGenerator<PluginReactQuery>({
         )}
 
         <QueryKey name={queryKeyName} typeName={queryKeyTypeName} node={node} tsResolver={tsResolver} transformer={ctx.options.queryKey} />
-
-        {client.kind === 'contract-inline' && <Operation name={clientName} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />}
 
         <File.Import name={['InfiniteData']} isTypeOnly path={importPath} />
         <File.Import name={['infiniteQueryOptions']} path={importPath} />

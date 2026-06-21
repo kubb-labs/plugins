@@ -36,15 +36,10 @@ export type Options = OutputOptions & {
    *
    * `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
    * single client plugin (plugin-fetch or plugin-axios) is registered it is auto-detected, so the
-   * string is only needed to disambiguate several client plugins.
-   *
-   * When unset and no client plugin is registered, the handlers emit their own inline contract client.
+   * string is only needed to disambiguate several client plugins. Register one of those plugins;
+   * options such as `baseURL` live there.
    */
   client?: ClientSelector
-  /**
-   * Base URL prepended to every request when the handlers emit their own inline contract client.
-   */
-  baseURL?: string
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -69,13 +64,10 @@ export type Options = OutputOptions & {
 }
 
 /**
- * The resolved client strategy for the generated handlers, computed once during setup.
- *
- * - `contract` — the handlers import and call a registered contract client plugin's `<op>`.
- * - `contract-inline` — the handlers emit their own inline contract client and inject the matching
- *   contract runtime (`'fetch'` / `'axios'` picks the bundled template).
+ * The resolved client strategy for the generated handlers, computed once during setup. The handlers
+ * always import and call a registered contract client plugin's `<op>`.
  */
-export type ResolvedClient = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
+export type ResolvedClient = { kind: 'contract'; pluginName: string }
 
 type ResolvedOptions = {
   output: Output
@@ -84,10 +76,9 @@ type ResolvedOptions = {
   override: Array<Override<ResolvedOptions>>
   group: Group | null
   /**
-   * The resolved client strategy the generators branch on (contract or inline contract).
+   * The resolved client strategy the generators branch on.
    */
   client: ResolvedClient
-  baseURL: string | undefined
   resolver: ResolverMcp
 }
 

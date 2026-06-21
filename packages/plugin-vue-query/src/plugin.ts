@@ -1,9 +1,6 @@
-import path from 'node:path'
 import { createGroupConfig } from '@internals/shared'
 import { definePlugin } from '@kubb/core'
 import { isParserEnabled } from '@internals/client'
-import { axiosClientTemplatePath } from '@kubb/plugin-axios'
-import { fetchClientTemplatePath } from '@kubb/plugin-fetch'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { mutationKeyTransformer } from '@internals/tanstack-query'
@@ -81,10 +78,9 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
           throw new Error(resolvedClient.message)
         }
 
-        // `contract` calls a registered plugin's op; `contract-inline` bundles its own runtime,
-        // defaulting to axios (the historical default) since no client plugin is in play.
-        const resolvedClientDescriptor: PluginVueQuery['resolvedOptions']['client'] =
-          resolvedClient.kind === 'contract' ? { kind: 'contract', pluginName: resolvedClient.pluginName } : { kind: 'contract-inline', client: 'axios' }
+        // The hooks always call a registered client plugin's op; the client runtime lives in
+        // plugin-axios / plugin-fetch, so nothing is bundled here.
+        const resolvedClientDescriptor: PluginVueQuery['resolvedOptions']['client'] = { kind: 'contract', pluginName: resolvedClient.pluginName }
 
         ctx.setOptions({
           output,
@@ -131,19 +127,6 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
 
         for (const gen of selectedGenerators) {
           ctx.addGenerator(gen)
-        }
-
-        const root = path.resolve(ctx.config.root, ctx.config.output.path)
-
-        // `contract-inline` bundles the shared `RequestResult` contract runtime, identical to what
-        // plugin-fetch / plugin-axios inject, so the inline op serializes form-data in its own runtime
-        // and needs no `config.ts`.
-        if (resolvedClientDescriptor.kind === 'contract-inline') {
-          ctx.injectFile({
-            baseName: 'client.ts',
-            path: path.resolve(root, '.kubb/client.ts'),
-            copy: resolvedClientDescriptor.client === 'fetch' ? fetchClientTemplatePath : axiosClientTemplatePath,
-          })
         }
       },
     },
