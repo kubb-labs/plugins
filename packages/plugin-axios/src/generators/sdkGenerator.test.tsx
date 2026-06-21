@@ -79,7 +79,7 @@ describe('sdkGenerator operations', () => {
   const testData = [
     { name: 'sdkClass', options: {} as Partial<PluginAxios['resolvedOptions']> },
     { name: 'sdkClassWithName', options: { sdk: { mode: 'tag', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
-    { name: 'sdkSingle', options: { sdk: { mode: 'single', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
+    { name: 'sdkSingle', options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginAxios['resolvedOptions']> },
   ] as const satisfies Array<{ name: string; options: Partial<PluginAxios['resolvedOptions']> }>
 
   test.each(testData)('$name', async (props) => {

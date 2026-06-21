@@ -75,7 +75,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
-        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { mode: 'single', name: 'PetStore' } }),
+        pluginFetch({ output: { path: './clients', barrel: false }, sdk: { mode: 'flat', name: 'PetStore' } }),
       ],
     },
   },
