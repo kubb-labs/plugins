@@ -4,25 +4,14 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { CreatePetRequestConfig, CreatePetResponses, CreatePetResponse } from './CreatePet'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { CreatePetRequestConfig, CreatePetResponse } from './CreatePet'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { client } from './.kubb/client'
+import { createPet } from './clients/createPet'
 
 export const createPetMutationKey = () => [{ url: '/pet' }] as const
 
 export type CreatePetMutationKey = ReturnType<typeof createPetMutationKey>
-
-/**
- * {@link /pet}
- */
-export function createPet<ThrowOnError extends boolean = true>(
-  options: Options<CreatePetRequestConfig, ThrowOnError>,
-): Promise<RequestResult<CreatePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<CreatePetResponses, ThrowOnError>>
-}
 
 export type CreatePetMutationArg = CreatePetRequestConfig
 

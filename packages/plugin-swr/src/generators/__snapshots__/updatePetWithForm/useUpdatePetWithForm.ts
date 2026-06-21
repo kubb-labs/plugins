@@ -4,25 +4,14 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses, UpdatePetWithFormResponse } from './UpdatePetWithForm'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponse } from './UpdatePetWithForm'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { client } from './.kubb/client'
+import { updatePetWithForm } from './clients/updatePetWithForm'
 
 export const updatePetWithFormMutationKey = () => [{ url: '/pet/:petId' }] as const
 
 export type UpdatePetWithFormMutationKey = ReturnType<typeof updatePetWithFormMutationKey>
-
-/**
- * {@link /pet/:petId}
- */
-export function updatePetWithForm<ThrowOnError extends boolean = true>(
-  options: Options<UpdatePetWithFormRequestConfig, ThrowOnError>,
-): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
-}
 
 export type UpdatePetWithFormMutationArg = UpdatePetWithFormRequestConfig
 

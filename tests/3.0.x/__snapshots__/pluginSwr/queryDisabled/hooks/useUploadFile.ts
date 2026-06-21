@@ -3,23 +3,13 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse } from '../types/UploadFile.ts'
-import { client } from '../.kubb/client.ts'
+import type { RequestConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig } from '../types/UploadFile.ts'
+import { uploadFile } from '../clients/uploadFile.ts'
 
 export const uploadFileQueryKey = ({ path, query, body }: Omit<UploadFileRequestConfig, 'headers'>) => [{ url: '/pet/:petId/uploadImage', params: path }, ...(query ? [query] : []), ...(body ? [body] : [])] as const
 
 type UploadFileQueryKey = ReturnType<typeof uploadFileQueryKey>
-
-/**
- * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
- */
-export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
-}
 
 export function uploadFileQueryOptions({ path, query, body }: UploadFileRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {

@@ -3,12 +3,11 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses, FindPetsByTagsResponse, FindPetsByTagsStatus200 } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsStatus200 } from './FindPetsByTags'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/react-query'
 import type { MaybeRefOrGetter } from 'vue'
-import { client } from './.kubb/client'
-import { FindPetsByTagsResponse } from './FindPetsByTags'
+import { findPetsByTags } from './clients/findPetsByTags'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 import { toValue } from 'vue'
 
@@ -16,19 +15,6 @@ export const findPetsByTagsQueryKey = ({ query }: { query: MaybeRefOrGetter<Omit
   ['findPetsByTags', { url: '/pet/findByTags' }, ...(query ? [query] : [])] as const
 
 export type FindPetsByTagsQueryKey = ReturnType<typeof findPetsByTagsQueryKey>
-
-/**
- * {@link /pet/findByTags}
- */
-export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
-): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pet/findByTags', parser: { response: (data: unknown) => FindPetsByTagsResponse.parse(data) }, ...config }) as Promise<
-    RequestResult<FindPetsByTagsResponses, ThrowOnError>
-  >
-}
 
 export function findPetsByTagsQueryOptions(
   { query }: { query: MaybeRefOrGetter<FindPetsByTagsRequestConfig['query']> },

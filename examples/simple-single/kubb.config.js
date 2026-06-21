@@ -1,4 +1,5 @@
 import { adapterOas } from '@kubb/adapter-oas'
+import { pluginFetch } from '@kubb/plugin-fetch'
 import { pluginReactQuery } from '@kubb/plugin-react-query'
 import { pluginRedoc } from '@kubb/plugin-redoc'
 import { pluginTs } from '@kubb/plugin-ts'
@@ -34,6 +35,9 @@ export default defineConfig([
       }),
       pluginTs({
         output: { path: 'models.ts', mode: 'file', clean: true },
+      }),
+      pluginFetch({
+        output: { path: './clients', barrel: { type: 'named' } },
       }),
       pluginReactQuery({
         output: {

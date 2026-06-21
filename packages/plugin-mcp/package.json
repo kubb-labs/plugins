@@ -61,8 +61,6 @@
     "@internals/utils": "workspace:*",
     "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:",
-    "@kubb/plugin-axios": "workspace:*",
-    "@kubb/plugin-fetch": "workspace:*",
     "@kubb/plugin-ts": "workspace:*",
     "@kubb/plugin-zod": "workspace:*",
     "@kubb/renderer-jsx": "catalog:"

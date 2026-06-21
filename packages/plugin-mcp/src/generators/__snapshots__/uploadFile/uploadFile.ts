@@ -1,19 +1,7 @@
-import type { Options, RequestResult } from './.kubb/client'
-import type { UploadFileRequestConfig, UploadFileResponses } from './UploadFile'
+import type { UploadFileRequestConfig } from './UploadFile'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from './.kubb/client'
-
-/**
- * {@link /pets/:petId/upload}
- */
-export function uploadFile<ThrowOnError extends boolean = true>(
-  options: Options<UploadFileRequestConfig, ThrowOnError>,
-): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pets/{petId}/upload', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
-}
+import { uploadFile } from './clients/uploadFile'
 
 /**
  * {@link /pets/:petId/upload}

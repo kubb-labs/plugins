@@ -3,34 +3,22 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { GetInventoryRequestConfig, GetInventoryResponses, GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
 import type { QueryKey, QueryClient, UseSuspenseQueryOptions, UseSuspenseQueryResult } from '@tanstack/react-query'
-import { client } from '../.kubb/client.ts'
-import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
+import { getInventory } from '../clients/getInventory.ts'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 
 export const getInventorySuspenseQueryKey = () => [{ url: '/store/inventory' }] as const
 
 type GetInventorySuspenseQueryKey = ReturnType<typeof getInventorySuspenseQueryKey>
 
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export function getInventorySuspense<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/store/inventory', parser: { response: (data: unknown) => getInventoryResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
-}
-
 export function getInventorySuspenseQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventorySuspenseQueryKey()
   return queryOptions<GetInventoryStatus200, ResponseErrorConfig<Error>, GetInventoryStatus200, typeof queryKey>({
    queryKey,
    queryFn: async ({ signal }) => {
-      const { data } = await getInventorySuspense({ ...config, signal: config.signal ?? signal, throwOnError: true })
+      const { data } = await getInventory({ ...config, signal: config.signal ?? signal, throwOnError: true })
       return data
    },
   })

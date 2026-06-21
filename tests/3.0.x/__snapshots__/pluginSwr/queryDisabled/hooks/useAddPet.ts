@@ -3,24 +3,13 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
-import type { AddPetRequestConfig, AddPetResponses, AddPetResponse } from '../types/AddPet.ts'
-import { client } from '../.kubb/client.ts'
+import type { RequestConfig } from '../.kubb/client.ts'
+import type { AddPetRequestConfig } from '../types/AddPet.ts'
+import { addPet } from '../clients/addPet.ts'
 
 export const addPetQueryKey = ({ body }: Omit<AddPetRequestConfig, 'headers'>) => [{ url: '/pet' }, ...(body ? [body] : [])] as const
 
 type AddPetQueryKey = ReturnType<typeof addPetQueryKey>
-
-/**
- * @description Add a new pet to the store
- * @summary Add a new pet to the store
- * {@link /pet}
- */
-export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
-}
 
 export function addPetQueryOptions({ body }: AddPetRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {

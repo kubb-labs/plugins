@@ -165,7 +165,7 @@ export type Options = OutputOptions & {
    *   single client plugin (plugin-fetch or plugin-axios) is registered it is
    *   auto-detected, so the string is only needed to disambiguate several client plugins.
    *
-   * When unset and no client plugin is registered, the composables emit their own inline contract client.
+   * A client plugin must be registered; the composables always call its `<op>`.
    */
   client?: ClientSelector
   /**
@@ -221,13 +221,10 @@ export type Options = OutputOptions & {
 }
 
 /**
- * The resolved client strategy for the generated composables, computed once during setup.
- *
- * - `contract` — the composables import and call a registered contract client plugin's `<op>`.
- * - `contract-inline` — the composables emit their own inline contract client and inject the matching
- *   contract runtime (`'fetch'` / `'axios'` picks the bundled template).
+ * The resolved client strategy for the generated composables, computed once during setup. The
+ * composables always import and call a registered contract client plugin's `<op>`.
  */
-export type ResolvedClient = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
+export type ResolvedClient = { kind: 'contract'; pluginName: string }
 
 type ResolvedOptions = {
   output: Output
@@ -236,7 +233,7 @@ type ResolvedOptions = {
   include: Options['include']
   override: NonNullable<Options['override']>
   /**
-   * The resolved client strategy the generators branch on (contract or inline contract).
+   * The resolved contract client the generators import and call.
    */
   client: ResolvedClient
   parser: NonNullable<Options['parser']>

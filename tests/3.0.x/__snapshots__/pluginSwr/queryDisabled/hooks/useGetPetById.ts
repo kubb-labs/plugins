@@ -3,24 +3,13 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig } from '../.kubb/client.ts'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses, GetPetByIdResponse } from '../types/GetPetById.ts'
-import { client } from '../.kubb/client.ts'
+import type { RequestConfig } from '../.kubb/client.ts'
+import type { GetPetByIdRequestConfig } from '../types/GetPetById.ts'
+import { getPetById } from '../clients/getPetById.ts'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
-
-/**
- * @description Returns a single pet
- * @summary Find pet by ID
- * {@link /pet/:petId}
- */
-export function getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
-}
 
 export function getPetByIdQueryOptions({ path }: GetPetByIdRequestConfig, config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   return {

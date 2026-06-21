@@ -4,25 +4,14 @@
  */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses, FindPetsByTagsResponse } from './FindPetsByTags'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponse } from './FindPetsByTags'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { client } from './.kubb/client'
+import { findPetsByTags } from './clients/findPetsByTags'
 
 export const findPetsByTagsMutationKey = () => [{ url: '/pet/findByTags' }] as const
 
 export type FindPetsByTagsMutationKey = ReturnType<typeof findPetsByTagsMutationKey>
-
-/**
- * {@link /pet/findByTags}
- */
-export function findPetsByTags<ThrowOnError extends boolean = true>(
-  options: Options<FindPetsByTagsRequestConfig, ThrowOnError>,
-): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pet/findByTags', ...config }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
-}
 
 export type FindPetsByTagsMutationArg = FindPetsByTagsRequestConfig
 

@@ -3,28 +3,16 @@
 * Do not edit manually.
 */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { GetInventoryRequestConfig, GetInventoryResponses, GetInventoryResponse, GetInventoryStatus200 } from '../types/GetInventory.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { GetInventoryStatus200 } from '../types/GetInventory.ts'
 import type { QueryKey, QueryClient, UseQueryOptions, UseQueryReturnType } from '@tanstack/vue-query'
-import { client } from '../.kubb/client.ts'
-import { getInventoryResponseSchema } from '../zod/getInventorySchema.ts'
+import { getInventory } from '../clients/getInventory.ts'
 import { queryOptions, useQuery } from '@tanstack/vue-query'
 import { toValue } from 'vue'
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
 
 export type GetInventoryQueryKey = ReturnType<typeof getInventoryQueryKey>
-
-/**
- * @description Returns a map of status codes to quantities
- * @summary Returns pet inventories by status
- * {@link /store/inventory}
- */
-export function getInventory<ThrowOnError extends boolean = true>(options: Options<GetInventoryRequestConfig, ThrowOnError>): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/store/inventory', parser: { response: (data: unknown) => getInventoryResponseSchema.parse(data) }, ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
-}
 
 export function getInventoryQueryOptions(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const queryKey = getInventoryQueryKey()

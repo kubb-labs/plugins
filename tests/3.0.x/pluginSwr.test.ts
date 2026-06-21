@@ -31,6 +31,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
         }),
@@ -50,6 +51,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           parser: 'zod',
@@ -69,6 +71,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           query: {
@@ -94,6 +97,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           query: false,
@@ -113,6 +117,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           mutation: false,
@@ -132,6 +137,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
         }),
@@ -150,6 +156,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           exclude: [
@@ -170,6 +177,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
@@ -189,6 +197,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       parsers: [parserTs],
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginSwr({
           output: { path: './hooks', barrel: false },
           group: { type: 'tag' },

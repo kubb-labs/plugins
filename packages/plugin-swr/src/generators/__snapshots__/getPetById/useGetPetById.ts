@@ -4,25 +4,14 @@
  */
 
 import useSWR from 'swr'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { GetPetByIdRequestConfig, GetPetByIdResponses, GetPetByIdResponse, GetPetByIdStatus400 } from './GetPetById'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { GetPetByIdRequestConfig, GetPetByIdResponse, GetPetByIdStatus400 } from './GetPetById'
 import type { SWRConfiguration } from 'swr'
-import { client } from './.kubb/client'
+import { getPetById } from './clients/getPetById'
 
 export const getPetByIdQueryKey = ({ path }: Omit<GetPetByIdRequestConfig, 'headers'>) => [{ url: '/pet/:petId', params: path }] as const
 
 type GetPetByIdQueryKey = ReturnType<typeof getPetByIdQueryKey>
-
-/**
- * {@link /pet/:petId}
- */
-export function getPetById<ThrowOnError extends boolean = true>(
-  options: Options<GetPetByIdRequestConfig, ThrowOnError>,
-): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
-}
 
 export function getPetByIdQueryOptions(
   { path }: GetPetByIdRequestConfig,

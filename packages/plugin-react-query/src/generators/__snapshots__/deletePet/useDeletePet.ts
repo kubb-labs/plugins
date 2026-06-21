@@ -3,27 +3,13 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { DeletePetRequestConfig, DeletePetResponses, DeletePetResponse, DeletePetStatus200 } from './DeletePet'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { DeletePetRequestConfig, DeletePetStatus200 } from './DeletePet'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { client } from './.kubb/client'
-import { DeletePetResponse } from './DeletePet'
+import { deletePet } from './clients/deletePet'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const deletePetMutationKey = () => [{ url: '/pet/:petId' }] as const
-
-/**
- * {@link /pet/:petId}
- */
-export function deletePet<ThrowOnError extends boolean = true>(
-  options: Options<DeletePetRequestConfig, ThrowOnError>,
-): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'DELETE', url: '/pet/{petId}', parser: { response: (data: unknown) => DeletePetResponse.parse(data) }, ...config }) as Promise<
-    RequestResult<DeletePetResponses, ThrowOnError>
-  >
-}
 
 export function deletePetMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = deletePetMutationKey()

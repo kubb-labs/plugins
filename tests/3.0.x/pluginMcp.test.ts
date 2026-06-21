@@ -33,6 +33,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
         }),
@@ -53,6 +54,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
         }),
@@ -73,6 +75,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
           exclude: [
@@ -95,6 +98,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
@@ -116,6 +120,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginMcp({
           output: { path: './mcp', barrel: false },
           group: { type: 'tag' },

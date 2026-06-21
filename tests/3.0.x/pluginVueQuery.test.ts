@@ -32,6 +32,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
         }),
@@ -51,6 +52,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
           infinite: {
@@ -75,6 +77,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
         pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
           parser: 'zod',
@@ -95,6 +98,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
           mutation: false,
@@ -115,6 +119,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
         }),
@@ -134,6 +139,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
           exclude: [
@@ -155,6 +161,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
           include: [{ type: 'tag', pattern: 'pet' }],
@@ -175,6 +182,7 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
       storage: fsStorage(),
       plugins: [
         pluginTs({ output: { path: './types', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
         pluginVueQuery({
           output: { path: './hooks', barrel: false },
           group: { type: 'tag' },

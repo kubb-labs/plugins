@@ -4,24 +4,14 @@
 */
 
 import useSWRMutation from 'swr/mutation'
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse } from '../types/UploadFile.ts'
+import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
+import type { UploadFileRequestConfig, UploadFileResponse } from '../types/UploadFile.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
-import { client } from '../.kubb/client.ts'
+import { uploadFile } from '../clients/uploadFile.ts'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
 
 export type UploadFileMutationKey = ReturnType<typeof uploadFileMutationKey>
-
-/**
- * @summary uploads an image
- * {@link /pet/:petId/uploadImage}
- */
-export function uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
-}
 
 export type UploadFileMutationArg = UploadFileRequestConfig
 

@@ -3,30 +3,13 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type { UploadFileRequestConfig, UploadFileResponses, UploadFileResponse, UploadFileStatus200 } from './UploadFile'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { UploadFileRequestConfig, UploadFileStatus200 } from './UploadFile'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
-import { client } from './.kubb/client'
-import { UploadFileResponse } from './UploadFile'
+import { uploadFile } from './clients/uploadFile'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
 
 export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] as const
-
-/**
- * {@link /pet/:petId/uploadImage}
- */
-export function uploadFile<ThrowOnError extends boolean = true>(
-  options: Options<UploadFileRequestConfig, ThrowOnError>,
-): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({
-    method: 'POST',
-    url: '/pet/{petId}/uploadImage',
-    parser: { response: (data: unknown) => UploadFileResponse.parse(data) },
-    ...config,
-  }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
-}
 
 export function uploadFileMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' } = {},

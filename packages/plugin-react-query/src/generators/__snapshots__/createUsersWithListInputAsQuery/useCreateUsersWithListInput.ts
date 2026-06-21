@@ -3,38 +3,16 @@
  * Do not edit manually.
  */
 
-import type { Options, RequestResult, RequestConfig, ResponseErrorConfig } from './.kubb/client'
-import type {
-  CreateUsersWithListInputRequestConfig,
-  CreateUsersWithListInputResponses,
-  CreateUsersWithListInputResponse,
-  CreateUsersWithListInputStatus200,
-} from './CreateUsersWithListInput'
+import type { RequestConfig, ResponseErrorConfig } from './.kubb/client'
+import type { CreateUsersWithListInputRequestConfig, CreateUsersWithListInputStatus200 } from './CreateUsersWithListInput'
 import type { QueryKey, QueryClient, QueryObserverOptions, UseQueryResult } from '@tanstack/react-query'
-import { client } from './.kubb/client'
-import { CreateUsersWithListInputResponse } from './CreateUsersWithListInput'
+import { createUsersWithListInput } from './clients/createUsersWithListInput'
 import { queryOptions, useQuery } from '@tanstack/react-query'
 
 export const createUsersWithListInputQueryKey = ({ body }: Omit<CreateUsersWithListInputRequestConfig, 'headers'>) =>
   [{ url: '/user/createWithList' }, ...(body ? [body] : [])] as const
 
 type CreateUsersWithListInputQueryKey = ReturnType<typeof createUsersWithListInputQueryKey>
-
-/**
- * {@link /user/createWithList}
- */
-export function createUsersWithListInput<ThrowOnError extends boolean = true>(
-  options: Options<CreateUsersWithListInputRequestConfig, ThrowOnError>,
-): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
-  const { client: request = client, ...config } = options
-
-  return request({
-    method: 'POST',
-    url: '/user/createWithList',
-    parser: { response: (data: unknown) => CreateUsersWithListInputResponse.parse(data) },
-    ...config,
-  }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>
-}
 
 export function createUsersWithListInputQueryOptions(
   { body }: CreateUsersWithListInputRequestConfig,

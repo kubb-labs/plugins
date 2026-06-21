@@ -2,6 +2,7 @@
 
 import type { Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
+import { resolverClient } from '@internals/client'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
 import { resolverTs } from '@kubb/plugin-ts'
@@ -27,8 +28,7 @@ const defaultOptions: PluginMcp['resolvedOptions'] = {
   exclude: [],
   include: undefined,
   override: [],
-  client: { kind: 'contract-inline', client: 'axios' },
-  baseURL: undefined,
+  client: { kind: 'contract', pluginName: 'plugin-axios' },
   group: null,
   resolver: resolverMcp,
 }
@@ -38,6 +38,27 @@ const mockedTsPlugin = createMockedPlugin<PluginTs>({
   options: { output: { path: '.' }, group: null } as PluginTs['resolvedOptions'],
   resolver: resolverTs,
 })
+
+const mockedAxiosPlugin = createMockedPlugin({
+  name: 'plugin-axios',
+  options: { output: { path: './clients' }, group: null } as PluginTs['resolvedOptions'],
+  resolver: resolverClient,
+})
+
+// The generator looks plugins up by name: plugin-ts for the request types, plugin-axios for the
+// contract `<op>`. The built-in mock is name-agnostic, so dispatch on the name here.
+function createMultiPluginDriver(name: string) {
+  const driver = createMockedPluginDriver({
+    name,
+    plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
+  })
+  const byName = { 'plugin-ts': mockedTsPlugin, 'plugin-axios': mockedAxiosPlugin } as Record<string, { resolver?: unknown }>
+  return {
+    ...driver,
+    getPlugin: (pluginName: string) => byName[pluginName] ?? mockedTsPlugin,
+    getResolver: (pluginName: string) => byName[pluginName]?.resolver ?? resolverTs,
+  } as typeof driver
+}
 
 describe('mcpGenerator — Operation', () => {
   const operations = [
@@ -127,10 +148,7 @@ describe('mcpGenerator — Operation', () => {
       ...(('options' in props ? (props as { options?: Partial<PluginMcp['resolvedOptions']> }).options : undefined) ?? {}),
     }
     const plugin = createMockedPlugin<PluginMcp>({ name: 'plugin-mcp', options, resolver: resolverMcp })
-    const driver = createMockedPluginDriver({
-      name: props.name,
-      plugin: mockedTsPlugin as unknown as NonNullable<Parameters<typeof createMockedPluginDriver>[0]>['plugin'],
-    })
+    const driver = createMultiPluginDriver(props.name)
 
     await renderGeneratorOperation(mcpGenerator, props.node, {
       config: testConfig,
