@@ -1,7 +1,7 @@
-import type { AddFilesData } from '../models/ts/AddFiles.js'
+import type { AddFilesRequestConfig } from '../models/ts/AddFiles.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { addFiles } from '../clients/addFiles.js'
 
 /**
  * @description Place a new file in the store
@@ -9,12 +9,10 @@ import { client } from '../.kubb/client.js'
  * {@link /pet/files}
  */
 export async function addFilesHandler(
-  { data }: { data?: AddFilesData } = {},
+  { body }: AddFilesRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestBody = data
-
-  const res = await client({ method: 'POST', url: `/pet/files`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody })
+  const res = await addFiles({ body })
 
   return {
     content: [

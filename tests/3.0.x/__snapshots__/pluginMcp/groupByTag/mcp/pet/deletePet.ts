@@ -1,4 +1,5 @@
-import type { DeletePetHeaderApiKey, DeletePetPathPetId } from '../../types/DeletePet.ts'
+import type { Options, RequestResult } from '../../.kubb/client.ts'
+import type { DeletePetRequestConfig, DeletePetResponses } from '../../types/DeletePet.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { client } from '../../.kubb/client.ts'
@@ -8,10 +9,19 @@ import { client } from '../../.kubb/client.ts'
  * @summary Deletes a pet
  * {@link /pet/:petId}
  */
-export async function deletePetHandler({ petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } }, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const mappedHeaders = headers ? { "api_key": headers.apiKey } : undefined
+export function deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
 
-  const res = await client({ method: "DELETE", url: `/pet/${petId}`, headers: { ...mappedHeaders } })
+  return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+}
+
+/**
+ * @description delete a pet
+ * @summary Deletes a pet
+ * {@link /pet/:petId}
+ */
+export async function deletePetHandler({ path, headers }: DeletePetRequestConfig, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+  const res = await deletePet({ path, headers })
 
   return {
     content: [

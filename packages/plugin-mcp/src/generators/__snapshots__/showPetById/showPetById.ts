@@ -1,4 +1,5 @@
-import type { ShowPetByIdPathPetId } from './ShowPetById'
+import type { Options, RequestResult } from './.kubb/client'
+import type { ShowPetByIdRequestConfig, ShowPetByIdResponses } from './ShowPetById'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { client } from './.kubb/client'
@@ -6,11 +7,22 @@ import { client } from './.kubb/client'
 /**
  * {@link /pets/:petId}
  */
+export function showPetById<ThrowOnError extends boolean = true>(
+  options: Options<ShowPetByIdRequestConfig, ThrowOnError>,
+): Promise<RequestResult<ShowPetByIdResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
+
+  return request({ method: 'GET', url: '/pets/{petId}', ...config }) as Promise<RequestResult<ShowPetByIdResponses, ThrowOnError>>
+}
+
+/**
+ * {@link /pets/:petId}
+ */
 export async function showPetByIdHandler(
-  { petId }: { petId: ShowPetByIdPathPetId },
+  { path }: ShowPetByIdRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const res = await client({ method: 'GET', url: `/pets/${petId}` })
+  const res = await showPetById({ path })
 
   return {
     content: [

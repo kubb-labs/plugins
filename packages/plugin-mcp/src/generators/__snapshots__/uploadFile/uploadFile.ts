@@ -1,4 +1,5 @@
-import type { UploadFileData, UploadFilePathPetId } from './UploadFile'
+import type { Options, RequestResult } from './.kubb/client'
+import type { UploadFileRequestConfig, UploadFileResponses } from './UploadFile'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { client } from './.kubb/client'
@@ -6,13 +7,22 @@ import { client } from './.kubb/client'
 /**
  * {@link /pets/:petId/upload}
  */
+export function uploadFile<ThrowOnError extends boolean = true>(
+  options: Options<UploadFileRequestConfig, ThrowOnError>,
+): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
+
+  return request({ method: 'POST', url: '/pets/{petId}/upload', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+}
+
+/**
+ * {@link /pets/:petId/upload}
+ */
 export async function uploadFileHandler(
-  { petId, data }: { petId: UploadFilePathPetId; data?: UploadFileData },
+  { path, body }: UploadFileRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestBody = data
-
-  const res = await client({ method: 'POST', url: `/pets/${petId}/upload`, body: requestBody, contentType: 'multipart/form-data' })
+  const res = await uploadFile({ path, body })
 
   return {
     content: [

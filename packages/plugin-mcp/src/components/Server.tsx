@@ -57,28 +57,31 @@ export function Server({ name, serverName, serverVersion, operations }: Props): 
     .map(({ tool, mcp, zod, node }) => {
       const { path: pathParams } = getOperationParameters(node)
 
-      const pathEntries: Array<{ key: string; value: string }> = []
-      const otherEntries: Array<{ key: string; value: string }> = []
+      // Group params into the same `{ path, query, headers, body }` shape the contract `<op>`
+      // expects, so the MCP tool input mirrors every other client consumer.
+      const entries: Array<{ key: string; value: string }> = []
 
-      for (const p of pathParams) {
-        const zodParam = zod.pathParams.find((zp) => zp.name === p.name)
-        pathEntries.push({ key: p.name, value: zodParam ? zodParam.schemaName : zodExprFromSchemaNode(p.schema) })
-      }
-
-      if (zod.requestName) {
-        otherEntries.push({ key: 'data', value: zod.requestName })
+      if (pathParams.length) {
+        const pathFields = pathParams
+          .map((p) => {
+            const zodParam = zod.pathParams.find((zp) => zp.name === p.name)
+            return `${JSON.stringify(p.name)}: ${zodParam ? zodParam.schemaName : zodExprFromSchemaNode(p.schema)}`
+          })
+          .join(', ')
+        entries.push({ key: 'path', value: `z.object({ ${pathFields} })` })
       }
 
       if (zod.queryParams) {
-        otherEntries.push({ key: 'params', value: zodGroupExpr(zod.queryParams) })
+        entries.push({ key: 'query', value: zodGroupExpr(zod.queryParams) })
       }
 
       if (zod.headerParams) {
-        otherEntries.push({ key: 'headers', value: zodGroupExpr(zod.headerParams) })
+        entries.push({ key: 'headers', value: zodGroupExpr(zod.headerParams) })
       }
 
-      otherEntries.sort((a, b) => a.key.localeCompare(b.key))
-      const entries = [...pathEntries, ...otherEntries]
+      if (zod.requestName) {
+        entries.push({ key: 'body', value: zod.requestName })
+      }
 
       const paramsNode = entries.length
         ? createFunctionParameters({

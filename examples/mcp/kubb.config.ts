@@ -30,16 +30,13 @@ export default defineConfig(() => {
         output: { path: 'models/ts', barrel: { type: 'named' } },
       }),
       pluginZod({}),
-      // A registered contract client. pluginMcp detects it and its handlers call the injected
-      // `.kubb/client.ts` contract runtime, which returns the shared `RequestResult` shape.
+      // A registered contract client. pluginMcp detects it and its handlers import and call its
+      // generated `<op>` functions, which return the shared `RequestResult` shape.
       pluginAxios({
         output: { path: './clients', barrel: { type: 'named' } },
+        baseURL: 'https://petstore.swagger.io/v2',
       }),
-      pluginMcp({
-        client: {
-          baseURL: 'https://petstore.swagger.io/v2',
-        },
-      }),
+      pluginMcp({}),
     ],
   }
 })

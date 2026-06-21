@@ -1,4 +1,5 @@
-import type { FindPetsByStatusQueryStatus } from '../types/FindPetsByStatus.ts'
+import type { Options, RequestResult } from '../.kubb/client.ts'
+import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../types/FindPetsByStatus.ts'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
 import { client } from '../.kubb/client.ts'
@@ -8,8 +9,19 @@ import { client } from '../.kubb/client.ts'
  * @summary Finds Pets by status
  * {@link /pet/findByStatus}
  */
-export async function findPetsByStatusHandler({ params }: { params?: { status?: FindPetsByStatusQueryStatus } } = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
-  const res = await client({ method: "GET", url: `/pet/findByStatus`, query: params })
+export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError>): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
+  const { client: request = client, ...config } = options
+
+  return request({ method: 'GET', url: '/pet/findByStatus', ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
+}
+
+/**
+ * @description Multiple status values can be provided with comma separated strings
+ * @summary Finds Pets by status
+ * {@link /pet/findByStatus}
+ */
+export async function findPetsByStatusHandler({ query }: FindPetsByStatusRequestConfig = {}, request: RequestHandlerExtra<ServerRequest, ServerNotification>): Promise<Promise<CallToolResult>> {
+  const res = await findPetsByStatus({ query })
 
   return {
     content: [

@@ -1,7 +1,7 @@
-import type { DeletePetHeaderApiKey, DeletePetPathPetId } from '../models/ts/DeletePet.js'
+import type { DeletePetRequestConfig } from '../models/ts/DeletePet.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { deletePet } from '../clients/deletePet.js'
 
 /**
  * @description delete a pet
@@ -9,12 +9,10 @@ import { client } from '../.kubb/client.js'
  * {@link /pet/:petId}
  */
 export async function deletePetHandler(
-  { petId, headers }: { petId: DeletePetPathPetId; headers?: { apiKey?: DeletePetHeaderApiKey } },
+  { path, headers }: DeletePetRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const mappedHeaders = headers ? { api_key: headers.apiKey } : undefined
-
-  const res = await client({ method: 'DELETE', url: `/pet/${petId}`, baseURL: `https://petstore.swagger.io/v2`, headers: { ...mappedHeaders } })
+  const res = await deletePet({ path, headers })
 
   return {
     content: [

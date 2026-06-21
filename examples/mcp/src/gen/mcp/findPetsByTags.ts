@@ -1,12 +1,7 @@
-import type {
-  FindPetsByTagsHeaderXEXAMPLE,
-  FindPetsByTagsQueryPage,
-  FindPetsByTagsQueryPageSize,
-  FindPetsByTagsQueryTags,
-} from '../models/ts/FindPetsByTags.js'
+import type { FindPetsByTagsRequestConfig } from '../models/ts/FindPetsByTags.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { findPetsByTags } from '../clients/findPetsByTags.js'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -14,18 +9,10 @@ import { client } from '../.kubb/client.js'
  * {@link /pet/findByTags}
  */
 export async function findPetsByTagsHandler(
-  {
-    headers,
-    params,
-  }: {
-    headers: { xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE }
-    params?: { tags?: FindPetsByTagsQueryTags; page?: FindPetsByTagsQueryPage; pageSize?: FindPetsByTagsQueryPageSize }
-  },
+  { query, headers }: FindPetsByTagsRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const mappedHeaders = headers ? { 'X-EXAMPLE': headers.xEXAMPLE } : undefined
-
-  const res = await client({ method: 'GET', url: `/pet/findByTags`, baseURL: `https://petstore.swagger.io/v2`, query: params, headers: { ...mappedHeaders } })
+  const res = await findPetsByTags({ query, headers })
 
   return {
     content: [

@@ -1,7 +1,7 @@
-import type { UpdatePetData } from '../models/ts/UpdatePet.js'
+import type { UpdatePetRequestConfig } from '../models/ts/UpdatePet.js'
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol'
 import type { CallToolResult, ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types'
-import { client } from '../.kubb/client.js'
+import { updatePet } from '../clients/updatePet.js'
 
 /**
  * @description Update an existing pet by Id
@@ -9,12 +9,10 @@ import { client } from '../.kubb/client.js'
  * {@link /pet}
  */
 export async function updatePetHandler(
-  { data }: { data: UpdatePetData },
+  { body }: UpdatePetRequestConfig,
   request: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<Promise<CallToolResult>> {
-  const requestBody = data
-
-  const res = await client({ method: 'PUT', url: `/pet`, baseURL: `https://petstore.swagger.io/v2`, body: requestBody })
+  const res = await updatePet({ body })
 
   return {
     content: [

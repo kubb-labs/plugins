@@ -6,6 +6,7 @@ import { getRelativePath } from '@internals/utils'
 import { adapterOas } from '@kubb/adapter-oas'
 import { AsyncEventEmitter, type Config, createKubb, Diagnostics, type KubbHooks, fsStorage } from '@kubb/core'
 import { parserTs } from '@kubb/parser-ts'
+import { pluginAxios } from '@kubb/plugin-axios'
 import { pluginMcp } from '@kubb/plugin-mcp'
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
@@ -118,6 +119,27 @@ const configs: Array<{ name: string; config: BuildConfig }> = [
         pluginMcp({
           output: { path: './mcp', barrel: false },
           group: { type: 'tag' },
+        }),
+      ],
+    },
+  },
+
+  // ─── with explicit client plugin ──────────────────────────────────────────
+  {
+    name: 'withClientPlugin',
+    config: {
+      root: __dirname,
+      input: { path: '../../schemas/3.0.x/petStore.yaml' },
+      output: { path: './gen', barrel: false },
+      adapter: adapterOas({ validate: false, enums: 'root' }),
+      parsers: [parserTs],
+      storage: fsStorage(),
+      plugins: [
+        pluginTs({ output: { path: './types', barrel: false } }),
+        pluginZod({ output: { path: './zod', barrel: false } }),
+        pluginAxios({ output: { path: './clients', barrel: false } }),
+        pluginMcp({
+          output: { path: './mcp', barrel: false },
         }),
       ],
     },

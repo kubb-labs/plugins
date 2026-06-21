@@ -747,6 +747,15 @@ importers:
 
   packages/plugin-mcp:
     dependencies:
+      '@internals/client':
+        specifier: workspace:*
+        version: link:../../internals/client
+      '@internals/shared':
+        specifier: workspace:*
+        version: link:../../internals/shared
+      '@internals/utils':
+        specifier: workspace:*
+        version: link:../../internals/utils
       '@kubb/ast':
         specifier: 'catalog:'
         version: 5.0.0-beta.71
@@ -768,13 +777,6 @@ importers:
       '@kubb/renderer-jsx':
         specifier: 'catalog:'
         version: 5.0.0-beta.71
-    devDependencies:
-      '@internals/shared':
-        specifier: workspace:*
-        version: link:../../internals/shared
-      '@internals/utils':
-        specifier: workspace:*
-        version: link:../../internals/utils
 
   packages/plugin-msw:
     dependencies:

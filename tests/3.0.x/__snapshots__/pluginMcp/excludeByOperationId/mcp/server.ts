@@ -27,9 +27,9 @@ export function getServer() {
     title: "Finds Pets by status",
     description: "Multiple status values can be provided with comma separated strings",
     outputSchema: { data: findPetsByStatusStatus200Schema },
-    inputSchema: { params: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
-  }, async ({ params }, request) => {
-    return findPetsByStatusHandler({ params }, request)
+    inputSchema: { query: z.object({ "status": findPetsByStatusQueryStatusSchema }) },
+  }, async ({ query }, request) => {
+    return findPetsByStatusHandler({ query }, request)
   })
 
 
@@ -37,9 +37,9 @@ export function getServer() {
     title: "Find pet by ID",
     description: "Returns a single pet",
     outputSchema: { data: getPetByIdStatus200Schema },
-    inputSchema: { petId: getPetByIdPathPetIdSchema },
-  }, async ({ petId }, request) => {
-    return getPetByIdHandler({ petId }, request)
+    inputSchema: { path: z.object({ "petId": getPetByIdPathPetIdSchema }) },
+  }, async ({ path }, request) => {
+    return getPetByIdHandler({ path }, request)
   })
 
 
@@ -47,9 +47,9 @@ export function getServer() {
     title: "uploads an image",
     description: "Make a POST request to /pet/{petId}/uploadImage",
     outputSchema: { data: uploadFileStatus200Schema },
-    inputSchema: { petId: uploadFilePathPetIdSchema, data: uploadFileDataSchema, params: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }) },
-  }, async ({ petId, data, params }, request) => {
-    return uploadFileHandler({ petId, data, params }, request)
+    inputSchema: { path: z.object({ "petId": uploadFilePathPetIdSchema }), query: z.object({ "additionalMetadata": uploadFileQueryAdditionalMetadataSchema }), body: uploadFileDataSchema },
+  }, async ({ path, query, body }, request) => {
+    return uploadFileHandler({ path, query, body }, request)
   })
 
 
@@ -66,9 +66,9 @@ export function getServer() {
     title: "Place an order for a pet",
     description: "Place a new order in the store",
     outputSchema: { data: placeOrderStatus200Schema },
-    inputSchema: { data: placeOrderDataSchema },
-  }, async ({ data }, request) => {
-    return placeOrderHandler({ data }, request)
+    inputSchema: { body: placeOrderDataSchema },
+  }, async ({ body }, request) => {
+    return placeOrderHandler({ body }, request)
   })
 
   return server

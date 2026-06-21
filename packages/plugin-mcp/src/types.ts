@@ -1,27 +1,5 @@
+import type { ClientSelector } from '@internals/client'
 import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, PluginFactoryOptions, Resolver } from '@kubb/core'
-
-/**
- * HTTP client each MCP handler uses to call the underlying API. When no client plugin
- * (`@kubb/plugin-axios` or `@kubb/plugin-fetch`) is registered, the runtime named here is bundled
- * into `.kubb/client.ts`. Set `importPath` to import a custom client module instead.
- */
-export type McpClient = {
-  /**
-   * HTTP client runtime bundled into `.kubb/client.ts` when no client plugin is registered.
-   *
-   * @default 'axios'
-   */
-  client?: 'axios' | 'fetch'
-  /**
-   * Path to a custom client module. When set, handlers import their client from here and nothing
-   * is bundled.
-   */
-  importPath?: string
-  /**
-   * Base URL prepended to every request.
-   */
-  baseURL?: string
-}
 
 /**
  * Resolver for MCP that provides naming methods for handler functions.
@@ -52,9 +30,21 @@ export type ResolverMcp = Resolver & {
  */
 export type Options = OutputOptions & {
   /**
-   * HTTP client used by each MCP handler to call the underlying API.
+   * Selects the HTTP client each MCP handler calls. Every client plugin speaks the `RequestResult`
+   * contract, so each handler calls a contract `<op>` that takes one grouped `{ path, query, headers,
+   * body }` object.
+   *
+   * `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
+   * single client plugin (plugin-fetch or plugin-axios) is registered it is auto-detected, so the
+   * string is only needed to disambiguate several client plugins.
+   *
+   * When unset and no client plugin is registered, the handlers emit their own inline contract client.
    */
-  client?: McpClient
+  client?: ClientSelector
+  /**
+   * Base URL prepended to every request when the handlers emit their own inline contract client.
+   */
+  baseURL?: string
   /**
    * Skip operations matching at least one entry in the list.
    */
@@ -78,13 +68,26 @@ export type Options = OutputOptions & {
   macros?: Array<ast.Macro>
 }
 
+/**
+ * The resolved client strategy for the generated handlers, computed once during setup.
+ *
+ * - `contract` — the handlers import and call a registered contract client plugin's `<op>`.
+ * - `contract-inline` — the handlers emit their own inline contract client and inject the matching
+ *   contract runtime (`'fetch'` / `'axios'` picks the bundled template).
+ */
+export type ResolvedClient = { kind: 'contract'; pluginName: string } | { kind: 'contract-inline'; client: 'fetch' | 'axios' }
+
 type ResolvedOptions = {
   output: Output
   exclude: Array<Exclude>
   include: Array<Include> | undefined
   override: Array<Override<ResolvedOptions>>
   group: Group | null
-  client: McpClient
+  /**
+   * The resolved client strategy the generators branch on (contract or inline contract).
+   */
+  client: ResolvedClient
+  baseURL: string | undefined
   resolver: ResolverMcp
 }
 

@@ -1,5 +1,6 @@
 import path from 'node:path'
-import { resolveOperationTypeNames } from '@internals/shared'
+import { Operation, resolveClientOperation } from '@internals/client'
+import { camelCase } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -8,9 +9,10 @@ import type { PluginMcp } from '../types.ts'
 
 /**
  * Built-in operation generator for `@kubb/plugin-mcp`. Emits one MCP tool
- * handler per OpenAPI operation, wiring the input Zod schema, the HTTP call,
- * and the response shape into a single function that an MCP server can
- * register as a callable tool.
+ * handler per OpenAPI operation. The handler takes the grouped `{ path, query,
+ * headers, body }` config and forwards it to a contract client `<op>`: a
+ * registered plugin-axios / plugin-fetch function in `contract` mode, or an
+ * inline contract client rendered into the handler file otherwise.
  */
 export const mcpGenerator = defineGenerator<PluginMcp>({
   name: 'mcp',
@@ -28,10 +30,20 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    // The handler only references the grouped params type — the request body data and the path/query
-    // params — so the response and error-status names are left out of the imports.
-    const responseName = tsResolver.resolveResponseName(node)
-    const importedTypeNames = resolveOperationTypeNames(node, tsResolver, { responseStatusNames: false }).filter((name) => name !== responseName)
+    // A registered contract client plugin owns the `<op>`; contract-inline renders its own client
+    // into this handler file.
+    const contractOp =
+      client.kind === 'contract' ? resolveClientOperation({ clientPlugin: { pluginName: client.pluginName }, driver, node, root, output }) : null
+    const clientPath = path.resolve(root, '.kubb/client.ts')
+    const inlineClientName = camelCase(node.operationId)
+    const calledClientName = contractOp ? contractOp.name : inlineClientName
+
+    // The handler signature references the grouped `<Name>RequestConfig`; the inline op also needs
+    // the `<Name>Responses` aggregate for its return type.
+    const importedTypeNames = [
+      tsResolver.resolveRequestConfigName(node),
+      client.kind === 'contract-inline' ? tsResolver.resolveResponsesName(node) : null,
+    ].filter((name): name is string => Boolean(name))
 
     const meta = {
       name: resolver.resolveHandlerName(node),
@@ -56,13 +68,19 @@ export const mcpGenerator = defineGenerator<PluginMcp>({
         )}
         <File.Import name={['CallToolResult', 'ServerNotification', 'ServerRequest']} path={'@modelcontextprotocol/sdk/types'} isTypeOnly />
         <File.Import name={['RequestHandlerExtra']} path={'@modelcontextprotocol/sdk/shared/protocol'} isTypeOnly />
-        {client.importPath ? (
-          <File.Import name={'client'} path={client.importPath} />
-        ) : (
-          <File.Import name={['client']} root={meta.file.path} path={path.resolve(root, '.kubb/client.ts')} />
+
+        {contractOp && <File.Import name={[contractOp.name]} root={meta.file.path} path={contractOp.path} />}
+
+        {client.kind === 'contract-inline' && (
+          <>
+            <File.Import name={['client']} root={meta.file.path} path={clientPath} />
+            <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
+          </>
         )}
 
-        <McpHandler name={meta.name} node={node} resolver={tsResolver} baseURL={client.baseURL} />
+        {client.kind === 'contract-inline' && <Operation name={inlineClientName} node={node} tsResolver={tsResolver} parser={false} />}
+
+        <McpHandler name={meta.name} clientName={calledClientName} node={node} resolver={tsResolver} />
       </File>
     )
   },
