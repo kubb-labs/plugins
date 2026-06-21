@@ -3,5 +3,16 @@
 * Do not edit manually.
 */
 
-export { PetClient } from './petClient'
-export { StoreClient } from './storeClient'
+import type { ClientConfig } from '../.kubb/client.ts'
+import { PetClient } from './petClient.ts'
+import { StoreClient } from './storeClient.ts'
+
+export class PetStore {
+  readonly petClient: PetClient
+  readonly storeClient: StoreClient
+
+  constructor(config: ClientConfig = {}) {
+    this.petClient = new PetClient(config)
+    this.storeClient = new StoreClient(config)
+  }
+}

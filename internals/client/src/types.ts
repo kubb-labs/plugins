@@ -90,12 +90,16 @@ export type Options = OutputOptions & {
    * // const api = new PetClient({ baseURL: 'https://api.example.com' })
    * // await api.getPetById({ path: { petId: 1 } })
    * ```
-   * @example An aggregation entry point re-exporting every tag client
+   * @example A composed root SDK instantiating every tag client from one config
    * ```ts
    * pluginFetch({ sdk: { shape: 'class', name: 'petStore' } })
-   * // petStore.ts
-   * // export { PetClient } from './petClient'
-   * // export { StoreClient } from './storeClient'
+   * // class PetStore {
+   * //   readonly petClient: PetClient
+   * //   readonly storeClient: StoreClient
+   * //   constructor(config = {}) { ... }
+   * // }
+   * // const api = new PetStore({ baseURL })
+   * // await api.petClient.getPetById({ path: { petId: 1 } })
    * ```
    */
   sdk?: {
@@ -112,8 +116,8 @@ export type Options = OutputOptions & {
     shape?: Shape
     /**
      * Name of the generated aggregation entry point, also the file name. For the `'class'` shape it
-     * barrels every tag client (`export { PetClient } from './petClient'`); for the `'function'`
-     * shape it emits a tree-shakeable `export * as <tag>` namespace per tag.
+     * emits a composed root class that instantiates every tag client from one shared config; for the
+     * `'function'` shape it emits a tree-shakeable `export * as <tag>` namespace per tag.
      */
     name?: string
   }
