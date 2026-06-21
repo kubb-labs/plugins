@@ -15,8 +15,11 @@ export function resolveOptions(options: Options): ResolvedOptions {
     baseURL,
     parser = false,
     group,
+    sdk,
     resolver: userResolver,
   } = options
+
+  const shape = sdk?.shape ?? (sdk?.name ? 'class' : 'function')
 
   return {
     output,
@@ -26,6 +29,7 @@ export function resolveOptions(options: Options): ResolvedOptions {
     group: createGroupConfig(group),
     baseURL,
     parser,
+    sdk: { shape, name: sdk?.name },
     resolver: userResolver ? { ...resolverClient, ...userResolver } : resolverClient,
   }
 }

@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { defaultMacros, isParserEnabled, resolveOptions } from '@internals/client'
+import { createSdkGenerator, defaultMacros, isParserEnabled, resolveOptions } from '@internals/client'
 import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
@@ -38,7 +38,11 @@ export const pluginFetchName = 'plugin-fetch' satisfies PluginFetch['name']
 export const pluginFetch = definePlugin<PluginFetch>((options) => {
   const resolved = resolveOptions(options)
   const { baseURL } = resolved
-  const selectedGenerators = [clientGenerator]
+
+  // `class` swaps the per-operation functions for one static class per tag. `function` keeps the
+  // functions and, when an `sdk.name` is set, adds the `export * as` aggregation entry point.
+  const selectedGenerators =
+    resolved.sdk.shape === 'class' ? [createSdkGenerator<PluginFetch>()] : [clientGenerator, ...(resolved.sdk.name ? [createSdkGenerator<PluginFetch>()] : [])]
 
   return {
     name: pluginFetchName,
