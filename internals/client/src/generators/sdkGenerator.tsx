@@ -9,6 +9,7 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../builders/parser.ts'
+import { getOperationSecurity, type SecurityDocument, type SecurityRequirement, type SecurityScheme } from '../builders/security.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
 import type { Options, ParserOptions, ResolvedOptions, ResolverClient } from '../types.ts'
@@ -29,6 +30,8 @@ type OperationData = {
   zodResolver: ResolverZod | null
   typeFile: ast.FileNode
   zodFile: ast.FileNode | null
+  security?: Array<SecurityRequirement>
+  schemes?: Record<string, SecurityScheme>
 }
 
 type Controller = {
@@ -65,6 +68,7 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
   const tsPluginOptions = pluginTs.options
   const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
   const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
+  const document = ctx.adapter.document as SecurityDocument | null | undefined
 
   function buildOperationData(node: ast.OperationNode): OperationData {
     const typeFile = tsResolver.resolveFile(operationFileEntry(node, node.operationId), {
@@ -81,7 +85,11 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
           })
         : null
 
-    return { node, name: resolver.resolveName(node.operationId), tsResolver, zodResolver, typeFile, zodFile }
+    const { security, schemes } = ast.isHttpOperationNode(node)
+      ? getOperationSecurity({ document, method: node.method, path: node.path })
+      : { security: undefined, schemes: undefined }
+
+    return { node, name: resolver.resolveName(node.operationId), tsResolver, zodResolver, typeFile, zodFile, security, schemes }
   }
 
   return nodes.reduce((acc, operationNode) => {

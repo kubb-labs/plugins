@@ -1,6 +1,8 @@
 export { buildSdkMethod } from './builders/sdkMethod.ts'
 export { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from './builders/parser.ts'
 export { buildReturnStatement } from './builders/returnStatement.ts'
+export { buildSchemesMetadata, buildSecurityMetadata, getOperationSecurity, resolveSecurityScheme } from './builders/security.ts'
+export type { SecurityDocument, SecurityRequirement, SecurityScheme } from './builders/security.ts'
 export { buildGroupedOptionsSignature } from './builders/signature.ts'
 export { buildParserHooks } from './builders/validator.ts'
 export { Operation } from './components/Operation.tsx'

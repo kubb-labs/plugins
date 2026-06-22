@@ -5,7 +5,7 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
-import { buildSecurityMetadata, type SecurityRequirement } from '../builders/security.ts'
+import { buildSchemesMetadata, buildSecurityMetadata, type SecurityRequirement, type SecurityScheme } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import { buildParserHooks } from '../builders/validator.ts'
 import type { ParserOptions } from '../types.ts'
@@ -32,9 +32,14 @@ type Props = {
    */
   parser?: ParserOptions
   /**
-   * Per-operation security requirements, serialized onto the call config (consumed by #395).
+   * Per-operation security requirements, serialized onto the call config's `security` field.
    */
   security?: Array<SecurityRequirement>
+  /**
+   * The schemes referenced by `security`, resolved from `components.securitySchemes` and serialized
+   * onto the call config's `schemes` field so the runtime knows how to place each credential.
+   */
+  schemes?: Record<string, SecurityScheme>
   isExportable?: boolean
   isIndexable?: boolean
 }
@@ -44,12 +49,13 @@ type Props = {
  * single `options` object to the resolved client and returns the `RequestResult`. The type, signature,
  * and call config are built with the AST factory, and only the jsx-renderer emits the source.
  */
-export function Operation({ name, node, tsResolver, zodResolver, parser, security, isExportable = true, isIndexable = true }: Props): KubbReactNode {
+export function Operation({ name, node, tsResolver, zodResolver, parser, security, schemes, isExportable = true, isIndexable = true }: Props): KubbReactNode {
   if (!ast.isHttpOperationNode(node)) return null
 
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
   const parsers = buildParserHooks({ node, parser, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
+  const schemesLiteral = buildSchemesMetadata({ schemes })
 
   const parserEntries = [parsers.request ? `request: ${parsers.request}` : null, parsers.response ? `response: ${parsers.response}` : null].filter(Boolean)
   const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
@@ -58,6 +64,7 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
     `method: '${node.method.toUpperCase()}'`,
     `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
+    schemesLiteral ? `schemes: ${schemesLiteral}` : null,
     parserLiteral,
     '...config',
   ]

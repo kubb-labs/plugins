@@ -4,6 +4,7 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildSdkMethod } from '../builders/sdkMethod.ts'
+import type { SecurityRequirement, SecurityScheme } from '../builders/security.ts'
 import type { ParserOptions } from '../types.ts'
 
 type OperationData = {
@@ -11,6 +12,8 @@ type OperationData = {
   name: string
   tsResolver: ResolverTs
   zodResolver?: ResolverZod | null
+  security?: Array<SecurityRequirement>
+  schemes?: Record<string, SecurityScheme>
 }
 
 type Props = {
@@ -29,13 +32,15 @@ type Props = {
  * still overrides the instance client for a one-off call.
  */
 export function SdkClient({ name, isExportable = true, isIndexable = true, operations, parser, children }: Props): KubbReactNode {
-  const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver }) =>
+  const methods = operations.map(({ node, name: methodName, tsResolver, zodResolver, security, schemes }) =>
     buildSdkMethod({
       node,
       name: methodName,
       tsResolver,
       zodResolver,
       parser,
+      security,
+      schemes,
     }),
   )
 
