@@ -1,24 +1,10 @@
-coverage:
-  status:
-    project:
-      default:
-        target: 80%
-        threshold: 10%
-
-comment:
-  require_bundle_changes: True
-
-bundle_analysis:
-  warning_threshold: "10MB"
-  status: True
-
-
 # configuration related to pull request comments
 comment: false # do not comment PR with the result
 
 ignore:
   - '**/examples/**'
   - '**/tests/**'
+
 coverage:
   range: 50..90 # coverage lower than 50 is red, higher than 90 green, between color code
 
@@ -31,37 +17,33 @@ coverage:
     # do not run coverage on patch nor changes
     patch: off
 
+bundle_analysis:
+  warning_threshold: '10MB'
+  status: true
+
 component_management:
   individual_components:
-    - component_id: cli
-      name: '@kubb/cli'
+    - component_id: plugin-axios
+      name: '@kubb/plugin-axios'
       paths:
-        - packages/cli/**
-    - component_id: core
-      name: '@kubb/core'
+        - packages/plugin-axios/**
+    - component_id: plugin-client
+      name: '@kubb/plugin-client'
       paths:
-        - packages/core/**
-    - component_id: kubb
-      name: 'kubb'
-      paths:
-        - packages/kubb/**
-    - component_id: mcp
-      name: '@kubb/mcp'
-      paths:
-        - packages/mcp/**
-    - component_id: oas
-      name: '@kubb/oas'
-      paths:
-        - packages/oas/**
-    - component_id:  plugin-cypress
+        - packages/plugin-client/**
+    - component_id: plugin-cypress
       name: '@kubb/plugin-cypress'
       paths:
         - packages/plugin-cypress/**
-    - component_id:  plugin-faker
+    - component_id: plugin-faker
       name: '@kubb/plugin-faker'
       paths:
         - packages/plugin-faker/**
-    - component_id:  plugin-mcp
+    - component_id: plugin-fetch
+      name: '@kubb/plugin-fetch'
+      paths:
+        - packages/plugin-fetch/**
+    - component_id: plugin-mcp
       name: '@kubb/plugin-mcp'
       paths:
         - packages/plugin-mcp/**
@@ -69,10 +51,6 @@ component_management:
       name: '@kubb/plugin-msw'
       paths:
         - packages/plugin-msw/**
-    - component_id: plugin-oas
-      name: '@kubb/plugin-oas'
-      paths:
-        - packages/plugin-oas/**
     - component_id: plugin-react-query
       name: '@kubb/plugin-react-query'
       paths:
@@ -81,6 +59,10 @@ component_management:
       name: '@kubb/plugin-redoc'
       paths:
         - packages/plugin-redoc/**
+    - component_id: plugin-swr
+      name: '@kubb/plugin-swr'
+      paths:
+        - packages/plugin-swr/**
     - component_id: plugin-ts
       name: '@kubb/plugin-ts'
       paths:
@@ -93,7 +75,3 @@ component_management:
       name: '@kubb/plugin-zod'
       paths:
         - packages/plugin-zod/**
-    - component_id: unplugin-kubb
-      name: 'unplugin-kubb'
-      paths:
-        - packages/unplugin-kubb/**
