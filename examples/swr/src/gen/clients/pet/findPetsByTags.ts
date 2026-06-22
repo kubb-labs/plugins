@@ -17,11 +17,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({
-    method: 'GET',
-    url: '/pet/findByTags',
-    security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-    schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-    ...config,
-  }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'oauth2' }], ...config }) as Promise<
+    RequestResult<FindPetsByTagsResponses, ThrowOnError>
+  >
 }

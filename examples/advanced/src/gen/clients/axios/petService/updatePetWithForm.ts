@@ -15,6 +15,7 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
   return request({
     method: 'POST',
     url: '/pet/{petId}:search',
+    security: [{ type: 'oauth2' }],
     parser: { response: (data: unknown) => updatePetWithFormResponseSchema.parse(data) },
     ...config,
   }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>

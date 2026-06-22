@@ -89,25 +89,27 @@ export type BodySerializer = (body: unknown, contentType?: string) => BodyInit |
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
 /**
- * A single OpenAPI security requirement: scheme name to the scopes it needs.
+ * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
+ * to the configured `auth` resolver and places the returned token accordingly.
  */
-export type SecurityRequirement = Record<string, Array<string>>
+export type Auth = {
+  type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
+  scheme?: 'bearer' | 'basic'
+  name?: string
+  in?: 'header' | 'query' | 'cookie'
+}
 
 /**
- * A resolved security scheme, narrowed to the kinds the runtime can place on a request.
+ * The token a consumer returns for a scheme, or `undefined` to skip it. Bearer and basic schemes are
+ * prefixed by the runtime (basic is base64-encoded), so return the raw token or `user:password`.
  */
-export type SecurityScheme = { type: 'http'; scheme: 'bearer' } | { type: 'http'; scheme: 'basic' } | { type: 'apiKey'; name: string; in: 'header' | 'query' }
+export type AuthToken = string | undefined
 
 /**
- * Credential a consumer returns for a scheme. A string is used directly (bearer token, api key);
- * the object form is encoded as HTTP basic credentials.
+ * Resolves the token for a security scheme: either a static token used for every scheme, or a
+ * callback called once per scheme on a guarded operation until one returns a token.
  */
-export type AuthCredential = string | { username: string; password: string } | undefined
-
-/**
- * Resolves the credential for a security scheme. Called once per scheme on a guarded operation.
- */
-export type AuthCallback = (params: { schemeName: string; scopes: Array<string> }) => AuthCredential | Promise<AuthCredential>
+export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
@@ -132,9 +134,8 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
   parser?: { request?: Parser; response?: Parser }
-  security?: Array<SecurityRequirement>
-  schemes?: Record<string, SecurityScheme>
-  auth?: AuthCallback
+  security?: Array<Auth>
+  auth?: AuthResolver
 }
 
 /**
@@ -162,8 +163,7 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  schemes?: Record<string, SecurityScheme>
-  auth?: AuthCallback
+  auth?: AuthResolver
 }
 
 /**
@@ -368,38 +368,33 @@ export function createInterceptorStack<T>(): InterceptorStack<T> {
 }
 
 /**
- * Walks the per-operation security requirements and places each resolved credential on the request,
- * mutating `headers` / `query` in place. Schemes with no resolved credential are skipped, and a
- * requirement is satisfied as soon as one of its schemes resolves.
+ * Walks the per-operation security in order and places the first resolved token on the request,
+ * mutating `headers` / `query` in place. Bearer (and oauth2 / openIdConnect) tokens become a `Bearer`
+ * Authorization header, basic credentials are base64-encoded, and an apiKey is placed under its
+ * `name` in the header, query, or cookie.
  */
 export async function resolveAuth(params: {
-  security: Array<SecurityRequirement> | undefined
-  schemes: Record<string, SecurityScheme> | undefined
-  auth: AuthCallback | undefined
+  security: Array<Auth> | undefined
+  auth: AuthResolver | undefined
   headers: Record<string, string>
   query: Record<string, unknown>
 }): Promise<void> {
-  const { security, schemes, auth, headers, query } = params
-  if (!security?.length || !auth) return
+  const { security, auth, headers, query } = params
+  if (!security?.length || auth === undefined) return
 
-  for (const requirement of security) {
-    let satisfied = false
-    for (const [schemeName, scopes] of Object.entries(requirement)) {
-      const credential = await auth({ schemeName, scopes })
-      if (credential === undefined) continue
+  for (const scheme of security) {
+    const token = typeof auth === 'function' ? await auth(scheme) : auth
+    if (token === undefined) continue
 
-      const scheme = schemes?.[schemeName]
-      if (scheme?.type === 'apiKey') {
-        if (scheme.in === 'query') query[scheme.name] = credential as string
-        else headers[scheme.name] = credential as string
-      } else if (scheme?.type === 'http' && scheme.scheme === 'basic' && typeof credential === 'object') {
-        headers.Authorization = `Basic ${btoa(`${credential.username}:${credential.password}`)}`
-      } else {
-        headers.Authorization = `Bearer ${credential as string}`
-      }
-      satisfied = true
+    if (scheme.type === 'apiKey') {
+      const name = scheme.name ?? 'Authorization'
+      if (scheme.in === 'query') query[name] = token
+      else if (scheme.in === 'cookie') headers.Cookie = [headers.Cookie, `${name}=${token}`].filter(Boolean).join('; ')
+      else headers[name] = token
+    } else {
+      headers.Authorization = scheme.scheme === 'basic' ? `Basic ${btoa(token)}` : `Bearer ${token}`
     }
-    if (satisfied) break
+    return
   }
 }
 
@@ -438,7 +433,6 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
     await resolveAuth({
       security: requestConfig.security,
-      schemes: requestConfig.schemes ?? config.schemes,
       auth: requestConfig.auth ?? config.auth,
       headers,
       query,

@@ -31,13 +31,7 @@ export class pet {
   ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'PUT',
-      url: '/pet',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+    return request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
   }
 
   /**
@@ -50,13 +44,7 @@ export class pet {
   ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'POST',
-      url: '/pet',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+    return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
   }
 
   /**
@@ -69,13 +57,9 @@ export class pet {
   ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'GET',
-      url: '/pet/findByStatus',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<
+      RequestResult<FindPetsByStatusResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -88,13 +72,9 @@ export class pet {
   ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'GET',
-      url: '/pet/findByTags',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'oauth2' }], ...config }) as Promise<
+      RequestResult<FindPetsByTagsResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -110,8 +90,7 @@ export class pet {
     return request({
       method: 'GET',
       url: '/pet/{petId}',
-      security: [{ api_key: [] }, { petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { api_key: { type: 'apiKey', name: 'api_key', in: 'header' }, petstore_auth: { type: 'http', scheme: 'bearer' } },
+      security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
       ...config,
     }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }
@@ -125,13 +104,9 @@ export class pet {
   ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'POST',
-      url: '/pet/{petId}',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
+    return request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
+      RequestResult<UpdatePetWithFormResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -144,13 +119,9 @@ export class pet {
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'DELETE',
-      url: '/pet/{petId}',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+    return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
+      RequestResult<DeletePetResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -162,12 +133,8 @@ export class pet {
   ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'POST',
-      url: '/pet/{petId}/uploadImage',
-      security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
-      ...config,
-    }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<
+      RequestResult<UploadFileResponses, ThrowOnError>
+    >
   }
 }

@@ -28,13 +28,9 @@ export class store {
   ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({
-      method: 'GET',
-      url: '/store/inventory',
-      security: [{ api_key: [] }],
-      schemes: { api_key: { type: 'apiKey', name: 'api_key', in: 'header' } },
-      ...config,
-    }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<
+      RequestResult<GetInventoryResponses, ThrowOnError>
+    >
   }
 
   /**
