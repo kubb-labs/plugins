@@ -16,6 +16,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
   return request({
     method: 'GET',
     url: '/pet/{petId}:search',
+    security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
     parser: { response: (data: unknown) => getPetByIdResponseSchema.parse(data) },
     ...config,
   }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>

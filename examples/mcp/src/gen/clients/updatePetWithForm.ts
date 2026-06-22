@@ -16,5 +16,7 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}', ...config }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
+    RequestResult<UpdatePetWithFormResponses, ThrowOnError>
+  >
 }

@@ -16,6 +16,7 @@ export function deletePet<ThrowOnError extends boolean = true>(
   return request({
     method: 'DELETE',
     url: '/pet/{petId}:search',
+    security: [{ type: 'oauth2' }],
     parser: { response: (data: unknown) => deletePetResponseSchema.parse(data) },
     ...config,
   }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>

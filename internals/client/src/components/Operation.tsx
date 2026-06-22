@@ -5,7 +5,7 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { File, Function } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
-import { buildSecurityMetadata, type SecurityRequirement } from '../builders/security.ts'
+import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
 import { buildParserHooks } from '../builders/validator.ts'
 import type { ParserOptions } from '../types.ts'
@@ -32,9 +32,10 @@ type Props = {
    */
   parser?: ParserOptions
   /**
-   * Per-operation security requirements, serialized onto the call config (consumed by #395).
+   * Per-operation security, resolved from the spec into inline `Auth` objects and serialized onto the
+   * call config's `security` field for the runtime `auth` resolver to consume.
    */
-  security?: Array<SecurityRequirement>
+  security?: Array<Auth>
   isExportable?: boolean
   isIndexable?: boolean
 }

@@ -1,5 +1,5 @@
-import { resolverClient } from '@internals/client'
-import type { Config } from '@kubb/core'
+import { resolverClient, type SecurityDocument } from '@internals/client'
+import type { Adapter, Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperation } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
@@ -99,6 +99,29 @@ const createPetNode = ast.factory.createOperation({
   ],
 })
 
+const securityDocument: SecurityDocument = {
+  security: [{ bearerAuth: [] }],
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: 'http', scheme: 'bearer' },
+      petstore_auth: { type: 'oauth2' },
+      api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
+    },
+  },
+  paths: {
+    '/pet': {
+      post: { security: [{ petstore_auth: ['write:pets', 'read:pets'] }] },
+    },
+    '/pet/{petId}': {
+      get: { security: [{ petstore_auth: ['read:pets'] }, { api_key: [] }] },
+    },
+  },
+}
+
+function mockedAdapterWithDocument(document: SecurityDocument): Adapter {
+  return { ...createMockedAdapter(), document } as Adapter
+}
+
 describe('clientGenerator operation', () => {
   const testData = [
     { name: 'findPetsByTags', node: findPetsByTagsNode, options: {} },
@@ -106,7 +129,13 @@ describe('clientGenerator operation', () => {
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
-  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginFetch['resolvedOptions']> }>
+    // Operation-level security overriding the global default, oauth2 reduced to bearer.
+    { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
+    // No operation-level security: falls back to the document's global `bearerAuth`.
+    { name: 'findPetsByTagsWithGlobalSecurity', node: findPetsByTagsNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
+    // Two requirements referencing two different schemes (oauth2 bearer + apiKey header).
+    { name: 'getPetByIdWithMultipleSchemes', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
+  ] as const satisfies Array<{ name: string; node: ast.OperationNode; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginFetch['resolvedOptions'] = { ...defaultOptions, ...props.options }
@@ -118,7 +147,7 @@ describe('clientGenerator operation', () => {
 
     await renderGeneratorOperation(clientGenerator, props.node, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
       driver,
       plugin,
       options,

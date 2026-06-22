@@ -15,5 +15,5 @@ import { client } from '../.kubb/client.ts'
 export function addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
 }

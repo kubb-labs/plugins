@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { Operation, resolveRequestParser, resolveResponseParser } from '@internals/client'
+import { getOperationSecurity, Operation, resolveRequestParser, resolveResponseParser, type SecurityDocument } from '@internals/client'
 import { operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -58,6 +58,12 @@ export const clientGenerator = defineGenerator<PluginAxios>({
           : null,
     } as const
 
+    const security = getOperationSecurity({
+      document: ctx.adapter.document as SecurityDocument | null | undefined,
+      method: node.method,
+      path: node.path,
+    })
+
     const clientPath = path.resolve(root, '.kubb/client.ts')
 
     return (
@@ -77,7 +83,7 @@ export const clientGenerator = defineGenerator<PluginAxios>({
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
 
-        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} />
+        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} security={security} />
       </File>
     )
   },

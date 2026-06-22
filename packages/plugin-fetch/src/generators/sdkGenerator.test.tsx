@@ -1,5 +1,5 @@
-import { createSdkGenerator, resolverClient } from '@internals/client'
-import type { Config } from '@kubb/core'
+import { createSdkGenerator, resolverClient, type SecurityDocument } from '@internals/client'
+import type { Adapter, Config } from '@kubb/core'
 import { ast, memoryStorage } from '@kubb/core'
 import { createMockedAdapter, createMockedPlugin, createMockedPluginDriver, renderGeneratorOperations } from '@kubb/core/mocks'
 import type { PluginTs } from '@kubb/plugin-ts'
@@ -75,12 +75,36 @@ const operationNodes: Array<ast.OperationNode> = [
   }),
 ]
 
+const securityDocument: SecurityDocument = {
+  components: {
+    securitySchemes: {
+      petstore_auth: { type: 'oauth2' },
+      api_key: { type: 'apiKey', name: 'api_key', in: 'header' },
+    },
+  },
+  paths: {
+    '/pet/{petId}': {
+      get: { security: [{ petstore_auth: ['read:pets'] }, { api_key: [] }] },
+    },
+  },
+}
+
+function mockedAdapterWithDocument(document: SecurityDocument): Adapter {
+  return { ...createMockedAdapter(), document } as Adapter
+}
+
 describe('sdkGenerator operations', () => {
   const testData = [
     { name: 'sdkClass', options: {} as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkClassWithName', options: { sdk: { mode: 'tag', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkSingle', options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
-  ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']> }>
+    // Only getPetById declares security in the spec, so the other methods stay bare.
+    {
+      name: 'sdkClassWithSecurity',
+      options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']>,
+      adapter: mockedAdapterWithDocument(securityDocument),
+    },
+  ] as const satisfies Array<{ name: string; options: Partial<PluginFetch['resolvedOptions']>; adapter?: Adapter }>
 
   test.each(testData)('$name', async (props) => {
     const options: PluginFetch['resolvedOptions'] = { ...defaultOptions, ...props.options }
@@ -92,7 +116,7 @@ describe('sdkGenerator operations', () => {
 
     await renderGeneratorOperations(createSdkGenerator<PluginFetch>(), operationNodes, {
       config: testConfig,
-      adapter: createMockedAdapter(),
+      adapter: 'adapter' in props ? props.adapter : createMockedAdapter(),
       driver,
       plugin,
       options,

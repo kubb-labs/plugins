@@ -26,7 +26,7 @@ export class PetClient {
     public addPet<ThrowOnError extends boolean = true>(options: Options<AddPetRequestConfig, ThrowOnError>): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet', ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+    return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
   }
 
 /**
@@ -37,7 +37,7 @@ export class PetClient {
     public findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError>): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/findByStatus', ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
   }
 
 /**
@@ -48,7 +48,7 @@ export class PetClient {
     public getPetById<ThrowOnError extends boolean = true>(options: Options<GetPetByIdRequestConfig, ThrowOnError>): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+    return request({ method: 'GET', url: '/pet/{petId}', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }], ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }
 
 /**
@@ -59,7 +59,7 @@ export class PetClient {
     public deletePet<ThrowOnError extends boolean = true>(options: Options<DeletePetRequestConfig, ThrowOnError>): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'DELETE', url: '/pet/{petId}', ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
+    return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
   }
 
 /**
@@ -69,6 +69,6 @@ export class PetClient {
     public uploadFile<ThrowOnError extends boolean = true>(options: Options<UploadFileRequestConfig, ThrowOnError>): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
   }
 }
