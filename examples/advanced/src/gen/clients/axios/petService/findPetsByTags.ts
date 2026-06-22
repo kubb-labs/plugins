@@ -16,6 +16,7 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
   return request({
     method: 'GET',
     url: '/pet/findByTags',
+    security: [{ type: 'oauth2' }],
     parser: { response: (data: unknown) => findPetsByTagsResponseSchema.parse(data) },
     ...config,
   }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
