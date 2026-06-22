@@ -1,6 +1,5 @@
 ---
 '@kubb/plugin-ts': major
-'@kubb/plugin-client': major
 '@kubb/plugin-react-query': major
 '@kubb/plugin-vue-query': major
 '@kubb/plugin-swr': major
