@@ -67,7 +67,6 @@
     "typecheck": "tsc -p ./tsconfig.json --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@internals/client": "workspace:*",
     "@kubb/ast": "catalog:",
     "@kubb/core": "catalog:",
     "@kubb/plugin-ts": "workspace:*",
@@ -75,6 +74,7 @@
     "@kubb/renderer-jsx": "catalog:"
   },
   "devDependencies": {
+    "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/tanstack-query": "workspace:*",
     "@internals/utils": "workspace:*"
