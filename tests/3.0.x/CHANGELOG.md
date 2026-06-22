@@ -1,5 +1,23 @@
 # tests-3.0.x
 
+## 0.0.1-beta.24
+
+### Patch Changes
+
+- Updated dependencies [[`ce1e109`](https://github.com/kubb-labs/plugins/commit/ce1e1093490a0bc3459276d25a8d8f39eaf1d981), [`3b4b366`](https://github.com/kubb-labs/plugins/commit/3b4b3664d8ce4e12694d150dfed6c7817625e950), [`c29bd39`](https://github.com/kubb-labs/plugins/commit/c29bd3949c07ffd23be20a2a6b98eb5de887d913), [`fcb28c1`](https://github.com/kubb-labs/plugins/commit/fcb28c13595d74520bacb526685129350d3bc185), [`c1a51f8`](https://github.com/kubb-labs/plugins/commit/c1a51f85c45dc313d57925b68e66ee92037a52ed), [`e823790`](https://github.com/kubb-labs/plugins/commit/e823790285532fb75a34df6454a4dfb1bce5f9ba), [`fca3007`](https://github.com/kubb-labs/plugins/commit/fca3007ceda865f7576157e57bcc70d9cbe37add), [`e0f0138`](https://github.com/kubb-labs/plugins/commit/e0f013848d4d42d59db8de6b7a7595409950f726), [`52345a6`](https://github.com/kubb-labs/plugins/commit/52345a6302c0e9fab5b1e87ee03446e99dc4273d), [`e0f0138`](https://github.com/kubb-labs/plugins/commit/e0f013848d4d42d59db8de6b7a7595409950f726), [`8864aa7`](https://github.com/kubb-labs/plugins/commit/8864aa72ae813c24028989b320b3c6947331f80f), [`7f3a055`](https://github.com/kubb-labs/plugins/commit/7f3a0556b967af0d468c5f9946455b073a1716c8), [`aa7ba7f`](https://github.com/kubb-labs/plugins/commit/aa7ba7f433ecb6ef5004cc2094f9ee7bed45a358), [`e0f0138`](https://github.com/kubb-labs/plugins/commit/e0f013848d4d42d59db8de6b7a7595409950f726), [`7364067`](https://github.com/kubb-labs/plugins/commit/7364067a2800d70822f530c6ab29b3d007cbd4e2), [`239d92c`](https://github.com/kubb-labs/plugins/commit/239d92c3b18751ba9a60a990602e1f1269c629cf), [`39f6760`](https://github.com/kubb-labs/plugins/commit/39f67602ac2a5c1c48afb26ecaaf4f2cd19070ec), [`6d27528`](https://github.com/kubb-labs/plugins/commit/6d2752810ef46328bcb6b9495e4ff068c5ec43e8), [`1e110db`](https://github.com/kubb-labs/plugins/commit/1e110dbb929acfc082989e740de30251c93eaebf), [`acb8222`](https://github.com/kubb-labs/plugins/commit/acb82223bd14d0a4da97c3548b0477091fe50822), [`4390631`](https://github.com/kubb-labs/plugins/commit/439063187de7b6d6b3fbeafe09a5391ab136bd20), [`25200d8`](https://github.com/kubb-labs/plugins/commit/25200d80496a2554aa96b8d72f13ea033a0efcd5)]:
+  - @kubb/plugin-react-query@5.0.0-beta.73
+  - @kubb/plugin-vue-query@5.0.0-beta.73
+  - @kubb/plugin-swr@5.0.0-beta.73
+  - @kubb/plugin-mcp@5.0.0-beta.73
+  - @kubb/plugin-faker@5.0.0-beta.73
+  - @kubb/plugin-ts@5.0.0-beta.73
+  - @kubb/plugin-cypress@5.0.0-beta.73
+  - @kubb/plugin-zod@5.0.0-beta.73
+  - @kubb/plugin-axios@5.0.0-beta.73
+  - @kubb/plugin-fetch@5.0.0-beta.73
+  - @kubb/plugin-msw@5.0.0-beta.73
+  - @kubb/plugin-redoc@5.0.0-beta.73
+
 ## 0.0.1-beta.23
 
 ### Patch Changes

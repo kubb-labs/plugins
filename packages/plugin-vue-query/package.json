@@ -1,6 +1,6 @@
 {
   "name": "@kubb/plugin-vue-query",
-  "version": "5.0.0-beta.72",
+  "version": "5.0.0-beta.73",
   "description": "Generate type-safe TanStack Query (Vue Query) composables with Kubb. Covers useQuery, useMutation, useInfiniteQuery, and queryOptions with Vue 3 Composition API support.",
   "keywords": [
     "code-generation",
