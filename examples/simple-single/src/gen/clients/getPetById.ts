@@ -17,5 +17,11 @@ export function getPetById<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetPetByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/{petId}', ...config }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
+  return request({
+    method: 'GET',
+    url: '/pet/{petId}',
+    security: [{ api_key: [] }, { petstore_auth: ['write:pets', 'read:pets'] }],
+    schemes: { api_key: { type: 'apiKey', name: 'api_key', in: 'header' }, petstore_auth: { type: 'http', scheme: 'bearer' } },
+    ...config,
+  }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }
