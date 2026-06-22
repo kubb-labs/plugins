@@ -14,4 +14,4 @@ return request({
 })
 ```
 
-The runtime walks `security` in order and resolves each entry through a single `auth` config field — a static token or a callback that receives the auth object — placing the result as a bearer/basic `Authorization` header or an apiKey in the header, query, or cookie. `oauth2` and `openIdConnect` resolve as bearer. With `auth` unset the metadata is ignored, so there is no change for specs that configure nothing.
+The runtime walks `security` in order and resolves each entry through a single `auth` config field, either a static token or a callback that receives the auth object. It places the result as a bearer or basic `Authorization` header, or an apiKey in the header, query, or cookie. `oauth2` and `openIdConnect` resolve as bearer. With `auth` unset the metadata is ignored, so there is no change for specs that configure nothing.

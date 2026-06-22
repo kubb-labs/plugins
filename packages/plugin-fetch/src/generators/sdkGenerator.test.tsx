@@ -98,7 +98,7 @@ describe('sdkGenerator operations', () => {
     { name: 'sdkClass', options: {} as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkClassWithName', options: { sdk: { mode: 'tag', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
     { name: 'sdkSingle', options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']> },
-    // The `getPetById` method carries the operation's security and resolved schemes; the others stay bare.
+    // Only getPetById declares security in the spec, so the other methods stay bare.
     {
       name: 'sdkClassWithSecurity',
       options: { sdk: { mode: 'flat', name: 'PetStore' } } as Partial<PluginFetch['resolvedOptions']>,
