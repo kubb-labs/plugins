@@ -16,5 +16,11 @@ export function uploadFile<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', ...config }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
+  return request({
+    method: 'POST',
+    url: '/pet/{petId}/uploadImage',
+    security: [{ petstore_auth: ['write:pets', 'read:pets'] }],
+    schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } },
+    ...config,
+  }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }
