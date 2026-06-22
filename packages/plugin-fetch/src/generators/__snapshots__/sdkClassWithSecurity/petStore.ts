@@ -24,8 +24,7 @@ export class PetStore {
     return request({
       method: 'GET',
       url: '/pet/{petId}',
-      security: [{ petstore_auth: ['read:pets'] }, { api_key: [] }],
-      schemes: { petstore_auth: { type: 'http', scheme: 'bearer' }, api_key: { type: 'apiKey', name: 'api_key', in: 'header' } },
+      security: [{ type: 'oauth2' }, { type: 'apiKey', name: 'api_key', in: 'header' }],
       ...config,
     }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }

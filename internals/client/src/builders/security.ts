@@ -1,13 +1,20 @@
 /**
- * A single OpenAPI security requirement: scheme name to the scopes it needs.
+ * A resolved security scheme as emitted on each generated call's `security` array. The runtime calls
+ * the configured `auth` resolver with this object and places the returned token: `http` bearer/basic
+ * on `Authorization`, `apiKey` under `name` in the header/query/cookie, and `oauth2`/`openIdConnect`
+ * as a bearer token.
  */
-export type SecurityRequirement = Record<string, Array<string>>
+export type Auth = {
+  type: 'http' | 'apiKey' | 'oauth2' | 'openIdConnect'
+  scheme?: 'bearer' | 'basic'
+  name?: string
+  in?: 'header' | 'query' | 'cookie'
+}
 
 /**
- * A resolved security scheme, narrowed to the kinds the runtime can place on a request. `oauth2` and
- * `openIdConnect` collapse to bearer, matching the runtime `resolveAuth` mapping.
+ * A single OpenAPI security requirement read from the spec: scheme name to the scopes it needs.
  */
-export type SecurityScheme = { type: 'http'; scheme: 'bearer' } | { type: 'http'; scheme: 'basic' } | { type: 'apiKey'; name: string; in: 'header' | 'query' }
+type SecurityRequirement = Record<string, Array<string>>
 
 /**
  * The slice of an OpenAPI document the security derivation reads: the global `security`, the
@@ -24,92 +31,79 @@ export type SecurityDocument = {
 
 type OasSecurityScheme = { type: 'http'; scheme?: string } | { type: 'apiKey'; name?: string; in?: string } | { type: 'oauth2' } | { type: 'openIdConnect' }
 
-const identifierPattern = /^[A-Za-z_$][A-Za-z0-9_$]*$/
-
-function quoteKey(name: string): string {
-  return identifierPattern.test(name) ? name : `'${name}'`
-}
-
-function serializeRequirement(requirement: SecurityRequirement): string {
-  const entries = Object.entries(requirement).map(([scheme, scopes]) => `${quoteKey(scheme)}: [${scopes.map((scope) => `'${scope}'`).join(', ')}]`)
-  return `{ ${entries.join(', ')} }`
-}
-
-function serializeScheme(scheme: SecurityScheme): string {
-  if (scheme.type === 'apiKey') return `{ type: 'apiKey', name: '${scheme.name}', in: '${scheme.in}' }`
-  return `{ type: 'http', scheme: '${scheme.scheme}' }`
+function serializeAuth(auth: Auth): string {
+  const parts = [`type: '${auth.type}'`]
+  if (auth.scheme) parts.push(`scheme: '${auth.scheme}'`)
+  if (auth.name) parts.push(`name: '${auth.name}'`)
+  if (auth.in) parts.push(`in: '${auth.in}'`)
+  return `{ ${parts.join(', ')} }`
 }
 
 /**
- * Maps an OpenAPI security scheme to the runtime `SecurityScheme`, or `null` when the runtime cannot
- * place it (an unresolved `$ref`, or an `apiKey` outside `header` / `query`). `oauth2` and
- * `openIdConnect` reduce to bearer, as do `http` schemes other than `basic`.
+ * Maps an OpenAPI security scheme to the inline `Auth` object, or `null` when the runtime cannot
+ * place it (an unresolved `$ref`, or an `apiKey` without a name or outside `header` / `query` /
+ * `cookie`). `http` schemes other than `basic` are treated as bearer.
  */
-export function resolveSecurityScheme(scheme: OasSecurityScheme | { $ref: string } | undefined): SecurityScheme | null {
+export function resolveSecurityScheme(scheme: OasSecurityScheme | { $ref: string } | undefined): Auth | null {
   if (!scheme || '$ref' in scheme) return null
   if (scheme.type === 'apiKey') {
-    if (!scheme.name || (scheme.in !== 'header' && scheme.in !== 'query')) return null
+    if (!scheme.name || (scheme.in !== 'header' && scheme.in !== 'query' && scheme.in !== 'cookie')) return null
     return { type: 'apiKey', name: scheme.name, in: scheme.in }
   }
-  if (scheme.type === 'http' && scheme.scheme?.toLowerCase() === 'basic') return { type: 'http', scheme: 'basic' }
-  return { type: 'http', scheme: 'bearer' }
+  if (scheme.type === 'http') return { type: 'http', scheme: scheme.scheme?.toLowerCase() === 'basic' ? 'basic' : 'bearer' }
+  if (scheme.type === 'oauth2') return { type: 'oauth2' }
+  if (scheme.type === 'openIdConnect') return { type: 'openIdConnect' }
+  return null
 }
 
 /**
  * Derives the per-operation security metadata from the OpenAPI document. The operation's own
  * `security` overrides the global `security` (an explicit empty array disables auth), and every
- * referenced scheme is resolved from `components.securitySchemes` into the runtime `schemes` map.
+ * referenced scheme is resolved from `components.securitySchemes` into a flat, de-duplicated list of
+ * `Auth` objects the runtime walks in order.
  *
  * @example
  * `getOperationSecurity({ document, method: 'POST', path: '/pet' })`
- * `// { security: [{ petstore_auth: ['write:pets'] }], schemes: { petstore_auth: { type: 'http', scheme: 'bearer' } } }`
+ * `// [{ type: 'http', scheme: 'bearer' }]`
  */
-export function getOperationSecurity({ document, method, path }: { document: SecurityDocument | null | undefined; method: string; path: string }): {
-  security?: Array<SecurityRequirement>
-  schemes: Record<string, SecurityScheme>
-} {
-  if (!document) return { schemes: {} }
+export function getOperationSecurity({
+  document,
+  method,
+  path,
+}: {
+  document: SecurityDocument | null | undefined
+  method: string
+  path: string
+}): Array<Auth> | undefined {
+  if (!document) return undefined
 
   const operation = document.paths?.[path]?.[method.toLowerCase()]
   const requirements = operation?.security ?? document.security
-  if (!requirements?.length) return { schemes: {} }
+  if (!requirements?.length) return undefined
 
   const definitions = document.components?.securitySchemes ?? {}
-  const schemes: Record<string, SecurityScheme> = {}
+  const security: Array<Auth> = []
+  const seen = new Set<string>()
   for (const requirement of requirements) {
     for (const schemeName of Object.keys(requirement)) {
-      if (schemes[schemeName]) continue
-      const resolved = resolveSecurityScheme(definitions[schemeName])
-      if (resolved) schemes[schemeName] = resolved
+      if (seen.has(schemeName)) continue
+      seen.add(schemeName)
+      const auth = resolveSecurityScheme(definitions[schemeName])
+      if (auth) security.push(auth)
     }
   }
 
-  return { security: requirements, schemes }
+  return security.length ? security : undefined
 }
 
 /**
- * Serializes per-operation security requirements into the literal emitted on each generated call's
- * `security` field. The runtime `resolveAuth` helper consumes it together with the `schemes` map.
+ * Serializes the per-operation security into the literal emitted on each generated call's `security`
+ * field. The runtime `resolveAuth` helper walks it, calling the configured `auth` resolver per entry.
  *
  * @example
- * `buildSecurityMetadata({ security: [{ bearerAuth: [] }] }) // "[{ bearerAuth: [] }]"`
+ * `buildSecurityMetadata({ security: [{ type: 'http', scheme: 'bearer' }] }) // "[{ type: 'http', scheme: 'bearer' }]"`
  */
-export function buildSecurityMetadata({ security }: { security?: Array<SecurityRequirement> }): string | null {
+export function buildSecurityMetadata({ security }: { security?: Array<Auth> }): string | null {
   if (!security?.length) return null
-  return `[${security.map(serializeRequirement).join(', ')}]`
-}
-
-/**
- * Serializes the resolved security schemes into the literal emitted on the generated call's
- * `schemes` field, telling the runtime how to place each scheme's credential.
- *
- * @example
- * `buildSchemesMetadata({ schemes: { bearerAuth: { type: 'http', scheme: 'bearer' } } })`
- * `// "{ bearerAuth: { type: 'http', scheme: 'bearer' } }"`
- */
-export function buildSchemesMetadata({ schemes }: { schemes?: Record<string, SecurityScheme> }): string | null {
-  if (!schemes) return null
-  const entries = Object.entries(schemes).map(([name, scheme]) => `${quoteKey(name)}: ${serializeScheme(scheme)}`)
-  if (!entries.length) return null
-  return `{ ${entries.join(', ')} }`
+  return `[${security.map(serializeAuth).join(', ')}]`
 }

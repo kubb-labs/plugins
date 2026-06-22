@@ -187,45 +187,71 @@ describe('createClientCore', () => {
 describe('resolveAuth', () => {
   test('places a bearer token on the Authorization header', async () => {
     const headers: Record<string, string> = {}
-    await resolveAuth({
-      security: [{ bearerAuth: [] }],
-      schemes: { bearerAuth: { type: 'http', scheme: 'bearer' } },
-      auth: () => 'token-123',
-      headers,
-      query: {},
-    })
+    await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: () => 'token-123', headers, query: {} })
     expect(headers.Authorization).toBe('Bearer token-123')
   })
 
-  test('encodes basic credentials', async () => {
+  test('base64-encodes a basic credential', async () => {
     const headers: Record<string, string> = {}
-    await resolveAuth({
-      security: [{ basicAuth: [] }],
-      schemes: { basicAuth: { type: 'http', scheme: 'basic' } },
-      auth: () => ({ username: 'user', password: 'pass' }),
-      headers,
-      query: {},
-    })
+    await resolveAuth({ security: [{ type: 'http', scheme: 'basic' }], auth: () => 'user:pass', headers, query: {} })
     expect(headers.Authorization).toBe(`Basic ${btoa('user:pass')}`)
   })
 
-  test('places an api key in the configured location', async () => {
+  test('resolves oauth2 as a bearer token', async () => {
+    const headers: Record<string, string> = {}
+    await resolveAuth({ security: [{ type: 'oauth2' }], auth: () => 'token-123', headers, query: {} })
+    expect(headers.Authorization).toBe('Bearer token-123')
+  })
+
+  test('places an api key in the header', async () => {
     const headers: Record<string, string> = {}
     const query: Record<string, unknown> = {}
-    await resolveAuth({
-      security: [{ apiKey: [] }],
-      schemes: { apiKey: { type: 'apiKey', name: 'X-API-Key', in: 'header' } },
-      auth: () => 'secret',
-      headers,
-      query,
-    })
+    await resolveAuth({ security: [{ type: 'apiKey', name: 'X-API-Key', in: 'header' }], auth: () => 'secret', headers, query })
     expect(headers['X-API-Key']).toBe('secret')
     expect(query).toStrictEqual({})
   })
 
-  test('does nothing without an auth callback', async () => {
+  test('places an api key in the query', async () => {
+    const query: Record<string, unknown> = {}
+    await resolveAuth({ security: [{ type: 'apiKey', name: 'api_key', in: 'query' }], auth: () => 'secret', headers: {}, query })
+    expect(query).toStrictEqual({ api_key: 'secret' })
+  })
+
+  test('places an api key in the cookie', async () => {
     const headers: Record<string, string> = {}
-    await resolveAuth({ security: [{ bearerAuth: [] }], schemes: {}, auth: undefined, headers, query: {} })
+    await resolveAuth({ security: [{ type: 'apiKey', name: 'sid', in: 'cookie' }], auth: () => 'secret', headers, query: {} })
+    expect(headers.Cookie).toBe('sid=secret')
+  })
+
+  test('accepts a static token without a callback', async () => {
+    const headers: Record<string, string> = {}
+    await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: 'token-123', headers, query: {} })
+    expect(headers.Authorization).toBe('Bearer token-123')
+  })
+
+  test('awaits an async resolver', async () => {
+    const headers: Record<string, string> = {}
+    await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: async () => 'token-123', headers, query: {} })
+    expect(headers.Authorization).toBe('Bearer token-123')
+  })
+
+  test('applies the first scheme that resolves a token', async () => {
+    const headers: Record<string, string> = {}
+    await resolveAuth({
+      security: [
+        { type: 'http', scheme: 'bearer' },
+        { type: 'apiKey', name: 'X-API-Key', in: 'header' },
+      ],
+      auth: (auth) => (auth.type === 'apiKey' ? 'secret' : undefined),
+      headers,
+      query: {},
+    })
+    expect(headers).toStrictEqual({ 'X-API-Key': 'secret' })
+  })
+
+  test('does nothing without an auth resolver', async () => {
+    const headers: Record<string, string> = {}
+    await resolveAuth({ security: [{ type: 'http', scheme: 'bearer' }], auth: undefined, headers, query: {} })
     expect(headers).toStrictEqual({})
   })
 })

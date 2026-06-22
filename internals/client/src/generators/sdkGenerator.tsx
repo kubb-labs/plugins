@@ -9,7 +9,7 @@ import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../builders/parser.ts'
-import { getOperationSecurity, type SecurityDocument, type SecurityRequirement, type SecurityScheme } from '../builders/security.ts'
+import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
 import type { Options, ParserOptions, ResolvedOptions, ResolverClient } from '../types.ts'
@@ -30,8 +30,7 @@ type OperationData = {
   zodResolver: ResolverZod | null
   typeFile: ast.FileNode
   zodFile: ast.FileNode | null
-  security?: Array<SecurityRequirement>
-  schemes?: Record<string, SecurityScheme>
+  security?: Array<Auth>
 }
 
 type Controller = {
@@ -85,11 +84,9 @@ function buildControllers(nodes: ReadonlyArray<ast.OperationNode>, ctx: Generato
           })
         : null
 
-    const { security, schemes } = ast.isHttpOperationNode(node)
-      ? getOperationSecurity({ document, method: node.method, path: node.path })
-      : { security: undefined, schemes: undefined }
+    const security = ast.isHttpOperationNode(node) ? getOperationSecurity({ document, method: node.method, path: node.path }) : undefined
 
-    return { node, name: resolver.resolveName(node.operationId), tsResolver, zodResolver, typeFile, zodFile, security, schemes }
+    return { node, name: resolver.resolveName(node.operationId), tsResolver, zodResolver, typeFile, zodFile, security }
   }
 
   return nodes.reduce((acc, operationNode) => {

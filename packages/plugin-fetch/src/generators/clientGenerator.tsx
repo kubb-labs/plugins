@@ -58,7 +58,7 @@ export const clientGenerator = defineGenerator<PluginFetch>({
           : null,
     } as const
 
-    const { security, schemes } = getOperationSecurity({
+    const security = getOperationSecurity({
       document: ctx.adapter.document as SecurityDocument | null | undefined,
       method: node.method,
       path: node.path,
@@ -83,7 +83,7 @@ export const clientGenerator = defineGenerator<PluginFetch>({
 
         {meta.fileZod && importedZodNames.length > 0 && <File.Import name={importedZodNames} root={meta.file.path} path={meta.fileZod.path} />}
 
-        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} security={security} schemes={schemes} />
+        <Operation name={meta.name} node={node} tsResolver={tsResolver} zodResolver={zodResolver} parser={parser} security={security} />
       </File>
     )
   },
