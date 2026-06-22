@@ -1,5 +1,28 @@
 # @kubb/plugin-fetch
 
+## 5.0.0-beta.74
+
+### Minor Changes
+
+- [#481](https://github.com/kubb-labs/plugins/pull/481) [`5a58bda`](https://github.com/kubb-labs/plugins/commit/5a58bda6b8801dde914d3f0f2f3eae6314fc506d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Resolve auth from the OpenAPI spec. Each generated call now carries a `security` array of inline auth objects derived from the operation's requirements (falling back to the global `security`) and `components.securitySchemes`:
+
+  ```ts
+  return request({
+    method: "POST",
+    url: "/pet",
+    security: [{ type: "http", scheme: "bearer" }],
+    ...config,
+  });
+  ```
+
+  The runtime walks `security` in order and resolves each entry through a single `auth` config field, either a static token or a callback that receives the auth object. It places the result as a bearer or basic `Authorization` header, or an apiKey in the header, query, or cookie. `oauth2` and `openIdConnect` resolve as bearer. With `auth` unset the metadata is ignored, so there is no change for specs that configure nothing.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.74
+  - @kubb/plugin-zod@5.0.0-beta.74
+
 ## 5.0.0-beta.73
 
 ### Major Changes

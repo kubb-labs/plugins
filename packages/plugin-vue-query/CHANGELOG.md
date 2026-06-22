@@ -1,5 +1,13 @@
 # @kubb/plugin-vue-query
 
+## 5.0.0-beta.74
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.74
+  - @kubb/plugin-zod@5.0.0-beta.74
+
 ## 5.0.0-beta.73
 
 ### Major Changes

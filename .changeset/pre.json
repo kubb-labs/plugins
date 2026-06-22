@@ -84,6 +84,7 @@
     "plugin-faker-v5-rewrite",
     "plugin-fetch-client",
     "plugin-fetch-request-config-input",
+    "plugin-fetch-security-metadata",
     "plugin-mcp-enum-path-params",
     "plugin-mcp-request-headers",
     "plugin-mcp-v5-migration",
