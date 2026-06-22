@@ -36,8 +36,8 @@ export type Options = OutputOptions & {
    *
    * `'fetch'` / `'axios'` calls the `@kubb/plugin-fetch` / `@kubb/plugin-axios` functions. When a
    * single client plugin (plugin-fetch or plugin-axios) is registered it is auto-detected, so the
-   * string is only needed to disambiguate several client plugins. Register one of those plugins;
-   * options such as `baseURL` live there.
+   * string is only needed to disambiguate several client plugins. Register one of those plugins.
+   * Options such as `baseURL` live there.
    */
   client?: ClientSelector
   /**
