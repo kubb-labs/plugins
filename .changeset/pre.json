@@ -141,6 +141,7 @@
     "shared-operation-file-entry",
     "simplify-function-printer",
     "single-quote-output-spacing",
+    "spread-generators-into-add-generator",
     "standardize-client-runtime-symbol",
     "swr-enabled-params-client-alignment",
     "tanstack-query-optional-enabled-params",

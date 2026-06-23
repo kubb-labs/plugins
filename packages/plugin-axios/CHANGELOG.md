@@ -1,5 +1,15 @@
 # @kubb/plugin-axios
 
+## 5.0.0-beta.75
+
+### Patch Changes
+
+- [#498](https://github.com/kubb-labs/plugins/pull/498) [`9912bc6`](https://github.com/kubb-labs/plugins/commit/9912bc6473a668330a114bf175415562decaa5f0) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Spread the selected generators into `ctx.addGenerator` so the call matches the narrowed `@kubb/core` signature, which now takes generators as separate arguments instead of a bare array.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.75
+  - @kubb/plugin-zod@5.0.0-beta.75
+
 ## 5.0.0-beta.74
 
 ### Minor Changes
