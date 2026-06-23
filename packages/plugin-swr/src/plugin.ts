@@ -83,7 +83,7 @@ export const pluginSwr = definePlugin<PluginSwr>((options) => {
           ctx.setMacros(userMacros)
         }
 
-        ctx.addGenerator(selectedGenerators)
+        ctx.addGenerator(...selectedGenerators)
       },
     },
   }
