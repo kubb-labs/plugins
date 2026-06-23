@@ -1,5 +1,15 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.75
+
+### Major Changes
+
+- [#500](https://github.com/kubb-labs/plugins/pull/500) [`6cabaa0`](https://github.com/kubb-labs/plugins/commit/6cabaa0f3bb219a789b5b31b97b65524ff855b30) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Remove the `operations` option.
+
+  `plugin-zod` no longer emits an `operations.ts` file with the `operations` and `paths` maps. The option was niche and added surface area that few projects relied on.
+
+  If you still need that file, add a small custom Kubb plugin that reproduces it. The [Zod migration guide](https://kubb.dev/docs/5.x/migration-guide/plugin-zod) carries a complete, copy-pasteable example built on the public `definePlugin` and `defineGenerator` API.
+
 ## 5.0.0-beta.74
 
 ## 5.0.0-beta.73
