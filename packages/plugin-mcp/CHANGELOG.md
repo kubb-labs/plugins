@@ -1,5 +1,15 @@
 # @kubb/plugin-mcp
 
+## 5.0.0-beta.74
+
+### Patch Changes
+
+- [#493](https://github.com/kubb-labs/plugins/pull/493) [`f475ce6`](https://github.com/kubb-labs/plugins/commit/f475ce639a667d626a36979fcca55c667c9dbe2d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Target `@kubb/core` `5.0.0-beta.74` and register generators in a single `ctx.addGenerator` call now that it accepts multiple generators, dropping the per-generator loop.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.74
+  - @kubb/plugin-zod@5.0.0-beta.74
+
 ## 5.0.0-beta.73
 
 ### Major Changes
