@@ -142,9 +142,7 @@ export const pluginReactQuery = definePlugin<PluginReactQuery>((options) => {
           ctx.setMacros(userMacros)
         }
 
-        for (const gen of selectedGenerators) {
-          ctx.addGenerator(gen)
-        }
+        ctx.addGenerator(selectedGenerators)
       },
     },
   }

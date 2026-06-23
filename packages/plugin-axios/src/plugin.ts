@@ -75,9 +75,7 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
         ctx.setResolver(resolved.resolver)
         ctx.setMacros([...defaultMacros, ...(options.macros ?? [])])
 
-        for (const gen of selectedGenerators) {
-          ctx.addGenerator(gen)
-        }
+        ctx.addGenerator(selectedGenerators)
 
         const root = path.resolve(ctx.config.root, ctx.config.output.path)
 

@@ -87,8 +87,7 @@ export const pluginMcp = definePlugin<PluginMcp>((options) => {
         if (userMacros?.length) {
           ctx.setMacros(userMacros)
         }
-        ctx.addGenerator(mcpGenerator)
-        ctx.addGenerator(serverGenerator)
+        ctx.addGenerator(mcpGenerator, serverGenerator)
       },
     },
   }
