@@ -66,7 +66,6 @@ export default defineConfig({
         },
       ],
       group: { type: 'tag' },
-      dateType: 'stringOffset',
       inferred: true,
       typed: true,
       operations: false,
