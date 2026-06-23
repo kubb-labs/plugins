@@ -16,6 +16,6 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["./src/**/*", "kubb.config.js"],
+  "include": ["./src/**/*", "kubb.config.js", "operationsPlugin.ts"],
   "exclude": ["**/node_modules", "**/types/**", "**/mocks/**"]
 }
