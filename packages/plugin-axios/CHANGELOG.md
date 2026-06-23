@@ -1,5 +1,45 @@
 # @kubb/plugin-axios
 
+## 5.0.0-beta.74
+
+### Minor Changes
+
+- [#490](https://github.com/kubb-labs/plugins/pull/490) [`ec7e712`](https://github.com/kubb-labs/plugins/commit/ec7e7128e34df644ecc521fc974c2d8f818f6d5a) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add a `getUrl` helper to the generated client runtime. `client.getUrl(config)` constructs the final request URL — base URL, interpolated path params, and the serialized query — without sending the request, which is handy for query keys, prefetching, and link building.
+
+  ```ts
+  import { client } from "./.kubb/client";
+
+  const url = client.getUrl({
+    url: "/pet/{petId}",
+    path: { petId: 1 },
+    query: { status: ["available"] },
+  });
+  // => '/pet/1?status=available'
+  ```
+
+  Both the fetch and axios runtimes share the same URL serialization the send path already uses, so a built URL matches the one the request would hit.
+
+- [#481](https://github.com/kubb-labs/plugins/pull/481) [`5a58bda`](https://github.com/kubb-labs/plugins/commit/5a58bda6b8801dde914d3f0f2f3eae6314fc506d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Resolve auth from the OpenAPI spec. Each generated call now carries a `security` array of inline auth objects derived from the operation's requirements (falling back to the global `security`) and `components.securitySchemes`:
+
+  ```ts
+  return request({
+    method: "POST",
+    url: "/pet",
+    security: [{ type: "http", scheme: "bearer" }],
+    ...config,
+  });
+  ```
+
+  The runtime walks `security` in order and resolves each entry through a single `auth` config field, either a static token or a callback that receives the auth object. It places the result as a bearer or basic `Authorization` header, or an apiKey in the header, query, or cookie. `oauth2` and `openIdConnect` resolve as bearer. With `auth` unset the metadata is ignored, so there is no change for specs that configure nothing.
+
+### Patch Changes
+
+- [#493](https://github.com/kubb-labs/plugins/pull/493) [`f475ce6`](https://github.com/kubb-labs/plugins/commit/f475ce639a667d626a36979fcca55c667c9dbe2d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Target `@kubb/core` `5.0.0-beta.74` and register generators in a single `ctx.addGenerator` call now that it accepts multiple generators, dropping the per-generator loop.
+
+- Updated dependencies []:
+  - @kubb/plugin-ts@5.0.0-beta.74
+  - @kubb/plugin-zod@5.0.0-beta.74
+
 ## 5.0.0-beta.73
 
 ### Minor Changes
