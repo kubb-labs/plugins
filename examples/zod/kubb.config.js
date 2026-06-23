@@ -24,7 +24,6 @@ export default defineConfig([
         output: {
           path: './zod',
         },
-        operations: true,
         importPath: '../../zod.ts',
         inferred: true,
       }),

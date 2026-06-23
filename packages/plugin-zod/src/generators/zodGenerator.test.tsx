@@ -27,7 +27,6 @@ const defaultOptions: PluginZod['resolvedOptions'] = {
   inferred: false,
   importPath: 'zod',
   coercion: false,
-  operations: false,
   guidType: 'uuid',
   regexType: 'literal',
   mini: false,
