@@ -221,6 +221,32 @@ describe('createClientCore', () => {
   })
 })
 
+describe('buildUrl', () => {
+  test('interpolates path params and serializes the query', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.buildUrl({ url: '/pet/{petId}', path: { petId: 7 }, query: { status: ['a', 'b'] } })).toBe('/pet/7?status=a&status=b')
+  })
+
+  test('prefixes the configured baseURL', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance, baseURL: 'https://example.com' })
+    expect(client.buildUrl({ url: '/pet/{petId}', path: { petId: 1 } })).toBe('https://example.com/pet/1')
+  })
+
+  test('prefixes a per-call baseURL', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.buildUrl({ baseURL: 'https://example.com', url: '/pet' })).toBe('https://example.com/pet')
+  })
+
+  test('uses a per-call querySerializer override', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.buildUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
+  })
+})
+
 describe('resolveAuth', () => {
   test('places a bearer token on the Authorization header', async () => {
     const headers: Record<string, string> = {}
