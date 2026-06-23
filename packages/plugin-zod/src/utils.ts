@@ -1,7 +1,7 @@
 import { extractRefName, stringify, toRegExpString } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
 import { syncSchemaRef } from '@kubb/ast/utils'
-import type { PluginZod, ResolverZod } from './types.ts'
+import type { PluginZod } from './types.ts'
 
 /**
  * Returns `true` when the given coercion option enables coercion for the specified type.
@@ -114,44 +114,6 @@ export function collectCodecRefNames(node: ast.SchemaNode): Array<string> {
   return ast.collect<string>(node, {
     schema: (n) => (n.type === 'ref' && n.ref && containsCodec(n) ? (extractRefName(n.ref) ?? undefined) : undefined),
   })
-}
-
-/**
- * Collects all resolved schema names for an operation's parameters and responses
- * into a single lookup object, useful for building imports and type references.
- */
-export function buildSchemaNames(node: ast.OperationNode, { params, resolver }: { params: Array<ast.ParameterNode>; resolver: ResolverZod }) {
-  const pathParam = params.find((p) => p.in === 'path')
-  const queryParam = params.find((p) => p.in === 'query')
-  const headerParam = params.find((p) => p.in === 'header')
-
-  const responses: Record<number | string, string> = {}
-  const errors: Record<number | string, string> = {}
-
-  for (const res of node.responses) {
-    const name = resolver.resolveResponseStatusName(node, res.statusCode)
-    const statusNum = Number(res.statusCode)
-
-    if (!Number.isNaN(statusNum)) {
-      responses[statusNum] = name
-      if (statusNum >= 400) {
-        errors[statusNum] = name
-      }
-    }
-  }
-
-  responses['default'] = resolver.resolveResponseName(node)
-
-  return {
-    request: node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null,
-    parameters: {
-      path: pathParam ? resolver.resolvePathParamsName(node, pathParam) : null,
-      query: queryParam ? resolver.resolveQueryParamsName(node, queryParam) : null,
-      header: headerParam ? resolver.resolveHeaderParamsName(node, headerParam) : null,
-    },
-    responses,
-    errors,
-  }
 }
 
 /**

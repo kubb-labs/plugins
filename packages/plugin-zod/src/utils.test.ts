@@ -1,11 +1,9 @@
 import { ast } from '@kubb/core'
 import { describe, expect, test } from 'vitest'
-import { resolverZod } from './resolvers/resolverZod.ts'
 import {
   applyMiniModifiers,
   applyModifiers,
   buildGroupedParamsSchema,
-  buildSchemaNames,
   formatDefault,
   formatLiteral,
   getCodec,
@@ -304,56 +302,6 @@ describe('shouldCoerce', () => {
 
   test('returns false for a specific type that is disabled', () => {
     expect(shouldCoerce({ strings: true, numbers: false, dates: false }, 'numbers')).toBe(false)
-  })
-})
-
-describe('buildSchemaNames', () => {
-  const node = ast.factory.createOperation({
-    operationId: 'listPets',
-    method: 'GET',
-    path: '/pets',
-    responses: [
-      ast.factory.createResponse({ statusCode: '200', description: 'OK', schema: ast.factory.createSchema({ type: 'object' }) }),
-      ast.factory.createResponse({ statusCode: '400', description: 'Bad Request', schema: ast.factory.createSchema({ type: 'object' }) }),
-    ],
-  })
-
-  test('resolves response and error names by status code', () => {
-    const result = buildSchemaNames(node, { params: [], resolver: resolverZod })
-
-    expect(result.responses[200]).toBe('listPetsStatus200Schema')
-    expect(result.errors[400]).toBe('listPetsStatus400Schema')
-    expect(result.responses['default']).toBe('listPetsResponseSchema')
-  })
-
-  test('returns undefined for request when no request body', () => {
-    const result = buildSchemaNames(node, { params: [], resolver: resolverZod })
-
-    expect(result.request).toBeNull()
-  })
-
-  test('resolves request name when request body exists', () => {
-    const nodeWithBody = ast.factory.createOperation({
-      operationId: 'createPet',
-      method: 'POST',
-      path: '/pets',
-      requestBody: { content: [ast.factory.createContent({ contentType: 'application/json', schema: ast.factory.createSchema({ type: 'object' }) })] },
-    })
-    const result = buildSchemaNames(nodeWithBody, { params: [], resolver: resolverZod })
-
-    expect(result.request).toBe('createPetDataSchema')
-  })
-
-  test('resolves path and query parameter names', () => {
-    const params = [
-      ast.factory.createParameter({ name: 'petId', schema: ast.factory.createSchema({ type: 'string' }), in: 'path', required: true }),
-      ast.factory.createParameter({ name: 'limit', schema: ast.factory.createSchema({ type: 'integer' }), in: 'query', required: false }),
-    ]
-    const result = buildSchemaNames(node, { params, resolver: resolverZod })
-
-    expect(result.parameters.path).toBe('listPetsPathPetIdSchema')
-    expect(result.parameters.query).toBe('listPetsQueryLimitSchema')
-    expect(result.parameters.header).toBeNull()
   })
 })
 

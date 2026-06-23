@@ -68,7 +68,6 @@ export default defineConfig({
       group: { type: 'tag' },
       inferred: true,
       typed: true,
-      operations: false,
     }),
     pluginReactQuery({
       output: {

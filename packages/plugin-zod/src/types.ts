@@ -137,11 +137,6 @@ export type Options = OutputOptions & {
    */
   coercion?: boolean | { dates?: boolean; strings?: boolean; numbers?: boolean }
   /**
-   * Emit an `operations.ts` file with request body, query/path params, and per-status
-   * response schemas grouped by operation.
-   */
-  operations?: boolean
-  /**
    * Validator for `format: uuid` properties.
    * - `'uuid'` — `z.uuid()`. Standard RFC 4122.
    * - `'guid'` — `z.guid()`. Accepts Microsoft-style GUIDs.
@@ -199,7 +194,6 @@ type ResolvedOptions = {
   inferred: NonNullable<Options['inferred']>
   importPath: NonNullable<Options['importPath']>
   coercion: NonNullable<Options['coercion']>
-  operations: NonNullable<Options['operations']>
   guidType: NonNullable<Options['guidType']>
   regexType: NonNullable<Options['regexType']>
   mini: NonNullable<Options['mini']>

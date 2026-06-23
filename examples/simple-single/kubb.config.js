@@ -50,7 +50,6 @@ export default defineConfig([
           path: './zod.ts',
           mode: 'file',
         },
-        operations: false,
       }),
     ],
   },

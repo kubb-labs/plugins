@@ -3,13 +3,12 @@ import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { Operations } from '../components/Operations.tsx'
 import { Zod } from '../components/Zod.tsx'
 import { ZOD_NAMESPACE_IMPORTS } from '../constants.ts'
 import { printerZod } from '../printers/printerZod.ts'
 import { printerZodMini } from '../printers/printerZodMini.ts'
 import type { PluginZod, ResolverZod } from '../types'
-import { buildSchemaNames, collectCodecRefNames, containsCodec } from '../utils.ts'
+import { collectCodecRefNames, containsCodec } from '../utils.ts'
 
 type StdPrinters = { output: ReturnType<typeof printerZod>; input: ReturnType<typeof printerZod> }
 type ZodPrinterEntry = StdPrinters & { coercion: unknown; guidType: unknown; regexType: unknown; dateType: unknown }
@@ -336,52 +335,6 @@ export const zodGenerator = defineGenerator<PluginZod>({
         {responseSchemas}
         {responseUnionSchema}
         {requestSchema}
-      </File>
-    )
-  },
-  operations(nodes, ctx) {
-    const { config, resolver, root } = ctx
-    const { output, importPath, group, operations } = ctx.options
-
-    if (!operations) {
-      return
-    }
-    const isZodImport = ZOD_NAMESPACE_IMPORTS.has(importPath as 'zod' | 'zod/mini')
-
-    const meta = {
-      file: resolver.resolveFile({ name: 'operations', extname: '.ts' }, { root, output, group: group ?? undefined }),
-    } as const
-
-    const transformedOperations = nodes.filter(ast.isHttpOperationNode).map((node) => {
-      const params = caseParams(node.parameters, 'camelcase')
-
-      return {
-        node,
-        data: buildSchemaNames(node, { params, resolver }),
-      }
-    })
-
-    const imports = transformedOperations.flatMap(({ node, data }) => {
-      const names = [data.request, ...Object.values(data.responses), ...Object.values(data.parameters)].filter(Boolean) as Array<string>
-      const opFile = resolver.resolveFile(
-        { name: node.operationId, extname: '.ts', tag: node.tags[0] ?? 'default', path: node.path },
-        { root, output, group: group ?? undefined },
-      )
-
-      return names.map((name) => <File.Import key={[name, opFile.path].join('-')} name={[name]} root={meta.file.path} path={opFile.path} />)
-    })
-
-    return (
-      <File
-        baseName={meta.file.baseName}
-        path={meta.file.path}
-        meta={meta.file.meta}
-        banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-        footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
-      >
-        <File.Import isTypeOnly name={isZodImport ? 'z' : ['z']} path={importPath} isNameSpace={isZodImport} />
-        {imports}
-        <Operations name="operations" operations={transformedOperations} />
       </File>
     )
   },
