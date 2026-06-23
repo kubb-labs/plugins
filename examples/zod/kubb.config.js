@@ -1,6 +1,7 @@
 import { pluginTs } from '@kubb/plugin-ts'
 import { pluginZod } from '@kubb/plugin-zod'
 import { defineConfig } from 'kubb'
+import { pluginZodOperations } from './operationsPlugin.ts'
 
 export default defineConfig([
   {
@@ -27,6 +28,7 @@ export default defineConfig([
         importPath: '../../zod.ts',
         inferred: true,
       }),
+      pluginZodOperations(),
     ],
   },
   {
