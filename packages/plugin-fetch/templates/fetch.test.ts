@@ -184,26 +184,26 @@ describe('createClientCore', () => {
   })
 })
 
-describe('buildUrl', () => {
+describe('getUrl', () => {
   test('interpolates path params and serializes the query', () => {
     const { client } = createClient()
-    expect(client.buildUrl({ url: '/pet/{petId}', path: { petId: 7 }, query: { status: ['a', 'b'] } })).toBe('/pet/7?status=a&status=b')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, query: { status: ['a', 'b'] } })).toBe('/pet/7?status=a&status=b')
   })
 
   test('prefixes the configured baseURL', () => {
     const { client } = createClient()
     client.setConfig({ baseURL: 'https://example.com' })
-    expect(client.buildUrl({ url: '/pet/{petId}', path: { petId: 1 } })).toBe('https://example.com/pet/1')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 1 } })).toBe('https://example.com/pet/1')
   })
 
   test('prefixes a per-call baseURL', () => {
     const { client } = createClient()
-    expect(client.buildUrl({ baseURL: 'https://example.com', url: '/pet' })).toBe('https://example.com/pet')
+    expect(client.getUrl({ baseURL: 'https://example.com', url: '/pet' })).toBe('https://example.com/pet')
   })
 
   test('uses a per-call querySerializer override', () => {
     const { client } = createClient()
-    expect(client.buildUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
+    expect(client.getUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
   })
 })
 

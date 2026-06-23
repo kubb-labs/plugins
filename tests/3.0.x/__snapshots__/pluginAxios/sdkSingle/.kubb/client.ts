@@ -214,7 +214,7 @@ export type ClientInstance<TRequest = AxiosRequestConfig, TResponse = AxiosRespo
   <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
   getConfig: () => ClientConfig
   setConfig: (config: ClientConfig) => ClientConfig
-  buildUrl: <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>) => string
+  getUrl: <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>) => string
   interceptors: Interceptors
   createClient: (config?: ClientConfig) => ClientInstance<TRequest, TResponse>
 }
@@ -311,7 +311,7 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
 
 /**
  * Joins the base and request URL parts, interpolates `{param}` segments from the path params
- * (URL-encoded), and appends the serialized query. Backs `buildUrl` so a URL can be constructed
+ * (URL-encoded), and appends the serialized query. Backs `getUrl` so a URL can be constructed
  * without sending the request.
  */
 function serializeUrl(parts: Array<string | undefined>, pathParams: Record<string, unknown>, search: string): string {
@@ -493,7 +493,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     config = { ...config, ...next, headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) } }
     return config
   }
-  client.buildUrl = (requestConfig) => {
+  client.getUrl = (requestConfig) => {
     const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))

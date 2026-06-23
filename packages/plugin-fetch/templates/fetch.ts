@@ -243,7 +243,7 @@ export type ClientInstance<TRequest = Request, TResponse = Response> = {
   <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>>
   getConfig: () => ClientConfig<TRequest, TResponse>
   setConfig: (config: ClientConfig<TRequest, TResponse>) => ClientConfig<TRequest, TResponse>
-  buildUrl: <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>) => string
+  getUrl: <TBody = unknown>(config: RequestConfig<TBody, TRequest, TResponse>) => string
   interceptors: Interceptors<TRequest, TResponse>
   createClient: (config?: ClientConfig<TRequest, TResponse>) => ClientInstance<TRequest, TResponse>
 }
@@ -340,7 +340,7 @@ function mergeHeaders(...sources: Array<HeadersInit | undefined>): Record<string
 
 /**
  * Joins the base and request URL parts, interpolates `{param}` segments from the path params
- * (URL-encoded), and appends the serialized query. Shared by the send path and `buildUrl` so both
+ * (URL-encoded), and appends the serialized query. Shared by the send path and `getUrl` so both
  * produce an identical URL.
  */
 function serializeUrl(parts: Array<string | undefined>, pathParams: Record<string, unknown>, search: string): string {
@@ -501,7 +501,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     config = { ...config, ...next, headers: { ...serializeHeaders(config.headers), ...serializeHeaders(next.headers) } }
     return config
   }
-  client.buildUrl = (requestConfig) => {
+  client.getUrl = (requestConfig) => {
     const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
