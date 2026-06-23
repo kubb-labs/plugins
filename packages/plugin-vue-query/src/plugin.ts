@@ -125,9 +125,7 @@ export const pluginVueQuery = definePlugin<PluginVueQuery>((options) => {
           ctx.setMacros(userMacros)
         }
 
-        for (const gen of selectedGenerators) {
-          ctx.addGenerator(gen)
-        }
+        ctx.addGenerator(selectedGenerators)
       },
     },
   }
