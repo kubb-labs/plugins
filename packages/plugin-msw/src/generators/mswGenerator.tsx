@@ -1,4 +1,4 @@
-import { getOperationSuccessResponses, resolveResponseTypes } from '@internals/shared'
+import { getOperationSuccessResponses, resolveOperationTypeImports, resolveResponseTypes } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginFakerName } from '@kubb/plugin-faker'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -59,6 +59,14 @@ export const mswGenerator = defineGenerator<PluginMsw>({
 
     const requestName = node.requestBody?.content?.[0]?.schema ? tsResolver.resolveDataName(node) : null
 
+    // Imports the response union, every per-status type, and the request body type, grouped by file
+    // so inlined single-`$ref` types resolve to their own model file instead of the operation file.
+    const typeImports = resolveOperationTypeImports(node, tsResolver, {
+      includeParams: false,
+      operationFilePath: type.file.path,
+      fileContext: { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+    })
+
     return (
       <File
         baseName={mock.file.baseName}
@@ -69,12 +77,9 @@ export const mswGenerator = defineGenerator<PluginMsw>({
       >
         <File.Import name={['http']} path="msw" />
         <File.Import name={['HttpResponseResolver']} isTypeOnly path="msw" />
-        <File.Import
-          name={Array.from(new Set([type.responseName, ...types.map((t) => t[1]), ...(requestName ? [requestName] : [])]))}
-          path={type.file.path}
-          root={mock.file.path}
-          isTypeOnly
-        />
+        {typeImports.map((imp) => (
+          <File.Import key={imp.path} name={imp.names} path={imp.path} root={mock.file.path} isTypeOnly />
+        ))}
         {parser === 'faker' && faker && <File.Import name={[faker.name]} root={mock.file.path} path={faker.file.path} />}
 
         {types

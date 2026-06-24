@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetsResponse, CreatePetsData } from './CreatePets'
+import type { CreatePetsData, CreatePetsResponse } from './CreatePets'
 import type { HttpResponseResolver } from 'msw'
 import { createCreatePetsResponse } from './createCreatePets'
 import { http } from 'msw'

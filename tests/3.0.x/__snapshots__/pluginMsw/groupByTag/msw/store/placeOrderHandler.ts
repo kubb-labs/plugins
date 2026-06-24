@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { PlaceOrderResponse, PlaceOrderStatus405, PlaceOrderData } from '../../types/PlaceOrder.ts'
+import type { Order } from '../../types/Order.ts'
+import type { PlaceOrderData, PlaceOrderResponse, PlaceOrderStatus405 } from '../../types/PlaceOrder.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

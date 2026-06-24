@@ -1,4 +1,4 @@
-import type { UploadFileResponse, UploadFileData } from '../../models/ts/pet/UploadFile.ts'
+import type { UploadFileData, UploadFileResponse } from '../../models/ts/pet/UploadFile.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

@@ -173,6 +173,50 @@ describe('typeGenerator — Operation', () => {
       }),
     },
     {
+      // A request body and responses backed by a single `$ref` inline to the referenced
+      // component type: no `<op>Data` / `<op>Status<code>` aliases, and the aggregate
+      // `RequestConfig`/`Responses`/`Response` types reference the imported base type directly.
+      // Inline (405) and Omit-wrapped (`keysToOmit`, 200) schemas keep their per-operation alias.
+      name: 'inlineSingleRef — POST with $ref body and $ref responses',
+      node: ast.factory.createOperation({
+        operationId: 'createPet',
+        method: 'POST',
+        path: '/pet',
+        tags: ['pet'],
+        requestBody: {
+          content: [
+            ast.factory.createContent({
+              contentType: 'application/json',
+              schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+            }),
+          ],
+        },
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '201',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+            description: 'Created',
+          }),
+          ast.factory.createResponse({
+            statusCode: '200',
+            description: 'Existing pet (read-only id omitted)',
+            content: [
+              ast.factory.createContent({
+                contentType: 'application/json',
+                schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+                keysToOmit: ['id'],
+              }),
+            ],
+          }),
+          ast.factory.createResponse({
+            statusCode: '405',
+            schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+            description: 'Invalid input',
+          }),
+        ],
+      }),
+    },
+    {
       name: 'updatePetWithForm — POST with path and query params',
       node: ast.factory.createOperation({
         operationId: 'updatePetWithForm',

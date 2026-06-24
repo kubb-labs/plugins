@@ -4,7 +4,8 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileStatus200 } from '../../models/pet/UploadFile.ts'
+import type { ApiResponse } from '../../models/ApiResponse.ts'
+import type { UploadFileRequestConfig } from '../../models/pet/UploadFile.ts'
 import type { UseMutationOptions, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { uploadFile } from '../../clients/pet/uploadFile.ts'
 import { mutationOptions, useMutation } from '@tanstack/react-query'
@@ -15,7 +16,7 @@ export function uploadFileMutationOptions<TContext = unknown>(
   config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' } = {},
 ) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
+  return mutationOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
       const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
@@ -30,7 +31,7 @@ export function uploadFileMutationOptions<TContext = unknown>(
  */
 export function useUploadFile<TContext>(
   options: {
-    mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' }
   } = {},
 ) {
@@ -38,19 +39,14 @@ export function useUploadFile<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
 
-  const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
-    UploadFileStatus200,
-    ResponseErrorConfig<Error>,
-    UploadFileRequestConfig,
-    TContext
-  >
+  const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
+  return useMutation<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
+  ) as UseMutationResult<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 }

@@ -4,7 +4,8 @@
 */
 
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UpdatePetRequestConfig, UpdatePetStatus200 } from '../types/UpdatePet.ts'
+import type { Pet } from '../types/Pet.ts'
+import type { UpdatePetRequestConfig } from '../types/UpdatePet.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { updatePet } from '../clients/updatePet.ts'
 import { useMutation } from '@tanstack/vue-query'
@@ -16,14 +17,14 @@ export const updatePetMutationKey = () => [{ url: '/pets/:pet_id' }] as const
  * {@link /pets/:pet_id}
  */
 export function useUpdatePet<TContext>(options: {
-  mutation?: MutationObserverOptions<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
+  mutation?: MutationObserverOptions<Pet, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext> & { client?: QueryClient },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
 } = {}) {
   const { mutation = {}, client: config = {} } = options ?? {}
   const { client: queryClient, ...mutationOptions } = mutation;
   const mutationKey = mutationOptions?.mutationKey ?? updatePetMutationKey()
 
-  return useMutation<UpdatePetStatus200, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
+  return useMutation<Pet, ResponseErrorConfig<Error>, UpdatePetRequestConfig, TContext>({
     mutationFn: async({ path, query, body }) => {
       const { data } = await updatePet({ ...config, path: toValue(path), query: toValue(query), body: toValue(body), throwOnError: true })
       return data

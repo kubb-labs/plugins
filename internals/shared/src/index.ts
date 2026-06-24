@@ -15,9 +15,13 @@ export {
   getSuccessResponses,
   operationFileEntry,
   resolveContentTypeVariants,
+  resolveDataRef,
   resolveErrorNames,
+  resolveOperationTypeImports,
   resolveOperationTypeNames,
+  resolveResponseStatusRef,
   resolveResponseTypes,
+  resolveSingleRef,
   resolveSuccessNames,
   type BuildOperationCommentsOptions,
   type ContentTypeInfo,
@@ -26,6 +30,7 @@ export {
   type OperationCommentLink,
   type OperationParameterGroups,
   type OperationParamsResolver,
+  type OperationTypeImportResolver,
   type OperationTypeNameResolver,
   type RequestConfigResolver,
   type RequestConfigNameResolver,
@@ -34,7 +39,9 @@ export {
   type ResponseNameResolver,
   type ResponseStatusNameResolver,
   type ResponseType,
+  type ResolveOperationTypeImportOptions,
   type ResolveOperationTypeNameOptions,
+  type SingleRef,
 } from './operation.ts'
 export { createGroupConfig } from './group.ts'
 export { buildParamsMapping, buildTransformedParamsMapping, caseParams } from './params.ts'

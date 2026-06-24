@@ -3,7 +3,8 @@
 * Do not edit manually.
 */
 
-import type { UploadFileResponse, UploadFileStatus200 } from '../types/UploadFile.ts'
+import type { ApiResponse } from '../types/ApiResponse.ts'
+import type { UploadFileResponse } from '../types/UploadFile.ts'
 import { createApiResponse } from './createApiResponse.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -18,8 +19,8 @@ export function createUploadFileQueryAdditionalMetadata(data?: string): string {
 /**
  * @description successful operation
  */
-export function createUploadFileStatus200(data?: Partial<UploadFileStatus200>): UploadFileStatus200 {
-  return createApiResponse(data) as UploadFileStatus200
+export function createUploadFileStatus200(data?: Partial<ApiResponse>): ApiResponse {
+  return createApiResponse(data) as ApiResponse
 }
 
 export function createUploadFileData(data?: Blob): Blob {

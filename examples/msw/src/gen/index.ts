@@ -96,7 +96,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './models/PlaceOrder.ts'
@@ -107,7 +106,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './models/PlaceOrderPatch.ts'
@@ -143,7 +141,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './models/UploadFile.ts'
 export { createAddPetRequest } from './mocks/createAddPetRequest.ts'
 export { createAddPetRequestStatusEnum } from './mocks/createAddPetRequestStatusEnum.ts'

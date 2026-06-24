@@ -1,4 +1,4 @@
-import { operationFileEntry, resolveOperationTypeNames } from '@internals/shared'
+import { operationFileEntry, resolveOperationTypeImports } from '@internals/shared'
 import { resolveClientOperation } from '@internals/client'
 import { resolveZodSchemaNames } from '@internals/tanstack-query'
 import { ast, defineGenerator } from '@kubb/core'
@@ -55,10 +55,13 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
       }),
     }
 
-    const importedTypeNames = [
-      tsResolver.resolveRequestConfigName(node),
-      ...resolveOperationTypeNames(node, tsResolver, { order: 'body-response-first', includeParams: false }),
-    ].filter((name): name is string => Boolean(name))
+    const typeImports = resolveOperationTypeImports(node, tsResolver, {
+      order: 'body-response-first',
+      includeParams: false,
+      extraOperationFileNames: [tsResolver.resolveRequestConfigName(node)],
+      operationFilePath: meta.fileTs.path,
+      fileContext: { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+    })
 
     const pluginZod = isParserEnabled(parser) ? driver.getPlugin(pluginZodName) : null
     const zodResolver = pluginZod ? driver.getResolver(pluginZodName) : null
@@ -87,9 +90,9 @@ export const mutationGenerator = defineGenerator<PluginReactQuery>({
         <File.Import name={['RequestConfig', 'ResponseErrorConfig']} root={meta.file.path} path={contractOp.clientPath} isTypeOnly />
 
         {customOptions && <File.Import name={[customOptions.name]} path={customOptions.importPath} />}
-        {meta.fileTs && importedTypeNames.length > 0 && (
-          <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />
-        )}
+        {typeImports.map((imp) => (
+          <File.Import key={imp.path} name={imp.names} root={meta.file.path} path={imp.path} isTypeOnly />
+        ))}
 
         <MutationKey name={mutationKeyName} node={node} transformer={ctx.options.mutationKey} />
 

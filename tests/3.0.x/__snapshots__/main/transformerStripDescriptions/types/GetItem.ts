@@ -15,11 +15,6 @@ export type GetItemPathId = bigint;
 /**
  * @type object
 */
-export type GetItemStatus200 = Item;
-
-/**
- * @type object
-*/
 export type GetItemRequestConfig = {
     body?: never;
     /**
@@ -36,10 +31,10 @@ export type GetItemRequestConfig = {
  * @type object
 */
 export type GetItemResponses = {
-    "200": GetItemStatus200;
+    "200": Item;
 };
 
 /**
  * @description Union of all possible responses
 */
-export type GetItemResponse = GetItemStatus200;
+export type GetItemResponse = Item;

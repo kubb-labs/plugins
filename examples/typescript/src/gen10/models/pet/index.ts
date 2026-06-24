@@ -84,5 +84,4 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './UploadFile.ts'

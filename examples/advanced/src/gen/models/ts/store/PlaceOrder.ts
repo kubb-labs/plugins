@@ -1,11 +1,6 @@
 import type { Order } from '../Order.ts'
 
 /**
- * @type object
- */
-export type PlaceOrderStatus200 = Order
-
-/**
  * @type any
  */
 export type PlaceOrderStatus405 = any
@@ -41,11 +36,11 @@ export type PlaceOrderRequestConfig = {
  * @type object
  */
 export type PlaceOrderResponses = {
-  '200': PlaceOrderStatus200
+  '200': Order
   '405': PlaceOrderStatus405
 }
 
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
+export type PlaceOrderResponse = Order | PlaceOrderStatus405

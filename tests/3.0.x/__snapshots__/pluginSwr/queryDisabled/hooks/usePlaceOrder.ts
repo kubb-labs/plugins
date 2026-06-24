@@ -4,6 +4,7 @@
 */
 
 import type { RequestConfig } from '../.kubb/client.ts'
+import type { Order } from '../types/Order.ts'
 import type { PlaceOrderRequestConfig } from '../types/PlaceOrder.ts'
 import { placeOrder } from '../clients/placeOrder.ts'
 

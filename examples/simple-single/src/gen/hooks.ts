@@ -30,13 +30,12 @@ import type {
   DeletePetResponse,
   DeletePetStatus400,
   UploadFileRequestConfig,
-  UploadFileStatus200,
+  ApiResponse,
   GetInventoryStatus200,
   PlaceOrderRequestConfig,
-  PlaceOrderStatus200,
+  Order,
   PlaceOrderStatus405,
   PlaceOrderPatchRequestConfig,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   GetOrderByIdRequestConfig,
   GetOrderByIdStatus200,
@@ -585,7 +584,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
 
 export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {}) {
   const mutationKey = uploadFileMutationKey()
-  return mutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
+  return mutationOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ path, query, body }) => {
       const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })
@@ -600,7 +599,7 @@ export function uploadFileMutationOptions<TContext = unknown>(config: Partial<Om
  */
 export function useUploadFile<TContext>(
   options: {
-    mutation?: UseMutationOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
   } = {},
 ) {
@@ -608,21 +607,16 @@ export function useUploadFile<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions.mutationKey ?? uploadFileMutationKey()
 
-  const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<
-    UploadFileStatus200,
-    ResponseErrorConfig<Error>,
-    UploadFileRequestConfig,
-    TContext
-  >
+  const baseOptions = uploadFileMutationOptions(config) as UseMutationOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
+  return useMutation<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
+  ) as UseMutationResult<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>
 }
 
 export const getInventoryQueryKey = () => [{ url: '/store/inventory' }] as const
@@ -721,7 +715,7 @@ export function placeOrderMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderMutationKey()
-  return mutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>({
+  return mutationOptions<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await placeOrder({ ...config, body, throwOnError: true })
@@ -737,7 +731,7 @@ export function placeOrderMutationOptions<TContext = unknown>(
  */
 export function usePlaceOrder<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient }
+    mutation?: UseMutationOptions<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
@@ -748,20 +742,20 @@ export function usePlaceOrder<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? placeOrderMutationKey()
 
   const baseOptions = placeOrderMutationOptions(config) as UseMutationOptions<
-    PlaceOrderStatus200,
+    Order,
     ResponseErrorConfig<PlaceOrderStatus405>,
     PlaceOrderRequestConfig,
     TContext
   >
 
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
+  return useMutation<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>
+  ) as UseMutationResult<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>
 }
 
 export const placeOrderPatchMutationKey = () => [{ url: '/store/order' }] as const
@@ -772,7 +766,7 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
   } = {},
 ) {
   const mutationKey = placeOrderPatchMutationKey()
-  return mutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>({
+  return mutationOptions<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>({
     mutationKey,
     mutationFn: async ({ body }) => {
       const { data } = await placeOrderPatch({ ...config, body, throwOnError: true })
@@ -788,9 +782,7 @@ export function placeOrderPatchMutationOptions<TContext = unknown>(
  */
 export function usePlaceOrderPatch<TContext>(
   options: {
-    mutation?: UseMutationOptions<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: UseMutationOptions<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
@@ -801,20 +793,20 @@ export function usePlaceOrderPatch<TContext>(
   const mutationKey = mutationOptions.mutationKey ?? placeOrderPatchMutationKey()
 
   const baseOptions = placeOrderPatchMutationOptions(config) as UseMutationOptions<
-    PlaceOrderPatchStatus200,
+    Order,
     ResponseErrorConfig<PlaceOrderPatchStatus405>,
     PlaceOrderPatchRequestConfig,
     TContext
   >
 
-  return useMutation<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>(
+  return useMutation<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>(
     {
       ...baseOptions,
       mutationKey,
       ...mutationOptions,
     },
     queryClient,
-  ) as UseMutationResult<PlaceOrderPatchStatus200, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>
+  ) as UseMutationResult<Order, ResponseErrorConfig<PlaceOrderPatchStatus405>, PlaceOrderPatchRequestConfig, TContext>
 }
 
 export const getOrderByIdQueryKey = ({ path }: Omit<GetOrderByIdRequestConfig, 'headers'>) => [{ url: '/store/order/:orderId', params: path }] as const

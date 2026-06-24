@@ -17,7 +17,6 @@ export type { Address } from './ts/models/Address.ts'
 export type { ApiResponse } from './ts/models/ApiResponse.ts'
 export type { Cat } from './ts/models/Cat.ts'
 export type { Category } from './ts/models/Category.ts'
-export type { Category1 } from './ts/models/Category1.ts'
 export type { Customer } from './ts/models/Customer.ts'
 export type { CustomerParamsStatusEnumKey } from './ts/models/CustomerParamsStatusEnum.ts'
 export type {
@@ -102,7 +101,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './ts/models/PlaceOrder.ts'
@@ -113,7 +111,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './ts/models/PlaceOrderPatch.ts'
@@ -150,7 +147,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './ts/models/UploadFile.ts'
 export { addPetRequestStatusEnum } from './ts/models/AddPetRequestStatusEnum.ts'
 export { customerParamsStatusEnum } from './ts/models/CustomerParamsStatusEnum.ts'

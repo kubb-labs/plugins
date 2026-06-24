@@ -1,4 +1,4 @@
-import type { UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405, UpdatePetData } from '../../models/ts/pet/UpdatePet.ts'
+import type { UpdatePetData, UpdatePetResponse, UpdatePetStatus400, UpdatePetStatus404, UpdatePetStatus405 } from '../../models/ts/pet/UpdatePet.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

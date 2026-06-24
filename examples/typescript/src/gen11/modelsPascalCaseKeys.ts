@@ -280,24 +280,6 @@ export type Cat = {
   name?: string
 }
 
-/**
- * @type object
- */
-export type Category1 = {
-  /**
-   * @description
-   * Format: `int64`
-   * @example 1
-   * @type integer | undefined
-   */
-  id?: bigint
-  /**
-   * @example Dogs
-   * @type string | undefined
-   */
-  name?: string
-}
-
 export type Pet = (
   | (Dog & {
       /**
@@ -325,10 +307,7 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
-  category?: Category1
+  category?: Category
   /**
    * @type array
    */
@@ -849,11 +828,6 @@ export type UploadFilePathPetId = bigint
 export type UploadFileQueryAdditionalMetadata = string | undefined
 
 /**
- * @type object
- */
-export type UploadFileStatus200 = ApiResponse
-
-/**
  * @description
  * Format: `binary`
  * @type string | undefined
@@ -884,13 +858,13 @@ export type UploadFileRequestConfig = {
  * @type object
  */
 export type UploadFileResponses = {
-  '200': UploadFileStatus200
+  '200': ApiResponse
 }
 
 /**
  * @description Union of all possible responses
  */
-export type UploadFileResponse = UploadFileStatus200
+export type UploadFileResponse = ApiResponse
 
 /**
  * @type object
@@ -920,11 +894,6 @@ export type GetInventoryResponses = {
  * @description Union of all possible responses
  */
 export type GetInventoryResponse = GetInventoryStatus200
-
-/**
- * @type object
- */
-export type PlaceOrderStatus200 = Order
 
 /**
  * @type any
@@ -963,19 +932,14 @@ export type PlaceOrderRequestConfig = {
  * @type object
  */
 export type PlaceOrderResponses = {
-  '200': PlaceOrderStatus200
+  '200': Order
   '405': PlaceOrderStatus405
 }
 
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderResponse = PlaceOrderStatus200 | PlaceOrderStatus405
-
-/**
- * @type object
- */
-export type PlaceOrderPatchStatus200 = Order
+export type PlaceOrderResponse = Order | PlaceOrderStatus405
 
 /**
  * @type any
@@ -1013,14 +977,14 @@ export type PlaceOrderPatchRequestConfig = {
  * @type object
  */
 export type PlaceOrderPatchResponses = {
-  '200': PlaceOrderPatchStatus200
+  '200': Order
   '405': PlaceOrderPatchStatus405
 }
 
 /**
  * @description Union of all possible responses
  */
-export type PlaceOrderPatchResponse = PlaceOrderPatchStatus200 | PlaceOrderPatchStatus405
+export type PlaceOrderPatchResponse = Order | PlaceOrderPatchStatus405
 
 /**
  * @description ID of order that needs to be fetched

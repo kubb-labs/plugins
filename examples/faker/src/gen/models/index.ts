@@ -83,7 +83,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './PlaceOrder.ts'
@@ -119,7 +118,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './UploadFile.ts'
 export { findPetsByStatusStatus } from './FindPetsByStatus.ts'
 export { orderStatusEnum } from './Order.ts'

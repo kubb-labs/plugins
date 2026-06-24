@@ -1,4 +1,4 @@
-import { caseParams, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, resolveContentTypeVariants, resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -173,6 +173,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (requestBodyContent.length === 1) {
         const entry = requestBodyContent[0]!
         if (!entry.schema) return null
+        // A single `$ref` body inlines to the base component, so skip the redundant `<op>Data` alias.
+        if (resolveDataRef(node)) return null
         return renderSchemaType({
           schema: {
             ...entry.schema,
@@ -197,6 +199,8 @@ export const typeGenerator = defineGenerator<PluginTs>({
       if (variants.length > 1) {
         return buildContentTypeVariants(variants, resolver.resolveResponseStatusName(node, res.statusCode))
       }
+      // A single `$ref` status inlines to the base component, so skip the redundant `<op>Status<code>` alias.
+      if (resolveResponseStatusRef(node, res.statusCode)) return null
       const primary = variants[0] ?? res.content?.[0]
       return renderSchemaType({
         schema: primary?.schema ?? null,

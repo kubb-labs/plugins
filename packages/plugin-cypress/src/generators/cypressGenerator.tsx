@@ -1,4 +1,3 @@
-import { resolveOperationTypeNames } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -26,8 +25,6 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
 
     const tsResolver = driver.getResolver(pluginTsName)
 
-    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), ...resolveOperationTypeNames(node, tsResolver, { includeParams: false })]
-
     const meta = {
       name: resolver.resolveName(node.operationId),
       file: resolver.resolveFile(
@@ -44,6 +41,10 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
       ),
     } as const
 
+    // The Cypress wrapper only references the aggregate `RequestConfig` (body) and `Response`
+    // (return) types, both of which live in the operation file.
+    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponseName(node)]
+
     return (
       <File
         baseName={meta.file.baseName}
@@ -52,7 +53,7 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {meta.fileTs && importedTypeNames.length > 0 && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
+        {meta.fileTs && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )

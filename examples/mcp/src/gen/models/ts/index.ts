@@ -34,7 +34,6 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
-  CreatePetsStatusDefault,
 } from './CreatePets.js'
 export type { CreatePetsXEXAMPLEKey } from './CreatePetsXEXAMPLE.js'
 export type {
@@ -114,7 +113,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './PlaceOrder.js'
@@ -125,7 +123,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './PlaceOrderPatch.js'

@@ -4,7 +4,6 @@ export type { Address } from './Address.ts'
 export type { ApiResponse } from './ApiResponse.ts'
 export type { Cat } from './Cat.ts'
 export type { Category } from './Category.ts'
-export type { Category1 } from './Category1.ts'
 export type { Customer } from './Customer.ts'
 export type { CustomerParamsStatusEnum } from './CustomerParamsStatusEnum.ts'
 export type { DeletePetStatus200Enum } from './DeletePetStatus200Enum.ts'
@@ -108,7 +107,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './pet/UploadFile.ts'
 export type {
   DeleteOrderPathOrderId,
@@ -137,7 +135,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './store/PlaceOrder.ts'
@@ -148,7 +145,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.ts'

@@ -4,7 +4,8 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { PlaceOrderRequestConfig, PlaceOrderStatus200, PlaceOrderStatus405 } from '../../models/store/PlaceOrder.ts'
+import type { Order } from '../../models/Order.ts'
+import type { PlaceOrderRequestConfig, PlaceOrderStatus405 } from '../../models/store/PlaceOrder.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { placeOrder } from '../../clients/store/placeOrder.ts'
 import { useMutation } from '@tanstack/vue-query'
@@ -19,9 +20,7 @@ export const placeOrderMutationKey = () => [{ url: '/store/order' }] as const
  */
 export function usePlaceOrder<TContext>(
   options: {
-    mutation?: MutationObserverOptions<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & {
-      client?: QueryClient
-    }
+    mutation?: MutationObserverOptions<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
@@ -31,7 +30,7 @@ export function usePlaceOrder<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? placeOrderMutationKey()
 
-  return useMutation<PlaceOrderStatus200, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
+  return useMutation<Order, ResponseErrorConfig<PlaceOrderStatus405>, PlaceOrderRequestConfig, TContext>(
     {
       mutationFn: async ({ body }) => {
         const { data } = await placeOrder({ ...config, body: toValue(body), throwOnError: true })

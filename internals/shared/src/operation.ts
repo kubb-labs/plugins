@@ -1,5 +1,6 @@
 import { Url } from '@internals/utils'
 import { ast, type ResolverFileParams } from '@kubb/core'
+import { extractRefName } from '@kubb/ast/utils'
 import { caseParams } from './params.ts'
 
 /**
@@ -400,6 +401,103 @@ export function resolveStatusCodeNames(node: ast.OperationNode, resolver: Respon
   return node.responses.map((response) => resolver.resolveResponseStatusName(node, response.statusCode))
 }
 
+/**
+ * A schema that is exactly one component `$ref`: the referenced component name plus
+ * its original `$ref` path. Inline, array, and union schemas have no single base type
+ * and never produce a `SingleRef`.
+ */
+export type SingleRef = {
+  rawName: string
+  ref: string
+}
+
+/**
+ * Returns the referenced component when `schema` is a single `$ref`, otherwise `null`.
+ * A synthetic ref (a `ref` node without a `$ref` path, used for the per-operation alias
+ * names) is not a `$ref` to a component and resolves to `null`.
+ */
+export function resolveSingleRef(schema: ast.SchemaNode | null | undefined): SingleRef | null {
+  if (!schema || schema.type !== 'ref' || !schema.ref) {
+    return null
+  }
+  return { rawName: extractRefName(schema.ref) ?? schema.name ?? '', ref: schema.ref }
+}
+
+/**
+ * Resolves the single component `$ref` backing a response status, or `null` when the
+ * status is inline, an array, a union, a multi-content union, or carries an `Omit`
+ * (`keysToOmit`) that makes it more than a plain alias of the base type.
+ */
+export function resolveResponseStatusRef(node: ast.OperationNode, statusCode: ast.StatusCode): SingleRef | null {
+  const response = node.responses.find((res) => String(res.statusCode) === String(statusCode))
+  if (!response) {
+    return null
+  }
+  const variants = (response.content ?? []).filter((entry) => entry.schema)
+  if (variants.length !== 1 || variants[0]!.keysToOmit?.length) {
+    return null
+  }
+  return resolveSingleRef(variants[0]!.schema)
+}
+
+/**
+ * Resolves the single component `$ref` backing the request body, or `null` when the body
+ * is inline, a multi-content union, or carries an `Omit` (`keysToOmit`).
+ */
+export function resolveDataRef(node: ast.OperationNode): SingleRef | null {
+  const content = node.requestBody?.content ?? []
+  if (content.length !== 1 || content[0]!.keysToOmit?.length) {
+    return null
+  }
+  return resolveSingleRef(content[0]!.schema)
+}
+
+type OperationTypeEntry = {
+  name: string
+  /** Set when this name is an inlined component type that lives in its own model file. */
+  inlineRef: SingleRef | null
+}
+
+function collectOperationTypeEntries(
+  node: ast.OperationNode,
+  resolver: OperationTypeNameResolver,
+  options: ResolveOperationTypeNameOptions,
+): OperationTypeEntry[] {
+  const { path, query, header } = getOperationParameters(node, { paramsCasing: options.paramsCasing })
+
+  const responseEntries: OperationTypeEntry[] =
+    options.responseStatusNames === false
+      ? []
+      : node.responses
+          .filter((response) => (options.responseStatusNames === 'error' ? isErrorStatusCode(response.statusCode) : true))
+          .map((response) => ({
+            name: resolver.resolveResponseStatusName(node, response.statusCode),
+            inlineRef: resolveResponseStatusRef(node, response.statusCode),
+          }))
+
+  const paramEntries: OperationTypeEntry[] =
+    options.includeParams === false
+      ? []
+      : [
+          ...path.map((param) => ({ name: resolver.resolvePathParamsName(node, param), inlineRef: null })),
+          ...query.map((param) => ({ name: resolver.resolveQueryParamsName(node, param), inlineRef: null })),
+          ...header.map((param) => ({ name: resolver.resolveHeaderParamsName(node, param), inlineRef: null })),
+        ]
+
+  const bodyAndResponseEntries: OperationTypeEntry[] = [
+    node.requestBody?.content?.[0]?.schema ? { name: resolver.resolveDataName(node), inlineRef: resolveDataRef(node) } : null,
+    { name: resolver.resolveResponseName(node), inlineRef: null },
+  ].filter((entry): entry is OperationTypeEntry => Boolean(entry))
+
+  const entries =
+    options.order === 'body-response-first'
+      ? [...bodyAndResponseEntries, ...paramEntries, ...responseEntries]
+      : [...paramEntries, ...bodyAndResponseEntries, ...responseEntries]
+
+  const exclude = new Set(options.exclude ?? [])
+  return entries.filter((entry) => Boolean(entry.name) && !exclude.has(entry.name))
+}
+
 const typeNamesByResolver = new WeakMap<OperationTypeNameResolver, Map<string, string[]>>()
 
 export function resolveOperationTypeNames(
@@ -417,31 +515,54 @@ export function resolveOperationTypeNames(
     typeNamesByResolver.set(resolver, byResolver)
   }
 
-  const { path, query, header } = getOperationParameters(node, { paramsCasing: options.paramsCasing })
-  const responseStatusNames =
-    options.responseStatusNames === 'error'
-      ? resolveErrorNames(node, resolver)
-      : options.responseStatusNames === false
-        ? []
-        : resolveStatusCodeNames(node, resolver)
-  const exclude = new Set(options.exclude ?? [])
-  const paramNames =
-    options.includeParams === false
-      ? []
-      : [
-          ...path.map((param) => resolver.resolvePathParamsName(node, param)),
-          ...query.map((param) => resolver.resolveQueryParamsName(node, param)),
-          ...header.map((param) => resolver.resolveHeaderParamsName(node, param)),
-        ]
-  const bodyAndResponseNames = [node.requestBody?.content?.[0]?.schema ? resolver.resolveDataName(node) : null, resolver.resolveResponseName(node)]
-  const names =
-    options.order === 'body-response-first'
-      ? [...bodyAndResponseNames, ...paramNames, ...responseStatusNames]
-      : [...paramNames, ...bodyAndResponseNames, ...responseStatusNames]
-
-  const result = names.filter((name): name is string => Boolean(name) && !exclude.has(name as string))
+  const result = collectOperationTypeEntries(node, resolver, options).map((entry) => entry.name)
   byResolver.set(cacheKey, result)
   return result
+}
+
+/**
+ * Resolver shape needed to turn operation type names into imports: the naming methods plus
+ * `resolveFile`, so inlined component types can be pointed at their own model file.
+ */
+export type OperationTypeImportResolver = OperationTypeNameResolver & {
+  resolveFile(params: ResolverFileParams, options: { root: string; output: { path: string }; group?: unknown }): { path: string }
+}
+
+export type ResolveOperationTypeImportOptions = ResolveOperationTypeNameOptions & {
+  /** Path of the operation's own TypeScript file, where non-inlined operation types live. */
+  operationFilePath: string
+  /** File context used to resolve a component type's model file (matches `plugin-ts` output/group). */
+  fileContext: { root: string; output: { path: string }; group?: unknown }
+  /** Extra names that always live in the operation file (e.g. `RequestConfig`), kept in order, deduped. */
+  extraOperationFileNames?: ReadonlyArray<string | undefined>
+}
+
+/**
+ * Like {@link resolveOperationTypeNames}, but groups the names by the file they should be
+ * imported from. Inlined single-`$ref` types (response statuses and the request body) point at
+ * their component's model file; everything else points at the operation file. Names are deduped
+ * within each group while preserving first-seen order.
+ */
+export function resolveOperationTypeImports(
+  node: ast.OperationNode,
+  resolver: OperationTypeImportResolver,
+  options: ResolveOperationTypeImportOptions,
+): Array<{ path: string; names: string[] }> {
+  const flat: Array<{ name: string; path: string }> = [
+    ...(options.extraOperationFileNames ?? []).filter((name): name is string => Boolean(name)).map((name) => ({ name, path: options.operationFilePath })),
+    ...collectOperationTypeEntries(node, resolver, options).map((entry) => ({
+      name: entry.name,
+      path: entry.inlineRef ? resolver.resolveFile({ name: entry.inlineRef.rawName, extname: '.ts' }, options.fileContext).path : options.operationFilePath,
+    })),
+  ]
+
+  const byPath = new Map<string, Set<string>>()
+  for (const { name, path } of flat) {
+    const names = byPath.get(path) ?? new Set<string>()
+    names.add(name)
+    byPath.set(path, names)
+  }
+  return Array.from(byPath, ([path, names]) => ({ path, names: Array.from(names) }))
 }
 
 export function resolveResponseTypes(node: ast.OperationNode, resolver: ResponseNameResolver): Array<[statusCode: number | 'default', typeName: string]> {

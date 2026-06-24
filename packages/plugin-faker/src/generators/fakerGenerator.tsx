@@ -1,4 +1,4 @@
-import { caseParams, getPerContentTypeName, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getPerContentTypeName, resolveContentTypeVariants, resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -115,7 +115,24 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       name: resolveParamNameByLocation(resolver, node, param),
       typeName: resolveParamNameByLocation(tsResolver, node, param),
     }))
-    type RenderUnit = { schema: ast.SchemaNode | null; name: string; typeName: string; description?: string; skipImportNames: Array<string> }
+    type RenderUnit = {
+      schema: ast.SchemaNode | null
+      name: string
+      typeName: string
+      description?: string
+      skipImportNames: Array<string>
+      /** Set when the TS type lives in its own model file (an inlined single-`$ref` type). */
+      typeFilePath?: string
+    }
+
+    // Resolves the model file a single-`$ref` component type lives in, so an inlined response/body
+    // type is imported from there instead of the operation file.
+    function modelTypeFilePath(rawName: string): string {
+      return tsResolver.resolveFile(
+        { name: rawName, extname: '.ts' },
+        { root, output: pluginTs?.options?.output ?? output, group: pluginTs?.options?.group ?? undefined },
+      ).path
+    }
 
     // Expands a content array into render units: one faker per content type plus a union faker
     // (named `baseName`) when more than one content type carries a schema, else a single faker.
@@ -125,12 +142,22 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       tsBaseName: string,
       description: string | undefined,
       decorate?: (schema: ast.SchemaNode) => ast.SchemaNode,
+      inlinedTypeFilePath?: string | null,
     ): Array<RenderUnit> {
       const withSchema = entries.filter((entry) => entry.schema)
       if (withSchema.length <= 1) {
         const primary = withSchema[0] ?? entries[0]
         if (!primary?.schema) return []
-        return [{ schema: decorate ? decorate(primary.schema) : primary.schema, name: baseName, typeName: tsBaseName, description, skipImportNames: [] }]
+        return [
+          {
+            schema: decorate ? decorate(primary.schema) : primary.schema,
+            name: baseName,
+            typeName: tsBaseName,
+            description,
+            skipImportNames: [],
+            typeFilePath: inlinedTypeFilePath ?? undefined,
+          },
+        ]
       }
       const variants = resolveContentTypeVariants(entries, baseName)
       const unionSchema = ast.factory.createSchema({
@@ -149,20 +176,25 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       ]
     }
 
-    const responseUnits = node.responses.flatMap((response) =>
-      expandContentUnits(
+    const responseUnits = node.responses.flatMap((response) => {
+      const inlined = resolveResponseStatusRef(node, response.statusCode)
+      return expandContentUnits(
         response.content ?? [],
         resolver.resolveResponseStatusName(node, response.statusCode),
         tsResolver.resolveResponseStatusName(node, response.statusCode),
         response.description,
-      ),
-    )
+        undefined,
+        inlined ? modelTypeFilePath(inlined.rawName) : null,
+      )
+    })
+    const dataRef = resolveDataRef(node)
     const dataUnits = expandContentUnits(
       node.requestBody?.content ?? [],
       resolver.resolveDataName(node),
       tsResolver.resolveDataName(node),
       node.requestBody?.description,
       (schema) => ({ ...schema, description: node.requestBody?.description ?? schema.description }),
+      dataRef ? modelTypeFilePath(dataRef.rawName) : null,
     )
     const responseName = resolver.resolveResponseName(node)
     const localHelperNames = new Set([
@@ -208,12 +240,14 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
       typeName,
       description,
       skipImportNames = [],
+      typeFilePath = meta.typeFile.path,
     }: {
       schema: ast.SchemaNode | null
       name: string
       typeName: string
       description?: string
       skipImportNames?: Array<string>
+      typeFilePath?: string
     }) {
       if (!schema) {
         return null
@@ -240,7 +274,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
         name,
         typeName,
         filePath: meta.file.path,
-        typeFilePath: meta.typeFile.path,
+        typeFilePath,
       })
 
       return (
@@ -287,6 +321,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName: unit.typeName,
             description: unit.description,
             skipImportNames: unit.skipImportNames,
+            typeFilePath: unit.typeFilePath,
           }),
         )}
         {dataUnits.map((unit) =>
@@ -296,6 +331,7 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeName: unit.typeName,
             description: unit.description,
             skipImportNames: unit.skipImportNames,
+            typeFilePath: unit.typeFilePath,
           }),
         )}
         {renderEntry({

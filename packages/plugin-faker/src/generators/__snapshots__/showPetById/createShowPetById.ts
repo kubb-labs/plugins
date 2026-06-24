@@ -3,7 +3,9 @@
  * Do not edit manually.
  */
 
-import type { ShowPetByIdResponse, ShowPetByIdStatus200, ShowPetByIdStatusDefault } from './types/ShowPetById'
+import type { Error } from './types/Error'
+import type { Pet } from './types/Pet'
+import type { ShowPetByIdResponse } from './types/ShowPetById'
 import { faker } from '@faker-js/faker'
 
 export function createShowPetByIdPathPetId(data?: string): string {
@@ -13,15 +15,15 @@ export function createShowPetByIdPathPetId(data?: string): string {
 /**
  * @description Expected response to a valid request
  */
-export function createShowPetByIdStatus200(data?: Partial<ShowPetByIdStatus200>): ShowPetByIdStatus200 {
-  return createPet(data) as ShowPetByIdStatus200
+export function createShowPetByIdStatus200(data?: Partial<Pet>): Pet {
+  return createPet(data) as Pet
 }
 
 /**
  * @description Unexpected error
  */
-export function createShowPetByIdStatusDefault(data?: Partial<ShowPetByIdStatusDefault>): ShowPetByIdStatusDefault {
-  return createError(data) as ShowPetByIdStatusDefault
+export function createShowPetByIdStatusDefault(data?: Partial<Error>): Error {
+  return createError(data) as Error
 }
 
 export function createShowPetByIdResponse(_data?: ShowPetByIdResponse): ShowPetByIdResponse {

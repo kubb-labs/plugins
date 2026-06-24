@@ -8,5 +8,4 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
-  CreatePetsStatusDefault,
 } from './CreatePets.ts'

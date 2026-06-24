@@ -115,7 +115,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './pet/UploadFile.ts'
 export type {
   CreatePetsData,
@@ -127,7 +126,6 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
-  CreatePetsStatusDefault,
 } from './pets/CreatePets.ts'
 export type {
   DeleteOrderPathOrderId,
@@ -156,7 +154,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './store/PlaceOrder.ts'
@@ -167,7 +164,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './store/PlaceOrderPatch.ts'

@@ -4,7 +4,8 @@
  */
 
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileStatus200 } from '../../models/pet/UploadFile.ts'
+import type { ApiResponse } from '../../models/ApiResponse.ts'
+import type { UploadFileRequestConfig } from '../../models/pet/UploadFile.ts'
 import type { MutationObserverOptions, QueryClient } from '@tanstack/vue-query'
 import { uploadFile } from '../../clients/pet/uploadFile.ts'
 import { useMutation } from '@tanstack/vue-query'
@@ -18,7 +19,7 @@ export const uploadFileMutationKey = () => [{ url: '/pet/:petId/uploadImage' }] 
  */
 export function useUploadFile<TContext>(
   options: {
-    mutation?: MutationObserverOptions<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
+    mutation?: MutationObserverOptions<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext> & { client?: QueryClient }
     client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & { contentType?: 'application/json' | 'multipart/form-data' }
   } = {},
 ) {
@@ -26,7 +27,7 @@ export function useUploadFile<TContext>(
   const { client: queryClient, ...mutationOptions } = mutation
   const mutationKey = mutationOptions?.mutationKey ?? uploadFileMutationKey()
 
-  return useMutation<UploadFileStatus200, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
+  return useMutation<ApiResponse, ResponseErrorConfig<Error>, UploadFileRequestConfig, TContext>(
     {
       mutationFn: async ({ path, query, body }) => {
         const { data } = await uploadFile({ ...config, path: toValue(path), query: toValue(query), body: toValue(body), throwOnError: true })

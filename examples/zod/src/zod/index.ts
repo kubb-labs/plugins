@@ -23,7 +23,6 @@ export type {
   CreatePetsResponse,
   CreatePetsResponses,
   CreatePetsStatus201,
-  CreatePetsStatusDefault,
   CreatePetsXEXAMPLEKey,
 } from './ts/CreatePets.ts'
 export type {
@@ -97,7 +96,6 @@ export type {
   GetThingsResponse,
   GetThingsResponses,
   GetThingsStatus201,
-  GetThingsStatusDefault,
 } from './ts/GetThings.ts'
 export type { Order, OrderHttpStatusEnumKey, OrderStatusEnumKey, OrderValueEnumKey } from './ts/Order.ts'
 export type { Pet, PetStatusEnumKey } from './ts/Pet.ts'
@@ -112,7 +110,6 @@ export type {
   PlaceOrderRequestConfig,
   PlaceOrderResponse,
   PlaceOrderResponses,
-  PlaceOrderStatus200,
   PlaceOrderStatus405,
   PlaceOrderXmlData,
 } from './ts/PlaceOrder.ts'
@@ -123,7 +120,6 @@ export type {
   PlaceOrderPatchRequestConfig,
   PlaceOrderPatchResponse,
   PlaceOrderPatchResponses,
-  PlaceOrderPatchStatus200,
   PlaceOrderPatchStatus405,
   PlaceOrderPatchXmlData,
 } from './ts/PlaceOrderPatch.ts'
@@ -159,7 +155,6 @@ export type {
   UploadFileRequestConfig,
   UploadFileResponse,
   UploadFileResponses,
-  UploadFileStatus200,
 } from './ts/UploadFile.ts'
 export type { AddPetRequestSchemaType } from './zod/addPetRequestSchema.ts'
 export type {

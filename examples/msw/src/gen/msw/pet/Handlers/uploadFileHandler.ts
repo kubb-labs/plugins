@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { UploadFileResponse, UploadFileData } from '../../../models/UploadFile.ts'
+import type { UploadFileData, UploadFileResponse } from '../../../models/UploadFile.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 

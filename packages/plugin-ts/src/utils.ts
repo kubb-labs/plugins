@@ -1,5 +1,5 @@
 import { jsStringEscape, stringify } from '@kubb/ast/utils'
-import { getOperationParameters } from '@internals/shared'
+import { getOperationParameters, resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
 import { ast } from '@kubb/core'
 import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
@@ -80,6 +80,9 @@ export function buildParams(node: ast.OperationNode, { params, resolver }: Build
 export function buildData(node: ast.OperationNode, { resolver }: BuildOperationSchemaOptions): ast.SchemaNode {
   const { path: pathParams, query: queryParams, header: headerParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const hasBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  // When the body is a single `$ref`, carry the `$ref` path so the operation file imports the
+  // base component (e.g. `Pet`) instead of referencing a now-removed `<op>Data` alias.
+  const bodyRef = resolveDataRef(node)
   const hasRequiredPath = pathParams.some((param) => param.required)
   const hasRequiredQuery = queryParams.some((param) => param.required)
   const hasRequiredHeader = headerParams.some((param) => param.required)
@@ -95,7 +98,7 @@ export function buildData(node: ast.OperationNode, { resolver }: BuildOperationS
         name: 'body',
         required: hasBody,
         schema: hasBody
-          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveDataName(node) })
+          ? ast.factory.createSchema({ type: 'ref', name: resolver.resolveDataName(node), ...(bodyRef ? { ref: bodyRef.ref } : {}) })
           : ast.factory.createSchema({ type: 'never', primitive: undefined, optional: true }),
       }),
       ast.factory.createProperty({
@@ -133,13 +136,18 @@ export function buildResponses(node: ast.OperationNode, { resolver }: BuildOpera
 
   return ast.factory.createSchema({
     type: 'object',
-    properties: node.responses.map((res) =>
-      ast.factory.createProperty({
+    properties: node.responses.map((res) => {
+      const inlined = resolveResponseStatusRef(node, res.statusCode)
+      return ast.factory.createProperty({
         name: String(res.statusCode),
         required: true,
-        schema: ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
-      }),
-    ),
+        schema: ast.factory.createSchema({
+          type: 'ref',
+          name: resolver.resolveResponseStatusName(node, res.statusCode),
+          ...(inlined ? { ref: inlined.ref } : {}),
+        }),
+      })
+    }),
   })
 }
 
@@ -152,6 +160,13 @@ export function buildResponseUnion(node: ast.OperationNode, { resolver }: BuildO
 
   return ast.factory.createSchema({
     type: 'union',
-    members: responsesWithSchema.map((res) => ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) })),
+    members: responsesWithSchema.map((res) => {
+      const inlined = resolveResponseStatusRef(node, res.statusCode)
+      return ast.factory.createSchema({
+        type: 'ref',
+        name: resolver.resolveResponseStatusName(node, res.statusCode),
+        ...(inlined ? { ref: inlined.ref } : {}),
+      })
+    }),
   })
 }

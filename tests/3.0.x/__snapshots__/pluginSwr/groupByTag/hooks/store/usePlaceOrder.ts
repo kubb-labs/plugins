@@ -5,6 +5,7 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../../.kubb/client.ts'
+import type { Order } from '../../types/Order.ts'
 import type { PlaceOrderRequestConfig, PlaceOrderResponse, PlaceOrderStatus405 } from '../../types/PlaceOrder.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { placeOrder } from '../../clients/placeOrder.ts'

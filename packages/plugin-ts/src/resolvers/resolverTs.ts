@@ -1,3 +1,4 @@
+import { resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
 import { ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginTs } from '../types.ts'
@@ -39,9 +40,20 @@ export const resolverTs = defineResolver<PluginTs>(() => {
       return this.resolveTypeName(`${node.operationId} ${param.in} ${param.name}`)
     },
     resolveResponseStatusName(node, statusCode) {
+      // A status backed by a single `$ref` inlines to the referenced component type, so no
+      // redundant `<op>Status<code>` alias is emitted and consumers reference the base type.
+      const inlined = resolveResponseStatusRef(node, statusCode)
+      if (inlined) {
+        return this.resolveTypeName(inlined.rawName)
+      }
       return this.resolveTypeName(`${node.operationId} Status ${statusCode}`)
     },
     resolveDataName(node) {
+      // A request body backed by a single `$ref` inlines to the referenced component type.
+      const inlined = resolveDataRef(node)
+      if (inlined) {
+        return this.resolveTypeName(inlined.rawName)
+      }
       return this.resolveTypeName(`${node.operationId} Data`)
     },
     resolveRequestConfigName(node) {
