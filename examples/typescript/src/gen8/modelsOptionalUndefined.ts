@@ -269,6 +269,24 @@ export type Cat = {
   name: string | undefined
 }
 
+/**
+ * @type object
+ */
+export type Category1 = {
+  /**
+   * @description
+   * Format: `int64`
+   * @example 1
+   * @type integer | undefined
+   */
+  id: bigint | undefined
+  /**
+   * @example Dogs
+   * @type string | undefined
+   */
+  name: string | undefined
+}
+
 export type Pet = (
   | (Dog & {
       /**
@@ -296,7 +314,10 @@ export type Pet = (
    * @type string
    */
   name: string
-  category: Category | undefined
+  /**
+   * @type object | undefined
+   */
+  category: Category1 | undefined
   /**
    * @type array
    */
