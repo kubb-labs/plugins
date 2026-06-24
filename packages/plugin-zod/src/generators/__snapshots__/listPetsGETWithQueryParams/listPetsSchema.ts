@@ -12,3 +12,5 @@ export const listPetsStatus200Schema = z.object({})
 export const listPetsStatusDefaultSchema = z.object({})
 
 export const listPetsResponseSchema = listPetsStatus200Schema
+
+export const listPetsErrorSchema = listPetsStatusDefaultSchema

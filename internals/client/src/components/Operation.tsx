@@ -52,7 +52,11 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
   const parsers = buildParserHooks({ node, parser, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
 
-  const parserEntries = [parsers.request ? `request: ${parsers.request}` : null, parsers.response ? `response: ${parsers.response}` : null].filter(Boolean)
+  const parserEntries = [
+    parsers.request ? `request: ${parsers.request}` : null,
+    parsers.response ? `response: ${parsers.response}` : null,
+    parsers.error ? `error: ${parsers.error}` : null,
+  ].filter(Boolean)
   const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
 
   const callConfig = `{ ${[

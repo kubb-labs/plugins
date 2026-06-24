@@ -18,6 +18,10 @@ export const placeOrderResponseSchema = placeOrderStatus200Schema
 
 export type PlaceOrderResponseSchemaType = z.infer<typeof placeOrderResponseSchema>
 
+export const placeOrderErrorSchema = placeOrderStatus405Schema
+
+export type PlaceOrderErrorSchemaType = z.infer<typeof placeOrderErrorSchema>
+
 export const placeOrderDataSchemaJson = orderSchema.optional()
 
 export type PlaceOrderDataSchemaJsonType = z.infer<typeof placeOrderDataSchemaJson>

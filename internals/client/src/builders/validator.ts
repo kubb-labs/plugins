@@ -1,7 +1,7 @@
 import type { ast } from '@kubb/core'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ParserOptions } from '../types.ts'
-import { buildZodResponseParse, resolveRequestParser, resolveResponseParser } from './parser.ts'
+import { buildZodErrorParse, buildZodResponseParse, resolveRequestParser, resolveResponseParser } from './parser.ts'
 
 /**
  * The per-call parser expressions a generated function wires into its request config. Both run
@@ -17,6 +17,12 @@ export type ParserHooks = {
    * Expression for the `parser.response` hook, or `null` when response parsing is off.
    */
   response: string | null
+  /**
+   * Expression for the `parser.error` hook, or `null` when error parsing is off or the operation
+   * documents no error responses. The runtime runs this on the error body when a non-2xx call does
+   * not throw.
+   */
+  error: string | null
   /**
    * Zod schema names the generated file imports from the zod plugin output.
    */
@@ -48,5 +54,9 @@ export function buildParserHooks({
   const response = responseParse ? `(data: unknown) => ${responseParse.expression}.parse(data)` : null
   if (responseParse) importedZodNames.push(...responseParse.importNames)
 
-  return { request, response, importedZodNames }
+  const errorParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodErrorParse(node, zodResolver) : null
+  const error = errorParse ? `(data: unknown) => ${errorParse.expression}.parse(data)` : null
+  if (errorParse) importedZodNames.push(...errorParse.importNames)
+
+  return { request, response, error, importedZodNames }
 }

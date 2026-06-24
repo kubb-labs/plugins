@@ -1,3 +1,4 @@
+import { isSuccessStatusCode } from '@internals/shared'
 import type { ast } from '@kubb/core'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import type { ParserOptions } from '../types.ts'
@@ -60,5 +61,17 @@ export type ZodResponseParse = {
  */
 export function buildZodResponseParse(node: ast.OperationNode, zodResolver: ResolverZod): ZodResponseParse | null {
   const name = zodResolver.resolveResponseName?.(node)
+  return name ? { expression: name, importNames: [name] } : null
+}
+
+/**
+ * Resolves the zod expression a generated client validates an error body with on the non-throw path.
+ * Uses the error-only `<operation>ErrorSchema` (the union of non-2xx statuses); returns `null` when the
+ * operation documents no error responses with a schema.
+ */
+export function buildZodErrorParse(node: ast.OperationNode, zodResolver: ResolverZod): ZodResponseParse | null {
+  const hasErrorResponse = node.responses.some((res) => !isSuccessStatusCode(res.statusCode) && res.content?.some((entry) => entry.schema))
+  if (!hasErrorResponse) return null
+  const name = zodResolver.resolveErrorName?.(node)
   return name ? { expression: name, importNames: [name] } : null
 }

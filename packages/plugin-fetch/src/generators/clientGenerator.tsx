@@ -1,5 +1,5 @@
 import path from 'node:path'
-import { getOperationSecurity, Operation, resolveRequestParser, resolveResponseParser, type SecurityDocument } from '@internals/client'
+import { buildZodErrorParse, getOperationSecurity, Operation, resolveRequestParser, resolveResponseParser, type SecurityDocument } from '@internals/client'
 import { operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -36,6 +36,7 @@ export const clientGenerator = defineGenerator<PluginFetch>({
     const importedZodNames = zodResolver
       ? [
           resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+          resolveResponseParser(parser) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
           resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null,
         ].filter((name): name is string => Boolean(name))
       : []

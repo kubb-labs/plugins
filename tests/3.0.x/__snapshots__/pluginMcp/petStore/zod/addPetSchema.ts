@@ -17,6 +17,8 @@ export const addPetStatus405Schema = z.any()
 
 export const addPetResponseSchema = addPetStatus200Schema
 
+export const addPetErrorSchema = addPetStatus405Schema
+
 export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
 export const addPetDataSchemaXml = petSchema.describe('Create a new pet in the store')

@@ -149,6 +149,21 @@ describe('createClientCore', () => {
     expect(response).not.toHaveBeenCalled()
   })
 
+  test('runs the error parser on a non-2xx body when throwOnError is false', async () => {
+    const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
+    const error = vi.fn(() => ({ parsed: true }))
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error } })) as CallResult<string, string>
+    expect(error).toHaveBeenCalledTimes(1)
+    expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, request: 'REQ', response: 'RES' })
+  })
+
+  test('skips the error parser on a success body', async () => {
+    const { client } = createClient({ data: { id: 1 }, status: 200 })
+    const error = vi.fn((value: unknown) => value)
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error } })
+    expect(error).not.toHaveBeenCalled()
+  })
+
   test('runs request and response interceptors', async () => {
     const { client, calls } = createClient()
     client.interceptors.request.use((request) => ({ ...request, headers: { ...request.headers, 'X-Trace': '1' } }))

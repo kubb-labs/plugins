@@ -58,6 +58,9 @@ export const resolverZod = defineResolver<PluginZod>(() => {
     resolveResponseName(node) {
       return this.resolveSchemaName(`${node.operationId} Response`)
     },
+    resolveErrorName(node) {
+      return this.resolveSchemaName(`${node.operationId} Error`)
+    },
     resolvePathParamsName(node, param) {
       return this.resolveParamName(node, param)
     },
