@@ -13,6 +13,10 @@ export const addFilesResponseSchema = addFilesStatus200Schema
 
 export type AddFilesResponseSchemaType = z.infer<typeof addFilesResponseSchema>
 
+export const addFilesErrorSchema = addFilesStatus405Schema
+
+export type AddFilesErrorSchemaType = z.infer<typeof addFilesErrorSchema>
+
 export const addFilesDataSchemaJson = z.object({
   url: z.url().describe('URL of the image to upload'),
 })

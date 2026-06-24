@@ -86,7 +86,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -136,7 +137,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -466,10 +467,11 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
       const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, response.data)
       return {
         status: response.status,
         data,
-        error: isSuccess ? undefined : response.data,
+        error,
         request: response.config as TRequest,
         response: response as TResponse,
       }
