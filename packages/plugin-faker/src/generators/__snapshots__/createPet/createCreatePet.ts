@@ -3,7 +3,7 @@
  * Do not edit manually.
  */
 
-import type { CreatePetData, CreatePetResponse } from './types/CreatePet'
+import type { CreatePetData } from './types/CreatePet'
 import type { Pet } from './types/Pet'
 import { faker } from '@faker-js/faker'
 
@@ -28,6 +28,6 @@ export function createCreatePetData<TData extends Partial<CreatePetData> = objec
   } as Omit<typeof defaultFakeData, keyof TData> & TData
 }
 
-export function createCreatePetResponse(data?: Partial<CreatePetResponse>): CreatePetResponse {
-  return createCreatePetStatus201(data) as CreatePetResponse
+export function createCreatePetResponse(data?: Partial<Pet>): Pet {
+  return createCreatePetStatus201(data) as Pet
 }

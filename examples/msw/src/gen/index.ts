@@ -139,7 +139,6 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
 } from './models/UploadFile.ts'
 export { createAddPetRequest } from './mocks/createAddPetRequest.ts'

@@ -118,7 +118,6 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
 } from './models.ts'
 export { addPet } from './cypress/addPet.ts'

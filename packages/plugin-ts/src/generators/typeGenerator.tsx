@@ -1,4 +1,4 @@
-import { caseParams, resolveContentTypeVariants, resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
+import { caseParams, resolveContentTypeVariants, resolveDataRef, resolveResponseRef, resolveResponseStatusRef } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
 import { Type } from '../components/Type.tsx'
@@ -222,6 +222,12 @@ export const typeGenerator = defineGenerator<PluginTs>({
     function buildResponseType() {
       const hasSchema = (res: ast.ResponseNode) => (res.content ?? []).some((entry) => entry.schema)
       if (!node.responses.some(hasSchema)) {
+        return null
+      }
+
+      // The union collapses to a single `$ref`, so the `<op>Response` alias would only point at the
+      // base component — skip it and let consumers reference the component directly.
+      if (resolveResponseRef(node)) {
         return null
       }
 

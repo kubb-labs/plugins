@@ -141,14 +141,7 @@ export type {
   UpdatePetWithFormResponses,
   UpdatePetWithFormStatus405,
 } from './UpdatePetWithForm.ts'
-export type {
-  UploadFileData,
-  UploadFilePathPetId,
-  UploadFileQueryAdditionalMetadata,
-  UploadFileRequestConfig,
-  UploadFileResponse,
-  UploadFileResponses,
-} from './UploadFile.ts'
+export type { UploadFileData, UploadFilePathPetId, UploadFileQueryAdditionalMetadata, UploadFileRequestConfig, UploadFileResponses } from './UploadFile.ts'
 export { addPetRequestStatusEnum } from './AddPetRequest.ts'
 export { createPetsXEXAMPLE } from './CreatePets.ts'
 export { findPetsByStatusStatus } from './FindPetsByStatus.ts'

@@ -3,10 +3,11 @@
 * Do not edit manually.
 */
 
-import type { UploadFileRequestConfig, UploadFileResponse } from '../types/UploadFile.ts'
+import type { ApiResponse } from '../types/ApiResponse.ts'
+import type { UploadFileRequestConfig } from '../types/UploadFile.ts'
 
-export function uploadFile({ path, query, body }: UploadFileRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<UploadFileResponse> {
-  return cy.request<UploadFileResponse>({
+export function uploadFile({ path, query, body }: UploadFileRequestConfig, options: Partial<Cypress.RequestOptions> = {}): Cypress.Chainable<ApiResponse> {
+  return cy.request<ApiResponse>({
     method: 'POST',
     url: `/pet/${path.petId}/uploadImage`,
     qs: query,

@@ -1,4 +1,4 @@
-import { resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
+import { resolveDataRef, resolveResponseRef, resolveResponseStatusRef } from '@internals/shared'
 import { ensureValidVarName, pascalCase, toFilePath } from '@internals/utils'
 import { defineResolver } from '@kubb/core'
 import type { PluginTs } from '../types.ts'
@@ -65,6 +65,12 @@ export const resolverTs = defineResolver<PluginTs>(() => {
       return this.resolveTypeName(`${node.operationId} Responses`)
     },
     resolveResponseName(node) {
+      // When every response collapses to a single `$ref`, the `<op>Response` union is just the base
+      // component, so reference it directly instead of emitting a redundant alias.
+      const inlined = resolveResponseRef(node)
+      if (inlined) {
+        return this.resolveTypeName(inlined.rawName)
+      }
       return this.resolveTypeName(`${node.operationId} Response`)
     },
     resolveEnumKeyName(node, enumTypeSuffix = 'key') {

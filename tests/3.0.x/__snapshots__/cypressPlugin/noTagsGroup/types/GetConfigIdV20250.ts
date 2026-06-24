@@ -31,8 +31,3 @@ export type GetConfigIdV20250RequestConfig = {
 export type GetConfigIdV20250Responses = {
     "200": Config;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type GetConfigIdV20250Response = Config;

@@ -5,7 +5,6 @@
 
 import type { Pet } from '../types/Pet.ts'
 import type { PetUpdate } from '../types/PetUpdate.ts'
-import type { UpdatePetResponse } from '../types/UpdatePet.ts'
 import { createPet } from './createPet.ts'
 import { createPetUpdate } from './createPetUpdate.ts'
 import { fakerEN as faker } from '@faker-js/faker'
@@ -33,6 +32,6 @@ export function createUpdatePetData(data?: Partial<PetUpdate>): PetUpdate {
   return createPetUpdate(data) as PetUpdate
 }
 
-export function createUpdatePetResponse(data?: Partial<UpdatePetResponse>): UpdatePetResponse {
-  return createUpdatePetStatus200(data) as UpdatePetResponse
+export function createUpdatePetResponse(data?: Partial<Pet>): Pet {
+  return createUpdatePetStatus200(data) as Pet
 }

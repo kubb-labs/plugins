@@ -104,7 +104,6 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
 } from './models/pet/UploadFile.ts'
 export type {

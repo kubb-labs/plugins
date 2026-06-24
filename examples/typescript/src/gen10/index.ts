@@ -4,7 +4,6 @@ export type { Address } from './models/Address.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'
 export type { Cat } from './models/Cat.ts'
 export type { Category } from './models/Category.ts'
-export type { Category1 } from './models/Category1.ts'
 export type { Customer } from './models/Customer.ts'
 export type { CustomerParamsStatusEnum } from './models/CustomerParamsStatusEnum.ts'
 export type { DeletePetStatus200Enum } from './models/DeletePetStatus200Enum.ts'
@@ -106,7 +105,6 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
 } from './models/pet/UploadFile.ts'
 export type {

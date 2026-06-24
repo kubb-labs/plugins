@@ -217,6 +217,25 @@ describe('typeGenerator — Operation', () => {
       }),
     },
     {
+      // A single response backed by a single `$ref` collapses the whole operation onto the base
+      // component: no `<op>Status<code>` and no `<op>Response` alias, only the `<op>Responses` map.
+      name: 'inlineResponseRef — GET with a single $ref response',
+      node: ast.factory.createOperation({
+        operationId: 'getPet',
+        method: 'GET',
+        path: '/pet/{petId}',
+        tags: ['pet'],
+        parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+        responses: [
+          ast.factory.createResponse({
+            statusCode: '200',
+            schema: ast.factory.createSchema({ type: 'ref', name: 'Pet', ref: '#/components/schemas/Pet' }),
+            description: 'A pet',
+          }),
+        ],
+      }),
+    },
+    {
       name: 'updatePetWithForm — POST with path and query params',
       node: ast.factory.createOperation({
         operationId: 'updatePetWithForm',

@@ -21,8 +21,3 @@ export type GetMeRequestConfig = {
 export type GetMeResponses = {
     "200": User;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type GetMeResponse = User;

@@ -33,8 +33,3 @@ export type GetItemRequestConfig = {
 export type GetItemResponses = {
     "200": Item;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type GetItemResponse = Item;

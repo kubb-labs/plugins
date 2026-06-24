@@ -1,3 +1,4 @@
+import { resolveResponseRef } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
@@ -42,8 +43,22 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
     } as const
 
     // The Cypress wrapper only references the aggregate `RequestConfig` (body) and `Response`
-    // (return) types, both of which live in the operation file.
-    const importedTypeNames = [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponseName(node)]
+    // (return) types. `RequestConfig` always lives in the operation file; `Response` lives in a
+    // component's model file when it inlines to a single `$ref`.
+    const responseRef = resolveResponseRef(node)
+    const responseFilePath = responseRef
+      ? tsResolver.resolveFile(
+          { name: responseRef.rawName, extname: '.ts' },
+          { root, output: pluginTs.options?.output ?? output, group: pluginTs.options?.group ?? undefined },
+        ).path
+      : meta.fileTs.path
+    const typeImports =
+      responseFilePath === meta.fileTs.path
+        ? [{ path: meta.fileTs.path, names: [tsResolver.resolveRequestConfigName(node), tsResolver.resolveResponseName(node)] }]
+        : [
+            { path: meta.fileTs.path, names: [tsResolver.resolveRequestConfigName(node)] },
+            { path: responseFilePath, names: [tsResolver.resolveResponseName(node)] },
+          ]
 
     return (
       <File
@@ -53,7 +68,9 @@ export const cypressGenerator = defineGenerator<PluginCypress>({
         banner={resolver.resolveBanner(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
         footer={resolver.resolveFooter(ctx.meta, { output, config, file: { path: meta.file.path, baseName: meta.file.baseName } })}
       >
-        {meta.fileTs && <File.Import name={importedTypeNames} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />}
+        {typeImports.map((imp) => (
+          <File.Import key={imp.path} name={imp.names} root={meta.file.path} path={imp.path} isTypeOnly />
+        ))}
         <Request name={meta.name} node={node} resolver={tsResolver} baseURL={baseURL} />
       </File>
     )

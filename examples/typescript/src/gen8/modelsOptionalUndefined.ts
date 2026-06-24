@@ -269,24 +269,6 @@ export type Cat = {
   name: string | undefined
 }
 
-/**
- * @type object
- */
-export type Category1 = {
-  /**
-   * @description
-   * Format: `int64`
-   * @example 1
-   * @type integer | undefined
-   */
-  id: bigint | undefined
-  /**
-   * @example Dogs
-   * @type string | undefined
-   */
-  name: string | undefined
-}
-
 export type Pet = (
   | (Dog & {
       /**
@@ -314,10 +296,7 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
-  category: Category1 | undefined
+  category: Category | undefined
   /**
    * @type array
    */
@@ -880,11 +859,6 @@ export type UploadFileRequestConfig = {
 export type UploadFileResponses = {
   '200': ApiResponse
 }
-
-/**
- * @description Union of all possible responses
- */
-export type UploadFileResponse = ApiResponse
 
 /**
  * @type object

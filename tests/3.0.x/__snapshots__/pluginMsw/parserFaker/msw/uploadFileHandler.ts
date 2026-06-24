@@ -3,12 +3,13 @@
 * Do not edit manually.
 */
 
-import type { UploadFileData, UploadFileResponse } from '../types/UploadFile.ts'
+import type { ApiResponse } from '../types/ApiResponse.ts'
+import type { UploadFileData } from '../types/UploadFile.ts'
 import type { HttpResponseResolver } from 'msw'
 import { createUploadFileResponse } from '../faker/createUploadFile.ts'
 import { http } from 'msw'
 
-export function uploadFileHandlerResponse200(data: UploadFileResponse) {
+export function uploadFileHandlerResponse200(data: ApiResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
       headers: {
@@ -17,7 +18,7 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {
+export function uploadFileHandler(data?: ApiResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {
   return http.post<Record<string, string>, UploadFileData, any>('/pet/:petId/uploadImage', function handler(info) {
       if(typeof data === 'function') return data(info)
 

@@ -21,8 +21,3 @@ export type GetVariantsRequestConfig = {
 export type GetVariantsResponses = {
     "200": Variant;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type GetVariantsResponse = Variant;

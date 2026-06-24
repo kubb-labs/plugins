@@ -28,8 +28,3 @@ export type CustomGetItemRequestConfig = {
 export type CustomGetItemResponses = {
     "200": Item;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type CustomGetItemResponse = Item;

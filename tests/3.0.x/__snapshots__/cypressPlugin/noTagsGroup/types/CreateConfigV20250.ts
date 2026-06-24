@@ -22,8 +22,3 @@ export type CreateConfigV20250RequestConfig = {
 export type CreateConfigV20250Responses = {
     "201": Config;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type CreateConfigV20250Response = Config;

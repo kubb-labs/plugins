@@ -19,6 +19,7 @@ export {
   resolveErrorNames,
   resolveOperationTypeImports,
   resolveOperationTypeNames,
+  resolveResponseRef,
   resolveResponseStatusRef,
   resolveResponseTypes,
   resolveSingleRef,

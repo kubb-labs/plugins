@@ -1,8 +1,9 @@
-import type { UploadFileData, UploadFileResponse } from '../../models/ts/pet/UploadFile.ts'
+import type { ApiResponse } from '../../models/ts/ApiResponse.ts'
+import type { UploadFileData } from '../../models/ts/pet/UploadFile.ts'
 import type { HttpResponseResolver } from 'msw'
 import { http } from 'msw'
 
-export function uploadFileHandlerResponse200(data: UploadFileResponse) {
+export function uploadFileHandlerResponse200(data: ApiResponse) {
   return new Response(JSON.stringify(data), {
     status: 200,
     headers: {
@@ -11,7 +12,7 @@ export function uploadFileHandlerResponse200(data: UploadFileResponse) {
   })
 }
 
-export function uploadFileHandler(data?: UploadFileResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {
+export function uploadFileHandler(data?: ApiResponse | HttpResponseResolver<Record<string, string>, UploadFileData, any>) {
   return http.post<Record<string, string>, UploadFileData, any>(`/pet/:petId/uploadImage`, function handler(info) {
     if (typeof data === 'function') return data(info)
 

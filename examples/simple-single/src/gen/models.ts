@@ -711,11 +711,6 @@ export type UploadFileResponses = {
 }
 
 /**
- * @description Union of all possible responses
- */
-export type UploadFileResponse = ApiResponse
-
-/**
  * @type object
  */
 export type GetInventoryStatus200 = {

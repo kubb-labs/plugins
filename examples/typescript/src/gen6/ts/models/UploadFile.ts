@@ -52,8 +52,3 @@ export type UploadFileRequestConfig = {
 export type UploadFileResponses = {
   '200': ApiResponse
 }
-
-/**
- * @description Union of all possible responses
- */
-export type UploadFileResponse = ApiResponse

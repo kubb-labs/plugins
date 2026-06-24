@@ -48,8 +48,3 @@ export type UpdatePetRequestConfig = {
 export type UpdatePetResponses = {
     "200": Pet;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type UpdatePetResponse = Pet;

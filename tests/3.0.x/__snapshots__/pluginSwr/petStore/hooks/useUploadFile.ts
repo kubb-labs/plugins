@@ -5,7 +5,8 @@
 
 import useSWRMutation from 'swr/mutation'
 import type { RequestConfig, ResponseErrorConfig } from '../.kubb/client.ts'
-import type { UploadFileRequestConfig, UploadFileResponse } from '../types/UploadFile.ts'
+import type { ApiResponse } from '../types/ApiResponse.ts'
+import type { UploadFileRequestConfig } from '../types/UploadFile.ts'
 import type { SWRMutationConfiguration } from 'swr/mutation'
 import { uploadFile } from '../clients/uploadFile.ts'
 
@@ -20,14 +21,14 @@ export type UploadFileMutationArg = UploadFileRequestConfig
  * {@link /pet/:petId/uploadImage}
  */
 export function useUploadFile(options: {
-  mutation?: SWRMutationConfiguration<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
+  mutation?: SWRMutationConfiguration<ApiResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg> & { throwOnError?: boolean },
   client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>,
   shouldFetch?: boolean,
 } = {}) {
   const { mutation: mutationOptions, client: config = {}, shouldFetch = true } = options ?? {}
   const mutationKey = uploadFileMutationKey()
 
-  return useSWRMutation<UploadFileResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
+  return useSWRMutation<ApiResponse, ResponseErrorConfig<Error>, UploadFileMutationKey | null, UploadFileMutationArg>(
     shouldFetch ? mutationKey : null,
     async (_url, { arg: { path, query, body } }) => {
       const { data } = await uploadFile({ ...config, path, query, body, throwOnError: true })

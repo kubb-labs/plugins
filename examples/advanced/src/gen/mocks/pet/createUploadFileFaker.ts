@@ -1,5 +1,4 @@
 import type { ApiResponse } from '../../models/ts/ApiResponse.ts'
-import type { UploadFileResponse } from '../../models/ts/pet/UploadFile.ts'
 import { createApiResponseFaker } from '../createApiResponseFaker.ts'
 import { fakerEN as faker } from '@faker-js/faker'
 
@@ -22,6 +21,6 @@ export function createUploadFileDataFaker(data?: Blob): Blob {
   return data ?? (faker.image.url() as unknown as Blob)
 }
 
-export function createUploadFileResponseFaker(data?: Partial<UploadFileResponse>): UploadFileResponse {
-  return createUploadFileStatus200Faker(data) as UploadFileResponse
+export function createUploadFileResponseFaker(data?: Partial<ApiResponse>): ApiResponse {
+  return createUploadFileStatus200Faker(data) as ApiResponse
 }

@@ -84,7 +84,6 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
 } from './UploadFile.ts'
 export { findPetsByStatusStatus } from './FindPetsByStatus.ts'

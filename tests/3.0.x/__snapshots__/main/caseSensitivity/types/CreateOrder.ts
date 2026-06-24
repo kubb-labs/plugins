@@ -36,8 +36,3 @@ export type CreateOrderRequestConfig = {
 export type CreateOrderResponses = {
     "201": Order;
 };
-
-/**
- * @description Union of all possible responses
-*/
-export type CreateOrderResponse = Order;

@@ -1,4 +1,4 @@
-import { caseParams, getPerContentTypeName, resolveContentTypeVariants, resolveDataRef, resolveResponseStatusRef } from '@internals/shared'
+import { caseParams, getPerContentTypeName, resolveContentTypeVariants, resolveDataRef, resolveResponseRef, resolveResponseStatusRef } from '@internals/shared'
 import { aliasConflictingImports, filterUsedImports, rewriteAliasedImports } from '@internals/utils'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -334,12 +334,16 @@ export const fakerGenerator = defineGenerator<PluginFaker>({
             typeFilePath: unit.typeFilePath,
           }),
         )}
-        {renderEntry({
-          schema: buildResponseUnionSchema(node, resolver),
-          name: responseName,
-          typeName: tsResolver.resolveResponseName(node),
-          skipImportNames: responseUnits.map((unit) => unit.name),
-        })}
+        {(() => {
+          const responseRef = resolveResponseRef(node)
+          return renderEntry({
+            schema: buildResponseUnionSchema(node, resolver),
+            name: responseName,
+            typeName: tsResolver.resolveResponseName(node),
+            skipImportNames: responseUnits.map((unit) => unit.name),
+            typeFilePath: responseRef ? modelTypeFilePath(responseRef.rawName) : undefined,
+          })
+        })()}
       </File>
     )
   },

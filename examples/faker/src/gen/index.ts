@@ -116,7 +116,6 @@ export type {
   UploadFilePathPetId,
   UploadFileQueryAdditionalMetadata,
   UploadFileRequestConfig,
-  UploadFileResponse,
   UploadFileResponses,
 } from './models/UploadFile.ts'
 export { createCategory } from './faker/createCategory.ts'

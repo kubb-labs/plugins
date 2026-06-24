@@ -452,6 +452,20 @@ export function resolveDataRef(node: ast.OperationNode): SingleRef | null {
   return resolveSingleRef(content[0]!.schema)
 }
 
+/**
+ * Resolves the single component `$ref` the response union (`<op>Response`) collapses to: when
+ * exactly one response carries a schema and that response is a single `$ref`, the union is just
+ * the base component, so the `<op>Response` alias is redundant. Returns `null` when the union has
+ * more than one member or any member is not a plain `$ref`.
+ */
+export function resolveResponseRef(node: ast.OperationNode): SingleRef | null {
+  const withSchema = node.responses.filter((response) => (response.content ?? []).some((entry) => entry.schema))
+  if (withSchema.length !== 1) {
+    return null
+  }
+  return resolveResponseStatusRef(node, withSchema[0]!.statusCode)
+}
+
 type OperationTypeEntry = {
   name: string
   /** Set when this name is an inlined component type that lives in its own model file. */
@@ -486,7 +500,7 @@ function collectOperationTypeEntries(
 
   const bodyAndResponseEntries: OperationTypeEntry[] = [
     node.requestBody?.content?.[0]?.schema ? { name: resolver.resolveDataName(node), inlineRef: resolveDataRef(node) } : null,
-    { name: resolver.resolveResponseName(node), inlineRef: null },
+    { name: resolver.resolveResponseName(node), inlineRef: resolveResponseRef(node) },
   ].filter((entry): entry is OperationTypeEntry => Boolean(entry))
 
   const entries =
