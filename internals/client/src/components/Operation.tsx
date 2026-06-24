@@ -1,4 +1,5 @@
 import { buildOperationComments, getContentTypeInfo } from '@internals/shared'
+import { Url } from '@internals/utils'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -65,7 +66,7 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
+    `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     parserLiteral,
     contentTypeLiteral,
