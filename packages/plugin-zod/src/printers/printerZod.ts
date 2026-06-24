@@ -280,18 +280,21 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
         // Handle additionalProperties as .catchall() or .strict(), falling back to patternProperties.
         const result = (() => {
+          const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+
           if (node.additionalProperties && node.additionalProperties !== true) {
             const catchallType = this.transform(node.additionalProperties)
             return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
           }
           if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-          if (node.additionalProperties === false) return `${objectBase}.strict()`
+          // `additionalProperties: false` with patternProperties still permits the pattern keys, so
+          // only emit `.strict()` when there are no patterns to honor.
+          if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
 
           // patternProperties maps regex key patterns to value schemas. With no fixed properties,
           // z.record(keySchema, value) validates both the key pattern and the value. Alongside
           // fixed properties zod can't constrain the extra-key names (a record in an intersection
           // rejects the fixed keys), so fall back to .catchall, which validates the value only.
-          const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
           if (patterns.length > 0) {
             const values = patterns.map(([, valueSchema]) => {
               const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!

@@ -13,7 +13,7 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini } from '../utils.ts'
+import { applyMiniModifiers, formatLiteral, lengthChecksMini, numberChecksMini, patternKeySchemaMini } from '../utils.ts'
 
 /**
  * Partial map of node-type overrides for the Zod Mini printer.
@@ -219,7 +219,32 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
           return isCyclic(schema) ? lazyGetter({ name: propName, body: value }) : `${objectKey(propName)}: ${value}`
         })
 
-        return `z.object(${buildObject(entries)})`
+        const objectBase = `z.object(${buildObject(entries)})`
+
+        // zod/mini has no chainable `.catchall()`/`.strict()`, so additionalProperties and
+        // patternProperties route through the functional `z.catchall()`, `z.strictObject()`, and
+        // `z.record()` forms instead.
+        const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+
+        if (node.additionalProperties && node.additionalProperties !== true) {
+          const catchallType = this.transform(node.additionalProperties)
+          return catchallType ? `z.catchall(${objectBase}, ${catchallType})` : objectBase
+        }
+        if (node.additionalProperties === true) return `z.catchall(${objectBase}, ${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
+        if (node.additionalProperties === false && patterns.length === 0) return objectBase.replace(/^z\.object\(/, 'z.strictObject(')
+
+        if (patterns.length > 0) {
+          const values = patterns.map(([, valueSchema]) => {
+            const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+            return valueSchema.nullable ? `z.nullable(${valueType})` : valueType
+          })
+          const distinct = [...new Set(values)]
+          const value = distinct.length === 1 ? distinct[0]! : `z.union([${distinct.join(', ')}])`
+
+          if (entries.length > 0) return `z.catchall(${objectBase}, ${value})`
+          return `z.record(${patternKeySchemaMini({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
+        }
+        return objectBase
       },
       array(node) {
         const items = mapSchemaItems(node, (item) => this.transform(item))

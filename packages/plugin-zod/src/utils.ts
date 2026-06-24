@@ -178,8 +178,24 @@ function regexFunc(regexType: PluginZod['resolvedOptions']['regexType'] | undefi
  * discard. Multiple patterns are combined into a single alternation (`(^a)|(^b)`).
  */
 export function patternKeySchema({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
+  return `z.string().regex(${patternKeySource({ patterns, regexType })})`
+}
+
+/**
+ * `zod/mini` variant of {@link patternKeySchema}: the regex lives inside a `.check(z.regex(...))`
+ * rather than a chained `.regex(...)`.
+ */
+export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
+  return `z.string().check(z.regex(${patternKeySource({ patterns, regexType })}))`
+}
+
+/**
+ * Render the regex source shared by both `patternKeySchema` variants, combining multiple patterns
+ * into a single alternation (`(^a)|(^b)`).
+ */
+function patternKeySource({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
   const source = patterns.length === 1 ? patterns[0]! : patterns.map((pattern) => `(${pattern})`).join('|')
-  return `z.string().regex(${toRegExpString(source, regexFunc(regexType))})`
+  return toRegExpString(source, regexFunc(regexType))
 }
 
 /**

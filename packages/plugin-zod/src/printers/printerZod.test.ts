@@ -322,6 +322,17 @@ describe('printerZod', () => {
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.number())"`)
     })
+
+    test('additionalProperties:false with patternProperties keeps the pattern record (not .strict)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: false,
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string())')
+    })
   })
 
   describe('array', () => {
