@@ -34,6 +34,26 @@ describe('Url.toTemplateString', () => {
   })
 })
 
+describe('Url.toCasedTemplate', () => {
+  test('camelCases placeholder names while keeping the braces', () => {
+    expect(Url.toCasedTemplate('/projects/{project_id}', { casing: 'camelcase' })).toBe('/projects/{projectId}')
+    expect(Url.toCasedTemplate('/user/{user_id}/posts/{post_id}', { casing: 'camelcase' })).toBe('/user/{userId}/posts/{postId}')
+  })
+
+  test('leaves already-camelCase and braceless paths unchanged', () => {
+    expect(Url.toCasedTemplate('/pet/{petId}', { casing: 'camelcase' })).toBe('/pet/{petId}')
+    expect(Url.toCasedTemplate('/health', { casing: 'camelcase' })).toBe('/health')
+  })
+
+  test('camelCases non-identifier placeholders such as kebab-case', () => {
+    expect(Url.toCasedTemplate('/user/{monetary-account-id}', { casing: 'camelcase' })).toBe('/user/{monetaryAccountId}')
+  })
+
+  test('preserves the original casing when no casing is requested', () => {
+    expect(Url.toCasedTemplate('/user/{user_id}')).toBe('/user/{user_id}')
+  })
+})
+
 describe('Url.toPath', () => {
   test('converts path params to Express-style colon syntax', () => {
     expect(Url.toPath('/user/{userID}/monetary-account/{monetary-accountID}/whitelist-sdd/{itemId}')).toBe(

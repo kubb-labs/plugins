@@ -84,6 +84,21 @@ const deletePetNode = ast.factory.createOperation({
   responses: [ast.factory.createResponse({ statusCode: '204', schema: ast.factory.createSchema({ type: 'void' }), description: 'no content' })],
 })
 
+const getProjectNode = ast.factory.createOperation({
+  operationId: 'getProject',
+  method: 'GET',
+  path: '/projects/{project_id}',
+  tags: ['project'],
+  parameters: [ast.factory.createParameter({ name: 'project_id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const createPetNode = ast.factory.createOperation({
   operationId: 'addPet',
   method: 'POST',
@@ -126,6 +141,8 @@ describe('clientGenerator operation', () => {
   const testData = [
     { name: 'findPetsByTags', node: findPetsByTagsNode, options: {} },
     { name: 'getPetById', node: getPetByIdNode, options: {} },
+    // Snake_case path param: the emitted url must be camelCased to match the grouped `path` keys.
+    { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },

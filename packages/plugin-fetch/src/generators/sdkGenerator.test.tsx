@@ -73,6 +73,21 @@ const operationNodes: Array<ast.OperationNode> = [
       }),
     ],
   }),
+  // Snake_case path param: the emitted url must be camelCased to match the grouped `path` keys.
+  ast.factory.createOperation({
+    operationId: 'getProject',
+    method: 'GET',
+    path: '/projects/{project_id}',
+    tags: ['project'],
+    parameters: [ast.factory.createParameter({ name: 'project_id', in: 'path', schema: ast.factory.createSchema({ type: 'string' }), required: true })],
+    responses: [
+      ast.factory.createResponse({
+        statusCode: '200',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+        description: 'successful operation',
+      }),
+    ],
+  }),
 ]
 
 const securityDocument: SecurityDocument = {

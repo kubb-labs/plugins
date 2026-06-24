@@ -1,4 +1,5 @@
 import { buildOperationComments } from '@internals/shared'
+import { Url } from '@internals/utils'
 import type { HttpOperationNode } from '@kubb/ast'
 import { buildJSDoc } from '@kubb/ast/utils'
 import { ast } from '@kubb/core'
@@ -33,7 +34,7 @@ function buildCallConfig({
 
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
-    `url: '${node.path}'`,
+    `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     parserLiteral,
     '...config',
