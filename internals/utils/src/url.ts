@@ -98,6 +98,18 @@ export class Url {
   }
 
   /**
+   * Rewrites OpenAPI placeholder names while keeping the `{...}` braces, so the generated `url`
+   * literal aligns with the grouped `path` request option that the runtime client interpolates by
+   * key.
+   *
+   * @example
+   * Url.toCasedTemplate('/projects/{project_id}', { casing: 'camelcase' }) // '/projects/{projectId}'
+   */
+  static toCasedTemplate(path: string, { casing }: { casing?: PathCasing } = {}): string {
+    return path.replace(/\{([^}]+)\}/g, (_, name: string) => `{${transformParam(name, casing)}}`)
+  }
+
+  /**
    * Converts an OpenAPI/Swagger path to a TypeScript template literal string.
    * `prefix` is prepended inside the literal, `replacer` transforms each parameter name,
    * and `casing` controls parameter identifier casing.

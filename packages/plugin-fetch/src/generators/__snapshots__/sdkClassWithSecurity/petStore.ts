@@ -4,6 +4,7 @@ import type { ClientConfig, ClientInstance, Options, RequestResult } from './.ku
 import type { DeletePetRequestConfig, DeletePetResponses } from './DeletePet'
 import type { GetInventoryRequestConfig, GetInventoryResponses } from './GetInventory'
 import type { GetPetByIdRequestConfig, GetPetByIdResponses } from './GetPetById'
+import type { GetProjectRequestConfig, GetProjectResponses } from './GetProject'
 import { createClient } from './.kubb/client'
 
 export class PetStore {
@@ -49,5 +50,16 @@ export class PetStore {
     const { client: request = this.client, ...config } = options
 
     return request({ method: 'GET', url: '/store/inventory', ...config }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
+  }
+
+  /**
+   * {@link /projects/:project_id}
+   */
+  public getProject<ThrowOnError extends boolean = true>(
+    options: Options<GetProjectRequestConfig, ThrowOnError>,
+  ): Promise<RequestResult<GetProjectResponses, ThrowOnError>> {
+    const { client: request = this.client, ...config } = options
+
+    return request({ method: 'GET', url: '/projects/{projectId}', ...config }) as Promise<RequestResult<GetProjectResponses, ThrowOnError>>
   }
 }
