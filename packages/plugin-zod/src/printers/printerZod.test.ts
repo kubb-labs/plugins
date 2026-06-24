@@ -255,6 +255,37 @@ describe('printerZod', () => {
       })
       expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
     })
+
+    test('object with patternProperties → .catchall(schema)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
+    })
+
+    test('object with nullable patternProperties → .catchall(schema.nullable())', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string', nullable: true }) },
+      })
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string().nullable())"`)
+    })
+
+    test('additionalProperties takes precedence over patternProperties', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: ast.factory.createSchema({ type: 'number' }),
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.number())"`)
+    })
   })
 
   describe('array', () => {

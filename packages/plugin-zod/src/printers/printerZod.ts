@@ -278,7 +278,7 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
         const objectBase = `z.object(${buildObject(entries)})`
 
-        // Handle additionalProperties as .catchall() or .strict()
+        // Handle additionalProperties as .catchall() or .strict(), falling back to patternProperties.
         const result = (() => {
           if (node.additionalProperties && node.additionalProperties !== true) {
             const catchallType = this.transform(node.additionalProperties)
@@ -286,6 +286,14 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           }
           if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
           if (node.additionalProperties === false) return `${objectBase}.strict()`
+
+          // Zod has no per-pattern key validation, so the first pattern's value schema becomes the
+          // catchall, mirroring the index signature emitted by the TypeScript plugin.
+          const patternValue = node.patternProperties && Object.values(node.patternProperties)[0]
+          if (patternValue) {
+            const patternType = this.transform(patternValue)
+            if (patternType) return `${objectBase}.catchall(${patternValue.nullable ? `${patternType}.nullable()` : patternType})`
+          }
           return objectBase
         })()
 
