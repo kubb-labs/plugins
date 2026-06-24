@@ -24,3 +24,5 @@ export const findPetsByTagsStatus200Schema = z.union([findPetsByTagsStatus200Sch
 export const findPetsByTagsStatus400Schema = z.any()
 
 export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
+
+export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema

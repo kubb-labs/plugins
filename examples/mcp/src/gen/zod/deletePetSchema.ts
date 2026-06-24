@@ -12,3 +12,5 @@ export const deletePetPathPetIdSchema = z.int().describe('Pet id to delete')
 export const deletePetStatus400Schema = z.any()
 
 export const deletePetResponseSchema = z.unknown()
+
+export const deletePetErrorSchema = deletePetStatus400Schema
