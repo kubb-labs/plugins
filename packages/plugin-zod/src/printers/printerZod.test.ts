@@ -276,17 +276,17 @@ describe('printerZod', () => {
       expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string().nullable())')
     })
 
-    test('patternProperties with fixed properties → intersected with the base object', () => {
+    test('patternProperties with fixed properties → .catchall (record cannot coexist with a fixed shape)', () => {
       const node = ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
         properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
         patternProperties: { '^meta_': ast.factory.createSchema({ type: 'string' }) },
       })
-      expect(printer.print(node)).toBe('z.object({\n  id: z.int(),\n}).and(z.record(z.string().regex(/^meta_/), z.string()))')
+      expect(printer.print(node)).toBe('z.object({\n  id: z.int(),\n}).catchall(z.string())')
     })
 
-    test('multiple patternProperties → records intersected', () => {
+    test('multiple patternProperties → alternation key regex with a union value', () => {
       const node = ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
@@ -296,7 +296,20 @@ describe('printerZod', () => {
           '^I_': ast.factory.createSchema({ type: 'integer' }),
         },
       })
-      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string()).and(z.record(z.string().regex(/^I_/), z.int()))')
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/(^S_)|(^I_)/), z.union([z.string(), z.int()]))')
+    })
+
+    test('multiple patternProperties with identical value types → single value, no union', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: {
+          '^S_': ast.factory.createSchema({ type: 'string' }),
+          '^T_': ast.factory.createSchema({ type: 'string' }),
+        },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/(^S_)|(^T_)/), z.string())')
     })
 
     test('additionalProperties takes precedence over patternProperties', () => {

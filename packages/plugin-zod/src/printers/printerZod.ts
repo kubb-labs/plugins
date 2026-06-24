@@ -287,20 +287,21 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
           if (node.additionalProperties === false) return `${objectBase}.strict()`
 
-          // patternProperties maps regex key patterns to value schemas. z.record(keySchema, value)
-          // validates both the key pattern and the value, which .catchall() cannot express. When
-          // fixed properties coexist, intersect the records with the base object.
-          if (node.patternProperties) {
-            const records = Object.entries(node.patternProperties).map(([pattern, valueSchema]) => {
+          // patternProperties maps regex key patterns to value schemas. With no fixed properties,
+          // z.record(keySchema, value) validates both the key pattern and the value. Alongside
+          // fixed properties zod can't constrain the extra-key names (a record in an intersection
+          // rejects the fixed keys), so fall back to .catchall, which validates the value only.
+          const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+          if (patterns.length > 0) {
+            const values = patterns.map(([, valueSchema]) => {
               const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
-              const value = valueSchema.nullable ? `${valueType}.nullable()` : valueType
-              return `z.record(${patternKeySchema({ pattern, regexType: this.options.regexType })}, ${value})`
+              return valueSchema.nullable ? `${valueType}.nullable()` : valueType
             })
-            const [firstRecord, ...restRecords] = records
-            if (firstRecord) {
-              const base = entries.length > 0 ? `${objectBase}.and(${firstRecord})` : firstRecord
-              return restRecords.reduce((acc, record) => `${acc}.and(${record})`, base)
-            }
+            const distinct = [...new Set(values)]
+            const value = distinct.length === 1 ? distinct[0]! : `z.union([${distinct.join(', ')}])`
+
+            if (entries.length > 0) return `${objectBase}.catchall(${value})`
+            return `z.record(${patternKeySchema({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
           }
           return objectBase
         })()

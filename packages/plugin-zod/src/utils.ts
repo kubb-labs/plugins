@@ -173,11 +173,13 @@ function regexFunc(regexType: PluginZod['resolvedOptions']['regexType'] | undefi
 }
 
 /**
- * Build a Zod key schema that constrains `z.record` keys to a `patternProperties` regex, so the
- * generated validator enforces the key pattern that a plain `.catchall()` would discard.
+ * Build a Zod key schema that constrains `z.record` keys to one or more `patternProperties`
+ * regexes, so the generated validator enforces the key pattern that a plain `.catchall()` would
+ * discard. Multiple patterns are combined into a single alternation (`(^a)|(^b)`).
  */
-export function patternKeySchema({ pattern, regexType }: { pattern: string; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
-  return `z.string().regex(${toRegExpString(pattern, regexFunc(regexType))})`
+export function patternKeySchema({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
+  const source = patterns.length === 1 ? patterns[0]! : patterns.map((pattern) => `(${pattern})`).join('|')
+  return `z.string().regex(${toRegExpString(source, regexFunc(regexType))})`
 }
 
 /**
