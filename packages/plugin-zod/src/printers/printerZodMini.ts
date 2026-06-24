@@ -221,9 +221,7 @@ export const printerZodMini = ast.createPrinter<PrinterZodMiniFactory>((options)
 
         const objectBase = `z.object(${buildObject(entries)})`
 
-        // zod/mini has no chainable `.catchall()`/`.strict()`, so additionalProperties and
-        // patternProperties route through the functional `z.catchall()`, `z.strictObject()`, and
-        // `z.record()` forms instead.
+        // zod/mini has no chainable `.catchall()`/`.strict()`, so route through the functional forms.
         const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
 
         if (node.additionalProperties && node.additionalProperties !== true) {

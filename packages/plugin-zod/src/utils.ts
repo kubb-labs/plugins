@@ -173,26 +173,20 @@ function regexFunc(regexType: PluginZod['resolvedOptions']['regexType'] | undefi
 }
 
 /**
- * Build a Zod key schema that constrains `z.record` keys to one or more `patternProperties`
- * regexes, so the generated validator enforces the key pattern that a plain `.catchall()` would
- * discard. Multiple patterns are combined into a single alternation (`(^a)|(^b)`).
+ * Builds a Zod record key schema that enforces the `patternProperties` regexes a plain
+ * `.catchall()` would drop. Several patterns combine into one alternation (`(^a)|(^b)`).
  */
 export function patternKeySchema({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
   return `z.string().regex(${patternKeySource({ patterns, regexType })})`
 }
 
 /**
- * `zod/mini` variant of {@link patternKeySchema}: the regex lives inside a `.check(z.regex(...))`
- * rather than a chained `.regex(...)`.
+ * `zod/mini` variant of {@link patternKeySchema}, wrapping the regex in `.check(z.regex(...))`.
  */
 export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
   return `z.string().check(z.regex(${patternKeySource({ patterns, regexType })}))`
 }
 
-/**
- * Render the regex source shared by both `patternKeySchema` variants, combining multiple patterns
- * into a single alternation (`(^a)|(^b)`).
- */
 function patternKeySource({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
   const source = patterns.length === 1 ? patterns[0]! : patterns.map((pattern) => `(${pattern})`).join('|')
   return toRegExpString(source, regexFunc(regexType))
