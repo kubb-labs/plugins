@@ -89,6 +89,29 @@ describe('defaultBodySerializer', () => {
     const body = defaultBodySerializer({ a: '1' }, 'application/x-www-form-urlencoded')
     expect(body).toBeInstanceOf(URLSearchParams)
   })
+
+  test('builds FormData from a plain object for multipart/form-data', () => {
+    const body = defaultBodySerializer({ field: 'x' }, 'multipart/form-data')
+    expect(body).toBeInstanceOf(FormData)
+    expect((body as FormData).get('field')).toBe('x')
+  })
+
+  test('passes Blob members through and serializes dates, objects, and arrays in multipart', () => {
+    const file = new Blob(['hi'], { type: 'text/plain' })
+    const body = defaultBodySerializer(
+      { file, when: new Date('2020-01-01T00:00:00.000Z'), meta: { a: 1 }, tags: ['a', 'b'] },
+      'multipart/form-data',
+    ) as FormData
+    expect(body.get('file')).toBeInstanceOf(Blob)
+    expect(body.get('when')).toBe('2020-01-01T00:00:00.000Z')
+    expect(body.get('meta')).toBe('{"a":1}')
+    expect(body.getAll('tags')).toStrictEqual(['a', 'b'])
+  })
+
+  test('passes a pre-built FormData through untouched for multipart', () => {
+    const formData = new FormData()
+    expect(defaultBodySerializer(formData, 'multipart/form-data')).toBe(formData)
+  })
 })
 
 describe('createClientCore', () => {
@@ -104,6 +127,29 @@ describe('createClientCore', () => {
     await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/json' })
     expect(calls[0]?.body).toBe('{"name":"odie"}')
     expect(calls[0]?.headers['Content-Type']).toBe('application/json')
+  })
+
+  test('builds FormData and omits Content-Type for multipart/form-data', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'POST', url: '/pet', body: { field: 'x' }, contentType: 'multipart/form-data' })
+    expect(calls[0]?.body).toBeInstanceOf(FormData)
+    expect(calls[0]?.headers['Content-Type']).toBeUndefined()
+  })
+
+  test('omits Content-Type when a pre-built FormData body is sent', async () => {
+    const { client, calls } = createClient()
+    const formData = new FormData()
+    formData.append('field', 'x')
+    await client({ method: 'POST', url: '/pet', body: formData, contentType: 'application/json' })
+    expect(calls[0]?.body).toBe(formData)
+    expect(calls[0]?.headers['Content-Type']).toBeUndefined()
+  })
+
+  test('sets Content-Type for form-urlencoded bodies', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'POST', url: '/pet', body: { a: '1' }, contentType: 'application/x-www-form-urlencoded' })
+    expect(calls[0]?.body).toBeInstanceOf(URLSearchParams)
+    expect(calls[0]?.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
   })
 
   test('returns the success shape with data and an undefined error', async () => {

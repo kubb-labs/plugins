@@ -114,6 +114,30 @@ const createPetNode = ast.factory.createOperation({
   ],
 })
 
+const uploadFileNode = ast.factory.createOperation({
+  operationId: 'uploadFile',
+  method: 'POST',
+  path: '/pet/{petId}/uploadImage',
+  tags: ['pet'],
+  parameters: [ast.factory.createParameter({ name: 'petId', in: 'path', schema: ast.factory.createSchema({ type: 'integer' }), required: true })],
+  requestBody: {
+    required: true,
+    content: [
+      ast.factory.createContent({
+        contentType: 'multipart/form-data',
+        schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      }),
+    ],
+  },
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -145,6 +169,8 @@ describe('clientGenerator operation', () => {
     { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
+    // multipart/form-data request body bakes a `contentType` into the call config.
+    { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },

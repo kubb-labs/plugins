@@ -69,6 +69,29 @@ describe('defaultBodySerializer', () => {
     const body = defaultBodySerializer({ a: '1' }, 'application/x-www-form-urlencoded')
     expect(body).toBeInstanceOf(URLSearchParams)
   })
+
+  test('builds FormData from a plain object for multipart/form-data', () => {
+    const body = defaultBodySerializer({ field: 'x' }, 'multipart/form-data')
+    expect(body).toBeInstanceOf(FormData)
+    expect((body as FormData).get('field')).toBe('x')
+  })
+
+  test('passes Blob members through and serializes dates, objects, and arrays in multipart', () => {
+    const file = new Blob(['hi'], { type: 'text/plain' })
+    const body = defaultBodySerializer(
+      { file, when: new Date('2020-01-01T00:00:00.000Z'), meta: { a: 1 }, tags: ['a', 'b'] },
+      'multipart/form-data',
+    ) as FormData
+    expect(body.get('file')).toBeInstanceOf(Blob)
+    expect(body.get('when')).toBe('2020-01-01T00:00:00.000Z')
+    expect(body.get('meta')).toBe('{"a":1}')
+    expect(body.getAll('tags')).toStrictEqual(['a', 'b'])
+  })
+
+  test('passes a pre-built FormData through untouched for multipart', () => {
+    const formData = new FormData()
+    expect(defaultBodySerializer(formData, 'multipart/form-data')).toBe(formData)
+  })
 })
 
 describe('createClientCore', () => {
@@ -107,15 +130,33 @@ describe('createClientCore', () => {
     expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
   })
 
-  test('maps bodySerializer onto axios transformRequest and sets Content-Type', async () => {
+  test('serializes the body before axios and sets Content-Type', async () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
     await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, contentType: 'application/json' })
-    expect(calls[0]?.data).toStrictEqual({ name: 'odie' })
-    const transform = (Array.isArray(calls[0]?.transformRequest) ? calls[0]?.transformRequest[0] : calls[0]?.transformRequest) as (data: unknown) => unknown
-    expect(transform({ name: 'odie' })).toBe('{"name":"odie"}')
+    expect(calls[0]?.data).toBe('{"name":"odie"}')
     const headers = calls[0]?.headers as Record<string, string>
     expect(headers['Content-Type']).toBe('application/json')
+  })
+
+  test('builds FormData and omits Content-Type for multipart/form-data', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'POST', url: '/pet', body: { field: 'x' }, contentType: 'multipart/form-data' })
+    expect(calls[0]?.data).toBeInstanceOf(FormData)
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers['Content-Type']).toBeUndefined()
+  })
+
+  test('omits Content-Type when a pre-built FormData body is sent', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    const formData = new FormData()
+    formData.append('field', 'x')
+    await client({ method: 'POST', url: '/pet', body: formData, contentType: 'application/json' })
+    expect(calls[0]?.data).toBe(formData)
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers['Content-Type']).toBeUndefined()
   })
 
   test('throws a ResponseError for a non-2xx status by default', async () => {
@@ -174,7 +215,7 @@ describe('createClientCore', () => {
     const response = vi.fn(() => ({ parsed: true }))
     const result = (await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, parser: { request, response } })) as CallResult
     expect(request).toHaveBeenCalledTimes(1)
-    expect(calls[0]?.data).toStrictEqual({ name: 'odie', validated: true })
+    expect(calls[0]?.data).toBe('{"name":"odie","validated":true}')
     expect(result.data).toStrictEqual({ parsed: true })
   })
 
