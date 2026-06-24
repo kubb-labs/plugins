@@ -30,6 +30,10 @@ export const createPetsResponseSchema = createPetsStatus201Schema
 
 export type CreatePetsResponseSchemaType = z.infer<typeof createPetsResponseSchema>
 
+export const createPetsErrorSchema = createPetsStatusDefaultSchema
+
+export type CreatePetsErrorSchemaType = z.infer<typeof createPetsErrorSchema>
+
 export const createPetsDataSchema = z.object({
   name: z.string(),
   tag: z.string(),

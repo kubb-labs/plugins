@@ -1,7 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.ts'
 import { client } from '../../../.kubb/client.ts'
-import { findPetsByStatusResponseSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
+import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
 /**
  * @description Multiple status values can be provided with comma separated strings
@@ -17,7 +17,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/findByStatus/{step_id}',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => findPetsByStatusResponseSchema.parse(data) },
+    parser: { response: (data: unknown) => findPetsByStatusResponseSchema.parse(data), error: (data: unknown) => findPetsByStatusErrorSchema.parse(data) },
     ...config,
   }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }

@@ -15,3 +15,5 @@ export const getThingsStatus201Schema = z.any()
 export const getThingsStatusDefaultSchema = petNotFoundSchema
 
 export const getThingsResponseSchema = getThingsStatus201Schema
+
+export const getThingsErrorSchema = getThingsStatusDefaultSchema
