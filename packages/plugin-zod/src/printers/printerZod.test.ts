@@ -238,12 +238,12 @@ describe('printerZod', () => {
 
     test('object with additionalProperties: true → .catchall(z.unknown())', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: true })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.unknown())"`)
+      expect(printer.print(node)).toBe('z.object({}).catchall(z.unknown())')
     })
 
     test('object with additionalProperties: false → .strict()', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: false })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).strict()"`)
+      expect(printer.print(node)).toBe('z.object({}).strict()')
     })
 
     test('object with additionalProperties schema → .catchall(schema)', () => {
@@ -253,7 +253,85 @@ describe('printerZod', () => {
         properties: [],
         additionalProperties: ast.factory.createSchema({ type: 'string' }),
       })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
+      expect(printer.print(node)).toBe('z.object({}).catchall(z.string())')
+    })
+
+    test('object with patternProperties → z.record(regex key, value)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string())')
+    })
+
+    test('object with nullable patternProperties value → record value gets .nullable()', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string', nullable: true }) },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string().nullable())')
+    })
+
+    test('patternProperties with fixed properties → .catchall (record cannot coexist with a fixed shape)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        patternProperties: { '^meta_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toBe('z.object({\n  id: z.int(),\n}).catchall(z.string())')
+    })
+
+    test('multiple patternProperties → alternation key regex with a union value', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: {
+          '^S_': ast.factory.createSchema({ type: 'string' }),
+          '^I_': ast.factory.createSchema({ type: 'integer' }),
+        },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/(^S_)|(^I_)/), z.union([z.string(), z.int()]))')
+    })
+
+    test('multiple patternProperties with identical value types → single value, no union', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: {
+          '^S_': ast.factory.createSchema({ type: 'string' }),
+          '^T_': ast.factory.createSchema({ type: 'string' }),
+        },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/(^S_)|(^T_)/), z.string())')
+    })
+
+    test('additionalProperties takes precedence over patternProperties', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: ast.factory.createSchema({ type: 'number' }),
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toBe('z.object({}).catchall(z.number())')
+    })
+
+    test('additionalProperties:false with patternProperties keeps the pattern record (not .strict)', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: false,
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string())')
     })
   })
 

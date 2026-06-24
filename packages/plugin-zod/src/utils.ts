@@ -173,6 +173,26 @@ function regexFunc(regexType: PluginZod['resolvedOptions']['regexType'] | undefi
 }
 
 /**
+ * Builds a Zod record key schema that enforces the `patternProperties` regexes a plain
+ * `.catchall()` would drop. Several patterns combine into one alternation (`(^a)|(^b)`).
+ */
+export function patternKeySchema({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
+  return `z.string().regex(${patternKeySource({ patterns, regexType })})`
+}
+
+/**
+ * `zod/mini` variant of {@link patternKeySchema}, wrapping the regex in `.check(z.regex(...))`.
+ */
+export function patternKeySchemaMini({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
+  return `z.string().check(z.regex(${patternKeySource({ patterns, regexType })}))`
+}
+
+function patternKeySource({ patterns, regexType }: { patterns: Array<string>; regexType?: PluginZod['resolvedOptions']['regexType'] }): string {
+  const source = patterns.length === 1 ? patterns[0]! : patterns.map((pattern) => `(${pattern})`).join('|')
+  return toRegExpString(source, regexFunc(regexType))
+}
+
+/**
  * Modifier options for applying chainable methods to Zod schema values.
  */
 export type ModifierOptions = {

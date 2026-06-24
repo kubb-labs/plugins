@@ -13,7 +13,7 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
+import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, patternKeySchema, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -278,14 +278,30 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
 
         const objectBase = `z.object(${buildObject(entries)})`
 
-        // Handle additionalProperties as .catchall() or .strict()
         const result = (() => {
+          const patterns = node.patternProperties ? Object.entries(node.patternProperties) : []
+
           if (node.additionalProperties && node.additionalProperties !== true) {
             const catchallType = this.transform(node.additionalProperties)
             return catchallType ? `${objectBase}.catchall(${catchallType})` : objectBase
           }
           if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
-          if (node.additionalProperties === false) return `${objectBase}.strict()`
+          // `additionalProperties: false` still permits patternProperties keys, so skip `.strict()` when patterns exist.
+          if (node.additionalProperties === false && patterns.length === 0) return `${objectBase}.strict()`
+
+          // No fixed properties: z.record enforces the key pattern. With fixed properties a record would
+          // reject the declared keys, so fall back to .catchall (value validated, key pattern not).
+          if (patterns.length > 0) {
+            const values = patterns.map(([, valueSchema]) => {
+              const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+              return valueSchema.nullable ? `${valueType}.nullable()` : valueType
+            })
+            const distinct = [...new Set(values)]
+            const value = distinct.length === 1 ? distinct[0]! : `z.union([${distinct.join(', ')}])`
+
+            if (entries.length > 0) return `${objectBase}.catchall(${value})`
+            return `z.record(${patternKeySchema({ patterns: patterns.map(([pattern]) => pattern), regexType: this.options.regexType })}, ${value})`
+          }
           return objectBase
         })()
 

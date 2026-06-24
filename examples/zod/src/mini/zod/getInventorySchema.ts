@@ -5,6 +5,6 @@
 
 import * as z from 'zod/mini'
 
-export const getInventoryStatus200Schema = z.object({})
+export const getInventoryStatus200Schema = z.catchall(z.object({}), z.int())
 
 export const getInventoryResponseSchema = getInventoryStatus200Schema
