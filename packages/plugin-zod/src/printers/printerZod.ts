@@ -13,7 +13,7 @@ import {
 import { ast } from '@kubb/core'
 import { containsCircularRef, syncSchemaRef } from '@kubb/ast/utils'
 import type { PluginZod, ResolverZod } from '../types.ts'
-import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, shouldCoerce } from '../utils.ts'
+import { applyModifiers, containsCodec, formatLiteral, getCodec, lengthConstraints, numberConstraints, patternKeySchema, shouldCoerce } from '../utils.ts'
 import type { AdapterOas } from '@kubb/adapter-oas'
 
 /**
@@ -287,12 +287,20 @@ export const printerZod = ast.createPrinter<PrinterZodFactory>((options) => {
           if (node.additionalProperties === true) return `${objectBase}.catchall(${this.transform(ast.factory.createSchema({ type: 'unknown' }))})`
           if (node.additionalProperties === false) return `${objectBase}.strict()`
 
-          // Zod has no per-pattern key validation, so the first pattern's value schema becomes the
-          // catchall, mirroring the index signature emitted by the TypeScript plugin.
-          const patternValue = node.patternProperties && Object.values(node.patternProperties)[0]
-          if (patternValue) {
-            const patternType = this.transform(patternValue)
-            if (patternType) return `${objectBase}.catchall(${patternValue.nullable ? `${patternType}.nullable()` : patternType})`
+          // patternProperties maps regex key patterns to value schemas. z.record(keySchema, value)
+          // validates both the key pattern and the value, which .catchall() cannot express. When
+          // fixed properties coexist, intersect the records with the base object.
+          if (node.patternProperties) {
+            const records = Object.entries(node.patternProperties).map(([pattern, valueSchema]) => {
+              const valueType = this.transform(valueSchema) ?? this.transform(ast.factory.createSchema({ type: 'unknown' }))!
+              const value = valueSchema.nullable ? `${valueType}.nullable()` : valueType
+              return `z.record(${patternKeySchema({ pattern, regexType: this.options.regexType })}, ${value})`
+            })
+            const [firstRecord, ...restRecords] = records
+            if (firstRecord) {
+              const base = entries.length > 0 ? `${objectBase}.and(${firstRecord})` : firstRecord
+              return restRecords.reduce((acc, record) => `${acc}.and(${record})`, base)
+            }
           }
           return objectBase
         })()

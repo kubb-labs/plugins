@@ -256,24 +256,47 @@ describe('printerZod', () => {
       expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
     })
 
-    test('object with patternProperties → .catchall(schema)', () => {
+    test('object with patternProperties → z.record(regex key, value)', () => {
       const node = ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
         properties: [],
         patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
       })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string())')
     })
 
-    test('object with nullable patternProperties → .catchall(schema.nullable())', () => {
+    test('object with nullable patternProperties value → record value gets .nullable()', () => {
       const node = ast.factory.createSchema({
         type: 'object',
         primitive: 'object',
         properties: [],
         patternProperties: { '^S_': ast.factory.createSchema({ type: 'string', nullable: true }) },
       })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string().nullable())"`)
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string().nullable())')
+    })
+
+    test('patternProperties with fixed properties → intersected with the base object', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'integer' }) })],
+        patternProperties: { '^meta_': ast.factory.createSchema({ type: 'string' }) },
+      })
+      expect(printer.print(node)).toBe('z.object({\n  id: z.int(),\n}).and(z.record(z.string().regex(/^meta_/), z.string()))')
+    })
+
+    test('multiple patternProperties → records intersected', () => {
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: {
+          '^S_': ast.factory.createSchema({ type: 'string' }),
+          '^I_': ast.factory.createSchema({ type: 'integer' }),
+        },
+      })
+      expect(printer.print(node)).toBe('z.record(z.string().regex(/^S_/), z.string()).and(z.record(z.string().regex(/^I_/), z.int()))')
     })
 
     test('additionalProperties takes precedence over patternProperties', () => {
