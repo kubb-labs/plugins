@@ -1,4 +1,4 @@
-import { buildOperationComments } from '@internals/shared'
+import { buildOperationComments, getContentTypeInfo } from '@internals/shared'
 import { ast } from '@kubb/core'
 import type { ResolverTs } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
@@ -52,6 +52,10 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
   const parsers = buildParserHooks({ node, parser, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
 
+  const { defaultContentType } = getContentTypeInfo(node)
+  const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
+  const contentTypeLiteral = hasRequestBody && defaultContentType !== 'application/json' ? `contentType: '${defaultContentType}'` : null
+
   const parserEntries = [
     parsers.request ? `request: ${parsers.request}` : null,
     parsers.response ? `response: ${parsers.response}` : null,
@@ -64,6 +68,7 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
     `url: '${node.path}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
     parserLiteral,
+    contentTypeLiteral,
     '...config',
   ]
     .filter(Boolean)
