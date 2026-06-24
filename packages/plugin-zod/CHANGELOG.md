@@ -1,5 +1,27 @@
 # @kubb/plugin-zod
 
+## 5.0.0-beta.76
+
+### Minor Changes
+
+- [#514](https://github.com/kubb-labs/plugins/pull/514) [`3fe9268`](https://github.com/kubb-labs/plugins/commit/3fe92680b3a624cec83db06dd42ebb57acab505d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Validate the error body with zod on the non-throw path (kubb-labs/plugins#369).
+
+  When a call resolves with a non-2xx status and `throwOnError: false`, the generated client now parses the error body against a new error-only `<operation>ErrorSchema` (a union of the documented non-2xx statuses), so `result.error` has a known, validated shape instead of being surfaced raw.
+
+  - **plugin-zod**: emits `<operation>ErrorSchema` alongside the success-only `<operation>ResponseSchema` for every operation that documents an error response with a schema. The success path is unchanged.
+  - **plugin-fetch / plugin-axios**: the `parser: 'zod'` shorthand (and the object form's `response: 'zod'`) now also wires an `error` parser hook; the runtime runs it on the error body only when a non-2xx call does not throw. The default `throwOnError: true` path still throws a raw `ResponseError`.
+
+  This is a small behavioral change for existing `parser: 'zod'` users: error bodies on non-throw calls are now validated and can surface a `ZodError` when the server's error response does not match the spec.
+
+- [#505](https://github.com/kubb-labs/plugins/pull/505) [`e64ff08`](https://github.com/kubb-labs/plugins/commit/e64ff085c2ad3676291d7c81cfb9be1761012798) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Add `patternProperties` support to the Zod and Zod Mini printers.
+
+  - Without fixed `properties`, an object emits `z.record(z.string().regex(<pattern>), <value>)` (`z.record(z.string().check(z.regex(...)), ...)` in mini), so the generated schema validates both the key pattern and the value. Multiple patterns combine into one alternation key regex with a union value.
+  - With fixed `properties`, the object falls back to `.catchall(<value>)` (`z.catchall(...)` in mini), because a regex-constrained `z.record` inside an intersection rejects the fixed keys at runtime.
+  - `additionalProperties: false` combined with `patternProperties` now keeps the pattern record instead of emitting `.strict()`, which would have rejected the pattern-matched keys.
+  - `additionalProperties` still takes precedence when both are present.
+
+  The Zod Mini printer also now honors `additionalProperties` itself: a schema maps to `z.catchall(...)`, `true` to `z.catchall(object, z.unknown())`, and `false` to `z.strictObject(...)`.
+
 ## 5.0.0-beta.75
 
 ### Major Changes
