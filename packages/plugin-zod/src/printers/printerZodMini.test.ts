@@ -189,7 +189,12 @@ describe('printerZodMini', () => {
     })
 
     test('additionalProperties schema → z.catchall(object, schema)', () => {
-      const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: ast.factory.createSchema({ type: 'string' }) })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        additionalProperties: ast.factory.createSchema({ type: 'string' }),
+      })
       expect(printer.print(node)).toBe('z.catchall(z.object({}), z.string())')
     })
 
@@ -204,12 +209,22 @@ describe('printerZodMini', () => {
     })
 
     test('patternProperties → z.record with a regex-checked key', () => {
-      const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) } })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+      })
       expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^S_/)), z.string())')
     })
 
     test('nullable patternProperties value → z.nullable wraps the record value', () => {
-      const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], patternProperties: { '^S_': ast.factory.createSchema({ type: 'string', nullable: true }) } })
+      const node = ast.factory.createSchema({
+        type: 'object',
+        primitive: 'object',
+        properties: [],
+        patternProperties: { '^S_': ast.factory.createSchema({ type: 'string', nullable: true }) },
+      })
       expect(printer.print(node)).toBe('z.record(z.string().check(z.regex(/^S_/)), z.nullable(z.string()))')
     })
 
