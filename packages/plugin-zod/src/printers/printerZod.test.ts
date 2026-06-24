@@ -238,12 +238,12 @@ describe('printerZod', () => {
 
     test('object with additionalProperties: true → .catchall(z.unknown())', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: true })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.unknown())"`)
+      expect(printer.print(node)).toBe('z.object({}).catchall(z.unknown())')
     })
 
     test('object with additionalProperties: false → .strict()', () => {
       const node = ast.factory.createSchema({ type: 'object', primitive: 'object', properties: [], additionalProperties: false })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).strict()"`)
+      expect(printer.print(node)).toBe('z.object({}).strict()')
     })
 
     test('object with additionalProperties schema → .catchall(schema)', () => {
@@ -253,7 +253,7 @@ describe('printerZod', () => {
         properties: [],
         additionalProperties: ast.factory.createSchema({ type: 'string' }),
       })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.string())"`)
+      expect(printer.print(node)).toBe('z.object({}).catchall(z.string())')
     })
 
     test('object with patternProperties → z.record(regex key, value)', () => {
@@ -320,7 +320,7 @@ describe('printerZod', () => {
         additionalProperties: ast.factory.createSchema({ type: 'number' }),
         patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
       })
-      expect(printer.print(node)).toMatchInlineSnapshot(`"z.object({}).catchall(z.number())"`)
+      expect(printer.print(node)).toBe('z.object({}).catchall(z.number())')
     })
 
     test('additionalProperties:false with patternProperties keeps the pattern record (not .strict)', () => {

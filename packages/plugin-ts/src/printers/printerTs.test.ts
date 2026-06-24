@@ -593,11 +593,9 @@ describe('printerTs', () => {
         }),
       )
 
-      expect(await formatTS(result)).toMatchInlineSnapshot(`
-        "{
-          [key: string]: string
-        }"
-      `)
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: string
+}`)
     })
 
     it('additionalProperties with existing properties uses unknown for index', async () => {
@@ -609,15 +607,13 @@ describe('printerTs', () => {
         }),
       )
 
-      expect(await formatTS(result)).toMatchInlineSnapshot(`
-        "{
-          /**
-           * @type number
-           */
-          id: number
-          [key: string]: unknown
-        }"
-      `)
+      expect(await formatTS(result)).toBe(`{
+  /**
+   * @type number
+   */
+  id: number
+  [key: string]: unknown
+}`)
     })
 
     it('patternProperties adds index signature', async () => {
@@ -629,11 +625,9 @@ describe('printerTs', () => {
         }),
       )
 
-      expect(await formatTS(result)).toMatchInlineSnapshot(`
-        "{
-          [key: string]: string
-        }"
-      `)
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: string
+}`)
     })
 
     it('patternProperties with nullable adds | null to index type', async () => {
@@ -645,11 +639,76 @@ describe('printerTs', () => {
         }),
       )
 
-      expect(await formatTS(result)).toMatchInlineSnapshot(`
-        "{
-          [key: string]: string | null
-        }"
-      `)
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: string | null
+}`)
+    })
+
+    it('multiple patternProperties union their value types in one index signature', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          patternProperties: {
+            '^S_': ast.factory.createSchema({ type: 'string' }),
+            '^I_': ast.factory.createSchema({ type: 'number' }),
+          },
+        }),
+      )
+
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: string | number
+}`)
+    })
+
+    it('multiple patternProperties with identical value types dedupe to one type', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          patternProperties: {
+            '^S_': ast.factory.createSchema({ type: 'string' }),
+            '^T_': ast.factory.createSchema({ type: 'string' }),
+          },
+        }),
+      )
+
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: string
+}`)
+    })
+
+    it('additionalProperties and patternProperties merge into a single index signature', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [],
+          additionalProperties: ast.factory.createSchema({ type: 'number' }),
+          patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+        }),
+      )
+
+      expect(await formatTS(result)).toBe(`{
+  [key: string]: number | string
+}`)
+    })
+
+    it('patternProperties with fixed properties uses unknown for the index type', async () => {
+      const result = printer.transform(
+        ast.factory.createSchema({
+          type: 'object',
+          properties: [ast.factory.createProperty({ name: 'id', required: true, schema: ast.factory.createSchema({ type: 'number' }) })],
+          patternProperties: { '^S_': ast.factory.createSchema({ type: 'string' }) },
+        }),
+      )
+
+      expect(await formatTS(result)).toBe(`{
+  /**
+   * @type number
+   */
+  id: number
+  [key: string]: unknown
+}`)
     })
 
     it('nullish property with optionalType=questionToken adds ?', async () => {

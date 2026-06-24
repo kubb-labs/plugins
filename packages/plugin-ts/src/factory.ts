@@ -938,35 +938,41 @@ export function buildPropertyType(
   return type
 }
 
+const indexSignaturePrinter = ts.createPrinter()
+const indexSignatureSource = ts.createSourceFile('', '', ts.ScriptTarget.Latest)
+
 /**
- * Creates TypeScript index signatures for `additionalProperties` and `patternProperties` on an object schema node.
+ * Creates a TypeScript index signature for `additionalProperties` and `patternProperties` on an
+ * object schema node. TypeScript allows only one string index signature and its value must be
+ * assignable from every named property, so both keywords collapse into a single signature: the
+ * union of all value types (deduplicated), or `unknown` when the object also has fixed properties.
+ * The key regex of `patternProperties` cannot be expressed by an index signature and is dropped.
  */
 export function buildIndexSignatures(
   node: { additionalProperties?: ast.SchemaNode | boolean; patternProperties?: Record<string, ast.SchemaNode> },
   propertyCount: number,
   print: (node: ast.SchemaNode) => ts.TypeNode | null | undefined,
 ): Array<ts.TypeElement> {
-  const elements: Array<ts.TypeElement> = []
+  const valueTypes: Array<ts.TypeNode> = []
 
   if (node.additionalProperties && node.additionalProperties !== true) {
-    const additionalType = print(node.additionalProperties) ?? keywordTypeNodes.unknown
-
-    elements.push(createIndexSignature(propertyCount > 0 ? keywordTypeNodes.unknown : additionalType))
+    valueTypes.push(print(node.additionalProperties) ?? keywordTypeNodes.unknown)
   } else if (node.additionalProperties === true) {
-    elements.push(createIndexSignature(keywordTypeNodes.unknown))
+    valueTypes.push(keywordTypeNodes.unknown)
   }
 
-  if (node.patternProperties) {
-    const first = Object.values(node.patternProperties)[0]
-    if (first) {
-      let patternType = print(first) ?? keywordTypeNodes.unknown
-
-      if (first.nullable) {
-        patternType = createUnionDeclaration({ nodes: [patternType, keywordTypeNodes.null] })
-      }
-      elements.push(createIndexSignature(patternType))
-    }
+  for (const schema of Object.values(node.patternProperties ?? {})) {
+    const patternType = print(schema) ?? keywordTypeNodes.unknown
+    valueTypes.push(schema.nullable ? createUnionDeclaration({ nodes: [patternType, keywordTypeNodes.null] }) : patternType)
   }
 
-  return elements
+  if (valueTypes.length === 0) return []
+
+  const seen = new Set<string>()
+  const distinct = valueTypes.filter((type) => {
+    const key = indexSignaturePrinter.printNode(ts.EmitHint.Unspecified, type, indexSignatureSource)
+    return seen.has(key) ? false : (seen.add(key), true)
+  })
+
+  return [createIndexSignature(propertyCount > 0 ? keywordTypeNodes.unknown : createUnionDeclaration({ nodes: distinct }))]
 }
