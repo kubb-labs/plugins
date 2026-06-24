@@ -1,4 +1,4 @@
-import { caseParams, getSuccessResponses, resolveContentTypeVariants } from '@internals/shared'
+import { caseParams, getSuccessResponses, isSuccessStatusCode, resolveContentTypeVariants } from '@internals/shared'
 import type { Adapter } from '@kubb/core'
 import { ast, defineGenerator } from '@kubb/core'
 import type { AdapterOas } from '@kubb/adapter-oas'
@@ -298,6 +298,46 @@ export const zodGenerator = defineGenerator<PluginZod>({
           })()
         : null
 
+    // Validate error bodies on the non-throw path. Mirrors the success union but selects every
+    // non-2xx response (including the OpenAPI `default`) so it lines up with plugin-ts `ErrorOf` (#369).
+    const errorResponsesWithSchema = responsesWithSchema.filter((res) => !isSuccessStatusCode(res.statusCode))
+    const errorUnionSchema =
+      errorResponsesWithSchema.length > 0
+        ? (() => {
+            const errorUnionName = resolver.resolveErrorName(node)
+
+            const importedNames = new Set(
+              errorResponsesWithSchema.flatMap((res) =>
+                (res.content ?? []).flatMap((entry) =>
+                  entry.schema
+                    ? adapter
+                        .getImports(entry.schema, (schemaName) => ({
+                          name: resolver.resolveSchemaName(schemaName),
+                          path: '',
+                        }))
+                        .flatMap((imp) => (Array.isArray(imp.name) ? imp.name : [imp.name]))
+                    : [],
+                ),
+              ),
+            )
+
+            if (importedNames.has(errorUnionName)) {
+              return null
+            }
+
+            const members = errorResponsesWithSchema.map((res) =>
+              ast.factory.createSchema({ type: 'ref', name: resolver.resolveResponseStatusName(node, res.statusCode) }),
+            )
+
+            const unionNode = members.length === 1 ? members[0]! : ast.factory.createSchema({ type: 'union', members })
+
+            return renderSchemaEntry({
+              schema: unionNode,
+              name: errorUnionName,
+            })
+          })()
+        : null
+
     const requestBodyContent = node.requestBody?.content ?? []
     const requestSchema = (() => {
       if (requestBodyContent.length === 0) return null
@@ -334,6 +374,7 @@ export const zodGenerator = defineGenerator<PluginZod>({
         {paramSchemas}
         {responseSchemas}
         {responseUnionSchema}
+        {errorUnionSchema}
         {requestSchema}
       </File>
     )

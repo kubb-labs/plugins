@@ -20,3 +20,7 @@ export type DeletePetStatus400SchemaType = z.infer<typeof deletePetStatus400Sche
 export const deletePetResponseSchema = z.unknown()
 
 export type DeletePetResponseSchemaType = z.infer<typeof deletePetResponseSchema>
+
+export const deletePetErrorSchema = deletePetStatus400Schema
+
+export type DeletePetErrorSchemaType = z.infer<typeof deletePetErrorSchema>

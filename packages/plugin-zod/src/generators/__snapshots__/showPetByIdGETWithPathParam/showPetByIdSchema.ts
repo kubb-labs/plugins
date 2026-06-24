@@ -12,3 +12,5 @@ export const showPetByIdStatus200Schema = z.object({})
 export const showPetByIdStatusDefaultSchema = z.object({})
 
 export const showPetByIdResponseSchema = showPetByIdStatus200Schema
+
+export const showPetByIdErrorSchema = showPetByIdStatusDefaultSchema

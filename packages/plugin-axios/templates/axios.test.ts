@@ -186,6 +186,23 @@ describe('createClientCore', () => {
     expect(response).not.toHaveBeenCalled()
   })
 
+  test('runs the error parser on a non-2xx body when throwOnError is false', async () => {
+    const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
+    const client = createClientCore({ transport: instance })
+    const error = vi.fn(() => ({ parsed: true }))
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error } })) as CallResult
+    expect(error).toHaveBeenCalledTimes(1)
+    expect(result.error).toStrictEqual({ parsed: true })
+  })
+
+  test('skips the error parser on a success body', async () => {
+    const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
+    const client = createClientCore({ transport: instance })
+    const error = vi.fn((value: unknown) => value)
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error } })
+    expect(error).not.toHaveBeenCalled()
+  })
+
   test('delegates interceptors to the native axios managers', () => {
     const { instance, requestUse, responseUse } = fakeAxios()
     const client = createClientCore({ transport: instance })

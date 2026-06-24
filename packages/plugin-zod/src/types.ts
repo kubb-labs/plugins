@@ -67,6 +67,14 @@ export type ResolverZod = Resolver &
      */
     resolveResponseName(this: ResolverZod, node: ast.OperationNode): string
     /**
+     * Resolves the name for the union of an operation's error (non-2xx) responses. Generated clients
+     * validate the error body against this on the non-throw path.
+     *
+     * @example Error union names
+     * `resolver.resolveErrorName(node) // → 'listPetsErrorSchema'`
+     */
+    resolveErrorName(this: ResolverZod, node: ast.OperationNode): string
+    /**
      * Resolves the name for an operation's grouped path parameters type.
      *
      * @example Path parameters names

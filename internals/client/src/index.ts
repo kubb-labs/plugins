@@ -1,5 +1,5 @@
 export { buildSdkMethod } from './builders/sdkMethod.ts'
-export { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from './builders/parser.ts'
+export { buildZodErrorParse, isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from './builders/parser.ts'
 export { buildReturnStatement } from './builders/returnStatement.ts'
 export { buildSecurityMetadata, getOperationSecurity, resolveSecurityScheme } from './builders/security.ts'
 export type { Auth, SecurityDocument } from './builders/security.ts'

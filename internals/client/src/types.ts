@@ -3,9 +3,11 @@ import type { ast, Exclude, Group, Include, Output, OutputOptions, Override, Plu
 /**
  * Validator applied to request and response bodies using schemas from `@kubb/plugin-zod`.
  * - `false`: no validation.
- * - `'zod'`: validates success (2xx) response bodies only.
+ * - `'zod'`: validates the success (2xx) response body, and the error body when a non-2xx call does
+ *   not throw (`throwOnError: false`).
  * - `{ request?: 'zod'; response?: 'zod' }`: opt in per direction. `request` validates the request
- *   body and query parameters before the call; `response` validates the success response body.
+ *   body and query parameters before the call; `response` validates the success response body and,
+ *   on the non-throw path, the error body.
  */
 export type ParserOptions = false | 'zod' | { request?: 'zod'; response?: 'zod' }
 

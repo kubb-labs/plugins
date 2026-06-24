@@ -13,6 +13,8 @@ export {
   getRequestGroups,
   getResponseType,
   getSuccessResponses,
+  isErrorStatusCode,
+  isSuccessStatusCode,
   operationFileEntry,
   resolveContentTypeVariants,
   resolveErrorNames,

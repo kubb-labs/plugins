@@ -8,7 +8,7 @@ import { pluginTsName } from '@kubb/plugin-ts'
 import type { ResolverZod } from '@kubb/plugin-zod'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { File, jsxRenderer } from '@kubb/renderer-jsx'
-import { isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../builders/parser.ts'
+import { buildZodErrorParse, isParserEnabled, resolveQueryParamsParser, resolveRequestParser, resolveResponseParser } from '../builders/parser.ts'
 import { type Auth, getOperationSecurity, type SecurityDocument } from '../builders/security.ts'
 import { SdkClient } from '../components/SdkClient.tsx'
 import { SdkFacade } from '../components/SdkFacade.tsx'
@@ -48,6 +48,7 @@ function resolveZodImportNames(node: ast.OperationNode, zodResolver: ResolverZod
   const { query: queryParams } = getOperationParameters(node, { paramsCasing: 'original' })
   const names: Array<string | null | undefined> = [
     resolveResponseParser(parser) === 'zod' ? zodResolver.resolveResponseName?.(node) : null,
+    resolveResponseParser(parser) === 'zod' ? (buildZodErrorParse(node, zodResolver)?.expression ?? null) : null,
     resolveRequestParser(parser) === 'zod' && node.requestBody?.content?.[0]?.schema ? zodResolver.resolveDataName?.(node) : null,
     resolveQueryParamsParser(parser) === 'zod' && queryParams.length > 0 ? zodResolver.resolveQueryParamsName?.(node, queryParams[0]!) : null,
   ]

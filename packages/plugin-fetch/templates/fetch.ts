@@ -84,7 +84,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => BodyInit |
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -133,7 +134,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -486,11 +487,12 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
 
     const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
+    const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, result.data)
 
     return {
       status: result.status,
       data,
-      error: isSuccess ? undefined : result.data,
+      error,
       request: result.request,
       response: result.response,
     }
