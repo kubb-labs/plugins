@@ -1,5 +1,17 @@
 # @kubb/plugin-ts
 
+## 5.0.0-beta.76
+
+### Minor Changes
+
+- [#505](https://github.com/kubb-labs/plugins/pull/505) [`4c7e449`](https://github.com/kubb-labs/plugins/commit/4c7e449383a8888273b1e7f32222a5d869d9c4d8) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Improve `patternProperties` handling in the TypeScript printer.
+
+  - Multiple patterns now contribute their value types to a single index signature instead of only the first pattern being used (`{ [key: string]: string | number }`), with identical value types deduplicated.
+  - `additionalProperties` and `patternProperties` declared together now merge into one string index signature instead of emitting two, which TypeScript rejects.
+  - When the object also has fixed properties, the index signature value falls back to `unknown` so it stays assignable from the named properties.
+
+  The key regex of `patternProperties` still cannot be expressed by a TypeScript index signature and is dropped, matching how the type is generated elsewhere.
+
 ## 5.0.0-beta.75
 
 ## 5.0.0-beta.74
