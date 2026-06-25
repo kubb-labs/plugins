@@ -1,5 +1,30 @@
 # @kubb/plugin-fetch
 
+## 5.0.0-beta.76
+
+### Minor Changes
+
+- [#514](https://github.com/kubb-labs/plugins/pull/514) [`3fe9268`](https://github.com/kubb-labs/plugins/commit/3fe92680b3a624cec83db06dd42ebb57acab505d) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Validate the error body with zod on the non-throw path (kubb-labs/plugins#369).
+
+  When a call resolves with a non-2xx status and `throwOnError: false`, the generated client now parses the error body against a new error-only `<operation>ErrorSchema` (a union of the documented non-2xx statuses), so `result.error` has a known, validated shape instead of being surfaced raw.
+
+  - **plugin-zod**: emits `<operation>ErrorSchema` alongside the success-only `<operation>ResponseSchema` for every operation that documents an error response with a schema. The success path is unchanged.
+  - **plugin-fetch / plugin-axios**: the `parser: 'zod'` shorthand (and the object form's `response: 'zod'`) now also wires an `error` parser hook; the runtime runs it on the error body only when a non-2xx call does not throw. The default `throwOnError: true` path still throws a raw `ResponseError`.
+
+  This is a small behavioral change for existing `parser: 'zod'` users: error bodies on non-throw calls are now validated and can surface a `ZodError` when the server's error response does not match the spec.
+
+### Patch Changes
+
+- [#516](https://github.com/kubb-labs/plugins/pull/516) [`bdb6e73`](https://github.com/kubb-labs/plugins/commit/bdb6e73e71789b48679cabcfd93c0c02d4dea0af) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Fix path parameter interpolation when the OpenAPI placeholder uses a different casing than the generated `path` option. The generated `url` literal now camelCases its `{placeholder}` names (`/projects/{project_id}` becomes `/projects/{projectId}`) so they line up with the camelCase keys on the grouped `path` request option. The runtime client looks each placeholder up by key, so a snake_case path param such as `project_id` is no longer dropped and the request reaches the right URL.
+
+- [#518](https://github.com/kubb-labs/plugins/pull/518) [`cf46f82`](https://github.com/kubb-labs/plugins/commit/cf46f825832dce0ec945b554c22cd00626f8bcbc) Thanks [@stijnvanhulle](https://github.com/stijnvanhulle)! - Build `FormData` again for `multipart/form-data` request bodies ([#512](https://github.com/kubb-labs/plugins/issues/512)).
+
+  Operations with a non-JSON request body now forward their content type to the runtime client, and the default body serializer converts a plain object into `FormData` for `multipart/form-data` (mirroring the existing `application/x-www-form-urlencoded` → `URLSearchParams` handling). A `Blob`/`File` value passes through, a `Date` becomes an ISO string, arrays expand into repeated keys, and nested objects are JSON-serialized. The `Content-Type` header is omitted whenever the serialized body is a `FormData` instance — including a manually supplied one — so the runtime appends the multipart boundary itself.
+
+- Updated dependencies [[`3fe9268`](https://github.com/kubb-labs/plugins/commit/3fe92680b3a624cec83db06dd42ebb57acab505d), [`4c7e449`](https://github.com/kubb-labs/plugins/commit/4c7e449383a8888273b1e7f32222a5d869d9c4d8), [`e64ff08`](https://github.com/kubb-labs/plugins/commit/e64ff085c2ad3676291d7c81cfb9be1761012798)]:
+  - @kubb/plugin-zod@5.0.0-beta.76
+  - @kubb/plugin-ts@5.0.0-beta.76
+
 ## 5.0.0-beta.75
 
 ### Patch Changes

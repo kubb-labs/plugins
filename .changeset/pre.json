@@ -51,6 +51,7 @@
     "enforce-array-type-syntax",
     "faker-discriminated-union-variant-types",
     "faker-drop-shapeless-allof-members",
+    "fetch-axios-path-param-casing",
     "fix-group-name-callback-ts-zod",
     "fix-mcp-singleton",
     "fix-stale-barrel-type-defaults",
@@ -68,10 +69,12 @@
     "move-function-params-to-plugin-ts",
     "multi-content-type-request-body",
     "multi-content-type-response",
+    "multipart-form-data-serializer",
     "oas-ts-resolve-options",
     "open-pianos-create",
     "operation-optional-method-path",
     "output-mode-adoption",
+    "parse-error-body-with-zod",
     "plugin-axios-client",
     "plugin-client-contract-392",
     "plugin-client-parser-request-direction",
@@ -151,10 +154,12 @@
     "target-core-beta-68",
     "ts-discriminator-string-types",
     "ts-fix-request-body-description",
+    "ts-pattern-properties",
     "use-add-generator-array",
     "zod-collect-codec-refs",
     "zod-date-roundtrip",
     "zod-faker-object-builder",
-    "zod-inferred-type-suffix"
+    "zod-inferred-type-suffix",
+    "zod-pattern-properties"
   ]
 }
