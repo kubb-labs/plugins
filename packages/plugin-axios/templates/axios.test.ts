@@ -245,7 +245,7 @@ describe('createClientCore', () => {
       method: 'POST',
       url: '/pet',
       body: { name: 'odie' },
-      parser: { request: toSchema(request), response: toSchema(response) },
+      validator: { request: toSchema(request), response: toSchema(response) },
     })) as CallResult
     expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.data).toBe('{"name":"odie","validated":true}')
@@ -256,7 +256,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
     const response = vi.fn((value: unknown) => value)
-    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response: toSchema(response) } })
+    await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { response: toSchema(response) } })
     expect(response).not.toHaveBeenCalled()
   })
 
@@ -264,7 +264,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
     const error = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error: toSchema(error) } })) as CallResult
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult
     expect(error).toHaveBeenCalledTimes(1)
     expect(result.error).toStrictEqual({ parsed: true })
   })
@@ -273,7 +273,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
     const client = createClientCore({ transport: instance })
     const error = vi.fn((value: unknown) => value)
-    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error: toSchema(error) } })
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).not.toHaveBeenCalled()
   })
 

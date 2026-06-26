@@ -9,7 +9,7 @@ import type { ParserOptions } from '../types.ts'
 import { buildReturnStatement } from './returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from './security.ts'
 import { buildGroupedOptionsSignature } from './signature.ts'
-import { buildParserHooks } from './validator.ts'
+import { buildValidatorHooks } from './validator.ts'
 
 /**
  * Builds the call config literal forwarded to the contract client, mirroring the shared `Operation`
@@ -27,16 +27,19 @@ function buildCallConfig({
   zodResolver?: ResolverZod | null
   security?: Array<Auth>
 }): string {
-  const parsers = buildParserHooks({ node, parser, zodResolver })
-  const parserEntries = [parsers.request ? `request: ${parsers.request}` : null, parsers.response ? `response: ${parsers.response}` : null].filter(Boolean)
-  const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
+  const validators = buildValidatorHooks({ node, parser, zodResolver })
+  const validatorEntries = [
+    validators.request ? `request: ${validators.request}` : null,
+    validators.response ? `response: ${validators.response}` : null,
+  ].filter(Boolean)
+  const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
   const securityLiteral = buildSecurityMetadata({ security })
 
   return `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
-    parserLiteral,
+    validatorLiteral,
     '...config',
   ]
     .filter(Boolean)

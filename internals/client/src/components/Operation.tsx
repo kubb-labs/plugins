@@ -8,7 +8,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
-import { buildParserHooks } from '../builders/validator.ts'
+import { buildValidatorHooks } from '../builders/validator.ts'
 import type { ParserOptions } from '../types.ts'
 
 type Props = {
@@ -50,25 +50,25 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
   if (!ast.isHttpOperationNode(node)) return null
 
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
-  const parsers = buildParserHooks({ node, parser, zodResolver })
+  const validators = buildValidatorHooks({ node, parser, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
 
   const { defaultContentType } = getContentTypeInfo(node)
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const contentTypeLiteral = hasRequestBody && defaultContentType !== 'application/json' ? `contentType: '${defaultContentType}'` : null
 
-  const parserEntries = [
-    parsers.request ? `request: ${parsers.request}` : null,
-    parsers.response ? `response: ${parsers.response}` : null,
-    parsers.error ? `error: ${parsers.error}` : null,
+  const validatorEntries = [
+    validators.request ? `request: ${validators.request}` : null,
+    validators.response ? `response: ${validators.response}` : null,
+    validators.error ? `error: ${validators.error}` : null,
   ].filter(Boolean)
-  const parserLiteral = parserEntries.length ? `parser: { ${parserEntries.join(', ')} }` : null
+  const validatorLiteral = validatorEntries.length ? `validator: { ${validatorEntries.join(', ')} }` : null
 
   const callConfig = `{ ${[
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
-    parserLiteral,
+    validatorLiteral,
     contentTypeLiteral,
     '...config',
   ]

@@ -210,7 +210,7 @@ describe('createClientCore', () => {
       method: 'POST',
       url: '/pet',
       body: { name: 'odie' },
-      parser: { request: toSchema(request), response: toSchema(response) },
+      validator: { request: toSchema(request), response: toSchema(response) },
     })) as CallResult<string, string>
     expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.body).toBe('{"name":"odie","validated":true}')
@@ -220,14 +220,14 @@ describe('createClientCore', () => {
   test('skips the response parser on a non-2xx body', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const response = vi.fn((value: unknown) => value)
-    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response: toSchema(response) } })
+    await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { response: toSchema(response) } })
     expect(response).not.toHaveBeenCalled()
   })
 
   test('runs the error parser on a non-2xx body when throwOnError is false', async () => {
     const { client } = createClient({ data: { message: 'invalid' }, status: 405 })
     const error = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error: toSchema(error) } })) as CallResult<string, string>
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, validator: { error: toSchema(error) } })) as CallResult<string, string>
     expect(error).toHaveBeenCalledTimes(1)
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { parsed: true }, request: 'REQ', response: 'RES' })
   })
@@ -235,7 +235,7 @@ describe('createClientCore', () => {
   test('skips the error parser on a success body', async () => {
     const { client } = createClient({ data: { id: 1 }, status: 200 })
     const error = vi.fn((value: unknown) => value)
-    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error: toSchema(error) } })
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, validator: { error: toSchema(error) } })
     expect(error).not.toHaveBeenCalled()
   })
 

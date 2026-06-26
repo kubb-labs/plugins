@@ -86,11 +86,11 @@ export type BodySerializer = (body: unknown, contentType?: string) => BodyInit |
 
 /**
  * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
- * it is received. `runParser` runs it through `validateStandardSchema`. Wired through the per-call
- * `parser.request` / `parser.response` / `parser.error` hooks (`error` runs on the error body when a
+ * it is received. `runValidator` runs it through `validateStandardSchema`. Wired through the per-call
+ * `validator.request` / `validator.response` / `validator.error` hooks (`error` runs on the error body when a
  * non-2xx call does not throw).
  */
-export type Parser<T = unknown> = StandardSchemaValidator<T>
+export type Validator<T = unknown> = StandardSchemaValidator<T>
 
 /**
  * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
@@ -146,7 +146,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   transport?: Transport<TRequest, TResponse>
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser; error?: Parser }
+  validator?: { request?: Validator; response?: Validator; error?: Validator }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -444,9 +444,9 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runParser<T>(parser: Parser<T> | undefined, value: T): Promise<T> {
-  if (!parser) return value
-  return validateStandardSchema(parser, value)
+async function runValidator<T>(validator: Validator<T> | undefined, value: T): Promise<T> {
+  if (!validator) return value
+  return validateStandardSchema(validator, value)
 }
 
 /**
@@ -483,7 +483,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     })
 
     const rawBody = requestConfig.body
-    const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
+    const validatedBody = await runValidator(requestConfig.validator?.request, rawBody)
     const body = bodySerializer(validatedBody, requestContentType)
     // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
     if (body instanceof FormData) {
@@ -514,7 +514,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const isSuccess = result.status >= 200 && result.status < 300
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
 
-    const parsedErrorData = !isSuccess ? await runParser(requestConfig.parser?.error, result.data) : undefined
+    const parsedErrorData = !isSuccess ? await runValidator(requestConfig.validator?.error, result.data) : undefined
 
     if (!isSuccess && throwOnError) {
       const error = new ResponseError({
@@ -528,7 +528,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
       throw error
     }
 
-    const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
+    const data = isSuccess ? await runValidator(requestConfig.validator?.response, result.data) : undefined
     const error = isSuccess ? undefined : parsedErrorData
 
     return {

@@ -12,7 +12,10 @@ export function createPets<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pets/{uuid}', parser: { response: createPetsResponseSchema, error: createPetsErrorSchema }, ...config }) as Promise<
-    RequestResult<CreatePetsResponses, ThrowOnError>
-  >
+  return request({
+    method: 'POST',
+    url: '/pets/{uuid}',
+    validator: { response: createPetsResponseSchema, error: createPetsErrorSchema },
+    ...config,
+  }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
 }

@@ -17,7 +17,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/{petId}:search',
     security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
-    parser: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
+    validator: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
     ...config,
   }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }
