@@ -5,6 +5,7 @@
 
 [![Stars][stars-src]][stars-href]
 [![License][license-src]][license-href]
+[![OC Backers][oc-backers-src]][oc-backers-href]
 
   <h4>
     <a href="https://kubb.dev" target="_blank">Documentation</a>
@@ -102,9 +103,23 @@ We welcome contributions, and there are a few ways to get involved:
 
 Want to contribute to an existing plugin or add a new one, official or community? See [CONTRIBUTING.md](./CONTRIBUTING.md) for the project structure, prerequisites, local setup, and commands.
 
+## Sponsors
+
+Kubb's development is funded by sponsors. To support the project, [become a sponsor on GitHub](https://github.com/sponsors/stijnvanhulle) or [back us on Open Collective](https://opencollective.com/kubb).
+
+<p align="center">
+  <a href="https://github.com/sponsors/stijnvanhulle">
+    <img src="https://shieldcn.dev/sponsors/stijnvanhulle.svg?titleAlign=center&mode=dark" alt="stijnvanhulle sponsors" width="100%" />
+  </a>
+</p>
+
 ## License
 
 [MIT](./LICENSE) © [Stijn Van Hulle](https://github.com/stijnvanhulle)
+
+## Star history
+
+<img alt="Star history chart" src="https://shieldcn.dev/chart/github/stars/kubb-labs/plugins.svg?theme=orange" width="100%" />
 
 <!-- Badges -->
 
@@ -114,3 +129,5 @@ Want to contribute to an existing plugin or add a new one, official or community
 [license-href]: https://github.com/kubb-labs/plugins/blob/main/LICENSE
 [coverage-src]: https://shieldcn.dev/codecov/github/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
 [coverage-href]: https://app.codecov.io/gh/kubb-labs/plugins
+[oc-backers-src]: https://shieldcn.dev/opencollective/backers/kubb.svg?variant=secondary&size=xs&theme=zinc&mode=dark
+[oc-backers-href]: https://opencollective.com/kubb
