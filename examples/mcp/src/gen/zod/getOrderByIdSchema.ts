@@ -19,3 +19,5 @@ export const getOrderByIdStatus400Schema = z.any()
 export const getOrderByIdStatus404Schema = z.any()
 
 export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
+
+export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])

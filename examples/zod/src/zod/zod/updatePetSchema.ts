@@ -34,6 +34,10 @@ export const updatePetResponseSchema = updatePetStatus200Schema
 
 export type UpdatePetResponseSchemaType = z.infer<typeof updatePetResponseSchema>
 
+export const updatePetErrorSchema = z.union([updatePetStatus400Schema, updatePetStatus404Schema, updatePetStatus405Schema])
+
+export type UpdatePetErrorSchemaType = z.infer<typeof updatePetErrorSchema>
+
 export const updatePetDataSchemaJson = z.lazy(() => petSchema).describe('Update an existent pet in the store')
 
 export type UpdatePetDataSchemaJsonType = z.infer<typeof updatePetDataSchemaJson>
