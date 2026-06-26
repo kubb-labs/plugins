@@ -68,7 +68,9 @@ describe('defaultQuerySerializer', () => {
   })
 
   test('form style without explode flattens objects with commas', () => {
-    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe('filter=role,admin,name,alex')
+    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe(
+      'filter=role,admin,name,alex',
+    )
   })
 
   test('deepObject style renders bracketed object keys', () => {

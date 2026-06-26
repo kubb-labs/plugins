@@ -89,7 +89,9 @@ describe('defaultQuerySerializer', () => {
   })
 
   test('form style without explode flattens objects with commas', () => {
-    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe('filter=role,admin,name,alex')
+    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe(
+      'filter=role,admin,name,alex',
+    )
   })
 
   test('deepObject style renders bracketed object keys', () => {
@@ -371,7 +373,9 @@ describe('getUrl', () => {
 
   test('applies queryStyles metadata to the query string', () => {
     const { client } = createClient()
-    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, queryStyles: { id: { style: 'spaceDelimited', explode: false } } })).toBe('/pets?id=3%204%205')
+    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, queryStyles: { id: { style: 'spaceDelimited', explode: false } } })).toBe(
+      '/pets?id=3%204%205',
+    )
   })
 })
 
