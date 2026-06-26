@@ -1,4 +1,5 @@
 export * from './.kubb/client.ts'
+export * from './.kubb/serializers.ts'
 export type { AddPetRequest } from './models/AddPetRequest.ts'
 export type { AddPetRequestStatusEnumKey } from './models/AddPetRequestStatusEnum.ts'
 export type { ApiResponse } from './models/ApiResponse.ts'

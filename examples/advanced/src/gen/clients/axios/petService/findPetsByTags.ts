@@ -17,7 +17,8 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/findByTags',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => findPetsByTagsResponseSchema.parse(data) },
+    serialization: { query: { tags: { explode: true } } },
+    parser: { response: (data: unknown) => findPetsByTagsResponseSchema.parse(data), error: (data: unknown) => findPetsByTagsErrorSchema.parse(data) },
     ...config,
   }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }

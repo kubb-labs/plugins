@@ -1,4 +1,5 @@
 export * from './.kubb/client'
+export * from './.kubb/serializers'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,
