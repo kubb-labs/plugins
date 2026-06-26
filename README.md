@@ -107,6 +107,10 @@ Want to contribute to an existing plugin or add a new one, official or community
 
 [MIT](./LICENSE) © [Stijn Van Hulle](https://github.com/stijnvanhulle)
 
+## Star history
+
+![Star history chart](https://shieldcn.dev/chart/github/stars/kubb-labs/plugins.svg?theme=orange)
+
 <!-- Badges -->
 
 [stars-src]: https://shieldcn.dev/github/stars/kubb-labs/plugins.svg?variant=secondary&size=xs&theme=zinc&mode=dark
