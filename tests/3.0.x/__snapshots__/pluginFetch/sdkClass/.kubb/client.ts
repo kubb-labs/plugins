@@ -78,14 +78,20 @@ export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text'
 export type QueryStyle = 'form' | 'spaceDelimited' | 'pipeDelimited' | 'deepObject'
 
 /**
- * The per-parameter query serialization metadata carried by the generated request. `style` and
- * `explode` follow OpenAPI, and `allowReserved` keeps RFC 3986 reserved characters unencoded.
+ * The serialization metadata shared by the styled parameter locations: the OpenAPI `style` (typed per
+ * location through `TStyle`), `explode`, and `allowReserved` (keeps RFC 3986 reserved characters
+ * unencoded, used by query and request bodies).
  */
-export type QueryParamStyle = {
-  style?: QueryStyle
+export type SerializationStyle<TStyle = string> = {
+  style?: TStyle
   explode?: boolean
   allowReserved?: boolean
 }
+
+/**
+ * The per-parameter query serialization metadata carried by the generated request.
+ */
+export type QueryParamStyle = SerializationStyle<QueryStyle>
 
 /**
  * Serializes the query object into a search string. The optional second argument carries the
@@ -115,11 +121,8 @@ export type HeaderParamStyle = {
  * `multipart/form-data` request body. `contentType` overrides the part's media type; `style` /
  * `explode` / `allowReserved` follow the OpenAPI query rules for urlencoded bodies.
  */
-export type BodyEncoding = {
+export type BodyEncoding = SerializationStyle<QueryStyle> & {
   contentType?: string
-  style?: QueryStyle
-  explode?: boolean
-  allowReserved?: boolean
 }
 
 /**
@@ -139,10 +142,7 @@ export type PathStyle = 'simple' | 'label' | 'matrix'
  * The per-parameter serialization metadata carried by the generated request. `style` selects the
  * OpenAPI style and `explode` controls how arrays and objects expand.
  */
-export type PathParamStyle = {
-  style?: PathStyle
-  explode?: boolean
-}
+export type PathParamStyle = SerializationStyle<PathStyle>
 
 /**
  * Serializes a single path parameter for interpolation into the URL, honoring the OpenAPI `style` /

@@ -25,6 +25,8 @@ A request carries this metadata in a new `pathStyles` field, `Record<string, { s
 
 **Object serializer signatures.** `PathSerializer` and `BodySerializer` now take a single object argument (`{ name, value, options? }` and `{ body, contentType?, encoding? }`) following the repo convention for functions with more than two parameters.
 
+**Shared style type.** The per-location style types derive from one generic base, `SerializationStyle<TStyle> = { style?: TStyle; explode?; allowReserved? }`. `QueryParamStyle`, `PathParamStyle`, and `BodyEncoding` alias it, so a future spec adapter (AsyncAPI, GraphQL) can reuse the same vocabulary.
+
 **Grouped serializer option (breaking).** The separate `querySerializer` / `bodySerializer` options on `ClientConfig` and `RequestConfig` are replaced by a single `serializer` object:
 
 ```ts
