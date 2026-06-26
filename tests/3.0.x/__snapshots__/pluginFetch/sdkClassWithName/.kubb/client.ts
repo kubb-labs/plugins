@@ -511,9 +511,11 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const isSuccess = result.status >= 200 && result.status < 300
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
 
+    const parsedErrorData = !isSuccess ? await runParser(requestConfig.parser?.error, result.data) : undefined
+
     if (!isSuccess && throwOnError) {
       const error = new ResponseError({
-        data: result.data,
+        data: parsedErrorData,
         status: result.status,
         statusText: result.statusText,
         request: result.request,
@@ -524,7 +526,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
 
     const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
-    const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, result.data)
+    const error = isSuccess ? undefined : parsedErrorData
 
     return {
       status: result.status,

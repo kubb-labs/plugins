@@ -6,3 +6,5 @@ import { fileURLToPath } from 'node:url'
  * field to emit the runtime into the generated `.kubb/client.ts` verbatim.
  */
 export const axiosClientTemplatePath = fileURLToPath(new URL('../templates/axios.ts', import.meta.url))
+
+export { standardSchemaTemplatePath } from '@internals/client'

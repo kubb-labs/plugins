@@ -5,7 +5,7 @@ import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { axiosClientTemplatePath } from './templates.ts'
+import { axiosClientTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginAxios, ResolvedOptions } from './types.ts'
 
 /**
@@ -85,6 +85,14 @@ export const pluginAxios = definePlugin<PluginAxios>((options) => {
           copy: axiosClientTemplatePath,
           footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
         })
+
+        if (isParserEnabled(resolved.parser)) {
+          ctx.injectFile({
+            baseName: 'standard-schema.ts',
+            path: path.resolve(root, '.kubb/standard-schema.ts'),
+            copy: standardSchemaTemplatePath,
+          })
+        }
       },
     },
   }

@@ -1,5 +1,13 @@
 import path from 'node:path'
-import { buildZodErrorParse, getOperationSecurity, Operation, resolveRequestParser, resolveResponseParser, type SecurityDocument } from '@internals/client'
+import {
+  buildParserHooks,
+  buildZodErrorParse,
+  getOperationSecurity,
+  Operation,
+  resolveRequestParser,
+  resolveResponseParser,
+  type SecurityDocument,
+} from '@internals/client'
 import { operationFileEntry } from '@internals/shared'
 import { ast, defineGenerator } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
@@ -66,6 +74,9 @@ export const clientGenerator = defineGenerator<PluginAxios>({
     })
 
     const clientPath = path.resolve(root, '.kubb/client.ts')
+    const standardSchemaPath = path.resolve(root, '.kubb/standard-schema.ts')
+
+    const parserHooks = buildParserHooks({ node, parser, zodResolver })
 
     return (
       <File
@@ -77,6 +88,8 @@ export const clientGenerator = defineGenerator<PluginAxios>({
       >
         <File.Import name={['client']} root={meta.file.path} path={clientPath} />
         <File.Import name={['Options', 'RequestResult']} root={meta.file.path} path={clientPath} isTypeOnly />
+
+        {parserHooks.needsValidateHelper && <File.Import name={['validateStandardSchema']} root={meta.file.path} path={standardSchemaPath} />}
 
         {meta.fileTs && importedTypeNames.length > 0 && (
           <File.Import name={Array.from(new Set(importedTypeNames))} root={meta.file.path} path={meta.fileTs.path} isTypeOnly />

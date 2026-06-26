@@ -7,8 +7,4 @@ import { fileURLToPath } from 'node:url'
  */
 export const fetchClientTemplatePath = fileURLToPath(new URL('../templates/fetch.ts', import.meta.url))
 
-/**
- * Absolute path to the Standard Schema runtime template. Pass it to a file node's `copy` field to
- * emit the helper into the generated `.kubb/standard-schema.ts` verbatim.
- */
-export const standardSchemaTemplatePath = fileURLToPath(new URL('../templates/standard-schema.ts', import.meta.url))
+export { standardSchemaTemplatePath } from '@internals/client'
