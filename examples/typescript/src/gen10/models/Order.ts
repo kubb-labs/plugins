@@ -5,7 +5,6 @@
 
 import type { OrderHttpStatusEnum } from './OrderHttpStatusEnum.ts'
 import type { OrderParamsStatusEnum } from './OrderParamsStatusEnum.ts'
-import type { OrderStatus } from './OrderStatus.ts'
 
 /**
  * @type object
@@ -55,7 +54,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | string
+  status?: 'accepted' | (string & {})
   /**
    * @description HTTP Status
    * @example 200

@@ -3,11 +3,13 @@
 * Do not edit manually.
 */
 
-import type { SedanTypeEnumKey } from './SedanTypeEnum.ts'
 import type { Vehicle } from './Vehicle.ts'
 
 export type Sedan = (Vehicle & {
-    type?: SedanTypeEnumKey;
+    /**
+     * @type string | undefined
+    */
+    type?: "Sedan";
     /**
      * @description Number of seats
      * @type integer | undefined

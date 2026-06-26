@@ -3,8 +3,7 @@
 * Do not edit manually.
 */
 
-export const SUVTypeEnum = {
-    SUV: "SUV"
-} as const;
-
-export type SUVTypeEnumKey = (typeof SUVTypeEnum)[keyof typeof SUVTypeEnum];
+/**
+ * @type string
+*/
+export type SUVTypeEnum = "SUV";

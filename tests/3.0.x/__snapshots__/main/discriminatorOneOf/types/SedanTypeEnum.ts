@@ -3,8 +3,7 @@
 * Do not edit manually.
 */
 
-export const sedanTypeEnum = {
-    Sedan: "Sedan"
-} as const;
-
-export type SedanTypeEnumKey = (typeof sedanTypeEnum)[keyof typeof sedanTypeEnum];
+/**
+ * @type string
+*/
+export type SedanTypeEnum = "Sedan";

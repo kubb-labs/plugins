@@ -3,8 +3,7 @@
 * Do not edit manually.
 */
 
-export const electricCarTypeEnum = {
-    ElectricCar: "ElectricCar"
-} as const;
-
-export type ElectricCarTypeEnumKey = (typeof electricCarTypeEnum)[keyof typeof electricCarTypeEnum];
+/**
+ * @type string
+*/
+export type ElectricCarTypeEnum = "ElectricCar";

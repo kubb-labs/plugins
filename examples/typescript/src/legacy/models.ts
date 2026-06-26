@@ -9,10 +9,6 @@ export enum OrderParamsStatusEnum {
   delivered = 'delivered',
 }
 
-export enum OrderStatus {
-  accepted = 'accepted',
-}
-
 export enum OrderHttpStatusEnum {
   OrderHttpStatusEnum_200 = 200,
   OrderHttpStatusEnum_400 = 400,
@@ -103,7 +99,7 @@ export interface Order {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | string
+  status?: 'accepted' | (string & {})
   /**
    * @description HTTP Status
    * @example 200
@@ -262,24 +258,6 @@ export interface Cat {
   name?: string
 }
 
-/**
- * @type object
- */
-export interface Category1 {
-  /**
-   * @description
-   * Format: `int64`
-   * @example 1
-   * @type integer | undefined
-   */
-  id?: bigint
-  /**
-   * @example Dogs
-   * @type string | undefined
-   */
-  name?: string
-}
-
 export type Pet = (
   | (Dog & {
       /**
@@ -307,10 +285,7 @@ export type Pet = (
    * @type string
    */
   name: string
-  /**
-   * @type object | undefined
-   */
-  category?: Category1
+  category?: Category
   /**
    * @type array
    */
