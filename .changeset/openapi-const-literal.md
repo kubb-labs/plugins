@@ -2,6 +2,6 @@
 "@kubb/plugin-ts": minor
 ---
 
-Render an OpenAPI 3.1 `const` schema as a literal type instead of a runtime enum.
+Render an OpenAPI 3.1 `const` as a literal type.
 
-A `const` is parsed into a single-value enum node, so a named const such as `Status: { const: "active" }` previously generated an `as const` object plus a `StatusKey` reference under the default `enum.type`. It now emits the bare literal `export type Status = "active"` across every `enum.type`, matching the inline (property-level) const that already rendered as a literal. Multi-value enums are unchanged.
+A `const` is parsed into a single-value enum, so `Status: { const: "active" }` used to generate an `as const` object and a `StatusKey` reference under the default `enum.type`. It now renders the bare literal `export type Status = "active"`, the same way an inline `const` on a property already did. Multi-value enums keep their existing output.
