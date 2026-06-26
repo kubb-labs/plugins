@@ -86,7 +86,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -114,6 +115,17 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
+ * Extra axios config the runtime spreads onto every request, an escape hatch for the per-call fields
+ * it does not set itself, such as `timeout`, `proxy`, `maxRedirects`, `decompress`, and the
+ * `onUploadProgress` / `onDownloadProgress` callbacks. The runtime-owned fields (`url`, `baseURL`,
+ * `method`, `headers`, `params`, `paramsSerializer`, `data`, `transformRequest`, `signal`,
+ * `responseType`, `validateStatus`) always win over anything set here. This is the per-request analog
+ * of the `transport` instance, which stays the place for cross-cutting concerns like retries and
+ * interceptors. It mirrors `options` in `@kubb/plugin-fetch`.
+ */
+export type AxiosOptions = AxiosRequestConfig
+
+/**
  * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
  * from the grouped options; everything else is plain request configuration. `transport` carries an
  * axios instance and `validateStatus` rides axios's own contract.
@@ -128,6 +140,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
+  options?: AxiosOptions
   contentType?: string
   responseType?: ResponseType
   throwOnError?: boolean
@@ -136,7 +149,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -161,6 +174,7 @@ export type Options<TData extends DataShape, ThrowOnError extends boolean = true
 export type ClientConfig = {
   baseURL?: string
   headers?: HeadersInit
+  options?: AxiosOptions
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
@@ -254,13 +268,30 @@ function isFormBody(body: unknown): boolean {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
@@ -426,10 +457,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
-    const contentType = headers['Content-Type'] ?? headers['content-type']
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -441,6 +469,14 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     })
 
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
@@ -448,15 +484,18 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const throwOnError = requestConfig.throwOnError ?? config.throwOnError ?? true
     const validateStatus = requestConfig.validateStatus ?? config.validateStatus ?? (throwOnError ? undefined : () => true)
 
+    const options = config.options || requestConfig.options ? { ...config.options, ...requestConfig.options } : undefined
+
     const axiosConfig: AxiosRequestConfig = {
+      ...options, // timeout, proxy, maxRedirects, decompress, onUploadProgress, …
       url,
       baseURL,
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
       paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
-      data: validatedBody,
-      transformRequest: (data) => bodySerializer(data, contentType),
+      data: body,
+      transformRequest: (data) => data,
       signal: requestConfig.signal,
       responseType: requestConfig.responseType,
       validateStatus,
@@ -466,10 +505,11 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
       const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, response.data)
       return {
         status: response.status,
         data,
-        error: isSuccess ? undefined : response.data,
+        error,
         request: response.config as TRequest,
         response: response as TResponse,
       }

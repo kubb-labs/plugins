@@ -170,6 +170,26 @@ describe('createClientCore', () => {
     expect(result).toStrictEqual({ status: 405, data: undefined, error: { message: 'invalid' }, request: 'REQ', response: 'RES' })
   })
 
+  test('passes client-level options to the transport', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store' } })
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.options).toStrictEqual({ cache: 'no-store' })
+  })
+
+  test('merges request-level options over client-level', async () => {
+    const { transport, calls } = fakeTransport()
+    const client = createClientCore<string, string>({ defaultTransport: transport, options: { cache: 'no-store', mode: 'cors' } })
+    await client({ method: 'GET', url: '/pet', options: { cache: 'force-cache', next: { revalidate: 60 } } })
+    expect(calls[0]?.options).toStrictEqual({ cache: 'force-cache', mode: 'cors', next: { revalidate: 60 } })
+  })
+
+  test('leaves options undefined when neither level sets it', async () => {
+    const { client, calls } = createClient()
+    await client({ method: 'GET', url: '/pet' })
+    expect(calls[0]?.options).toBeUndefined()
+  })
+
   test('resolves the per-call transport over the default', async () => {
     const { client } = createClient()
     const override = fakeTransport({ data: { from: 'override' } })

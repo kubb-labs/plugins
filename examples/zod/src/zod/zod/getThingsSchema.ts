@@ -25,3 +25,7 @@ export type GetThingsStatusDefaultSchemaType = z.infer<typeof getThingsStatusDef
 export const getThingsResponseSchema = getThingsStatus201Schema
 
 export type GetThingsResponseSchemaType = z.infer<typeof getThingsResponseSchema>
+
+export const getThingsErrorSchema = getThingsStatusDefaultSchema
+
+export type GetThingsErrorSchemaType = z.infer<typeof getThingsErrorSchema>

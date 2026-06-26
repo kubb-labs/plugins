@@ -167,6 +167,7 @@ export type {
   AddPetDataSchemaJsonType,
   AddPetDataSchemaType,
   AddPetDataSchemaXmlType,
+  AddPetErrorSchemaType,
   AddPetResponseSchemaType,
   AddPetStatus200SchemaJsonType,
   AddPetStatus200SchemaType,
@@ -177,6 +178,7 @@ export type { ApiResponseSchemaType } from './zod/apiResponseSchema.ts'
 export type { CategorySchemaType } from './zod/categorySchema.ts'
 export type {
   CreatePetsDataSchemaType,
+  CreatePetsErrorSchemaType,
   CreatePetsHeaderXEXAMPLESchemaType,
   CreatePetsPathUuidSchemaType,
   CreatePetsQueryOffsetSchemaType,
@@ -185,18 +187,21 @@ export type {
   CreatePetsStatusDefaultSchemaType,
 } from './zod/createPetsSchema.ts'
 export type {
+  DeleteOrderErrorSchemaType,
   DeleteOrderPathOrderIdSchemaType,
   DeleteOrderResponseSchemaType,
   DeleteOrderStatus400SchemaType,
   DeleteOrderStatus404SchemaType,
 } from './zod/deleteOrderSchema.ts'
 export type {
+  DeletePetErrorSchemaType,
   DeletePetHeaderApiKeySchemaType,
   DeletePetPathPetIdSchemaType,
   DeletePetResponseSchemaType,
   DeletePetStatus400SchemaType,
 } from './zod/deletePetSchema.ts'
 export type {
+  FindPetsByStatusErrorSchemaType,
   FindPetsByStatusQueryStatusSchemaType,
   FindPetsByStatusResponseSchemaType,
   FindPetsByStatusStatus200SchemaJsonType,
@@ -205,6 +210,7 @@ export type {
   FindPetsByStatusStatus400SchemaType,
 } from './zod/findPetsByStatusSchema.ts'
 export type {
+  FindPetsByTagsErrorSchemaType,
   FindPetsByTagsHeaderXEXAMPLESchemaType,
   FindPetsByTagsQueryPageSchemaType,
   FindPetsByTagsQueryPageSizeSchemaType,
@@ -217,6 +223,7 @@ export type {
 } from './zod/findPetsByTagsSchema.ts'
 export type { GetInventoryResponseSchemaType, GetInventoryStatus200SchemaType } from './zod/getInventorySchema.ts'
 export type {
+  GetOrderByIdErrorSchemaType,
   GetOrderByIdPathOrderIdSchemaType,
   GetOrderByIdResponseSchemaType,
   GetOrderByIdStatus200SchemaJsonType,
@@ -226,6 +233,7 @@ export type {
   GetOrderByIdStatus404SchemaType,
 } from './zod/getOrderByIdSchema.ts'
 export type {
+  GetPetByIdErrorSchemaType,
   GetPetByIdPathPetIdSchemaType,
   GetPetByIdResponseSchemaType,
   GetPetByIdStatus200SchemaJsonType,
@@ -235,6 +243,7 @@ export type {
   GetPetByIdStatus404SchemaType,
 } from './zod/getPetByIdSchema.ts'
 export type {
+  GetThingsErrorSchemaType,
   GetThingsQueryLimitSchemaType,
   GetThingsQuerySkipSchemaType,
   GetThingsResponseSchemaType,
@@ -252,6 +261,7 @@ export type {
   PlaceOrderPatchDataSchemaJsonType,
   PlaceOrderPatchDataSchemaType,
   PlaceOrderPatchDataSchemaXmlType,
+  PlaceOrderPatchErrorSchemaType,
   PlaceOrderPatchResponseSchemaType,
   PlaceOrderPatchStatus200SchemaType,
   PlaceOrderPatchStatus405SchemaType,
@@ -261,6 +271,7 @@ export type {
   PlaceOrderDataSchemaJsonType,
   PlaceOrderDataSchemaType,
   PlaceOrderDataSchemaXmlType,
+  PlaceOrderErrorSchemaType,
   PlaceOrderResponseSchemaType,
   PlaceOrderStatus200SchemaType,
   PlaceOrderStatus405SchemaType,
@@ -271,6 +282,7 @@ export type {
   UpdatePetDataSchemaJsonType,
   UpdatePetDataSchemaType,
   UpdatePetDataSchemaXmlType,
+  UpdatePetErrorSchemaType,
   UpdatePetResponseSchemaType,
   UpdatePetStatus200SchemaJsonType,
   UpdatePetStatus200SchemaType,
@@ -280,6 +292,7 @@ export type {
   UpdatePetStatus405SchemaType,
 } from './zod/updatePetSchema.ts'
 export type {
+  UpdatePetWithFormErrorSchemaType,
   UpdatePetWithFormPathPetIdSchemaType,
   UpdatePetWithFormQueryNameSchemaType,
   UpdatePetWithFormQueryStatusSchemaType,
@@ -305,6 +318,7 @@ export {
   addPetDataSchemaFormUrlEncoded,
   addPetDataSchemaJson,
   addPetDataSchemaXml,
+  addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
   addPetStatus200SchemaJson,
@@ -315,6 +329,7 @@ export { apiResponseSchema } from './zod/apiResponseSchema.ts'
 export { categorySchema } from './zod/categorySchema.ts'
 export {
   createPetsDataSchema,
+  createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
@@ -322,9 +337,22 @@ export {
   createPetsStatus201Schema,
   createPetsStatusDefaultSchema,
 } from './zod/createPetsSchema.ts'
-export { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './zod/deleteOrderSchema.ts'
-export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './zod/deletePetSchema.ts'
 export {
+  deleteOrderErrorSchema,
+  deleteOrderPathOrderIdSchema,
+  deleteOrderResponseSchema,
+  deleteOrderStatus400Schema,
+  deleteOrderStatus404Schema,
+} from './zod/deleteOrderSchema.ts'
+export {
+  deletePetErrorSchema,
+  deletePetHeaderApiKeySchema,
+  deletePetPathPetIdSchema,
+  deletePetResponseSchema,
+  deletePetStatus400Schema,
+} from './zod/deletePetSchema.ts'
+export {
+  findPetsByStatusErrorSchema,
   findPetsByStatusQueryStatusSchema,
   findPetsByStatusResponseSchema,
   findPetsByStatusStatus200Schema,
@@ -333,6 +361,7 @@ export {
   findPetsByStatusStatus400Schema,
 } from './zod/findPetsByStatusSchema.ts'
 export {
+  findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
@@ -345,6 +374,7 @@ export {
 } from './zod/findPetsByTagsSchema.ts'
 export { getInventoryResponseSchema, getInventoryStatus200Schema } from './zod/getInventorySchema.ts'
 export {
+  getOrderByIdErrorSchema,
   getOrderByIdPathOrderIdSchema,
   getOrderByIdResponseSchema,
   getOrderByIdStatus200Schema,
@@ -354,6 +384,7 @@ export {
   getOrderByIdStatus404Schema,
 } from './zod/getOrderByIdSchema.ts'
 export {
+  getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
   getPetByIdResponseSchema,
   getPetByIdStatus200Schema,
@@ -363,6 +394,7 @@ export {
   getPetByIdStatus404Schema,
 } from './zod/getPetByIdSchema.ts'
 export {
+  getThingsErrorSchema,
   getThingsQueryLimitSchema,
   getThingsQuerySkipSchema,
   getThingsResponseSchema,
@@ -381,6 +413,7 @@ export {
   placeOrderPatchDataSchemaFormUrlEncoded,
   placeOrderPatchDataSchemaJson,
   placeOrderPatchDataSchemaXml,
+  placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
@@ -390,6 +423,7 @@ export {
   placeOrderDataSchemaFormUrlEncoded,
   placeOrderDataSchemaJson,
   placeOrderDataSchemaXml,
+  placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
   placeOrderStatus405Schema,
@@ -400,6 +434,7 @@ export {
   updatePetDataSchemaFormUrlEncoded,
   updatePetDataSchemaJson,
   updatePetDataSchemaXml,
+  updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
   updatePetStatus200SchemaJson,
@@ -409,6 +444,7 @@ export {
   updatePetStatus405Schema,
 } from './zod/updatePetSchema.ts'
 export {
+  updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,

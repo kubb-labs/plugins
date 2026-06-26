@@ -71,7 +71,7 @@
     "@internals/client": "workspace:*",
     "@internals/shared": "workspace:*",
     "@internals/utils": "workspace:*",
-    "axios": "^1.18.0",
+    "axios": "^1.18.1",
     "typescript": "catalog:"
   },
   "peerDependencies": {

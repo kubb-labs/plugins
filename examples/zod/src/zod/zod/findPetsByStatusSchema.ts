@@ -33,3 +33,7 @@ export type FindPetsByStatusStatus400SchemaType = z.infer<typeof findPetsByStatu
 export const findPetsByStatusResponseSchema = findPetsByStatusStatus200Schema
 
 export type FindPetsByStatusResponseSchemaType = z.infer<typeof findPetsByStatusResponseSchema>
+
+export const findPetsByStatusErrorSchema = findPetsByStatusStatus400Schema
+
+export type FindPetsByStatusErrorSchemaType = z.infer<typeof findPetsByStatusErrorSchema>
