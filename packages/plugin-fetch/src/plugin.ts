@@ -86,13 +86,11 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
         })
 
-        if (isParserEnabled(resolved.parser)) {
-          ctx.injectFile({
-            baseName: 'standard-schema.ts',
-            path: path.resolve(root, '.kubb/standard-schema.ts'),
-            copy: standardSchemaTemplatePath,
-          })
-        }
+        ctx.injectFile({
+          baseName: 'standardSchema.ts',
+          path: path.resolve(root, '.kubb/standardSchema.ts'),
+          copy: standardSchemaTemplatePath,
+        })
       },
     },
   }

@@ -4,21 +4,22 @@ import type { ParserOptions } from '../types.ts'
 import { buildZodErrorParse, buildZodResponseParse, resolveRequestParser, resolveResponseParser } from './parser.ts'
 
 /**
- * The per-call parser expressions a generated function wires into its request config. Both run
- * through the runtime's `parser.request` / `parser.response` hooks rather than inline parse calls,
- * and the response parser only ever sees success (2xx) bodies.
+ * The per-call parser expressions a generated function wires into its request config. Each hook is
+ * the bare schema reference passed to the runtime's `parser.request` / `parser.response` /
+ * `parser.error` slot; `client.ts` runs it through `validateStandardSchema`. The response parser only
+ * ever sees success (2xx) bodies.
  */
 export type ParserHooks = {
   /**
-   * Expression for the `parser.request` hook, or `null` when request parsing is off.
+   * Schema reference for the `parser.request` hook, or `null` when request parsing is off.
    */
   request: string | null
   /**
-   * Expression for the `parser.response` hook, or `null` when response parsing is off.
+   * Schema reference for the `parser.response` hook, or `null` when response parsing is off.
    */
   response: string | null
   /**
-   * Expression for the `parser.error` hook, or `null` when error parsing is off or the operation
+   * Schema reference for the `parser.error` hook, or `null` when error parsing is off or the operation
    * documents no error responses. The runtime runs this on the error body when a non-2xx call does
    * not throw.
    */
@@ -27,11 +28,6 @@ export type ParserHooks = {
    * Zod schema names the generated file imports from the zod plugin output.
    */
   importedZodNames: Array<string>
-  /**
-   * `true` when any hook expression was generated. The generator uses this to conditionally import
-   * `validateStandardSchema` from the injected `standard-schema.ts` runtime.
-   */
-  needsValidateHelper: boolean
 }
 
 /**
@@ -52,18 +48,16 @@ export function buildParserHooks({
 
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const zodRequestName = zodResolver && resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null
-  const request = zodRequestName ? `(data: unknown) => validateStandardSchema(${zodRequestName}, data)` : null
+  const request = zodRequestName ?? null
   if (zodRequestName) importedZodNames.push(zodRequestName)
 
   const responseParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodResponseParse(node, zodResolver) : null
-  const response = responseParse ? `(data: unknown) => validateStandardSchema(${responseParse.expression}, data)` : null
+  const response = responseParse ? responseParse.expression : null
   if (responseParse) importedZodNames.push(...responseParse.importNames)
 
   const errorParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodErrorParse(node, zodResolver) : null
-  const error = errorParse ? `(data: unknown) => validateStandardSchema(${errorParse.expression}, data)` : null
+  const error = errorParse ? errorParse.expression : null
   if (errorParse) importedZodNames.push(...errorParse.importNames)
 
-  const needsValidateHelper = Boolean(request || response || error)
-
-  return { request, response, error, importedZodNames, needsValidateHelper }
+  return { request, response, error, importedZodNames }
 }

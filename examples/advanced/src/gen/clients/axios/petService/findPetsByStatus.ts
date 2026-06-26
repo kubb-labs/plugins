@@ -1,7 +1,6 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { FindPetsByStatusRequestConfig, FindPetsByStatusResponses } from '../../../models/ts/pet/FindPetsByStatus.ts'
 import { client } from '../../../.kubb/client.ts'
-import { validateStandardSchema } from '../../../.kubb/standard-schema.ts'
 import { findPetsByStatusResponseSchema, findPetsByStatusErrorSchema } from '../../../zod/pet/findPetsByStatusSchema.ts'
 
 /**
@@ -18,10 +17,7 @@ export function findPetsByStatus<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/findByStatus/{stepId}',
     security: [{ type: 'oauth2' }],
-    parser: {
-      response: (data: unknown) => validateStandardSchema(findPetsByStatusResponseSchema, data),
-      error: (data: unknown) => validateStandardSchema(findPetsByStatusErrorSchema, data),
-    },
+    parser: { response: findPetsByStatusResponseSchema, error: findPetsByStatusErrorSchema },
     ...config,
   }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }

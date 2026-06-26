@@ -3,7 +3,6 @@
 import type { Options, RequestResult } from './.kubb/client'
 import type { AddPetRequestConfig, AddPetResponses } from './AddPet'
 import { client } from './.kubb/client'
-import { validateStandardSchema } from './.kubb/standard-schema'
 import { AddPetResponse } from './AddPet'
 
 /**
@@ -14,7 +13,5 @@ export function addPet<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet', parser: { response: (data: unknown) => validateStandardSchema(AddPetResponse, data) }, ...config }) as Promise<
-    RequestResult<AddPetResponses, ThrowOnError>
-  >
+  return request({ method: 'POST', url: '/pet', parser: { response: AddPetResponse }, ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
 }

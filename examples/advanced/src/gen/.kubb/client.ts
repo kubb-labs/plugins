@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import { type StandardSchemaValidator, validateStandardSchema } from './standardSchema.ts'
 
 /**
  * HTTP status codes treated as a success. A resolved call only ever carries a body from one of
@@ -86,10 +87,12 @@ export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
- * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
+ * transformed) value. A parser is either a plain function or a Standard Schema validator (zod,
+ * valibot, arktype); `runParser` runs the latter through `validateStandardSchema`. Wired through the
+ * per-call `parser.request` / `parser.response` / `parser.error` hooks (`error` runs on the error
+ * body when a non-2xx call does not throw).
  */
-export type Parser<T = unknown> = (value: T) => T | Promise<T>
+export type Parser<T = unknown> = ((value: T) => T | Promise<T>) | StandardSchemaValidator<T>
 
 /**
  * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
@@ -384,9 +387,10 @@ export async function resolveAuth(params: {
   }
 }
 
-async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
+async function runParser<T>(parser: Parser<T> | undefined, value: T): Promise<T> {
   if (!parser) return value
-  return (await parser(value)) as T
+  if (typeof parser === 'function') return (await parser(value)) as T
+  return validateStandardSchema(parser, value)
 }
 
 /**

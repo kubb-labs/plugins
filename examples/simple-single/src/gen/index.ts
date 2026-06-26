@@ -1,4 +1,5 @@
 export * from './.kubb/client'
+export * from './.kubb/standardSchema'
 export type {
   AddPetData,
   AddPetFormUrlEncodedData,

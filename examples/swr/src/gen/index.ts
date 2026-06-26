@@ -1,4 +1,5 @@
 export * from './.kubb/client.ts'
+export * from './.kubb/standardSchema.ts'
 export type { AddPetMutationArg, AddPetMutationKey } from './hooks/pet/useAddPet.ts'
 export type { DeletePetMutationArg, DeletePetMutationKey } from './hooks/pet/useDeletePet.ts'
 export type { UpdatePetMutationArg, UpdatePetMutationKey } from './hooks/pet/useUpdatePet.ts'

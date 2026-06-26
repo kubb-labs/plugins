@@ -1,7 +1,6 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { GetPetByIdRequestConfig, GetPetByIdResponses } from '../../../models/ts/pet/GetPetById.ts'
 import { client } from '../../../.kubb/client.ts'
-import { validateStandardSchema } from '../../../.kubb/standard-schema.ts'
 import { getPetByIdResponseSchema, getPetByIdErrorSchema } from '../../../zod/pet/getPetByIdSchema.ts'
 
 /**
@@ -18,10 +17,7 @@ export function getPetById<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/{petId}:search',
     security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
-    parser: {
-      response: (data: unknown) => validateStandardSchema(getPetByIdResponseSchema, data),
-      error: (data: unknown) => validateStandardSchema(getPetByIdErrorSchema, data),
-    },
+    parser: { response: getPetByIdResponseSchema, error: getPetByIdErrorSchema },
     ...config,
   }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
 }
