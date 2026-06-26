@@ -27,6 +27,11 @@ export type ParserHooks = {
    * Zod schema names the generated file imports from the zod plugin output.
    */
   importedZodNames: Array<string>
+  /**
+   * `true` when any hook expression was generated. The generator uses this to conditionally import
+   * `validateStandardSchema` from the injected `standard-schema.ts` runtime.
+   */
+  needsValidateHelper: boolean
 }
 
 /**
@@ -47,16 +52,18 @@ export function buildParserHooks({
 
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
   const zodRequestName = zodResolver && resolveRequestParser(parser) === 'zod' && hasRequestBody ? zodResolver.resolveDataName?.(node) : null
-  const request = zodRequestName ? `(data: unknown) => ${zodRequestName}.parse(data)` : null
+  const request = zodRequestName ? `(data: unknown) => validateStandardSchema(${zodRequestName}, data)` : null
   if (zodRequestName) importedZodNames.push(zodRequestName)
 
   const responseParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodResponseParse(node, zodResolver) : null
-  const response = responseParse ? `(data: unknown) => ${responseParse.expression}.parse(data)` : null
+  const response = responseParse ? `(data: unknown) => validateStandardSchema(${responseParse.expression}, data)` : null
   if (responseParse) importedZodNames.push(...responseParse.importNames)
 
   const errorParse = zodResolver && resolveResponseParser(parser) === 'zod' ? buildZodErrorParse(node, zodResolver) : null
-  const error = errorParse ? `(data: unknown) => ${errorParse.expression}.parse(data)` : null
+  const error = errorParse ? `(data: unknown) => validateStandardSchema(${errorParse.expression}, data)` : null
   if (errorParse) importedZodNames.push(...errorParse.importNames)
 
-  return { request, response, error, importedZodNames }
+  const needsValidateHelper = Boolean(request || response || error)
+
+  return { request, response, error, importedZodNames, needsValidateHelper }
 }

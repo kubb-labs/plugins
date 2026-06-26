@@ -32,37 +32,42 @@ describe('buildParserHooks', () => {
       response: null,
       error: null,
       importedZodNames: [],
+      needsValidateHelper: false,
     })
   })
 
   test("the 'zod' shorthand wires the response parser only when there is no error response", () => {
     const hooks = buildParserHooks({ node: addPet, parser: 'zod', zodResolver: resolverZod })
     expect(hooks.request).toBeNull()
-    expect(hooks.response).toBe('(data: unknown) => addPetResponseSchema.parse(data)')
+    expect(hooks.response).toBe('(data: unknown) => validateStandardSchema(addPetResponseSchema, data)')
     expect(hooks.error).toBeNull()
     expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema'])
+    expect(hooks.needsValidateHelper).toBe(true)
   })
 
   test("the 'zod' shorthand also wires the error parser when an error response is documented", () => {
     const hooks = buildParserHooks({ node: addPetWithError, parser: 'zod', zodResolver: resolverZod })
-    expect(hooks.response).toBe('(data: unknown) => addPetResponseSchema.parse(data)')
-    expect(hooks.error).toBe('(data: unknown) => addPetErrorSchema.parse(data)')
+    expect(hooks.response).toBe('(data: unknown) => validateStandardSchema(addPetResponseSchema, data)')
+    expect(hooks.error).toBe('(data: unknown) => validateStandardSchema(addPetErrorSchema, data)')
     expect(hooks.importedZodNames).toStrictEqual(['addPetResponseSchema', 'addPetErrorSchema'])
+    expect(hooks.needsValidateHelper).toBe(true)
   })
 
   test('the object form wires the request parser from the data schema', () => {
     const hooks = buildParserHooks({ node: addPet, parser: { request: 'zod' }, zodResolver: resolverZod })
-    expect(hooks.request).toBe('(data: unknown) => addPetDataSchema.parse(data)')
+    expect(hooks.request).toBe('(data: unknown) => validateStandardSchema(addPetDataSchema, data)')
     expect(hooks.response).toBeNull()
     expect(hooks.error).toBeNull()
     expect(hooks.importedZodNames).toStrictEqual(['addPetDataSchema'])
+    expect(hooks.needsValidateHelper).toBe(true)
   })
 
   test('wires both directions when both are enabled', () => {
     const hooks = buildParserHooks({ node: addPet, parser: { request: 'zod', response: 'zod' }, zodResolver: resolverZod })
-    expect(hooks.request).toBe('(data: unknown) => addPetDataSchema.parse(data)')
-    expect(hooks.response).toBe('(data: unknown) => addPetResponseSchema.parse(data)')
+    expect(hooks.request).toBe('(data: unknown) => validateStandardSchema(addPetDataSchema, data)')
+    expect(hooks.response).toBe('(data: unknown) => validateStandardSchema(addPetResponseSchema, data)')
     expect(hooks.error).toBeNull()
     expect(hooks.importedZodNames).toStrictEqual(['addPetDataSchema', 'addPetResponseSchema'])
+    expect(hooks.needsValidateHelper).toBe(true)
   })
 })

@@ -5,7 +5,7 @@ import { definePlugin } from '@kubb/core'
 import { pluginTsName } from '@kubb/plugin-ts'
 import { pluginZodName } from '@kubb/plugin-zod'
 import { clientGenerator } from './generators/clientGenerator.tsx'
-import { fetchClientTemplatePath } from './templates.ts'
+import { fetchClientTemplatePath, standardSchemaTemplatePath } from './templates.ts'
 import type { PluginFetch, ResolvedOptions } from './types.ts'
 
 /**
@@ -85,6 +85,14 @@ export const pluginFetch = definePlugin<PluginFetch>((options) => {
           copy: fetchClientTemplatePath,
           footer: baseURL ? `client.setConfig({ baseURL: ${JSON.stringify(baseURL)} })` : undefined,
         })
+
+        if (isParserEnabled(resolved.parser)) {
+          ctx.injectFile({
+            baseName: 'standard-schema.ts',
+            path: path.resolve(root, '.kubb/standard-schema.ts'),
+            copy: standardSchemaTemplatePath,
+          })
+        }
       },
     },
   }
