@@ -86,13 +86,12 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
 export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
- * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. A parser is either a plain function or a Standard Schema validator (zod,
- * valibot, arktype); `runParser` runs the latter through `validateStandardSchema`. Wired through the
- * per-call `parser.request` / `parser.response` / `parser.error` hooks (`error` runs on the error
- * body when a non-2xx call does not throw).
+ * A Standard Schema validator (zod, valibot, arktype) that parses a value before it is sent or after
+ * it is received. `runParser` runs it through `validateStandardSchema`. Wired through the per-call
+ * `parser.request` / `parser.response` / `parser.error` hooks (`error` runs on the error body when a
+ * non-2xx call does not throw).
  */
-export type Parser<T = unknown> = ((value: T) => T | Promise<T>) | StandardSchemaValidator<T>
+export type Parser<T = unknown> = StandardSchemaValidator<T>
 
 /**
  * A resolved security scheme carried on each generated call's `security` array. The runtime passes it
@@ -389,7 +388,6 @@ export async function resolveAuth(params: {
 
 async function runParser<T>(parser: Parser<T> | undefined, value: T): Promise<T> {
   if (!parser) return value
-  if (typeof parser === 'function') return (await parser(value)) as T
   return validateStandardSchema(parser, value)
 }
 

@@ -41,6 +41,10 @@ function fakeAxios(result: Programmed = {}) {
   return { instance, calls, request, requestUse, responseUse, requestEject, responseEject }
 }
 
+function toSchema<T>(transform: (value: unknown) => T) {
+  return { '~standard': { validate: (value: unknown) => ({ value: transform(value) }) } }
+}
+
 describe('defaultQuerySerializer', () => {
   test('explodes arrays into repeated keys', () => {
     expect(defaultQuerySerializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
@@ -237,7 +241,12 @@ describe('createClientCore', () => {
     const client = createClientCore({ transport: instance })
     const request = vi.fn((body: unknown) => ({ ...(body as object), validated: true }))
     const response = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', body: { name: 'odie' }, parser: { request, response } })) as CallResult
+    const result = (await client({
+      method: 'POST',
+      url: '/pet',
+      body: { name: 'odie' },
+      parser: { request: toSchema(request), response: toSchema(response) },
+    })) as CallResult
     expect(request).toHaveBeenCalledTimes(1)
     expect(calls[0]?.data).toBe('{"name":"odie","validated":true}')
     expect(result.data).toStrictEqual({ parsed: true })
@@ -247,7 +256,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
     const response = vi.fn((value: unknown) => value)
-    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response } })
+    await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { response: toSchema(response) } })
     expect(response).not.toHaveBeenCalled()
   })
 
@@ -255,7 +264,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { message: 'invalid' }, status: 405 })
     const client = createClientCore({ transport: instance })
     const error = vi.fn(() => ({ parsed: true }))
-    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error } })) as CallResult
+    const result = (await client({ method: 'POST', url: '/pet', throwOnError: false, parser: { error: toSchema(error) } })) as CallResult
     expect(error).toHaveBeenCalledTimes(1)
     expect(result.error).toStrictEqual({ parsed: true })
   })
@@ -264,7 +273,7 @@ describe('createClientCore', () => {
     const { instance } = fakeAxios({ data: { id: 1 }, status: 200 })
     const client = createClientCore({ transport: instance })
     const error = vi.fn((value: unknown) => value)
-    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error } })
+    await client({ method: 'GET', url: '/pet/1', throwOnError: false, parser: { error: toSchema(error) } })
     expect(error).not.toHaveBeenCalled()
   })
 
