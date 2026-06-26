@@ -491,8 +491,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
     const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
 
-    const fetchOptions =
-      config.fetchOptions || requestConfig.fetchOptions ? { ...config.fetchOptions, ...requestConfig.fetchOptions } : undefined
+    const fetchOptions = config.fetchOptions || requestConfig.fetchOptions ? { ...config.fetchOptions, ...requestConfig.fetchOptions } : undefined
 
     let resolvedRequest: ResolvedRequest = {
       url,
