@@ -83,11 +83,26 @@ export type QuerySerializer = (params: Record<string, unknown>) => string
 export type BodySerializer = (body: unknown, contentType?: string) => BodyInit | undefined
 
 /**
- * Serializes a single path parameter for interpolation into the URL. By default arrays join their
- * URL-encoded members with commas and objects render as comma-separated `key=value` pairs (OpenAPI
- * `simple` style, `explode: false`); primitives are URL-encoded.
+ * The OpenAPI path-parameter serialization style. `simple` is the default and emits the bare value;
+ * `label` prefixes a `.` and `matrix` prefixes a `;name=` segment.
  */
-export type PathSerializer = (name: string, value: unknown) => string
+export type PathStyle = 'simple' | 'label' | 'matrix'
+
+/**
+ * The per-parameter serialization metadata carried by the generated request. `style` selects the
+ * OpenAPI style and `explode` controls how arrays and objects expand.
+ */
+export type PathParamStyle = {
+  style?: PathStyle
+  explode?: boolean
+}
+
+/**
+ * Serializes a single path parameter for interpolation into the URL, honoring the OpenAPI `style` /
+ * `explode` passed as `options`. Defaults to `simple` style with `explode: false`: primitives are
+ * URL-encoded, arrays join their members with commas, and objects flatten to `key,value` pairs.
+ */
+export type PathSerializer = (name: string, value: unknown, options?: PathParamStyle) => string
 
 /**
  * The per-concern serializers, grouped so they can be set in one place and overridden per client or
@@ -138,6 +153,7 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
   path?: Record<string, unknown>
+  pathStyles?: Record<string, PathParamStyle>
   query?: unknown
   params?: unknown
   body?: TBody
@@ -356,22 +372,45 @@ export const defaultQuerySerializer: QuerySerializer = (params) => {
   return search.toString()
 }
 
-/**
- * Default path serializer (OpenAPI `simple` style, `explode: false`): arrays join their URL-encoded
- * members with commas and objects render as comma-separated `key=value` pairs. Replaces the previous
- * `String(value)` interpolation, which emitted `[object Object]` for object path params.
- */
-export const defaultPathSerializer: PathSerializer = (_name, value) => {
-  if (value === undefined || value === null) return ''
-  if (Array.isArray(value)) {
-    return value.map((item) => encodeURIComponent(String(item))).join(',')
-  }
-  if (typeof value === 'object') {
-    return Object.entries(value)
-      .map(([key, item]) => `${key}=${encodeURIComponent(String(item))}`)
-      .join(',')
-  }
+function encodePathValue(value: unknown): string {
   return encodeURIComponent(String(value))
+}
+
+function serializePathPrimitive(name: string, value: unknown, style: PathStyle): string {
+  const encoded = encodePathValue(value)
+  if (style === 'label') return `.${encoded}`
+  if (style === 'matrix') return `;${name}=${encoded}`
+  return encoded
+}
+
+function serializePathArray(name: string, value: Array<unknown>, style: PathStyle, explode: boolean): string {
+  const items = value.map(encodePathValue)
+  if (style === 'label') return `.${items.join(explode ? '.' : ',')}`
+  if (style === 'matrix') return explode ? items.map((item) => `;${name}=${item}`).join('') : `;${name}=${items.join(',')}`
+  return items.join(',')
+}
+
+function serializePathObject(name: string, value: Record<string, unknown>, style: PathStyle, explode: boolean): string {
+  const entries = Object.entries(value)
+  const pairs = entries.map(([key, item]) => `${encodePathValue(key)}=${encodePathValue(item)}`)
+  const flat = entries.map(([key, item]) => `${encodePathValue(key)},${encodePathValue(item)}`)
+  if (style === 'label') return `.${explode ? pairs.join('.') : flat.join(',')}`
+  if (style === 'matrix') return explode ? pairs.map((pair) => `;${pair}`).join('') : `;${name}=${flat.join(',')}`
+  return (explode ? pairs : flat).join(',')
+}
+
+/**
+ * Default path serializer honoring the OpenAPI `style` / `explode` metadata. Without metadata it
+ * falls back to `simple` style with `explode: false`. Replaces the previous `String(value)`
+ * interpolation, which emitted `[object Object]` for object path params.
+ */
+export const defaultPathSerializer: PathSerializer = (name, value, options) => {
+  if (value === undefined || value === null) return ''
+  const style = options?.style ?? 'simple'
+  const explode = options?.explode ?? false
+  if (Array.isArray(value)) return serializePathArray(name, value, style, explode)
+  if (typeof value === 'object') return serializePathObject(name, value as Record<string, unknown>, style, explode)
+  return serializePathPrimitive(name, value, style)
 }
 
 function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
@@ -399,11 +438,12 @@ function serializeUrl(
   pathParams: Record<string, unknown>,
   search: string,
   pathSerializer: PathSerializer = defaultPathSerializer,
+  pathStyles?: Record<string, PathParamStyle>,
 ): string {
   const path = parts
     .filter(Boolean)
     .join('')
-    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer(key, pathParams[key]))
+    .replace(/\{([^{}]+)\}/g, (_, key: string) => pathSerializer(key, pathParams[key], pathStyles?.[key]))
   return path + (search ? `?${search}` : '')
 }
 
@@ -517,7 +557,13 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     } else if (requestConfig.contentType) {
       headers['Content-Type'] = requestConfig.contentType
     }
-    const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query), pathSerializer)
+    const url = serializeUrl(
+      [config.baseURL, requestConfig.baseURL, requestConfig.url],
+      requestConfig.path ?? {},
+      querySerializer(query),
+      pathSerializer,
+      requestConfig.pathStyles,
+    )
 
     let resolvedRequest: ResolvedRequest = {
       url,
@@ -569,7 +615,13 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
-    return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query), pathSerializer)
+    return serializeUrl(
+      [config.baseURL, requestConfig.baseURL, requestConfig.url],
+      requestConfig.path ?? {},
+      querySerializer(query),
+      pathSerializer,
+      requestConfig.pathStyles,
+    )
   }
   client.interceptors = interceptors
   client.createClient = (next) => createClientCore({ defaultTransport, ...config, ...next })

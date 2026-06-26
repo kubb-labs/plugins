@@ -56,16 +56,34 @@ describe('defaultQuerySerializer', () => {
 })
 
 describe('defaultPathSerializer', () => {
-  test('URL-encodes a primitive value', () => {
+  test('simple style URL-encodes a primitive value', () => {
     expect(defaultPathSerializer('id', 'a b')).toBe('a%20b')
   })
 
-  test('joins array members with commas (simple style)', () => {
+  test('simple style joins array members with commas', () => {
     expect(defaultPathSerializer('ids', [3, 4, 5])).toBe('3,4,5')
   })
 
-  test('renders objects as comma-separated key=value pairs', () => {
-    expect(defaultPathSerializer('point', { x: 1, y: 2 })).toBe('x=1,y=2')
+  test('simple style flattens objects to comma-separated key,value pairs', () => {
+    expect(defaultPathSerializer('point', { x: 1, y: 2 })).toBe('x,1,y,2')
+  })
+
+  test('simple style with explode renders objects as key=value pairs', () => {
+    expect(defaultPathSerializer('point', { x: 1, y: 2 }, { explode: true })).toBe('x=1,y=2')
+  })
+
+  test('label style prefixes a dot', () => {
+    expect(defaultPathSerializer('id', 5, { style: 'label' })).toBe('.5')
+    expect(defaultPathSerializer('ids', [3, 4], { style: 'label' })).toBe('.3,4')
+    expect(defaultPathSerializer('ids', [3, 4], { style: 'label', explode: true })).toBe('.3.4')
+    expect(defaultPathSerializer('point', { x: 1, y: 2 }, { style: 'label', explode: true })).toBe('.x=1.y=2')
+  })
+
+  test('matrix style prefixes a named segment', () => {
+    expect(defaultPathSerializer('id', 5, { style: 'matrix' })).toBe(';id=5')
+    expect(defaultPathSerializer('id', [3, 4], { style: 'matrix' })).toBe(';id=3,4')
+    expect(defaultPathSerializer('id', [3, 4], { style: 'matrix', explode: true })).toBe(';id=3;id=4')
+    expect(defaultPathSerializer('point', { x: 1, y: 2 }, { style: 'matrix', explode: true })).toBe(';x=1;y=2')
   })
 
   test('serializes undefined and null to an empty string', () => {
@@ -138,7 +156,14 @@ describe('createClientCore', () => {
     const { instance, calls } = fakeAxios()
     const client = createClientCore({ transport: instance })
     await client({ method: 'GET', url: '/pet/{ids}/{point}', path: { ids: [3, 4], point: { x: 1, y: 2 } } })
-    expect(calls[0]?.url).toBe('/pet/3,4/x=1,y=2')
+    expect(calls[0]?.url).toBe('/pet/3,4/x,1,y,2')
+  })
+
+  test('honors per-parameter pathStyles metadata', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet/{id}{filter}', path: { id: 5, filter: ['a', 'b'] }, pathStyles: { id: { style: 'matrix' }, filter: { style: 'label' } } })
+    expect(calls[0]?.url).toBe('/pet/;id=5.a,b')
   })
 
   test('forwards the merged baseURL to axios', async () => {
@@ -334,6 +359,12 @@ describe('getUrl', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: (_name, value) => `id-${value as string}` } })).toBe('/pet/id-7')
+  })
+
+  test('applies pathStyles metadata to the matching placeholders', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, pathStyles: { petId: { style: 'matrix' } } })).toBe('/pet/;petId=7')
   })
 })
 
