@@ -17,5 +17,7 @@ export function addFiles<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<AddFilesResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/files', ...config }) as Promise<RequestResult<AddFilesResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pet/files', meta: { operationId: 'addFiles', schemaPath: '/pet/files' }, ...config }) as Promise<
+    RequestResult<AddFilesResponses, ThrowOnError>
+  >
 }

@@ -1,7 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { FindPetsByTagsRequestConfig, FindPetsByTagsResponses } from '../../../models/ts/pet/FindPetsByTags.ts'
 import { client } from '../../../.kubb/client.ts'
-import { findPetsByTagsResponseSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
+import { findPetsByTagsResponseSchema, findPetsByTagsErrorSchema } from '../../../zod/pet/findPetsByTagsSchema.ts'
 
 /**
  * @description Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
@@ -17,7 +17,8 @@ export function findPetsByTags<ThrowOnError extends boolean = true>(
     method: 'GET',
     url: '/pet/findByTags',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => findPetsByTagsResponseSchema.parse(data) },
+    parser: { response: (data: unknown) => findPetsByTagsResponseSchema.parse(data), error: (data: unknown) => findPetsByTagsErrorSchema.parse(data) },
+    meta: { operationId: 'findPetsByTags', schemaPath: '/pet/findByTags' },
     ...config,
   }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
 }

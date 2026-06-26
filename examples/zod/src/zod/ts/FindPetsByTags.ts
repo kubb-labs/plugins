@@ -74,6 +74,7 @@ export type FindPetsByTagsRequestConfig = {
   headers: {
     xEXAMPLE: FindPetsByTagsHeaderXEXAMPLE
   }
+  cookie?: never
 }
 
 /**

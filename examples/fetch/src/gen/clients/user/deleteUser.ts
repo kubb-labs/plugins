@@ -17,5 +17,7 @@ export function deleteUser<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<DeleteUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'DELETE', url: '/user/{username}', ...config }) as Promise<RequestResult<DeleteUserResponses, ThrowOnError>>
+  return request({ method: 'DELETE', url: '/user/{username}', meta: { operationId: 'deleteUser', schemaPath: '/user/{username}' }, ...config }) as Promise<
+    RequestResult<DeleteUserResponses, ThrowOnError>
+  >
 }

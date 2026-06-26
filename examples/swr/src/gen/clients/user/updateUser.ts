@@ -17,5 +17,7 @@ export function updateUser<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<UpdateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'PUT', url: '/user/{username}', ...config }) as Promise<RequestResult<UpdateUserResponses, ThrowOnError>>
+  return request({ method: 'PUT', url: '/user/{username}', meta: { operationId: 'updateUser', schemaPath: '/user/{username}' }, ...config }) as Promise<
+    RequestResult<UpdateUserResponses, ThrowOnError>
+  >
 }

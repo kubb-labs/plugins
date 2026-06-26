@@ -17,5 +17,10 @@ export function createUsersWithListInput<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/user/createWithList', ...config }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>
+  return request({
+    method: 'POST',
+    url: '/user/createWithList',
+    meta: { operationId: 'createUsersWithListInput', schemaPath: '/user/createWithList' },
+    ...config,
+  }) as Promise<RequestResult<CreateUsersWithListInputResponses, ThrowOnError>>
 }

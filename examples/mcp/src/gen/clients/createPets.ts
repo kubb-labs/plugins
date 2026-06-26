@@ -16,5 +16,7 @@ export function createPets<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<CreatePetsResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pets/{uuid}', ...config }) as Promise<RequestResult<CreatePetsResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/pets/{uuid}', meta: { operationId: 'createPets', schemaPath: '/pets/{uuid}' }, ...config }) as Promise<
+    RequestResult<CreatePetsResponses, ThrowOnError>
+  >
 }

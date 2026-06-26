@@ -18,6 +18,7 @@ export type OptionsFindPetsByStatusRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

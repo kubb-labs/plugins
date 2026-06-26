@@ -47,6 +47,7 @@ export type GetThingsRequestConfig = {
     skip?: GetThingsQuerySkip
   }
   headers?: never
+  cookie?: never
 }
 
 /**

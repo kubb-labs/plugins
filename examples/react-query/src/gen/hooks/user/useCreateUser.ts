@@ -12,7 +12,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const createUserMutationKey = () => [{ url: '/user' }] as const
 
 export function createUserMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & {
     contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
   } = {},
 ) {
@@ -34,7 +34,7 @@ export function createUserMutationOptions<TContext = unknown>(
 export function useCreateUser<TContext>(
   options: {
     mutation?: UseMutationOptions<CreateUserResponse, ResponseErrorConfig<Error>, CreateUserRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},

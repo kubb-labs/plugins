@@ -31,7 +31,13 @@ export class pet {
   ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+    return request({
+      method: 'PUT',
+      url: '/pet',
+      security: [{ type: 'oauth2' }],
+      meta: { operationId: 'updatePet', schemaPath: '/pet' },
+      ...config,
+    }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
   }
 
   /**
@@ -44,7 +50,9 @@ export class pet {
   ): Promise<RequestResult<AddPetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
+    return request({ method: 'POST', url: '/pet', security: [{ type: 'oauth2' }], meta: { operationId: 'addPet', schemaPath: '/pet' }, ...config }) as Promise<
+      RequestResult<AddPetResponses, ThrowOnError>
+    >
   }
 
   /**
@@ -57,9 +65,13 @@ export class pet {
   ): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<FindPetsByStatusResponses, ThrowOnError>
-    >
+    return request({
+      method: 'GET',
+      url: '/pet/findByStatus',
+      security: [{ type: 'oauth2' }],
+      meta: { operationId: 'findPetsByStatus', schemaPath: '/pet/findByStatus' },
+      ...config,
+    }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
   }
 
   /**
@@ -72,9 +84,13 @@ export class pet {
   ): Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'GET', url: '/pet/findByTags', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<FindPetsByTagsResponses, ThrowOnError>
-    >
+    return request({
+      method: 'GET',
+      url: '/pet/findByTags',
+      security: [{ type: 'oauth2' }],
+      meta: { operationId: 'findPetsByTags', schemaPath: '/pet/findByTags' },
+      ...config,
+    }) as Promise<RequestResult<FindPetsByTagsResponses, ThrowOnError>>
   }
 
   /**
@@ -91,6 +107,7 @@ export class pet {
       method: 'GET',
       url: '/pet/{petId}',
       security: [{ type: 'apiKey', name: 'api_key', in: 'header' }, { type: 'oauth2' }],
+      meta: { operationId: 'getPetById', schemaPath: '/pet/{petId}' },
       ...config,
     }) as Promise<RequestResult<GetPetByIdResponses, ThrowOnError>>
   }
@@ -104,9 +121,13 @@ export class pet {
   ): Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<UpdatePetWithFormResponses, ThrowOnError>
-    >
+    return request({
+      method: 'POST',
+      url: '/pet/{petId}',
+      security: [{ type: 'oauth2' }],
+      meta: { operationId: 'updatePetWithForm', schemaPath: '/pet/{petId}' },
+      ...config,
+    }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
   }
 
   /**
@@ -119,9 +140,13 @@ export class pet {
   ): Promise<RequestResult<DeletePetResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'DELETE', url: '/pet/{petId}', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<DeletePetResponses, ThrowOnError>
-    >
+    return request({
+      method: 'DELETE',
+      url: '/pet/{petId}',
+      security: [{ type: 'oauth2' }],
+      meta: { operationId: 'deletePet', schemaPath: '/pet/{petId}' },
+      ...config,
+    }) as Promise<RequestResult<DeletePetResponses, ThrowOnError>>
   }
 
   /**
@@ -133,8 +158,12 @@ export class pet {
   ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
     const { client: request = this.client, ...config } = options
 
-    return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<
-      RequestResult<UploadFileResponses, ThrowOnError>
-    >
+    return request({
+      method: 'POST',
+      url: '/pet/{petId}/uploadImage',
+      security: [{ type: 'oauth2' }],
+      meta: { operationId: 'uploadFile', schemaPath: '/pet/{petId}/uploadImage' },
+      ...config,
+    }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
   }
 }

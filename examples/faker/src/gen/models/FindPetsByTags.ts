@@ -41,6 +41,7 @@ export type FindPetsByTagsRequestConfig = {
     tags?: FindPetsByTagsQueryTags
   }
   headers?: never
+  cookie?: never
 }
 
 /**

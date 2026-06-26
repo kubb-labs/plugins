@@ -42,6 +42,7 @@ export type GetPetByIdRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

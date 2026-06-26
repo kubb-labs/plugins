@@ -20,7 +20,7 @@ export const updateUserMutationKey = () => [{ url: '/user/:username' }] as const
 export function useUpdateUser<TContext>(
   options: {
     mutation?: MutationObserverOptions<UpdateUserResponse, ResponseErrorConfig<Error>, UpdateUserRequestConfig, TContext> & { client?: QueryClient }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> & {
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> & {
       contentType?: 'application/json' | 'application/xml' | 'application/x-www-form-urlencoded'
     }
   } = {},

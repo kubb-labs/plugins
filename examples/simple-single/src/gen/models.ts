@@ -293,6 +293,7 @@ export type UpdatePetRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -366,6 +367,7 @@ export type AddPetRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -417,6 +419,7 @@ export type FindPetsByStatusRequestConfig = {
     status?: FindPetsByStatusQueryStatus
   }
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -482,6 +485,7 @@ export type FindPetsByTagsRequestConfig = {
     pageSize?: FindPetsByTagsQueryPageSize
   }
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -540,6 +544,7 @@ export type GetPetByIdRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -600,6 +605,7 @@ export type UpdatePetWithFormRequestConfig = {
     status?: UpdatePetWithFormQueryStatus
   }
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -650,6 +656,7 @@ export type DeletePetRequestConfig = {
   headers?: {
     apiKey?: DeletePetHeaderApiKey
   }
+  cookie?: never
 }
 
 /**
@@ -706,6 +713,7 @@ export type UploadFileRequestConfig = {
     additionalMetadata?: UploadFileQueryAdditionalMetadata
   }
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -735,6 +743,7 @@ export type GetInventoryRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -784,6 +793,7 @@ export type PlaceOrderRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -834,6 +844,7 @@ export type PlaceOrderPatchRequestConfig = {
   path?: never
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -892,6 +903,7 @@ export type GetOrderByIdRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**
@@ -939,6 +951,7 @@ export type DeleteOrderRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

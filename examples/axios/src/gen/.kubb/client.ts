@@ -66,7 +66,7 @@ export type RequestResult<TResponses, ThrowOnError extends boolean = true, TRequ
  * The data-shaped keys of the grouped options object. `Options` subtracts these from the runtime
  * `RequestConfig` and adds them back, typed per operation, from the generated `<Name>Request` type.
  */
-export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown }
+export type DataShape = { body?: unknown; headers?: unknown; path?: unknown; query?: unknown; cookie?: unknown }
 
 export type HeaderValue = string | number | boolean | null | undefined | object
 export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderValue>
@@ -86,7 +86,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -114,9 +115,19 @@ export type AuthToken = string | undefined
 export type AuthResolver = AuthToken | ((auth: Auth) => AuthToken | Promise<AuthToken>)
 
 /**
- * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` come
- * from the grouped options; everything else is plain request configuration. `transport` carries an
- * axios instance and `validateStatus` rides axios's own contract.
+ * Operation context known at generation time. The generated call config carries it under `meta`, and
+ * the runtime forwards it onto the axios request config so interceptors can read which operation they
+ * are handling.
+ */
+export type RequestMeta = {
+  operationId?: string
+  schemaPath?: string
+}
+
+/**
+ * The request a generated function hands to the runtime. `body` / `headers` / `path` / `query` /
+ * `cookie` come from the grouped options; everything else is plain request configuration. `transport`
+ * carries an axios instance and `validateStatus` rides axios's own contract.
  */
 export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TResponse = AxiosResponse> = {
   baseURL?: string
@@ -125,6 +136,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   path?: Record<string, unknown>
   query?: unknown
   params?: unknown
+  cookie?: Record<string, unknown>
   body?: TBody
   headers?: HeadersInit
   signal?: AbortSignal
@@ -136,9 +148,13 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
+  /**
+   * Operation context the generated call config supplies; forwarded onto the axios request config.
+   */
+  meta?: RequestMeta
 }
 
 /**
@@ -254,13 +270,30 @@ function isFormBody(body: unknown): boolean {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
@@ -353,6 +386,18 @@ export async function resolveAuth(params: {
   }
 }
 
+/**
+ * Serializes a cookie params object into a `key=value; key2=value2` string for the `Cookie` header,
+ * skipping `undefined` and `null` members. Returns `undefined` when nothing is left to send.
+ */
+function serializeCookies(cookies: Record<string, unknown> | undefined): string | undefined {
+  if (!cookies) return undefined
+  const pairs = Object.entries(cookies)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => `${key}=${value}`)
+  return pairs.length ? pairs.join('; ') : undefined
+}
+
 async function runParser<T>(parser: Parser | undefined, value: T): Promise<T> {
   if (!parser) return value
   return (await parser(value)) as T
@@ -426,10 +471,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
-    const contentType = headers['Content-Type'] ?? headers['content-type']
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -440,7 +482,18 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       query,
     })
 
+    const cookie = serializeCookies(requestConfig.cookie)
+    if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
+
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
@@ -455,8 +508,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       headers,
       params: query,
       paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
-      data: validatedBody,
-      transformRequest: (data) => bodySerializer(data, contentType),
+      data: body,
+      transformRequest: (data) => data,
       signal: requestConfig.signal,
       responseType: requestConfig.responseType,
       validateStatus,
@@ -466,10 +519,11 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
       const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, response.data)
       return {
         status: response.status,
         data,
-        error: isSuccess ? undefined : response.data,
+        error,
         request: response.config as TRequest,
         response: response as TResponse,
       }

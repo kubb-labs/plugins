@@ -1,7 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { UpdatePetWithFormRequestConfig, UpdatePetWithFormResponses } from '../../../models/ts/pet/UpdatePetWithForm.ts'
 import { client } from '../../../.kubb/client.ts'
-import { updatePetWithFormResponseSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
+import { updatePetWithFormResponseSchema, updatePetWithFormErrorSchema } from '../../../zod/pet/updatePetWithFormSchema.ts'
 
 /**
  * @summary Updates a pet in the store with form data
@@ -16,7 +16,8 @@ export function updatePetWithForm<ThrowOnError extends boolean = true>(
     method: 'POST',
     url: '/pet/{petId}:search',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => updatePetWithFormResponseSchema.parse(data) },
+    parser: { response: (data: unknown) => updatePetWithFormResponseSchema.parse(data), error: (data: unknown) => updatePetWithFormErrorSchema.parse(data) },
+    meta: { operationId: 'updatePetWithForm', schemaPath: '/pet/{petId}:search' },
     ...config,
   }) as Promise<RequestResult<UpdatePetWithFormResponses, ThrowOnError>>
 }

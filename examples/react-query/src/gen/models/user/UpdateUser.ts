@@ -49,6 +49,7 @@ export type UpdateUserRequestConfig = {
   }
   query?: never
   headers?: never
+  cookie?: never
 }
 
 /**

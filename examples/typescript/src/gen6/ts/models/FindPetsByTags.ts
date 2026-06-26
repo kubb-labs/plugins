@@ -55,6 +55,7 @@ export type FindPetsByTagsRequestConfig = {
     pageSize?: FindPetsByTagsQueryPageSize
   }
   headers?: never
+  cookie?: never
 }
 
 /**

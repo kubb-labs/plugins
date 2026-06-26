@@ -17,5 +17,10 @@ export function getOrderById<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/order/{orderId}', ...config }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>
+  return request({
+    method: 'GET',
+    url: '/store/order/{orderId}',
+    meta: { operationId: 'getOrderById', schemaPath: '/store/order/{orderId}' },
+    ...config,
+  }) as Promise<RequestResult<GetOrderByIdResponses, ThrowOnError>>
 }

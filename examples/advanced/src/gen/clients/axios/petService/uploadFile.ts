@@ -11,7 +11,12 @@ export function uploadFile<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<UploadFileResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/pet/{petId}/uploadImage', security: [{ type: 'oauth2' }], ...config }) as Promise<
-    RequestResult<UploadFileResponses, ThrowOnError>
-  >
+  return request({
+    method: 'POST',
+    url: '/pet/{petId}/uploadImage',
+    security: [{ type: 'oauth2' }],
+    contentType: 'application/octet-stream',
+    meta: { operationId: 'uploadFile', schemaPath: '/pet/{petId}/uploadImage' },
+    ...config,
+  }) as Promise<RequestResult<UploadFileResponses, ThrowOnError>>
 }

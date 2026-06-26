@@ -16,5 +16,7 @@ export function getUserByName<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetUserByNameResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/{username}', ...config }) as Promise<RequestResult<GetUserByNameResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/user/{username}', meta: { operationId: 'getUserByName', schemaPath: '/user/{username}' }, ...config }) as Promise<
+    RequestResult<GetUserByNameResponses, ThrowOnError>
+  >
 }

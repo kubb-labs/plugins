@@ -46,6 +46,7 @@ export type DeletePetRequestConfig = {
   headers?: {
     apiKey?: DeletePetHeaderApiKey
   }
+  cookie?: never
 }
 
 /**

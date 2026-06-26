@@ -1,7 +1,7 @@
 import type { Options, RequestResult } from '../../../.kubb/client.ts'
 import type { AddPetRequestConfig, AddPetResponses } from '../../../models/ts/pet/AddPet.ts'
 import { client } from '../../../.kubb/client.ts'
-import { addPetResponseSchema } from '../../../zod/pet/addPetSchema.ts'
+import { addPetResponseSchema, addPetErrorSchema } from '../../../zod/pet/addPetSchema.ts'
 
 /**
  * @description Add a new pet to the store
@@ -17,7 +17,8 @@ export function addPet<ThrowOnError extends boolean = true>(
     method: 'POST',
     url: '/pet',
     security: [{ type: 'oauth2' }],
-    parser: { response: (data: unknown) => addPetResponseSchema.parse(data) },
+    parser: { response: (data: unknown) => addPetResponseSchema.parse(data), error: (data: unknown) => addPetErrorSchema.parse(data) },
+    meta: { operationId: 'addPet', schemaPath: '/pet' },
     ...config,
   }) as Promise<RequestResult<AddPetResponses, ThrowOnError>>
 }

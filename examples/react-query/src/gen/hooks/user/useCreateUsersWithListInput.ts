@@ -12,7 +12,7 @@ import { mutationOptions, useMutation } from '@tanstack/react-query'
 export const createUsersWithListInputMutationKey = () => [{ url: '/user/createWithList' }] as const
 
 export function createUsersWithListInputMutationOptions<TContext = unknown>(
-  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>> = {},
+  config: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>> = {},
 ) {
   const mutationKey = createUsersWithListInputMutationKey()
   return mutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext>({
@@ -34,7 +34,7 @@ export function useCreateUsersWithListInput<TContext>(
     mutation?: UseMutationOptions<CreateUsersWithListInputStatus200, ResponseErrorConfig<Error>, CreateUsersWithListInputRequestConfig, TContext> & {
       client?: QueryClient
     }
-    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'url'>>
+    client?: Partial<Omit<RequestConfig, 'path' | 'query' | 'body' | 'headers' | 'cookie' | 'url'>>
   } = {},
 ) {
   const { mutation = {}, client: config = {} } = options ?? {}

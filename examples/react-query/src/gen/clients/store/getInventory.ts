@@ -17,7 +17,11 @@ export function getInventory<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<GetInventoryResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/store/inventory', security: [{ type: 'apiKey', name: 'api_key', in: 'header' }], ...config }) as Promise<
-    RequestResult<GetInventoryResponses, ThrowOnError>
-  >
+  return request({
+    method: 'GET',
+    url: '/store/inventory',
+    security: [{ type: 'apiKey', name: 'api_key', in: 'header' }],
+    meta: { operationId: 'getInventory', schemaPath: '/store/inventory' },
+    ...config,
+  }) as Promise<RequestResult<GetInventoryResponses, ThrowOnError>>
 }

@@ -17,5 +17,7 @@ export function updatePet<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<UpdatePetResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<UpdatePetResponses, ThrowOnError>>
+  return request({ method: 'PUT', url: '/pet', security: [{ type: 'oauth2' }], meta: { operationId: 'updatePet', schemaPath: '/pet' }, ...config }) as Promise<
+    RequestResult<UpdatePetResponses, ThrowOnError>
+  >
 }

@@ -17,5 +17,7 @@ export function createUser<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<CreateUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'POST', url: '/user', ...config }) as Promise<RequestResult<CreateUserResponses, ThrowOnError>>
+  return request({ method: 'POST', url: '/user', meta: { operationId: 'createUser', schemaPath: '/user' }, ...config }) as Promise<
+    RequestResult<CreateUserResponses, ThrowOnError>
+  >
 }

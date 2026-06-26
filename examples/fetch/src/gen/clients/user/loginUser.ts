@@ -16,5 +16,7 @@ export function loginUser<ThrowOnError extends boolean = true>(
 ): Promise<RequestResult<LoginUserResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/user/login', ...config }) as Promise<RequestResult<LoginUserResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/user/login', meta: { operationId: 'loginUser', schemaPath: '/user/login' }, ...config }) as Promise<
+    RequestResult<LoginUserResponses, ThrowOnError>
+  >
 }
