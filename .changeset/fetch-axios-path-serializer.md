@@ -15,6 +15,8 @@ Serialize array and object path parameters instead of emitting `[object Object]`
 
 A request carries this metadata in a new `pathStyles` field, `Record<string, { style?, explode? }>`, which the runtime passes to the serializer per placeholder. The `PathSerializer` signature is now `(name, value, options?) => string`. (The generator wiring that fills `pathStyles` from the spec follows once the OpenAPI adapter captures `style` / `explode`.)
 
+**Query style / explode / allowReserved support.** `defaultQuerySerializer` now honors per-parameter OpenAPI query metadata: `form` (default), `spaceDelimited`, `pipeDelimited`, and `deepObject`, each with `explode`, plus `allowReserved` to keep RFC 3986 reserved characters unencoded. The metadata rides a new `queryStyles` field, `Record<string, { style?, explode?, allowReserved? }>`, and the `QuerySerializer` signature is now `(params, options?) => string`. Members without metadata keep the previous defaults (arrays explode into repeated keys, nested objects use `deepObject`), so existing output is unchanged.
+
 **Grouped serializer option (breaking).** The separate `querySerializer` / `bodySerializer` options on `ClientConfig` and `RequestConfig` are replaced by a single `serializer` object:
 
 ```ts

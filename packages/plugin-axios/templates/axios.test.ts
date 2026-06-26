@@ -53,6 +53,32 @@ describe('defaultQuerySerializer', () => {
   test('skips undefined and null members', () => {
     expect(defaultQuerySerializer({ a: 1, b: undefined, c: null })).toBe('a=1')
   })
+
+  test('form style without explode joins arrays with commas', () => {
+    expect(defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } })).toBe('id=3,4,5')
+  })
+
+  test('spaceDelimited and pipeDelimited join arrays without explode', () => {
+    expect(defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } })).toBe('id=3%204%205')
+    expect(defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } })).toBe('id=3|4|5')
+  })
+
+  test('form style with explode expands objects into top-level keys', () => {
+    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: true } })).toBe('role=admin&name=alex')
+  })
+
+  test('form style without explode flattens objects with commas', () => {
+    expect(defaultQuerySerializer({ filter: { role: 'admin', name: 'alex' } }, { filter: { style: 'form', explode: false } })).toBe('filter=role,admin,name,alex')
+  })
+
+  test('deepObject style renders bracketed object keys', () => {
+    expect(defaultQuerySerializer({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
+  })
+
+  test('allowReserved leaves reserved characters unencoded', () => {
+    expect(defaultQuerySerializer({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
+    expect(defaultQuerySerializer({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
+  })
 })
 
 describe('defaultPathSerializer', () => {
@@ -184,6 +210,14 @@ describe('createClientCore', () => {
     await client({ method: 'GET', url: '/pet', query: { tags: ['a', 'b'] } })
     const serializer = calls[0]?.paramsSerializer as (params: Record<string, unknown>) => string
     expect(serializer({ tags: ['a', 'b'] })).toBe('tags=a&tags=b')
+  })
+
+  test('passes queryStyles through the axios paramsSerializer', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet', query: { id: [3, 4, 5] }, queryStyles: { id: { style: 'pipeDelimited', explode: false } } })
+    const serializer = calls[0]?.paramsSerializer as (params: Record<string, unknown>) => string
+    expect(serializer({ id: [3, 4, 5] })).toBe('id=3|4|5')
   })
 
   test('serializes the body before axios and sets Content-Type', async () => {
@@ -370,6 +404,12 @@ describe('getUrl', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
     expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, pathStyles: { petId: { style: 'matrix' } } })).toBe('/pet/;petId=7')
+  })
+
+  test('applies queryStyles metadata to the query string', () => {
+    const { instance } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    expect(client.getUrl({ url: '/pets', query: { id: [3, 4, 5] }, queryStyles: { id: { style: 'pipeDelimited', explode: false } } })).toBe('/pets?id=3|4|5')
   })
 })
 

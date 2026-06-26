@@ -73,10 +73,28 @@ export type HeadersInit = Array<[string, HeaderValue]> | Record<string, HeaderVa
 export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text' | 'stream' | 'formdata'
 
 /**
- * Serializes the query object into a search string. Array and object members follow the configured
- * style (`form` with `explode` by default; `deepObject` for nested objects).
+ * The OpenAPI query-parameter serialization style. `form` is the default; `spaceDelimited` and
+ * `pipeDelimited` join arrays with a space or pipe, and `deepObject` renders objects as
+ * `key[prop]=value`.
  */
-export type QuerySerializer = (params: Record<string, unknown>) => string
+export type QueryStyle = 'form' | 'spaceDelimited' | 'pipeDelimited' | 'deepObject'
+
+/**
+ * The per-parameter query serialization metadata carried by the generated request. `style` and
+ * `explode` follow OpenAPI, and `allowReserved` keeps RFC 3986 reserved characters unencoded.
+ */
+export type QueryParamStyle = {
+  style?: QueryStyle
+  explode?: boolean
+  allowReserved?: boolean
+}
+
+/**
+ * Serializes the query object into a search string. The optional second argument carries the
+ * per-parameter OpenAPI `style` / `explode` / `allowReserved` metadata; without it arrays explode
+ * into repeated keys and nested objects use the `deepObject` style.
+ */
+export type QuerySerializer = (params: Record<string, unknown>, options?: Record<string, QueryParamStyle>) => string
 
 /**
  * Serializes the request body. JSON by default; `FormData`, `URLSearchParams`, `Blob`,
@@ -158,6 +176,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   path?: Record<string, unknown>
   pathStyles?: Record<string, PathParamStyle>
   query?: unknown
+  queryStyles?: Record<string, QueryParamStyle>
   params?: unknown
   body?: TBody
   headers?: HeadersInit
@@ -331,16 +350,52 @@ function appendQueryValue(search: URLSearchParams, key: string, value: unknown):
   search.append(key, String(value))
 }
 
-/**
- * Default query serializer: arrays explode into repeated keys and nested objects use the
- * `deepObject` style (`key[prop]=value`).
- */
-export const defaultQuerySerializer: QuerySerializer = (params) => {
+const queryDelimiters: Record<QueryStyle, string> = { form: ',', spaceDelimited: '%20', pipeDelimited: '|', deepObject: ',' }
+
+function notNullish(value: unknown): boolean {
+  return value !== undefined && value !== null
+}
+
+function serializeStyledQueryArray(key: string, value: Array<unknown>, options: QueryParamStyle, encode: (value: unknown) => string): Array<string> {
+  const items = value.filter(notNullish)
+  if (options.explode ?? true) return items.map((item) => `${encode(key)}=${encode(item)}`)
+  return [`${encode(key)}=${items.map(encode).join(queryDelimiters[options.style ?? 'form'])}`]
+}
+
+function serializeStyledQueryObject(key: string, value: Record<string, unknown>, options: QueryParamStyle, encode: (value: unknown) => string): Array<string> {
+  const entries = Object.entries(value).filter(([, item]) => notNullish(item))
+  if ((options.style ?? 'form') === 'deepObject') return entries.map(([prop, item]) => `${encode(`${key}[${prop}]`)}=${encode(item)}`)
+  if (options.explode ?? true) return entries.map(([prop, item]) => `${encode(prop)}=${encode(item)}`)
+  return [`${encode(key)}=${entries.flatMap(([prop, item]) => [prop, item]).map(encode).join(',')}`]
+}
+
+function serializeStyledQueryParam(key: string, value: unknown, options: QueryParamStyle): Array<string> {
+  if (value === undefined || value === null) return []
+  const encode = options.allowReserved ? (input: unknown) => encodeURI(String(input)) : (input: unknown) => encodeURIComponent(String(input))
+  if (Array.isArray(value)) return serializeStyledQueryArray(key, value, options, encode)
+  if (typeof value === 'object') return serializeStyledQueryObject(key, value as Record<string, unknown>, options, encode)
+  return [`${encode(key)}=${encode(value)}`]
+}
+
+function serializeDefaultQueryParam(key: string, value: unknown): Array<string> {
   const search = new URLSearchParams()
+  appendQueryValue(search, key, value)
+  const result = search.toString()
+  return result ? [result] : []
+}
+
+/**
+ * Default query serializer. Members with `options` metadata follow their OpenAPI `style` / `explode`
+ * / `allowReserved`; members without it keep the defaults — arrays explode into repeated keys and
+ * nested objects use the `deepObject` style (`key[prop]=value`).
+ */
+export const defaultQuerySerializer: QuerySerializer = (params, options) => {
+  const parts: Array<string> = []
   for (const [key, value] of Object.entries(params)) {
-    appendQueryValue(search, key, value)
+    const paramOptions = options?.[key]
+    parts.push(...(paramOptions ? serializeStyledQueryParam(key, value, paramOptions) : serializeDefaultQueryParam(key, value)))
   }
-  return search.toString()
+  return parts.join('&')
 }
 
 function encodePathValue(value: unknown): string {
@@ -556,7 +611,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
-      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
+      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.queryStyles),
       data: body,
       transformRequest: (data) => data,
       signal: requestConfig.signal,
@@ -603,7 +658,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     return serializeUrl(
       [config.baseURL, requestConfig.baseURL, requestConfig.url],
       requestConfig.path ?? {},
-      querySerializer(query),
+      querySerializer(query, requestConfig.queryStyles),
       pathSerializer,
       requestConfig.pathStyles,
     )
