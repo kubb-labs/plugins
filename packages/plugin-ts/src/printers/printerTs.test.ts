@@ -264,6 +264,19 @@ describe('printerTs', () => {
       expect(await formatTS(result)).toMatchInlineSnapshot(`"42"`)
     })
 
+    it('single-value enum renders an inline literal even when its name is a registered enum (discriminator const)', async () => {
+      const p = printerTs({
+        resolver: resolverTs,
+        optionalType: 'questionToken',
+        arrayType: 'array',
+        enum: asConstEnum,
+        enumSchemaNames: new Set(['SUVTypeEnum']),
+      })
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'SUVTypeEnum', primitive: 'string', enumValues: ['SUV'] }))
+
+      expect(await formatTS(result)).toMatchInlineSnapshot(`"'SUV'"`)
+    })
+
     it('namedEnumValues take precedence over enumValues', async () => {
       const result = printer.transform(
         ast.factory.createSchema({

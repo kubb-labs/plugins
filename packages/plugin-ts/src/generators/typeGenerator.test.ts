@@ -668,6 +668,38 @@ describe('typeGenerator — const (single-value enum)', () => {
   })
 })
 
+describe('typeGenerator — single-value enum registered as a named enum (discriminator const)', () => {
+  // A single-member discriminator enum (e.g. SUV's `type`) is registered in `meta.enumNames`, yet
+  // it must still render as a bare literal with no runtime enum or `...Key` alias, regardless of
+  // the configured enum.type. Regression for kubb-labs/plugins#548.
+  const discriminatorConstSchema = ast.factory.createSchema({
+    type: 'enum',
+    name: 'SUVTypeEnum',
+    primitive: 'string',
+    enumValues: ['SUV'],
+  })
+
+  const enumTypes = ['asConst', 'enum', 'constEnum', 'literal', 'inlineLiteral'] as const
+
+  test.each(enumTypes.map((t) => ({ enumType: t })))('enumType $enumType — renders a literal even when registered in meta.enumNames', async ({ enumType }) => {
+    const options: PluginTs['resolvedOptions'] = { ...defaultOptions, enum: { ...defaultOptions.enum, type: enumType } }
+    const plugin = createMockedPlugin<PluginTs>({ name: 'plugin-ts', options, resolver: resolverTs })
+    const driver = createMockedPluginDriver({ name: `discriminatorConst ${enumType}` })
+
+    await renderGeneratorSchema(typeGenerator, discriminatorConstSchema, {
+      config: testConfig,
+      adapter: createMockedAdapter(),
+      driver,
+      plugin,
+      options,
+      resolver: resolverTs,
+      meta: { circularNames: [], enumNames: ['SUVTypeEnum'] },
+    })
+
+    await matchFiles(driver.fileManager.files, `discriminatorConst ${enumType}`)
+  })
+})
+
 describe('typeGenerator — enumType — empty string value', () => {
   const emptyStringEnumSchema = ast.factory.createSchema({
     type: 'enum',

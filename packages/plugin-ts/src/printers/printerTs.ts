@@ -179,9 +179,9 @@ export const printerTs = ast.createPrinter<PrinterTs>((options) => {
       enum(node) {
         const values = node.namedEnumValues?.map((v) => v.value) ?? node.enumValues ?? []
 
-        // A `const` (single-value enum) the adapter did not register as a named enum emits the bare
-        // literal regardless of `enum.type`, matching how its references resolve.
-        if (this.options.enum.type === 'inlineLiteral' || !node.name || isInlineConstEnum(node, this.options.enumSchemaNames)) {
+        // A single-value enum (an OAS 3.1 `const` or a one-member discriminator enum) emits the
+        // bare literal regardless of `enum.type`, matching how its references resolve.
+        if (this.options.enum.type === 'inlineLiteral' || !node.name || isInlineConstEnum(node)) {
           const literalNodes = values
             .filter((v): v is string | number | boolean => v !== null && v !== undefined)
             .map((value) => factory.constToTypeNode(value, typeof value as 'string' | 'number' | 'boolean'))

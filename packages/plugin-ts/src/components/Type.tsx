@@ -22,9 +22,9 @@ export function Type({ name, node, printer, enum: enumOptions, resolver }: Props
   const enumSchemaNodes = ast.collect<ast.EnumSchemaNode>(node, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.narrowSchema(n, ast.schemaTypes.enum)
-      // Skip an inline `const` (single-value enum the adapter did not register): it renders as a
-      // literal, so it gets no runtime enum declaration.
-      if (enumNode?.name && !isInlineConstEnum(enumNode, printer.options.enumSchemaNames)) return enumNode
+      // Skip a single-value enum (an OAS 3.1 `const` or a one-member discriminator enum): it
+      // renders as a literal, so it gets no runtime enum declaration.
+      if (enumNode?.name && !isInlineConstEnum(enumNode)) return enumNode
     },
   })
 

@@ -5,17 +5,16 @@ import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
 
 /**
- * Tells whether a `const` (single-value enum) should render as a bare literal type (`'active'`)
+ * Tells whether an enum holds a single value and should render as a bare literal type (`'active'`)
  * rather than a named enum reference or a runtime enum declaration.
  *
- * The parser folds `const` into a single-value enum node. The adapter decides which schemas are
- * named enums and lists them in `enumSchemaNames`, and references to those names get suffixed (for
- * example `StatusKey`). A const renders as a literal only when the adapter has not registered it as
- * a named enum, which keeps the declaration and its references in sync across adapter versions.
+ * A single-value enum is a constant: an OAS 3.1 `const`, or a one-member enum such as a
+ * discriminator constant. It always renders as a literal, ignoring the `enum.type` option and
+ * whether the adapter registered its name as a named enum. The declaration, the inline reference,
+ * and the suffix-naming all key off this helper, so they stay consistent.
  */
-export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: ReadonlySet<string>): boolean {
-  const isConst = (node.namedEnumValues ?? node.enumValues ?? []).length === 1
-  return isConst && !(node.name && enumSchemaNames?.has(node.name))
+export function isInlineConstEnum(node: ast.EnumSchemaNode): boolean {
+  return (node.namedEnumValues ?? node.enumValues ?? []).length === 1
 }
 
 /**

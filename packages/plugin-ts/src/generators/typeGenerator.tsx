@@ -40,9 +40,9 @@ export const typeGenerator = defineGenerator<PluginTs>({
     }))
 
     const enumNode = ast.narrowSchema(node, ast.schemaTypes.enum)
-    // An inline `const` (single-value enum the adapter did not register) renders as a literal type,
-    // so it keeps its plain name instead of the suffixed enum-key name.
-    const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode, enumSchemaNames)
+    // A single-value enum (an OAS 3.1 `const` or a one-member discriminator enum) renders as a
+    // literal type, so it keeps its plain name instead of the suffixed enum-key name.
+    const isEnumSchema = !!enumNode && !isInlineConstEnum(enumNode)
 
     const meta = {
       name:
