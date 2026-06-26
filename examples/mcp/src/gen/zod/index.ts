@@ -2,6 +2,7 @@ export {
   addFilesDataSchema,
   addFilesDataSchemaFormData,
   addFilesDataSchemaJson,
+  addFilesErrorSchema,
   addFilesResponseSchema,
   addFilesStatus200Schema,
   addFilesStatus405Schema,
@@ -13,6 +14,7 @@ export {
   addPetDataSchemaFormUrlEncoded,
   addPetDataSchemaJson,
   addPetDataSchemaXml,
+  addPetErrorSchema,
   addPetResponseSchema,
   addPetStatus200Schema,
   addPetStatus200SchemaJson,
@@ -23,6 +25,7 @@ export { apiResponseSchema } from './apiResponseSchema.js'
 export { categorySchema } from './categorySchema.js'
 export {
   createPetsDataSchema,
+  createPetsErrorSchema,
   createPetsHeaderXEXAMPLESchema,
   createPetsPathUuidSchema,
   createPetsQueryOffsetSchema,
@@ -31,9 +34,22 @@ export {
   createPetsStatusDefaultSchema,
 } from './createPetsSchema.js'
 export { createPetsXEXAMPLESchema } from './createPetsXEXAMPLESchema.js'
-export { deleteOrderPathOrderIdSchema, deleteOrderResponseSchema, deleteOrderStatus400Schema, deleteOrderStatus404Schema } from './deleteOrderSchema.js'
-export { deletePetHeaderApiKeySchema, deletePetPathPetIdSchema, deletePetResponseSchema, deletePetStatus400Schema } from './deletePetSchema.js'
 export {
+  deleteOrderErrorSchema,
+  deleteOrderPathOrderIdSchema,
+  deleteOrderResponseSchema,
+  deleteOrderStatus400Schema,
+  deleteOrderStatus404Schema,
+} from './deleteOrderSchema.js'
+export {
+  deletePetErrorSchema,
+  deletePetHeaderApiKeySchema,
+  deletePetPathPetIdSchema,
+  deletePetResponseSchema,
+  deletePetStatus400Schema,
+} from './deletePetSchema.js'
+export {
+  findPetsByStatusErrorSchema,
   findPetsByStatusPathStepIdSchema,
   findPetsByStatusResponseSchema,
   findPetsByStatusStatus200Schema,
@@ -42,6 +58,7 @@ export {
   findPetsByStatusStatus400Schema,
 } from './findPetsByStatusSchema.js'
 export {
+  findPetsByTagsErrorSchema,
   findPetsByTagsHeaderXEXAMPLESchema,
   findPetsByTagsQueryPageSchema,
   findPetsByTagsQueryPageSizeSchema,
@@ -55,6 +72,7 @@ export {
 export { findPetsByTagsXEXAMPLESchema } from './findPetsByTagsXEXAMPLESchema.js'
 export { getInventoryResponseSchema, getInventoryStatus200Schema } from './getInventorySchema.js'
 export {
+  getOrderByIdErrorSchema,
   getOrderByIdPathOrderIdSchema,
   getOrderByIdResponseSchema,
   getOrderByIdStatus200Schema,
@@ -64,6 +82,7 @@ export {
   getOrderByIdStatus404Schema,
 } from './getOrderByIdSchema.js'
 export {
+  getPetByIdErrorSchema,
   getPetByIdPathPetIdSchema,
   getPetByIdResponseSchema,
   getPetByIdStatus200Schema,
@@ -84,6 +103,7 @@ export {
   placeOrderPatchDataSchemaFormUrlEncoded,
   placeOrderPatchDataSchemaJson,
   placeOrderPatchDataSchemaXml,
+  placeOrderPatchErrorSchema,
   placeOrderPatchResponseSchema,
   placeOrderPatchStatus200Schema,
   placeOrderPatchStatus405Schema,
@@ -93,6 +113,7 @@ export {
   placeOrderDataSchemaFormUrlEncoded,
   placeOrderDataSchemaJson,
   placeOrderDataSchemaXml,
+  placeOrderErrorSchema,
   placeOrderResponseSchema,
   placeOrderStatus200Schema,
   placeOrderStatus405Schema,
@@ -103,6 +124,7 @@ export {
   updatePetDataSchemaFormUrlEncoded,
   updatePetDataSchemaJson,
   updatePetDataSchemaXml,
+  updatePetErrorSchema,
   updatePetResponseSchema,
   updatePetStatus200Schema,
   updatePetStatus200SchemaJson,
@@ -113,6 +135,7 @@ export {
   updatePetStatus405Schema,
 } from './updatePetSchema.js'
 export {
+  updatePetWithFormErrorSchema,
   updatePetWithFormPathPetIdSchema,
   updatePetWithFormQueryNameSchema,
   updatePetWithFormQueryStatusSchema,

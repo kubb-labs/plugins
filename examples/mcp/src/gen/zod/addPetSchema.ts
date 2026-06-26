@@ -20,6 +20,8 @@ export const addPetStatus405Schema = z.object({
 
 export const addPetResponseSchema = addPetStatus200Schema
 
+export const addPetErrorSchema = addPetStatus405Schema
+
 export const addPetDataSchemaJson = addPetRequestSchema.describe('Create a new pet in the store')
 
 export const addPetDataSchemaXml = petSchema.omit({ id: true }).describe('Create a new pet in the store')

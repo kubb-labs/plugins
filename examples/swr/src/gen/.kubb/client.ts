@@ -77,6 +77,22 @@ export type ResponseType = 'arraybuffer' | 'blob' | 'document' | 'json' | 'text'
 export type QuerySerializer = (params: Record<string, unknown>) => string
 
 /**
+ * Declarative query serialization knobs that mirror the OpenAPI 3.x `style` / `explode` /
+ * `allowReserved` model. Pass these to `createQuerySerializer`, or set them directly on a
+ * `querySerializer` config field instead of writing a `QuerySerializer` by hand.
+ *
+ * @example
+ * ```ts
+ * { array: { style: 'pipeDelimited', explode: false } }
+ * ```
+ */
+export type QuerySerializerOptions = {
+  array?: { style: 'form' | 'spaceDelimited' | 'pipeDelimited'; explode: boolean }
+  object?: { style: 'form' | 'deepObject'; explode: boolean }
+  allowReserved?: boolean
+}
+
+/**
  * Serializes the request body. JSON by default; `FormData`, `URLSearchParams`, `Blob`,
  * `ArrayBuffer`, and string bodies pass through untouched.
  */
@@ -84,7 +100,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => BodyInit |
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -131,9 +148,9 @@ export type RequestConfig<TBody = unknown, TRequest = Request, TResponse = Respo
   throwOnError?: boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: Transport<TRequest, TResponse>
-  querySerializer?: QuerySerializer
+  querySerializer?: QuerySerializer | QuerySerializerOptions
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -161,7 +178,7 @@ export type ClientConfig<TRequest = Request, TResponse = Response> = {
   credentials?: RequestCredentials
   throwOnError?: boolean
   transport?: Transport<TRequest, TResponse>
-  querySerializer?: QuerySerializer
+  querySerializer?: QuerySerializer | QuerySerializerOptions
   bodySerializer?: BodySerializer
   auth?: AuthResolver
 }
@@ -283,44 +300,110 @@ function isFormBody(body: unknown): body is BodyInit {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body as BodyInit
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
   return JSON.stringify(body)
 }
 
-function appendQueryValue(search: URLSearchParams, key: string, value: unknown): void {
+const arrayValueDelimiters = { form: ',', spaceDelimited: '%20', pipeDelimited: '|' } as const
+
+function encodeQueryPart(value: unknown, allowReserved: boolean | undefined): string {
+  return allowReserved ? String(value) : encodeURIComponent(String(value))
+}
+
+function appendQueryValue(parts: Array<string>, key: string, value: unknown, options: QuerySerializerOptions): void {
   if (value === undefined || value === null) return
+
   if (Array.isArray(value)) {
-    for (const item of value) appendQueryValue(search, key, item)
-    return
-  }
-  if (typeof value === 'object') {
-    for (const [prop, propValue] of Object.entries(value as Record<string, unknown>)) {
-      appendQueryValue(search, `${key}[${prop}]`, propValue)
+    if (value.length === 0) return
+    const { style, explode } = options.array ?? { style: 'form', explode: true }
+    if (explode) {
+      for (const item of value) appendQueryValue(parts, key, item, options)
+      return
     }
+    const joined = value.map((item) => encodeQueryPart(item, options.allowReserved)).join(arrayValueDelimiters[style])
+    parts.push(`${encodeQueryPart(key, options.allowReserved)}=${joined}`)
     return
   }
-  search.append(key, String(value))
+
+  if (typeof value === 'object') {
+    const { style, explode } = options.object ?? { style: 'deepObject', explode: true }
+    if (style === 'deepObject') {
+      for (const [prop, propValue] of Object.entries(value as Record<string, unknown>)) {
+        appendQueryValue(parts, `${key}[${prop}]`, propValue, options)
+      }
+      return
+    }
+    if (explode) {
+      for (const [prop, propValue] of Object.entries(value as Record<string, unknown>)) {
+        appendQueryValue(parts, prop, propValue, options)
+      }
+      return
+    }
+    const joined = Object.entries(value as Record<string, unknown>)
+      .flatMap(([prop, propValue]) => [prop, propValue])
+      .map((part) => encodeQueryPart(part, options.allowReserved))
+      .join(',')
+    parts.push(`${encodeQueryPart(key, options.allowReserved)}=${joined}`)
+    return
+  }
+
+  parts.push(`${encodeQueryPart(key, options.allowReserved)}=${encodeQueryPart(value, options.allowReserved)}`)
+}
+
+/**
+ * Builds a `QuerySerializer` from declarative options. Without options it reproduces the default:
+ * arrays explode into repeated keys (`form`) and nested objects use the `deepObject` style
+ * (`key[prop]=value`). `style`, `explode`, and `allowReserved` adjust each kind from there.
+ */
+export function createQuerySerializer(options: QuerySerializerOptions = {}): QuerySerializer {
+  return (params) => {
+    const parts: Array<string> = []
+    for (const [key, value] of Object.entries(params)) {
+      appendQueryValue(parts, key, value, options)
+    }
+    return parts.join('&')
+  }
 }
 
 /**
  * Default query serializer: arrays explode into repeated keys and nested objects use the
  * `deepObject` style (`key[prop]=value`).
  */
-export const defaultQuerySerializer: QuerySerializer = (params) => {
-  const search = new URLSearchParams()
-  for (const [key, value] of Object.entries(params)) {
-    appendQueryValue(search, key, value)
-  }
-  return search.toString()
+export const defaultQuerySerializer: QuerySerializer = createQuerySerializer()
+
+/**
+ * Resolves a `querySerializer` config value to a function: a function passes through, declarative
+ * options become a serializer, and an unset value falls back to the default.
+ */
+function resolveQuerySerializer(serializer: QuerySerializer | QuerySerializerOptions | undefined): QuerySerializer {
+  if (!serializer) return defaultQuerySerializer
+  return typeof serializer === 'function' ? serializer : createQuerySerializer(serializer)
 }
 
 function serializeHeaders(headers: HeadersInit | undefined): Record<string, string> {
@@ -435,13 +518,11 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const transport = requestConfig.transport ?? config.transport ?? defaultTransport
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
+    const querySerializer = resolveQuerySerializer(requestConfig.querySerializer ?? config.querySerializer)
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -454,13 +535,21 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
 
     const rawBody = requestConfig.body
     const validatedBody = await runParser(requestConfig.parser?.request, rawBody)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so the runtime appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const url = serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
 
     let resolvedRequest: ResolvedRequest = {
       url,
       method: (requestConfig.method ?? 'GET').toUpperCase(),
       headers,
-      body: bodySerializer(validatedBody, headers['Content-Type'] ?? headers['content-type']),
+      body,
       signal: requestConfig.signal,
       credentials: requestConfig.credentials,
       responseType: requestConfig.responseType,
@@ -486,11 +575,12 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     }
 
     const data = isSuccess ? await runParser(requestConfig.parser?.response, result.data) : undefined
+    const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, result.data)
 
     return {
       status: result.status,
       data,
-      error: isSuccess ? undefined : result.data,
+      error,
       request: result.request,
       response: result.response,
     }
@@ -502,7 +592,7 @@ export function createClientCore<TRequest = Request, TResponse = Response>(
     return config
   }
   client.getUrl = (requestConfig) => {
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
+    const querySerializer = resolveQuerySerializer(requestConfig.querySerializer ?? config.querySerializer)
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query))
   }
