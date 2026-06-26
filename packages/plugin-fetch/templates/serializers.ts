@@ -124,12 +124,11 @@ function isFormBody(body: unknown): body is BodyInit {
 function appendFormDataValue({ formData, key, value, contentType }: { formData: FormData; key: string; value: unknown; contentType?: string }): void {
   if (value === undefined || value === null) return
   if (value instanceof Blob) formData.append(key, value)
-  else if (value instanceof Date) formData.append(key, value.toISOString())
-  else if (typeof value === 'object') {
+  else if (typeof value === 'object' && !(value instanceof Date)) {
     const json = JSON.stringify(value)
     // A part's media type can only be set by wrapping the value in a typed Blob.
     formData.append(key, contentType ? new Blob([json], { type: contentType }) : json)
-  } else formData.append(key, String(value))
+  } else formData.append(key, toValue(value))
 }
 
 /**
@@ -239,6 +238,20 @@ function toValue(value: unknown): string {
 }
 
 /**
+ * Percent-encodes a value, keeping RFC 3986 reserved characters intact (used when `allowReserved` is set).
+ */
+function encodeReserved(value: unknown): string {
+  return encodeURI(toValue(value))
+}
+
+/**
+ * Percent-encodes a value, escaping reserved characters (the default query/path encoder).
+ */
+function encodeComponent(value: unknown): string {
+  return encodeURIComponent(toValue(value))
+}
+
+/**
  * Whether a value should expand into bracketed/keyed parts. Arrays and `Date` are excluded so they
  * are serialized as a unit (a `Date` becomes an ISO string, not its enumerable own properties).
  */
@@ -301,7 +314,7 @@ function serializeStyledQueryObject({
 
 function serializeStyledQueryParam({ key, value, options }: { key: string; value: unknown; options: QueryParamStyle }): Array<string> {
   if (value === undefined || value === null) return []
-  const encode = options.allowReserved ? (input: unknown) => encodeURI(toValue(input)) : (input: unknown) => encodeURIComponent(toValue(input))
+  const encode = options.allowReserved ? encodeReserved : encodeComponent
   if (Array.isArray(value)) return serializeStyledQueryArray({ key, value, options, encode })
   if (isRecord(value)) return serializeStyledQueryObject({ key, value, options, encode })
   return [`${encode(key)}=${encode(value)}`]
@@ -338,31 +351,27 @@ export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   return parts.join('&')
 }
 
-function encodePathValue(value: unknown): string {
-  return encodeURIComponent(toValue(value))
-}
-
 function serializePathPrimitive({ name, value, style }: { name: string; value: unknown; style: PathStyle }): string {
-  const encoded = encodePathValue(value)
+  const encoded = encodeComponent(value)
   if (style === 'label') return `.${encoded}`
   if (style === 'matrix') return `;${name}=${encoded}`
   return encoded
 }
 
 function serializePathArray({ name, value, style, explode }: { name: string; value: Array<unknown>; style: PathStyle; explode: boolean }): string {
-  const items = value.map(encodePathValue)
+  const items = value.map(encodeComponent)
   if (style === 'label') return `.${items.join(explode ? '.' : ',')}`
   if (style === 'matrix') return explode ? items.map((item) => `;${name}=${item}`).join('') : `;${name}=${items.join(',')}`
   return items.join(',')
 }
 
 function serializePathObject({ name, value, style, explode }: { name: string; value: Record<string, unknown>; style: PathStyle; explode: boolean }): string {
-  const entries = Object.entries(value)
-  const pairs = entries.map(([key, item]) => `${encodePathValue(key)}=${encodePathValue(item)}`)
-  const flat = entries.map(([key, item]) => `${encodePathValue(key)},${encodePathValue(item)}`)
-  if (style === 'label') return `.${explode ? pairs.join('.') : flat.join(',')}`
-  if (style === 'matrix') return explode ? pairs.map((pair) => `;${pair}`).join('') : `;${name}=${flat.join(',')}`
-  return (explode ? pairs : flat).join(',')
+  const members = Object.entries(value).map(([key, item]) =>
+    explode ? `${encodeComponent(key)}=${encodeComponent(item)}` : `${encodeComponent(key)},${encodeComponent(item)}`,
+  )
+  if (style === 'label') return `.${members.join(explode ? '.' : ',')}`
+  if (style === 'matrix') return explode ? members.map((member) => `;${member}`).join('') : `;${name}=${members.join(',')}`
+  return members.join(',')
 }
 
 /**
