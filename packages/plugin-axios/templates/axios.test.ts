@@ -1,6 +1,15 @@
 import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { describe, expect, test, vi } from 'vitest'
-import { type CallResult, createClientCore, defaultBodySerializer, defaultPathSerializer, defaultQuerySerializer, ResponseError, resolveAuth } from './axios.ts'
+import {
+  type CallResult,
+  createClientCore,
+  defaultBodySerializer,
+  defaultPathSerializer,
+  defaultQuerySerializer,
+  ResponseError,
+  resolveAuth,
+  serializeCookies,
+} from './axios.ts'
 
 type Programmed = { data?: unknown; status?: number; statusText?: string }
 
@@ -85,68 +94,68 @@ describe('defaultQuerySerializer', () => {
 
 describe('defaultPathSerializer', () => {
   test('simple style URL-encodes a primitive value', () => {
-    expect(defaultPathSerializer('id', 'a b')).toBe('a%20b')
+    expect(defaultPathSerializer({ name: 'id', value: 'a b' })).toBe('a%20b')
   })
 
   test('simple style joins array members with commas', () => {
-    expect(defaultPathSerializer('ids', [3, 4, 5])).toBe('3,4,5')
+    expect(defaultPathSerializer({ name: 'ids', value: [3, 4, 5] })).toBe('3,4,5')
   })
 
   test('simple style flattens objects to comma-separated key,value pairs', () => {
-    expect(defaultPathSerializer('point', { x: 1, y: 2 })).toBe('x,1,y,2')
+    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 } })).toBe('x,1,y,2')
   })
 
   test('simple style with explode renders objects as key=value pairs', () => {
-    expect(defaultPathSerializer('point', { x: 1, y: 2 }, { explode: true })).toBe('x=1,y=2')
+    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { explode: true } })).toBe('x=1,y=2')
   })
 
   test('label style prefixes a dot', () => {
-    expect(defaultPathSerializer('id', 5, { style: 'label' })).toBe('.5')
-    expect(defaultPathSerializer('ids', [3, 4], { style: 'label' })).toBe('.3,4')
-    expect(defaultPathSerializer('ids', [3, 4], { style: 'label', explode: true })).toBe('.3.4')
-    expect(defaultPathSerializer('point', { x: 1, y: 2 }, { style: 'label', explode: true })).toBe('.x=1.y=2')
+    expect(defaultPathSerializer({ name: 'id', value: 5, options: { style: 'label' } })).toBe('.5')
+    expect(defaultPathSerializer({ name: 'ids', value: [3, 4], options: { style: 'label' } })).toBe('.3,4')
+    expect(defaultPathSerializer({ name: 'ids', value: [3, 4], options: { style: 'label', explode: true } })).toBe('.3.4')
+    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'label', explode: true } })).toBe('.x=1.y=2')
   })
 
   test('matrix style prefixes a named segment', () => {
-    expect(defaultPathSerializer('id', 5, { style: 'matrix' })).toBe(';id=5')
-    expect(defaultPathSerializer('id', [3, 4], { style: 'matrix' })).toBe(';id=3,4')
-    expect(defaultPathSerializer('id', [3, 4], { style: 'matrix', explode: true })).toBe(';id=3;id=4')
-    expect(defaultPathSerializer('point', { x: 1, y: 2 }, { style: 'matrix', explode: true })).toBe(';x=1;y=2')
+    expect(defaultPathSerializer({ name: 'id', value: 5, options: { style: 'matrix' } })).toBe(';id=5')
+    expect(defaultPathSerializer({ name: 'id', value: [3, 4], options: { style: 'matrix' } })).toBe(';id=3,4')
+    expect(defaultPathSerializer({ name: 'id', value: [3, 4], options: { style: 'matrix', explode: true } })).toBe(';id=3;id=4')
+    expect(defaultPathSerializer({ name: 'point', value: { x: 1, y: 2 }, options: { style: 'matrix', explode: true } })).toBe(';x=1;y=2')
   })
 
   test('serializes undefined and null to an empty string', () => {
-    expect(defaultPathSerializer('id', undefined)).toBe('')
-    expect(defaultPathSerializer('id', null)).toBe('')
+    expect(defaultPathSerializer({ name: 'id', value: undefined })).toBe('')
+    expect(defaultPathSerializer({ name: 'id', value: null })).toBe('')
   })
 })
 
 describe('defaultBodySerializer', () => {
   test('JSON-serializes plain objects', () => {
-    expect(defaultBodySerializer({ name: 'odie' })).toBe('{"name":"odie"}')
+    expect(defaultBodySerializer({ body: { name: 'odie' } })).toBe('{"name":"odie"}')
   })
 
   test('passes FormData through untouched', () => {
     const formData = new FormData()
-    expect(defaultBodySerializer(formData)).toBe(formData)
+    expect(defaultBodySerializer({ body: formData })).toBe(formData)
   })
 
   test('encodes form-urlencoded objects as URLSearchParams', () => {
-    const body = defaultBodySerializer({ a: '1' }, 'application/x-www-form-urlencoded')
+    const body = defaultBodySerializer({ body: { a: '1' }, contentType: 'application/x-www-form-urlencoded' })
     expect(body).toBeInstanceOf(URLSearchParams)
   })
 
   test('builds FormData from a plain object for multipart/form-data', () => {
-    const body = defaultBodySerializer({ field: 'x' }, 'multipart/form-data')
+    const body = defaultBodySerializer({ body: { field: 'x' }, contentType: 'multipart/form-data' })
     expect(body).toBeInstanceOf(FormData)
     expect((body as FormData).get('field')).toBe('x')
   })
 
   test('passes Blob members through and serializes dates, objects, and arrays in multipart', () => {
     const file = new Blob(['hi'], { type: 'text/plain' })
-    const body = defaultBodySerializer(
-      { file, when: new Date('2020-01-01T00:00:00.000Z'), meta: { a: 1 }, tags: ['a', 'b'] },
-      'multipart/form-data',
-    ) as FormData
+    const body = defaultBodySerializer({
+      body: { file, when: new Date('2020-01-01T00:00:00.000Z'), meta: { a: 1 }, tags: ['a', 'b'] },
+      contentType: 'multipart/form-data',
+    }) as FormData
     expect(body.get('file')).toBeInstanceOf(Blob)
     expect(body.get('when')).toBe('2020-01-01T00:00:00.000Z')
     expect(body.get('meta')).toBe('{"a":1}')
@@ -155,7 +164,31 @@ describe('defaultBodySerializer', () => {
 
   test('passes a pre-built FormData through untouched for multipart', () => {
     const formData = new FormData()
-    expect(defaultBodySerializer(formData, 'multipart/form-data')).toBe(formData)
+    expect(defaultBodySerializer({ body: formData, contentType: 'multipart/form-data' })).toBe(formData)
+  })
+
+  test('honors per-property encoding for urlencoded bodies', () => {
+    const body = defaultBodySerializer({
+      body: { tags: ['a', 'b'], filter: { x: 1 } },
+      contentType: 'application/x-www-form-urlencoded',
+      encoding: { tags: { style: 'form', explode: false }, filter: { style: 'deepObject' } },
+    })
+    expect(body).toBe('tags=a,b&filter%5Bx%5D=1')
+  })
+})
+
+describe('serializeCookies', () => {
+  test('serializes primitives and arrays in form style', () => {
+    expect(serializeCookies({ session: 'abc', ids: [1, 2] })).toBe('session=abc; ids=1,2')
+  })
+
+  test('explodes arrays and objects when explode is set', () => {
+    expect(serializeCookies({ ids: [1, 2] }, { ids: { explode: true } })).toBe('ids=1; ids=2')
+    expect(serializeCookies({ filter: { a: 1, b: 2 } }, { filter: { explode: true } })).toBe('a=1; b=2')
+  })
+
+  test('skips undefined and null members', () => {
+    expect(serializeCookies({ a: 'x', b: undefined, c: null })).toBe('a=x')
   })
 })
 
@@ -229,6 +262,14 @@ describe('createClientCore', () => {
     expect(calls[0]?.data).toBe('{"name":"odie"}')
     const headers = calls[0]?.headers as Record<string, string>
     expect(headers['Content-Type']).toBe('application/json')
+  })
+
+  test('serializes cookie params into the Cookie header', async () => {
+    const { instance, calls } = fakeAxios()
+    const client = createClientCore({ transport: instance })
+    await client({ method: 'GET', url: '/pet', cookies: { session: 'abc', ids: [1, 2] } })
+    const headers = calls[0]?.headers as Record<string, string>
+    expect(headers.Cookie).toBe('session=abc; ids=1,2')
   })
 
   test('builds FormData and omits Content-Type for multipart/form-data', async () => {
@@ -399,7 +440,7 @@ describe('getUrl', () => {
   test('uses a per-call path serializer override', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: (_name, value) => `id-${value as string}` } })).toBe('/pet/id-7')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: ({ value }) => `id-${value as string}` } })).toBe('/pet/id-7')
   })
 
   test('applies pathStyles metadata to the matching placeholders', () => {
