@@ -250,6 +250,20 @@ describe('printerTs', () => {
       expect(await formatTS(result)).toMatchInlineSnapshot(`"'active' | 'inactive'"`)
     })
 
+    it('single-value enum (OAS 3.1 const) renders an inline literal even with a name and enumType=asConst', async () => {
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: asConstEnum })
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Status', primitive: 'string', enumValues: ['active'] }))
+
+      expect(await formatTS(result)).toMatchInlineSnapshot(`"'active'"`)
+    })
+
+    it('single-value enum (OAS 3.1 const) renders an inline literal with enumType=enum', async () => {
+      const p = printerTs({ resolver: resolverTs, optionalType: 'questionToken', arrayType: 'array', enum: enumEnum })
+      const result = p.transform(ast.factory.createSchema({ type: 'enum', name: 'Answer', primitive: 'number', enumValues: [42] }))
+
+      expect(await formatTS(result)).toMatchInlineSnapshot(`"42"`)
+    })
+
     it('namedEnumValues take precedence over enumValues', async () => {
       const result = printer.transform(
         ast.factory.createSchema({

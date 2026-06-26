@@ -5,6 +5,20 @@ import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
 
 /**
+ * Tells whether a `const` (single-value enum) should render as a bare literal type (`'active'`)
+ * rather than a named enum reference or a runtime enum declaration.
+ *
+ * The parser folds `const` into a single-value enum node. The adapter decides which schemas are
+ * named enums and lists them in `enumSchemaNames`, and references to those names get suffixed (for
+ * example `StatusKey`). A const renders as a literal only when the adapter has not registered it as
+ * a named enum, which keeps the declaration and its references in sync across adapter versions.
+ */
+export function isInlineConstEnum(node: ast.EnumSchemaNode, enumSchemaNames?: ReadonlySet<string>): boolean {
+  const isConst = (node.namedEnumValues ?? node.enumValues ?? []).length === 1
+  return isConst && !(node.name && enumSchemaNames?.has(node.name))
+}
+
+/**
  * Collects JSDoc annotation strings for a schema node.
  *
  * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@default`, `@example`, `@type`.
