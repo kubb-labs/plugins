@@ -116,8 +116,8 @@ export type CookieParamStyle = {
  *
  * @example
  * ```ts
- * // headerStyles: { 'X-Ids': { explode: false } }, header [3, 4] -> 'X-Ids: 3,4'
- * // headerStyles: { 'X-Filter': { explode: true } }, header { role: 'admin' } -> 'X-Filter: role=admin'
+ * // styles.header: { 'X-Ids': { explode: false } }, header [3, 4] -> 'X-Ids: 3,4'
+ * // styles.header: { 'X-Filter': { explode: true } }, header { role: 'admin' } -> 'X-Filter: role=admin'
  * ```
  */
 export type HeaderParamStyle = {
@@ -170,6 +170,18 @@ export type Serializers = {
 }
 
 /**
+ * The per-parameter serialization metadata a generated request carries, grouped by location. Each
+ * map is keyed by parameter name, mirroring the `serializer` grouping.
+ */
+export type RequestStyles = {
+  path?: Record<string, PathParamStyle>
+  query?: Record<string, QueryParamStyle>
+  header?: Record<string, HeaderParamStyle>
+  cookie?: Record<string, CookieParamStyle>
+  body?: Record<string, BodyEncoding>
+}
+
+/**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
  * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
  * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
@@ -209,16 +221,12 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   url?: string
   method?: 'GET' | 'PUT' | 'PATCH' | 'POST' | 'DELETE' | 'OPTIONS' | 'HEAD'
   path?: Record<string, unknown>
-  pathStyles?: Record<string, PathParamStyle>
   query?: unknown
-  queryStyles?: Record<string, QueryParamStyle>
   params?: unknown
   cookies?: Record<string, unknown>
-  cookieStyles?: Record<string, CookieParamStyle>
   body?: TBody
-  bodyEncoding?: Record<string, BodyEncoding>
   headers?: HeadersInit
-  headerStyles?: Record<string, HeaderParamStyle>
+  styles?: RequestStyles
   signal?: AbortSignal
   contentType?: string
   responseType?: ResponseType
@@ -742,7 +750,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
     const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
-    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.headerStyles))
+    const headers = mergeHeaders(config.headers, applyHeaderStyles(requestConfig.headers, requestConfig.styles?.header))
     const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
@@ -755,12 +763,12 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     })
 
     if (requestConfig.cookies) {
-      const cookie = serializeCookies(requestConfig.cookies, requestConfig.cookieStyles)
+      const cookie = serializeCookies(requestConfig.cookies, requestConfig.styles?.cookie)
       if (cookie) headers.Cookie = [headers.Cookie, cookie].filter(Boolean).join('; ')
     }
 
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
-    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.bodyEncoding })
+    const body = bodySerializer({ body: validatedBody, contentType: requestContentType, encoding: requestConfig.styles?.body })
     // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
     if (body instanceof FormData) {
       delete headers['Content-Type']
@@ -770,7 +778,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) =>
-      pathSerializer({ name: key, value: pathParams[key], options: requestConfig.pathStyles?.[key] }),
+      pathSerializer({ name: key, value: pathParams[key], options: requestConfig.styles?.path?.[key] }),
     )
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
 
@@ -783,7 +791,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       method: requestConfig.method ?? 'GET',
       headers,
       params: query,
-      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.queryStyles),
+      paramsSerializer: (params) => querySerializer(params as Record<string, unknown>, requestConfig.styles?.query),
       data: body,
       transformRequest: (data) => data,
       signal: requestConfig.signal,
@@ -830,9 +838,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     return serializeUrl({
       parts: [config.baseURL, requestConfig.baseURL, requestConfig.url],
       pathParams: requestConfig.path ?? {},
-      search: querySerializer(query, requestConfig.queryStyles),
+      search: querySerializer(query, requestConfig.styles?.query),
       pathSerializer,
-      pathStyles: requestConfig.pathStyles,
+      pathStyles: requestConfig.styles?.path,
     })
   }
   client.interceptors = interceptors
