@@ -92,6 +92,16 @@ export type BodySerializer = (body: unknown, contentType?: string) => unknown
 export type PathSerializer = (name: string, value: unknown) => string
 
 /**
+ * The per-concern serializers, grouped so they can be set in one place and overridden per client or
+ * per call. Each field falls back to the matching `default*Serializer` when omitted.
+ */
+export type Serializers = {
+  query?: QuerySerializer
+  body?: BodySerializer
+  path?: PathSerializer
+}
+
+/**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
  * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
  * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
@@ -142,9 +152,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   validateStatus?: (status: number) => boolean
   client?: ClientInstance<TRequest, TResponse>
   transport?: AxiosInstance
-  querySerializer?: QuerySerializer
-  bodySerializer?: BodySerializer
-  pathSerializer?: PathSerializer
+  serializer?: Serializers
   parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
@@ -173,9 +181,7 @@ export type ClientConfig = {
   throwOnError?: boolean
   validateStatus?: (status: number) => boolean
   transport?: AxiosInstance
-  querySerializer?: QuerySerializer
-  bodySerializer?: BodySerializer
-  pathSerializer?: PathSerializer
+  serializer?: Serializers
   auth?: AuthResolver
 }
 
@@ -472,9 +478,9 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
 
   const client = (async <TBody = unknown>(requestConfig: RequestConfig<TBody, TRequest, TResponse>): Promise<CallResult<TRequest, TResponse>> => {
     const activeInstance = requestConfig.transport ?? config.transport ?? instance
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
-    const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
-    const pathSerializer = requestConfig.pathSerializer ?? config.pathSerializer ?? defaultPathSerializer
+    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
+    const bodySerializer = requestConfig.serializer?.body ?? config.serializer?.body ?? defaultBodySerializer
+    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
     const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
@@ -551,8 +557,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     return config
   }
   client.getUrl = (requestConfig) => {
-    const querySerializer = requestConfig.querySerializer ?? config.querySerializer ?? defaultQuerySerializer
-    const pathSerializer = requestConfig.pathSerializer ?? config.pathSerializer ?? defaultPathSerializer
+    const querySerializer = requestConfig.serializer?.query ?? config.serializer?.query ?? defaultQuerySerializer
+    const pathSerializer = requestConfig.serializer?.path ?? config.serializer?.path ?? defaultPathSerializer
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
     return serializeUrl([config.baseURL, requestConfig.baseURL, requestConfig.url], requestConfig.path ?? {}, querySerializer(query), pathSerializer)
   }

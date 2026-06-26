@@ -324,16 +324,16 @@ describe('getUrl', () => {
     expect(client.getUrl({ baseURL: 'https://example.com', url: '/pet' })).toBe('https://example.com/pet')
   })
 
-  test('uses a per-call querySerializer override', () => {
+  test('uses a per-call query serializer override', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    expect(client.getUrl({ url: '/pet', query: { a: 1 }, querySerializer: () => 'custom=1' })).toBe('/pet?custom=1')
+    expect(client.getUrl({ url: '/pet', query: { a: 1 }, serializer: { query: () => 'custom=1' } })).toBe('/pet?custom=1')
   })
 
-  test('uses a per-call pathSerializer override', () => {
+  test('uses a per-call path serializer override', () => {
     const { instance } = fakeAxios()
     const client = createClientCore({ transport: instance })
-    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, pathSerializer: (_name, value) => `id-${value as string}` })).toBe('/pet/id-7')
+    expect(client.getUrl({ url: '/pet/{petId}', path: { petId: 7 }, serializer: { path: (_name, value) => `id-${value as string}` } })).toBe('/pet/id-7')
   })
 })
 
