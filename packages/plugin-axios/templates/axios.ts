@@ -113,6 +113,12 @@ export type CookieParamStyle = {
 /**
  * The per-parameter header serialization metadata carried by the generated request. Headers use the
  * OpenAPI `simple` style, so only `explode` is configurable.
+ *
+ * @example
+ * ```ts
+ * // headerStyles: { 'X-Ids': { explode: false } }, header [3, 4] -> 'X-Ids: 3,4'
+ * // headerStyles: { 'X-Filter': { explode: true } }, header { role: 'admin' } -> 'X-Filter: role=admin'
+ * ```
  */
 export type HeaderParamStyle = {
   explode?: boolean
@@ -351,6 +357,13 @@ function appendFormDataValue({ formData, key, value }: { formData: FormData; key
  * For `multipart/form-data` plain objects become `FormData` and for
  * `application/x-www-form-urlencoded` they become `URLSearchParams`. When `encoding` is supplied each
  * urlencoded property follows its OpenAPI `style` / `explode` / `allowReserved`.
+ *
+ * @example
+ * ```ts
+ * defaultBodySerializer({ body: { name: 'odie' } }) // '{"name":"odie"}'
+ * defaultBodySerializer({ body: { field: 'x' }, contentType: 'multipart/form-data' }) // FormData
+ * defaultBodySerializer({ body: { tags: ['a', 'b'] }, contentType: 'application/x-www-form-urlencoded', encoding: { tags: { explode: false } } }) // 'tags=a,b'
+ * ```
  */
 export const defaultBodySerializer: BodySerializer = ({ body, contentType, encoding }) => {
   if (body === undefined || body === null) return undefined
@@ -398,6 +411,12 @@ function serializeCookie({ name, value, explode }: { name: string; value: unknow
 /**
  * Serializes cookie parameters into a `Cookie` header value using the OpenAPI `form` style, joined
  * with `; `. Values are URL-encoded and `explode` is honored per parameter.
+ *
+ * @example
+ * ```ts
+ * serializeCookies({ session: 'abc', ids: [1, 2] }) // 'session=abc; ids=1,2'
+ * serializeCookies({ ids: [1, 2] }, { ids: { explode: true } }) // 'ids=1; ids=2'
+ * ```
  */
 export function serializeCookies(cookies: Record<string, unknown>, styles?: Record<string, CookieParamStyle>): string {
   const parts: Array<string> = []
@@ -486,6 +505,15 @@ function serializeDefaultQueryParam(key: string, value: unknown): Array<string> 
  * Default query serializer. Members with `options` metadata follow their OpenAPI `style` / `explode`
  * / `allowReserved`. Members without it keep the defaults: arrays explode into repeated keys and
  * nested objects use the `deepObject` style (`key[prop]=value`).
+ *
+ * @example
+ * ```ts
+ * defaultQuerySerializer({ id: [3, 4, 5] }) // 'id=3&id=4&id=5'
+ * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'form', explode: false } }) // 'id=3,4,5'
+ * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'spaceDelimited', explode: false } }) // 'id=3%204%205'
+ * defaultQuerySerializer({ id: [3, 4, 5] }, { id: { style: 'pipeDelimited', explode: false } }) // 'id=3|4|5'
+ * defaultQuerySerializer({ a: { b: 1 } }, { a: { style: 'deepObject' } }) // 'a%5Bb%5D=1'
+ * ```
  */
 export const defaultQuerySerializer: QuerySerializer = (params, options) => {
   const parts: Array<string> = []
@@ -527,6 +555,14 @@ function serializePathObject({ name, value, style, explode }: { name: string; va
  * Default path serializer honoring the OpenAPI `style` / `explode` metadata. Without metadata it
  * falls back to `simple` style with `explode: false`. Replaces the previous `String(value)`
  * interpolation, which emitted `[object Object]` for object path params.
+ *
+ * @example
+ * ```ts
+ * defaultPathSerializer({ name: 'id', value: [3, 4, 5] }) // '3,4,5'
+ * defaultPathSerializer({ name: 'id', value: [3, 4, 5], options: { style: 'label', explode: true } }) // '.3.4.5'
+ * defaultPathSerializer({ name: 'id', value: [3, 4, 5], options: { style: 'matrix', explode: true } }) // ';id=3;id=4;id=5'
+ * defaultPathSerializer({ name: 'pt', value: { x: 1, y: 2 } }) // 'x,1,y,2'
+ * ```
  */
 export const defaultPathSerializer: PathSerializer = ({ name, value, options }) => {
   if (value === undefined || value === null) return ''
