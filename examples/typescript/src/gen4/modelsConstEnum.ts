@@ -9,10 +9,6 @@ export const enum OrderParamsStatusEnum {
   delivered = 'delivered',
 }
 
-export const enum OrderStatus {
-  accepted = 'accepted',
-}
-
 export const enum OrderHttpStatusEnum {
   OrderHttpStatusEnum_200 = 200,
   OrderHttpStatusEnum_400 = 400,
@@ -103,7 +99,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | string
+  status?: 'accepted' | (string & {})
   /**
    * @description HTTP Status
    * @example 200

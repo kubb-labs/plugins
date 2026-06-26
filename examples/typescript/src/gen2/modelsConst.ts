@@ -11,12 +11,6 @@ export const orderParamsStatusEnum = {
 
 export type OrderParamsStatusEnumenumType = (typeof orderParamsStatusEnum)[keyof typeof orderParamsStatusEnum]
 
-export const orderStatus = {
-  accepted: 'accepted',
-} as const
-
-export type OrderStatusenumType = (typeof orderStatus)[keyof typeof orderStatus]
-
 export const orderHttpStatusEnum = {
   '200': 200,
   '400': 400,
@@ -121,7 +115,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatusenumType | string
+  status?: 'accepted' | (string & {})
   /**
    * @description HTTP Status
    * @example 200

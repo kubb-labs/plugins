@@ -1,8 +1,10 @@
-import type { CreatePetsBoolParamKey } from '../CreatePetsBoolParam.ts'
 import type { CreatePetsXEXAMPLEKey } from '../CreatePetsXEXAMPLE.ts'
 import type { PetNotFound } from '../PetNotFound.ts'
 
-export type CreatePetsQueryBoolParam = CreatePetsBoolParamKey | undefined
+/**
+ * @type boolean | undefined
+ */
+export type CreatePetsQueryBoolParam = true | undefined
 
 /**
  * @description UUID

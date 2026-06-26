@@ -11,11 +11,6 @@
 export type OrderParamsStatusEnum = 'placed' | 'approved' | 'delivered'
 
 /**
- * @type string
- */
-export type OrderStatus = 'accepted'
-
-/**
  * @description HTTP Status
  * @example 200
  * @type number
@@ -106,7 +101,7 @@ export type Order = {
   /**
    * @description Order Status
    */
-  status?: OrderStatus | string
+  status?: 'accepted' | (string & {})
   /**
    * @description HTTP Status
    * @example 200
