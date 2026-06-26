@@ -86,7 +86,8 @@ export type BodySerializer = (body: unknown, contentType?: string) => unknown
 
 /**
  * Parses a value before it is sent or after it is received, returning the parsed (and optionally
- * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` hooks.
+ * transformed) value. Wires zod parsing through the per-call `parser.request` / `parser.response` /
+ * `parser.error` hooks (`error` runs on the error body when a non-2xx call does not throw).
  */
 export type Parser<T = unknown> = (value: T) => T | Promise<T>
 
@@ -136,7 +137,7 @@ export type RequestConfig<TBody = unknown, TRequest = AxiosRequestConfig, TRespo
   transport?: AxiosInstance
   querySerializer?: QuerySerializer
   bodySerializer?: BodySerializer
-  parser?: { request?: Parser; response?: Parser }
+  parser?: { request?: Parser; response?: Parser; error?: Parser }
   security?: Array<Auth>
   auth?: AuthResolver
 }
@@ -254,13 +255,30 @@ function isFormBody(body: unknown): boolean {
   )
 }
 
+function appendFormDataValue(formData: FormData, key: string, value: unknown): void {
+  if (value === undefined || value === null) return
+  if (value instanceof Blob) formData.append(key, value)
+  else if (value instanceof Date) formData.append(key, value.toISOString())
+  else if (typeof value === 'object') formData.append(key, JSON.stringify(value))
+  else formData.append(key, String(value))
+}
+
 /**
  * Default body serializer: passes binary/form bodies through and JSON-serializes everything else.
- * For `application/x-www-form-urlencoded` plain objects become `URLSearchParams`.
+ * For `multipart/form-data` plain objects become `FormData` and for
+ * `application/x-www-form-urlencoded` they become `URLSearchParams`.
  */
 export const defaultBodySerializer: BodySerializer = (body, contentType) => {
   if (body === undefined || body === null) return undefined
   if (isFormBody(body)) return body
+  if (contentType?.includes('multipart/form-data')) {
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
+      if (Array.isArray(value)) for (const item of value) appendFormDataValue(formData, key, item)
+      else appendFormDataValue(formData, key, value)
+    }
+    return formData
+  }
   if (contentType?.includes('application/x-www-form-urlencoded')) {
     return new URLSearchParams(body as Record<string, string>)
   }
@@ -426,10 +444,7 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     const bodySerializer = requestConfig.bodySerializer ?? config.bodySerializer ?? defaultBodySerializer
 
     const headers = mergeHeaders(config.headers, requestConfig.headers)
-    if (requestConfig.contentType && requestConfig.contentType !== 'multipart/form-data') {
-      headers['Content-Type'] = requestConfig.contentType
-    }
-    const contentType = headers['Content-Type'] ?? headers['content-type']
+    const requestContentType = requestConfig.contentType ?? headers['Content-Type'] ?? headers['content-type']
 
     const query: Record<string, unknown> = { ...((requestConfig.query ?? requestConfig.params) as Record<string, unknown> | undefined) }
 
@@ -441,6 +456,14 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
     })
 
     const validatedBody = await runParser(requestConfig.parser?.request, requestConfig.body)
+    const body = bodySerializer(validatedBody, requestContentType)
+    // A FormData body must keep its Content-Type unset so axios appends the multipart boundary.
+    if (body instanceof FormData) {
+      delete headers['Content-Type']
+      delete headers['content-type']
+    } else if (requestConfig.contentType) {
+      headers['Content-Type'] = requestConfig.contentType
+    }
     const pathParams = requestConfig.path ?? {}
     const url = (requestConfig.url ?? '').replace(/\{([^{}]+)\}/g, (_, key: string) => encodeURIComponent(String(pathParams[key] ?? '')))
     const baseURL = [config.baseURL, requestConfig.baseURL].filter(Boolean).join('') || undefined
@@ -455,8 +478,8 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       headers,
       params: query,
       paramsSerializer: (params) => querySerializer(params as Record<string, unknown>),
-      data: validatedBody,
-      transformRequest: (data) => bodySerializer(data, contentType),
+      data: body,
+      transformRequest: (data) => data,
       signal: requestConfig.signal,
       responseType: requestConfig.responseType,
       validateStatus,
@@ -466,10 +489,11 @@ export function createClientCore<TRequest = AxiosRequestConfig, TResponse = Axio
       const response = await activeInstance.request<unknown, AxiosResponse>(axiosConfig)
       const isSuccess = response.status >= 200 && response.status < 300
       const data = isSuccess ? await runParser(requestConfig.parser?.response, response.data) : undefined
+      const error = isSuccess ? undefined : await runParser(requestConfig.parser?.error, response.data)
       return {
         status: response.status,
         data,
-        error: isSuccess ? undefined : response.data,
+        error,
         request: response.config as TRequest,
         response: response as TResponse,
       }

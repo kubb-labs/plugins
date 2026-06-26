@@ -33,3 +33,7 @@ export type GetOrderByIdStatus404SchemaType = z.infer<typeof getOrderByIdStatus4
 export const getOrderByIdResponseSchema = getOrderByIdStatus200Schema
 
 export type GetOrderByIdResponseSchemaType = z.infer<typeof getOrderByIdResponseSchema>
+
+export const getOrderByIdErrorSchema = z.union([getOrderByIdStatus400Schema, getOrderByIdStatus404Schema])
+
+export type GetOrderByIdErrorSchemaType = z.infer<typeof getOrderByIdErrorSchema>

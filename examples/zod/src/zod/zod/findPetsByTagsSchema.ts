@@ -41,3 +41,7 @@ export type FindPetsByTagsStatus400SchemaType = z.infer<typeof findPetsByTagsSta
 export const findPetsByTagsResponseSchema = findPetsByTagsStatus200Schema
 
 export type FindPetsByTagsResponseSchemaType = z.infer<typeof findPetsByTagsResponseSchema>
+
+export const findPetsByTagsErrorSchema = findPetsByTagsStatus400Schema
+
+export type FindPetsByTagsErrorSchemaType = z.infer<typeof findPetsByTagsErrorSchema>
