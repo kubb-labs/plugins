@@ -5,6 +5,16 @@ import { syncSchemaRef } from '@kubb/ast/utils'
 import type { ResolverTs } from './types.ts'
 
 /**
+ * Tells whether an enum node is an OAS 3.1 `const`: a schema constrained to exactly one value.
+ *
+ * The parser folds `const` into a single-value enum node, so the printer renders it as a bare
+ * literal type (`'active'`) instead of a named enum reference or a runtime enum declaration.
+ */
+export function isConstEnum(node: ast.EnumSchemaNode): boolean {
+  return (node.namedEnumValues ?? node.enumValues ?? []).length === 1
+}
+
+/**
  * Collects JSDoc annotation strings for a schema node.
  *
  * Only uses official JSDoc tags from https://jsdoc.app/: `@description`, `@deprecated`, `@default`, `@example`, `@type`.

@@ -3,6 +3,7 @@ import { File } from '@kubb/renderer-jsx'
 import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import type { PrinterTsFactory } from '../printers/printerTs.ts'
 import type { PluginTs, ResolverTs } from '../types.ts'
+import { isConstEnum } from '../utils.ts'
 import { Enum, getEnumNames } from './Enum.tsx'
 
 type Props = {
@@ -21,7 +22,9 @@ export function Type({ name, node, printer, enum: enumOptions, resolver }: Props
   const enumSchemaNodes = ast.collect<ast.EnumSchemaNode>(node, {
     schema(n): ast.EnumSchemaNode | undefined {
       const enumNode = ast.narrowSchema(n, ast.schemaTypes.enum)
-      if (enumNode?.name) return enumNode
+      // Skip single-value enums (OAS 3.1 `const`): they render as inline literals, so they get no
+      // runtime enum declaration.
+      if (enumNode?.name && !isConstEnum(enumNode)) return enumNode
     },
   })
 
