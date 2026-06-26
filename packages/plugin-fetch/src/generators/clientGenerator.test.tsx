@@ -138,6 +138,38 @@ const uploadFileNode = ast.factory.createOperation({
   ],
 })
 
+const listPetsStyledNode = ast.factory.createOperation({
+  operationId: 'listPetsStyled',
+  method: 'GET',
+  path: '/pets/{petId}',
+  tags: ['pet'],
+  parameters: [
+    ast.factory.createParameter({
+      name: 'petId',
+      in: 'path',
+      schema: ast.factory.createSchema({ type: 'integer' }),
+      required: true,
+      style: 'matrix',
+      explode: true,
+    }),
+    ast.factory.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+      required: false,
+      style: 'pipeDelimited',
+      explode: false,
+    }),
+  ],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   security: [{ bearerAuth: [] }],
   components: {
@@ -171,6 +203,8 @@ describe('clientGenerator operation', () => {
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
     // multipart/form-data request body bakes a `contentType` into the call config.
     { name: 'uploadFileMultipart', node: uploadFileNode, options: {} },
+    // Parameter style/explode flows from the ParameterNode into a `styles` call-config entry.
+    { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
     // Operation-level security overriding the global default, oauth2 reduced to bearer.
     { name: 'addPetWithSecurity', node: createPetNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },

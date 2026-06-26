@@ -8,6 +8,7 @@ import type { KubbReactNode } from '@kubb/renderer-jsx/types'
 import { buildReturnStatement } from '../builders/returnStatement.ts'
 import { type Auth, buildSecurityMetadata } from '../builders/security.ts'
 import { buildGroupedOptionsSignature } from '../builders/signature.ts'
+import { buildStylesMetadata } from '../builders/styles.ts'
 import { buildParserHooks } from '../builders/validator.ts'
 import type { ParserOptions } from '../types.ts'
 
@@ -52,6 +53,7 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
   const signature = buildGroupedOptionsSignature({ node, tsResolver })
   const parsers = buildParserHooks({ node, parser, zodResolver })
   const securityLiteral = buildSecurityMetadata({ security })
+  const stylesLiteral = buildStylesMetadata({ node })
 
   const { defaultContentType } = getContentTypeInfo(node)
   const hasRequestBody = Boolean(node.requestBody?.content?.[0]?.schema)
@@ -68,6 +70,7 @@ export function Operation({ name, node, tsResolver, zodResolver, parser, securit
     `method: '${node.method.toUpperCase()}'`,
     `url: '${Url.toCasedTemplate(node.path, { casing: 'camelcase' })}'`,
     securityLiteral ? `security: ${securityLiteral}` : null,
+    stylesLiteral ? `styles: ${stylesLiteral}` : null,
     parserLiteral,
     contentTypeLiteral,
     '...config',

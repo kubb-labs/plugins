@@ -15,5 +15,5 @@ import { client } from '../.kubb/client.ts'
 export function findPetsByStatus<ThrowOnError extends boolean = true>(options: Options<FindPetsByStatusRequestConfig, ThrowOnError>): Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>> {
   const { client: request = client, ...config } = options
 
-  return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
+  return request({ method: 'GET', url: '/pet/findByStatus', security: [{ type: 'oauth2' }], styles: { query: { status: { explode: true } } }, ...config }) as Promise<RequestResult<FindPetsByStatusResponses, ThrowOnError>>
 }
