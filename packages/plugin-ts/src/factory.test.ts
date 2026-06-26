@@ -473,6 +473,42 @@ describe('Code Generation', () => {
     expect(output).not.toMatch(/[\n{]\s*#0099ff:/)
     expect(output).not.toMatch(/[\n{]\s*#ccff9a:/)
   })
+
+  it('renders per-member descriptions as JSDoc on enum members', async () => {
+    const output = await formatTS(
+      createEnumDeclaration({
+        type: 'enum',
+        name: 'status',
+        typeName: 'Status',
+        enums: [
+          ['active', 'active', 'The resource is active'],
+          ['archived', 'archived', 'The resource is archived'],
+        ],
+      }),
+    )
+
+    expect(output).toContain('The resource is active')
+    expect(output).toContain('The resource is archived')
+    expect(output).toMatch(/\/\*\*[\s\S]*The resource is active[\s\S]*\*\/\s*active = 'active'/)
+  })
+
+  it('renders per-member descriptions as JSDoc on asConst members', async () => {
+    const output = await formatTS(
+      createEnumDeclaration({
+        type: 'asConst',
+        name: 'status',
+        typeName: 'StatusKey',
+        enums: [
+          ['active', 'active', 'The resource is active'],
+          ['archived', 'archived'],
+        ],
+      }),
+    )
+
+    expect(output).toMatch(/\/\*\*[\s\S]*The resource is active[\s\S]*\*\/\s*active: 'active'/)
+    // members without a description stay un-annotated
+    expect(output).not.toMatch(/\*\/\s*archived: 'archived'/)
+  })
 })
 
 describe('Import/Export Sorting Consistency', () => {
