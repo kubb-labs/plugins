@@ -96,6 +96,14 @@ describe('defaultQuerySerializer', () => {
     expect(defaultQuerySerializer({ filter: { role: 'admin' } }, { filter: { style: 'deepObject' } })).toBe('filter%5Brole%5D=admin')
   })
 
+  test('deepObject style recurses into nested objects', () => {
+    expect(defaultQuerySerializer({ a: { b: { c: 1 } } }, { a: { style: 'deepObject' } })).toBe('a%5Bb%5D%5Bc%5D=1')
+  })
+
+  test('serializes Date values as ISO-8601', () => {
+    expect(defaultQuerySerializer({ since: new Date('2020-01-02T03:04:05.000Z') })).toBe('since=2020-01-02T03%3A04%3A05.000Z')
+  })
+
   test('allowReserved leaves reserved characters unencoded', () => {
     expect(defaultQuerySerializer({ path: '/a/b' }, { path: { allowReserved: true } })).toBe('path=/a/b')
     expect(defaultQuerySerializer({ path: '/a/b' })).toBe('path=%2Fa%2Fb')
@@ -136,6 +144,10 @@ describe('defaultPathSerializer', () => {
   test('serializes undefined and null to an empty string', () => {
     expect(defaultPathSerializer({ name: 'id', value: undefined })).toBe('')
     expect(defaultPathSerializer({ name: 'id', value: null })).toBe('')
+  })
+
+  test('serializes a Date value as ISO-8601', () => {
+    expect(defaultPathSerializer({ name: 'since', value: new Date('2020-01-02T03:04:05.000Z') })).toBe('2020-01-02T03%3A04%3A05.000Z')
   })
 })
 
@@ -184,6 +196,18 @@ describe('defaultBodySerializer', () => {
       encoding: { tags: { style: 'form', explode: false }, filter: { style: 'deepObject' } },
     })
     expect(body).toBe('tags=a,b&filter%5Bx%5D=1')
+  })
+
+  test('applies a per-part content type from multipart encoding via a typed Blob', async () => {
+    const body = defaultBodySerializer({
+      body: { meta: { a: 1 } },
+      contentType: 'multipart/form-data',
+      encoding: { meta: { contentType: 'application/json' } },
+    }) as FormData
+    const part = body.get('meta')
+    expect(part).toBeInstanceOf(Blob)
+    expect((part as Blob).type).toBe('application/json')
+    expect(await (part as Blob).text()).toBe('{"a":1}')
   })
 })
 

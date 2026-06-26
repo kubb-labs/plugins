@@ -114,6 +114,38 @@ const createPetNode = ast.factory.createOperation({
   ],
 })
 
+const listPetsStyledNode = ast.factory.createOperation({
+  operationId: 'listPetsStyled',
+  method: 'GET',
+  path: '/pets/{petId}',
+  tags: ['pet'],
+  parameters: [
+    ast.factory.createParameter({
+      name: 'petId',
+      in: 'path',
+      schema: ast.factory.createSchema({ type: 'integer' }),
+      required: true,
+      style: 'matrix',
+      explode: true,
+    }),
+    ast.factory.createParameter({
+      name: 'tags',
+      in: 'query',
+      schema: ast.factory.createSchema({ type: 'array', items: [ast.factory.createSchema({ type: 'string' })] }),
+      required: false,
+      style: 'pipeDelimited',
+      explode: false,
+    }),
+  ],
+  responses: [
+    ast.factory.createResponse({
+      statusCode: '200',
+      schema: ast.factory.createSchema({ type: 'object', properties: [] }),
+      description: 'successful operation',
+    }),
+  ],
+})
+
 const securityDocument: SecurityDocument = {
   components: {
     securitySchemes: {
@@ -140,6 +172,8 @@ describe('clientGenerator operation', () => {
     { name: 'getProject', node: getProjectNode, options: {} },
     { name: 'deletePetNoContent', node: deletePetNode, options: {} },
     { name: 'addPetMultiStatus', node: createPetNode, options: {} },
+    // Parameter style/explode flows from the ParameterNode into a `styles` call-config entry.
+    { name: 'listPetsWithStyles', node: listPetsStyledNode, options: {} },
     { name: 'addPetMultiStatusWithZod', node: createPetNode, options: { parser: 'zod' as const } },
     // Two requirements referencing two schemes (oauth2 bearer + apiKey header).
     { name: 'getPetByIdWithSecurity', node: getPetByIdNode, options: {}, adapter: mockedAdapterWithDocument(securityDocument) },
