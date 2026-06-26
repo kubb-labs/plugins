@@ -1,5 +1,13 @@
 # @kubb/plugin-swr
 
+## 5.0.0-beta.77
+
+### Patch Changes
+
+- Updated dependencies [[`fae9f47`](https://github.com/kubb-labs/plugins/commit/fae9f470468870ed7015f2c910fd817c7e7daeef), [`455e6f1`](https://github.com/kubb-labs/plugins/commit/455e6f1c1f9047fb5cb7d4d12038dc2b5eb4422a)]:
+  - @kubb/plugin-ts@5.0.0-beta.77
+  - @kubb/plugin-zod@5.0.0-beta.77
+
 ## 5.0.0-beta.76
 
 ### Patch Changes
