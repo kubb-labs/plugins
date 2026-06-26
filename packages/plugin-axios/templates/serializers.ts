@@ -67,7 +67,7 @@ export type BodyEncoding = SerializationStyle<QueryStyle> & {
  * `ArrayBuffer`, and string bodies pass through untouched. The optional `encoding` argument carries
  * the per-property OpenAPI `encoding` metadata for form bodies.
  */
-export type BodySerializer = (args: { body: unknown; contentType?: string; encoding?: Record<string, BodyEncoding> }) => unknown
+export type BodySerializer = (args: { body: unknown; contentType?: string; encoding?: Record<string, BodyEncoding> }) => BodyInit | undefined
 
 /**
  * The OpenAPI path-parameter serialization style. `simple` is the default and emits the bare value;
@@ -110,7 +110,7 @@ export type RequestStyles = {
   body?: Record<string, BodyEncoding>
 }
 
-function isFormBody(body: unknown): boolean {
+function isFormBody(body: unknown): body is BodyInit {
   return (
     body instanceof FormData ||
     body instanceof URLSearchParams ||
@@ -144,7 +144,7 @@ function appendFormDataValue({ formData, key, value }: { formData: FormData; key
  */
 export const defaultBodySerializer: BodySerializer = ({ body, contentType, encoding }) => {
   if (body === undefined || body === null) return undefined
-  if (isFormBody(body)) return body
+  if (isFormBody(body)) return body as BodyInit
   if (contentType?.includes('multipart/form-data')) {
     const formData = new FormData()
     for (const [key, value] of Object.entries(body as Record<string, unknown>)) {
