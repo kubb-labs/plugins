@@ -1,5 +1,6 @@
 ---
 "@kubb/plugin-fetch": minor
+"@kubb/plugin-axios": minor
 ---
 
 Generated parser expressions now call `validateStandardSchema(Schema, data)` instead of `.parse(data)`.
